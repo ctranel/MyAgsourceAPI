@@ -1,0 +1,10 @@
+@CHARSET "UTF-8";
+/* tooltip styles */
+.tip-link {font-size: .8em;}
+a.tooltip {text-decoration: underline;}
+a.tooltip:hover {cursor:pointer;}
+
+.qtip-content table {border-collapse: collapse;}
+.qtip-content td {border: solid 1px #000; padding: 4px;}
+a.qtip-button, a.qtip-button:hover {color:#fff;}
+/* end tooltip styles */

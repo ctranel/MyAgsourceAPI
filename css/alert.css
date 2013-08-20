@@ -1,0 +1,11 @@
+@CHARSET "UTF-8";
+table#scc, table#scc-by-contrib {width:100%; margin-bottom: 30px;}
+table#scc td, table#scc-by-contrib td {border: solid 1px #000;}
+#herd-info {max-width:1024px;}
+#herd-text {float:right; margin: 0 0 15px 12px; padding-bottom: 10px; border: solid 1px #004147; -moz-border-radius: 7px; -webkit-border-radius: 7px;}
+#herd-text h3 {color:#fff; background: #004147 none; padding: 2px 0 5px 5px; margin: 0 0 6px; border: solid 1px #004147; -moz-border-radius: 3px 3px 0 0; -webkit-border-radius: 3px 3px 0 0;}
+#herd-text div {margin: 2px 10px;}
+h2 {clear:both;}
+
+.jqPlot {clear: left;}
+.chart-container {margin: 0 auto;}

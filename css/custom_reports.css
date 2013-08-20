@@ -1,0 +1,43 @@
+@CHARSET "ISO-8859-1";
+
+.form-grouping {border: solid 1px #000; margin: 0 0 20px 15.5em; padding: 5px;}
+.form-subgrouping {border: solid 1px #999; margin: 0 auto; overflow: auto;}
+
+.field-target{background-color:#B0D9DB;}
+
+.remove-fld, .add-fld, .remove-head, .remove-col, .remove-trend-col{font-weight:bold; color:#d33;}
+.split {font-weight: normal; font-size: 80%; padding-right:20px; text-decoration:underline;}
+
+.table-only {display:none;}
+.chart-only {display:none;}
+
+/* GENERAL BLOCK FIELDS */
+#choose-field {float:left; border:solid 1px #000; padding: 8px; width: 14em;}
+#choose_table_id {display: none;}
+/* END GENERAL BLOCK FIELDS */
+
+/* FIELD LISTING ("DRAG FROM" CONTAINER) */
+#field-container{height:15em; overflow:auto; border: solid 1px #999; background-color:#B0D9DB;}
+/* END FIELD LISTING ("DRAG FROM" CONTAINER) */
+
+/* BUILD SELECT FIELDS */
+/* tables and charts */
+
+/* tables only */
+#table-build .fields-in {border-top:double 8px black;}
+#table-build {border-collapse:collapse;}
+#table-build td, #table-build th {border: solid 1px black;}
+
+/* charts only */
+#yaxis {float: left; margin: 1em .5em 0 .75em;}
+/* #yaxis input {display:block;}
+#yaxis input.checkbox {display:inline;} */
+#xaxis {text-align:center;}
+#trend-build .fields-in th {display:block;}
+#trend-build {min-height: 10em; border-left:solid 3px black; border-bottom:solid 3px black; padding: 12px;}
+#trend-build td, #trend-build th {border: solid 1px black; padding:.15em;}
+
+/* END BUILD SELECT FIELDS */
+
+#set-group-by {display: none;}
+

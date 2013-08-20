@@ -1,0 +1,63 @@
+#graph-canvas{background:transparent url('i/AgSource_watermark.gif') no-repeat center 70px;text-align:center}.highcharts-container{border:solid 1px #cococo}
+@CHARSET "UTF-8";sub{color:#003E3F;font-size:80%;font-family:"Arial Narrow","Arial","Verdana",sans-serif}#main-report{border-collapse:collapse;clear:both;margin:0
+auto;max-width:100%}.tbl{border-collapse:collapse;clear:both;border:solid 1px #000;margin:0
+auto}.tbl
+td{padding:1px
+6px}h2.block{color:#004147;font-weight:normal;text-align:center;font-family:"Helvetica","Arial","Verdana",sans-serif;margin:0
+0 0 37px;padding:0;white-space:nowrap;overflow:visible}h3.block{color:#6d869f;font:normal 12px "Lucida Grande", "Lucida Sans Unicode", Verdana, Arial, Helvetica, sans-serif;text-align:center;margin:0
+0 3px 37px;padding:0;white-space:nowrap;overflow:visible;background:none}th.cat-heading,th.subcat-heading{font-size:.85em;text-align:center;border:solid 1px #000;vertical-align:bottom;padding:2px}th.cat-heading, th.cat-heading
+a{color:#004147;background-color:#C1B57C;white-space:nowrap}th.subcat-heading, th.subcat-heading
+a{color:#DBFFD4;background-color:#1B9E9F;font-size:.85em;font-weight:normal}th span.hide-column{cursor:pointer}.hide-column{display:none;font-size:50%;color:#a22}#main-report
+td{font-size:.8em;text-align:center;border:solid 1px #000;font-weight:normal}.table-wrapper{clear:both;display:none;margin:20px
+auto 0;text-align:center}.table-wrapper
+td{text-align:left}.table-section{display:inline-block;margin:0
+auto}.table-container{display:inline-block}.open-download-menu{float:right;cursor:pointer}.downloads-container{margin-right:10px;float:right}a.download-links{font-family:"Lucida Grande","Lucida Sans Unicode",Verdana,Arial,Helvetica,sans-serif;text-decoration:none;cursor:pointer;padding:0pt 5px;display:block}a.download-links:hover{color:#F1F8F8;background-color:#004147}.download-link-wrapper{cursor:pointer;background:none repeat scroll 0% 0% transparent;color:rgb(48,48,48);font-size:11px;white-space:nowrap}.download-links-container{box-shadow:3px 3px 10px rgb(136, 136, 136);border:1px
+solid rgb(160, 160, 160);background:none repeat scroll 0% 0% rgb(255, 255, 255);position:relative;top:6px;right:0;list-style:none outside none;padding:0;margin-bottom: -20px;display:none}#herd-info{max-width:50%}#herd-text,#quartile-herd{float:left;margin:15px
+10px}#herd-text
+label{margin:0
+5px 0 0;color:#004147;background-color:#fff}#herd-text{text-align:left;font-size: .9em}#comments{position:absolute;right:120px;border:solid 1px #000;min-width:150px;min-height:100px;max-width:25%;text-align:left;vertical-align:top;padding:15px}#report-links{border:solid 1px #004147;margin:15px
+auto;padding:10px;background-color:#F1F8F8;clear:left}ul.report-nav,ul.pstring-nav{margin:0;list-style:none;border:none;padding-left:5px}ul.report-nav,ul.pstring-nav{display:inline;margin:0;list-style:none;border:none}ul.report-nav li, ul.pstring-nav
+li{display:inline;padding:0px
+5px;border-left:solid 1px #004147;margin:0
+0 0 -5px}ul.report-nav li.first, ul.pstring-nav
+li.first{border-left:none}ul.report-nav li a, ul.pstring-nav li
+a{text-decoration:none;font:normal .8em helvetica,arial,sans-serif;color:#004147}ul.report-nav li a:hover, ul.pstring-nav li a:hover{text-decoration:underline}ul.report-nav li a.sel, ul.pstring-nav li
+a.sel{font-weight:bold;text-decoration:underline}.subnav{margin-left:20px}.jqPlot{clear:left}.chart-container{margin:0
+auto}#filters{display:none}#herd-text{}#herd-text .general-herd{}#herd-text .report-specific{float:right}.section-header{font-weight:bold}#main-report td.sum-label{white-space:normal;font-weight:bold}th.cat-heading, th.cat-heading
+a{white-space:normal}tr#herd-avg
+td{border-top:solid 2px black}
+
+@CHARSET "UTF-8";h1{margin:0;padding:0
+0 10px}img,embed,object,video{border:none;max-width:100%}sup{font-size: .7em}#main-content{padding:0
+10px;text-align:left}td.menu-padding{width:20px}p{padding:0
+0 5px}#header{height:127px;background:#C8C488 url("http://agsource.crinet.com/images/AgSource-Cooperative-Services/img-header-lft.gif") no-repeat left top;padding:0;clear:both}#header
+a{text-decoration:none}.header-link{width:342px;height:127px}ul.primary-nav{background-image:url("http://agsource.crinet.com/images/Common-Images/navbar-stretch.gif");background-repeat:repeat-x;color:#FFF;font-size:9pt;height:25px;padding:5px
+0;margin:0}ul.primary-nav
+li{float:left;border-left:solid 1px #B0D9DB;list-style:none;padding:0
+10px}ul.primary-nav
+li.first{border-left:none}#container{margin:0
+auto;display:table;border:solid 2px #E8E8E8}#header{background-color:#CAC68A}a, .footer a:link,a:hover,a:active,a:visited{color:#004147}.important-message{font-size:1.3em;color:#004147;background-color:inherit;font-weight:bold}ul.primary-nav{white-space:nowrap}ul.primary-nav li.sectionnav, ul.primary-nav li.sectionnav ul, ul.primary-nav li.groupnav, ul.primary-nav li.groupnav
+ul{float:right;margin:0;list-style:none;border:none}ul.primary-nav li.sectionnav, ul.primary-nav
+li.groupnav{padding:0
+5px 0 0;width:120px}ul.primary-nav
+li.groupnav{padding:0
+5px 0 0;width:75px}ul.primary-nav li.sectionnav ul, ul.primary-nav li.groupnav
+ul{position:relative;cursor:pointer;visibility:hidden;margin:5px
+-5px 0 0;height:1px;overflow:visible}ul.primary-nav li.sectionnav ul li, ul.primary-nav li.groupnav ul
+li{margin:0;padding:5px;float:none;border-bottom:solid 1px #004147;border-left:solid 1px #004147;border-right:solid 1px #004147;background-color:#B0D9DB}ul.primary-nav li.sectionnav ul li a, ul.primary-nav li.groupnav ul li
+a{text-decoration:none;font:normal .8em helvetica,arial,sans-serif;color:#004147;display:block;text-align:left}ul.primary-nav li
+a{white-space:nowrap;color:#B0D9DB;font-size:9pt;padding:0;text-align:center;text-decoration:none;text-transform:uppercase}ul#session-nav{margin:0;padding:5px
+0 0;list-style:none}ul#session-nav
+li{padding:0
+5px;margin:0;float:right;line-height:1.1em;border-left:solid 1px #666;border-right:solid 1px #666}ul#session-nav
+a{text-decoration:none}ul#session-nav{float:right}.hover{display:block}#inter-section-nav{background-color:#262626;color:#ccc;float:left;width:100%}#inter-section-nav
+ul{list-style:none;margin:0;padding:0}#inter-section-nav
+li{float:left;padding:5px
+8px;white-space:nowrap;border-left:solid 1px #555}#inter-section-nav
+li.first{border:none}#inter-section-nav li
+a{text-decoration:none;display:block;background-color:#262626;color:#ccc}#inter-section-nav
+li.current{background-color:#555;border-top:solid 2px #f00}#inter-section-nav li.current
+a{background-color:#555}label, fieldset
+legend{color:#004147}label{display:inline}label:after{content:":"}input.require,input.required,select.require{background-color:#9CD7DD}label
+require{color:#004147}.odd{background-color:#fff;color:#000}.even{background-color:#D3D09E;color:#000}#infoMessage p,#infoMessage{background-color:#fff;color:#f00}div#infoMessage{margin:0
+0 10px 0}

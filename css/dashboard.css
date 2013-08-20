@@ -1,0 +1,24 @@
+@CHARSET "UTF-8";
+
+#main-content {padding: 15px 0 !important;}
+div{background: none transparent scroll repeat 0% 0%}
+  
+ .d-column {float: left; width:32%; height:100%; padding: 0 0 17px;}
+ #d-sections {margin-left: 1%;}
+ .d-space {float:left; width:1%;}
+ #d-full-width {clear:left; width:97%; margin: 10px auto;}
+ .widget {margin: 0 0 3px 0; width: 100%; border: solid 1px #004147; border-radius: 7px;}
+ /*.widget h2 {color:#fff; background-color: #004147; padding: 4px 0 4px 5px; border: solid 1px #004147; border-radius: 3px 3px 0 0;}*/
+ .widget-content {overflow: auto; padding: 5px 7px; max-height:330px; overflow:auto;}
+.widget-bottom {color:#fff; background-color: #004147; padding: 5px 0 0 5px; border: solid 1px #004147; border-radius: 0 0 3px 3px;}
+ .widget-bottom a:link, .widget-bottom a:hover, .widget-bottom a:active, .widget-bottom a:visited {color:#fff; font-size: .75em; background-color: #004147; text-decoration: none;}
+
+ .likert {text-align:center;}
+  #youtube {text-align:center;}
+  
+  #dairy-feed h3 {margin: 10px 0 0; padding: 0; background-color: #fff; background-image:none;}
+  #dairy-feed .date {font-size: .75em;}
+  
+  
+.lt-768 .widget-content {padding: 0px;}
+.lt-768 .d-column {float: none; width:auto; height:100%;}

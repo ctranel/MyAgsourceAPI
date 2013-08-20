@@ -1,0 +1,112 @@
+@CHARSET "UTF-8";.accordion-section{border:solid 1px #004147;margin:0
+0 3px}.accordion
+h2{background-color:#004147;border:1px
+solid #004147;border-radius:3px 3px 0 0;color:#FFF;padding:4px
+0 4px 5px;margin:0}.accordion h2
+a{background-color:#004147;color:#FFF;test-decoration:none}.accordion h2+div{height:0;overflow:hidden;-webkit-transition:height 0.3s ease-in;–moz-transition: height 0.3s ease-in;–ms-transition: height 0.3s ease-in;–o-transition: height 0.3s ease-in;transition:height 0.3s ease-in}.lt-ie9 .accordion h2+div{height:auto;margin:0
+0 18px}.accordion :target h2+div{padding:10px;height:auto}.accordion .accordion-section.large:target h2+div{overflow:auto}
+body{font-family:helvetica,arial,sans-serif;background-color:#FFF;margin:0px}form{margin:0px;padding:0px}h1{font-family:"Helvetica","Arial","Verdana",sans-serif;font-size:16pt;font-weight:bold;padding:0px
+0px 10px 0px;margin:0px}h2{font-family:"Helvetica","Arial","Verdana",sans-serif;font-size:12pt;padding:0px
+0px 10px 0px;margin:0px}h3{font-family:"Helvetica","Arial","Verdana",sans-serif;font-size:12pt;font-weight:900;background-color:#92C2C2;background-image:url('http://agsource.crinet.com/css/../images/Common-Images/h3bg.gif');background-repeat:repeat-x;padding:2px
+0px 1px 6px;margin:0px
+0px 18px 0px}p{padding:0px
+0px 15px 0px;margin:0px}.content a, .content a:link, .content a:hover, .content a:visited, .content a:active{color:#00959b}tr.teal_banner{height:25px;font-size:9pt;padding:0px
+0px 0px 0px;color:#FFF;background-image:url(http://agsource.crinet.com/css/../images/Common-Images/navbar-stretch.gif);background-repeat:repeat-x}tr.teal_banner
+td{text-align:center}a.teal_banner,a:link.teal_banner,a:active.teal_banner,a:visited.teal_banner{color:#B0D9DB;text-transform:uppercase;text-decoration:none;text-align:center;font-size:9pt;padding:0px
+0px 0px 0px}a:hover.teal_banner{color:#FFF;text-transform:uppercase;text-decoration:none;text-align:center;font-size:9pt;padding:0px
+0px 0px 0px}.tall_shaded{background-image:url(http://agsource.crinet.com/css/../images/AgSource-Cooperative-Services/subhead-newproducts.gif);background-repeat:repeat-x;width:497px;height:20px;text-align:left;padding:6px
+0px 4px 14px;font-size:18px;font-weight:900;font-style:italic;margin:0px}h2.tall_shaded{background-image:url(http://agsource.crinet.com/css/../images/AgSource-Cooperative-Services/subhead-newproducts.gif);background-repeat:repeat-x;width:497px;height:20px;text-align:left;padding:6px
+0px 4px 14px;font-size:18px;font-weight:900;font-style:italic;margin:0px}div.tall_shaded{background-image:url(http://agsource.crinet.com/css/../images/AgSource-Cooperative-Services/subhead-newproducts.gif);background-repeat:repeat-x;width:497px;height:20px;text-align:left;padding:6px
+0px 4px 14px;font-size:18px;font-weight:900;font-style:italic;margin:0px}h2.short_shaded{background-image:url(http://agsource.crinet.com/css/../images/AgSource-Cooperative-Services/subhead-featuredprod.jpg);background-repeat:repeat-x;width:497px;height:20px;text-align:left;padding:6px
+0px 4px 14px;font-size:18px;font-weight:900;font-style:italic;margin:0px}h2.unrelated_tall_shaded{background-image:url(http://agsource.crinet.com/css/../images/AgSource-Cooperative-Services/subhead-newproducts.gif);background-repeat:repeat-x;width:711px;height:20px;text-align:left;padding:6px
+0px 4px 14px;font-size:18px;font-weight:900;font-style:italic;margin:0px}h2.category_shaded{background-image:url(http://agsource.crinet.com/css/../images/AgSource-Cooperative-Services/subhead-newproducts.gif);background-repeat:repeat-x;width:715px;height:20px;text-align:left;padding:6px
+0px 4px 14px;font-size:18px;font-weight:900;font-style:italic;margin:0px}.shadow_left{background-image:url(http://agsource.crinet.com/css/../images/Common-Images/dropshdw-left.gif);background-repeat:repeat-y;width:7px;text-align:right}.shadow_right{background-image:url(http://agsource.crinet.com/css/../images/Common-Images/dropshdw-right.gif);background-repeat:repeat-y;width:7px;text-align:left}td.page_header{background-image:url(http://agsource.crinet.com/css/../images/AgSource-Cooperative-Services/img-header.gif);background-repeat:no-repeat;width:769px;height:124px;vertical-align:bottom;text-align:right}div.search_box{background-image:url(http://agsource.crinet.com/css/../images/AgSource-Cooperative-Services/header-searchbox-backg.jpg);background-repeat:no-repeat;background-position:0% 0%;width:210px;height:37px;text-align:left}.search_input{height:22px;width:137px;color:#676566;font-size:8pt}td.content{font-family:helvetica,arial,sans-serif;font-size:10pt;padding:10px
+10px 0px 10px}div.content{font-family:helvetica,arial,sans-serif;font-size:10pt;padding:10px
+5px 0px 10px;text-align:left;font-size:10pt}div.quicklinks{padding:10px
+0px 0px 10px;text-align:left;font-size:10pt}ul.ql_list{text-align:left;padding:0px
+0px 0px 15px;margin:0px
+0px 0px 0px;list-style-position:outside}div.quicklinks_header{padding:10px
+0px 0px 10px;text-align:left;font-size:10pt;font-weight:bold}.supercategory{width:182px;height:55px;background-image:url(http://agsource.crinet.com/css/../images/AgSource-Cooperative-Services/subnav-box.gif);background-repeat:repeat-x;padding:10px
+0px 0px 10px;font-size:11pt;font-weight:bold;text-align:left}.arrow{padding:0px
+0px 3px 6px;width:13px;vertical-align:middle;margin:0px}.category{width:180px;text-align:left;padding:0px
+0px 3px 5px;margin:0px}a.category_link,a:hover.category_link,a:active.category_link,a:visited.category_link{width:180px;color:#00959b;display:block;text-transform:uppercase;text-decoration:none;font-weight:900;font-size:10pt;padding:0px;margin:0px}.subcategory{width:182px;text-align:left}a.subcategory_link,a:hover.subcategory_link,a:active.subcategory_link,a:visited.subcategory_link{width:182px;color:#000;display:block;text-transform:uppercase;text-decoration:none;font-weight:bold;font-size:8pt;padding:0px
+0px 3px 10px}.sub2category{width:185px;text-align:left}a.sub2category_link,a:hover.sub2category_link,a:active.sub2category_link,a:visited.sub2category_link{width:185px;color:#00959b;display:block;text-transform:uppercase;text-decoration:none;font-weight:bold;font-size:8pt;padding:0px
+0px 3px 20px}.pages_sidebar{background-color:#F7F7ED;padding-left:4px;padding-top:8px}.top_of_sidebar_gutter{width:5px;background-color:#F7F7ED}.top_of_sidebar{background-color:#F7F7ED;width:200px;padding-top:14px;height:34px}.bottom_of_sidebar{background-color:#F7F7ED;height:130px}.breadcrumb{text-align:left;padding:10px
+0px 0px 12px;color:#00959b;text-transform:uppercase;font-size:9pt;line-height:14pt}a.breadcrumb_link,a:hover.breadcrumb_link,a:active.breadcrumb_link,a:visited.breadcrumb_link{color:#00959b;text-transform:uppercase;font-size:9pt}.breadcrumb_current_page{font-weight:bold}a.email_print_page,a:link.email_print_page,a:hover.email_print_page,a:active.email_print_page,a:visited.email_print_page{color:#00959b;font-weight:bold;font-size:8pt}.footer{text-align:center;font-size:9pt}.footer a:link,a:hover,a:active,a:visited{color:black}a.appfooter,a:link.appfooter,a:hover.appfooter,a:active.appfooter,a:visited.appfooter{color:black}a.pages,a:hover.pages,a:active.pages,a:visited.pages{color:#000;display:block;width:213px;text-transform:uppercase;text-decoration:none;font-weight:bold;text-align:left;font-size:9pt}.space_gutter{width:12px}.extended_header{background-image:url(http://agsource.crinet.com/css/../images/AgSource-Cooperative-Services/img-header-filler.gif);background-repeat:repeat-x;padding:0px
+0px 0px 0px}.right_header{background-image:url(http://agsource.crinet.com/css/../images/AgSource-Cooperative-Services/img-header-rht.gif);background-repeat:no-repeat;padding:0px
+0px 0px 0px}.left_header{background-image:url(http://agsource.crinet.com/css/../images/AgSource-Cooperative-Services/img-header-lft.gif);background-repeat:no-repeat;padding:0px
+0px 0px 0px}td.three_images{width:550px;padding:0px
+0px 0px 0px}td.intro_copy{width:550px;height:100px;background-image:url(http://agsource.crinet.com/css/../images/AgSource-Cooperative-Services/img-bkground-introcopy.jpg);background-repeat:no-repeat;padding:0px
+0px 0px 0px}td.dotted_line{padding:0px
+15px 0px 7px}td.news{background-color:#E7E3C6}td.spotlight{background-color:#F6F6EC}.spotlight_repeat{height:20px;background-image:url(http://agsource.crinet.com/css/../images/AgSource-Cooperative-Services/img-filler-spotlight.gif);background-repeat:repeat-x;padding:0px
+0px 0px 0px}td.inner_spotlight{background-color:#EFECD9}td.enews{width:433px;height:97px;background-image:url(http://agsource.crinet.com/css/../images/AgSource-Cooperative-Services/img-enews.gif);background-repeat:no-repeat;padding:0px
+0px 0px 0px}td.login_header{padding:0px
+0px 0px 10px}td.login_select{align:middle;padding:0px
+5px 0px 5px}td.login_submit{vertical-align:middle;padding:0px
+0px 0px 0px}td.enews_background{background-color:#F6F4E8}td.highlights{font-size:10pt;padding:5px
+5px 0px 15px;text-align:left}.highlights a, .highlights a:link, .highlights a:hover, .highlights a:visited, .highlights a:active{color:black}div.enews_header{font-weight:bold;font-style:italic;font-size:11pt;padding:10px
+10px 0px 100px;text-align:left}div.enews_content{font-size:9pt;padding:5px
+10px 37px 100px;text-align:left}div.spotlight_header{font-weight:bold;font-size:12pt;padding:0px
+0px 0px 10px;text-align:left}div.image_caption{font-size:8pt;padding:5px
+2px 0px 5px;text-align:left}div.news_header{padding:10px
+0px 0px 10px}div.news_content{font-size:10pt;padding:15px
+5px 0px 10px;text-align:left}a.enews_links,a:hover.enews_links,a:active.enews_links,a:visited.enews_links{color:#00959b;font-weight:bold;font-size:9pt;padding:5px
+0px 0px 5px;line-height:16px;text-align:left}#bulleted_list{text-align:left;padding:10px
+10px 15px 25px;margin:0px
+0px 0px 0px;list-style-position:outside}#bulleted_list
+li{padding:0px
+0px 0px 0px;font-size:10pt}#bulleted_list_2{text-align:left;padding:0px
+0px 0px 0px;margin:0px
+0px 0px 0px;list-style-position:outside}#bulleted_list_2
+ul{padding:0px
+0px 0px 20px;margin:0px}#bulleted_list_2
+li{padding:5px
+0px 0px 0px;font-size:10pt}.right_side{background-color:#F7F7ED}.overlap_color{background-color:#EDE9D0}.login{text-align:left;padding:0px
+0px 0px 0px;color:#00959b;text-transform:uppercase;font-size:9pt;font-weight:bold}.news_nav_header{text-align:left;padding:15px
+0px 0px 10px;color:#00959b;text-transform:uppercase;font-size:9pt;line-height:14pt;font-weight:bold}a.news_nav,a:hover.news_nav,a:active.news_nav,a:visited.news_nav{color:#00959b;font-size:9pt;padding:5px
+0px px 10px}td.news_nav{font-size:9pt;line-height:12pt;text-align:left;padding:0px
+0px 0px 10px}td.current_issue_title{font-weight:bold;color:#00959b;font-size:14pt;text-align:left;padding:15px
+0px 0px 10px}a.current_issue_title,a:hover.current_issue_title,a:active.current_issue_title,a:visited.current_issue_title{color:#00959b;font-size:14pt}.pub_header{padding:10px
+0px 0px 0px;text-align:left;font-weight:bold;font-size:14pt}td.news_date{padding:0px
+0px 0px 10px;text-align:left;font-size:10pt}td.headlines{font-size:9pt;line-height:12pt;text-align:left;font-weight:bold;padding:0px
+0px 0px 10px}#bulleted_headlines{text-align:left;padding:0px
+0px 0px 15px;margin:0px
+0px 0px 0px;list-style-position:outside}#bulleted_headlines
+li{padding:0px
+0px 0px 0px;font-size:10pt}.beefdairylinks
+p{font-family:"Helvetica","Arial","Verdana",sans-serif;font-size:9pt;text-transform:uppercase;padding-left:20px;padding-bottom:13px}.beefdairylinks a, .beefdairylinks a:hover, .beefdairylinks a:link, .beefdairylinks a:active, .beefdairylinks a:visited{font-family:"Helvetica","Arial","Verdana",sans-serif;font-size:9pt;text-transform:uppercase;color:#000}td.sitemap{background-color:#92C2C2;background-image:url('http://agsource.crinet.com/css/../images/Common-Images/h3bg.gif');background-repeat:repeat-x;padding:2px
+0px 1px 6px;margin:0px
+0px 18px 0px}div.sitemap_content{padding:10px
+5px 0px 10px;text-align:left;font-size:10pt}a.sitemap,a:link.sitemap,a:hover.sitemap,a:visited.sitemap,a:active.sitemap{font-family:"Helvetica","Arial","Verdana",sans-serif;font-size:12pt;font-weight:bold;color:#000}a.sitemap2,a:link.sitemap2,a:hover.sitemap2,a:visited.sitemap2,a:active.sitemap2{font-family:"Helvetica","Arial","Verdana",sans-serif;color:#00959b}.sitemap_other{font-family:"Helvetica","Arial","Verdana",sans-serif;font-size:12pt;font-weight:bold;color:#000}
+@CHARSET "UTF-8";h1{margin:0;padding:0
+0 10px}img,embed,object,video{border:none;max-width:100%}sup{font-size: .7em}#main-content{padding:0
+10px;text-align:left}td.menu-padding{width:20px}p{padding:0
+0 5px}#header{height:127px;background:#C8C488 url("http://agsource.crinet.com/images/AgSource-Cooperative-Services/img-header-lft.gif") no-repeat left top;padding:0;clear:both}#header
+a{text-decoration:none}.header-link{width:342px;height:127px}ul.primary-nav{background-image:url("http://agsource.crinet.com/images/Common-Images/navbar-stretch.gif");background-repeat:repeat-x;color:#FFF;font-size:9pt;height:25px;padding:5px
+0;margin:0}ul.primary-nav
+li{float:left;border-left:solid 1px #B0D9DB;list-style:none;padding:0
+10px}ul.primary-nav
+li.first{border-left:none}#container{margin:0
+auto;display:table;border:solid 2px #E8E8E8}#header{background-color:#CAC68A}a, .footer a:link,a:hover,a:active,a:visited{color:#004147}.important-message{font-size:1.3em;color:#004147;background-color:inherit;font-weight:bold}ul.primary-nav li.appnav, ul.primary-nav li.appnav
+ul{float:right;margin:0;list-style:none;border:none}ul.primary-nav
+li.appnav{padding:0
+5px 0 0;width:120px}ul.primary-nav li.appnav
+ul{position:relative;cursor:pointer;visibility:hidden;margin:5px
+-5px 0 0;height:1px;overflow:visible}ul.primary-nav li.appnav ul
+li{margin:0;padding:5px;float:none;border-bottom:solid 1px #004147;border-left:solid 1px #004147;border-right:solid 1px #004147;background-color:#B0D9DB}ul.primary-nav li.appnav ul li
+a{text-decoration:none;font:normal .8em helvetica,arial,sans-serif;color:#004147;display:block;text-align:left}ul.primary-nav li
+a{white-space:nowrap;color:#B0D9DB;font-size:9pt;padding:0;text-align:center;text-decoration:none;text-transform:uppercase}ul#session-nav{margin:0;padding:5px
+0 0;list-style:none}ul#session-nav
+li{padding:0
+5px;margin:0;float:right;line-height:1.1em;border-left:solid 1px #666;border-right:solid 1px #666}ul#session-nav
+a{text-decoration:none}ul#session-nav{float:right}.hover{display:block}#inter-app-nav{background-color:#262626;color:#ccc;float:left;width:100%}#inter-app-nav
+ul{list-style:none;margin:0;padding:0}#inter-app-nav
+li{float:left;padding:5px
+8px;white-space:nowrap;border-left:solid 1px #555}#inter-app-nav
+li.first{border:none}#inter-app-nav li
+a{text-decoration:none;display:block;background-color:#262626;color:#ccc}#inter-app-nav
+li.current{background-color:#555;border-top:solid 2px #f00}#inter-app-nav li.current
+a{background-color:#555}label, fieldset
+legend{color:#004147}label{display:inline}label:after{content:":"}input.require,input.required,select.require{background-color:#9CD7DD}label
+require{color:#004147}.odd{background-color:#fff;color:#000}.even{background-color:#D3D09E;color:#000}#infoMessage p,#infoMessage{background-color:#fff;color:#f00}div#infoMessage{margin:0
+0 10px 0}
