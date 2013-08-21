@@ -164,7 +164,7 @@ echo "group_by <br>";
 						,'aggregate' => $aggregate_val
 						,'list_order' => $cnt
 						,'display' => 1 //bit field, yes or no
-						,'block_header_group_id' => $this->arr_header_groups_data[$cnt_header_group_rows][$arr_header_group_index_vals[$k]]['id']
+						,'block_header_group_id' => $cnt_header_group_rows > 0 ? $this->arr_header_groups_data[$cnt_header_group_rows][$arr_header_group_index_vals[$k]]['id'] : NULL
 						,'user_id' => $this->block_user_id
 						,'header_text' => $v
 						//,'break' => true

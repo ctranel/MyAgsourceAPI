@@ -518,7 +518,7 @@ class Report_model extends CI_Model {
 	protected function prep_sort($arr_sort_by, $arr_sort_order){
 		$arr_len = is_array($arr_sort_by)?count($arr_sort_by):0;
 		for($c=0; $c<$arr_len; $c++) {
-			$sort_order = ($arr_sort_order[$c] == 'DESC') ? 'DESC' : 'ASC';
+			$sort_order = (strtoupper($arr_sort_order[$c]) == 'DESC') ? 'DESC' : 'ASC';
 			$table = isset($this->arr_field_table[$arr_sort_by[$c]]) && !empty($this->arr_field_table[$arr_sort_by[$c]])?$this->arr_field_table[$arr_sort_by[$c]] . '.':$this->primary_table_name . '.';
 			if((!is_array($this->arr_unsortable_columns) || in_array($arr_sort_by[$c], $this->arr_unsortable_columns) === FALSE) && !empty($arr_sort_by[$c])){
 				//if($this->arr_field_sort[$arr_sort_by[$c]] == 'ASC'){
