@@ -34,7 +34,6 @@ function getHeaderLayer(&$arr_header_structure, $arr_data_in, &$depth, $tot_leve
 			//get number of leaves and PDF width for this array
 			$num_leaves = 0;
 			$pdf_width = 0;
-			//array_walk_recursive($v, create_function('$val, $key, $obj', '$obj["num_leaves_in"] = $obj["num_leaves_in"] + 1;'), array('num_leaves_in' => &$num_leaves));
 			array_walk_recursive(
 				$v,
 				create_function(
@@ -43,18 +42,29 @@ function getHeaderLayer(&$arr_header_structure, $arr_data_in, &$depth, $tot_leve
 				),
 				array('num_leaves_in' => &$num_leaves, 'pdf_width' => &$pdf_width, 'arr_pdf_widths' => $arr_pdf_widths)
 			);
-			//add data to return array
-echo 'cols: ' . $depth . ' - ' . $k . ' - ' . $num_leaves . "\n";
-			$arr_header_structure[$depth][] = Array('text' => $k, 'colspan' => $num_leaves, 'rowspan' => '1', 'pdf_width' => $pdf_width);
-			getHeaderLayer($arr_header_structure, $v, ++$depth, $tot_levels, $arr_pdf_widths);
+						//add data to referenced array ($arr_header_structure)
+			$trim_k = trim($k);
+			if(empty($trim_k)){ //if the header has no text, keep the current depth, but add one to the rowspan
+				$pass_depth = $curr_depth;
+				$rowspan++;
+			}
+			else{ //if there is text in the header, increment the depth (not the rowspan), and create an entry in the header structure array
+				$pass_depth = ($tot_levels - $curr_depth) - $rowspan;//++$curr_depth;
+//echo 'cols: ' . $curr_depth . ' | ' . $rowspan . ' | ' . $k . ' | ' . $num_leaves . "\n";
+				$arr_header_structure[$curr_depth][] = Array('text' => $k, 'colspan' => $num_leaves, 'rowspan' => $rowspan, 'pdf_width' => $pdf_width);
+			}
+			//recursively retrieve header info for this sub-array
+			getHeaderLayer($arr_header_structure, $v, $pass_depth, $rowspan, $tot_levels, $arr_pdf_widths);
 		}
-		else {
-echo 'leaf: ' . $depth . ' - ' . $k . ' - ' . "\n";
-			$rowspan = $tot_levels - $depth;
-			$arr_header_structure[$depth][] = Array('text' => $k, 'colspan' => '1', 'rowspan' => $rowspan, 'field_name' => $v);
+		else { //add leaf node
+			$rowspan = $tot_levels - $curr_depth;
+//echo 'leaf: ' . $curr_depth . ' | ' . $rowspan . ' | ' . $k . ' | ' . "\n";
+			$arr_header_structure[$curr_depth][] = Array('text' => $k, 'colspan' => '1', 'rowspan' => $rowspan, 'field_name' => $v);
 		}
 	}
-	$depth--; //revert to the depth from before the array was processed.
+	//if(($curr_depth + 1) == $tot_levels) 
+	$rowspan = 1;
+	$curr_depth = $curr_depth - $rowspan; //revert to the depth from before the array was processed.
 }
 
 /** *takes array of data structure and returns and array of menu data including text,
