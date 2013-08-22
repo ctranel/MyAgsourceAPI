@@ -97,7 +97,7 @@ var global_options = {
 };
 Highcharts.setOptions(global_options);
 
-//set width of page and charts
+/*set width of page and charts DO WITH HEAD.JS
 var doc_width = $(window).innerWidth() < 1000 ? $(window).innerWidth() : 1200;
 var container_width = Math.floor(doc_width * .95);
 $('#container').width(container_width);
@@ -112,7 +112,7 @@ else {
 	$(".chart-odd, .chart-even").css("float", "none");
 	$(".chart-odd, .chart-even").css("clear", "both");
 }
-
+*/
 function updateFilter(event, this_in, divid, field_in, value_in){
 	//set_styles(this_in, divid);
 	$('input[name=' + field_in + '][value=' + value_in + ']').attr("checked", true);
