@@ -12,10 +12,9 @@ var var_arr_graph_colors = ['#F15928', '#585C5F', '#08A04A', '#006C70', '#98E8F9
 //var var_arr_graph_colors = ['#D54C18', '#48495B', '#264071', '#9CA294'];
 var base_options = {chart: {backgroundColor: null}, yAxis:{}};//base options are specific to each report, see report helper functions (js files)
 //get current base url
+if (!window.location.origin) window.location.origin = window.location.protocol+"//"+window.location.host;
 var pathArray = window.location.href.split( '/' );
-var protocol = pathArray[0];
-var host = pathArray[2];
-var url = protocol + '://' + host;
+var server_path = (typeof(pathArray[3]) == "string") ? pathArray[3] : '';
 
 var global_options = {
 	chart: {
@@ -23,7 +22,7 @@ var global_options = {
 	},
 	colors: [var_arr_graph_colors[0], var_arr_graph_colors[1], var_arr_graph_colors[2], var_arr_graph_colors[3], var_arr_graph_colors[4]],
 	credits: {
-		href: url + '/myagsource',
+		href: window.location.origin + '/' + server_path + '/index.php',
 		text: '© AgSource Cooperative Services'
 	},
 	xAxis: {
