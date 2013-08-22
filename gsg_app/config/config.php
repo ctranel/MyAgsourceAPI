@@ -18,8 +18,8 @@
 			$config['base_url_assets']	= "http://localhost/app/";
 		break;
 		case 'testing':
-			$config['base_url']	= "https://agswww.crinet.com/myagsource/";
-			$config['base_url_assets']	= "https://agswww.crinet.com/myagsource/";
+			$config['base_url']	= "https://feweb.verona.crinet/myagsource/";
+			$config['base_url_assets']	= "https://feweb.verona.crinet/myagsource/";
 		break;
 		case 'production':
 			$config['base_url']	= "https://agswww.crinet.com/myagsource/";
