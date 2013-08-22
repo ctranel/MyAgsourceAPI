@@ -10,7 +10,6 @@
 function get_table_header_array($arr_header_data, $arr_pdf_widths = array()){
 	$depth = 0;
 	$rowspan = 1;
-//var_dump($arr_header_data);
 	$tot_levels = array_depth($arr_header_data);
 	$arr_header_structure = array(); //return value
 	getHeaderLayer($arr_header_structure, $arr_header_data, $depth, $rowspan, $tot_levels, $arr_pdf_widths);// not currently used, too taxing on memory.
