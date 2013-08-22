@@ -57,7 +57,7 @@ class Auth extends Ionauth {
 						'{twitter: "' . $this->config->item("base_url_assets") . 'js/jquery/jquery.jtweetsanywhere-1.2.1.min.js"}',
 						'{highcharts: "' . $this->config->item("base_url_assets") . 'js/charts/highcharts.js"}',
 						'{graph_helper: "' . $this->config->item("base_url_assets") . 'js/charts/graph_helper.js"}',
-						'{card_helper: "' . $this->config->item("base_url_assets") . 'js/report_card_helper.js"}',
+						'{card_helper: "' . $this->config->item("base_url_assets") . 'js/summary_reports/report_card_helper.js"}',
 						'{helper: "' . $this->config->item("base_url_assets") . 'js/as_dashboard_helper.js"}'
 					)
 				)
