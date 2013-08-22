@@ -23,7 +23,7 @@ var global_options = {
 	},
 	colors: [var_arr_graph_colors[0], var_arr_graph_colors[1], var_arr_graph_colors[2], var_arr_graph_colors[3], var_arr_graph_colors[4]],
 	credits: {
-		href: host + '/myagsource',
+		href: url + '/myagsource',
 		text: '© AgSource Cooperative Services'
 	},
 	xAxis: {
