@@ -15,6 +15,10 @@ var global_options = {
 	chart: {
 		backgroundColor: null
 	},
+var global_options = {
+	chart: {
+		backgroundColor: null
+	},
 	colors: [var_arr_graph_colors[0], var_arr_graph_colors[1], var_arr_graph_colors[2], var_arr_graph_colors[3], var_arr_graph_colors[4]],
 	credits: {
 		href: 'https://agswww.crinet.com/myagsource',
@@ -89,10 +93,6 @@ var global_options = {
     }]
 	// SET MORE THEME-RELATED VARIABLES (COLOR, ETC)?
 };
-Highcharts.setOptions(global_options);
-
-//set width of page and charts
-var doc_width = $(window).innerWidth() < 1000 ? $(window).innerWidth() : 1200;
 var container_width = Math.floor(doc_width * .95);
 $('#container').width(container_width);
 if(doc_width >= 768) {

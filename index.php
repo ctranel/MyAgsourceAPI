@@ -55,7 +55,7 @@ if (defined('ENVIRONMENT'))
  * This variable must contain the name of your "system" folder.
  * Include the path if the folder is not in the same  directory
  * as this file.
- *
+ * 
  */
 if (defined('ENVIRONMENT'))
 {
@@ -65,7 +65,7 @@ if (defined('ENVIRONMENT'))
 			$system_path = 'C:\Program Files (x86)\Zend\Apache2\as_sys';
 		break;
 		case 'testing':
-			$system_path = "/var/www/agsource/as_sys";
+			$system_path = "/var/www/as_sys";
 		break;
 		case 'production':
 			$system_path = "/var/www/agsource/as_sys";
@@ -75,7 +75,7 @@ if (defined('ENVIRONMENT'))
 			exit('The application environment is not set correctly.');
 	}
 }
-	
+
 /*
  *---------------------------------------------------------------
  * APPLICATION FOLDER NAME
@@ -96,7 +96,7 @@ if (defined('ENVIRONMENT'))
 			$application_folder = 'gsg_app';
 		break;
 		case 'testing':
-			$application_folder = "/var/www/agsource/myagsource/gsg_app";
+			$application_folder = "/var/www/myagsource/gsg_app";
 		break;
 		case 'production':
 			$application_folder = "/var/www/agsource/myagsource/gsg_app";
