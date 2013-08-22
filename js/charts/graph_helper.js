@@ -11,17 +11,19 @@ var chart_cnt = 0;
 var var_arr_graph_colors = ['#F15928', '#585C5F', '#08A04A', '#006C70', '#98E8F9']; 
 //var var_arr_graph_colors = ['#D54C18', '#48495B', '#264071', '#9CA294'];
 var base_options = {chart: {backgroundColor: null}, yAxis:{}};//base options are specific to each report, see report helper functions (js files)
-var global_options = {
-	chart: {
-		backgroundColor: null
-	},
+//get current base url
+var pathArray = window.location.href.split( '/' );
+var protocol = pathArray[0];
+var host = pathArray[2];
+var url = protocol + '://' + host;
+
 var global_options = {
 	chart: {
 		backgroundColor: null
 	},
 	colors: [var_arr_graph_colors[0], var_arr_graph_colors[1], var_arr_graph_colors[2], var_arr_graph_colors[3], var_arr_graph_colors[4]],
 	credits: {
-		href: 'https://agswww.crinet.com/myagsource',
+		href: url + '/myagsource',
 		text: '© AgSource Cooperative Services'
 	},
 	xAxis: {
@@ -93,6 +95,11 @@ var global_options = {
     }]
 	// SET MORE THEME-RELATED VARIABLES (COLOR, ETC)?
 };
+
+Highcharts.setOptions(global_options);
+
+/*set width of page and charts DO WITH HEAD.JS
+var doc_width = $(window).innerWidth() < 1000 ? $(window).innerWidth() : 1200;
 var container_width = Math.floor(doc_width * .95);
 $('#container').width(container_width);
 if(doc_width >= 768) {
@@ -106,7 +113,7 @@ else {
 	$(".chart-odd, .chart-even").css("float", "none");
 	$(".chart-odd, .chart-even").css("clear", "both");
 }
-
+*/
 function updateFilter(event, this_in, divid, field_in, value_in){
 	//set_styles(this_in, divid);
 	$('input[name=' + field_in + '][value=' + value_in + ']').attr("checked", true);

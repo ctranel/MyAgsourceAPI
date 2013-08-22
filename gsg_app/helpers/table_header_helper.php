@@ -9,11 +9,11 @@
  **/
 function get_table_header_array($arr_header_data, $arr_pdf_widths = array()){
 	$depth = 0;
-//var_dump($arr_header_data);
+	$rowspan = 1;
 	$tot_levels = array_depth($arr_header_data);
 	$arr_header_structure = array(); //return value
-	getHeaderLayer($arr_header_structure, $arr_header_data, $depth, $tot_levels, $arr_pdf_widths);// not currently used, too taxing on memory.
-//var_dump($arr_header_structure);
+	getHeaderLayer($arr_header_structure, $arr_header_data, $depth, $rowspan, $tot_levels, $arr_pdf_widths);// not currently used, too taxing on memory.
+	ksort($arr_header_structure);
 	return $arr_header_structure;
 } //end function table_header_cell
 
@@ -28,13 +28,20 @@ function get_table_header_array($arr_header_data, $arr_pdf_widths = array()){
  *  @param int total levels in header array hierarchy
  *  @param array pdf column widths
  **/
-function getHeaderLayer(&$arr_header_structure, $arr_data_in, &$depth, $tot_levels, $arr_pdf_widths){
+function getHeaderLayer(&$arr_header_structure, $arr_data_in, $curr_depth, $rowspan, $tot_levels, $arr_pdf_widths, $parent_was_empty = FALSE){
 	foreach($arr_data_in as $k => $v){
+		$trim_k = trim($k);
+		if(empty($trim_k)){ //if the header has no text, keep the current depth, but add one to the rowspan
+			$rowspan++;
+		}
+		else{ //if there is text in the header, increment the depth (not the rowspan), and create an entry in the header structure array
+			$curr_depth++;
+		}
 		if(is_array($v)){
 			//get number of leaves and PDF width for this array
 			$num_leaves = 0;
 			$pdf_width = 0;
-			array_walk_recursive(
+			array_walk_recursive( 
 				$v,
 				create_function(
 					'$val, $key, $obj',
@@ -42,29 +49,23 @@ function getHeaderLayer(&$arr_header_structure, $arr_data_in, &$depth, $tot_leve
 				),
 				array('num_leaves_in' => &$num_leaves, 'pdf_width' => &$pdf_width, 'arr_pdf_widths' => $arr_pdf_widths)
 			);
-						//add data to referenced array ($arr_header_structure)
-			$trim_k = trim($k);
-			if(empty($trim_k)){ //if the header has no text, keep the current depth, but add one to the rowspan
-				$pass_depth = $curr_depth;
-				$rowspan++;
-			}
-			else{ //if there is text in the header, increment the depth (not the rowspan), and create an entry in the header structure array
-				$pass_depth = ($tot_levels - $curr_depth) - $rowspan;//++$curr_depth;
-//echo 'cols: ' . $curr_depth . ' | ' . $rowspan . ' | ' . $k . ' | ' . $num_leaves . "\n";
-				$arr_header_structure[$curr_depth][] = Array('text' => $k, 'colspan' => $num_leaves, 'rowspan' => $rowspan, 'pdf_width' => $pdf_width);
+			//add data to referenced array ($arr_header_structure)
+			if(!empty($trim_k)){ //if the header has no text, keep the current depth, but add one to the rowspan
+//echo 'cols: ' . ($curr_depth - 1) . ' | ' . $rowspan . ' | ' . $k . ' | ' . $num_leaves . "\n";
+				$arr_header_structure[($curr_depth - 1)][] = Array('text' => $k, 'colspan' => $num_leaves, 'rowspan' => $rowspan, 'pdf_width' => $pdf_width);
 			}
 			//recursively retrieve header info for this sub-array
-			getHeaderLayer($arr_header_structure, $v, $pass_depth, $rowspan, $tot_levels, $arr_pdf_widths);
+			$pass_rowspan = $parent_was_empty && !empty($trim_k) ? 1 : $rowspan;
+			$pass_depth = $parent_was_empty && !empty($trim_k) ? $curr_depth + 1 : $curr_depth;
+			getHeaderLayer($arr_header_structure, $v, $pass_depth, $pass_rowspan, $tot_levels, $arr_pdf_widths, empty($trim_k));
 		}
 		else { //add leaf node
-			$rowspan = $tot_levels - $curr_depth;
-//echo 'leaf: ' . $curr_depth . ' | ' . $rowspan . ' | ' . $k . ' | ' . "\n";
-			$arr_header_structure[$curr_depth][] = Array('text' => $k, 'colspan' => '1', 'rowspan' => $rowspan, 'field_name' => $v);
+//echo 'leaf: ' . ($curr_depth - 1) . ' | ' . $rowspan . ' | ' . $k . ' | ' . "\n";
+			$arr_header_structure[($curr_depth - 1)][] = Array('text' => $k, 'colspan' => '1', 'rowspan' => $rowspan, 'field_name' => $v);
 		}
+		if(empty($trim_k)) $rowspan--;
+		else $curr_depth--;
 	}
-	//if(($curr_depth + 1) == $tot_levels) 
-	$rowspan = 1;
-	$curr_depth = $curr_depth - $rowspan; //revert to the depth from before the array was processed.
 }
 
 /** *takes array of data structure and returns and array of menu data including text,
