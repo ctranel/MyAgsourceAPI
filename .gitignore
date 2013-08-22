@@ -2,3 +2,5 @@
 /index.php
 /dummy.php
 /gsg_app/config/database.php
+/.buildpath
+/.project
