@@ -1,11 +1,10 @@
-/index.php
+index.php
 /dummy.php
 /gsg_app/config/database.php
-/.project
 /.buildpath
-/deployment.properties
-/cookies.txt
+/.project
 /.settings
+/deployment.properties
 /ci_system_tmp
 /uploads
 /deployment.xml

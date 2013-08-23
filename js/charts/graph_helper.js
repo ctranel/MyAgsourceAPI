@@ -94,6 +94,7 @@ var global_options = {
     }]
 	// SET MORE THEME-RELATED VARIABLES (COLOR, ETC)?
 };
+
 Highcharts.setOptions(global_options);
 
 /*set width of page and charts DO WITH HEAD.JS
