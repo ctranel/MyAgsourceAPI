@@ -17,11 +17,23 @@ class Uhm_summary extends parent_report {
 	 	$this->product_name = 'UHM - Risk Analysis';
 		parent::display($block_in, $display_format);
 	 }
-	function uhm_charts($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL){
-	 	$this->product_name = 'UHM - Charts';
+	function uhm_dist_scc($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL){
+	 	$this->product_name = 'UHM - Distribution by SCC';
 		parent::display($block_in, $display_format);
 	 }
-
+	 function uhm_dim($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL){
+	 	$this->product_name = 'UHM - DIM at First Test';
+	 	parent::display($block_in, $display_format);
+	 }
+	 function uhm_infect($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL){
+	 	$this->product_name = 'UHM - Infection by Lact Group';
+	 	parent::display($block_in, $display_format);
+	 }
+	 function uhm_wgt_scc($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL){
+	 	$this->product_name = 'UHM - Weighted Avg SCC';
+	 	parent::display($block_in, $display_format);
+	 }
+	 
 	 /*
 	 * ajax_report: Called via AJAX to populate graphs
 	 * to add flexibility (any graph/table can be called from any page),
