@@ -186,7 +186,6 @@ class Report_model extends CI_Model {
 			->result_array();
 		$header_data = $this->get_select_field_structure($block_in);
 		if(is_array($arr_field_data) && !empty($arr_field_data)){
-//var_dump($arr_field_data);
 			foreach($arr_field_data as $fd){
 				$fn = $fd['db_field_name'];
 				$this->arr_db_field_list[] = $fn;
@@ -208,20 +207,20 @@ class Report_model extends CI_Model {
 		$this->primary_table_name = array_search(max($arr_table_ref_cnt), $arr_table_ref_cnt);
 		//set up arr_fields hierarchy
 		$this->arr_fields = $header_data['arr_fields'];
-//var_dump($this->arr_aggregates);
-//var_dump(array_flatten($this->arr_fields));
 		if(is_array($arr_field_child) && !empty($arr_field_child)){
 			foreach($arr_field_child as $k=>$fc){
 				// individually insert each field that does not have a parent
 				if(empty($k)){
 					foreach($fc as $k1=>$fc1){
 						$tmp = isset($header_data['arr_ref'][$k1]) ? $header_data['arr_ref'][$k1] : NULL;
+//echo $tmp . ': ' . $k1 . ' -> ' . $fc1 . "\n";
 						set_element_by_key($this->arr_fields, $tmp, array($k1 => $fc1), $header_data['arr_order']);
 					} 
 				}
 				else set_element_by_key($this->arr_fields, $header_data['arr_ref'][$k], $fc, $header_data['arr_order']);
 			}
 		}
+//var_dump($this->arr_fields);
 		if(is_array($arr_table_ref_cnt) && count($arr_table_ref_cnt) >  1){
 			foreach($arr_table_ref_cnt as $t => $cnt){
 				if($t != $this->primary_table_name){
@@ -265,7 +264,7 @@ class Report_model extends CI_Model {
 			
 		if(!is_array($arr_groupings) || empty($arr_groupings)){
 			$arr_groupings = $this->{$this->db_group_name}
-				->query("SELECT 1 AS id, f.name AS text, NULL AS parent_id, bf.list_order
+				->query("SELECT 1 AS id, bf.header_text AS text, NULL AS parent_id, bf.list_order
 				FROM users.dbo.blocks_select_fields bf
 					LEFT JOIN users.dbo.db_fields f ON bf.field_id = f.id
 				WHERE bf.block_id = " . $block_in
@@ -286,6 +285,7 @@ class Report_model extends CI_Model {
 				}
 			}
 		}
+		
 		return array('arr_ref' => $arr_ref, 'arr_fields' => $arr_fields, 'arr_order' => $arr_order);
 	}
 
@@ -360,7 +360,7 @@ class Report_model extends CI_Model {
 		if(is_array($arr_filter_criteria) && !empty($arr_filter_criteria)) $this->prep_where_criteria($arr_filter_criteria);
 		if(is_array($this->arr_fields)){
 			$arr_select_fields = array_flatten($this->arr_fields);
-//var_dump($arr_select_fields);
+//var_dump($this->arr_fields);
 			$arr_select_fields = $this->prep_select_fields($arr_select_fields);
 			// resolve field name/data/format exceptions (see animal_model prep_select_fields function override)
 			//process zero is null
@@ -841,7 +841,7 @@ FROM (SELECT DISTINCT TOP " . ($num_dates + 1) . " " . $date_field . "
 		if(isset($num_dates) && !empty($num_dates)) $this->{$this->db_group_name}->limit(1, ($num_dates));		
 		$result = $this->{$this->db_group_name}->get('herd.dbo.herd_test_results')->result_array();
 */		
-		if(isset($num_dates) === FALSE) $num_dates = (count($result) -1);
+		if(isset($num_dates) === FALSE || ($num_dates) > (count($result) -1)) $num_dates = (count($result) -1);
 		if(is_array($result) && !empty($result)) return $result[($num_dates)][$date_field];
 		else return FALSE;
 	}

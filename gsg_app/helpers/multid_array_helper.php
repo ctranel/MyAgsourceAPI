@@ -284,7 +284,7 @@ if ( ! function_exists('set_element_by_key')) {
                 if (!empty($new_val_in) && empty($key_in) && is_array($input)){
 			    //root level $input does not have a key, and cannot have list order.  if key_in is empty, traverse array and insert in appropriate slot
                 	if(isset($arr_order) && is_array($arr_order) && $arr_order[key($new_val_in)] < $arr_order[$key]){
-                    	array_insert($input, $cnt, $new_val_in);
+                		array_insert($input, $cnt, $new_val_in);
                     }
                     //elseif($cnt == $arr_len){
                     //	$input[] = array($new_val_in => $new_val_in);
