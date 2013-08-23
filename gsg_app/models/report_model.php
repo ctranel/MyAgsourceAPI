@@ -835,6 +835,7 @@ FROM (SELECT DISTINCT TOP " . ($num_dates + 1) . " " . $date_field . "
 	WHERE herd_code = '" . $this->session->userdata('herd_code') . "' AND pstring = '" . $this->session->userdata('pstring') . "' AND " . $date_field . " IS NOT NULL
 	ORDER BY " . $date_field . " DESC) a";
 		$result = $this->{$this->db_group_name}->query($sql)->result_array();
+		
 /*			->select("FORMATs(" . $date_field . ", '" . $date_format . "', 'en-US') AS " . $date_field, FALSE)
 			->where('herd_code', $this->session->userdata('herd_code'))
 			->order_by('herd.dbo.herd_test_results.' . $date_field, 'desc');
