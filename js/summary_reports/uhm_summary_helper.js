@@ -18,7 +18,7 @@
 				//$('#' + app_data['block']).css('font-weight', 'bold');
 				//$('input[name=block][value=' + value_in + ']').attr("checked", true);
 
-				 if(typeof(chart) != 'undefined' && app_data['block'] == 'weighted_avg_scc' && typeof(app_data['avg_weighted_avg'] != 'undefined')){
+				 if(typeof(chart) != 'undefined' && app_data['block'] == 'weighted_avg_scc_-_la' && typeof(app_data['avg_weighted_avg'] != 'undefined')){
 					//chart is global variable declared in graph_helper.js
 					$.each(chart.series[0].data, function(i, point) {
 					    if(point.y > app_data['avg_weighted_avg']) {
