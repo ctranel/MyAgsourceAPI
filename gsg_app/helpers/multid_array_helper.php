@@ -74,6 +74,12 @@ if ( ! function_exists('multid_array_filter')) {
 	}
 }
 
+if(! function_exists('filter_empty_arrays')){
+	function filter_empty_arrays($arr_in){
+		return !empty($array);
+	}
+}
+
 if(! function_exists('multid_remove_element')){
 	function multid_remove_element( $arr_in, $key_in ) {
  		$newArr = array();

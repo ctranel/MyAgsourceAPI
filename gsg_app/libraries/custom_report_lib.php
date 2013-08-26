@@ -131,7 +131,7 @@ echo "group_by <br>";
 
 	//add header groups
 	protected function header_groups() {
-		$arr_header_groups = $this->input->post('head_group');
+		$arr_header_groups = filter_empty_arrays($this->input->post('head_group'));
 		$this->arr_header_groups_data = array();
 		$arr_head_group_parent_index = $this->input->post('head_group_parent_index');
 		$arr_header_keys = array();
