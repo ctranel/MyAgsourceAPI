@@ -49,7 +49,7 @@ class Uhm_summary extends parent_report {
 	 			'sort_order' => $sort_order,
 	 			'graph_order' => $report_count
 	 	);
-	 	//if block == 'weighted_average_scc_-_la', get average scc
+	 	$arr_return['avg_weighted_avg'] = 200;//if block == 'weighted_average_scc_-_la', get average scc
 	 	return $arr_return;
 	 }
 }
