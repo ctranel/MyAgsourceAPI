@@ -313,7 +313,7 @@ echo "calling function";
 				$this->add_header_group($v, $new_arr_header_groups, $arr_head_group_parent_index, $key_param);
 			}
 			else {
-				if($v != 'Enter text here to add a header grouping') {
+				if($v != 'Enter text here to add a header grouping' && $v != '') {
 					$parent_array_index = isset($arr_head_group_parent_index[$parent_key]) ? $arr_head_group_parent_index[$parent_key][$k] : NULL;
 					$parent_id = isset($new_arr_header_groups[($parent_key - 1)]) ? $new_arr_header_groups[($parent_key - 1)][$parent_array_index]['id'] : NULL;
 					$arr_header_group_data = array(
