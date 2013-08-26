@@ -215,12 +215,12 @@ class Report_model extends CI_Model {
 						$tmp = isset($header_data['arr_ref'][$k1]) ? $header_data['arr_ref'][$k1] : NULL;
 //echo $tmp . ': ' . $k1 . ' -> ' . $fc1 . "\n";
 						set_element_by_key($this->arr_fields, $tmp, array($k1 => $fc1), $header_data['arr_order']);
+//var_dump($this->arr_fields);
 					} 
 				}
 				else set_element_by_key($this->arr_fields, $header_data['arr_ref'][$k], $fc, $header_data['arr_order']);
 			}
 		}
-//var_dump($this->arr_fields);
 		if(is_array($arr_table_ref_cnt) && count($arr_table_ref_cnt) >  1){
 			foreach($arr_table_ref_cnt as $t => $cnt){
 				if($t != $this->primary_table_name){

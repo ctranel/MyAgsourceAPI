@@ -39,4 +39,17 @@ class Uhm_summary extends parent_report {
 	 * to add flexibility (any graph/table can be called from any page),
 	 * all block generation code has been moved to the report parent ajax_report function
 	 */
+	 
+	 protected function get_section_data($block, $pstring, $sort_by, $sort_order, $report_count){
+	 	$arr_return = array(
+	 			'block' => $block,
+	 			//'test_date' => $test_date[0],
+	 			'pstring' => $pstring,
+	 			'sort_by' => $sort_by,
+	 			'sort_order' => $sort_order,
+	 			'graph_order' => $report_count
+	 	);
+	 	$arr_return['avg_weighted_avg'] = 200;//if block == 'weighted_average_scc_-_la', get average scc
+	 	return $arr_return;
+	 }
 }

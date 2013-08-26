@@ -441,19 +441,15 @@ abstract class parent_report extends CI_Controller {
 		$this->graph = NULL;
 		$this->display = $output;
 		//set parameters for given block
-//INVENTORY
+
 		switch ($block) {
 			default:
-				//$this->section_path = 'genetics';
 				$this->load_block($block, $report_count, $file_format);
-				//if($this->display == 'table') $this->load_block($block, $report_count, $file_format);
-				//elseif($this->display == 'chart') 
 				break;
 		}
 
 		
 		//common functionality
-		//header('Content-type: application/json');
 		if($file_format == 'csv') return $this->report_data['report_data'];
 		elseif($file_format == 'pdf'){
 			if($this->display == 'html') return $this->html;
@@ -465,19 +461,23 @@ abstract class parent_report extends CI_Controller {
 		if($this->display == 'table'){
 			$this->graph['html'] = $this->html;
 		}
-		$this->graph['section_data'] = array(
-			'block' => $block,
-			//'test_date' => $test_date[0],
-			'pstring' => $this->pstring,
-			'sort_by' => $sort_by,
-			'sort_order' => $sort_order,
-			'graph_order' => $report_count
-		);
+		$this->graph['section_data'] = $this->get_section_data($block, $this->pstring, $sort_by, $sort_order, $report_count);
 		$return_val = prep_output($this->display, $this->graph, $report_count, $file_format);
 		if($return_val) {
 			return $return_val;
 		}
  	   	exit;
+	}
+	
+	protected function get_section_data($block, $pstring, $sort_by, $sort_order, $report_count){
+		return array(
+			'block' => $block,
+			//'test_date' => $test_date[0],
+			'pstring' => $pstring,
+			'sort_by' => $sort_by,
+			'sort_order' => $sort_order,
+			'graph_order' => $report_count
+		);
 	}
 	
 	protected function load_block($block, $report_count, $file_format){
