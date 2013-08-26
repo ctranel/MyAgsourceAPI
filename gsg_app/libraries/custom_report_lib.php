@@ -131,7 +131,7 @@ echo "group_by <br>";
 
 	//add header groups
 	protected function header_groups() {
-		$arr_header_groups = filter_empty_arrays($this->input->post('head_group'));
+		$arr_header_groups = $this->input->post('head_group');
 		$this->arr_header_groups_data = array();
 		$arr_head_group_parent_index = $this->input->post('head_group_parent_index');
 		$arr_header_keys = array();
@@ -287,9 +287,9 @@ echo "calling function";
 	protected function sort_by(){
 		$arr_sort_order_vals = $this->input->post('sort_order');
 		if(isset($arr_sort_order_vals) && is_array($arr_sort_order_vals)){
-			$arr_sort_by_data = array();
 			foreach($arr_sort_order_vals as $k=>$v){
 				if($k > 0){
+					$arr_sort_by_data = array();
 					$cnt = 1;
 					$arr_sort_by_data[] = array(
 						'block_id' => $this->block_id

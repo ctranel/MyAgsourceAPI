@@ -76,7 +76,7 @@ if ( ! function_exists('multid_array_filter')) {
 
 if(! function_exists('filter_empty_arrays')){
 	function filter_empty_arrays($arr_in){
-		return !empty($array);
+		return !empty($arr_in);
 	}
 }
 
