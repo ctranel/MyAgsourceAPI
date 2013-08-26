@@ -29,11 +29,15 @@ class Herd_summary extends parent_report {
 	 	$this->product_name = 'Herd Summary Reproduction';
 		parent::display($block_in, $display_format);
 	 }
-	function hs_gen_inv($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL){
-	 	$this->product_name = 'Herd Summary Genetics & Inventory';
+	function hs_gen($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL){
+	 	$this->product_name = 'Herd Summary Genetics';
 		parent::display($block_in, $display_format);
 	 }
 
+	function hs_inv($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL){
+	 	$this->product_name = 'Herd Summary Inventory';
+		parent::display($block_in, $display_format);
+	 }
 	 /*
 	 * ajax_report: Called via AJAX to populate graphs
 	 * to add flexibility (any graph/table can be called from any page),
