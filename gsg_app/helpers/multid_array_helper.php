@@ -295,7 +295,6 @@ if ( ! function_exists('set_element_by_key')) {
 	                    elseif($arr_order[key($new_val_in)] == count($arr_order) && $arr_order[key($new_val_in)] == $arr_order[$key]){
 //echo "miling times" . count($arr_order);
 //var_dump($new_val_in);
-//echo $key . $value;
 	                    	$input[$key] = $new_val_in[$key];
 //var_dump($input);
 	                    }
