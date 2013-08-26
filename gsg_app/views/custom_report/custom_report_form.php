@@ -51,7 +51,7 @@
 	    </p>
 	</div>
 	<h2>Report Builder</h2>
-	<div id="choose-field">
+	<div id="choose-field" style="overflow: hidden">
 		<p id="p-cow-or-summary">
 			<span class="form-radio"><?php echo form_radio('cow_or_summary', 'cow', $cow_or_summary_selected == 'cow', 'class = "radio cow_or_summary"'); ?>Cow</span> <span class="form-radio"><?php echo form_radio('cow_or_summary', 'summary', $cow_or_summary_selected == 'summary', 'class = "radio cow_or_summary"'); ?>Summary</span>
 		</p>
