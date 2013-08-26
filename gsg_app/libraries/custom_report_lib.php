@@ -84,7 +84,7 @@ class Custom_report_lib
 			'user_id' => $this->block_user_id
 			,'name' => $this->input->post('report_name')
 			,'description' => $this->input->post('report_description')
-			,'url_segment' => preg_replace('[^A-Za-z0-9 ]', '', strtolower(str_replace(' ', '_', $this->input->post('report_name'))))
+			,'url_segment' => preg_replace("/\W|_/", '', strtolower(str_replace(' ', '_', $this->input->post('report_name'))))
 			,'display_type_id' => $this->input->post('report_display_id')
 			,'scope_id' => 2
 			,'list_order' => $this->input->post('insert_after')
