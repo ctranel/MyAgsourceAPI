@@ -259,7 +259,9 @@ if ( ! function_exists('set_element_by_key')) {
         }
         $cnt = 0;
         $arr_len = count($input) - 1;
-        foreach ($input AS $key => $value){
+//var_dump($input);
+		$arr_copy = $input;
+        foreach ($arr_copy AS $key => $value){
            if (is_array($input[$key])){
            	if (!empty($new_val_in) && !empty($key_in)){
                     if($key == $key_in){
@@ -274,25 +276,34 @@ if ( ! function_exists('set_element_by_key')) {
                     	}
                     }
                 }
-           		set_element_by_key($input[$key], $key_in, $new_val_in, $arr_order);
+                set_element_by_key($input[$key], $key_in, $new_val_in, $arr_order);
             }
             else{
-                $saved_value = $value;
-                if (!empty($new_val_in) && !empty($key_in)){
-                    if($key == $key_in) $value = $new_val_in;
-                }
-                if (!empty($new_val_in) && empty($key_in) && is_array($input)){
-			    //root level $input does not have a key, and cannot have list order.  if key_in is empty, traverse array and insert in appropriate slot
-                	if(isset($arr_order) && is_array($arr_order) && $arr_order[key($new_val_in)] < $arr_order[$key]){
-                		array_insert($input, $cnt, $new_val_in);
-                    }
-                    //elseif($cnt == $arr_len){
-                    //	$input[] = array($new_val_in => $new_val_in);
-                   // }
-                }
-                if ($value != $saved_value){
-                    $input[$key] = $value;
-                }
+//echo $key . ' -- ';
+//var_dump($new_val_in);
+            	$saved_value = $value;
+            	if (!empty($new_val_in)){
+	                if (!empty($key_in)){
+	                    if($key == $key_in) $value = $new_val_in;
+	                }
+	                elseif (is_array($input)){
+				    //root level $input does not have a key, and cannot have list order.  if key_in is empty, traverse array and insert in appropriate slot
+	//echo "\n\n\n\n" . key($new_val_in) . ' - ' . $arr_order[key($new_val_in)] . ' == ' . ($arr_order[$key] - 1) . " - $cnt \n\n";
+	                	if(isset($arr_order) && is_array($arr_order) && $arr_order[key($new_val_in)] == ($arr_order[$key] - 1)){
+	                		array_insert($input, $cnt, $new_val_in);
+	                    }
+	                    elseif($arr_order[key($new_val_in)] == count($arr_order) && $arr_order[key($new_val_in)] == $arr_order[$key]){
+//echo "miling times" . count($arr_order);
+//var_dump($new_val_in);
+//echo $key . $value;
+	                    	$input[$key] = $new_val_in[$key];
+//var_dump($input);
+	                    }
+	                }
+	                if ($value != $saved_value){
+	                    $input[$key] = $value;
+	                }
+            	}
             }
             $cnt++;
         }
@@ -302,7 +313,12 @@ if ( ! function_exists('set_element_by_key')) {
 
 function array_insert (&$array, $position, $insert_array) { 
   $first_array = array_splice ($array, 0, $position); 
+//var_dump($first_array);
+//var_dump($insert_array);
+//var_dump($array);
+  
   $array = array_merge ($first_array, $insert_array, $array); 
+//var_dump($array);
 } 
 
 function compare_arrays($a1, $a2){

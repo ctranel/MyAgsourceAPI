@@ -9,19 +9,19 @@
 	}
 	
 	//this function is called in the graph_helper.js file after the JSON data file has loaded.  It can make report specific updates after the data has been loaded (see commented code for example)
-	function post_render(app_data){
-		if(typeof(app_data) !== 'undefined'){
-			if(typeof(app_data['block']) !== 'undefined'){
+	function post_render(section_data){
+		if(typeof(section_data) !== 'undefined'){
+			if(typeof(section_data['block']) !== 'undefined'){
 				//$('#block-links > ul > li > a').css('text-decoration', 'none');
 				//$('#block-links > ul > li > a').css('font-weight', 'normal');
 				//$('#' + app_data['block']).css('text-decoration', 'underline');
 				//$('#' + app_data['block']).css('font-weight', 'bold');
 				//$('input[name=block][value=' + value_in + ']').attr("checked", true);
 
-				 if(typeof(chart) != 'undefined' && app_data['block'] == 'weighted_avg_scc' && typeof(app_data['avg_weighted_avg'] != 'undefined')){
+				 if(typeof(chart) != 'undefined' && section_data['block'] == 'weighted_average_scc_-_la' && typeof(section_data['avg_weighted_avg'] != 'undefined')){
 					//chart is global variable declared in graph_helper.js
 					$.each(chart.series[0].data, function(i, point) {
-					    if(point.y > app_data['avg_weighted_avg']) {
+					    if(point.y > section_data['avg_weighted_avg']) {
 					    	point.update({color: 'red'}, FALSE);
 					    }
 					});
