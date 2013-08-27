@@ -174,8 +174,6 @@ echo "group_by <br>";
 					$cnt++;
 				}
 			}
-//var_dump($arr_column_data);
-echo "calling function";
 			return $this->custom_report_model->add_columns($arr_column_data);
 		}
 		return false;
@@ -207,6 +205,7 @@ echo "calling function";
 						,'display' => 1 //bit field, yes or no
 						,'user_id' => $this->block_user_id
 						,'axis_index' => $arr_axis_index_vals[$k]
+						,'header_text' => $v
 					);
 					if($arr_aggregate_vals[$k] != NULL) $this->arr_aggregate_columns[$k] = $arr_aggregate_vals[$k];
 					$this->arr_columns[$k] = $v;
