@@ -18,11 +18,7 @@
 				//$('#' + app_data['block']).css('font-weight', 'bold');
 				//$('input[name=block][value=' + value_in + ']').attr("checked", true);
 
-<<<<<<< HEAD
 				 if(typeof(chart) != 'undefined' && section_data['block'] == 'weighted_average_scc_-_la' && typeof(section_data['avg_weighted_avg'] != 'undefined')){
-=======
-				 if(typeof(chart) != 'undefined' && app_data['block'] == 'weighted_avg_scc_-_la' && typeof(app_data['avg_weighted_avg'] != 'undefined')){
->>>>>>> branch 'master' of ssh://ctranel@feweb.verona.crinet/var/local/repos/MyAgsource.git
 					//chart is global variable declared in graph_helper.js
 					$.each(chart.series[0].data, function(i, point) {
 					    if(point.y > section_data['avg_weighted_avg']) {
