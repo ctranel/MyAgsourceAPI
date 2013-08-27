@@ -207,20 +207,25 @@ class Report_model extends CI_Model {
 		$this->primary_table_name = array_search(max($arr_table_ref_cnt), $arr_table_ref_cnt);
 		//set up arr_fields hierarchy
 		$this->arr_fields = $header_data['arr_fields'];
-		if(is_array($arr_field_child) && !empty($arr_field_child)){
+
+		//add actual field names to header hierarchy
+		$this->arr_fields = merge_arrays_on_value_key_match($this->arr_fields, $arr_field_child);
+
+/*		KEEPING THIS AROUND IN CASE THE NEED FOR THE 'arr_order' FUNCTIONALITY ARISES
+ * 		if(is_array($arr_field_child) && !empty($arr_field_child)){
 			foreach($arr_field_child as $k=>$fc){
 				// individually insert each field that does not have a parent
 				if(empty($k)){
 					foreach($fc as $k1=>$fc1){
 						$tmp = isset($header_data['arr_ref'][$k1]) ? $header_data['arr_ref'][$k1] : NULL;
-//echo $tmp . ': ' . $k1 . ' -> ' . $fc1 . "\n";
 						set_element_by_key($this->arr_fields, $tmp, array($k1 => $fc1), $header_data['arr_order']);
-//var_dump($this->arr_fields);
 					} 
 				}
-				else set_element_by_key($this->arr_fields, $header_data['arr_ref'][$k], $fc, $header_data['arr_order']);
+				else{
+					set_element_by_key($this->arr_fields, $header_data['arr_ref'][$k], $fc, $header_data['arr_order']);
+				}
 			}
-		}
+		} */
 		if(is_array($arr_table_ref_cnt) && count($arr_table_ref_cnt) >  1){
 			foreach($arr_table_ref_cnt as $t => $cnt){
 				if($t != $this->primary_table_name){
@@ -258,7 +263,7 @@ class Report_model extends CI_Model {
 					 FROM users.dbo.block_header_groups t
 					 join cteRecursive r ON r.parent_id = t.id
 				)
-				SELECT DISTINCT * FROM cteRecursive ORDER BY parent_id, list_order;" //
+				SELECT DISTINCT * FROM cteRecursive ORDER BY parent_id, list_order;"
 			)
 			->result_array();
 			
@@ -278,10 +283,10 @@ class Report_model extends CI_Model {
 			}
 			foreach($arr_groupings as $h){
 				if($h['parent_id'] == NULL) {
-					$arr_fields[$h['text']] = '';
+					$arr_fields[$h['text']] = $h['id'];
 				}
 				else{
-					set_element_by_key($arr_fields, $arr_ref[$h['parent_id']], array($h['text'] => ''));
+					set_element_by_key($arr_fields, $arr_ref[$h['parent_id']], array($h['text'] => $h['id']));
 				}
 			}
 		}
@@ -402,7 +407,6 @@ class Report_model extends CI_Model {
 			}
 		}
 		else $this->{$this->db_group_name}->limit($limit);
-//$this->{$this->db_group_name}->where('x', 'z');
 		
 		// Group By
 		$this->prep_group_by(); // the prep_group_by function adds group by field to the active record object
@@ -427,11 +431,15 @@ class Report_model extends CI_Model {
 	 * @author Chris Tranel
 	 **/
 	protected function prep_select_fields($arr_select_fields){
+		//		
 		if (($key = array_search('test_date', $arr_select_fields)) !== FALSE) {
 			$arr_select_fields[$key] = "FORMAT(" . $this->primary_table_name . ".test_date, 'MM-dd-yy', 'en-US') AS test_date";//MMM-dd-yy
 		}
 		if (($key = array_search('fresh_month', $arr_select_fields)) !== FALSE) {
 			$arr_select_fields[$key] = "FORMAT(" . $this->primary_table_name . ".fresh_month, 'MM-dd-yy', 'en-US') AS fresh_month";//MMM-dd-yy
+		}
+		if (($key = array_search('cycle_date', $arr_select_fields)) !== FALSE) {
+			$arr_select_fields[$key] = "FORMAT(" . $this->primary_table_name . ".cycle_date, 'MM-dd-yy', 'en-US') AS cycle_date";//MMM-dd-yy
 		}
 		foreach($arr_select_fields as $k => $v){
 			if(!empty($this->arr_aggregates[$k])){

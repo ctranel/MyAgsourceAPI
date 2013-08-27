@@ -11,6 +11,7 @@
  * @param	boolean maintain empty rows
  * @param	boolean maintain key
  * @param	constant sort order
+	 * @author Chris Tranel
  * @return	array
  */
 if ( ! function_exists('multid_array_sort')) {
@@ -101,6 +102,7 @@ if ( ! function_exists('array_flatten')) {
 	 *
 	 * @param array array to flatten
 	 * @return flattened array
+	 * @author Chris Tranel
 	 **/
 	function array_flatten($arr_in){
 		$arr_return = array(); // initialize so that it can be passed by reference
@@ -151,6 +153,7 @@ if ( ! function_exists('array_depth')) {
 	 * Find maximum depth of an array
 	 * Usage: int ArrayDepth( array $array, [int $DepthCount] )
 	 * @return integer with max depth, if Array is a string or an empty array it will return 0
+	 * @author Chris Tranel
 	 * 
 	 **/
 
@@ -175,6 +178,7 @@ if ( ! function_exists('array_extract_value_recursive')) {
 	 * @param $key string ("*" to extract all data into a )
 	 * @param $arr array
 	 * @return null|string|array
+	 * @author Chris Tranel
 	 */
 	function array_extract_value_recursive($key_in, array $arr_in){
 		$new_val = array();
@@ -190,6 +194,7 @@ if ( ! function_exists('array_map_recursive')) {
 	 * @param callback function
 	 * @param $arr array
 	 * @return array of values after callback has been applied to each
+	 * @author Chris Tranel
 	 */
 	function array_map_recursive($func, $arr) {
 	     $newArr = array();
@@ -208,6 +213,7 @@ if ( ! function_exists('array_merge_distinct')) {
 	 * @param $arr_1 array
 	 * @param $arr_2 array
 	 * @return array
+	 * @author Chris Tranel
 	 */
  
 	function array_merge_distinct($arr_1, $arr_2, $sort_field = FALSE){
@@ -235,6 +241,7 @@ if ( ! function_exists('get_element_by_key')) {
 	 * @param key
 	 * @param array
 	 * @return mixed
+	 * @author Chris Tranel
 	 */
  
 	function get_element_by_key($key, $array){
@@ -258,6 +265,7 @@ if ( ! function_exists('set_element_by_key')) {
 	 * @param key
 	 * @param mixed value to be inserted
 	 * @return void
+	 * @author Chris Tranel
 	 */
     function set_element_by_key(&$input, $key_in, $new_val_in, $arr_order = NULL){
         if (!is_array($input)){
@@ -265,17 +273,17 @@ if ( ! function_exists('set_element_by_key')) {
         }
         $cnt = 0;
         $arr_len = count($input) - 1;
-//var_dump($input);
 		$arr_copy = $input;
         foreach ($arr_copy AS $key => $value){
            if (is_array($input[$key])){
            	if (!empty($new_val_in) && !empty($key_in)){
                     if($key == $key_in){
                     	if(is_array($input[$key])){
-                    		if(isset($arr_order) && is_array($arr_order) && $arr_order[key($input[$key])] > key($new_val_in)){
-								$input[$key] = array_merge($new_val_in, $input[$key]);
-                    		}
-                    		else $input[$key] = array_merge($input[$key], $new_val_in);
+                    		//if(isset($arr_order) && is_array($arr_order) && $arr_order[key($input[$key])] > key($new_val_in)){
+							//	$input[$key] = array_merge($new_val_in, $input[$key]);
+                    		//}
+                    		//else 
+                    		$input[$key] = array_merge($input[$key], $new_val_in);
                     	}
                     	else {
 	                    	$value = $new_val_in;
@@ -285,8 +293,6 @@ if ( ! function_exists('set_element_by_key')) {
                 set_element_by_key($input[$key], $key_in, $new_val_in, $arr_order);
             }
             else{
-//echo $key . ' -- ';
-//var_dump($new_val_in);
             	$saved_value = $value;
             	if (!empty($new_val_in)){
 	                if (!empty($key_in)){
@@ -294,15 +300,11 @@ if ( ! function_exists('set_element_by_key')) {
 	                }
 	                elseif (is_array($input)){
 				    //root level $input does not have a key, and cannot have list order.  if key_in is empty, traverse array and insert in appropriate slot
-	//echo "\n\n\n\n" . key($new_val_in) . ' - ' . $arr_order[key($new_val_in)] . ' == ' . ($arr_order[$key] - 1) . " - $cnt \n\n";
 	                	if(isset($arr_order) && is_array($arr_order) && $arr_order[key($new_val_in)] == ($arr_order[$key] - 1)){
 	                		array_insert($input, $cnt, $new_val_in);
 	                    }
 	                    elseif($arr_order[key($new_val_in)] == count($arr_order) && $arr_order[key($new_val_in)] == $arr_order[$key]){
-//echo "miling times" . count($arr_order);
-//var_dump($new_val_in);
 	                    	$input[$key] = $new_val_in[$key];
-//var_dump($input);
 	                    }
 	                }
 	                if ($value != $saved_value){
@@ -316,14 +318,30 @@ if ( ! function_exists('set_element_by_key')) {
     }
 }
 
+if ( ! function_exists('merge_arrays_on_value_key_match')) {
+	/**
+	 * @abstract Returns an array in which values of param2 are inserted into param1 where the key of param2 
+	 * 		matches the value of param1 (replacing the value of param1).  If there are no matches, no replacements are made.
+	 *
+	 * @param array
+	 * @param array
+	 * @return array
+	 * @author Chris Tranel
+	 */
+
+	function merge_arrays_on_value_key_match(&$array1, &$array2){
+		foreach($array1 as $k => $v){
+			if(is_array($v)) $array1[$k] = merge_arrays_on_value_key_match($v, $array2);
+			else $array1[$k] = get_element_by_key($v, $array2);
+		}
+		return $array1;
+	}
+}
+
+
 function array_insert (&$array, $position, $insert_array) { 
   $first_array = array_splice ($array, 0, $position); 
-//var_dump($first_array);
-//var_dump($insert_array);
-//var_dump($array);
-  
   $array = array_merge ($first_array, $insert_array, $array); 
-//var_dump($array);
 } 
 
 function compare_arrays($a1, $a2){
