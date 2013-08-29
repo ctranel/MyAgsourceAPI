@@ -20,6 +20,7 @@ abstract class parent_report extends CI_Controller {
 	protected $html;
 	protected $graph;
 	protected $page;
+	protected $block;
 	protected $report_count;
 	protected $print_all = FALSE;
 	protected $data_dump = FALSE;
@@ -36,11 +37,10 @@ abstract class parent_report extends CI_Controller {
 		if($this->uri->segment(1) != $this->section_path){
 			$this->section_path = $this->uri->segment(1) . '/' . $this->section_path;
 		} 
-		$this->primary_model = $this->section_path . '_model';
-		
-		//$this->report_path = $this->section_path . '/display';
 		$this->page = $this->router->fetch_method();
+		$this->block = $this->uri->segment(5);
 		$this->report_path = $this->section_path . '/' . $this->page;
+		$this->primary_model = $this->block . '_model';
 		$this->report_form_id = 'report_criteria';
 		$this->herd_code = strlen($this->session->userdata('herd_code')) == 8?$this->session->userdata('herd_code'):NULL;
 		$this->page_header_data['user_sections'] = $this->as_ion_auth->arr_user_super_sections;

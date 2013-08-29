@@ -53,8 +53,6 @@ class Report_model extends CI_Model {
 		$this->{$this->db_group_name} = $this->load->database($this->db_group_name, TRUE);
 		if(isset($section_path)) $this->section_id = $this->ion_auth_model->get_section_id_by_path($section_path);
 		if(isset($this->section_id)) $this->arr_blocks = $this->access_log_model->get_block_links($this->section_id);
-		//$this->populate_field_meta_arrays(1); //parameter should be block id
-		//$this->adjust_fields($this->session->userdata('herd_code'));
 	}
 	function get_primary_table_name(){
 		return $this->primary_table_name;
