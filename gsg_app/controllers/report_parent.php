@@ -486,7 +486,6 @@ abstract class parent_report extends CI_Controller {
 		$this->arr_filter_criteria = array('herd_code' => $this->session->userdata('herd_code'));
 		$arr_this_block = get_element_by_key($block, $this->{$this->primary_model}->arr_blocks);
 		$this->max_rows = isset($arr_this_block['max_rows']) ? $arr_this_block['max_rows'] : NULL;
-//new fields --- summary and pivot
 		$this->cnt_row = $arr_this_block['cnt_row'];
 		$this->sum_row = $arr_this_block['sum_row'];
 		$this->avg_row = $arr_this_block['avg_row'];
@@ -586,7 +585,7 @@ abstract class parent_report extends CI_Controller {
 		}
 		$this->graph['data'] = $this->{$this->primary_model}->get_graph_data($arr_fieldnames, $this->session->userdata('herd_code'), $this->max_rows, $x_axis_date_field, $this->graph['config']['xAxis']['categories']); // was $model in place of $this->primary_model
 		
-/*				
+/*				examples of output:
 				$this->graph['config']['tooltip']['formatter'] = "function(){return '<b>' + this.series.name + ':</b><br>' + Highcharts.dateFormat('%B %e, %Y', this.x) + ' - ' + this.y + ' lbs';}";
 				$this->graph['config']['tooltip']['formatter'] = "function(){return '<b>'+ Highcharts.dateFormat('%B %e, %Y', this.x) +'</b><br/>'+this.series.name +': '+ this.y +'<br/>'+'Combined Total: '+ this.point.stackTotal +'<br/>'+'Click on graph line to view Cow Report for that group';}";
 				$this->graph['config']['tooltip']['formatter'] = "function(){return '<b>' + this.series.name + ':</b><br>' + Math.floor(this.x / 12) + ' yrs, ' + (this.x % 12) + ' mos' + ' - ' + '$' + this.y;}";
@@ -618,7 +617,6 @@ abstract class parent_report extends CI_Controller {
 		
 		$results = $this->{$this->primary_model}->search($this->session->userdata('herd_code'), $this->arr_filter_criteria, $this->arr_sort_by, $this->arr_sort_order, $this->max_rows);// was $model in place of $this->primary_model
 		if(!empty($this->pivot_db_field)) $results = $this->{$this->primary_model}->pivot($results, $this->pivot_db_field, 10, 10, $this->avg_row, $this->sum_row, $this->bench_row);// was $model in place of $this->primary_model
-//var_dump($results);
 		
 		$tmp = array(
 			'form_id' => $this->report_form_id,
@@ -640,9 +638,6 @@ abstract class parent_report extends CI_Controller {
 		if(isset($sess_benchmarks['arr_states'])) $bench_text .= ' for Herds in ' . implode(',', $sess_benchmarks['arr_states']) . '.';
 */
 	//	$bench_text = $this->benchmarks_lib->get_bench_text();
-//var_dump(array_keys($results));
-//var_dump($this->{$model}->get_fieldlist_array());
-//die();
 		$this->report_data = array(
 			'table_header' => $this->load->view('table_header', $table_header_data, TRUE),
 			'table_id' => $arr_this_block['url_segment'],

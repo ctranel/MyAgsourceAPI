@@ -163,6 +163,7 @@ class Report_model extends CI_Model {
 			'arr_header_data' => $this->arr_fields,
 		);
 		$table_header_data['structure'] = get_table_header_array($table_header_data['arr_header_data']); //table header helper function
+//var_dump($table_header_data['arr_header_data']);
 		return $table_header_data;
 	}
 
@@ -209,7 +210,9 @@ class Report_model extends CI_Model {
 		$this->arr_fields = $header_data['arr_fields'];
 
 		//add actual field names to header hierarchy
-		$this->arr_fields = merge_arrays_on_value_key_match($this->arr_fields, $arr_field_child);
+		 $tmp = key($arr_field_child);
+		 if(!empty($tmp)) $this->arr_fields = merge_arrays_on_value_key_match($this->arr_fields, $arr_field_child);
+		 else($this->arr_fields = $arr_field_child);
 
 /*		KEEPING THIS AROUND IN CASE THE NEED FOR THE 'arr_order' FUNCTIONALITY ARISES
  * 		if(is_array($arr_field_child) && !empty($arr_field_child)){
@@ -356,7 +359,6 @@ class Report_model extends CI_Model {
 		$this->herd_code = $herd_code;
 		$this->{$this->db_group_name}->start_cache();
 		$this->{$this->db_group_name}->from($this->primary_table_name);
-//			->where('herd_code',$herd_code);
 		if(is_array($this->arr_joins) && !empty($this->arr_joins)) {
 			foreach($this->arr_joins as $j){
 				$this->{$this->db_group_name}->join($j['table'], $j['join_text']);
@@ -365,7 +367,6 @@ class Report_model extends CI_Model {
 		if(is_array($arr_filter_criteria) && !empty($arr_filter_criteria)) $this->prep_where_criteria($arr_filter_criteria);
 		if(is_array($this->arr_fields)){
 			$arr_select_fields = array_flatten($this->arr_fields);
-//var_dump($this->arr_fields);
 			$arr_select_fields = $this->prep_select_fields($arr_select_fields);
 			// resolve field name/data/format exceptions (see animal_model prep_select_fields function override)
 			//process zero is null
@@ -431,7 +432,6 @@ class Report_model extends CI_Model {
 	 * @author Chris Tranel
 	 **/
 	protected function prep_select_fields($arr_select_fields){
-		//		
 		if (($key = array_search('test_date', $arr_select_fields)) !== FALSE) {
 			$arr_select_fields[$key] = "FORMAT(" . $this->primary_table_name . ".test_date, 'MM-dd-yy', 'en-US') AS test_date";//MMM-dd-yy
 		}
@@ -507,7 +507,6 @@ class Report_model extends CI_Model {
 	 * @author Chris Tranel
 	 */
 	protected function prep_group_by(){
-//var_dump($this->arr_group_by_field);
 		$arr_len = is_array($this->arr_group_by_field)?count($this->arr_group_by_field):0;
 		for($c=0; $c<$arr_len; $c++) {
 			$table = isset($this->arr_field_table[$this->arr_group_by_field[$c]]) && !empty($this->arr_field_table[$this->arr_group_by_field[$c]])?$this->arr_field_table[$this->arr_group_by_field[$c]] . '.':$this->primary_table_name . '.';
@@ -559,61 +558,47 @@ $bool_bench_column = FALSE;
 		$this->date_field = $header_field;
 		$sess_benchmarks = $this->session->userdata('benchmarks');
 		$header_text = ' ';
-		$arr_sum = 0;
-		$count = 0;
 		$new_dataset = array();
-		//headers not allowed in pivot tables, so we flatten the array
-		$this->arr_fields = array_flatten($this->arr_fields);
+		//headers not used in pivot tables, so we flatten the array
+		$tmp_keys = array_keys(current($this->arr_fields));
+		$tmp_vals = array_flatten($this->arr_fields);
+		$this->arr_fields = array_combine($tmp_keys, $tmp_vals);
 		foreach($this->arr_fields as $k=>$v){
 			if($v == $header_field){
 				$header_text = $k;
 				$this->arr_unsortable_columns[] = $v;
 			}
 			else {
-//echo $header_field . '<br>';
 				$new_dataset[$v][$header_field] = $k;
 			}
 		}
-		
 		$this->arr_fields = array($header_text => $header_field); //used for labels in left-most column that are set in foreach loop above
 		$this->arr_field_sort[$header_field] = 'ASC';
 		$this->arr_pdf_widths[$header_field] = $label_column_width;
 		if(!isset($arr_dataset) || empty($arr_dataset)) return FALSE;
-		
-//******************pull decimal points from meta data???***************
-		foreach($arr_dataset[0] as $k => $v){
-			$dec_pts[$k] = 0;
-		}
 		foreach($arr_dataset as $row){
-			$cnt = 0;
-//var_dump($row);
-//die();
 			foreach($row as $name => $val){
-				if($name == $header_field){
+				if($name == $header_field && isset($val)){
 					$this->arr_fields[$val] = $val;
 					$this->arr_pdf_widths[$val] = $header_field_width;
 					$this->arr_field_sort[$val] = 'ASC';
 					$this->arr_unsortable_columns[] = $val;
 				}
-				elseif(strpos($name, 'isnull') === FALSE) {
-					if(isset($this->arr_decimal_points[$name])){
-						$dec_pts[$name] = $this->arr_decimal_points[$name];
-					} 
-					else{
-						$tmp_dec_pts  = strlen(substr(strrchr($val, "."), 1));
-						if($tmp_dec_pts > $dec_pts[$name]) $dec_pts[$name] = $tmp_dec_pts;
-					}
+				elseif(strpos($name, 'isnull') === FALSE && isset($row[$header_field]) && !empty($row[$header_field])) { //2nd part eliminates rows where fresh date is null (FCS)
+					if(isset($this->arr_decimal_points[$k])) $val = round($val, $this->arr_decimal_points[$k]);
+
 					if(isset($new_dataset[$name]['total']) === FALSE && $val !== NULL){
 						$new_dataset[$name]['total'] = 0;
 						$new_dataset[$name]['count'] = 0;
 					} 
-						$new_dataset[$name][$row[$header_field]] = $val;
+					
+					$new_dataset[$name][$row[$header_field]] = $val;
+
 					if($val !== NULL){
 						$new_dataset[$name]['total'] += $val;
 						$new_dataset[$name]['count'] ++;
 					} 
 				}				
-				$cnt++;
 			}
 		}
 		//begin benchmarks
@@ -642,141 +627,24 @@ $bool_bench_column = FALSE;
 			$this->arr_unsortable_columns[] = 'total';
 			}
 		foreach($new_dataset as $k=>$a){
-			if($bool_bench_column){
-				if($arr_benchmarks[$k] !== NULL) $sum_data['benchmark'] = round($arr_benchmarks[$k], $dec_pts[$k]);//strpos($arr_benchmarks[$k], '.') !== FALSE ? trim(trim($arr_benchmarks[$k],'0'), '.') : $arr_benchmarks[$k];
-				else $sum_data['benchmark'] = NULL;
-			}
-			if($bool_avg_column){
-				$count = count($a) - 1;
-				$new_dataset[$k]['average'] = $new_dataset[$k]['total'] / $count;
-			}
-			if($bool_sum_column){
-				$new_dataset[$k]['total'] = $sum;
-			}
-			if(($bool_avg_column && !$bool_sum_column) || (!$bool_avg_column && !$bool_sum_column)){ //total column should not be displayed on PDF if it is only used to calculate avg 
-				unset($new_dataset[$k]['total']);
+			if(!empty($k)){
+				if($bool_bench_column){
+					if($arr_benchmarks[$k] !== NULL) $sum_data['benchmark'] = round($arr_benchmarks[$k], $this->arr_decimal_points[$k]);//strpos($arr_benchmarks[$k], '.') !== FALSE ? trim(trim($arr_benchmarks[$k],'0'), '.') : $arr_benchmarks[$k];
+					else $sum_data['benchmark'] = NULL;
+				}
+				if($bool_avg_column){
+					$new_dataset[$k]['average'] = $new_dataset[$k]['total'] / $new_dataset[$name]['count'];
+					if(isset($this->arr_decimal_points[$k])) $new_dataset[$k]['average'] = round($new_dataset[$k]['average'], $this->arr_decimal_points[$k]);
+				}
+				if(($bool_avg_column && !$bool_sum_column) || (!$bool_avg_column && !$bool_sum_column)){ //total column should not be displayed on PDF if it is only used to calculate avg 
+					unset($new_dataset[$k]['total']);
+				}
 			}
 		}
 		$this->arr_db_field_list = $this->arr_fields;
-//var_dump($this->arr_fields);
-//var_dump($new_dataset);
-//die();
 		return $new_dataset;
 	}
 	
-	/*  
-	 * @method date_to_header()
-	 * @param array dataset
-	 * @param string header field
-	 * @param int pdf with of header field
-	 * @param bool add average column
-	 * @param bool add sum column
-	 * @return array pivoted resultset
-	 * @author Chris Tranel
-	 */
-	protected function date_to_header($arr_dataset, $x_axis_field, $y_axis_field, $header_field_width, $label_column_width, $bool_avg_column = TRUE, $bool_sum_column = FALSE, $bool_bench_column = FALSE){
-		$this->date_field = $x_axis_field;
-		$sess_benchmarks = $this->session->userdata('benchmarks');
-		$header_text = ' ';
-		$arr_sum = 0;
-		$count = 0;
-		$new_dataset = array();
-		foreach($this->arr_fields as $k=>$v){
-			if($v == $x_axis_field){
-				$header_text = $k;
-				$this->arr_unsortable_columns[] = $v;
-			}
-			else {
-				//$new_dataset[$v[$y_axis_field]][$x_axis_field] = $k;
-			}
-		}
-		
-		$this->arr_fields = array($header_text => $x_axis_field); //used for labels in left-most column that are set in foreach loop above
-		$this->arr_field_sort[$x_axis_field] = 'ASC';
-		$this->arr_pdf_widths[$x_axis_field] = $label_column_width;
-		foreach($arr_dataset as $row){
-			$dec_pts[$row[$y_axis_field]] = 0;
-			foreach($row as $k => $v){
-				if(!isset($dec_pts[$k])) $dec_pts[$k] = 0;
-				if($k == $x_axis_field){
-					$this->arr_fields[$row[$x_axis_field]] = $v;
-					$this->arr_pdf_widths[$row[$x_axis_field]] = $header_field_width;
-					$this->arr_field_sort[$row[$x_axis_field]] = 'ASC';
-					$this->arr_unsortable_columns[] = $v; 
-				}
-				elseif($k == $y_axis_field){
-					
-				}
-				elseif(strpos($row[$y_axis_field], 'isnull') === FALSE) {
-					if(isset($this->arr_decimal_points[$k])) $dec_pts[$k] = $this->arr_decimal_points[$k];
-					else{
-						$tmp_dec_pts  = strlen(substr(strrchr($v, "."), 1));
-						if($tmp_dec_pts > $dec_pts[$k]) $dec_pts[$k] = $tmp_dec_pts;
-					}
-					
-					$new_dataset[$row[$y_axis_field]][$x_axis_field] = $row[$y_axis_field];
-					if(isset($new_dataset[$row[$y_axis_field]]['total']) === FALSE && $v !== NULL){
-						$new_dataset[$row[$y_axis_field]]['total'] = 0;
-						$new_dataset[$row[$y_axis_field]]['average'] = 0;
-						$new_dataset[$row[$y_axis_field]]['count'] = 0;
-					} 
-					$new_dataset[$row[$y_axis_field]][$row[$x_axis_field]] = $v;
-					if($v !== NULL){
-						$new_dataset[$row[$y_axis_field]]['total'] += $v;
-						$new_dataset[$row[$y_axis_field]]['count'] ++;
-					} 
-				}				
-			}
-		}
-
-		//begin benchmarks
-		if($bool_bench_column){
-			$bench_settings = $this->get_bench_settings();
-			$this->benchmarks_lib->set_criteria($this->primary_table_name, $header_field, $bench_settings['metric'], $bench_settings['criteria'], $bench_settings['arr_herd_size'], $bench_settings['arr_states']);
-			$bench_sql = $this->benchmarks_lib->build_benchmark_query($this);
-			$arr_benchmarks = $this->{$this->db_group_name}->query($bench_sql)->result_array();
-			$arr_benchmarks = $arr_benchmarks[0];
-			
-			$arr_summary_fields[ucwords(strtolower(str_replace('_', ' ', $sess_benchmarks['metric']))) . ' (' . $arr_benchmarks['cnt_herds'] . ')'] = 'benchmark';
-			$this->arr_pdf_widths['benchmark'] = $header_field_width;
-			$this->arr_field_sort['benchmark'] = 'ASC';
-			$this->arr_unsortable_columns[] = 'benchmark';
-		}
-		if($bool_avg_column){
-			$arr_summary_fields['Rolling 12'] = 'average';
-			$this->arr_pdf_widths['average'] = $header_field_width;
-			$this->arr_field_sort['average'] = 'ASC';
-			$this->arr_unsortable_columns[] = 'average';
-		}
-		if($bool_sum_column){
-			$arr_summary_fields['Total'] = 'total';
-			$this->arr_pdf_widths['total'] = $header_field_width;
-			$this->arr_field_sort['total'] = 'ASC';
-		}
-		$this->arr_fields = array_slice($this->arr_fields, 0, 1) + $arr_summary_fields + array_slice($this->arr_fields, 1);
-		unset($arr_summary_fields);
-		foreach($new_dataset as $k=>$a){
-			if($bool_bench_column){
-				if($arr_benchmarks[$k] !== NULL) $sum_data['benchmark'] = round($arr_benchmarks[$k], $dec_pts[$k]);//strpos($arr_benchmarks[$k], '.') !== FALSE ? trim(trim($arr_benchmarks[$k],'0'), '.') : $arr_benchmarks[$k];
-				else $sum_data['benchmark'] = NULL;
-			}
-			if($bool_avg_column){
-				$sum_data['average'] = isset($new_dataset[$k]['count']) ? $new_dataset[$k]['total'] / $new_dataset[$k]['count'] : NULL;
-				if($sum_data['average'] !== NULL) $sum_data['average'] = round($sum_data['average'], $dec_pts[$k]);
-			}
-			if($bool_sum_column){
-				$sum_data['total'] = $sum;
-			}
-			if($bool_avg_column && !$bool_sum_column){ //total column should not be displayed on PDF if it is only used to calculate avg 
-				unset($new_dataset[$k]['total']);
-			}
-			if(!$bool_avg_column && !$bool_sum_column)
-			unset($new_dataset[$k]['count']);
-			$new_dataset[$k] = array_slice($new_dataset[$k], 0, 1) + $sum_data + array_slice($new_dataset[$k], 1);
-			unset($sum_data);
-		}
-		return $new_dataset;
-	}
 	
 	protected function _set_autofilter($arr_filter_criteria){
 		$this->arr_messages['filter_alert'] = '';

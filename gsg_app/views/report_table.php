@@ -23,7 +23,8 @@
 							foreach($fields as $field_display => $field_name):
 								if(is_array($cr) && array_key_exists($field_name, $cr)) $value = $cr[$field_name];
 								elseif(is_object($cr) && property_exists($cr, $field_name)) $value = $cr->$field_name;
-				/* PROGRAM DB_FIELD LINK INFO */
+								else $value = '';
+				/* todo: PROGRAM DB_FIELD LINK INFO */
 								if($field_name == 'barn_name') $value = '<a href="http://newdata.crinet.com/agsourcedm/index.php?action=events&comp_num=507&UserID=35999999&Password=12345&source=myagsource" title="View Cow Data">' . $value . '</a>';
 								?><td><?php echo $value; ?></td><?php
 							endforeach;

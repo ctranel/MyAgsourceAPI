@@ -330,7 +330,9 @@ if ( ! function_exists('merge_arrays_on_value_key_match')) {
 	 */
 
 	function merge_arrays_on_value_key_match(&$array1, &$array2){
+//var_dump($array2);
 		foreach($array1 as $k => $v){
+//echo "$k => $v \n";
 			if(is_array($v)) $array1[$k] = merge_arrays_on_value_key_match($v, $array2);
 			else $array1[$k] = get_element_by_key($v, $array2);
 		}

@@ -12,7 +12,7 @@ function get_table_header_array($arr_header_data, $arr_pdf_widths = array()){
 	$rowspan = 1;
 	$tot_levels = array_depth($arr_header_data);
 	$arr_header_structure = array(); //return value
-	getHeaderLayer($arr_header_structure, $arr_header_data, $depth, $rowspan, $tot_levels, $arr_pdf_widths);// not currently used, too taxing on memory.
+	getHeaderLayer($arr_header_structure, $arr_header_data, $depth, $rowspan, $tot_levels, $arr_pdf_widths);
 	ksort($arr_header_structure);
 	return $arr_header_structure;
 } //end function table_header_cell
