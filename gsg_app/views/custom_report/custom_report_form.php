@@ -134,7 +134,7 @@
 				</th>
 			</tr>
 		</table>
-		<div id="xaxis" class="chart-only">
+		<div id="xaxis-trend" class="chart-only">
 			<div id="wxaxis-0">
 				<label for="xaxis_label">Text</label><input name="xaxis_label" id="xaxis_label" size="10" maxlength="50"><br>
 				<label for="xaxis_field">Timespan Field</label><select name="xaxis_field" id="xaxis_field"></select><br>
@@ -147,12 +147,6 @@
 		</div>
 	</div>
 	
-<!-- 	<div id="set-group-by" class="form-grouping">
-		<h2>Group By</h2>
-		<div id="wgroupby-0">
-			<input name="group_by[0]" id="groupby-0"><a class="remove-fld link">X</a>
-		</div>
-	</div> -->
 	<div id="set-sort-by" class="form-grouping table-only">
 		<h2>Sort By</h2>
 		<div id="wsortby-0">
