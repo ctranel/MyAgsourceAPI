@@ -91,9 +91,10 @@ function drop_table_build_field(ev){ //called by event ondrop
 	drop_table_field(ev, 'wcolumn');
 }
 
-function drop_trend_build_field(ev){ //called by event ondrop
+function drop_chart_build_field(ev){ //called by event ondrop
 	ev.preventDefault();
-	drop_table_field(ev, 'wtrendfield');
+	var container_id = $(ev.target).parent("TH").attr('id').split('-')[0];
+	drop_table_field(ev, container_id);
 }
 
 function drop_table_field(ev, container_id){
@@ -178,9 +179,10 @@ function trash_table_build_column(ev){
 	trash_column(ev, 'wcolumn');
 }
 
-function trash_trend_build_column(ev){
+function trash_chart_build_column(ev){
 	ev.preventDefault();
-	trash_column(ev, 'wtrendfield');
+	var container_id = $(ev.target).parent("TH").attr('id').split('-')[0];
+	trash_column(ev, container_id);
 }
 
 function trash_column(ev, container_id){
@@ -443,7 +445,7 @@ $(".add-header-row").on("click", add_head_row); //table design header rows
 $(".split").on("click", split_head); //table design header rows
 $(".remove-head").on("click", trash_head); //table design header rows
 $(".remove-col").on("click", trash_table_build_column);
-$(".remove-trend-col").on("click", trash_trend_build_column);
+$(".remove-trend-col").on("click", trash_chart_build_column);
 $(".remove-fld").on("click", trash_field);
 $(".column-aggregate").on("change", add_aggregate);
 
@@ -461,14 +463,19 @@ $('#field-container').children().each(function(){$(this).on('dragstart', drag);}
 	$('#wcolumn-0').addClass('field-target');
 	
 	//select trend fields
-	$('#wtrendfield-0').on('drop', drop_trend_build_field);
+	$('#wtrendfield-0').on('drop', drop_chart_build_field);
 	$('#wtrendfield-0').on('dragover', allow_drop);
 	$('#wtrendfield-0').addClass('field-target');
 	
 	//select compare fields
-	$('#wcomparefield-0').on('drop', drop_table_build_field);
+	$('#wcomparefield-0').on('drop', drop_chart_build_field);
 	$('#wcomparefield-0').on('dragover', allow_drop);
 	$('#wcomparefield-0').addClass('field-target');
+
+	//select boxplot fields
+	$('#wboxplotfield-0').on('drop', drop_chart_build_field);
+	$('#wboxplotfield-0').on('dragover', allow_drop);
+	$('#wboxplotfield-0').addClass('field-target');
 // END SELECT FIELD AREA
 	
 //group by
