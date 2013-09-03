@@ -267,15 +267,6 @@ abstract class parent_report extends CI_Controller {
 							$sort_by = implode('|', $this->arr_sort_by);
 							$sort_order = implode('|', $this->arr_sort_order);
 						}
-						/*load appropriate model
-						$model = $pb['url_segment'] . '_model';
-						if(file_exists(APPPATH . 'models/' . $this->section_path . '/' . $model . '.php')){
-							$this->load->model($this->section_path . '/' . $model);
-						}
-						else{
-							$model = 'report_model';
-							$this->load->model('report_model');
-						} */
 
 						$this->{$this->primary_model}->populate_field_meta_arrays($pb['id']);
 						//$data[] = multid_remove_element($this->ajax_report($this->page, $block_in, $this->session->userdata('pstring'), 'array', 'pdf'), 'count');//data is an array to allow for multiple tables on one PDF
@@ -554,16 +545,16 @@ abstract class parent_report extends CI_Controller {
 		}
 		if(is_array($arr_axes['y'])){
 			foreach($arr_axes['y'] as $a){
-				switch($a['data_type']) {
+/*				switch($a['data_type']) {
 					case 'datetime':
 						$label_format = "function(){return '<b>' + this.series.name + ':</b><br> - ' + this.x + Highcharts.dateFormat('%B %e, %Y', this.y);}";
 						$tooltip_format = "function(){return '<b>' + this.series.name + ':</b><br> - ' + this.x + Highcharts.dateFormat('%B %e, %Y', this.y);}";
 						break;
-					default:
+					default: */
 						$label_format = 'function(){return this.value}';
 						$tooltip_format = "function(){return '<b>' + this.series.name + ':</b><br>' + Highcharts.dateFormat('%B %e, %Y', this.x) + ' - ' + this.y + ' " . $um . "';}";
-						break;
-				}
+/*						break;
+				} */
 				$tmp_array = array(
 					'opposite' => $a['opposite'],
 					'title' => array('text' => $a['text'], 'style'=>array('color'=>'')),
