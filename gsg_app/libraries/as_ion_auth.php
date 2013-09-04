@@ -569,6 +569,9 @@ class As_ion_auth extends Ion_auth {
 						$a = $this->ion_auth_model->get_unmanaged_sections_array($group_id, $user_id, $herd_code);
 						if(!empty($a)) $tmp_array = array_merge($tmp_array, $a);
 					break;
+//SKIP PUBLIC SCOPE FOR NOW
+					case 'public':
+						break;
 					default:
 						$a = $this->ion_auth_model->get_sections_by_scope($s);
 						if(!empty($a)) $tmp_array = array_merge($tmp_array, $a);

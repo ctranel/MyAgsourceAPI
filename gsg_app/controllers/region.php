@@ -67,10 +67,6 @@ class Region extends CI_Controller {
 					array(
 						'title'=>'Manage Staff - ' . $this->config->item('product_name'),
 						'description'=>'Manage Staff - ' . $this->config->item('product_name'),
-						'arr_headjs_line'=>array(
-							'{customheadjs: "' . $this->config->item("base_url_assets") . 'js/custom-head.min.js"}'
-					//	'{techhelper: "' . $this->config->item("base_url_assets") . 'js/gs_tech_selection_helper.js"}'
-						)
 					)
 				);
 			}

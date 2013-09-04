@@ -360,11 +360,12 @@ abstract class parent_report extends CI_Controller {
 						'</script>'
 					),
 					'arr_headjs_line'=>array(
-						'{customheadjs: "' . $this->config->item("base_url_assets") . 'js/custom-head.min.js"}',
 						'{tooltips: "' . $this->config->item("base_url_assets") . 'js/jquery/jquery.qtip-1.0.0.min.js"}',
 						//'{tips_helper: "' . $this->config->item("base_url_assets") . 'js/rc_tooltip.js"}',
-						'{highcharts: "' . $this->config->item("base_url_assets") . 'js/charts/highcharts.js"}',
-						'{exporting: "' . $this->config->item("base_url_assets") . 'js/charts/exporting.js"}',
+						//'{highcharts: "' . $this->config->item("base_url_assets") . 'js/charts/highcharts.js"}',
+						//'{exporting: "' . $this->config->item("base_url_assets") . 'js/charts/exporting.js"}',
+						'{highcharts: "https://cdnjs.cloudflare.com/ajax/libs/highcharts/3.0.2/highcharts.js"}',
+						'{exporting: "https://cdnjs.cloudflare.com/ajax/libs/highcharts/3.0.2/modules/exporting.js"}',
 						'{graph_helper: "' . $this->config->item("base_url_assets") . 'js/charts/graph_helper.js"}',
 						'{inv_helper: "' . $this->config->item("base_url_assets") . 'js/' . $this->section_path . '_helper.js"}',
 						'function(){' . $tmp_js . ';}'
@@ -391,11 +392,13 @@ abstract class parent_report extends CI_Controller {
 			'herd_data' => $this->load->view('herd_info', $herd_data, TRUE),
 			'filters' => $this->load->view($this->section_path . '/filters', $filter_data, TRUE),
 			'page_footer' => $this->load->view('page_footer', $this->page_footer_data, TRUE),
-			'report_nav' => $this->load->view($report_nav_path, $arr_nav_data, TRUE),
 			'charts' => $arr_chart,
 			'print_all' => $this->print_all,
 			'report_path' => $this->report_path
 		);
+		
+		if((is_array($arr_nav_data['arr_pages']) && count($arr_nav_data['arr_pages']) > 1) || (is_array($arr_nav_data['arr_pstring']) && count($arr_nav_data['arr_pstring']) > 1)) $data['report_nav'] = $this->load->view($report_nav_path, $arr_nav_data, TRUE);
+		
 		//$this->access_log_model->write_entry($this->{$this->primary_model}->arr_blocks[$this->page]['page_id'], 'web');
 		$this->load->view('report', $data);
 	}

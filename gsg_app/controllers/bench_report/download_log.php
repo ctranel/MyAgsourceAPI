@@ -156,8 +156,6 @@ class Download_log extends parent_report {
 						'page_heading' => $this->product_name,
 						'section_nav' => $this->load->view('bench_report/section_nav', NULL, TRUE),
 						'arr_headjs_line'=>array(
-							'{customheadjs: "' . $this->config->item("base_url_assets") . 'js/custom-head.min.js"}',
-							//'{report_helper: "' . $this->config->item("base_url_assets") . 'js/gs_report_helper.js"}',
 							'{datepick: "' . $this->config->item("base_url_assets") . 'js/jquery/jquery.datepick.min.js"}',
 							'{log_helper: "' . $this->config->item("base_url_assets") . 'js/as_download_log_helper.js"}'
 						)

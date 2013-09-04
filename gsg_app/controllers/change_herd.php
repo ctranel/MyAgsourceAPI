@@ -178,7 +178,6 @@ class Change_herd extends CI_Controller {
 						'title'=>'Select Herd - ' . $this->config->item('product_name'),
 						'description'=>'Herd Selection Form for ' . $this->config->item('product_name'),
 						'arr_headjs_line'=>array(
-							'{customheadjs: "' . $this->config->item("base_url_assets") . 'js/custom-head.min.js"}',
 							'{datatable: "' . $this->config->item("base_url_assets") . 'js/herd_selection_helper.js"}'
 						)
 					)

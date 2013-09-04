@@ -53,9 +53,9 @@ class Auth extends Ionauth {
 					'title'=>'Dashboard - ' . $this->config->item("product_name"),
 					'description'=>'Dashboard for ' . $this->config->item("product_name"),
 					'arr_headjs_line'=>array(
-						'{customheadjs: "' . $this->config->item("base_url_assets") . 'js/custom-head.min.js"}',
 						'{twitter: "' . $this->config->item("base_url_assets") . 'js/jquery/jquery.jtweetsanywhere-1.2.1.min.js"}',
-						'{highcharts: "' . $this->config->item("base_url_assets") . 'js/charts/highcharts.js"}',
+						'{highcharts: "https://cdnjs.cloudflare.com/ajax/libs/highcharts/3.0.2/highcharts.js"}',
+						'{exporting: "https://cdnjs.cloudflare.com/ajax/libs/highcharts/3.0.2/modules/exporting.js"}',
 						'{graph_helper: "' . $this->config->item("base_url_assets") . 'js/charts/graph_helper.js"}',
 						'{card_helper: "' . $this->config->item("base_url_assets") . 'js/summary_reports/report_card_helper.js"}',
 						'{helper: "' . $this->config->item("base_url_assets") . 'js/as_dashboard_helper.js"}'
@@ -271,9 +271,6 @@ class Auth extends Ionauth {
 				array(
 					'title'=>'Manage Herd Access - ' . $this->config->item('product_name'),
 					'description'=>'Manage Herd Access, ' . $this->config->item('product_name'),
-					'arr_headjs_line'=>array(
-						'{customheadjs: "' . $this->config->item("base_url_assets") . 'js/custom-head.min.js"}',
-					)
 				)
 			);
 		}
@@ -382,9 +379,6 @@ class Auth extends Ionauth {
 				array(
 					'title'=>'Manage Herd Access - ' . $this->config->item('product_name'),
 					'description'=>'Manage Herd Access, ' . $this->config->item('product_name'),
-					'arr_headjs_line'=>array(
-						'{customheadjs: "' . $this->config->item("base_url_assets") . 'js/custom-head.min.js"}',
-					)
 				)
 			);
 		}
@@ -564,7 +558,6 @@ class Auth extends Ionauth {
 						'title'=>'Grant Consultant Access - ' . $this->config->item('product_name'),
 						'description'=>'Grant Consultant Access to ' . $this->config->item('product_name'),
 						'arr_headjs_line'=>array(
-							'{customheadjs: "' . $this->config->item("base_url_assets") . 'js/custom-head.min.js"}',
 							'{datepick: "' . $this->config->item("base_url_assets") . 'js/jquery/jquery.datepick.min.js"}',
 							'{report_helper: "' . $this->config->item("base_url_assets") . 'js/consultant_helper.js"}',
 						)
@@ -690,7 +683,6 @@ class Auth extends Ionauth {
 						'title'=>'Request Data Access - ' . $this->config->item('product_name'),
 						'description'=>'Grant Consultant Access to ' . $this->config->item('product_name'),
 						'arr_headjs_line'=>array(
-							'{customheadjs: "' . $this->config->item("base_url_assets") . 'js/custom-head.min.js"}',
 							'{datepick: "' . $this->config->item("base_url_assets") . 'js/jquery/jquery.datepick.min.js"}',
 							'{report_helper: "' . $this->config->item("base_url_assets") . 'js/consultant_helper.js"}',
 						)
@@ -727,7 +719,6 @@ class Auth extends Ionauth {
 					'title'=>'User List - ' . $this->config->item('product_name'),
 					'description'=>'Log In Form - ' . $this->config->item('product_name'),
 					'arr_headjs_line'=>array(
-						'{customheadjs: "' . $this->config->item("base_url_assets") . 'js/custom-head.min.js"}',
 						'{datatable: "' . $this->config->item("base_url_assets") . 'js/jquery/jquery.dataTables.min.js"}'
 					)
 				)
