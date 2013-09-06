@@ -142,16 +142,19 @@ class Herd_model extends CI_Model {
 	public function get_herds($limit=NULL, $offset=NULL, $order_by='farm_name')
 	{
 		$this->db
-		->select($this->tables['herds'] . '.*')
-		->join($this->tables['herds_regions'], $this->tables['herds'] . '.herd_code = ' . $this->tables['herds_regions'] . '.herd_code', 'LEFT')
-		->join($this->tables['regions'], $this->tables['herds_regions'] . '.region_id = ' . $this->tables['regions'] . '.id', 'LEFT');
+		->select('h.[herd_code],h.[farm_name],h.[herd_owner],h.[contact_fn],h.[contact_ln],h.[address_1],h.[address_2]
+				,h.[city],h.[state],h.[zip_5],h.[zip_4],h.[primary_area_code],h.[primary_phone_num],h.[association_num]
+				,h.[dhi_affiliate_num],h.[supervisor_num],h.[owner_privacy],h.[records_release_code]')
+		->join($this->tables['herds_regions'], 'h.herd_code = ' . $this->tables['herds_regions'] . '.herd_code', 'LEFT')
+		->join($this->tables['regions'], $this->tables['herds_regions'] . '.region_id = ' . $this->tables['regions'] . '.id', 'LEFT')
+		->where("h.member_status_code = 'A'");
 		//->join($this->tables['companies'], $this->tables['regions'] . '.company_id = ' . $this->tables['companies'] . '.id', 'LEFT');
 		
 		if(isset($order_by))$this->db->order_by($order_by);
 		if (isset($limit) && isset($offset)) $this->db->limit($limit, $offset);
 		elseif(isset($limit)) $this->db->limit($limit);
 		//if(!$this->as_ion_auth->has_permission('View Other Companies')) $this->db->where($this->tables['regions'] . '.company_id', $this->session->userdata('company_id'));
-		$results = $this->db->get($this->tables['herds']);
+		$results = $this->db->get($this->tables['herds'] . ' h');
 		return $results;
 	}
 
