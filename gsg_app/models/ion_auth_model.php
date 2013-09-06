@@ -946,9 +946,9 @@ class Ion_auth_model extends Ion_auth_parent_model
 		->select($this->tables['super_sections'] . '.id, ' . $this->tables['super_sections'] . '.name, ' . $this->tables['super_sections'] . '.path, ' . $this->tables['super_sections'] . '.list_order')
 		->distinct()
 		->join($this->tables['sections'], $this->tables['super_sections'] . '.id = ' . $this->tables['sections'] . '.super_section_id', 'left')
-		->join('users_sections', 'users_sections.section_id = sections.id', 'inner')
-		->where("(" . $this->tables['sections'] . '.user_id IS NULL OR ' . $this->tables['sections'] . '.user_id = ' . $user_id . ' OR users_sections.user_id = ' . $user_id . ")")
-		->where('users_sections.user_id', $user_id);
+		->join($this->tables['users_sections'], $this->tables['users_sections'] . '.section_id = ' . $this->tables['sections'] . '.id', 'inner')
+		->where("(" . $this->tables['sections'] . '.user_id IS NULL OR ' . $this->tables['sections'] . '.user_id = ' . $user_id . ' OR ' . $this->tables['users_sections'] . '.user_id = ' . $user_id . ")")
+		->where($this->tables['users_sections'] . '.user_id', $user_id);
 		return $this->get_super_sections();
 	}
 	
@@ -973,9 +973,9 @@ class Ion_auth_model extends Ion_auth_parent_model
 	public function get_sections_by_user($user_id){
 		$this->db
 		->select($this->tables['sections'] . '.id, ' . $this->tables['sections'] . '.name, ' . $this->tables['sections'] . '.path')
-		->join('users_sections', 'users_sections.section_id = sections.id', 'left')
-		->where("(" . $this->tables['sections'] . '.user_id IS NULL OR ' . $this->tables['sections'] . '.user_id = ' . $user_id . ' OR users_sections.user_id = ' . $user_id . ")")
-		->where('users_sections.user_id', $user_id);
+		->join($this->tables['users_sections'], $this->tables['users_sections'] . '.section_id = ' . $this->tables['sections'] . '.id', 'left')
+		->where("(" . $this->tables['sections'] . '.user_id IS NULL OR ' . $this->tables['sections'] . '.user_id = ' . $user_id . ' OR ' . $this->tables['users_sections'] . '.user_id = ' . $user_id . ")")
+		->where($this->tables['users_sections'] . '.user_id', $user_id);
 		return $this->get_sections();
 	}
 	
@@ -1006,7 +1006,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 		->where('group_id', $this->session->userdata('active_group_id'))
 		//->where('section_id', $section_id)
 		//->where('permission', '1')
-		->get('tasks')
+		->get($this->tables['tasks'])
 		->result_array();
 		return array_extract_value_recursive('name', $results);
 	}

@@ -49,6 +49,7 @@
 //	$config['tables']['meta']    = 'users_meta';
 	$config['tables']['users_herds']    = 'users.dbo.users_herds';
 	$config['tables']['login_attempts']  = 'users.dbo.login_attempts';
+	$config['tables']['tasks']  = 'users.dbo.tasks';
 	$config['tables']['groups_tasks']  = 'users.dbo.groups_tasks';
 	
 	//herds

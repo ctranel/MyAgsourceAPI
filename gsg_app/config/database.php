@@ -79,8 +79,8 @@ $db['default']['stricton'] = FALSE;
     die( 'file: ' .__FILE__ . '--> Line: ' .__LINE__); */
 
 $db['herd']['hostname'] = 'testdare.verona.crinet\\' . $db_server;
-$db['herd']['username'] = 'webuser';//'myags_admin';
-$db['herd']['password'] = 'm1$AgSourze';//'DHI4web*';
+$db['herd']['username'] = 'myags_admin';//'webuser';
+$db['herd']['password'] = 'DHI4web*';//'m1$AgSourze';
 $db['herd']['database'] = "herd";//"genetic_selection_guide";publication_name
 $db['herd']['dbdriver'] = "mssql";
 $db['herd']['dbprefix'] = "";
