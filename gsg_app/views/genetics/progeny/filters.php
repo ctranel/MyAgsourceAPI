@@ -69,9 +69,9 @@
 				<?php break;
 			case 'age': ?>
 				<p class = "filter-group">
-					<?php echo form_label('Age Range (months)', 'age_dbfrom'); ?>		
-					Between <?php echo form_input(array('name'=>'age_dbfrom', 'value'=>$filter_selected['age_dbfrom'], 'size'=>'4', 'maxlength'=>'4', 'id'=>'age_dbfrom')); ?>
-					and <?php echo form_input(array('name'=>'age_dbto', 'value'=>$filter_selected['age_dbto'], 'size'=>'4', 'maxlength'=>'4', 'id'=>'age_dbto')); ?>
+					<?php echo form_label('Age Range (months)', 'age_monthsfrom'); ?>		
+					Between <?php echo form_input(array('name'=>'age_monthsfrom', 'value'=>$filter_selected['age_monthsfrom'], 'size'=>'4', 'maxlength'=>'4', 'id'=>'age_monthsfrom')); ?>
+					and <?php echo form_input(array('name'=>'age_monthsto', 'value'=>$filter_selected['age_monthsto'], 'size'=>'4', 'maxlength'=>'4', 'id'=>'age_monthsto')); ?>
 				</p>
 				<?php break;
 				endswitch; 

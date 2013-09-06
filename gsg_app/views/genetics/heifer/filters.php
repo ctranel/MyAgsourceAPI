@@ -24,7 +24,7 @@
 					echo form_fieldset_close(); ?>
 				<?php endif; ?>
 				<?php break;
-			case 'quartile': ?>
+			case 'decision_guide_qtile_num': ?>
 				<p class = "filter-group">
 					<?php echo form_fieldset('Quartile', array('id' => 'quartile-fieldset')); ?>
 					<span class="filter-checkbox">
@@ -67,11 +67,11 @@
 					and <?php echo form_input(array('name'=>'curr_lact_dim_dbto', 'value'=>$filter_selected['curr_lact_dim_dbto'], 'size'=>'3', 'maxlength'=>'3', 'id'=>'curr_lact_dim_dbto')); ?>
 				</p>
 				<?php break;
-			case 'age': ?>
+			case 'age_months': ?>
 				<p class = "filter-group">
-					<?php echo form_label('Age Range (months)', 'age_dbfrom'); ?>		
-					Between <?php echo form_input(array('name'=>'age_dbfrom', 'value'=>$filter_selected['age_dbfrom'], 'size'=>'4', 'maxlength'=>'4', 'id'=>'age_dbfrom')); ?>
-					and <?php echo form_input(array('name'=>'age_dbto', 'value'=>$filter_selected['age_dbto'], 'size'=>'4', 'maxlength'=>'4', 'id'=>'age_dbto')); ?>
+					<?php echo form_label('Age Range (months)', 'age_monthsfrom'); ?>		
+					Between <?php echo form_input(array('name'=>'age_monthsfrom', 'value'=>$filter_selected['age_monthsfrom'], 'size'=>'4', 'maxlength'=>'4', 'id'=>'age_monthsfrom')); ?>
+					and <?php echo form_input(array('name'=>'age_monthsto', 'value'=>$filter_selected['age_monthsto'], 'size'=>'4', 'maxlength'=>'4', 'id'=>'age_monthsto')); ?>
 				</p>
 				<?php break;
 				endswitch; 

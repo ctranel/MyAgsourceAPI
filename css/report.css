@@ -69,7 +69,6 @@ ul.report-nav li a.sel, ul.pstring-nav li a.sel {font-weight: bold;  text-decora
 .jqPlot {clear: left;}
 .chart-container {margin: 0 auto;}
 
-#filters {display: none;}
 #herd-text {}
 #herd-text .general-herd {}
 #herd-text .report-specific {float: right;}

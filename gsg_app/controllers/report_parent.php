@@ -65,7 +65,7 @@ abstract class parent_report extends CI_Controller {
 			$this->session->keep_flashdata('redirect_url');
 			redirect(site_url('change_herd/select'));			
 		}
-		$this->section_id = $this->{$this->primary_model}->section_id;
+		$this->section_id = $this->{$this->primary_model}->get_section_id();
 		/* Load the profile.php config file if it exists
 		$this->config->load('profiler', false, true);
 		if ($this->config->config['enable_profiler']) {
@@ -166,25 +166,36 @@ abstract class parent_report extends CI_Controller {
 		}
 
 //FILTERS
-		$arr_filter_criteria = array(); //filter data for filters included in $this->arr_page_filters
 	//always have filters for pstring (and page?)
+		$this->arr_page_filters = $this->access_log_model->get_page_filters($this->section_id, $this->page);
 		if(array_key_exists('pstring', $this->arr_page_filters) === FALSE){
-			$this->arr_page_filters['pstring'] = array('db_field_name' => 'pstring', 'name' => 'PString', 'default_value' => array(0));
+			$this->arr_page_filters['pstring'] = array('db_field_name' => 'pstring', 'name' => 'PString', 'type' => 'select multiple', 'default_value' => array(0));
 			$this->arr_filter_criteria['pstring'] = array(0);
-		} 
+		}
+
 /*		if(array_key_exists('page', $this->arr_page_filters) === FALSE){
 			$this->arr_page_filters[] = 'page';
 			$this->arr_filter_criteria['page'] = $this->report_path;
 		} */
 		$this->load->library('form_validation');
 		//validate form input for filters
-		foreach($this->arr_page_filters as $f){
+		foreach($this->arr_page_filters as $k=>$f){
+		//if range, create 2 fields, to and from.  Default value stored in DB as pipe-delimited
+			if($f['type'] == 'range' || $f['type'] == 'date range'){
+				if(!isset($f['default_value'])) $f['default_value'] = '|';
+				list($this->arr_filter_criteria[$k . 'from'], $this->arr_filter_criteria[$k . 'to']) = explode('|', $f['default_value']);
+			}
+			elseif(!isset($this->arr_filter_criteria[$k])) $this->arr_filter_criteria[$k] = $f['default_value'];
 			$arr_filters_list[] = $f['db_field_name'];
 			$this->form_validation->set_rules($f['db_field_name'], $f['name']);
 		}
 		if ($this->form_validation->run() == TRUE) { //successful submission
 			foreach($this->arr_page_filters as $f){
 				if($f['db_field_name'] == 'page') $this->arr_filter_criteria['page'] = $this->arr_pages[$this->input->post('page', TRUE)]['name'];
+				elseif($f['type'] == 'range' || $f['type'] == 'date range'){
+					$this->arr_filter_criteria[$k . 'from'] = $this->input->post($k . 'from', TRUE);
+					$this->arr_filter_criteria[$k . 'to'] = $this->input->post($k . 'to', TRUE);
+				}
 				else $this->arr_filter_criteria[$f['db_field_name']] = $this->input->post($f['db_field_name'], TRUE);
 			}
 		}
@@ -208,7 +219,7 @@ abstract class parent_report extends CI_Controller {
 			'filter_selected'=>$this->arr_filter_criteria,
 			'report_path'=>$this->report_path,
 			'arr_pstring'=>$this->{$this->primary_model}->arr_pstring,
-			'arr_pages' => $this->access_log_model->get_pages_by_criteria(array('section_id' => $this->section_id))->result_array()
+			//'arr_pages' => $this->access_log_model->get_pages_by_criteria(array('section_id' => $this->section_id))->result_array()
 			//'page' => $this->arr_filter_criteria['page']
 		);
 		//END FILTERS
@@ -292,6 +303,8 @@ abstract class parent_report extends CI_Controller {
 		$this->carabiner->css('chart.css', 'print');
 		$this->carabiner->css('report.css', 'print');
 		$this->carabiner->css($this->section_path . '.css', 'screen');
+		if(count($this->{$this->primary_model}->arr_blocks) > 1 && count($this->arr_page_filters) > 1) $this->carabiner->css('filters.css', 'screen');
+		else $this->carabiner->css('hide_filters.css', 'screen');
 		//$this->carabiner->css('tooltip.css', 'screen');
 		//get_herd_data
 		$herd_data = $this->herd_model->header_info($this->session->userdata('herd_code'));
@@ -382,7 +395,6 @@ abstract class parent_report extends CI_Controller {
 //			'block' => $block_in,
 			'arr_pages' => $this->access_log_model->get_pages_by_criteria(array('section_id' => $this->section_id))->result_array()
 		);
-		
 		$this->page_footer_data = array();
 		$report_nav_path = 'report_nav';
 		if(file_exists(APPPATH . 'views/' . $this->section_path . '/report_nav.php')) $report_nav_path =  $this->section_path . '/' . $report_nav_path;

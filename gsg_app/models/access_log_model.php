@@ -165,6 +165,35 @@ class Access_log_model extends Report_Model {
 
 
 	/**
+	 * get_page_filters
+	 * @return array of filter data for given page
+	 * @author Chris Tranel
+	 **/
+	public function get_page_filters($section_id, $page_url_segment) {
+		$ret_array = array();
+		$results = $this->{$this->db_group_name}
+			->select('pf.*, f.db_field_name')
+			->where('p.section_id', $section_id)
+			->where('p.url_segment', $page_url_segment)
+			->join($this->tables['pages'] . ' p', "pf.page_id = p.id")
+			->join('users.dbo.db_fields f', "pf.field_id = f.id")
+			->order_by('pf.list_order')
+			->get('users.dbo.page_filters pf')
+			->result_array();
+		if(isset($results) && is_array($results)){
+			foreach($results as $r){
+				$ret_array[$r['db_field_name']] = array(
+					'db_field_name' => $r['db_field_name']
+					,'name' => $r['name']
+					,'type' => $r['type']
+					,'default_value' => unserialize($r['default_value'])
+				);
+			}
+		}
+		return $ret_array;
+	}
+	
+	/**
 	 * get_keyed_page_array
 	 *
 	 * @return 2d array ([section_id][id]=name)

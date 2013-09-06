@@ -2,7 +2,7 @@
 /* parent of all report models */
 
 class Report_model extends CI_Model {
-	protected $db_group_name;
+	protected $section_id;
 	public $arr_tables;
 	protected $test_date;
 	protected $arr_field_table;//DB field name is key
@@ -40,7 +40,7 @@ class Report_model extends CI_Model {
 	public $arr_pstring = array();
 	public $arr_blocks = array();
 	public $arr_messages = array();
-	public $section_id;
+//	public $section_id;
 	
 	public function __construct($section_path = NULL){
 		parent::__construct();
@@ -83,6 +83,9 @@ class Report_model extends CI_Model {
 	}
 	function get_num_results(){
 		return $this->num_results;
+	}
+	function get_section_id(){
+		return $this->section_id;
 	}
 	
 	function set_primary_table($table_name){
@@ -161,7 +164,6 @@ class Report_model extends CI_Model {
 			'arr_header_data' => $this->arr_fields,
 		);
 		$table_header_data['structure'] = get_table_header_array($table_header_data['arr_header_data']); //table header helper function
-//var_dump($table_header_data['arr_header_data']);
 		return $table_header_data;
 	}
 
@@ -407,10 +409,7 @@ class Report_model extends CI_Model {
 		}
 		else $this->{$this->db_group_name}->limit($limit);
 		
-		// Group By
 		$this->prep_group_by(); // the prep_group_by function adds group by field to the active record object
-
-		// Sort
 		$this->prep_sort($arr_sort_by, $arr_sort_order); // the prep_sort function adds the sort field to the active record object
 
 		//add select fields to query
