@@ -303,7 +303,7 @@ abstract class parent_report extends CI_Controller {
 		$this->carabiner->css('chart.css', 'print');
 		$this->carabiner->css('report.css', 'print');
 		$this->carabiner->css($this->section_path . '.css', 'screen');
-		if(count($this->{$this->primary_model}->arr_blocks) > 1 && count($this->arr_page_filters) > 1) $this->carabiner->css('filters.css', 'screen');
+		if(count($this->{$this->primary_model}->arr_blocks) == 1 && count($this->arr_page_filters) > 1) $this->carabiner->css('filters.css', 'screen');
 		else $this->carabiner->css('hide_filters.css', 'screen');
 		//$this->carabiner->css('tooltip.css', 'screen');
 		//get_herd_data
