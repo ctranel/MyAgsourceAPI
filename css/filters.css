@@ -51,3 +51,5 @@ html legend{
 #filters span.filter-checkbox {white-space:nowrap;}
 
 #filters .submit {margin: 10px 20px;}
+
+#report-links {display: none;}
