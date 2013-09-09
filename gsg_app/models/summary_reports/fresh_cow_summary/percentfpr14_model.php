@@ -20,8 +20,8 @@ class Percentfpr14_model extends Report_model {
 		$avg_l4_ffp_ratio_gt14_pct = $arr_dataset[0]['l4_ffp_ratio_gt14_pct'];
 		$new_dataset = parent::pivot($arr_dataset, $header_field, $header_field_width, $label_column_width, $bool_avg_column, $bool_sum_column, $bool_bench_column);
 		//update total field in new dataset
-		$new_dataset['l1_ffp_ratio_gt14_pct']['average'] = round($avg_l1_ffp_ratio_gt14_pct / 12);
-		$new_dataset['l4_ffp_ratio_gt14_pct']['average'] = round($avg_l4_ffp_ratio_gt14_pct / 12);
+		$new_dataset['l1_ffp_ratio_gt14_pct']['average'] = $avg_l1_ffp_ratio_gt14_pct;
+		$new_dataset['l4_ffp_ratio_gt14_pct']['average'] = $avg_l4_ffp_ratio_gt14_pct;
 		//Change Header Text
 		$this->arr_fields['Annual Average'] = 'average';
 		unset($this->arr_fields['Average']);
