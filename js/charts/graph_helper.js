@@ -156,7 +156,7 @@ function updateBlock(container_div_id, block_in, sort_field, sort_order, display
 			table_cnt++;
 			break;
 		case "chart":
-			load_chart(base_url + '/ajax_report/' + page + '/' + block + '/' + pstring + '/' + display + '/' + sort_field + '/' + sort_order + '/web/null/' + chart_cnt + '/' + cache_bust, container_div_id);
+			load_chart(base_url + '/ajax_report/' + page + '/' + block + '/' + pstring + '/' + display + '/' + sort_field + '/' + sort_order + '/web/null/' + chart_cnt + '/null/' + cache_bust, container_div_id);
 			chart_cnt++;
 			break;
 	}

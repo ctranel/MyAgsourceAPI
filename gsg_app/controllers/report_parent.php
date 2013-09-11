@@ -57,7 +57,7 @@ abstract class parent_report extends CI_Controller {
 		}
 		else {
 			if($this->session->flashdata('message')) $this->session->keep_flashdata('message');
-			if($this->uri->segment(2) != 'ajax_report') $this->session->set_flashdata('redirect_url', $this->uri->uri_string());
+			if($this->uri->segment(3) != 'ajax_report') $this->session->set_flashdata('redirect_url', $this->uri->uri_string());
 			redirect(site_url('auth/login'));
 		}
 		
@@ -75,13 +75,13 @@ abstract class parent_report extends CI_Controller {
 
 	protected function authorize(){
 		if(!isset($this->as_ion_auth)){
-	       	if($this->uri->segment(2) == 'ajax_report'){
+	       	if($this->uri->segment(3) == 'ajax_report'){
 				echo "Your session has expired, please log in and try again.";
 			}
 			else return FALSE;
 		}
 		if(!$this->as_ion_auth->logged_in()) {
-	       	if($this->uri->segment(2) == 'ajax_report'){
+	       	if($this->uri->segment(3) == 'ajax_report'){
 				echo "Your session has expired, please log in and try again.";
 			}
 			else {
@@ -90,7 +90,7 @@ abstract class parent_report extends CI_Controller {
 			}
 		}
 		if(!isset($this->herd_code)){
-	       	if($this->uri->segment(2) == 'ajax_report'){
+	       	if($this->uri->segment(3) == 'ajax_report'){
 				echo 'Please select a herd and try again.';
 			}
 			else {
@@ -104,7 +104,7 @@ abstract class parent_report extends CI_Controller {
 		if(!$pass_view_nonowned_test) $pass_view_nonowned_test = $this->as_ion_auth->has_permission("View non-own w permission") && $this->ion_auth_model->consultant_has_access($this->session->userdata('user_id'), $this->herd_code, $this->section_id);
 		if($pass_unsubscribed_test && $pass_view_nonowned_test) return TRUE;
 		elseif(!$pass_unsubscribed_test && !$pass_view_nonowned_test) {
-			if($this->uri->segment(2) == 'ajax_report') {
+			if($this->uri->segment(3) == 'ajax_report') {
 				echo 'Herd ' . $this->herd_code . ' is not subscribed to the ' . $this->product_name . ', nor do you have permission to view this report for herd ' . $this->herd_code . '.  Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' if you have questions or concerns.';
 			}
 			else {
@@ -113,7 +113,7 @@ abstract class parent_report extends CI_Controller {
 			}
 		}
 		elseif(!$pass_unsubscribed_test) {
-			if($this->uri->segment(2) == 'ajax_report') {
+			if($this->uri->segment(3) == 'ajax_report') {
 				echo 'Herd ' . $this->herd_code . ' is not subscribed to the ' . $this->product_name . '.  Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' if you have questions or concerns.';
 			}
 			else {
@@ -122,7 +122,7 @@ abstract class parent_report extends CI_Controller {
 			}
 		}
 		elseif(!$pass_view_nonowned_test) {
-			if($this->uri->segment(2) == 'ajax_report') {
+			if($this->uri->segment(3) == 'ajax_report') {
 				echo 'You do not have permission to view the ' . $this->product_name . ' for herd ' . $this->herd_code . '.  Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' if you have questions or concerns.';
 			}
 			else {
@@ -426,11 +426,10 @@ abstract class parent_report extends CI_Controller {
 	public function ajax_report($page, $block, $pstring, $output, $sort_by = 'null', $sort_order = 'null', $file_format = 'web', $test_date = FALSE, $report_count=0, $json_filter_data = NULL, $cache_buster = NULL) {//, $herd_size_code = FALSE, $all_breeds_code = FALSE
 		if(isset($json_filter_data)){
 			$arrParams = (array)json_decode(urldecode($json_filter_data));
-//var_dump($arrParams);
 			if(isset($arrParams['csrf_test_name']) && $arrParams['csrf_test_name'] != $this->security->get_csrf_hash()) die("I don't recognize your browser session, your session may have expired, or you may have cookies turned off.");
 			unset($arrParams['csrf_test_name']);
 			$this->_set_filters($page, $arrParams);
-//var_dump($this->arr_filter_criteria);
+				
 //die();
 		}
 		$this->load->helper('report_chart_helper');
@@ -443,14 +442,9 @@ abstract class parent_report extends CI_Controller {
 			$this->arr_sort_by = $tmp['arr_sort_by'];
 			$this->arr_sort_order = $tmp['arr_sort_order'];
 		}
-		//if(!$test_date || $test_date == 'null') $test_date = $this->{$this->primary_model}->get_recent_dates($date_field, 1, 'MM-dd-yyyy');
 
 		$pstring = (empty($pstring) && $pstring !== 0)?'0':$pstring;
-		// if pstring is changing, reset session data
-		//if($this->session->userdata('pstring') != $pstring){
-
 		$this->session->set_userdata('pstring', $pstring);
-		//}
 		$this->pstring = $pstring;
 
 		$this->page = $page;

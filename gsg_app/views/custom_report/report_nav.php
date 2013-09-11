@@ -7,7 +7,7 @@
 	
 			<?php $top = count($arr_pstring);
 			for( $c=0; $c < $top; $c++): ?>
-				<li class="first"><a href="#chart" id="<?php echo $arr_pstring[$c]['pstring']; ?>" onclick="return updateChart(event, this, 'pstring-links', 'pstring', '<?php echo $arr_pstring[$c]['pstring']; ?>');"><?php echo $arr_pstring[$c]['publication_name']; // . ' - ' . $arr_pstring[$c]['publication_name']; ?></a></li>
+				<li class="first"><a href="#chart" id="<?php echo $arr_pstring[$c]['pstring']; ?>" onclick="return updateBlock(event, this, 'pstring-links', 'pstring', '<?php echo $arr_pstring[$c]['pstring']; ?>');"><?php echo $arr_pstring[$c]['publication_name']; // . ' - ' . $arr_pstring[$c]['publication_name']; ?></a></li>
 					
 			<?php endfor; ?>
 		</ul>
@@ -26,7 +26,7 @@
 				else :
 					$li_class = FALSE; 
 				endif; ?>
-				<li <?php if($li_class) echo 'class="first"'; ?>><a href="#chart" id="<?php echo $e['url_segment']; ?>" onclick="return updateChart(event, this, 'block-links', 'block', '<?php echo $e['url_segment']; ?>');"><?php echo $e['name']; ?></a></li>
+				<li <?php if($li_class) echo 'class="first"'; ?>><a href="#chart" id="<?php echo $e['url_segment']; ?>" onclick="return updateBlock(event, this, 'block-links', 'block', '<?php echo $e['url_segment']; ?>');"><?php echo $e['name']; ?></a></li>
 <?php 		endforeach;
 		endif; ?>
 		</ul>

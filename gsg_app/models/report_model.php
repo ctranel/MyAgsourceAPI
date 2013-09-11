@@ -425,6 +425,9 @@ class Report_model extends CI_Model {
 		if (($key = array_search('test_date', $arr_select_fields)) !== FALSE) {
 			$arr_select_fields[$key] = "FORMAT(" . $this->primary_table_name . ".test_date, 'MM-dd-yy', 'en-US') AS test_date";//MMM-dd-yy
 		}
+		if (($key = array_search('calving_date', $arr_select_fields)) !== FALSE) {
+			$arr_select_fields[$key] = "FORMAT(" . $this->primary_table_name . ".calving_date, 'MM-dd-yy', 'en-US') AS calving_date";//MMM-dd-yy
+		}
 		if (($key = array_search('fresh_month', $arr_select_fields)) !== FALSE) {
 			$arr_select_fields[$key] = "FORMAT(" . $this->primary_table_name . ".fresh_month, 'MM-dd-yy', 'en-US') AS fresh_month";//MMM-dd-yy
 		}
@@ -827,7 +830,6 @@ FROM (SELECT DISTINCT TOP " . ($num_dates + 1) . " " . $date_field . "
 	 * @return array of data for the chart
 	 * @access public
 	 *
-	 **/
 	function get_12_mo_avg_graph_data($arr_fieldname, $herd_code, $num_tests = 12, $date_field = 'test_date', $arr_categories = NULL){
 		if(is_array($arr_fieldname) && !empty($arr_fieldname)) {
 			$select_str = '';
@@ -848,6 +850,7 @@ FROM (SELECT DISTINCT TOP " . ($num_dates + 1) . " " . $date_field . "
 		else $return_val = $this->set_longitudinal_data($data, $date_field);
 		return $return_val;
 	}
+	 **/
 	
 	/**
 	 * @method get_graph_data()
@@ -860,7 +863,7 @@ FROM (SELECT DISTINCT TOP " . ($num_dates + 1) . " " . $date_field . "
 	 *
 	 **/
 	function get_graph_data($arr_fieldname, $herd_code, $num_dates, $date_field, $arr_categories = NULL){
-		if(isset($date_field)){
+		if(isset($date_field) && isset($num_dates)){
 			$from_date = $this->get_start_date($date_field, $num_dates, 'MM-dd-yyyy');
 			$arr_to_date = $this->get_recent_dates($date_field, 1, 'MM-dd-yyyy');
 			$data = $this->search($herd_code, array('herd_code'=>$herd_code, 'pstring'=>$this->session->userdata('pstring'), $date_field . '_dbfrom' => $from_date, $date_field . '_dbto' => $arr_to_date[0]), array($date_field . ''), array('ASC'), $num_dates);
