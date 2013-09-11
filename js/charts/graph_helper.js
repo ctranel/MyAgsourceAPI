@@ -185,7 +185,7 @@ function load_table(server_path, div_id, tbl_cnt_in, sort_field, sort_order, blo
 	}
 	if(typeof(div_id) === 'undefined' || !div_id) div_id = 'table-canvas0';
 	//load javascript file (with a cache-busting parameter) rather than calling with AJAX for consistency with charts
-	head.js(server_path + '/' + Math.floor(Math.random()*10001), function() { process_table(div_id, tbl_cnt_in); });
+	head.js(server_path, function() { process_table(div_id, tbl_cnt_in); });
 	//cancel link when called from anchor tag
 	return false;
 }
