@@ -28,7 +28,7 @@
 				<p class = "filter-group">
 					<?php echo form_fieldset('Quartile', array('id' => 'quartile-fieldset')); ?>
 					<span class="filter-checkbox">
-						<?php echo form_checkbox(array('name'=>'decision_guide_qtile_num[]', 'id'=>'decision_guide_qtile_num0'), 'NULL', in_array('NULL', $filter_selected['decision_guide_qtile_num']) !== false); ?>
+						<?php echo form_checkbox(array('name'=>'decision_guide_qtile_num[]', 'id'=>'decision_guide_qtile_num0'), '0', in_array('NULL', $filter_selected['decision_guide_qtile_num']) !== false); ?>
 						None&nbsp;&nbsp;
 					</span>
 					<span class="filter-checkbox">
