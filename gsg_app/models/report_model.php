@@ -368,13 +368,6 @@ class Report_model extends CI_Model {
 		if(is_array($this->arr_fields)){
 			$arr_select_fields = array_flatten($this->arr_fields);
 			$arr_select_fields = $this->prep_select_fields($arr_select_fields);
-			// resolve field name/data/format exceptions (see animal_model prep_select_fields function override)
-			//process zero is null
-			//if(isset($this->arr_zero_is_null_fields) && !empty($this->arr_zero_is_null_fields)){
-			//	foreach($this->arr_zero_is_null_fields as $df){
-			//		if (($key = array_search($df, $arr_select_fields)) !== false) $arr_select_fields[$key] = "IF(" . $df . " = 0, '', " . $df . ") AS " . $df . "";
-			//	}
-			//}
 			//convert dates
 			if(isset($this->arr_date_fields) && !empty($this->arr_date_fields)){
 				foreach($this->arr_date_fields as $d){
@@ -473,23 +466,26 @@ class Report_model extends CI_Model {
 		}
 
 		foreach($arr_filter_criteria as $k => $v){
-			if(strpos($k, '.') === FALSE && strpos($k, 'dbfrom') === FALSE && strpos($k, 'dbto') === FALSE) $k = isset($this->arr_field_table[$k]) && !empty($this->arr_field_table[$k])?$this->arr_field_table[$k] . '.' . $k: $this->primary_table_name . '.' . $k;
+			if(strpos($k, '.') === FALSE && strpos($k, 'dbfrom') === FALSE && strpos($k, 'dbto') === FALSE) {
+				$k = isset($this->arr_field_table[$k]) && !empty($this->arr_field_table[$k])?$this->arr_field_table[$k] . '.' . $k: $this->primary_table_name . '.' . $k;
+			}
 			
 			if(empty($v) === FALSE || $v === '0'){
 				if(is_array($v)){
-					if(($tmp_key = array_search('NULL', $v)) !== FALSE){
+					/*if(($tmp_key = array_search('NULL', $v)) !== FALSE){
 						unset($v[$tmp_key]);
 						$text = implode(',', $v);
-						if(!empty($v)) $this->{$this->db_group_name}->where("($k IS NULL OR $k IN ( $text ))");
-						else $this->{$this->db_group_name}->where("$k IS NULL");
+						$this->{$this->db_group_name}->where("($k IN ( $text ))");
 					}
-					else $this->{$this->db_group_name}->where_in($k, $v);
+					else */$this->{$this->db_group_name}->where_in($k, $v);
 				}
 				else { //is not an array
 					if(substr($k, -5) == "_dbto"){ //ranges
 						$db_field = substr($k, 0, -5);
+						$from = is_date_format($arr_filter_criteria[$db_field . '_dbfrom']) ? date_to_mysqldatetime($arr_filter_criteria[$db_field . '_dbfrom']) : $arr_filter_criteria[$db_field . '_dbfrom'];
+						$to = is_date_format($arr_filter_criteria[$db_field . '_dbto']) ? date_to_mysqldatetime($arr_filter_criteria[$db_field . '_dbto']) : $arr_filter_criteria[$db_field . '_dbto'];
 						if(strpos($db_field, '.') === FALSE) $db_full_field = isset($this->arr_field_table[$db_field]) && !empty($this->arr_field_table[$db_field])?$this->arr_field_table[$db_field] . '.' . $db_field: $this->primary_table_name . '.' . $db_field;
-						$this->{$this->db_group_name}->where("$db_full_field BETWEEN '" . date_to_mysqldatetime($arr_filter_criteria[$db_field . '_dbfrom']) . "' AND '" . date_to_mysqldatetime($arr_filter_criteria[$db_field . '_dbto']) . "'");
+						$this->{$this->db_group_name}->where("$db_full_field BETWEEN '" . $from . "' AND '" . $to . "'");
 					}
 					elseif(substr($k, -7) != "_dbfrom"){ //default--it skips the opposite end of the range as _dbto
 						$this->{$this->db_group_name}->where($k, $v);

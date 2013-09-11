@@ -6,7 +6,7 @@
 <?php //$link_url = str_replace('display', 'filter', $form_url)?>
 <div class="handle"><a id="set_filters" class="handle">Set Filters</a></div>
 <?php //echo anchor("#","Apply Filters", 'class="handle"'); ?>
-<?php echo form_open($form_url, array('name'=>'report_search', 'id'=>'report_search')); ?>
+<?php echo form_open($form_url, array('name'=>'report-filter', 'id'=>'report-filter')); ?>
 <?php if(is_array($arr_filters)):
 	 foreach($arr_filters as $f):
 		switch($f): 

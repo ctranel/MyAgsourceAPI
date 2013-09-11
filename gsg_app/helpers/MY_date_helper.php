@@ -10,6 +10,27 @@
  * @param	string
  * @return	string
  */
+if ( ! function_exists('is_date_format'))
+{
+	function is_date_format($datestr = ''){
+		if ($datestr == '') return FALSE;
+		$datestr = str_replace('/', '-', trim($datestr));
+		// check db format
+		if (preg_match('/^[0-9]{2,4}\-[0-9]{1,2}\-[0-9]{1,2}/', $datestr)) return TRUE;
+		// check US Format
+		if (preg_match('/^[0-9]{1,2}\-[0-9]{1,2}\-[0-9]{2,4}/', $datestr)) return TRUE;
+		return FALSE;
+	}
+}
+/**
+ * Convert MySQL date (YYYY-MM-DD) to MM/DD/YYYY
+ *
+ * Reverses the above process
+ *
+ * @access	public
+ * @param	string
+ * @return	string
+ */
 if ( ! function_exists('mysql_to_human'))
 {
 	function mysql_to_human($datestr = '')

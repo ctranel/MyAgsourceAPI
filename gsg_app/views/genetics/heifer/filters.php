@@ -6,7 +6,7 @@
 <?php //$link_url = str_replace('display', 'filter', $form_url)?>
 <div class="handle"><a id="set_filters" class="handle">Set Filters</a></div>
 <?php //echo anchor("#","Apply Filters", 'class="handle"'); ?>
-<?php echo form_open($form_url, array('name'=>'report_search', 'id'=>'report_search')); ?>
+<?php echo form_open($form_url, array('name'=>'report-filter', 'id'=>'report-filter')); ?>
 <?php if(is_array($arr_filters)):
 	 foreach($arr_filters as $f):
 		switch($f): 
@@ -69,9 +69,9 @@
 				<?php break;
 			case 'age_months': ?>
 				<p class = "filter-group">
-					<?php echo form_label('Age Range (months)', 'age_monthsfrom'); ?>		
-					Between <?php echo form_input(array('name'=>'age_monthsfrom', 'value'=>$filter_selected['age_monthsfrom'], 'size'=>'4', 'maxlength'=>'4', 'id'=>'age_monthsfrom')); ?>
-					and <?php echo form_input(array('name'=>'age_monthsto', 'value'=>$filter_selected['age_monthsto'], 'size'=>'4', 'maxlength'=>'4', 'id'=>'age_monthsto')); ?>
+					<?php echo form_label('Age Range (months)', 'age_months_dbfrom'); ?>		
+					Between <?php echo form_input(array('name'=>'age_months_dbfrom', 'value'=>$filter_selected['age_months_dbfrom'], 'size'=>'4', 'maxlength'=>'4', 'id'=>'age_months_dbfrom')); ?>
+					and <?php echo form_input(array('name'=>'age_months_dbto', 'value'=>$filter_selected['age_months_dbto'], 'size'=>'4', 'maxlength'=>'4', 'id'=>'age_months_dbto')); ?>
 				</p>
 				<?php break;
 				endswitch; 

@@ -130,18 +130,26 @@ function updatePage(ev){
 	//get block urls for page (ajax or included in function call?)
 	//for each block
 		//create container div
-		updateChart();//actually updates both charts and tables
+		updateBlock();
 }
 
-function updateChart(container_div_id, block, sort_field, sort_order, display){//}, title, benchmark_text){
+function updateBlock(container_div_id, block_in, sort_field, sort_order, display){//}, title, benchmark_text){
 	//load and process ajax data - base_url and page are defined globally in the controller
+	block = block_in;
+	var params = '';
 	var cache_bust = Math.floor(Math.random()*1000);
 	//var block = $('input:radio[name=block]:checked').val();
 	var pstring = $('input:radio[name=pstring]:checked').val();
+	if($("#report-filter")){
+		params = encodeURIComponent(JSON.stringify($("#report-filter").serializeObject()));
+	}
+
 	if(typeof(pstring) == 'undefined') pstring = 0;
+	if(typeof(sort_field) == 'undefined') sort_field = null;
+	if(typeof(sort_order) == 'undefined') sort_order = null;
 	switch(display){
 		case "table": 
-			load_table(base_url + '/ajax_report/' + page + '/' + block + '/' + pstring + '/' + display + '/' + sort_field + '/' + sort_order + '/web/null/' + table_cnt + '/' + cache_bust, container_div_id, table_cnt, sort_field, sort_order, block);
+			load_table(base_url + '/ajax_report/' + page + '/' + block + '/' + pstring + '/' + display + '/' + sort_field + '/' + sort_order + '/web/null/' + table_cnt + '/' + params + '/' + cache_bust, container_div_id, table_cnt, sort_field, sort_order, block, params);
 			//$('#table-title-line' + table_cnt).html(title);
 			//$('#table-subtitle-line' + table_cnt).html('Herd ' + herd_code);
 			//$('#table-benchmark-line' + table_cnt).html(benchmark_text);
@@ -155,19 +163,27 @@ function updateChart(container_div_id, block, sort_field, sort_order, display){/
 	return false;
 }
 
-function load_table(server_path, div_id, tbl_cnt_in, sort_field, sort_order, block){
+function load_table(server_path, div_id, tbl_cnt_in, sort_field, sort_order, block_in, params){
+	block = block_in;
+	if(typeof(sort_field) == 'undefined') sort_field = null;
+	if(typeof(sort_order) == 'undefined') sort_order = null;
+	if(params = '' && $("#report-filter")){
+		params = encodeURIComponent(JSON.stringify($("#report-filter").serializeObject()));
+	}
+
 	if(!server_path) {
-			var pstring = $('input:radio[name=pstring]:checked').val();
-			if(typeof(block) != 'undefined' && typeof(pstring) != 'undefined'){
+		var pstring = $('input:radio[name=pstring]:checked').val();
+		if(typeof(pstring) == 'undefined') pstring = 0;
+		if(typeof(block) != 'undefined' && typeof(pstring) != 'undefined'){
 			var cache_bust = Math.floor(Math.random()*1000);
-			server_path = base_url + '/ajax_report/' + page + '/' + block + '/' + pstring + '/table/' + sort_field + '/' + sort_order + '/web/null/' + tbl_cnt_in + '/' + cache_bust;
+			server_path = base_url + '/ajax_report/' + page + '/' + block_in + '/' + pstring + '/table/' + sort_field + '/' + sort_order + '/web/null/' + tbl_cnt_in + '/' + params + '/' + cache_bust;
 		}
 		else {
 			alert("No data found.");
 			return false;
 		}
 	}
-	if(typeof(div_id) === 'undefined' || !div_id) div_id = 'table-canvas';
+	if(typeof(div_id) === 'undefined' || !div_id) div_id = 'table-canvas0';
 	//load javascript file (with a cache-busting parameter) rather than calling with AJAX for consistency with charts
 	head.js(server_path + '/' + Math.floor(Math.random()*10001), function() { process_table(div_id, tbl_cnt_in); });
 	//cancel link when called from anchor tag
@@ -235,15 +251,15 @@ function process_chart(div_id){ //chart_data is defined globally at the top of t
 	if(typeof(section_data) == "object" && typeof post_render == 'function') post_render(section_data);
 	$('.chart-container').css('display', 'block');
 }
-
+/*
 function pausecomp(millis)
 {
-var date = new Date();
-var curDate = null;
-
-do { curDate = new Date(); } 
-while(curDate-date < millis);
-} 
+	var date = new Date();
+	var curDate = null;
+	
+	do { curDate = new Date(); } 
+	while(curDate-date < millis);
+} */
 
 
 function process_table(div_id, tbl_cnt_in){
@@ -257,8 +273,6 @@ function process_table(div_id, tbl_cnt_in){
 		else{
 			$('#' + div_id).html(table_data[tbl_cnt_in].html);
 		}
-		//alert(JSON.stringify(section_data));
-		//if(typeof section_data !== 'undefined') return section_data;
 	}
 	if(typeof(section_data) == "object" && typeof post_render == 'function') post_render(section_data);
 	$('.table-wrapper').css('display', 'block');

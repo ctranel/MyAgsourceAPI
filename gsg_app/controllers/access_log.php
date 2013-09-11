@@ -11,7 +11,7 @@ class Access_log extends parent_report {
 		$this->primary_model = 'access_log_model';
 		parent::__construct();
 		$this->section_id = 3;
-		$this->report_form_id = 'report_search';
+		$this->report_form_id = 'report-filter';
 		$this->product_name = 'Access Log';
 		$this->report_path = 'access_log';
 		$this->herd_code = strlen($this->session->userdata('herd_code')) == 8?$this->session->userdata('herd_code'):NULL;

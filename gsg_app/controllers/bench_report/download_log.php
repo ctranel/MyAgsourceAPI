@@ -7,7 +7,7 @@ class Download_log extends parent_report {
 	function __construct(){
 		parent::__construct();
 		$this->section_id = 3;
-		$this->report_form_id = 'report_search';
+		$this->report_form_id = 'report-filter';
 		$this->product_name = 'Benchmark Download Log';
 		$this->report_path = 'bench_report/download_log';
 		$this->herd_code = strlen($this->session->userdata('herd_code')) == 8?$this->session->userdata('herd_code'):NULL;
