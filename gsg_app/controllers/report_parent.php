@@ -427,7 +427,7 @@ abstract class parent_report extends CI_Controller {
 		if(isset($json_filter_data)){
 			$arrParams = (array)json_decode(urldecode($json_filter_data));
 //var_dump($arrParams);
-			if($arrParams['csrf_test_name'] != $this->security->get_csrf_hash()) die("I don't recognize your browser session, your session may have expired, or you may have cookies turned off.");
+			if(isset($arrParams['csrf_test_name']) && $arrParams['csrf_test_name'] != $this->security->get_csrf_hash()) die("I don't recognize your browser session, your session may have expired, or you may have cookies turned off.");
 			unset($arrParams['csrf_test_name']);
 			$this->_set_filters($page, $arrParams);
 //var_dump($this->arr_filter_criteria);
