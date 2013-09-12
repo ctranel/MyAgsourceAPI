@@ -4,7 +4,7 @@ sub {color: #003E3F; font-size: 80%; font-family: "Arial Narrow","Arial","Verdan
 /* report table */
 #main-report {border-collapse:collapse; clear:both; margin: 0 auto; max-width: 100%;}
 .tbl {border-collapse:collapse; clear:both; border: solid 1px #000; margin: 0 auto} /* the table created for fixed headers */
-.tbl td {padding:1px 6px;}
+.tbl td {padding:1px 6px; text-align:right;}
 
 /* table headings */
 h2.block {color:#004147; font-weight: normal; text-align: center; font-family: "Helvetica","Arial","Verdana",sans-serif; margin: 0 0 0 37px; padding: 0; white-space: nowrap; overflow: visible;}/* 37px to offset width of print box */
@@ -24,7 +24,7 @@ th span.hide-column {cursor: pointer;}
 #main-report td {font-size:.8em; text-align: center; border:solid 1px #000; font-weight:normal;}
 
 .table-wrapper {clear:both; display:none; margin: 20px auto 0; text-align: center;} /* border:solid 1px #999; padding:10px;  */
-.table-wrapper td {text-align: left;}
+.table-wrappers td {text-align: left;}
 .table-section {display:inline-block; margin: 0 auto;}
 .table-container {display:inline-block;}
 .open-download-menu {float: right; cursor: pointer;}

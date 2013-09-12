@@ -252,7 +252,7 @@ abstract class parent_report extends CI_Controller {
 						}
 						$this->reports->sort_text($this->arr_sort_by, $this->arr_sort_order);//this function sets text, and could return it if needed
 //						$this->{$this->primary_model}->populate_field_meta_arrays($pb['id']);
-						$tmp_data = $this->ajax_report($this->page, $pb['url_segment'], $this->session->userdata('pstring'), 'array', $sort_by, $sort_order, 'csv', NULL);
+						$tmp_data = $this->ajax_report(urlencode($this->page), urlencode($pb['url_segment']), $this->session->userdata('pstring'), 'array', urlencode($sort_by), $sort_order, 'csv', NULL);
 						$data[] = array('test_date' => $pb['description']);
 						$data = array_merge($data, $tmp_data);
 					}
@@ -290,7 +290,7 @@ abstract class parent_report extends CI_Controller {
 						}
 
 						$this->{$this->primary_model}->populate_field_meta_arrays($pb['id']);
-						$block[$i]['data'] = $this->ajax_report($this->page, $pb['url_segment'], $this->session->userdata('pstring'), 'array', $sort_by, $sort_order, 'pdf', NULL);
+						$block[$i]['data'] = $this->ajax_report(urlencode($this->page), urlencode($pb['url_segment']), $this->session->userdata('pstring'), 'array', urlencode($sort_by), $sort_order, 'pdf', NULL);
 						$tmp_pdf_width = $this->{$this->primary_model}->get_pdf_widths(); // was $model in place of $this->primary_model
 						$block[$i]['arr_pdf_widths'] = $tmp_pdf_width;
 						$arr_header_data = $this->{$this->primary_model}->get_fields(); // was $model
@@ -411,11 +411,13 @@ abstract class parent_report extends CI_Controller {
 		$this->page_footer_data = array();
 		$report_nav_path = 'report_nav';
 		if(file_exists(APPPATH . 'views/' . $this->section_path . '/report_nav.php')) $report_nav_path =  $this->section_path . '/' . $report_nav_path;
+		$report_filter_path = 'filters';
+		if(file_exists(APPPATH . 'views/' . $this->section_path . '/filters.php')) $report_filter_path =  $this->section_path . '/' . $report_filter_path;
 		$data = array(
 			'page_header' => $this->load->view('page_header', $this->page_header_data, TRUE),
 			'herd_code' => $this->session->userdata('herd_code'),
 			'herd_data' => $this->load->view('herd_info', $herd_data, TRUE),
-			'filters' => $this->load->view($this->section_path . '/filters', $filter_data, TRUE),
+			'filters' => $this->load->view($report_filter_path, $filter_data, TRUE),
 			'page_footer' => $this->load->view('page_footer', $this->page_footer_data, TRUE),
 			'charts' => $arr_chart,
 			'print_all' => $this->print_all,
@@ -436,6 +438,9 @@ abstract class parent_report extends CI_Controller {
 	 * @param string cache_buster: text to make page appear as a different page so that new data is retrieved
 	 */
 	public function ajax_report($page, $block, $pstring, $output, $sort_by = 'null', $sort_order = 'null', $file_format = 'web', $test_date = FALSE, $report_count=0, $json_filter_data = NULL, $cache_buster = NULL) {//, $herd_size_code = FALSE, $all_breeds_code = FALSE
+		$page = urldecode($page);
+		$block = urldecode($block);
+		$sort_by = urldecode($sort_by);
 		if(isset($json_filter_data)){
 			$arrParams = (array)json_decode(urldecode($json_filter_data));
 			if(isset($arrParams['csrf_test_name']) && $arrParams['csrf_test_name'] != $this->security->get_csrf_hash()) die("I don't recognize your browser session, your session may have expired, or you may have cookies turned off.");
