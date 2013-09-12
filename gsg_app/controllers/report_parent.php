@@ -96,10 +96,10 @@ abstract class parent_report extends CI_Controller {
 			else {
       			$this->session->set_flashdata('message',  $this->session->flashdata('message') . "Please select a herd and try again.");
 				if($this->session->flashdata('message')) $this->session->keep_flashdata('message');
-				if($this->uri->segment(3) != 'ajax_report') $this->session->set_flashdata('redirect_url', $this->uri->uri_string());
+				$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
 				redirect(site_url('change_herd/select'));
-      			exit;
 			}
+  			exit;
 		}
 
 		$pass_unsubscribed_test = $this->as_ion_auth->has_permission("View Unsubscribed Herds") || $this->ion_auth_model->herd_is_subscribed($this->section_id, $this->herd_code);
@@ -112,8 +112,11 @@ abstract class parent_report extends CI_Controller {
 			}
 			else {
 				$this->session->set_flashdata('message', 'Herd ' . $this->herd_code . ' is not subscribed to the ' . $this->product_name . ', nor do you have permission to view this report for herd ' . $this->herd_code . '.  Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' if you have questions or concerns.');
-				return FALSE;
-			}
+ 				if($this->session->flashdata('message')) $this->session->keep_flashdata('message');
+				$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
+				redirect(site_url());
+      		}
+			exit;
 		}
 		elseif(!$pass_unsubscribed_test) {
 			if($this->uri->segment(3) == 'ajax_report') {
@@ -121,8 +124,11 @@ abstract class parent_report extends CI_Controller {
 			}
 			else {
 				$this->session->set_flashdata('message', 'Herd ' . $this->herd_code . ' is not subscribed to the ' . $this->product_name . '.  Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' if you have questions or concerns.');
-				return FALSE;
+ 				if($this->session->flashdata('message')) $this->session->keep_flashdata('message');
+				$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
+				redirect(site_url());
 			}
+			exit;
 		}
 		elseif(!$pass_view_nonowned_test) {
 			if($this->uri->segment(3) == 'ajax_report') {
@@ -130,8 +136,11 @@ abstract class parent_report extends CI_Controller {
 			}
 			else {
 				$this->session->set_flashdata('message', 'You do not have permission to view the ' . $this->product_name . ' for herd ' . $this->herd_code . '.  Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' if you have questions or concerns.');
-				return FALSE;
+ 				if($this->session->flashdata('message')) $this->session->keep_flashdata('message');
+				$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
+				redirect(site_url());
 			}
+			exit;
 		}
 		return FALSE;
 	}
