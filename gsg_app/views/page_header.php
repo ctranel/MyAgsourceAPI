@@ -54,8 +54,7 @@
 					$arr_link_path = explode('/', $a['path']);
 					if(!empty($a['path']) && $arr_cur_path[0] == $arr_link_path[0]) $class_name .= ' current';
 					if($arr_link_path[0] == $arr_cur_path[0]) $class_name .= ' current'; 
-						$super_section_append = $this->as_ion_auth->get_super_section_id() === NULL ? '' : '/land';
-						$href = $url . $a['path'] . $super_section_append; ?>
+						$href = $url . $a['path']; ?>
 						<li<?php if(!empty($class_name)) echo ' class="' . $class_name . '"'; ?>><?php echo anchor($href, $a['name']);?></li>
 				<?php endforeach;
 			endif; ?>

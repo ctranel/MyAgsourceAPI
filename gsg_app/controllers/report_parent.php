@@ -95,7 +95,10 @@ abstract class parent_report extends CI_Controller {
 			}
 			else {
       			$this->session->set_flashdata('message',  $this->session->flashdata('message') . "Please select a herd and try again.");
-				return FALSE;
+				if($this->session->flashdata('message')) $this->session->keep_flashdata('message');
+				if($this->uri->segment(3) != 'ajax_report') $this->session->set_flashdata('redirect_url', $this->uri->uri_string());
+				redirect(site_url('change_herd/select'));
+      			exit;
 			}
 		}
 
