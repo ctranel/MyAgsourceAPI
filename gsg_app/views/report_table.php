@@ -27,7 +27,7 @@
 								
 				/* todo: PROGRAM DB_FIELD LINK INFO */
 								if($field_name == 'barn_name') $value = '<a href="http://newdata.crinet.com/agsourcedm/index.php?action=events&comp_num=507&UserID=35999999&Password=12345&source=myagsource" title="View Cow Data">' . $value . '</a>';
-								?><td><?php echo $value; echo gettype($value);?></td><?php
+								?><td><?php echo $value; ?></td><?php
 							endforeach;
 						else:
 							?><td>No display fields were found.  Please make sure at least one field is selected in the settings section.</td><?php
