@@ -15,6 +15,10 @@ class Sample extends parent_report {
 		parent::display($block_in, $display_format);
 	}
 	 
+	function prod_fi($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL){
+		$this->product_name = 'Sample Day Flex Items';
+		parent::display($block_in, $display_format);
+	}
 	 /*
 	 * ajax_report: Called via AJAX to populate graphs
 	 * to add flexibility (any graph/table can be called from any page),
