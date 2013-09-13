@@ -72,7 +72,7 @@
 
     if(!window.form_reset){
     	function form_reset(){
-    		oForm = document.getElementById("report-filter");
+    		oForm = document.getElementById("filter-form");
     		var frm_elements = oForm.elements;
     		for (i = 0; i < frm_elements.length; i++) {  
     		    field_type = frm_elements[i].type.toLowerCase();  
@@ -109,7 +109,7 @@
 
 	if(!window.form_reset){
 		function form_reset(){
-			oForm = document.getElementById("report-filter");
+			oForm = document.getElementById("filter-form");
 			var frm_elements = oForm.elements;
 			for (i = 0; i < frm_elements.length; i++) {  
 			    field_type = frm_elements[i].type.toLowerCase();  

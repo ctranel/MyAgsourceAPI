@@ -4,7 +4,7 @@
 <?php echo validation_errors(); ?>
 <?php if(isset($form_url) === false) $form_url = current_url(); ?>
 <?php //$link_url = str_replace('display', 'filter', $form_url)?>
-<div class="handle"><a id="set_filters" class="handle">Select Report Criteria</a></div>
+<div class="handle"><a id="set-filters" class="handle">Select Report Criteria</a></div>
 <?php //echo anchor("#","Apply Filters", 'class="handle"'); ?>
 <?php echo form_open($form_url, array('name'=>'report_criteria', 'id'=>'report_criteria')); ?>
 <?php if(is_array($arr_filters)):

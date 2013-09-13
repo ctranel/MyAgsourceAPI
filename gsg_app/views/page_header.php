@@ -76,7 +76,7 @@
 	</div>
 	<div id="header">
 		<ul id="session-nav">
-			<li><?php echo anchor('http://agsource.crinet.com', $this->config->item("product_name") . ' Home'); ?></li>
+			<li><?php echo anchor('http://agsource.crinet.com', 'AgSource Site'); ?></li>
 			<?php if(($this->as_ion_auth->logged_in())): ?>
 				<li><?php echo anchor('auth/logout', 'Log Out'); ?></li>
 				<?php if($this->as_ion_auth->has_permission("View non-own w permission")): ?>

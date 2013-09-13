@@ -140,8 +140,8 @@ function updateBlock(container_div_id, block_in, sort_field, sort_order, display
 	var cache_bust = Math.floor(Math.random()*1000);
 	//var block = $('input:radio[name=block]:checked').val();
 	var pstring = $('input:radio[name=pstring]:checked').val();
-	if($("#report-filter")){
-		params = encodeURIComponent(JSON.stringify($("#report-filter").serializeObject()));
+	if($("#filter-form")){
+		params = encodeURIComponent(JSON.stringify($("#filter-form").serializeObject()));
 	}
 
 	if(typeof(pstring) == 'undefined') pstring = 0;
@@ -149,14 +149,14 @@ function updateBlock(container_div_id, block_in, sort_field, sort_order, display
 	if(typeof(sort_order) == 'undefined') sort_order = null;
 	switch(display){
 		case "table": 
-			load_table(base_url + '/ajax_report/' + page + '/' + block + '/' + pstring + '/' + display + '/' + sort_field + '/' + sort_order + '/web/null/' + table_cnt + '/' + params + '/' + cache_bust, container_div_id, table_cnt, sort_field, sort_order, block, params);
+			load_table(base_url + '/ajax_report/' + encodeURIComponent(page) + '/' + encodeURIComponent(block) + '/' + pstring + '/' + display + '/' + encodeURIComponent(sort_field) + '/' + sort_order + '/web/null/' + table_cnt + '/' + params + '/' + cache_bust, container_div_id, table_cnt, sort_field, sort_order, block, params);
 			//$('#table-title-line' + table_cnt).html(title);
 			//$('#table-subtitle-line' + table_cnt).html('Herd ' + herd_code);
 			//$('#table-benchmark-line' + table_cnt).html(benchmark_text);
 			table_cnt++;
 			break;
 		case "chart":
-			load_chart(base_url + '/ajax_report/' + page + '/' + block + '/' + pstring + '/' + display + '/' + sort_field + '/' + sort_order + '/web/null/' + chart_cnt + '/null/' + cache_bust, container_div_id);
+			load_chart(base_url + '/ajax_report/' + encodeURIComponent(page) + '/' + encodeURIComponent(block) + '/' + pstring + '/' + display + '/' + encodeURIComponent(sort_field) + '/' + sort_order + '/web/null/' + chart_cnt + '/null/' + cache_bust, container_div_id);
 			chart_cnt++;
 			break;
 	}
@@ -167,8 +167,8 @@ function load_table(server_path, div_id, tbl_cnt_in, sort_field, sort_order, blo
 	block = block_in;
 	if(typeof(sort_field) == 'undefined') sort_field = null;
 	if(typeof(sort_order) == 'undefined') sort_order = null;
-	if(params = '' && $("#report-filter")){
-		params = encodeURIComponent(JSON.stringify($("#report-filter").serializeObject()));
+	if(params = '' && $("#filter-form")){
+		params = encodeURIComponent(JSON.stringify($("#filter-form").serializeObject()));
 	}
 
 	if(!server_path) {
@@ -176,7 +176,7 @@ function load_table(server_path, div_id, tbl_cnt_in, sort_field, sort_order, blo
 		if(typeof(pstring) == 'undefined') pstring = 0;
 		if(typeof(block) != 'undefined' && typeof(pstring) != 'undefined'){
 			var cache_bust = Math.floor(Math.random()*1000);
-			server_path = base_url + '/ajax_report/' + page + '/' + block_in + '/' + pstring + '/table/' + sort_field + '/' + sort_order + '/web/null/' + tbl_cnt_in + '/' + params + '/' + cache_bust;
+			server_path = base_url + '/ajax_report/' + encodeURIComponent(page) + '/' + encodeURIComponent(block) + '/' + pstring + '/table/' + encodeURIComponent(sort_field) + '/' + sort_order + '/web/null/' + tbl_cnt_in + '/' + params + '/' + cache_bust;
 		}
 		else {
 			alert("No data found.");

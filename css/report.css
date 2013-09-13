@@ -7,8 +7,26 @@ sub {color: #003E3F; font-size: 80%; font-family: "Arial Narrow","Arial","Verdan
 .tbl td {padding:1px 6px; text-align:right;}
 
 /* table headings */
-h2.block {color:#004147; font-weight: normal; text-align: center; font-family: "Helvetica","Arial","Verdana",sans-serif; margin: 0 0 0 37px; padding: 0; white-space: nowrap; overflow: visible;}/* 37px to offset width of print box */
-h3.block {color:#6d869f; font: normal 12px "Lucida Grande", "Lucida Sans Unicode", Verdana, Arial, Helvetica, sans-serif; text-align: center; margin: 0 0 3px 37px; padding:0; white-space: nowrap; overflow: visible; background: none;}
+h2.block {
+	color:#004147; 
+	font-weight: normal;
+	text-align: center; 
+	font-family: "Helvetica","Arial","Verdana",sans-serif; 
+	margin: 0; 
+	padding: 0; 
+	white-space: nowrap; 
+	overflow: visible;
+}/* 37px to offset width of print box */
+h3.block {
+	color:#6d869f; 
+	font: normal 12px "Lucida Grande", "Lucida Sans Unicode", Verdana, Arial, Helvetica, sans-serif; 
+	text-align: center; 
+	margin: 0; 
+	padding:0; 
+	white-space: nowrap; 
+	overflow: visible; 
+	background: none;
+}
 th.cat-heading, th.subcat-heading {font-size:.85em; text-align: center; border:solid 1px #000; vertical-align:bottom; padding:2px;}
 th.cat-heading, th.cat-heading a {color:#004147; background-color:#C1B57C; white-space:nowrap;}
 th.subcat-heading, th.subcat-heading a {color:#DBFFD4; background-color:#1B9E9F; font-size:.85em; font-weight:normal;}
@@ -23,12 +41,14 @@ th span.hide-column {cursor: pointer;}
 .hide-column {display:none; font-size:50%; color:#a22;}
 #main-report td {font-size:.8em; text-align: center; border:solid 1px #000; font-weight:normal;}
 
-.table-wrapper {clear:both; display:none; margin: 20px auto 0; text-align: center;} /* border:solid 1px #999; padding:10px;  */
+.table-wrapper {display:none; margin: 0 auto 0; text-align: center;} /* border:solid 1px #999; padding:10px;  */
 .table-wrappers td {text-align: left;}
 .table-section {display:inline-block; margin: 0 auto;}
 .table-container {display:inline-block;}
 .open-download-menu {float: right; cursor: pointer;}
-.downloads-container { margin-right: 10px; float: right;}
+.downloads-container {position: relative; right: 2px; top:30px;}
+/* IE workaround */
+.ie .downloads-container {right: 30px; top:6px;}
 a.download-links {font-family: "Lucida Grande","Lucida Sans Unicode",Verdana,Arial,Helvetica,sans-serif; text-decoration: none; cursor: pointer; padding: 0pt 5px; display:block;}
 a.download-links:hover {color:#F1F8F8; background-color:#004147;}
 .download-link-wrapper {cursor: pointer; background: none repeat scroll 0% 0% transparent; color: rgb(48, 48, 48); font-size: 11px; white-space: nowrap;}
@@ -36,19 +56,19 @@ a.download-links:hover {color:#F1F8F8; background-color:#004147;}
 	box-shadow: 3px 3px 10px rgb(136, 136, 136); 
 	border: 1px solid rgb(160, 160, 160); 
 	background: none repeat scroll 0% 0% rgb(255, 255, 255); 
-	position: relative; 
-	top:6px; 
+	position: absolute;
 	right:0;
+	top:28px; 
 	list-style: none outside none;
     padding: 0;
-    margin-bottom: -20px;
-    /* visibility: hidden; */
+    margin: 0 0 0 0;
     display:none;
 }
 
+
 /* header herd info */
 #herd-info {max-width:50%;}
-#herd-text, #quartile-herd {float:left; margin: 15px 10px;}
+#herd-text, #quartile-herd {float:left; margin: 15px 10px 0;}
 #herd-text label {margin: 0 5px 0 0; color:#004147; background-color:#fff;}
 #herd-text {text-align: left; font-size: .9em;}
 #comments {position:absolute; right:120px; border: solid 1px #000; min-width: 150px; min-height: 100px; max-width:25%; text-align: left; vertical-align: top; padding: 15px;}
@@ -66,9 +86,6 @@ ul.report-nav li a.sel, ul.pstring-nav li a.sel {font-weight: bold;  text-decora
 
 .subnav {margin-left: 20px;}
 
-.jqPlot {clear: left;}
-.chart-container {margin: 0 auto;}
-
 #herd-text {}
 #herd-text .general-herd {}
 #herd-text .report-specific {float: right;}
@@ -77,3 +94,19 @@ ul.report-nav li a.sel, ul.pstring-nav li a.sel {font-weight: bold;  text-decora
 #main-report td.sum-label {white-space: normal; font-weight: bold;}
 th.cat-heading, th.cat-heading a {white-space:normal;}
 tr#herd-avg td {border-top: solid 2px black;}
+
+
+/* charts only */
+.jqPlot {clear: left;}
+.chart-container {margin: 0 auto 15px;}
+
+#graph-canvas {background:transparent url('i/AgSource_watermark.gif') no-repeat center 70px; text-align: center;}
+.highcharts-container {border: solid 1px #c0c0c0;}
+.gt-1024 .chart-container {width: 380px; display:inline; margin: 0;}
+.gt-1024 .chart-odd {float: left; clear: both;}
+.gt-1024 .chart-even {float: right;}
+.gt-1024 .chart-container {width: 480px; display:inline; margin: 0;}
+.gt-1024 .highcharts-container {width: 480px;}
+
+
+

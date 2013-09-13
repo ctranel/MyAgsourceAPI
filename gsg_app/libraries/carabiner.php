@@ -924,7 +924,8 @@ class Carabiner {
 	* @return   String of files contents
 	*/
 	private function _get_contents($ref)
-	{
+	{	
+		if(empty($ref)) return '';
 
 		if( $this->isURL($ref) && ( ini_get('allow_url_fopen') == 0 || $this->force_curl ) ):
 

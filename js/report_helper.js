@@ -1,11 +1,25 @@
 var arr_sort_by = new Array();
 var arr_sort_order = new Array();
 
-if($('#report-filter')){ //if there is a filter form (only on pages with one table)
-	$('#report-filter').submit(function(ev){
+if($('#filter-form')){ //if there is a filter form (only on pages with one table)
+	$('#filter-form').submit(function(ev){
 		ev.preventDefault();
 		updateBlock("table-canvas0", block, arr_sort_by[0], arr_sort_order[0], "table")
 	});
+	
+	$('#set-filters').click(function(ev){
+		ev.preventDefault();
+		if($('#set-filters').hasClass('expanded')){
+			$('#set-filters').removeClass('expanded');
+			$('#filter-form').removeClass('expanded');
+		}
+		else{
+			//var width = $('#set-filters').parent().width();
+			$('#set-filters').addClass('expanded');
+			$('#filter-form').addClass('expanded');
+			//$('#set-filters').parent().width(width);
+		}
+	})
 }
 
 (function($) {

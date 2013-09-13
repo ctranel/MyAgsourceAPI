@@ -45,7 +45,6 @@ class Auth extends Ionauth {
 		//$this->carabiner->css('jquery.tweet.css', 'screen');
 		$this->carabiner->css('jquery.jtweetsanywhere-1.2.0.css', 'screen');
 		$this->carabiner->css('dashboard.css', 'screen');
-		$this->carabiner->css('chart.css', 'screen');
 		$this->carabiner->css('accordion.css', 'screen');
 		if(is_array($this->page_header_data)){
 			$this->page_header_data = array_merge($this->page_header_data,

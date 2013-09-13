@@ -1,4 +1,7 @@
-/* filters and downloads/exports */
+@CHARSET "UTF-8";
+/* filters */
+a.#set_filters {}
+
 #filters, #downloads {
 	background-color: #C1B57C;
 	border: 1px solid #004147;
@@ -10,11 +13,7 @@
 	display:none; */
 }
 
-/*
-#filters {max-width: 35%;}
-#downloads {max-width: 15%;}
- */
-#filters .handle, #downloads .handle {
+#filters .handle {
 	color:#DBFFD4;
 	background-color:#004147;
 	padding:4px;
@@ -27,18 +26,30 @@
 	top:-23px;
 	left:-21px; */
 }
-#filters .handle a, #downloads .handle a {
+#filters .handle a {
 	font-size:.9em;
 	font-weight:bold;
+	cursor: pointer;
+}
+#filters .handle a:before {
+	content: "▼";
 }
 
+#filter-form {visibility: hidden; height: 0px; background-color: #C1B57C;}
+
+#filters {}
+#filter-form.expanded{z-index: 10; visibility: visible; float:right; height: auto;}
+#filters a.expanded:before {content: "▲";}
+
 #filters p {padding: 10px 20px 0px 20px;}
+/*
+#filters {max-width: 35%;}
+#downloads {max-width: 15%;}
 #downloads p {padding:6px 20px;}
-
 #downloads p a {background-color:#C1B57C; color:#004147; font-weight:bold; font-size:.9em;}
-
+*/
 #filters fieldset {border: solid 1px #004147; border-radius: 3px; margin: 10px 10px 0; padding: 5px; font-size: .85em; width:auto;}
-#filters fieldset fieldset {width:97%; margin: 2px 0 0 1%;}
+#filters fieldset fieldset {width:97%; margin: 1px 0 0 1%;}
 /* .filter-checkbox {float:left;}
 html legend{
     position:absolute;
