@@ -56,7 +56,7 @@
 					1&nbsp;&nbsp;</span>
 					<span class="filter-checkbox"><?php echo form_checkbox(array('name'=>'lact_num[]', 'id'=>'lact_num2'), '2', in_array('2', $filter_selected['lact_num']) !== false); ?>
 					2&nbsp;&nbsp;</span>
-					<span class="filter-checkbox"><?php echo form_checkbox(array('name'=>'lact_num[]', 'id'=>'lact_num3'), '>3', in_array('>3', $filter_selected['lact_num']) !== false); ?>
+					<span class="filter-checkbox"><?php echo form_checkbox(array('name'=>'lact_num[]', 'id'=>'lact_num3'), '>3', in_array('3,4,5,6,7,8,9', $filter_selected['lact_num']) !== false); ?>
 					3+&nbsp;&nbsp;</span>
 				<?php echo form_fieldset_close();
 				break;

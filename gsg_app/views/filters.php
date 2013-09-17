@@ -50,13 +50,23 @@
 				</p>
 				<?php echo form_fieldset_close();
 				break;
+			case 'lact_num': ?>
+					<?php echo form_fieldset('Lactation #', array('id' => 'lact-num-fieldset')); ?>
+					<span class="filter-checkbox"><?php echo form_checkbox(array('name'=>'lact_num[]', 'id'=>'lact_num1'), '1', in_array('1', $filter_selected['lact_num']) !== false); ?>
+					1&nbsp;&nbsp;</span>
+					<span class="filter-checkbox"><?php echo form_checkbox(array('name'=>'lact_num[]', 'id'=>'lact_num2'), '2', in_array('2', $filter_selected['lact_num']) !== false); ?>
+					2&nbsp;&nbsp;</span>
+					<span class="filter-checkbox"><?php $arr_intersect = array_intersect(array(3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20), $filter_selected['lact_num']); echo form_checkbox(array('name'=>'lact_num[]', 'id'=>'lact_num3'), '3|4|5|6|7|8|9|10|11|12|13|14|15|16|17|18|19|20', !empty($arr_intersect)); ?>
+					3+&nbsp;&nbsp;</span>
+				<?php echo form_fieldset_close();
+				break;
 			case 'dam_lact_num': ?>
 					<?php echo form_fieldset('Dam Lactation #', array('id' => 'dam_lact_num-fieldset')); ?>
 					<span class="filter-checkbox"><?php echo form_checkbox(array('name'=>'dam_lact_num[]', 'id'=>'dam_lact_num1'), '1', in_array('1', $filter_selected['dam_lact_num']) !== false); ?>
 					1&nbsp;&nbsp;</span>
 					<span class="filter-checkbox"><?php echo form_checkbox(array('name'=>'dam_lact_num[]', 'id'=>'dam_lact_num2'), '2', in_array('2', $filter_selected['dam_lact_num']) !== false); ?>
 					2&nbsp;&nbsp;</span>
-					<span class="filter-checkbox"><?php echo form_checkbox(array('name'=>'dam_lact_num[]', 'id'=>'dam_lact_num3'), '>3', in_array('>3', $filter_selected['dam_lact_num']) !== false); ?>
+					<span class="filter-checkbox"><?php $arr_intersect = array_intersect(array(3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20), $filter_selected['dam_lact_num']); echo form_checkbox(array('name'=>'dam_lact_num[]', 'id'=>'dam_lact_num3'), '3|4|5|6|7|8|9|10|11|12|13|14|15|16|17|18|19|20', !empty($arr_intersect)); ?>
 					3+&nbsp;&nbsp;</span>
 				<?php echo form_fieldset_close();
 				break;

@@ -4,7 +4,7 @@ var arr_sort_order = new Array();
 if($('#filter-form')){ //if there is a filter form (only on pages with one table)
 	$('#filter-form').submit(function(ev){
 		ev.preventDefault();
-		updateBlock("table-canvas0", block, arr_sort_by[0], arr_sort_order[0], "table")
+		updateBlock("table-canvas0", block, 0, arr_sort_by[0], arr_sort_order[0], "table")
 	});
 	
 	$('#set-filters').click(function(ev){

@@ -6,9 +6,13 @@ var table_data = new Array(); //must match variable in the javascript files that
 //var base_url; set in controller
 //var herd_code; set in controller
 //var page; set in controller
-var table_cnt = 0;
-var chart_cnt = 0;
-var var_arr_graph_colors = ['#F15928', '#585C5F', '#08A04A', '#006C70', '#98E8F9']; 
+//var table_cnt = 0;
+//var chart_cnt = 0;
+//var var_arr_graph_colors = ['#FF3C3C','#FF5A5A','#FF7878','#FF9696','#FFB4B4']; //monochrome
+//var var_arr_graph_colors = ['#643b3b', '#825a5a', '#a07878', '#bd9696', '#dcb2b2'];  //monochrome
+//var var_arr_graph_colors = ['#F15928', '#585C5F', '#08A04A', '#006C70', '#98E8F9']; //dpn?
+var var_arr_graph_colors = ['#E4B577', '#75C4E4', '#E07F8D', '#B6B6A5', '#97C4A4']; 
+//var var_arr_graph_colors = ['#00838C', '#939E77', '#B03500', '#BA91A8', '#97C4A4']; 
 //var var_arr_graph_colors = ['#D54C18', '#48495B', '#264071', '#9CA294'];
 var base_options = {chart: {backgroundColor: null}, yAxis:{}};//base options are specific to each report, see report helper functions (js files)
 //get current base url
@@ -133,7 +137,7 @@ function updatePage(ev){
 		updateBlock();
 }
 
-function updateBlock(container_div_id, block_in, sort_field, sort_order, display){//}, title, benchmark_text){
+function updateBlock(container_div_id, block_in, block_index, sort_field, sort_order, display){//}, title, benchmark_text){
 	//load and process ajax data - base_url and page are defined globally in the controller
 	block = block_in;
 	var params = '';
@@ -147,17 +151,18 @@ function updateBlock(container_div_id, block_in, sort_field, sort_order, display
 	if(typeof(pstring) == 'undefined') pstring = 0;
 	if(typeof(sort_field) == 'undefined') sort_field = null;
 	if(typeof(sort_order) == 'undefined') sort_order = null;
+//alert(display);
 	switch(display){
 		case "table": 
-			load_table(base_url + '/ajax_report/' + encodeURIComponent(page) + '/' + encodeURIComponent(block) + '/' + pstring + '/' + display + '/' + encodeURIComponent(sort_field) + '/' + sort_order + '/web/null/' + table_cnt + '/' + params + '/' + cache_bust, container_div_id, table_cnt, sort_field, sort_order, block, params);
+			load_table(base_url + '/ajax_report/' + encodeURIComponent(page) + '/' + encodeURIComponent(block) + '/' + pstring + '/' + display + '/' + encodeURIComponent(sort_field) + '/' + sort_order + '/web/null/' + block_index + '/' + params + '/' + cache_bust, container_div_id, block_index, sort_field, sort_order, block, params);
 			//$('#table-title-line' + table_cnt).html(title);
 			//$('#table-subtitle-line' + table_cnt).html('Herd ' + herd_code);
 			//$('#table-benchmark-line' + table_cnt).html(benchmark_text);
-			table_cnt++;
+//			table_cnt++;
 			break;
 		case "chart":
-			load_chart(base_url + '/ajax_report/' + encodeURIComponent(page) + '/' + encodeURIComponent(block) + '/' + pstring + '/' + display + '/' + encodeURIComponent(sort_field) + '/' + sort_order + '/web/null/' + chart_cnt + '/null/' + cache_bust, container_div_id);
-			chart_cnt++;
+			load_chart(base_url + '/ajax_report/' + encodeURIComponent(page) + '/' + encodeURIComponent(block) + '/' + pstring + '/' + display + '/' + encodeURIComponent(sort_field) + '/' + sort_order + '/web/null/' + block_index + '/null/' + cache_bust, container_div_id);
+//			chart_cnt++;
 			break;
 	}
 	return false;
@@ -167,16 +172,17 @@ function load_table(server_path, div_id, tbl_cnt_in, sort_field, sort_order, blo
 	block = block_in;
 	if(typeof(sort_field) == 'undefined') sort_field = null;
 	if(typeof(sort_order) == 'undefined') sort_order = null;
-	if(params = '' && $("#filter-form")){
+//alert(params)
+	if(typeof(params) == 'undefined' && $("#filter-form")){
 		params = encodeURIComponent(JSON.stringify($("#filter-form").serializeObject()));
 	}
-
 	if(!server_path) {
 		var pstring = $('input:radio[name=pstring]:checked').val();
 		if(typeof(pstring) == 'undefined') pstring = 0;
 		if(typeof(block) != 'undefined' && typeof(pstring) != 'undefined'){
 			var cache_bust = Math.floor(Math.random()*1000);
 			server_path = base_url + '/ajax_report/' + encodeURIComponent(page) + '/' + encodeURIComponent(block) + '/' + pstring + '/table/' + encodeURIComponent(sort_field) + '/' + sort_order + '/web/null/' + tbl_cnt_in + '/' + params + '/' + cache_bust;
+alert(server_path)
 		}
 		else {
 			alert("No data found.");

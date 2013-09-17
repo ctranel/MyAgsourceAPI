@@ -308,11 +308,11 @@ class Report_model extends CI_Model {
 		//remove pstring column if the herd does not have pstrings
 		$this->arr_pstring = $this->herd_model->get_pstring_array($herd_code);
 		if (empty($this->arr_pstring) || count($this->arr_pstring) == 1) {
-			//if (($key = array_search('pstring', $this->arr_fields)) !== false) {
-				//unset($arr_select_fields[$key]);
+			if (($key = array_search('pstring', $this->arr_fields)) !== false) {
+				unset($arr_select_fields[$key]);
 				$this->load->helper('multid_array_helper');
 				$this->arr_fields = multid_remove_element($this->arr_fields, 'PString');
-			//}
+			}
 		}
 	}
 
@@ -475,12 +475,16 @@ class Report_model extends CI_Model {
 			
 			if(empty($v) === FALSE || $v === '0'){
 				if(is_array($v)){
+					if($k != 'pstring'){
+						$v = array_filter($v);
+						if(empty($v)) continue;
+					}
 					/*if(($tmp_key = array_search('NULL', $v)) !== FALSE){
 						unset($v[$tmp_key]);
 						$text = implode(',', $v);
 						$this->{$this->db_group_name}->where("($k IN ( $text ))");
 					}
-					else */$this->{$this->db_group_name}->where_in($k, $v);
+					else */ $this->{$this->db_group_name}->where_in($k, $v);
 				}
 				else { //is not an array
 					if(substr($k, -5) == "_dbto"){ //ranges

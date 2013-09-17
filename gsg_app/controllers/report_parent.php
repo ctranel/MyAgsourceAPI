@@ -354,9 +354,10 @@ abstract class parent_report extends CI_Controller {
 						$arr_chart[$display][] = $this->load->view($display, $arr_blk_data, TRUE);
 						//add js line to populate the block after the page loads
 						$tmp_container_div = $display == 'chart' ? 'graph-canvas' . $x : 'table-canvas' . $x;
-						$tmp_js .= "updateBlock(\"$tmp_container_div\", \"$k\", \"null\", \"null\", \"$display\")\n";//, \"" . $this->{$this->primary_model}->arr_blocks[$this->page]['display'][$display][$block]['description'] . "\", \"" . $bench_text . "\");\n";
+						$tmp_js .= "updateBlock(\"$tmp_container_div\", \"$k\", \"$x\", \"null\", \"null\", \"$display\")\n";//, \"" . $this->{$this->primary_model}->arr_blocks[$this->page]['display'][$display][$block]['description'] . "\", \"" . $bench_text . "\");\n";
 						$tmp_block = $k;
 						$x++;
+echo $x;
 					}
 				}
 			}
@@ -706,14 +707,28 @@ abstract class parent_report extends CI_Controller {
 					$this->arr_filter_criteria[$k . '_dbfrom'] = $arr_params[$k . '_dbfrom'];
 					$this->arr_filter_criteria[$k . '_dbto'] = $arr_params[$k . '_dbto'];
 				}
+				elseif($f['type'] == 'select multiple'){
+					if(isset($arr_params[$k]) && is_array($arr_params[$k])){
+						 foreach($arr_params[$k] as $k1=>$v1){
+							$arr_params[$k][$k1] = explode('|', $v1);
+						 } 
+						$arr_params[$k] = array_flatten($arr_params[$k]);
+						$this->arr_filter_criteria[$k] = $arr_params[$k];
+					}
+					if(!$this->arr_filter_criteria[$k] && $k != 'pstring') {
+						$this->arr_filter_criteria[$k] = array();
+					}
+//					elseif(){
+						
+//					}
+					elseif(isset($arr_params[$k])) $this->arr_filter_criteria[$k] = $arr_params[$k];
+				}
 				else {
 					if(!isset($arr_params[$k])) continue;
 					$this->arr_filter_criteria[$k] = $arr_params[$k];
 				}
-				if($f['type'] == 'select multiple' && !$this->arr_filter_criteria[$k] && $k != 'pstring') {
-					$this->arr_filter_criteria[$k] = array();
-				}
 			}
+//var_dump($this->arr_filter_criteria);
 		}
 		else { //if no form has been successfully submitted, set to defaults
 			foreach($this->arr_page_filters as $f){
