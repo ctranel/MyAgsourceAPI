@@ -172,6 +172,7 @@ abstract class parent_report extends CI_Controller {
 			$arr_blocks = array('table' => $arr_tables, 'chart' => $arr_charts);
 		}
 		else $arr_blocks = $this->{$this->primary_model}->arr_blocks[$this->page]['display'];
+echo $this->page;
 		if(empty($this->herd_code) || strlen($this->herd_code) != 8){
 			$this->session->set_flashdata('message', 'Please select a valid herd.');
 			redirect(site_url($this->report_path));
