@@ -86,7 +86,7 @@ class Benchmarks_lib
 	 * __construct
 	 *
 	 * @return void
-	 * @author Ben
+	 * @author Chris Tranel
 	 **/
 	public function __construct()
 	{
@@ -108,11 +108,11 @@ class Benchmarks_lib
 			4 => array('floor' => 2001, 'ceiling' => 100000),
 		);
 		$this->arr_criteria_table = array(
-			'p.avg_milk' => array('join_text' => " LEFT JOIN dbo.v_prod_dashboard p ON td.herd_code = p.herd_code AND td.prev_test_date = p.test_date", 'sort_order' => 'desc', 'date_field' => 'test_date'),
-			'r.herd_preg_rate' => array('join_text' => " LEFT JOIN dbo.v_repro_dashboard r ON td.herd_code = r.herd_code AND td.recent_backup_date = r.backup_date", 'sort_order' => 'desc', 'date_field' => 'backup_date'),
-			'hr.preg_rate_395_vwp' => array('join_text' => " LEFT JOIN dbo.v_heifer_repro_dashboard hr ON td.herd_code = hr.herd_code AND td.recent_backup_date = hr.backup_date", 'sort_order' => 'desc', 'date_field' => 'backup_date'),
-			'q.avg_linear' => array('join_text' => " LEFT JOIN dbo.v_quality_dashboard q ON td.herd_code = q.herd_code AND td.prev_test_date= q.test_date", 'sort_order' => 'asc', 'date_field' => 'test_date'),
-			'g.avg_net_merit' => array('join_text' => " LEFT JOIN dbo.genetics g ON td.herd_code = g.herd_code AND td.recent_backup_date = g.backup_date", 'sort_order' => 'desc', 'date_field' => 'backup_date')
+			'p.herd_rha' => 			array('join_text' => " LEFT JOIN herd_summary.dbo.herd_rha p ON td.herd_code = p.herd_code AND td.recent_test_date = p.test_date", 'sort_order' => 'desc', 'date_field' => 'test_date'),
+//			'r.herd_preg_rate' => 		array('join_text' => " LEFT JOIN dbo.v_repro_dashboard r ON td.herd_code = r.herd_code AND td.recent_test_date = r.test_date", 'sort_order' => 'desc', 'date_field' => 'test_date'),
+//			'hr.preg_rate_395_vwp' => 	array('join_text' => " LEFT JOIN dbo.v_heifer_repro_dashboard hr ON td.herd_code = hr.herd_code AND td.recent_test_date = hr.recent_test_date", 'sort_order' => 'desc', 'date_field' => 'test_date'),
+			'q.avg_linear' =>			array('join_text' => " LEFT JOIN dbo.v_quality_dashboard q ON td.herd_code = q.herd_code AND td.recent_test_date= q.test_date", 'sort_order' => 'asc', 'date_field' => 'test_date'),
+			'g.avg_net_merit' => 		array('join_text' => " LEFT JOIN dbo.genetics g ON td.herd_code = g.herd_code AND td.recent_test_date = g.recent_test_date", 'sort_order' => 'desc', 'date_field' => 'test_date')
 		);
 	}
 
@@ -282,7 +282,7 @@ class Benchmarks_lib
 			'metric' => 'TOP10_PCT',
 			'criteria' => 'p.avg_milk',
 			'arr_herd_size' => $this->get_default_herd_range($herd_info['herd_size']),
-			'arr_states' => NULL // $this->get_default_states($herd_info['state'])
+			'arr_states' => NULL // $this->get_default_states($herd_info['state_prov'])
 		);
 		$this->ci->session->set_userdata('benchmarks', $arr_tmp);
 		return $arr_tmp;
@@ -300,7 +300,7 @@ class Benchmarks_lib
 	 * @return void
 	 * @author Chris Tranel
 	 **/
-	public function set_criteria($db_table, $date_field, $metric = 'TOP10_PCT', $criteria = 'p.avg_milk', $arr_herd_size = NULL, array $arr_states = NULL){
+	public function set_criteria($db_table, $date_field, $metric = 'TOP10_PCT', $criteria = 'p.herd_rha', $arr_herd_size = NULL, array $arr_states = NULL){
 		if(isset($db_table)) $this->db_table = $db_table;
 		if(isset($date_field)) $this->date_field = $date_field;
 		else return FALSE;
@@ -356,11 +356,13 @@ class Benchmarks_lib
 		$from = '';
 		$where = '';
 		$group_by = '';
+		$order_by = '';
 		$criteria_date_field = $this->arr_criteria_table[$this->criteria]['date_field'];
 		$this->primary_table_date_field = $report_model->date_field;
 		
 		if($this->metric == "AVG") {
-			$from = " FROM " . $this->db_table;
+			$cte = $this->build_cte();
+			$from = " FROM benchmark_herds bh INNER JOIN " . $this->db_table . " p ON bh.herd_code = p.herd_code AND bh.recent_" . $report_model->date_field . " = p." . $report_model->date_field;
 		}
 		else {
 			$cte = $this->build_cte();
@@ -374,54 +376,53 @@ class Benchmarks_lib
 		
 		if(isset($arr_group_by) && is_array($arr_group_by)){
 			$group_by = " GROUP BY " . $arr_group_by[0];
+			$order_by = " ORDER BY " . $arr_group_by[0];
 			$addl_select_fields = $arr_group_by[0] . ',';
 			$high_index = (count($arr_group_by) - 1);
 			for($i=1; $i<=$high_index; $i++){
 				$addl_select_fields .= $arr_group_by[$i] . ',';
 				$group_by .= ", " . $arr_group_by[$i];
+				$order_by .= ", " . $arr_group_by[$i];
 			}
 		}
-		$sql = $cte . "SELECT COUNT(1) AS cnt_herds, " . $addl_select_fields. $avg_fields . $from . $where . $group_by;
+		$sql = $cte . "SELECT COUNT(1) AS cnt_herds, " . $addl_select_fields. $avg_fields . $from . $where . $group_by . $order_by;
 		return $sql;
 	}
 	
 	protected function build_cte(){
-//works with avg milk, need to adjust for criteria that use other tables
 		$sql = '';
 		$cte_top = '';
 		$cte_order_by = '';
 		$criteria_date_field = $this->arr_criteria_table[$this->criteria]['date_field'];
 		list($table_pre, $table_name) = explode('.', $this->criteria);
 		
-		if($this->metric == "AVG") return NULL;
+		if($this->metric == "AVG") $cte_top = "WITH benchmark_herds(herd_code, recent_test_date) AS (SELECT td.herd_code, td.recent_test_date FROM";
 		if($this->metric == "TOP10_PCT"){
-			$cte_top = "WITH benchmark_herds(herd_code, recent_backup_date, prev_test_date) AS (SELECT TOP(10)PERCENT td.herd_code, td.recent_backup_date, td.prev_test_date FROM";
+			$cte_top = "WITH benchmark_herds(herd_code, recent_test_date) AS (SELECT TOP(10)PERCENT td.herd_code, td.recent_test_date FROM";
 			$cte_order_by = "ORDER BY " . $this->criteria . " " . $this->arr_criteria_table[$this->criteria]['sort_order'];
 		}
 		if(strpos($this->metric, 'QTILE') !== FALSE){
-			$cte_top = "WITH benchmark_herds(quartile, herd_code, recent_" . $criteria_date_field . ") AS (SELECT NTILE(4) OVER (ORDER BY " . $this->criteria . " " . $this->arr_criteria_table[$this->criteria]['sort_order'] . ") AS quartile, td.herd_code, td.recent_" . $criteria_date_field . " FROM";
+			$cte_top = "WITH benchmark_herds(quartile, herd_code, recent_test_date) AS (SELECT NTILE(4) OVER (ORDER BY " . $this->criteria . " " . $this->arr_criteria_table[$this->criteria]['sort_order'] . ") AS quartile, td.herd_code, td.recent_test_date FROM";
 		}
 		
 		$sql = $cte_top . "(
-				SELECT i.herd_code, MAX(i.backup_date) AS recent_backup_date, MAX(p.test_date) AS prev_test_date 
+				SELECT i.herd_code, MAX(p.test_date) AS recent_test_date 
 				FROM herd.dbo.herd_id h
-				LEFT JOIN herd.dbo.view_prev_test_date td ON h.herd_code = td.herd_code
-				LEFT JOIN dbo.inventory i ON h.herd_code = i.herd_code
-				LEFT JOIN dbo.v_prod_dashboard p ON i.herd_code = p.herd_code AND i.backup_date = p.backup_date";
-		$sql .= " GROUP BY i.herd_code, i.backup_date
-			HAVING (SELECT MAX(backup_date) FROM inventory WHERE herd_code = i.herd_code";
+				LEFT JOIN herd_summary.dbo.herd_inventory i ON h.herd_code = i.herd_code
+				LEFT JOIN herd_summary.dbo.herd_rha p ON i.herd_code = p.herd_code AND i.test_date = p.test_date";
+		$sql .= " GROUP BY i.herd_code, i.test_date
+			HAVING (SELECT MAX(test_date) FROM inventory WHERE herd_code = i.herd_code";
 //var_dump($this->herd_size_floor);
 //die();				
-		if(isset($this->herd_size_floor) && isset($this->herd_size_ceiling)) $sql .= " AND avg_12_mo_mature_cnt BETWEEN " . $this->herd_size_floor . " AND " . $this->herd_size_ceiling;
-		if(isset($this->arr_states) && is_array($this->arr_states) && !empty($this->arr_states)) " AND state IN (" . implode(',', $this->arr_states) . ")";
+		if(isset($this->herd_size_floor) && isset($this->herd_size_ceiling)) $sql .= " AND hi.milk_cow_cnt BETWEEN " . $this->herd_size_floor . " AND " . $this->herd_size_ceiling;
+		if(isset($this->arr_states) && is_array($this->arr_states) && !empty($this->arr_states)) " AND state_prov IN (" . implode(',', $this->arr_states) . ")";
 		
-		$sql .= ") = i.backup_date
+		$sql .= ") = i.test_date
 		) td";
-//			LEFT JOIN dbo.v_prod_dashboard p ON td.herd_code = p.herd_code AND td.recent_" . $criteria_date_field . " = p." . $date_field;
 		if(isset($this->arr_criteria_table[$this->criteria]['join_text'])) {
 			$sql .= $this->arr_criteria_table[$this->criteria]['join_text'];
 		}
-		$sql .= " WHERE DATEDIFF(MONTH, GETDATE(), " . $table_pre . "." . $criteria_date_field . ") < 4 " .
+		$sql .= " WHERE DATEDIFF(MONTH, GETDATE(), " . $table_pre . "." . $criteria_date_field . ") < 4 AND " . $this->criteria . " IS NOT NULL " .
 			$cte_order_by .
 		")";
 		return $sql;

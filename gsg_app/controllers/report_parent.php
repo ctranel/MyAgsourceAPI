@@ -172,7 +172,7 @@ abstract class parent_report extends CI_Controller {
 			$arr_blocks = array('table' => $arr_tables, 'chart' => $arr_charts);
 		}
 		else $arr_blocks = $this->{$this->primary_model}->arr_blocks[$this->page]['display'];
-echo $this->page;
+//echo $this->page;
 		if(empty($this->herd_code) || strlen($this->herd_code) != 8){
 			$this->session->set_flashdata('message', 'Please select a valid herd.');
 			redirect(site_url($this->report_path));
@@ -358,7 +358,7 @@ echo $this->page;
 						$tmp_js .= "updateBlock(\"$tmp_container_div\", \"$k\", \"$x\", \"null\", \"null\", \"$display\")\n";//, \"" . $this->{$this->primary_model}->arr_blocks[$this->page]['display'][$display][$block]['description'] . "\", \"" . $bench_text . "\");\n";
 						$tmp_block = $k;
 						$x++;
-echo $x;
+//echo $x;
 					}
 				}
 			}
