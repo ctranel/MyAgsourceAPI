@@ -11,7 +11,7 @@ class Monthly extends parent_report {
 	}
 
 	function index($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL){
-	 	$this->product_name = 'Production - Sample Day';
+	 	$this->product_name = 'Monthly Animal ID';
 		parent::display($block_in, $display_format);
 	}
 	 
