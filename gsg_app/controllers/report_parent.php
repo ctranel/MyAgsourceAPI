@@ -718,9 +718,6 @@ echo $x;
 					if(!$this->arr_filter_criteria[$k] && $k != 'pstring') {
 						$this->arr_filter_criteria[$k] = array();
 					}
-//					elseif(){
-						
-//					}
 					elseif(isset($arr_params[$k])) $this->arr_filter_criteria[$k] = $arr_params[$k];
 				}
 				else {
@@ -728,7 +725,6 @@ echo $x;
 					$this->arr_filter_criteria[$k] = $arr_params[$k];
 				}
 			}
-//var_dump($this->arr_filter_criteria);
 		}
 		else { //if no form has been successfully submitted, set to defaults
 			foreach($this->arr_page_filters as $f){
