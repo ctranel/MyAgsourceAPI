@@ -4,7 +4,7 @@ sub {color: #003E3F; font-size: 80%; font-family: "Arial Narrow","Arial","Verdan
 /* report table */
 #main-report {border-collapse:collapse; clear:both; margin: 0 auto; max-width: 100%;}
 .tbl {border-collapse:collapse; clear:both; border: solid 1px #000; margin: 0 auto} /* the table created for fixed headers */
-.tbl td {padding:1px 6px; text-align:right;}
+.tbl td {padding:1px 6px; text-align:right; white-space:nowrap;}
 
 /* table headings */
 h2.block {
@@ -49,6 +49,7 @@ th span.hide-column {cursor: pointer;}
 .downloads-container {position: relative; right: 2px; top:30px;}
 /* IE workaround */
 .ie .downloads-container {right: 30px; top:6px;}
+/* IE workaround */
 a.download-links {font-family: "Lucida Grande","Lucida Sans Unicode",Verdana,Arial,Helvetica,sans-serif; text-decoration: none; cursor: pointer; padding: 0pt 5px; display:block;}
 a.download-links:hover {color:#F1F8F8; background-color:#004147;}
 .download-link-wrapper {cursor: pointer; background: none repeat scroll 0% 0% transparent; color: rgb(48, 48, 48); font-size: 11px; white-space: nowrap;}
@@ -68,7 +69,7 @@ a.download-links:hover {color:#F1F8F8; background-color:#004147;}
 
 /* header herd info */
 #herd-info {max-width:50%;}
-#herd-text, #quartile-herd {float:left; margin: 15px 10px 0;}
+#herd-text, #quartile-herd {float:left; margin: 15px 10px 10px;}
 #herd-text label {margin: 0 5px 0 0; color:#004147; background-color:#fff;}
 #herd-text {text-align: left; font-size: .9em;}
 #comments {position:absolute; right:120px; border: solid 1px #000; min-width: 150px; min-height: 100px; max-width:25%; text-align: left; vertical-align: top; padding: 15px;}
@@ -102,10 +103,11 @@ tr#herd-avg td {border-top: solid 2px black;}
 
 #graph-canvas {background:transparent url('i/AgSource_watermark.gif') no-repeat center 70px; text-align: center;}
 .highcharts-container {border: solid 1px #c0c0c0;}
-.gt-1024 .chart-container {width: 380px; display:inline; margin: 0;}
+/*.gt-1024 .chart-container {width: 380px; display:inline; margin: 0;} */
 .gt-1024 .chart-odd {float: left; clear: both;}
 .gt-1024 .chart-even {float: right;}
-.gt-1024 .chart-container {width: 480px; display:inline; margin: 0;}
+.gt-1024 .chart-last-odd {display: block; margin: 0 auto;}
+.gt-1024 .chart-container {width: 480px;}
 .gt-1024 .highcharts-container {width: 480px;}
 
 

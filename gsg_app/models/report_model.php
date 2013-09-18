@@ -180,6 +180,8 @@ class Report_model extends CI_Model {
 		$arr_table_ref_cnt = array();
 
 		$this->arr_group_by_field = $this->get_group_by_fields($block_in);
+		$tmp_arr_pstring = $this->session->userdata('arr_pstring');
+		if(!is_array($tmp_arr_pstring) || empty($tmp_arr_pstring)) $this->{$this->db_group_name}->where('db_field_name != ', 'pstring');
 		$arr_field_data = $this->{$this->db_group_name}
 			->where('block_id', $block_in)
 			->order_by('list_order')
@@ -252,8 +254,7 @@ class Report_model extends CI_Model {
 		$arr_ref = array();
 		$arr_order = array();
 		
-		$arr_groupings = $this->{$this->db_group_name}
-			->query("WITH cteAnchor AS (
+		$grouping_sql = "WITH cteAnchor AS (
 					 SELECT bh.id, bh.[text], bh.parent_id, bh.list_order
 					 FROM users.dbo.block_header_groups bh
 					 	LEFT JOIN users.dbo.blocks_select_fields bs ON bh.id = bs.block_header_group_id
@@ -266,9 +267,9 @@ class Report_model extends CI_Model {
 					 FROM users.dbo.block_header_groups t
 					 join cteRecursive r ON r.parent_id = t.id
 				)
-				SELECT DISTINCT * FROM cteRecursive ORDER BY parent_id, list_order;"
-			)
-			->result_array();
+				SELECT DISTINCT * FROM cteRecursive ORDER BY parent_id, list_order;";
+		
+		$arr_groupings = $this->{$this->db_group_name}->query($grouping_sql)->result_array();
 			
 		if(!is_array($arr_groupings) || empty($arr_groupings)){
 			$arr_groupings = $this->{$this->db_group_name}
@@ -422,6 +423,7 @@ class Report_model extends CI_Model {
 	 * @author Chris Tranel
 	 **/
 	protected function prep_select_fields($arr_select_fields){
+//var_dump($arr_select_fields);
 		if (($key = array_search('test_date', $arr_select_fields)) !== FALSE) {
 			$arr_select_fields[$key] = "FORMAT(" . $this->primary_table_name . ".test_date, 'MM-dd-yy', 'en-US') AS test_date";//MMM-dd-yy
 		}
@@ -442,6 +444,9 @@ class Report_model extends CI_Model {
 				//$arr_select_fields[$k] = $new_name;
 			} 
 		}
+		//$tmp_arr_pstring = $this->session->userdata('arr_pstring');
+		//$pstring_index = array_search('pstring', $arr_select_fields);
+		//if((!is_array($tmp_arr_pstring) || empty($tmp_arr_pstring)) && $pstring_index !== FALSE) unset($arr_select_fields[$pstring_index]);
 		return($arr_select_fields);
 	}
 
@@ -475,8 +480,13 @@ class Report_model extends CI_Model {
 			
 			if(empty($v) === FALSE || $v === '0'){
 				if(is_array($v)){
-					if($k != 'pstring'){
+					if(strpos($k, 'pstring') !== FALSE){
 						$v = array_filter($v);
+						if(empty($v)) continue;
+					}
+					else {
+						$v = array_filter($v, create_function('$a', 'return (!empty($a) || $a === "0");'));
+						//$v = array_filter($v);
 						if(empty($v)) continue;
 					}
 					/*if(($tmp_key = array_search('NULL', $v)) !== FALSE){

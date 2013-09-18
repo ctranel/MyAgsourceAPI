@@ -74,6 +74,7 @@ class Change_herd extends CI_Controller {
 
 		if ($this->form_validation->run() == TRUE) { //if validation is successful
 			$this->session->set_userdata('herd_code', $this->input->post('herd_code'));
+			$this->session->set_userdata('arr_pstring', $this->herd_model->get_pstring_array($this->input->post('herd_code'), FALSE));
 			$this->access_log_model->write_entry(2); //2 is the page code for herd change
 			redirect(site_url($redirect_url));
 		}
@@ -139,6 +140,7 @@ class Change_herd extends CI_Controller {
 
 		if ($this->form_validation->run() == TRUE) { //successful submission
 			$this->session->set_userdata('herd_code', $this->input->post('herd_code'));
+			$this->session->set_userdata('arr_pstring', $this->herd_model->get_pstring_array($this->input->post('herd_code'), FALSE));
 			$this->access_log_model->write_entry(2); //2 is the page code for herd change
 			redirect(site_url($redirect_url));
 		}
@@ -149,6 +151,7 @@ class Change_herd extends CI_Controller {
 			$tmp_obj = $this->as_ion_auth->get_herds_by_group(NULL, NULL , TRUE);
 			if(is_string($tmp_obj)){ //producers will return a string instead of the database object
 				$this->session->set_userdata('herd_code', $tmp_obj);
+				$this->session->set_userdata('arr_pstring', $this->herd_model->get_pstring_array($tmp_obj, FALSE));
 				redirect(site_url($redirect_url));
 			}
 			elseif(is_object($tmp_obj)){

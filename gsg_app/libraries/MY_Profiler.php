@@ -140,7 +140,7 @@ class MY_Profiler extends CI_Profiler {
 			$color	= '#009900';
 
 		} else {
-
+return '';
 			$title 	= 'Loaded Template Vars';
 			$data 	= $this->CI->load->_ci_cached_vars;
 			$color	= '#24006B';

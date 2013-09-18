@@ -104,7 +104,10 @@ class As_ion_auth extends Ion_auth {
 			$this->arr_user_super_sections = $this->get_super_sections_array($this->session->userdata('active_group_id'), $this->session->userdata('user_id'), $this->session->userdata('herd_code'), $arr_scope);
 			$this->arr_user_sections = $this->get_sections_array($this->session->userdata('active_group_id'), $this->session->userdata('user_id'), $this->session->userdata('herd_code'), $this->super_section_id, $arr_scope);
 		}
-		if(!isset($tmp) || empty($tmp) !== FALSE) $this->session->set_userdata('herd_code', $this->config->item('default_herd', 'ion_auth'));
+		if(!isset($tmp) || empty($tmp) !== FALSE) {
+			$this->session->set_userdata('herd_code', $this->config->item('default_herd', 'ion_auth'));
+			$this->session->set_userdata('arr_pstring', $this->herd_model->get_pstring_array($this->config->item('default_herd', 'ion_auth'), FALSE));
+		}
 	}
 	
 	//accessor
@@ -124,6 +127,7 @@ class As_ion_auth extends Ion_auth {
 		$this->session->unset_userdata('arr_groups');
 		$this->session->unset_userdata('active_group_id');
 		$this->session->unset_userdata('herd_code');
+		$this->session->unset_userdata('arr_pstring');
 		$this->session->unset_userdata('first_name');
 		$this->session->unset_userdata('last_name');
 //		$this->session->unset_userdata('company');

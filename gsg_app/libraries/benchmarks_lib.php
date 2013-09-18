@@ -6,7 +6,7 @@
 *  
 * Created:  1-11-2013
 *
-* Description:  Works with the report model of the DPNavigator to set benchmark criteria, calculate benchmarks and return benchmark data.
+* Description:  Works with the report model of MyAgSource to set benchmark criteria, calculate benchmarks and return benchmark data.
 *
 * Requirements: PHP5 or above
 *
@@ -15,13 +15,13 @@
 class Benchmarks_lib
 {
 	/**
-	 * table used in benchmarks (avg, qtile, top 10%, etc ...)
+	 * table used in benchmarks
 	 * @var string
 	 **/
 	protected $db_table;
 
 	/**
-	 * table used in benchmarks (avg, qtile, top 10%, etc ...)
+	 * date field used in benchmarks (for MyAgSource, this will always be test date?)
 	 * @var string
 	 **/
 	protected $primary_table_date_field;
@@ -111,8 +111,8 @@ class Benchmarks_lib
 			'p.herd_rha' => 			array('join_text' => " LEFT JOIN herd_summary.dbo.herd_rha p ON td.herd_code = p.herd_code AND td.recent_test_date = p.test_date", 'sort_order' => 'desc', 'date_field' => 'test_date'),
 //			'r.herd_preg_rate' => 		array('join_text' => " LEFT JOIN dbo.v_repro_dashboard r ON td.herd_code = r.herd_code AND td.recent_test_date = r.test_date", 'sort_order' => 'desc', 'date_field' => 'test_date'),
 //			'hr.preg_rate_395_vwp' => 	array('join_text' => " LEFT JOIN dbo.v_heifer_repro_dashboard hr ON td.herd_code = hr.herd_code AND td.recent_test_date = hr.recent_test_date", 'sort_order' => 'desc', 'date_field' => 'test_date'),
-			'q.avg_linear' =>			array('join_text' => " LEFT JOIN dbo.v_quality_dashboard q ON td.herd_code = q.herd_code AND td.recent_test_date= q.test_date", 'sort_order' => 'asc', 'date_field' => 'test_date'),
-			'g.avg_net_merit' => 		array('join_text' => " LEFT JOIN dbo.genetics g ON td.herd_code = g.herd_code AND td.recent_test_date = g.recent_test_date", 'sort_order' => 'desc', 'date_field' => 'test_date')
+//			'q.avg_linear' =>			array('join_text' => " LEFT JOIN dbo.v_quality_dashboard q ON td.herd_code = q.herd_code AND td.recent_test_date= q.test_date", 'sort_order' => 'asc', 'date_field' => 'test_date'),
+//			'g.avg_net_merit' => 		array('join_text' => " LEFT JOIN dbo.genetics g ON td.herd_code = g.herd_code AND td.recent_test_date = g.recent_test_date", 'sort_order' => 'desc', 'date_field' => 'test_date')
 		);
 	}
 
@@ -142,10 +142,10 @@ class Benchmarks_lib
 	public function get_criteria_options(){
 		return array(
 			'p.avg_milk' => 'Average Milk',
-			'r.herd_preg_rate' => 'Cow Preg Rate',
-			'hr.preg_rate_395_vwp' => 'Heifer Preg Rate',
-			'q.avg_linear' => 'Average Linear Score',
-			'g.avg_net_merit' => 'Net Merit'
+//			'r.herd_preg_rate' => 'Cow Preg Rate',
+//			'hr.preg_rate_395_vwp' => 'Heifer Preg Rate',
+//			'q.avg_linear' => 'Average Linear Score',
+//			'g.avg_net_merit' => 'Net Merit'
 		);
 	}
 
