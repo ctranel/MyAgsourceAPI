@@ -423,7 +423,6 @@ class Report_model extends CI_Model {
 	 * @author Chris Tranel
 	 **/
 	protected function prep_select_fields($arr_select_fields){
-//var_dump($arr_select_fields);
 		if (($key = array_search('test_date', $arr_select_fields)) !== FALSE) {
 			$arr_select_fields[$key] = "FORMAT(" . $this->primary_table_name . ".test_date, 'MM-dd-yy', 'en-US') AS test_date";//MMM-dd-yy
 		}
@@ -444,9 +443,6 @@ class Report_model extends CI_Model {
 				//$arr_select_fields[$k] = $new_name;
 			} 
 		}
-		//$tmp_arr_pstring = $this->session->userdata('arr_pstring');
-		//$pstring_index = array_search('pstring', $arr_select_fields);
-		//if((!is_array($tmp_arr_pstring) || empty($tmp_arr_pstring)) && $pstring_index !== FALSE) unset($arr_select_fields[$pstring_index]);
 		return($arr_select_fields);
 	}
 

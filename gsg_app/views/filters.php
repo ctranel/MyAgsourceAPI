@@ -51,7 +51,7 @@
 				<?php echo form_fieldset_close();
 				break;
 			case 'lact_num': ?>
-					<?php echo form_fieldset('Lactation #', array('id' => 'lact-num-fieldset')); ?>
+				<?php echo form_fieldset('Lactation #', array('id' => 'lact-num-fieldset')); ?>
 					<span class="filter-checkbox"><?php echo form_checkbox(array('name'=>'lact_num[]', 'id'=>'lact_num1'), '1', in_array('1', $filter_selected['lact_num']) !== false); ?>
 					1&nbsp;&nbsp;</span>
 					<span class="filter-checkbox"><?php echo form_checkbox(array('name'=>'lact_num[]', 'id'=>'lact_num2'), '2', in_array('2', $filter_selected['lact_num']) !== false); ?>
@@ -61,7 +61,7 @@
 				<?php echo form_fieldset_close();
 				break;
 			case 'dam_lact_num': ?>
-					<?php echo form_fieldset('Dam Lactation #', array('id' => 'dam_lact_num-fieldset')); ?>
+				<?php echo form_fieldset('Dam Lactation #', array('id' => 'dam_lact_num-fieldset')); ?>
 					<span class="filter-checkbox"><?php echo form_checkbox(array('name'=>'dam_lact_num[]', 'id'=>'dam_lact_num1'), '1', in_array('1', $filter_selected['dam_lact_num']) !== false); ?>
 					1&nbsp;&nbsp;</span>
 					<span class="filter-checkbox"><?php echo form_checkbox(array('name'=>'dam_lact_num[]', 'id'=>'dam_lact_num2'), '2', in_array('2', $filter_selected['dam_lact_num']) !== false); ?>
@@ -77,14 +77,14 @@
 					and <?php echo form_input(array('name'=>'curr_lact_dim_dbto', 'value'=>$filter_selected['curr_lact_dim_dbto'], 'size'=>'3', 'maxlength'=>'3', 'id'=>'curr_lact_dim_dbto')); ?>
 				</p>
 				<?php break;
-			case 'age': ?>
-				<p class = "filter-group">
+			case 'age_months': ?>
+				<?php echo form_fieldset('Dam Lactation #', array('id' => 'dam_lact_num-fieldset')); ?>
 					<?php echo form_label('Age Range (months)', 'age_months_dbfrom'); ?>		
 					Between <?php echo form_input(array('name'=>'age_months_dbfrom', 'value'=>$filter_selected['age_months_dbfrom'], 'size'=>'4', 'maxlength'=>'4', 'id'=>'age_months_dbfrom')); ?>
 					and <?php echo form_input(array('name'=>'age_months_dbto', 'value'=>$filter_selected['age_months_dbto'], 'size'=>'4', 'maxlength'=>'4', 'id'=>'age_months_dbto')); ?>
-				</p>
-				<?php break;
-				endswitch; 
+				<?php echo form_fieldset_close();
+				break;
+			endswitch; 
 	endforeach;
 endif; ?>
 <div class="submit"><?php echo form_submit('filter_submit', 'Apply Filter');?>&nbsp;&nbsp;&nbsp;<?php echo form_button('reset_filter', 'Reset Filter', 'onclick="form_reset()"')?>
