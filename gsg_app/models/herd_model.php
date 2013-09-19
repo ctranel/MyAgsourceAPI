@@ -139,7 +139,7 @@ class Herd_model extends CI_Model {
 	 * @access public
 	 * @author Chris Tranel
 	 **/
-	public function get_herds($limit=NULL, $offset=NULL, $order_by='farm_name')
+	public function get_herds($limit=NULL, $offset=NULL, $order_by='herd_owner')
 	{
 		$this->db
 		->select('h.[herd_code],h.[farm_name],h.[herd_owner],h.[contact_fn],h.[contact_ln],h.[address_1],h.[address_2]
