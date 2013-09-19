@@ -110,31 +110,45 @@ function get_column_options(){
 }
 
 function get_bar_options(){
-	return array(
-		'chart' => array(
-			'defaultSeriesType' => 'bar'
-		),
-		'xAxis' => array(
-			'type'=>'datetime',
-			'categories' => NULL, //clear out previously declared categories
-			'labels' => array('formatter' => "function(){return Highcharts.dateFormat('%b %Y', this.value);}", 'align' => 'right', 'x' => -5, 'y' => 5)
-		),
-
-		'yAxis' => array(
-			'type'=>'linear',
-		),
-		//'legend' => array('enabled' => 'true'),
-		'plotOptions' => array(
-			'column' => array(
-				'stacking' => NULL,
-				'shadow' => false,
-				'borderWidth' => 0
+		return array(
+			'legend' => array('enabled'=>FALSE),
+			'xAxis' => array('type'=>'linear', 'categories'=>array()),
+			'yAxis' => array(
+				array(
+					'title' => array('text' => 'Percentile Ranking'),
+					'min' => 1,
+					'max' => 100,
+					'tickInterval' => 10,
+			        'plotLines' => array(
+						array(
+				            'color'=> '#ff0000',
+				            'width'=> 4,
+				            'value'=> 20
+						),array(
+				            'color'=> '#194d4b',
+				            'width'=> 4,
+				            'value'=> 80
+						)
+				     ),
+					'plotBands' => array(
+				     	array(
+				            'color'=> 'rgba(204,100,100,.1)',
+				            'from'=> 0,
+				            'to'=> 20
+				        ),array(
+				            'color'=> 'rgba(100,204,100,.1)',
+				            'from'=> 80,
+				            'to'=> 100
+				        )
+					)
+				)
+			),
+	        'series' => array(
+				array('type' => 'bar', 'name' => 'Percentile'),
+		 	    array('type' => 'scatter', 'marker' => array('radius' => 0)),
+		 	    //array('type' => 'spline', 'connectNulls' => TRUE)
 			)
-		),
-		'tooltip' => array(
-			'formatter' => "function(){return '<b>'+ Highcharts.dateFormat('%B %e, %Y', this.x) +'</b><br/>'+this.series.name +': '+ this.y;}"
-		)
-	);
+		);
 }
 
 function get_boxplot_options(){

@@ -254,6 +254,7 @@ abstract class parent_report extends CI_Controller {
 						$this->reports->sort_text($this->arr_sort_by, $this->arr_sort_order);//this function sets text, and could return it if needed
 //						$this->{$this->primary_model}->populate_field_meta_arrays($pb['id']);
 						$tmp_data = $this->ajax_report(urlencode($this->page), urlencode($pb['url_segment']), $this->session->userdata('pstring'), 'array', urlencode($sort_by), $sort_order, 'csv', NULL);
+var_dump($tmp_data);
 						$data[] = array('test_date' => $pb['description']);
 						$data = array_merge($data, $tmp_data);
 					}
@@ -358,7 +359,6 @@ abstract class parent_report extends CI_Controller {
 						$tmp_js .= "updateBlock(\"$tmp_container_div\", \"$k\", \"$x\", \"null\", \"null\", \"$display\")\n";//, \"" . $this->{$this->primary_model}->arr_blocks[$this->page]['display'][$display][$block]['description'] . "\", \"" . $bench_text . "\");\n";
 						$tmp_block = $k;
 						$x++;
-//echo $x;
 					}
 				}
 			}
@@ -395,11 +395,14 @@ abstract class parent_report extends CI_Controller {
 						'{exporting: "https://cdnjs.cloudflare.com/ajax/libs/highcharts/3.0.2/modules/exporting.js"}',
 						'{graph_helper: "' . $this->config->item("base_url_assets") . 'js/charts/graph_helper.js"}',
 						'{report_helper: "' . $this->config->item("base_url_assets") . 'js/report_helper.js"}',
-						'{inv_helper: "' . $this->config->item("base_url_assets") . 'js/' . $this->section_path . '_helper.js"}',
 						'function(){' . $tmp_js . ';}'
 					)
 				)
 			);
+			//load the report-specific js file if it exists
+			if(file_exists($this->config->item("base_url_assets") . 'js/' . $this->section_path . '_helper.js')){
+				$this->page_header_data['arr_headjs_line'][] = '{inv_helper: "' . $this->config->item("base_url_assets") . 'js/' . $this->section_path . '_helper.js"}';
+			}
 		}
 		unset($this->{$this->primary_model}->arr_messages); //clear message var once it is displayed
 		$arr_nav_data = array(
@@ -444,12 +447,11 @@ abstract class parent_report extends CI_Controller {
 		$block = urldecode($block);
 		$sort_by = urldecode($sort_by);
 		if(isset($json_filter_data)){
+//echo $arrParams['csrf_test_name'] . ' != ' . $this->security->get_csrf_hash();
 			$arrParams = (array)json_decode(urldecode($json_filter_data));
 			if(isset($arrParams['csrf_test_name']) && $arrParams['csrf_test_name'] != $this->security->get_csrf_hash()) die("I don't recognize your browser session, your session may have expired, or you may have cookies turned off.");
 			unset($arrParams['csrf_test_name']);
 			$this->_set_filters($page, $arrParams);
-				
-//die();
 		}
 		$this->load->helper('report_chart_helper');
 		if($sort_by != 'null' && $sort_order != 'null') {
@@ -476,8 +478,6 @@ abstract class parent_report extends CI_Controller {
 				$this->load_block($block, $report_count, $file_format);
 				break;
 		}
-
-		
 		//common functionality
 		if($file_format == 'csv') return $this->report_data['report_data'];
 		elseif($file_format == 'pdf'){
@@ -486,7 +486,6 @@ abstract class parent_report extends CI_Controller {
 				return $this->report_data['report_data'];
 			}
 		}
-
 		if($this->display == 'table'){
 			$this->graph['html'] = $this->html;
 		}
@@ -535,18 +534,18 @@ abstract class parent_report extends CI_Controller {
 			$this->load->model('report_model');
 		} */
 		$arr_axes = $this->{$this->primary_model}->get_chart_axes($arr_this_block['id']); // was $model in place of $this->primary_model
-		$x_axis_date_field = 'test_date';
+		$x_axis_date_field = '';
 		$this->graph['config'] = get_chart_options($arr_this_block['chart_type']);
 		$this->graph['config']['subtitle']['text'] = "Herd " . $this->session->userdata('herd_code');
 		$this->graph['config']['title']['text'] = $arr_this_block['description'];
 		$this->graph['config']['exporting']['filename'] = $arr_this_block['name'];
 		$this->graph['config']['title']['text'] = $arr_this_block['description'];
-		$this->{$this->primary_model}->set_chart_fields($arr_this_block['id']); // was $model in place of $this->primary_model
-		$arr_fields = $this->{$this->primary_model}->get_fields(); // was $model in place of $this->primary_model
+		$this->{$this->primary_model}->set_chart_fields($arr_this_block['id']);
+		$arr_fields = $this->{$this->primary_model}->get_fields();
 		if(is_array($arr_fields) && !empty($arr_fields)){
 			$c = 0;
-			$arr_chart_type = $this->{$this->primary_model}->get_chart_type_array(); // was $model in place of $this->primary_model
-			$arr_axis_index = $this->{$this->primary_model}->get_axis_index_array(); // was $model in place of $this->primary_model
+			$arr_chart_type = $this->{$this->primary_model}->get_chart_type_array();
+			$arr_axis_index = $this->{$this->primary_model}->get_axis_index_array();
 			
 			foreach($arr_fields as $k=>$f){
 				//these 2 arrays need to have the same numeric index so that the yaxis# can be correctly assigned to series
@@ -572,10 +571,12 @@ abstract class parent_report extends CI_Controller {
 				}
 				$tmp_array = array(
 					'type' => $a['data_type'], 
-					'categories' => $tmp_cat,
-					'title' => array('text' => $a['text']),
-					'labels' => array('formatter' => $label_format, 'rotation' => -35, 'align' => 'left', 'x' => -50, 'y' => 55)
+					'categories' => $tmp_cat
 				);
+				if($arr_this_block['chart_type'] != 'bar'){
+					$tmp_array['title'] = array('text' => $a['text']);
+					$tmp_array['labels'] = array('formatter' => $label_format, 'rotation' => -35, 'align' => 'left', 'x' => -50, 'y' => 55);
+				}
 				if(count($arr_axes['x']) > 1) $this->graph['config']['xAxis'][] = $tmp_array;
 				else $this->graph['config']['xAxis'] = $tmp_array;
 				if(isset($a['db_field_name']) && !empty($a['db_field_name'])) $this->{$this->primary_model}->add_field(array('Date' => $a['db_field_name'])); // was $model in place of $this->primary_model
@@ -593,11 +594,9 @@ abstract class parent_report extends CI_Controller {
 						$tooltip_format = "function(){return '<b>' + this.series.name + ':</b><br>' + Highcharts.dateFormat('%B %e, %Y', this.x) + ' - ' + this.y + ' " . $um . "';}";
 /*						break;
 				} */
-				$tmp_array = array(
-					'opposite' => $a['opposite'],
-					'title' => array('text' => $a['text'], 'style'=>array('color'=>'')),
-					'labels' => array('formatter' => $label_format)
-				);
+				if($arr_this_block['chart_type'] != 'bar') $tmp_array['opposite'] = $a['opposite'];
+				if(isset($a['text'])) $tmp_array['title'] = array('text' => $a['text'], 'style'=>array('color'=>''));
+				if(isset($label_format) && $arr_this_block['chart_type'] != 'bar') $tmp_array['labels'] = array('formatter' => $label_format);
 				if(isset($a['data_type'])) $tmp_array['type'] = $a['data_type'];
 				if(isset($a['max'])) $tmp_array['max'] = $a['max'];
 				if(isset($a['min'])) $tmp_array['min'] = $a['min'];
@@ -607,13 +606,15 @@ abstract class parent_report extends CI_Controller {
 					$tmp_key = array_search($a['db_field_name'], $arr_fieldnames);
 					$this->graph['config']['series'][$tmp_key]['yAxis'] = 1;
 				}
+
 				if(count($arr_axes['y']) > 1) $this->graph['config']['yAxis'][] = $tmp_array;
+				elseif(isset($this->graph['config']['yAxis'])) ;//$this->graph['config']['yAxis'] = array_merge($this->graph['config']['yAxis'], $tmp_array);
 				else $this->graph['config']['yAxis'] = $tmp_array;
 			}
 			$this->graph['config']['tooltip']['formatter'] = $tooltip_format;
 		}
+//var_dump($this->graph['config']);
 		$this->graph['data'] = $this->{$this->primary_model}->get_graph_data($arr_fieldnames, $this->session->userdata('herd_code'), $this->max_rows, $x_axis_date_field, $this->graph['config']['xAxis']['categories']); // was $model in place of $this->primary_model
-		
 /*				examples of output:
 				$this->graph['config']['tooltip']['formatter'] = "function(){return '<b>' + this.series.name + ':</b><br>' + Highcharts.dateFormat('%B %e, %Y', this.x) + ' - ' + this.y + ' lbs';}";
 				$this->graph['config']['tooltip']['formatter'] = "function(){return '<b>'+ Highcharts.dateFormat('%B %e, %Y', this.x) +'</b><br/>'+this.series.name +': '+ this.y +'<br/>'+'Combined Total: '+ this.point.stackTotal +'<br/>'+'Click on graph line to view Cow Report for that group';}";

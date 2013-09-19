@@ -355,7 +355,7 @@ class Report_model extends CI_Model {
 	 * @return array results of search
 	 * @author Chris Tranel
 	 **/
-	function search($herd_code, $arr_filter_criteria, $arr_sort_by = array('test_date'), $arr_sort_order = array('ASC'), $limit = NULL) {
+	function search($herd_code, $arr_filter_criteria, $arr_sort_by = array(''), $arr_sort_order = array(''), $limit = NULL) {
 		$this->load->helper('multid_array_helper');
 		$this->herd_code = $herd_code;
 		$this->{$this->db_group_name}->start_cache();
