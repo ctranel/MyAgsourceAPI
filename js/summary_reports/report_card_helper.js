@@ -16,7 +16,7 @@
 			    {color:'rgba(100,204,100,.1)',from:80,to:100}
 			];
 		}
-alert(JSON.stringify(options_in));
+//alert(JSON.stringify(options_in));
 		$('.chart-container').each(function(){
 			$(this).addClass('chart-only').removeClass('chart-odd').removeClass('chart-even').removeClass('chart-last-odd');
 		})
