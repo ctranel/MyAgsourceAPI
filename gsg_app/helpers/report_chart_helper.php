@@ -34,7 +34,9 @@ function get_stacked_area_options(){
 		),
 
 		'yAxis' => array(
-			'type'=>'linear',
+			array(
+				'type'=>'linear',
+			)
 		),
 		//'legend' => array('enabled' => 'true'),
 		'plotOptions' => array(
@@ -64,7 +66,9 @@ function get_stacked_column_options(){
 		),
 
 		'yAxis' => array(
-			'type'=>'linear',
+			array(
+				'type'=>'linear',
+			)
 		),
 		//'legend' => array('enabled' => 'true'),
 		'plotOptions' => array(
@@ -93,7 +97,9 @@ function get_column_options(){
 		),
 
 		'yAxis' => array(
-			'type'=>'linear',
+			array(
+				'type'=>'linear',
+			)
 		),
 		//'legend' => array('enabled' => 'true'),
 		'plotOptions' => array(
@@ -110,45 +116,13 @@ function get_column_options(){
 }
 
 function get_bar_options(){
-		return array(
-			'legend' => array('enabled'=>FALSE),
-			'xAxis' => array('type'=>'linear', 'categories'=>array()),
-			'yAxis' => array(
-				array(
-					'title' => array('text' => 'Percentile Ranking'),
-					'min' => 1,
-					'max' => 100,
-					'tickInterval' => 10,
-			        'plotLines' => array(
-						array(
-				            'color'=> '#ff0000',
-				            'width'=> 4,
-				            'value'=> 20
-						),array(
-				            'color'=> '#194d4b',
-				            'width'=> 4,
-				            'value'=> 80
-						)
-				     ),
-					'plotBands' => array(
-				     	array(
-				            'color'=> 'rgba(204,100,100,.1)',
-				            'from'=> 0,
-				            'to'=> 20
-				        ),array(
-				            'color'=> 'rgba(100,204,100,.1)',
-				            'from'=> 80,
-				            'to'=> 100
-				        )
-					)
-				)
-			),
-	        'series' => array(
-				array('type' => 'bar', 'name' => 'Percentile'),
-		 	    array('type' => 'scatter', 'marker' => array('radius' => 0)),
-		 	    //array('type' => 'spline', 'connectNulls' => TRUE)
-			)
-		);
+	return array(
+		'chart' => array(
+			'defaultSeriesType' => 'bar'
+		),
+		'legend' => array('enabled'=>FALSE),
+		'xAxis' => array('type'=>'linear', 'categories'=>array()),
+	);
 }
 
 function get_boxplot_options(){
@@ -158,7 +132,9 @@ function get_boxplot_options(){
 			'categories' => NULL //clear out previously declared categories
 		),
 		'yAxis' => array(
-			'type'=>'linear',
+			array(
+				'type'=>'linear',
+			)
 		),
 		'plotOptions' => array(
 			'candlestick' => array(
@@ -191,11 +167,9 @@ function get_line_options(){
 		),
 
 		'yAxis' => array(
-			'type'=>'linear',
-//			'title' => array('text' => 'Percentile Ranking'),
-//			'tickInterval' => 10,
-//			'min' => 0,
-//			'max' => 100
+			array(
+				'type'=>'linear',
+			)
 		),
 		'legend' => array('enabled' => TRUE),
 /*		'series' => array(

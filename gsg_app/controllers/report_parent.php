@@ -344,7 +344,8 @@ var_dump($tmp_data);
 					}
 					if($arr_block_in == NULL || in_array($k, $arr_block_in)){
 						$this->{$this->primary_model}->populate_field_meta_arrays($pb['id']);
-						if($x % 2 == 1) $odd_even = 'chart-even';
+						if($cnt == 1) $odd_even = 'chart-only';
+						elseif($x % 2 == 1) $odd_even = 'chart-even';
 						elseif($x == ($cnt - 1)) $odd_even = 'chart-last-odd';
 						else $odd_even = 'chart-odd';
 						$arr_blk_data = array(
@@ -395,14 +396,18 @@ var_dump($tmp_data);
 						'{exporting: "https://cdnjs.cloudflare.com/ajax/libs/highcharts/3.0.2/modules/exporting.js"}',
 						'{graph_helper: "' . $this->config->item("base_url_assets") . 'js/charts/graph_helper.js"}',
 						'{report_helper: "' . $this->config->item("base_url_assets") . 'js/report_helper.js"}',
-						'function(){' . $tmp_js . ';}'
+//						'function(){' . $tmp_js . ';}'
 					)
 				)
 			);
 			//load the report-specific js file if it exists
-			if(file_exists($this->config->item("base_url_assets") . 'js/' . $this->section_path . '_helper.js')){
+//echo "C:\Program Files (x86)\Zend\Apache2\htdocs\app\js\summary_reports";
+//echo PROJ_DIR . FS_SEP . 'js' . FS_SEP . str_replace('/', FS_SEP, $this->section_path) . '_helper.js';
+//var_dump(file_exists(PROJ_DIR . FS_SEP . 'js' . FS_SEP . str_replace('/', FS_SEP, $this->section_path) . '_helper.js'));
+			if(file_exists(PROJ_DIR . FS_SEP . 'js' . FS_SEP . str_replace('/', FS_SEP, $this->section_path) . '_helper.js')){
 				$this->page_header_data['arr_headjs_line'][] = '{inv_helper: "' . $this->config->item("base_url_assets") . 'js/' . $this->section_path . '_helper.js"}';
 			}
+			$this->page_header_data['arr_headjs_line'][] = 'function(){' . $tmp_js . ';}';
 		}
 		unset($this->{$this->primary_model}->arr_messages); //clear message var once it is displayed
 		$arr_nav_data = array(
@@ -525,16 +530,8 @@ var_dump($tmp_data);
 	
 	protected function load_chart(&$arr_this_block, $report_count){
 		$um = '';//unit of measure
-		/* $model = $arr_this_block['url_segment'] . '_model';
-		if(file_exists(APPPATH . 'models/' . $this->section_path . '/' . $model . '.php')){
-			$this->load->model($this->section_path . '/' . $model);
-		}
-		else{
-			$model = 'report_model';
-			$this->load->model('report_model');
-		} */
 		$arr_axes = $this->{$this->primary_model}->get_chart_axes($arr_this_block['id']); // was $model in place of $this->primary_model
-		$x_axis_date_field = '';
+		$x_axis_date_field = NULL;
 		$this->graph['config'] = get_chart_options($arr_this_block['chart_type']);
 		$this->graph['config']['subtitle']['text'] = "Herd " . $this->session->userdata('herd_code');
 		$this->graph['config']['title']['text'] = $arr_this_block['description'];
@@ -583,6 +580,7 @@ var_dump($tmp_data);
 			}
 		}
 		if(is_array($arr_axes['y'])){
+			$cnt = 0;
 			foreach($arr_axes['y'] as $a){
 /*				switch($a['data_type']) {
 					case 'datetime':
@@ -591,7 +589,8 @@ var_dump($tmp_data);
 						break;
 					default: */
 						$label_format = 'function(){return this.value}';
-						$tooltip_format = "function(){return '<b>' + this.series.name + ':</b><br>' + Highcharts.dateFormat('%B %e, %Y', this.x) + ' - ' + this.y + ' " . $um . "';}";
+						if(isset($x_axis_date_field)) $tooltip_format = "function(){return '<b>' + this.series.name + ':</b><br>' + Highcharts.dateFormat('%B %e, %Y', this.x) + ' - ' + this.y + ' " . $um . "';}";
+						else $tooltip_format = "function(){return '<b>' + this.series.name + ':</b>' + this.y + ' " . $um . "';}";
 /*						break;
 				} */
 				if($arr_this_block['chart_type'] != 'bar') $tmp_array['opposite'] = $a['opposite'];
@@ -601,19 +600,22 @@ var_dump($tmp_data);
 				if(isset($a['max'])) $tmp_array['max'] = $a['max'];
 				if(isset($a['min'])) $tmp_array['min'] = $a['min'];
 				//check for opposite yAxes
-
 				if(isset($a['db_field_name']) && !empty($a['db_field_name']) && $a['opposite']){
 					$tmp_key = array_search($a['db_field_name'], $arr_fieldnames);
 					$this->graph['config']['series'][$tmp_key]['yAxis'] = 1;
 				}
 
-				if(count($arr_axes['y']) > 1) $this->graph['config']['yAxis'][] = $tmp_array;
-				elseif(isset($this->graph['config']['yAxis'])) ;//$this->graph['config']['yAxis'] = array_merge($this->graph['config']['yAxis'], $tmp_array);
-				else $this->graph['config']['yAxis'] = $tmp_array;
+				if(count($arr_axes['y']) > 1) {
+					if(isset($this->graph['config']['yAxis'][$cnt])) $this->graph['config']['yAxis'][$cnt] = array_merge($this->graph['config']['yAxis'][$cnt], $tmp_array);
+					else $this->graph['config']['yAxis'][$cnt] = $tmp_array;
+				}
+				else {
+					if(isset($this->graph['config']['yAxis'])) $this->graph['config']['yAxis'] = array_merge($this->graph['config']['yAxis'][$cnt], $tmp_array);
+					else $this->graph['config']['yAxis'] = $tmp_array;
+				}
 			}
 			$this->graph['config']['tooltip']['formatter'] = $tooltip_format;
 		}
-//var_dump($this->graph['config']);
 		$this->graph['data'] = $this->{$this->primary_model}->get_graph_data($arr_fieldnames, $this->session->userdata('herd_code'), $this->max_rows, $x_axis_date_field, $this->graph['config']['xAxis']['categories']); // was $model in place of $this->primary_model
 /*				examples of output:
 				$this->graph['config']['tooltip']['formatter'] = "function(){return '<b>' + this.series.name + ':</b><br>' + Highcharts.dateFormat('%B %e, %Y', this.x) + ' - ' + this.y + ' lbs';}";

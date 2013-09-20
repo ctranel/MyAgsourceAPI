@@ -101,14 +101,14 @@ tr#herd-avg td {border-top: solid 2px black;}
 .jqPlot {clear: left;}
 .chart-container {margin: 0 auto 15px;}
 
-#graph-canvas {background:transparent url('i/AgSource_watermark.gif') no-repeat center 70px; text-align: center;}
+#graph-canvas, .chart {background:transparent url('i/AgSource_watermark.gif') no-repeat center 70px; text-align: center;}
 .highcharts-container {border: solid 1px #c0c0c0;}
-/*.gt-1024 .chart-container {width: 380px; display:inline; margin: 0;} */
+.gt-1024 .chart-container {width: 480px;}
+.gt-1024 .highcharts-container {width: 480px; margin: 0 auto;}
 .gt-1024 .chart-odd {float: left; clear: both;}
 .gt-1024 .chart-even {float: right;}
 .gt-1024 .chart-last-odd {display: block; margin: 0 auto;}
-.gt-1024 .chart-container {width: 480px;}
-.gt-1024 .highcharts-container {width: 480px;}
+.gt-1024 .chart-only {display: block; width: 100%; clear: both;}
 
 
 

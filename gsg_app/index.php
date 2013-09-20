@@ -62,7 +62,7 @@ if (defined('ENVIRONMENT'))
 	switch (ENVIRONMENT)
 	{
 		case 'development':
-			$system_path = 'C:\Program Files (x86)\Zend\Apache2\as_sys';
+			$system_path = 'C:\\Program Files (x86)\\Zend\\Apache2\\as_sys';
 		break;
 		case 'testing':
 			$system_path = "/var/www/agsource/as_sys";
@@ -76,6 +76,39 @@ if (defined('ENVIRONMENT'))
 	}
 }
 	
+/*
+ *---------------------------------------------------------------
+ * PROJECT FOLDER NAME
+ *---------------------------------------------------------------
+ *
+ * This is directory in which the application, css, js, etc directories reside
+ *  
+ * NO TRAILING SLASH!
+ *
+ */
+if (defined('ENVIRONMENT'))
+{
+	switch (ENVIRONMENT)
+	{
+		case 'development':
+			$project_folder = 'C:\\Program Files (x86)\\Zend\\Apache2\\';
+		break;
+		case 'testing':
+			$project_folder = "/var/www/agsource/myagsource";
+		break;
+		case 'production':
+			$project_folder = "/var/www/agsource/myagsource";
+		break;
+
+		default:
+			exit('The project environment is not set correctly.');
+	}
+	
+	// Name of the "system folder"
+	define('PROJ_DIR', $project_folder);
+	echo PROJ_DIR;
+}
+			
 /*
  *---------------------------------------------------------------
  * APPLICATION FOLDER NAME
@@ -93,13 +126,13 @@ if (defined('ENVIRONMENT'))
 	switch (ENVIRONMENT)
 	{
 		case 'development':
-			$application_folder = 'gsg_app';
+			$application_folder = $project_folder . '/gsg_app';
 		break;
 		case 'testing':
-			$application_folder = "/var/www/agsource/myagsource/gsg_app";
+			$application_folder = $project_folder . "/gsg_app";
 		break;
 		case 'production':
-			$application_folder = "/var/www/agsource/myagsource/gsg_app";
+			$application_folder = $project_folder . "/gsg_app";
 		break;
 
 		default:

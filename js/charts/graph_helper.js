@@ -101,22 +101,6 @@ var global_options = {
 
 Highcharts.setOptions(global_options);
 
-/*set width of page and charts DO WITH HEAD.JS
-var doc_width = $(window).innerWidth() < 1000 ? $(window).innerWidth() : 1200;
-var container_width = Math.floor(doc_width * .95);
-$('#container').width(container_width);
-if(doc_width >= 768) {
-	var chart_width = Math.floor(container_width * .47);
-	global_options['chart']['width'] = chart_width;
-	$(".chart-odd, .chart-even, .chart").css("width", chart_width);
-	$(".chart-last-odd").css("max-width", '600px');
-}
-else {
-	global_options['chart']['width'] = Math.floor(container_width * .95);
-	$(".chart-odd, .chart-even").css("float", "none");
-	$(".chart-odd, .chart-even").css("clear", "both");
-}
-*/
 function updateFilter(event, this_in, divid, field_in, value_in){
 	//set_styles(this_in, divid);
 	$('input[name=' + field_in + '][value=' + value_in + ']').attr("checked", true);
@@ -151,7 +135,6 @@ function updateBlock(container_div_id, block_in, block_index, sort_field, sort_o
 	if(typeof(pstring) == 'undefined') pstring = 0;
 	if(typeof(sort_field) == 'undefined') sort_field = null;
 	if(typeof(sort_order) == 'undefined') sort_order = null;
-//alert(display);
 	switch(display){
 		case "table": 
 			load_table(base_url + '/ajax_report/' + encodeURIComponent(page) + '/' + encodeURIComponent(block) + '/' + pstring + '/' + display + '/' + encodeURIComponent(sort_field) + '/' + sort_order + '/web/null/' + block_index + '/' + params + '/' + cache_bust, container_div_id, block_index, sort_field, sort_order, block, params);
@@ -182,7 +165,6 @@ function load_table(server_path, div_id, tbl_cnt_in, sort_field, sort_order, blo
 		if(typeof(block) != 'undefined' && typeof(pstring) != 'undefined'){
 			var cache_bust = Math.floor(Math.random()*1000);
 			server_path = base_url + '/ajax_report/' + encodeURIComponent(page) + '/' + encodeURIComponent(block) + '/' + pstring + '/table/' + encodeURIComponent(sort_field) + '/' + sort_order + '/web/null/' + tbl_cnt_in + '/' + params + '/' + cache_bust;
-alert(server_path)
 		}
 		else {
 			alert("No data found.");
