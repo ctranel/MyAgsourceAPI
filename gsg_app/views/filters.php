@@ -6,26 +6,38 @@
 <?php //$link_url = str_replace('display', 'filter', $form_url)?>
 <div class="handle"><a id="set-filters" class="handle">Set Filters </a></div>
 <?php //echo anchor("#","Apply Filters", 'class="handle"'); ?>
-<?php echo form_open($form_url, array('name'=>'filter-form', 'id'=>'filter-form')); ?>
+<?php echo form_open($form_url, array('name'=>'filter-form', 'id'=>'filter-form'));?>
+<p></p>
 <?php if(is_array($arr_filters)):
 	 foreach($arr_filters as $f):
 		switch($f): 
-			case 'pstring': ?>
-				<?php if(!empty($arr_pstring) && count($arr_pstring) > 1):
+			case 'pstring':
+				if(!empty($arr_pstring) && count($arr_pstring) > 1):
 					echo form_fieldset('PString', array('id' => 'pages-fieldset'));
 						$top=count($arr_pstring);
 						for( $c=0; $c < $top; $c++): ?>
 							<span class="pstring-filter-item filter-checkbox">
-								<?php //echo form_radio('pstring', $arr_pstring[$c]['pstring'], $filter_selected['pstring'] == $arr_pstring[$c]['pstring']);
-								echo form_checkbox('pstring[]', $arr_pstring[$c]['pstring'], in_array($arr_pstring[$c]['pstring'], $filter_selected['pstring']) !== FALSE);
+								<?php echo form_checkbox('pstring[]', $arr_pstring[$c]['pstring'], in_array($arr_pstring[$c]['pstring'], $filter_selected['pstring']) !== FALSE);
 								echo $arr_pstring[$c]['publication_name']; ?>
 							</span>
 						<?php endfor;
-					echo form_fieldset_close(); ?>
-				<?php endif; ?>
-				<?php break;
+					echo form_fieldset_close();
+				endif;
+				break;
+			case 'tstring':
+				if(!empty($arr_tstring) && count($arr_tstring) > 1):
+					echo form_fieldset('Pen', array('id' => 'pages-fieldset'));
+						$top=count($arr_tstring);
+						for( $c=0; $c < $top; $c++): ?>
+							<span class="tstring-filter-item filter-checkbox">
+								<?php echo form_checkbox('tstring[]', $arr_tstring[$c]['tstring'], in_array($arr_tstring[$c]['tstring'], $filter_selected['tstring']) !== FALSE);
+								echo $arr_tstring[$c]['tstring']; ?>
+							</span>
+						<?php endfor;
+					echo form_fieldset_close();
+				endif;
+				break;
 			case 'decision_guide_qtile_num': ?>
-				<p class = "filter-group">
 					<?php echo form_fieldset('Quartile', array('id' => 'quartile-fieldset')); ?>
 					<span class="filter-checkbox">
 						<?php echo form_checkbox(array('name'=>'decision_guide_qtile_num[]', 'id'=>'decision_guide_qtile_num0'), '0', in_array('0', $filter_selected['decision_guide_qtile_num']) !== false); ?>
@@ -47,7 +59,6 @@
 						<?php echo form_checkbox(array('name'=>'decision_guide_qtile_num[]', 'id'=>'decision_guide_qtile_num4'), '4', in_array('4', $filter_selected['decision_guide_qtile_num']) !== false); ?>
 						4th&nbsp;&nbsp;
 					</span>
-				</p>
 				<?php echo form_fieldset_close();
 				break;
 			case 'lact_num': ?>
@@ -57,6 +68,16 @@
 					<span class="filter-checkbox"><?php echo form_checkbox(array('name'=>'lact_num[]', 'id'=>'lact_num2'), '2', in_array('2', $filter_selected['lact_num']) !== false); ?>
 					2&nbsp;&nbsp;</span>
 					<span class="filter-checkbox"><?php $arr_intersect = array_intersect(array(3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20), $filter_selected['lact_num']); echo form_checkbox(array('name'=>'lact_num[]', 'id'=>'lact_num3'), '3|4|5|6|7|8|9|10|11|12|13|14|15|16|17|18|19|20', !empty($arr_intersect)); ?>
+					3+&nbsp;&nbsp;</span>
+				<?php echo form_fieldset_close();
+				break;
+			case 'curr_lact_num': ?>
+				<?php echo form_fieldset('Lactation #', array('id' => 'lact-num-fieldset')); ?>
+					<span class="filter-checkbox"><?php echo form_checkbox(array('name'=>'curr_lact_num[]', 'id'=>'curr_lact_num1'), '1', in_array('1', $filter_selected['curr_lact_num']) !== false); ?>
+					1&nbsp;&nbsp;</span>
+					<span class="filter-checkbox"><?php echo form_checkbox(array('name'=>'curr_lact_num[]', 'id'=>'curr_lact_num2'), '2', in_array('2', $filter_selected['curr_lact_num']) !== false); ?>
+					2&nbsp;&nbsp;</span>
+					<span class="filter-checkbox"><?php $arr_intersect = array_intersect(array(3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20), $filter_selected['curr_lact_num']); echo form_checkbox(array('name'=>'curr_lact_num[]', 'id'=>'curr_lact_num3'), '3|4|5|6|7|8|9|10|11|12|13|14|15|16|17|18|19|20', !empty($arr_intersect)); ?>
 					3+&nbsp;&nbsp;</span>
 				<?php echo form_fieldset_close();
 				break;
@@ -77,9 +98,15 @@
 					and <?php echo form_input(array('name'=>'curr_lact_dim_dbto', 'value'=>$filter_selected['curr_lact_dim_dbto'], 'size'=>'3', 'maxlength'=>'3', 'id'=>'curr_lact_dim_dbto')); ?>
 				</p>
 				<?php break;
-			case 'age_months': ?>
-				<?php echo form_fieldset('Dam Lactation #', array('id' => 'dam_lact_num-fieldset')); ?>
-					<?php echo form_label('Age Range (months)', 'age_months_dbfrom'); ?>		
+			case 'curr_lact_dim':
+				echo form_fieldset('DIM Range', array('id' => 'dam_lact_num-fieldset')); ?>
+					Between <?php echo form_input(array('name'=>'curr_lact_dim_dbfrom', 'value'=>$filter_selected['curr_lact_dim_dbfrom'], 'size'=>'3', 'maxlength'=>'3', 'id'=>'curr_lact_dim_dbfrom')); ?>
+					and <?php echo form_input(array('name'=>'curr_lact_dim_dbto', 'value'=>$filter_selected['curr_lact_dim_dbto'], 'size'=>'3', 'maxlength'=>'3', 'id'=>'curr_lact_dim_dbto')); ?>
+				<?php echo form_fieldset_close();
+				break;
+			case 'age_months':
+				echo form_fieldset('Age Range (months)', array('id' => 'dam_lact_num-fieldset')); ?>
+					<?php //echo form_label('Age Range (months)', 'age_months_dbfrom'); ?>		
 					Between <?php echo form_input(array('name'=>'age_months_dbfrom', 'value'=>$filter_selected['age_months_dbfrom'], 'size'=>'4', 'maxlength'=>'4', 'id'=>'age_months_dbfrom')); ?>
 					and <?php echo form_input(array('name'=>'age_months_dbto', 'value'=>$filter_selected['age_months_dbto'], 'size'=>'4', 'maxlength'=>'4', 'id'=>'age_months_dbto')); ?>
 				<?php echo form_fieldset_close();

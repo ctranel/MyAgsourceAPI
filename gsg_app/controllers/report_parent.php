@@ -47,8 +47,14 @@ abstract class parent_report extends CI_Controller {
 		if($this->authorize()) {
 			$this->load->library('reports');
 			$this->reports->herd_code = $this->herd_code;
+			$tmp_dir = explode('/', $this->section_path);
+			$tmp_dir = $tmp_dir[(count($tmp_dir) - 1)] . '_model';
 			if(file_exists(APPPATH . 'models/' . $this->section_path . '/' . $this->primary_model . '.php')){
 				$this->load->model($this->section_path . '/' . $this->primary_model, '', FALSE, $this->section_path);
+			}
+			elseif(file_exists(APPPATH . 'models/' . $this->section_path . '/' . $tmp_dir . '.php')){
+				$this->load->model($this->section_path . '/' . $tmp_dir, '', FALSE, $this->section_path);
+				$this->primary_model = $tmp_dir;
 			}
 			else{
 				$this->load->model('report_model', '', FALSE, $this->section_path);
@@ -172,7 +178,6 @@ abstract class parent_report extends CI_Controller {
 			$arr_blocks = array('table' => $arr_tables, 'chart' => $arr_charts);
 		}
 		else $arr_blocks = $this->{$this->primary_model}->arr_blocks[$this->page]['display'];
-//echo $this->page;
 		if(empty($this->herd_code) || strlen($this->herd_code) != 8){
 			$this->session->set_flashdata('message', 'Please select a valid herd.');
 			redirect(site_url($this->report_path));
@@ -315,7 +320,7 @@ var_dump($tmp_data);
 		$this->carabiner->css('report.css', 'print');
 		$this->carabiner->css($this->section_path . '.css', 'screen');
 //@todo: change this to look specifically for cow reports
-		if(count($this->{$this->primary_model}->arr_blocks) == 1 && count($this->arr_page_filters) > 1) $this->carabiner->css('filters.css', 'screen');
+		if(count($arr_blocks) == 1 && count($this->arr_page_filters) > 1) $this->carabiner->css('filters.css', 'screen');
 		else $this->carabiner->css('hide_filters.css', 'screen');
 		//$this->carabiner->css('tooltip.css', 'screen');
 		//get_herd_data
@@ -423,6 +428,7 @@ var_dump($tmp_data);
 		if(file_exists(APPPATH . 'views/' . $this->section_path . '/report_nav.php')) $report_nav_path =  $this->section_path . '/' . $report_nav_path;
 		$report_filter_path = 'filters';
 		if(file_exists(APPPATH . 'views/' . $this->section_path . '/filters.php')) $report_filter_path =  $this->section_path . '/' . $report_filter_path;
+//var_dump($filter_data);
 		$data = array(
 			'page_header' => $this->load->view('page_header', $this->page_header_data, TRUE),
 			'herd_code' => $this->session->userdata('herd_code'),
@@ -622,6 +628,15 @@ var_dump($tmp_data);
 				$this->graph['config']['tooltip']['formatter'] = "function(){return '<b>'+ Highcharts.dateFormat('%B %e, %Y', this.x) +'</b><br/>'+this.series.name +': '+ this.y +'<br/>'+'Combined Total: '+ this.point.stackTotal +'<br/>'+'Click on graph line to view Cow Report for that group';}";
 				$this->graph['config']['tooltip']['formatter'] = "function(){return '<b>' + this.series.name + ':</b><br>' + Math.floor(this.x / 12) + ' yrs, ' + (this.x % 12) + ' mos' + ' - ' + '$' + this.y;}";
 *//*
+			case 'inventory':
+				$graph['config'] = $this->get_snapshot_options();
+				$graph['config']['title']['text'] = 'Inventory';
+				$graph['config']['xAxis']['categories'] = array('Turnover Less<br>Dairy Sales %', 'All Cows Died %', 'Live Heifer Calves %');
+				$graph['config']['exporting']['filename'] = 'RC-Inventory';
+				$arr_fieldname_base = array('l0_left_herd_percent', 'l0_exit_died_percent', 'females_born_alive_percent');
+				break;
+
+				
 				$this->graph['config']['plotOptions']['series']['point']['events']['click'] = 'function(){
 					if(this.series.name.indexOf("1st") == 0) location.href = "../uhm_cow/display/chronic/null/null";
 					if(this.series.name.indexOf("Peak") == 0) location.href = "../uhm_cow/display/new_infect/null/null";

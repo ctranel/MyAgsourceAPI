@@ -48,7 +48,7 @@ a.#set_filters {}
 #downloads p {padding:6px 20px;}
 #downloads p a {background-color:#C1B57C; color:#004147; font-weight:bold; font-size:.9em;}
 */
-#filters fieldset {border: solid 1px #004147; border-radius: 3px; margin: 10px 10px 0; padding: 5px; font-size: .85em; width:auto;}
+#filters fieldset {border: solid 1px #004147; border-radius: 3px; margin: 0 10px 5px; padding: 5px; font-size: .85em; width:auto;}
 #filters fieldset fieldset {width:97%; margin: 1px 0 0 1%;}
 /* .filter-checkbox {float:left;}
 html legend{
