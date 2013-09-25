@@ -1,6 +1,6 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 require_once APPPATH . 'controllers/report_parent.php';
-class Sample extends parent_report {
+class Flex extends parent_report {
 	function __construct(){
 		parent::__construct();
 		/* Load the profile.php config file if it exists
@@ -11,7 +11,7 @@ class Sample extends parent_report {
 	}
 
 	function index($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL){
-	 	$this->product_name = 'Production - Sample Day';
+	 	$this->product_name = 'Production - Sample Day Flex Items';
 		parent::display($block_in, $display_format);
 	}
 
