@@ -5,6 +5,7 @@ abstract class parent_report extends CI_Controller {
 	protected $report_form_id;
 	protected $arr_page_filters = array(); //two dimensional of filters on the page, includes 3 keys, e.g.: array('db_field_name' => 'pstring', 'name' => 'PString', 'default_value' => array(0));
 	protected $arr_filter_criteria = array(); //data for filtering results, the db_field_name key value of $this->arr_page_filters is a key for this array
+	protected $log_filter_text;
 	protected $arr_sort_by = array();
 	protected $arr_sort_order = array();
 	protected $pstring;
@@ -155,7 +156,7 @@ abstract class parent_report extends CI_Controller {
 		redirect(site_url($this->report_path));
 	}
 
-	function display($arr_block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
+	function display($arr_block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL, $json_filter_data = NULL){
 		//SET PSTRING
 		$this->arr_pstring = $this->herd_model->get_pstring_array($this->session->userdata('herd_code'));
 		$tmp = current($this->{$this->primary_model}->arr_pstring);
@@ -185,11 +186,17 @@ abstract class parent_report extends CI_Controller {
 
 //FILTERS
 	//always have filters for pstring (and page?)
-		$this->arr_page_filters = $this->access_log_model->get_page_filters($this->section_id, $this->page);
+		//if(isset($json_filter_data)){
+			$arrParams = (array)json_decode(urldecode($json_filter_data));
+			if(isset($arrParams['csrf_test_name']) && $arrParams['csrf_test_name'] != $this->security->get_csrf_hash()) die("I don't recognize your browser session, your session may have expired, or you may have cookies turned off.");
+			unset($arrParams['csrf_test_name']);
+			$this->_set_filters($this->page, $arrParams);
+		//}
+/*		$this->arr_page_filters = $this->access_log_model->get_page_filters($this->section_id, $this->page);
 		if(array_key_exists('pstring', $this->arr_page_filters) === FALSE){
 			$this->arr_page_filters['pstring'] = array('db_field_name' => 'pstring', 'name' => 'PString', 'type' => 'select multiple', 'default_value' => array(0));
 			$this->arr_filter_criteria['pstring'] = array(0);
-		}
+		} */
 
 		$this->load->library('form_validation');
 		//validate form input for filters
@@ -259,7 +266,6 @@ abstract class parent_report extends CI_Controller {
 						$this->reports->sort_text($this->arr_sort_by, $this->arr_sort_order);//this function sets text, and could return it if needed
 //						$this->{$this->primary_model}->populate_field_meta_arrays($pb['id']);
 						$tmp_data = $this->ajax_report(urlencode($this->page), urlencode($pb['url_segment']), $this->session->userdata('pstring'), 'array', urlencode($sort_by), $sort_order, 'csv', NULL);
-var_dump($tmp_data);
 						$data[] = array('test_date' => $pb['description']);
 						$data = array_merge($data, $tmp_data);
 					}
@@ -308,7 +314,7 @@ var_dump($tmp_data);
 				}
 			}
 			//}
-			$this->access_log_model->write_entry($this->{$this->primary_model}->arr_blocks[$this->page]['page_id'], 'pdf', $this->reports->sort_text_brief($this->arr_sort_by, $this->arr_sort_order), $log_filter_text);
+			$this->access_log_model->write_entry($this->{$this->primary_model}->arr_blocks[$this->page]['page_id'], 'pdf', $this->reports->sort_text_brief($this->arr_sort_by, $this->arr_sort_order), $this->log_filter_text);
 			$this->reports->create_pdf($block, $this->product_name, NULL, $herd_data, 'P');
 			exit;
 		}
@@ -406,9 +412,6 @@ var_dump($tmp_data);
 				)
 			);
 			//load the report-specific js file if it exists
-//echo "C:\Program Files (x86)\Zend\Apache2\htdocs\app\js\summary_reports";
-//echo PROJ_DIR . FS_SEP . 'js' . FS_SEP . str_replace('/', FS_SEP, $this->section_path) . '_helper.js';
-//var_dump(file_exists(PROJ_DIR . FS_SEP . 'js' . FS_SEP . str_replace('/', FS_SEP, $this->section_path) . '_helper.js'));
 			if(file_exists(PROJ_DIR . FS_SEP . 'js' . FS_SEP . str_replace('/', FS_SEP, $this->section_path) . '_helper.js')){
 				$this->page_header_data['arr_headjs_line'][] = '{inv_helper: "' . $this->config->item("base_url_assets") . 'js/' . $this->section_path . '_helper.js"}';
 			}
@@ -433,13 +436,13 @@ var_dump($tmp_data);
 			'page_header' => $this->load->view('page_header', $this->page_header_data, TRUE),
 			'herd_code' => $this->session->userdata('herd_code'),
 			'herd_data' => $this->load->view('herd_info', $herd_data, TRUE),
-			'filters' => $this->load->view($report_filter_path, $filter_data, TRUE),
 			'page_footer' => $this->load->view('page_footer', $this->page_footer_data, TRUE),
 			'charts' => $arr_chart,
 			'print_all' => $this->print_all,
 			'report_path' => $this->report_path
 		);
 		
+		if(isset($filter_data)) $data['filters'] = $this->load->view($report_filter_path, $filter_data, TRUE);
 		if((is_array($arr_nav_data['arr_pages']) && count($arr_nav_data['arr_pages']) > 1) || (is_array($arr_nav_data['arr_pstring']) && count($arr_nav_data['arr_pstring']) > 1)) $data['report_nav'] = $this->load->view($report_nav_path, $arr_nav_data, TRUE);
 		
 		//$this->access_log_model->write_entry($this->{$this->primary_model}->arr_blocks[$this->page]['page_id'], 'web');
@@ -484,6 +487,7 @@ var_dump($tmp_data);
 		$this->display = $output;
 		//set parameters for given block
 
+		//can change functionality depending on block.  Suggest making chart changes in the JS file that corresponds with chart(one js file per section)
 		switch ($block) {
 			default:
 				$this->load_block($block, $report_count, $file_format);
@@ -530,7 +534,7 @@ var_dump($tmp_data);
 		$this->avg_row = $arr_this_block['avg_row'];
 		$this->bench_row = $arr_this_block['bench_row'];
 		$this->pivot_db_field = isset($arr_this_block['pivot_db_field']) ? $arr_this_block['pivot_db_field'] : NULL;
-		if($this->display == 'table') $this->load_table($arr_this_block, $report_count);
+		if($this->display == 'table' || $this->display == 'array') $this->load_table($arr_this_block, $report_count);
 		elseif($this->display == 'chart'){$this->load_chart($arr_this_block, $report_count);}
 	}
 	
@@ -759,7 +763,7 @@ var_dump($tmp_data);
 		}
 		if(validation_errors()) $this->{$this->primary_model}->arr_messages[] = validation_errors();
 		$arr_filter_text = $this->reports->filters_to_text($this->arr_filter_criteria, $this->{$this->primary_model}->arr_pstring);
-		$log_filter_text = is_array($arr_filter_text) && !empty($arr_filter_text)?implode('; ', $arr_filter_text):'';
+		$this->log_filter_text = is_array($arr_filter_text) && !empty($arr_filter_text)?implode('; ', $arr_filter_text):'';
 		$filter_data = array(
 				'arr_filters'=>isset($arr_filters_list) && is_array($arr_filters_list)?$arr_filters_list:array(),
 				'filter_selected'=>$this->arr_filter_criteria,

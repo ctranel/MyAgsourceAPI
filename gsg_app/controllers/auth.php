@@ -57,6 +57,7 @@ class Auth extends Ionauth {
 			'page_heading' => 'My Account',
 			'herd_code' => $this->session->userdata('herd_code'),
 			'herd_data' => $this->load->view('herd_info', $herd_data, TRUE),
+			'table_heading' => 'Herd Overview',
 			'page_footer' => $this->load->view('page_footer', $this->footer_data, TRUE),
 			'bench_data' => $this->alert_model->get_benchmarks($this->session->userdata('herd_code'))
 //			'report_path' => $this->report_path

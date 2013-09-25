@@ -5,6 +5,7 @@ if (!empty($page_heading)) echo heading($page_heading);
 	<?php if (!empty($herd_data)): 
 		echo $herd_data;
 	endif;	?>
+	<p style = "clear:both"></p>
 	<?php if (!empty($table_heading)): 
 		?><h2 class="block"><?php echo $table_heading; ?></h2><?php
 	endif;	?>	
@@ -52,7 +53,7 @@ if(isset($bench_data) && is_array($bench_data)): ?>
 		<tr class="even"><td>Service Rate</td><td><?php echo $bench_data['prev_service_rate_pct']; ?></td><td class="<?php echo $arr_cls[$s]; ?>"><?php echo $s; ?></td><td><?php echo $bench_data['curr_service_rate_pct']; ?></td><td><?php echo $bench_data['bench_service_rate_pct']; ?></td></tr>
  		<?php $s = get_trend_symbol($bench_data['prev_pregnancy_rate_pct'], $bench_data['curr_pregnancy_rate_pct'], TRUE);?>
 		<tr class="odd"><td>Preg Rate</td><td><?php echo $bench_data['prev_pregnancy_rate_pct']; ?></td><td class="<?php echo $arr_cls[$s]; ?>"><?php echo $s; ?></td><td><?php echo $bench_data['curr_pregnancy_rate_pct']; ?></td><td><?php echo $bench_data['bench_pregnancy_rate_pct']; ?></td></tr>
- 		<?php $s = get_trend_symbol($bench_data['prev_pregnancy_loss_pct'], $bench_data['curr_pregnancy_loss_pct'], TRUE);?>
+ 		<?php $s = get_trend_symbol($bench_data['prev_pregnancy_loss_pct'], $bench_data['curr_pregnancy_loss_pct'], FALSE);?>
 		<tr class="even"><td>Preg Loss Rate</td><td><?php echo $bench_data['prev_pregnancy_loss_pct']; ?></td><td class="<?php echo $arr_cls[$s]; ?>"><?php echo $s; ?></td><td><?php echo $bench_data['curr_pregnancy_loss_pct']; ?></td><td><?php echo $bench_data['bench_pregnancy_loss_pct']; ?></td></tr>
  		<?php $s = get_trend_symbol($bench_data['prev_l0_exit_died_percent'], $bench_data['curr_l0_exit_died_percent'], FALSE);?>
 		<tr class="odd"><td>% Died</td><td><?php echo $bench_data['prev_l0_exit_died_percent']; ?></td><td class="<?php echo $arr_cls[$s]; ?>"><?php echo $s; ?></td><td><?php echo $bench_data['curr_l0_exit_died_percent']; ?></td><td><?php echo $bench_data['bench_l0_exit_died_percent']; ?></td></tr>
