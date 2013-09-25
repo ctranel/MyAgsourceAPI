@@ -23,8 +23,56 @@ class Auth extends Ionauth {
 			$this->output->enable_profiler(TRUE);
 		} */
 	}
-	//dashboard
+	
 	function index(){
+		$this->load->model('herd_model');
+		$this->load->model('alert_model');
+		if(!isset($this->as_ion_auth) || !$this->as_ion_auth->logged_in()){
+			$this->session->keep_flashdata('redirect_url');
+			redirect(site_url('auth/login'));
+		}
+		if(is_array($this->page_header_data)){
+			$this->page_header_data = array_merge($this->page_header_data,
+					array(
+							'title'=>'Dashboard - ' . $this->config->item("product_name"),
+							'description'=>'Dashboard for ' . $this->config->item("product_name"),
+					)
+			);
+		}
+		$this->carabiner->css('report.css');
+		$this->carabiner->css('benchmarks.css');
+		$this->footer_data = Array();
+		
+		//header and footer
+		$this->page_header_data['section_nav'] = $this->load->view('auth/section_nav', NULL, TRUE);
+		//		$this->load->_ci_cached_vars = array();
+		//widgets (pull from DB?)
+		//get_herd_data
+		$herd_data = $this->herd_model->header_info($this->session->userdata('herd_code'));
+		
+
+	
+		$this->data = array(
+			'page_header' => $this->load->view('page_header', $this->page_header_data, TRUE),
+			'page_heading' => 'My Account',
+			'herd_code' => $this->session->userdata('herd_code'),
+			'herd_data' => $this->load->view('herd_info', $herd_data, TRUE),
+			'page_footer' => $this->load->view('page_footer', $this->footer_data, TRUE),
+			'bench_data' => $this->alert_model->get_benchmarks($this->session->userdata('herd_code'))
+//			'report_path' => $this->report_path
+		);
+		
+//		if((is_array($arr_nav_data['arr_pages']) && count($arr_nav_data['arr_pages']) > 1) || (is_array($arr_nav_data['arr_pstring']) && count($arr_nav_data['arr_pstring']) > 1)) $data['report_nav'] = $this->load->view($report_nav_path, $arr_nav_data, TRUE);
+		
+		//$this->access_log_model->write_entry($this->{$this->primary_model}->arr_blocks[$this->page]['page_id'], 'web');
+		$this->load->view('auth/dashboard/main-bench', $this->data);
+		//$this->load->view('report', $data);
+	}
+
+	
+	
+	//dashboard
+	function index_dashboard(){
 		if(!isset($this->as_ion_auth) || !$this->as_ion_auth->logged_in()){
 			$this->session->keep_flashdata('redirect_url');
 			redirect(site_url('auth/login'));

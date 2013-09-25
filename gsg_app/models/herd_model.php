@@ -180,12 +180,12 @@ class Herd_model extends CI_Model {
 	 **/
 	public function header_info($herd_code){
 		// results query
-		$q = $this->db->select($this->tables['herds'] . ".herd_code, farm_name, herd_owner, " . $this->tables['regions'] . ".region_name, supervisor_num, FORMAT(prev_test_date,'MM-dd-yyyy') AS test_date", FALSE)
-		->from($this->tables['herds'])
-		->join('[herd].[dbo].[view_prev_test_date]', $this->tables['herds'] . '.herd_code = ' . '[herd].[dbo].[view_prev_test_date]' . '.herd_code', 'left')
-		->join($this->tables['herds_regions'], $this->tables['herds'] . '.herd_code = ' . $this->tables['herds_regions'] . '.herd_code', 'left')
+		$q = $this->db->select("h.herd_code, h.farm_name, h.herd_owner, " . $this->tables['regions'] . ".region_name, supervisor_num, FORMAT(ct.test_date,'MM-dd-yyyy') AS test_date", FALSE)
+		->from($this->tables['herds'] . ' h')
+		->join('[herd].[dbo].[view_herd_id_curr_test] ct', 'h.herd_code = ' . 'ct.herd_code', 'left')
+		->join($this->tables['herds_regions'], 'h.herd_code = ' . $this->tables['herds_regions'] . '.herd_code', 'left')
 		->join($this->tables['regions'], $this->tables['herds_regions'] . '.region_id = ' . $this->tables['regions'] . '.id', 'left')
-		->where($this->tables['herds'] . '.herd_code',$herd_code);
+		->where('h.herd_code',$herd_code);
 		$ret = $q->get()->result_array();
 		if(!empty($ret) && is_array($ret)) return $ret[0];
 		else return FALSE;

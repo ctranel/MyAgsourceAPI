@@ -544,7 +544,7 @@ class Report_model extends CI_Model {
 				//	$this->{$this->db_group_name}->order_by('isnull' . $c, $sort_order);
 				//}
 				if(is_array($this->arr_natural_sort_fields) && in_array($arr_sort_by[$c], $this->arr_natural_sort_fields) !== FALSE){
-					$this->{$this->db_group_name}->order_by('rpm.dbo.naturalize(' . $table . $arr_sort_by[$c] . ')', $sort_order);
+					$this->{$this->db_group_name}->order_by('users.dbo.naturalize(' . $table . $arr_sort_by[$c] . ')', $sort_order);
 				}
 				else {
 					$this->{$this->db_group_name}->order_by($table . $arr_sort_by[$c], $sort_order);
@@ -912,7 +912,7 @@ FROM (SELECT DISTINCT TOP " . ($num_dates + 1) . " " . $date_field . "
 					$arr_return[$k][] = array($data[$x][$date_field], $tmp_data);
 				}
 			}
-			else{
+			elseif(isset($data[$x][$date_field]) && !empty($data[$x][$date_field])){
 				$arr_d = explode('-', $data[$x][$date_field]);
 				foreach($arr_fields as $k=>$f){
 					$tmp_data = is_numeric($data[$x][$f]) ? (float)$data[$x][$f] : $data[$x][$f];
