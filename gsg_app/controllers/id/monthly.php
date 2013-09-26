@@ -10,14 +10,14 @@ class Monthly extends parent_report {
 		} */
 	}
 
-	function index($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL){
+	function index($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL, $json_filter_data = NULL){
 	 	$this->product_name = 'Monthly Animal ID';
-		parent::display($block_in, $display_format);
+		parent::display($block_in, $display_format, isset($sort_by) ? urldecode($sort_by) : NULL, isset($sort_order) ? urldecode($sort_order) : NULL, isset($json_filter_data) ? urldecode($json_filter_data) : NULL);
 	}
 	 
-	function id_monthly($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL){
+	function id_monthly($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL, $json_filter_data = NULL){
 		$this->product_name = 'Monthly Animal ID';
-		parent::display($block_in, $display_format);
+		parent::display($block_in, $display_format, isset($sort_by) ? urldecode($sort_by) : NULL, isset($sort_order) ? urldecode($sort_order) : NULL, isset($json_filter_data) ? urldecode($json_filter_data) : NULL);
 	}
 	 /*
 	 * ajax_report: Called via AJAX to populate graphs
