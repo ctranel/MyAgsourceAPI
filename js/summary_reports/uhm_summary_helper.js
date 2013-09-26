@@ -3,7 +3,7 @@
 		//if there is a second yAxis, change the color
 		if(typeof options_in.yAxis[1] != 'undefined') options_in.yAxis[1].title.style.color = var_arr_graph_colors[1];
 		if(section_data['block'] == 'uhm_risk'){Highcharts.setOptions({
-			 //colors: ['#50B432', '#ED561B', '#DDDF00']
+			 colors: ['#D18FBA', '#D5EAFF', '#BFBFFF']
 			});
 		}
 	}
