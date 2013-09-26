@@ -438,6 +438,9 @@ class Report_model extends CI_Model {
 		if (($key = array_search('summary_date', $arr_select_fields)) !== FALSE) {
 			$arr_select_fields[$key] = "FORMAT(" . $this->primary_table_name . ".summary_date, 'MM-dd-yy', 'en-US') AS summary_date";//MMM-dd-yy
 		}
+		if (($key = array_search('peak_dim', $arr_select_fields)) !== FALSE) {
+			$arr_select_fields[$key] = "FORMAT(" . $this->primary_table_name . ".peak_dim, 'MM-dd-yy', 'en-US') AS peak_dim";//MMM-dd-yy
+		}
 		foreach($arr_select_fields as $k => $v){
 			if(!empty($this->arr_aggregates[$k])){
 				$new_name = strtolower($this->arr_aggregates[$k]) . '_' . $v;

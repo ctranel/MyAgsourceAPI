@@ -4,6 +4,9 @@ function get_chart_options($chart_type){
 		case 'stacked area':
 			return get_stacked_area_options();
 			break;
+		case 'scatter':
+			return get_scatter_options();
+			break;
 		case 'stacked column':
 			return get_stacked_column_options();
 			break;
@@ -178,6 +181,26 @@ function get_line_options(){
 			array('type' => 'line', 'connectNulls' => TRUE)
 		)
 */	);
+}
+
+function get_scatter_options(){
+	return array(
+			'chart' => array(
+				'defaultSeriesType' => 'scatter'
+			),
+			'xAxis' => array(
+					'type'=>'datetime',
+					'categories' => NULL, //clear out previously declared categories
+					'labels' => array('formatter' => "function(){return Highcharts.dateFormat('%b %e, %Y', this.value);}", 'rotation' => -35, 'align' => 'left', 'x' => -50, 'y' => 55)
+			),
+
+			'yAxis' => array(
+					array(
+							'type'=>'linear',
+					)
+			),
+			'legend' => array('enabled' => TRUE),
+	);
 }
 
 function prep_output($output, $graph, $report_count, $file_format = NULL){
