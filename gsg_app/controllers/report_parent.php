@@ -598,6 +598,7 @@ abstract class parent_report extends CI_Controller {
 				}
 				if(count($arr_axes['x']) > 1) $this->graph['config']['xAxis'][] = $tmp_array;
 				else $this->graph['config']['xAxis'] = $tmp_array;
+				unset($tmp_array);
 				if(isset($a['db_field_name']) && !empty($a['db_field_name'])) $this->{$this->primary_model}->add_field(array('Date' => $a['db_field_name'])); // was $model in place of $this->primary_model
 			}
 		}
