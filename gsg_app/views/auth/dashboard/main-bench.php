@@ -12,8 +12,8 @@ if (!empty($page_heading)) echo heading($page_heading);
 	<?php if (!empty($table_sub_heading)): 
 		?><h3 class="block"><?php echo $table_sub_heading; ?></h3><?php
 	endif;	?>	
-	<?php if (!empty($table_benchmark_text)): 
-		?><h3 class="block"><?php echo $table_benchmark_text; ?></h3><?php
+	<?php if (!empty($bench_data['breed_code'])): 
+		?><h3 class="block">80th percentile is derived from <?php echo $bench_data['breed_code']; ?> herds<?php if(isset($bench_data['herd_size']) && !empty($bench_data['herd_size'])) echo ' with ' . $bench_data['herd_size'] . ' animals'; ?>.</h3><?php
 	endif;
 $arr_cls = array('' => 'b-same', '-' => 'b-down', '+' => 'b-up');
 if(isset($bench_data) && is_array($bench_data)): ?>
