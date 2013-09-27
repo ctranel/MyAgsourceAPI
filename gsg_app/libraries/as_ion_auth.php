@@ -178,7 +178,6 @@ class As_ion_auth extends Ion_auth {
 		} */
 		$obj_user = $this->ion_auth_model->user($this->session->userdata('user_id'))->row();
 		$obj_user->arr_groups = array_keys($this->ion_auth_model->get_users_group_array($obj_user->id));
-
 		if($this->is_admin){
 			return TRUE;
 		}
