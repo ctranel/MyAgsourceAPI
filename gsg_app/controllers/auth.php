@@ -163,7 +163,6 @@ class Auth extends Ionauth {
 		$this->load->library('RSSParser', array('url' => 'http://www.agweb.com/rss/blogs.aspx?bf=%2f&bid=281', 'life' => 0));
 		//Get six items from the feed
 		$data = $this->rssparser->getFeed(6);
-//var_dump($data);
 		$this->data['widget']['agsource'][] = array(
 			'content' => $this->load->view('auth/dashboard/dairy_blog', array('data'=>$data), TRUE),
 			'title' => 'Dairy Blog'

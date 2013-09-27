@@ -143,6 +143,7 @@ $config['max_rounds']     = 9;
  | The controller should check this function and act
  | appropriately. If this variable set to 0, there is no maximum.
  */
+$config['default_herd']			= "35999571";
 $config['site_title']           = "MyAgSource"; 		// Site Title, example.com
 $config['admin_email']          = "ctranel@agsource.com"; 	// Admin Email, admin@example.com
 $config['cust_serv_company']	  = "AgSource Cooperative Services"; //custom CDT
