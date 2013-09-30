@@ -2,7 +2,7 @@
 	function pre_render(options_in, section_data){
 		//if there is a second yAxis, change the color
 		if(typeof options_in.yAxis[1] != 'undefined') options_in.yAxis[1].title.style.color = var_arr_graph_colors[1];
-		if(section_data['block'] == 'uhm_risk'){Highcharts.setOptions({
+		if(section_data['block'] == 'risk_group_analysis'){Highcharts.setOptions({
 			 colors: ['#D18FBA', '#D5EAFF', '#BFBFFF']
 			});
 		}
