@@ -1273,7 +1273,7 @@ class Auth extends Ionauth {
 				$arr_form_group_id = $this->form_validation->set_value('group_id[]', $obj_user->arr_groups);
 				$this->data['group_selected'] = $arr_form_group_id;
 
-				$obj_user->section_id = $this->as_ion_auth->set_form_array($this->ion_auth_model->get_subscribed_sections_array($obj_user->arr_groups, $user_id), 'id', 'id'); // populate array of sections for which user is enrolled
+				$obj_user->section_id = $this->as_ion_auth->set_form_array($this->ion_auth_model->get_subscribed_sections_array($obj_user->arr_groups, $user_id, $this->as_ion_auth->super_section_id), 'id', 'id'); // populate array of sections for which user is enrolled
 				$arr_form_section_id = $this->form_validation->set_value('section_id[]', $obj_user->section_id);
 				$this->data['section_selected'] = $arr_form_section_id;
 

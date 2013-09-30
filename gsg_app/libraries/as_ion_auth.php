@@ -412,6 +412,7 @@ class As_ion_auth extends Ion_auth {
 	 * @author Chris Tranel
 	 **/
 	public function subscribed_section($section_id){
+		return TRUE;
 		$tmp_array = $this->arr_user_sections;
 		if(isset($tmp_array) && is_array($tmp_array)){
 			$this->load->helper('multid_array_helper');

@@ -24,7 +24,7 @@ class Region_model extends CI_Model {
 		if (isset($limit) && isset($offset))
 		$this->db->limit($limit, $offset);
 
-		return $this->db->get('regions')->result();
+		return $this->db->get($this->ion_auth_model->tables['regions'])->result();
 	}
 	/**
 	 * create_region
@@ -37,7 +37,7 @@ class Region_model extends CI_Model {
 			$this->error = "The region number entered already exists.  Please edit that record or enter a different region number.";
 			return FALSE;
 		}
-		$this->db->insert('regions', $data);
+		$this->db->insert($this->ion_auth_model->tables['regions'], $data);
 		if($this->db->affected_rows() <= 0){
 			$this->error = "Could not add record";
 			return FALSE;
@@ -55,7 +55,7 @@ class Region_model extends CI_Model {
 		$has_data = is_array($data);
 
 		if (array_key_exists('id', $data)) {
-			if($this->db->update('regions', $data, array('id' => $data['id']))) return TRUE;
+			if($this->db->update($this->ion_auth_model->tables['regions'], $data, array('id' => $data['id']))) return TRUE;
 		}
 
 		return FALSE;
@@ -69,7 +69,7 @@ class Region_model extends CI_Model {
 	 **/
 	public function is_duplicate($region_id = '') {
 		if (empty($region_id)) return TRUE;
-		return $this->db->where('id', $region_id)->count_all_results('regions') > 0;
+		return $this->db->where('id', $region_id)->count_all_results($this->ion_auth_model->tables['regions']) > 0;
 	}
 
 	/**

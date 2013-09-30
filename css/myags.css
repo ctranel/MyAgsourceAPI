@@ -18,6 +18,7 @@ p {padding: 0 0 5px;}
 ul.primary-nav {background-image: url("http://agsource.crinet.com/images/Common-Images/navbar-stretch.gif"); background-repeat: repeat-x; color: #FFFFFF; font-size: 9pt; height: 25px; padding: 5px 0; margin: 0;}
 ul.primary-nav li {float: left; border-left: solid 1px #B0D9DB; list-style: none; padding: 0 10px;}
 ul.primary-nav li.first {border-left: none;}
+ul.primary-nav li.groupnav {display:none;}
 /* end agsource override */
 
 /* new styles */

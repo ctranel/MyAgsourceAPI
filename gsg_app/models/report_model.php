@@ -111,6 +111,7 @@ class Report_model extends CI_Model {
 	function get_default_sort($block_url_segment){
 		$arr_ret = array();
 		$arr_res = $this->{$this->db_group_name}
+//			->distinct()
 			->select('users.dbo.db_fields.db_field_name, users.dbo.blocks_sort_by.sort_order')
 			->where($this->tables['blocks'] . '.url_segment', $block_url_segment)
 			->join('users.dbo.blocks_sort_by', $this->tables['blocks'] . '.id = users.dbo.blocks_sort_by.block_id' , 'left')

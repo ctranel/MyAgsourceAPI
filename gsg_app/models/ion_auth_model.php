@@ -641,10 +641,9 @@ class Ion_auth_model extends Ion_auth_parent_model
 			$this->db
 			->where($this->tables['super_sections'] . '.active', 1)
 			->where($this->tables['super_sections'] . '.scope_id', 2); // 2 = subscription
-			//has_permissions can not be used, because this function is called in the as_ion_auth constructor
-			//if($this->as_ion_auth->has_permission("View Unsubscribed Herds")){ //if the logged in user has permission to view reports to which the herd is not subscribed
+			//if($this->has_permission("View Unsubscribed Herds")){ //if the logged in user has permission to view reports to which the herd is not subscribed
 			if($group_id == 2){ //if this is a producer
-			//if(!$this->as_ion_auth->has_permission("View Non-owned Herds")){
+			//if(!$this->has_permission("View Non-owned Herds")){
 				if(isset($herd_code) && !empty($herd_code)){
 					$tmp_arr_sections = $this->get_super_sections_by_herd($herd_code)->result_array();
 				}
@@ -660,6 +659,20 @@ class Ion_auth_model extends Ion_auth_parent_model
 			return $tmp_arr_sections;
 		}
 	}
+
+	/**
+	 * @method has_permission
+	 * @param string task name
+	 * @return boolean
+	 * @access public
+	 *
+	 **/
+	public function has_permission($task_name){
+		$tmp_array = $this->get_task_permissions();
+		if(is_array($tmp_array) !== FALSE) return in_array($task_name, $tmp_array);
+		else return FALSE;
+	}
+
 	/**
 	 * @method get_subscribed_sections_array
 	 * @param int $group_id for active session
@@ -680,10 +693,9 @@ class Ion_auth_model extends Ion_auth_parent_model
 			->where($this->tables['sections'] . '.active', 1)
 			->where($this->tables['sections'] . '.super_section_id', $super_section_id)
 			->where($this->tables['sections'] . '.scope_id', 2); // 2 = subscription
-			//has_permissions can not be used, because this function is called in the as_ion_auth constructor
-			//if($this->as_ion_auth->has_permission("View Unsubscribed Herds")){ //if the logged in user has permission to view reports to which the herd is not subscribed
+			//if($this->has_permission("View Unsubscribed Herds")){ //if the logged in user has permission to view reports to which the herd is not subscribed
 			if($group_id == 2){ //if this is a producer
-			//if(!$this->as_ion_auth->has_permission("View Non-owned Herds")){
+			//if(!$this->has_permission("View Non-owned Herds")){
 				if(isset($herd_code) && !empty($herd_code)){
 					$tmp_arr_sections = $this->get_sections_by_herd($herd_code)->result_array();
 				}
@@ -948,9 +960,10 @@ class Ion_auth_model extends Ion_auth_parent_model
 		->select($this->tables['super_sections'] . '.id, ' . $this->tables['super_sections'] . '.name, ' . $this->tables['super_sections'] . '.path, ' . $this->tables['super_sections'] . '.list_order')
 		->distinct()
 		->join($this->tables['sections'], $this->tables['super_sections'] . '.id = ' . $this->tables['sections'] . '.super_section_id', 'left')
-		->join($this->tables['users_sections'], $this->tables['users_sections'] . '.section_id = ' . $this->tables['sections'] . '.id', 'inner')
-		->where("(" . $this->tables['sections'] . '.user_id IS NULL OR ' . $this->tables['sections'] . '.user_id = ' . $user_id . ' OR ' . $this->tables['users_sections'] . '.user_id = ' . $user_id . ")")
-		->where($this->tables['users_sections'] . '.user_id', $user_id);
+		//->join($this->tables['users_sections'], $this->tables['users_sections'] . '.section_id = ' . $this->tables['sections'] . '.id', 'inner')
+		->where("(" . $this->tables['sections'] . '.user_id IS NULL OR ' . $this->tables['sections'] . '.user_id = ' . $user_id . ")");
+		//->where("(" . $this->tables['sections'] . '.user_id IS NULL OR ' . $this->tables['sections'] . '.user_id = ' . $user_id . ' OR ' . $this->tables['users_sections'] . '.user_id = ' . $user_id . ")");
+		//->where($this->tables['users_sections'] . '.user_id', $user_id);
 		return $this->get_super_sections();
 	}
 	
@@ -975,9 +988,10 @@ class Ion_auth_model extends Ion_auth_parent_model
 	public function get_sections_by_user($user_id){
 		$this->db
 		->select($this->tables['sections'] . '.id, ' . $this->tables['sections'] . '.name, ' . $this->tables['sections'] . '.path')
-		->join($this->tables['users_sections'], $this->tables['users_sections'] . '.section_id = ' . $this->tables['sections'] . '.id', 'left')
-		->where("(" . $this->tables['sections'] . '.user_id IS NULL OR ' . $this->tables['sections'] . '.user_id = ' . $user_id . ' OR ' . $this->tables['users_sections'] . '.user_id = ' . $user_id . ")")
-		->where($this->tables['users_sections'] . '.user_id', $user_id);
+		//->join($this->tables['users_sections'], $this->tables['users_sections'] . '.section_id = ' . $this->tables['sections'] . '.id', 'left')
+		->where("(" . $this->tables['sections'] . '.user_id IS NULL OR ' . $this->tables['sections'] . '.user_id = ' . $user_id . ")");
+		//->where("(" . $this->tables['sections'] . '.user_id IS NULL OR ' . $this->tables['sections'] . '.user_id = ' . $user_id . ' OR ' . $this->tables['users_sections'] . '.user_id = ' . $user_id . ")")
+		//->where($this->tables['users_sections'] . '.user_id', $user_id);
 		return $this->get_sections();
 	}
 	
