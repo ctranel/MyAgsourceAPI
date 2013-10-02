@@ -1,0 +1,40 @@
+Egit/Project setup
+
+In Git Repositories:
+Clone remote repository.
+
+You'll need the URI.  URI for MyAgsource for example:
+ssh://kmarshall@feweb.verona.crinet/var/local/repos/MyAgsource.git
+
+New > Project from Existing directory
+Select the new clone in your local git folder
+For example: C:\Users\kmarshall\git\MyAgsource\.git
+
+Once project is loaded into PHP Explorer,
+  right click on topmost project folder.
+Choose Automatic Upload and enable it.
+
+Then point it to Local Connection and the htdocs folder
+  of your localhost.
+  
+For example: C:\Program Files (x86)\Zend\Apache2\htdocs\app
+
+Finally, get a working copy of index.php from a colleague or make
+  one.  index.php should not be tracked and SHOULD be ignored as
+  each machine in turn will need index.php to track the specific
+  directory tree locally.  index.php should have its environment
+  variable set to 'development' for programmers' machines,
+  'testing' for the test server and 'production' for the live
+  server.
+
+The folder name for the local connection should be the same as
+  other programmers' on the same project so urls on each machine
+  are identical for troubleshooting purposes.
+  
+When everything is working, saving a file locally will
+  automatically upload to the localhost for easy debugging.
+  If it works correctly, Commit and Push to upload the change to
+  the test server repository which in turn uploads to the test
+  server host via a hook.  It will also allow other programmers
+  to pull and retrieve your changes.
+  
