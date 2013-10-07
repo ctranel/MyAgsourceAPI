@@ -15,8 +15,8 @@ class MUN_Summ extends parent_report {
 	 function index($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL){
 	 	redirect(site_url('summary_reports/mun_summary/mun_summ'));
 	 }
-	function mun_summ($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL){
-	 	$this->product_name = 'mun_summ';
+	function mun_summary($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL){
+	 	$this->product_name = 'Management MUN Summary';
 		parent::display($block_in, $display_format);
 	 }
 /*
