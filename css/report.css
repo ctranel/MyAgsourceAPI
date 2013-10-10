@@ -77,6 +77,7 @@ a.download-links:hover {color:#F1F8F8; background-color:#004147;}
 
 /* inter-chart navigation */
 #report-links {border: solid 1px #004147; margin: 15px auto; padding: 10px; background-color: #F1F8F8; clear: left;}
+#report-links a.current {font-weight: bold;}
 ul.report-nav, ul.pstring-nav {margin: 0; list-style: none; border: none; padding-left: 5px;}
 ul.report-nav, ul.pstring-nav {display:inline; margin: 0; list-style: none; border: none;}
 ul.report-nav li, ul.pstring-nav li {display:inline; padding: 0px 5px; border-left: solid 1px #004147; margin: 0 0 0 -5px;}

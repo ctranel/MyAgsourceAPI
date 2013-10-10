@@ -113,21 +113,47 @@ function updateFilter(event, this_in, divid, field_in, value_in){
 
 
 //to be used when we move to loading pages within a section via ajax.  Will need to have one "block" incrementor, rather than incrementers for charts and tables
-function updatePage(ev){
-	//clear current blocks
-	//get block urls for page (ajax or included in function call?)
-	//for each block
-		//create container div
-		updateBlock();
+function updatePage(el){
+	var div_id;
+	var block_name;
+	var block_index;
+	var sort_field;
+	var sort_order;
+	var display;
+	
+	$('.chart').each(function(){
+		div_id = $(this).attr('id');
+		block_name = $(this).attr('data-block');
+		block_index = div_id.replace('graph-canvas','');
+		sort_field = null;
+		sort_order = null;
+		display = 'chart'
+		updateBlock(div_id, block_name, block_index, sort_field, sort_order, display);
+	})
+	$('.table-container').each(function(){
+		div_id = $(this).attr('id');
+		block_name = $(this).attr('data-block');
+		block_index = div_id.replace('table-canvas','');
+		sort_field = null;
+		sort_order = null;
+		display = 'table'
+		updateBlock(div_id, block_name, block_index, sort_field, sort_order, display);
+	})
+	
+	$('.pstring-link').css('fontWeight', 'normal');
+	el.style.fontWeight = 'bold';
 }
 
 function updateBlock(container_div_id, block_in, block_index, sort_field, sort_order, display){//}, title, benchmark_text){
-	//load and process ajax data - base_url and page are defined globally in the controller
+//alert(container_div_id + ', ' + block_in + ', ' + block_index + ', ' + sort_field + ', ' + sort_order + ', ' + display);
+	
+//load and process ajax data - base_url and page are defined globally in the controller
+	
 	block = block_in;
 	var params = '';
 	var cache_bust = Math.floor(Math.random()*1000);
 	//var block = $('input:radio[name=block]:checked').val();
-	var pstring = $('input:radio[name=pstring]:checked').val();
+	var pstring = $('.pstring-filter-item > input:checked').val();
 	if($("#filter-form")){
 		params = encodeURIComponent(JSON.stringify($("#filter-form").serializeObject()));
 	}
@@ -144,7 +170,7 @@ function updateBlock(container_div_id, block_in, block_index, sort_field, sort_o
 //			table_cnt++;
 			break;
 		case "chart":
-			load_chart(base_url + '/ajax_report/' + encodeURIComponent(page) + '/' + encodeURIComponent(block) + '/' + pstring + '/' + display + '/' + encodeURIComponent(sort_field) + '/' + sort_order + '/web/null/' + block_index + '/null/' + cache_bust, container_div_id);
+			load_chart(base_url + '/ajax_report/' + encodeURIComponent(page) + '/' + encodeURIComponent(block) + '/' + pstring + '/' + display + '/' + encodeURIComponent(sort_field) + '/' + sort_order + '/web/null/' + block_index + '/' + params + '/' + cache_bust, container_div_id, params);
 //			chart_cnt++;
 			break;
 	}
@@ -160,7 +186,7 @@ function load_table(server_path, div_id, tbl_cnt_in, sort_field, sort_order, blo
 		params = encodeURIComponent(JSON.stringify($("#filter-form").serializeObject()));
 	}
 	if(!server_path) {
-		var pstring = $('input:radio[name=pstring]:checked').val();
+		var pstring = $('input:checkbox[name=pstring]:checked').val();
 		if(typeof(pstring) == 'undefined') pstring = 0;
 		if(typeof(block) != 'undefined' && typeof(pstring) != 'undefined'){
 			var cache_bust = Math.floor(Math.random()*1000);
@@ -178,7 +204,10 @@ function load_table(server_path, div_id, tbl_cnt_in, sort_field, sort_order, blo
 	return false;
 }
 
-function load_chart(server_path, div_id){
+function load_chart(server_path, div_id, params){
+	if(typeof(params) == 'undefined' && $("#filter-form")){
+		params = encodeURIComponent(JSON.stringify($("#filter-form").serializeObject()));
+	}
 	if(!server_path) {
 		alert("No data found.");
 		return false;

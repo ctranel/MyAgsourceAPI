@@ -11,7 +11,7 @@ class Lact extends parent_report {
 	}
 
 	function index($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL, $json_filter_data = NULL){
-	 	$this->product_name = 'Production - Lactation Report';
+		$this->product_name = 'Production - Lactation Report';
 		parent::display($block_in, $display_format, isset($sort_by) ? urldecode($sort_by) : NULL, isset($sort_order) ? urldecode($sort_order) : NULL, isset($json_filter_data) ? urldecode($json_filter_data) : NULL);
 	}
 
