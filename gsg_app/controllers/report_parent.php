@@ -376,7 +376,8 @@ abstract class parent_report extends CI_Controller {
 							$display . '_num' => $x, 
 							'link_url' => site_url($this->section_path . '/' . $this->page . '/' . $k . '/' . $sort_by . '/' . $sort_order), 
 							'form_id' => $this->report_form_id,
-							'odd_even' => $odd_even
+							'odd_even' => $odd_even,
+							'block' => $k
 						);
 						$arr_chart[$display][] = $this->load->view($display, $arr_blk_data, TRUE);
 						//add js line to populate the block after the page loads
@@ -436,7 +437,8 @@ abstract class parent_report extends CI_Controller {
 			'pstring_selected' => $this->arr_filter_criteria['pstring'][0],
 			'section_path' => $this->section_path,
 //			'benchmarks_id' => $this->arr_filter_criteria['benchmarks_id'],
-//			'block' => $block_in,
+			'curr_pstring' => $this->pstring,
+			'curr_page' => $this->page,
 			'arr_pages' => $this->access_log_model->get_pages_by_criteria(array('section_id' => $this->section_id))->result_array()
 		);
 		$this->page_footer_data = array();
@@ -453,7 +455,6 @@ abstract class parent_report extends CI_Controller {
 			'print_all' => $this->print_all,
 			'report_path' => $this->report_path
 		);
-		
 		if(isset($filter_data)) $data['filters'] = $this->load->view($report_filter_path, $filter_data, TRUE);
 		if((is_array($arr_nav_data['arr_pages']) && count($arr_nav_data['arr_pages']) > 1) || (is_array($arr_nav_data['arr_pstring']) && count($arr_nav_data['arr_pstring']) > 1)) $data['report_nav'] = $this->load->view($report_nav_path, $arr_nav_data, TRUE);
 		
@@ -467,6 +468,7 @@ abstract class parent_report extends CI_Controller {
 	 * @param string output: method of output (chart, table, etc)
 	 * @param boolean/string file_format: return the value of function (TRUE), or echo it (FALSE).  Defaults to FALSE
 	 * @param string cache_buster: text to make page appear as a different page so that new data is retrieved
+	 * @todo phasing out passing the pstring in the url, using the filter form instead
 	 */
 	public function ajax_report($page, $block, $pstring, $output, $sort_by = 'null', $sort_order = 'null', $file_format = 'web', $test_date = FALSE, $report_count=0, $json_filter_data = NULL, $cache_buster = NULL) {//, $herd_size_code = FALSE, $all_breeds_code = FALSE
 		$page = urldecode($page);
@@ -489,10 +491,12 @@ abstract class parent_report extends CI_Controller {
 			$this->arr_sort_order = $tmp['arr_sort_order'];
 		}
 
-		$pstring = (empty($pstring) && $pstring !== 0)?'0':$pstring;
+		//$pstring = (empty($pstring) && $pstring !== 0)?'0':$pstring;
+		//ASSUMING ONLY ONE PSTRING WILL BE SELECTED FOR NOW
+		$pstring = (!isset($arr_params['pstring']) || empty($arr_params['pstring'][0]))?'0':$arr_params['pstring'][0];
 		$this->session->set_userdata('pstring', $pstring);
 		$this->pstring = $pstring;
-
+		
 		$this->page = $page;
 		$this->graph = NULL;
 		$this->display = $output;
@@ -593,7 +597,8 @@ abstract class parent_report extends CI_Controller {
 				);
 				if($arr_this_block['chart_type'] != 'bar'){
 					$tmp_array['title'] = array('text' => $a['text']);
-					$tmp_array['labels'] = array('formatter' => $label_format, 'rotation' => -35, 'align' => 'left', 'x' => -50, 'y' => 55);
+					if($a['data_type'] == 'datetime') $tmp_array['labels'] = array('formatter' => $label_format, 'rotation' => -35, 'align' => 'left', 'x' => -50, 'y' => 55);
+					else $tmp_array['labels'] = array('formatter' => $label_format, 'rotation' => -35, 'y' => 25);
 				}
 				if(count($arr_axes['x']) > 1) $this->graph['config']['xAxis'][] = $tmp_array;
 				else $this->graph['config']['xAxis'] = $tmp_array;
