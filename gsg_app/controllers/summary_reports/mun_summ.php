@@ -13,12 +13,19 @@ class MUN_Summ extends parent_report {
 	}
 
 	 function index($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL){
-	 	redirect(site_url('summary_reports/mun_summ/mun_summary'));
+	 	redirect(site_url('summary_reports/mun_summ/mun_curr'));
 	 }
-	function mun_summary($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL){
-	 	$this->product_name = 'Management MUN Summary';
+	 
+	function mun_curr($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL){
+	 	$this->product_name = 'Management MUN Current';
 		parent::display($block_in, $display_format);
 	 }
+
+	 function mun_recent($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL){
+	 	$this->product_name = 'Management MUN Recent';
+	 	parent::display($block_in, $display_format);
+	 }
+	 
 /*
 	 * ajax_report: Called via AJAX to populate graphs
 	 * to add flexibility (any graph/table can be called from any page),
