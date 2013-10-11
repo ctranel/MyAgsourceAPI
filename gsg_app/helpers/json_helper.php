@@ -13,40 +13,32 @@ function json_strip_escape($string)
     return str_replace(array('\"','/','"','n','t'),array('"','/','"','',''),substr($string[0],1,-1));
 }
 
-function json_encode_jsfunc($input=array(), $funcs=array(), $level=0) 
- { 
-  foreach($input as $key=>$value) 
-         { 
-          if (is_array($value)) 
-             { 
-              $ret = json_encode_jsfunc($value, $funcs, 1); 
-              $input[$key]=$ret[0]; 
-              $funcs=$ret[1]; 
-             } 
-          else 
-             { 
-              if (substr($value,0,10)=='function()') 
-                 { 
-                  $func_key="#".uniqid()."#"; 
-                  $funcs[$func_key]=$value; 
-                  $input[$key]=$func_key; 
-                 } 
-             } 
-         } 
-  if ($level==1) 
-     { 
-      return array($input, $funcs); 
-     } 
-  else 
-     { 
-      $input_json = json_encode($input); 
-      foreach($funcs as $key=>$value) 
-             { 
-              $input_json = str_replace('"'.$key.'"', $value, $input_json); 
-             } 
-      return $input_json; 
-     } 
- } 
+function json_encode_jsfunc($input = array(), $funcs = array(), $level = 0, &$func_key = 0) {
+	foreach ( $input as $key => $value ) {
+		if (is_array ( $value )) {
+			$ret = json_encode_jsfunc ( $value, $funcs, 1, $func_key );
+			$input [$key] = $ret [0];
+			$funcs = $ret [1];
+		}
+		else {
+			if (substr ( $value, 0, 10 ) == 'function()') {
+				$func_key++;
+				$funcs [$func_key] = $value;
+				$input [$key] = $func_key;
+			}
+		}
+	}
+	if ($level == 1) {
+		return array ($input,$funcs);
+	}
+	else {
+		$input_json = json_encode ( $input );
+		foreach ( $funcs as $key => $value ) {
+			$input_json = str_replace ( '"' . $key . '"', $value, $input_json );
+		}
+		return $input_json;
+	}
+} 
 
 
 
