@@ -13,16 +13,17 @@ function json_strip_escape($string)
     return str_replace(array('\"','/','"','n','t'),array('"','/','"','',''),substr($string[0],1,-1));
 }
 
-function json_encode_jsfunc($input = array(), $funcs = array(), $level = 0, &$func_key = 0) {
+function json_encode_jsfunc($input = array(), $funcs = array(), $level = 0, &$func_index = 0) {
 	foreach ( $input as $key => $value ) {
 		if (is_array ( $value )) {
-			$ret = json_encode_jsfunc ( $value, $funcs, 1, $func_key );
+			$ret = json_encode_jsfunc ( $value, $funcs, 1, $func_index );
 			$input [$key] = $ret [0];
 			$funcs = $ret [1];
 		}
 		else {
 			if (substr ( $value, 0, 10 ) == 'function()') {
-				$func_key++;
+				$func_index++;
+				$func_key = '#' . $func_index . '#';
 				$funcs [$func_key] = $value;
 				$input [$key] = $func_key;
 			}
