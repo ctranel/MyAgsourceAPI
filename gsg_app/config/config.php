@@ -22,8 +22,8 @@
 			$config['base_url_assets']	= "http://feweb.verona.crinet/myagsource/";
 		break;
 		case 'production':
-			$config['base_url']	= "http://feweb.verona.crinet/myagsource/";
-			$config['base_url_assets']	= "http://feweb.verona.crinet/myagsource/";
+			$config['base_url']	= "http://173.229.1.156/myagsource/";
+			$config['base_url_assets']	= "http://173.229.1.156/myagsource/";
 		break;
 		default:
 			exit('The application environment is not set correctly.');

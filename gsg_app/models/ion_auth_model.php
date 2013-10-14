@@ -1017,12 +1017,12 @@ class Ion_auth_model extends Ion_auth_parent_model
 	public function get_task_permissions($section_id = ''){
 		$this->load->helper('multid_array_helper');
 		$results = $this->db->select('name, description')
-		->join($this->tables['groups_tasks'], 'tasks.id = ' . $this->tables['groups_tasks'] . '.task_id', 'left')
+		->join($this->tables['groups_tasks'] . ' gt', 't.id = gt.task_id', 'left')
 		//->where_in('group_id', array_keys($this->session->userdata('arr_groups')))
 		->where('group_id', $this->session->userdata('active_group_id'))
 		//->where('section_id', $section_id)
 		//->where('permission', '1')
-		->get($this->tables['tasks'])
+		->get($this->tables['tasks'] . ' t')
 		->result_array();
 		return array_extract_value_recursive('name', $results);
 	}

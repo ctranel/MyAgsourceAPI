@@ -106,7 +106,6 @@ if (defined('ENVIRONMENT'))
 	
 	// Name of the "system folder"
 	define('PROJ_DIR', $project_folder);
-	echo PROJ_DIR;
 }
 			
 /*
