@@ -259,7 +259,7 @@ if ( ! function_exists('get_element_by_key')) {
 
 if ( ! function_exists('set_element_by_key')) {
 	/**
-	 * @abstract Sets value for first match if $key in mulitdimensional array
+	 * @abstract Sets value for first match of $key in mulitdimensional array
 	 *
 	 * @param array into which value will be inserted
 	 * @param key
@@ -268,26 +268,17 @@ if ( ! function_exists('set_element_by_key')) {
 	 * @author Chris Tranel
 	 */
     function set_element_by_key(&$input, $key_in, $new_val_in, $arr_order = NULL){
-        if (!is_array($input)){
+    	if (!is_array($input)){
             return false;
         }
         $cnt = 0;
-        $arr_len = count($input) - 1;
 		$arr_copy = $input;
         foreach ($arr_copy AS $key => $value){
-           if (is_array($input[$key])){
-           	if (!empty($new_val_in) && !empty($key_in)){
+        	$key = (string)$key;
+        	if (is_array($input[$key])){
+        	   	if (!empty($new_val_in) && !empty($key_in)){
                     if($key == $key_in){
-                    	if(is_array($input[$key])){
-                    		//if(isset($arr_order) && is_array($arr_order) && $arr_order[key($input[$key])] > key($new_val_in)){
-							//	$input[$key] = array_merge($new_val_in, $input[$key]);
-                    		//}
-                    		//else 
-                    		$input[$key] = array_merge($input[$key], $new_val_in);
-                    	}
-                    	else {
-	                    	$value = $new_val_in;
-                    	}
+                   		$input[$key] = $input[$key] + $new_val_in;
                     }
                 }
                 set_element_by_key($input[$key], $key_in, $new_val_in, $arr_order);

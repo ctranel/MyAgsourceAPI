@@ -211,7 +211,6 @@ class Report_model extends CI_Model {
 		$this->primary_table_name = array_search(max($arr_table_ref_cnt), $arr_table_ref_cnt);
 		//set up arr_fields hierarchy
 		$this->arr_fields = $header_data['arr_fields'];
-
 		//add actual field names to header hierarchy
 		 $tmp = key($arr_field_child);
 		 if(!empty($tmp)) $this->arr_fields = merge_arrays_on_value_key_match($this->arr_fields, $arr_field_child);
@@ -269,7 +268,7 @@ class Report_model extends CI_Model {
 					 join cteRecursive r ON r.parent_id = t.id
 				)
 				SELECT DISTINCT * FROM cteRecursive ORDER BY parent_id, list_order;";
-		
+
 		$arr_groupings = $this->{$this->db_group_name}->query($grouping_sql)->result_array();
 			
 		if(!is_array($arr_groupings) || empty($arr_groupings)){
@@ -283,15 +282,22 @@ class Report_model extends CI_Model {
 			
 		if(is_array($arr_groupings) && !empty($arr_groupings)){
 			foreach($arr_groupings as $h){
-				$arr_ref[$h['id']] = $h['text'];
-				$arr_order[$h['text']] = $h['list_order'];
+				$arr_ref[$h['id']] = (string)$h['text'];
+				$arr_order[(string)$h['text']] = $h['list_order'];
 			}
+//var_dump($arr_groupings);
 			foreach($arr_groupings as $h){
+				$h['text'] = (string)$h['text'];
 				if($h['parent_id'] == NULL) {
+//echo $h['text'] . " = " . $h['id'] . "\n";
 					$arr_fields[$h['text']] = $h['id'];
 				}
 				else{
-					set_element_by_key($arr_fields, $arr_ref[$h['parent_id']], array($h['text'] => $h['id']));
+//var_dump((string)$h['text']);
+//var_dump(array((string)$h['text'] => $h['id']));
+					set_element_by_key($arr_fields, $arr_ref[$h['parent_id']], array((string)$h['text'] => $h['id']));
+//var_dump($arr_fields);
+//echo "\n\n\n\n\n\n";
 				}
 			}
 		}
@@ -485,7 +491,9 @@ class Report_model extends CI_Model {
 			if(empty($v) === FALSE || $v === '0'){
 				if(is_array($v)){
 					if(strpos($k, 'pstring') !== FALSE){
-						$v = array_filter($v);
+//var_dump($v);
+						//$v = array_filter($v);
+//var_dump($v);
 						if(empty($v)) continue;
 					}
 					else {
