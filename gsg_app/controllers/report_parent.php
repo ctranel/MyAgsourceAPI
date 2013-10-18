@@ -42,7 +42,7 @@ abstract class parent_report extends CI_Controller {
 		$this->block = $this->uri->segment(5);
 		$this->report_path = $this->section_path . '/' . $this->page;
 		$this->primary_model = $this->block . '_model';
-		$this->report_form_id = 'report_criteria';
+		$this->report_form_id = 'filter-form';
 		$this->herd_code = strlen($this->session->userdata('herd_code')) == 8?$this->session->userdata('herd_code'):NULL;
 		$this->page_header_data['user_sections'] = $this->as_ion_auth->arr_user_super_sections;
 		if($this->authorize()) {
@@ -474,10 +474,15 @@ abstract class parent_report extends CI_Controller {
 		$page = urldecode($page);
 		$block = urldecode($block);
 		$sort_by = urldecode($sort_by);
+		
 		if(isset($json_filter_data)){
 			$arr_params = (array)json_decode(urldecode($json_filter_data));
 			if(isset($arr_params['csrf_test_name']) && $arr_params['csrf_test_name'] != $this->security->get_csrf_hash()) die("I don't recognize your browser session, your session may have expired, or you may have cookies turned off.");
 			unset($arr_params['csrf_test_name']);
+			//ASSUMING ONLY ONE PSTRING WILL BE SELECTED FOR NOW
+			$pstring = (!isset($arr_params['pstring']) || empty($arr_params['pstring'][0]))?'0':$arr_params['pstring'][0];
+			$this->session->set_userdata('pstring', $pstring);
+			$this->pstring = $pstring;
 			$this->_set_filters($page, $arr_params);
 		}
 		$this->load->helper('report_chart_helper');
@@ -492,11 +497,6 @@ abstract class parent_report extends CI_Controller {
 		}
 
 		//$pstring = (empty($pstring) && $pstring !== 0)?'0':$pstring;
-		//ASSUMING ONLY ONE PSTRING WILL BE SELECTED FOR NOW
-		$pstring = (!isset($arr_params['pstring']) || empty($arr_params['pstring'][0]))?'0':$arr_params['pstring'][0];
-		$this->session->set_userdata('pstring', $pstring);
-		$this->pstring = $pstring;
-		
 		$this->page = $page;
 		$this->graph = NULL;
 		$this->display = $output;
@@ -685,7 +685,7 @@ abstract class parent_report extends CI_Controller {
 			'report_count' => $report_count,
 //			'num_months_displayed' => $this->max_rows
 		);
-		$tmp2 = $this->{$this->primary_model}->get_table_header_data();// was $model in place of $this->primary_model
+		$tmp2 = $this->{$this->primary_model}->get_table_header_data();
 		$table_header_data = array_merge($tmp, $tmp2);
 
 /*		$sess_benchmarks = $this->session->userdata('benchmarks');
