@@ -284,10 +284,10 @@ echo "group_by <br>";
 	protected function sort_by(){
 		$arr_sort_order_vals = $this->input->post('sort_order');
 		if(isset($arr_sort_order_vals) && is_array($arr_sort_order_vals)){
+			$cnt = 1;
 			foreach($arr_sort_order_vals as $k=>$v){
 				if($k > 0){
 					$arr_sort_by_data = array();
-					$cnt = 1;
 					$arr_sort_by_data[] = array(
 						'block_id' => $this->block_id
 						,'field_id' => $k
