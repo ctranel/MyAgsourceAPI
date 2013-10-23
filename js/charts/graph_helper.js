@@ -104,7 +104,7 @@ Highcharts.setOptions(global_options);
 function updateFilter(event, this_in, divid, field_in, value_in){
 	//set_styles(this_in, divid);
 	$('input[name=' + field_in + '][value=' + value_in + ']').attr("checked", true);
-	$('#report_criteria').submit();
+	$('#filter-form').submit();
 //	var block = $('input:radio[name=block]:checked').val();
 //	var pstring = $('input:radio[name=pstring]:checked').val();
 
@@ -145,10 +145,7 @@ function updatePage(el){
 }
 
 function updateBlock(container_div_id, block_in, block_index, sort_field, sort_order, display){//}, title, benchmark_text){
-//alert(container_div_id + ', ' + block_in + ', ' + block_index + ', ' + sort_field + ', ' + sort_order + ', ' + display);
-	
 //load and process ajax data - base_url and page are defined globally in the controller
-	
 	block = block_in;
 	var params = '';
 	var cache_bust = Math.floor(Math.random()*1000);
@@ -157,8 +154,7 @@ function updateBlock(container_div_id, block_in, block_index, sort_field, sort_o
 	if($("#filter-form")){
 		params = encodeURIComponent(JSON.stringify($("#filter-form").serializeObject()));
 	}
-
-	if(typeof(pstring) == 'undefined') pstring = 0;
+	//if(typeof(pstring) == 'undefined') pstring = 0;
 	if(typeof(sort_field) == 'undefined') sort_field = null;
 	if(typeof(sort_order) == 'undefined') sort_order = null;
 	switch(display){
@@ -185,6 +181,7 @@ function load_table(server_path, div_id, tbl_cnt_in, sort_field, sort_order, blo
 	if(typeof(params) == 'undefined' && $("#filter-form")){
 		params = encodeURIComponent(JSON.stringify($("#filter-form").serializeObject()));
 	}
+//alert(params)
 	if(!server_path) {
 		var pstring = $('input:checkbox[name=pstring]:checked').val();
 		if(typeof(pstring) == 'undefined') pstring = 0;

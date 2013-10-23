@@ -326,7 +326,7 @@ class Access_log_model extends Report_Model {
 		$arr_return = array();
 		if(isset($section_id)) $this->{$this->db_group_name}->where('p.section_id', $section_id);
 		$result = $this->{$this->db_group_name}
-		->select("p.id AS page_id, b.id, p.section_id, b.url_segment, b.name, ct.name AS chart_type, b.description, p.url_segment AS page, p.name AS page_name, CASE WHEN dt.name LIKE '%chart' THEN 'chart' ELSE dt.name END AS display,s.path AS section_path, b.max_rows, b.cnt_row, b.sum_row, b.avg_row, b.bench_row, pf.db_field_name AS pivot_db_field")
+		->select("p.id AS page_id, b.id, p.section_id, b.url_segment, b.name, ct.name AS chart_type, b.description, p.url_segment AS page, p.name AS page_name, CASE WHEN dt.name LIKE '%chart' THEN 'chart' ELSE dt.name END AS display,s.path AS section_path, b.max_rows, b.cnt_row, b.sum_row, b.avg_row, b.bench_row, pf.db_field_name AS pivot_db_field, b.is_summary")
 		->join($this->tables['pages'] . ' AS p', 'p.section_id = s.id', 'left')
 		->join($this->tables['pages_blocks'] . ' AS pb', 'p.id = pb.page_id', 'left')
 		->join($this->tables['blocks'] . ' AS b', 'pb.block_id = b.id', 'left')
@@ -357,6 +357,7 @@ class Access_log_model extends Report_Model {
 						'sum_row'=>$r['sum_row'],
 						'avg_row'=>$r['avg_row'],
 						'bench_row'=>$r['bench_row'],
+						'is_summary'=>$r['is_summary'],
 						'pivot_db_field'=>$r['pivot_db_field']
 					);
 				} 
@@ -367,11 +368,11 @@ class Access_log_model extends Report_Model {
 						'name'=>$r['name'],
 						'description'=>$r['description'],
 						'url_segment'=>$r['url_segment'],
+						'is_summary'=>$r['is_summary'],
 						'section_path'=>$r['section_path']
 					);
 				}
  			}
-//var_dump($arr_return);
 			return $arr_return;
 		}
 		else return FALSE;

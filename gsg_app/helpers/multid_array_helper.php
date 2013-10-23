@@ -236,7 +236,7 @@ if ( ! function_exists('array_merge_distinct')) {
 
 if ( ! function_exists('get_element_by_key')) {
 	/**
-	 * @abstract Returns first match if $key in mulitdimensional array
+	 * @abstract Returns first match of $key in mulitdimensional array
 	 *
 	 * @param key
 	 * @param array
@@ -254,6 +254,29 @@ if ( ! function_exists('get_element_by_key')) {
 				if(isset($arr_ret)) return $arr_ret;
 			}
 		}
+	}	
+}
+
+if ( ! function_exists('get_elements_by_key')) {
+	/**
+	 * @abstract Recursively returns all matches of $key in mulitdimensional $array, returns array with all values for that key
+	 *
+	 * @param key
+	 * @param array
+	 * @return array
+	 * @author Chris Tranel
+	 */
+ 
+	function get_elements_by_key($key, $array, &$ret_val = NULL){
+		foreach($array as $k => $v){
+			if($k == $key){
+				$ret_val[] = $v;
+			} 
+			if(is_array($v)) {
+				get_elements_by_key($key, $v, $ret_val);
+			}
+		}
+		return $ret_val;
 	}	
 }
 

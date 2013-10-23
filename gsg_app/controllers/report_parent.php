@@ -186,12 +186,10 @@ abstract class parent_report extends CI_Controller {
 
 //FILTERS
 	//always have filters for pstring (and page?)
-		//if(isset($json_filter_data)){
-			$arr_params = (array)json_decode(urldecode($json_filter_data));
-			if(isset($arr_params['csrf_test_name']) && $arr_params['csrf_test_name'] != $this->security->get_csrf_hash()) die("I don't recognize your browser session, your session may have expired, or you may have cookies turned off.");
-			unset($arr_params['csrf_test_name']);
-			$this->_set_filters($this->page, $arr_params);
-		//}
+		$arr_params = (array)json_decode(urldecode($json_filter_data));
+		if(isset($arr_params['csrf_test_name']) && $arr_params['csrf_test_name'] != $this->security->get_csrf_hash()) die("I don't recognize your browser session, your session may have expired, or you may have cookies turned off.");
+		unset($arr_params['csrf_test_name']);
+		$this->_set_filters($this->page, $arr_params);
 		//if params were passed to the function
 		if(isset($arr_params) && is_array($arr_params)){
 			foreach($arr_params as $k => $v){
@@ -338,9 +336,9 @@ abstract class parent_report extends CI_Controller {
 		$this->carabiner->css('chart.css', 'print');
 		$this->carabiner->css('report.css', 'print');
 		$this->carabiner->css($this->section_path . '.css', 'screen');
-//@todo: change this to look specifically for cow reports
-		if(count($arr_blocks) == 1 && count($this->arr_page_filters) > 1) $this->carabiner->css('filters.css', 'screen');
-		else $this->carabiner->css('hide_filters.css', 'screen');
+		$bool_has_summary = array_search(1, get_elements_by_key('is_summary', $arr_blocks)) === FALSE ? FALSE : TRUE;
+		if($bool_has_summary) $this->carabiner->css('hide_filters.css', 'screen');
+		else $this->carabiner->css('filters.css', 'screen');
 		//$this->carabiner->css('tooltip.css', 'screen');
 		//get_herd_data
 		$herd_data = $this->herd_model->header_info($this->session->userdata('herd_code'));
@@ -468,7 +466,7 @@ abstract class parent_report extends CI_Controller {
 	 * @param string output: method of output (chart, table, etc)
 	 * @param boolean/string file_format: return the value of function (TRUE), or echo it (FALSE).  Defaults to FALSE
 	 * @param string cache_buster: text to make page appear as a different page so that new data is retrieved
-	 * @todo phasing out passing the pstring in the url, using the filter form instead
+	 * @todo phasing out passing the pstring in the url, using the filter form instead (passed as $json_filter_data) --- the pstring parameter is no longer being used, but I have not removed it from the URLs that call ajax_report
 	 */
 	public function ajax_report($page, $block, $pstring, $output, $sort_by = 'null', $sort_order = 'null', $file_format = 'web', $test_date = FALSE, $report_count=0, $json_filter_data = NULL, $cache_buster = NULL) {//, $herd_size_code = FALSE, $all_breeds_code = FALSE
 		$page = urldecode($page);

@@ -285,19 +285,13 @@ class Report_model extends CI_Model {
 				$arr_ref[$h['id']] = (string)$h['text'];
 				$arr_order[(string)$h['text']] = $h['list_order'];
 			}
-//var_dump($arr_groupings);
 			foreach($arr_groupings as $h){
 				$h['text'] = (string)$h['text'];
 				if($h['parent_id'] == NULL) {
-//echo $h['text'] . " = " . $h['id'] . "\n";
 					$arr_fields[$h['text']] = $h['id'];
 				}
 				else{
-//var_dump((string)$h['text']);
-//var_dump(array((string)$h['text'] => $h['id']));
 					set_element_by_key($arr_fields, $arr_ref[$h['parent_id']], array((string)$h['text'] => $h['id']));
-//var_dump($arr_fields);
-//echo "\n\n\n\n\n\n";
 				}
 			}
 		}
@@ -491,10 +485,11 @@ class Report_model extends CI_Model {
 			if(empty($v) === FALSE || $v === '0'){
 				if(is_array($v)){
 					if(strpos($k, 'pstring') !== FALSE){
-//var_dump($v);
-						//$v = array_filter($v);
-//var_dump($v);
-						if(empty($v)) continue;
+						$bool_has_summary = array_search(1, get_elements_by_key('is_summary', $this->arr_blocks)) === FALSE ? FALSE : TRUE;
+						if(!$bool_has_summary) {
+							$v = array_filter($v);
+							if(empty($v)) continue;
+						}
 					}
 					else {
 						$v = array_filter($v, create_function('$a', 'return (!empty($a) || $a === "0");'));
