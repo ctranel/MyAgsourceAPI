@@ -228,7 +228,6 @@ echo "group_by <br>";
 			$arr_yaxes_data = array();
 			foreach($arr_yaxes_vals as $k=>$v){
 				if($k >= 0){
-					$cnt = 1;
 					$arr_yaxes_data[] = array(
 						'block_id' => $this->block_id
 						,'x_or_y' => 'y'
@@ -239,7 +238,6 @@ echo "group_by <br>";
 						,'opposite' => $arr_yaxes_opposite[$k]
 						,'list_order' => "$k"
 					);
-					$cnt++;
 				}
 			}
 			return $this->custom_report_model->add_yaxes($arr_yaxes_data);
