@@ -14,8 +14,8 @@
 	switch (ENVIRONMENT)
 	{
 		case 'development':
-			$config['base_url']	= "http://localhost/app/";
-			$config['base_url_assets']	= "http://localhost/app/";
+			$config['base_url']	= "http://localhost/MyAgSource/";
+			$config['base_url_assets']	= "http://localhost/MyAgSource/";
 		break;
 		case 'testing':
 			$config['base_url']	= "http://feweb.verona.crinet/myagsource/";
