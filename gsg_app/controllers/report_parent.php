@@ -42,7 +42,7 @@ abstract class parent_report extends CI_Controller {
 		$this->block = $this->uri->segment(5);
 		$this->report_path = $this->section_path . '/' . $this->page;
 		$this->primary_model = $this->block . '_model';
-		$this->report_form_id = 'filter-form';
+		$this->report_form_id = 'report_criteria';//filter-form';
 		$this->herd_code = strlen($this->session->userdata('herd_code')) == 8?$this->session->userdata('herd_code'):NULL;
 		$this->page_header_data['user_sections'] = $this->as_ion_auth->arr_user_super_sections;
 		if($this->authorize()) {
@@ -790,3 +790,4 @@ abstract class parent_report extends CI_Controller {
 		//END FILTERS
 	}
 }
+
