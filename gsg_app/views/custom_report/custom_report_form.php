@@ -110,11 +110,11 @@
 				<a class="add-fld link">+</a>
 			</div>
 		</div>
-		<table id="trend-build" class="trend-only">
+		<table id="trend-build">
 			<tr class="fields-in">
 				<th id="wtrendfield-0">
-					<input name="column[0]" id="trendcolumn-0" value="Drop Display Field Here">
-					<select name="aggregate[0]">
+					<input name="trendcolumn[0]" id="trendcolumn-0" value="Drop Display Field Here">
+					<select name="trendaggregate[0]">
 	                    <option value="">Summarization</option>
 	                    <option value="COUNT">Count</option>
 	                    <option value="SUM">Sum</option>
@@ -124,9 +124,9 @@
 					</select>
 <?php 				if(!empty($chart_type_options)):
 						if(isset($chart_type_options[''])) $chart_type_options[''] = str_replace('Select one', 'Select Display Type', $chart_type_options['']);
-	      				echo form_dropdown('graph_type[0]', $chart_type_options, NULL, $series_chart_type);
+	      				echo form_dropdown('trendgraph_type[0]', $chart_type_options, NULL, $series_chart_type);
 					endif; ?>
-					<select name="yaxis[0]">
+					<select name="trendyaxis[0]">
 	                    <option value="0">Y Axis</option>
 	                    <option value="0" selected>Default</option>
 					</select>
@@ -134,18 +134,7 @@
 				</th>
 			</tr>
 		</table>
-		<div id="xaxis-trend" class="trend-only">
-			<div id="wxaxis-0">
-				<label for="xaxis_label">Text</label><input name="xaxis_label" id="xaxis_label" size="10" maxlength="50"><br>
-				<label for="xaxis_field">Timespan Field</label><select name="xaxis_field" id="xaxis_field"></select><br>
-				<select name="xaxis_datatype">
-	                    <option value="">Select Data Type</option>
-	                    <option value="datetime">Date/Time</option>
-	                    <option value="linear">Numeric</option>
-				</select>
-			</div>
-		</div>
-		<div id="xaxis-compare" class="compare-only">
+		<div id="xaxis-trend" class="chart-only">
 			<div id="wxaxis-0">
 				<label for="xaxis_label">Text</label><input name="xaxis_label" id="xaxis_label" size="10" maxlength="50"><br>
 				<label for="xaxis_field">Timespan Field</label><select name="xaxis_field" id="xaxis_field"></select><br>

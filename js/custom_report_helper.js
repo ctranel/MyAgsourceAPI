@@ -7,26 +7,6 @@ function allow_drop(ev){ //called by event ondragover
 	ev.preventDefault();
 }
 
-function select_el(ev){
-//	alert(this.id);
-//	$this = $(this);
-//	$this.select();
-    var this_div = this,
-    sel, range;
-    
-	if(window.getSelection){
-	    range = document.createRange();
-	    range.selectNode(this_div)
-	    sel = window.getSelection();
-	    sel.addRange(range);
-	}else{
-	    range = document.body.createTextRange();
-	    range.moveToElementText(this_div);
-	    range.collapse(false);
-	    range.select_el();
-	}
-}
-
 function drag(ev){ //called by event ondragstart
 	//ev.originalEvent.dataTransfer.setData("Text",ev.target.id);
 	var arr_id = this.id.split('-');
@@ -71,7 +51,6 @@ function drop_input_field(ev){ //called by event ondrop
 	}
 	else return false;
 	drop(input, target);
-	el_drag_start.blur;
 	el_drag_start = null;old_container=null;new_container=null;
 }
 
@@ -97,7 +76,6 @@ function drop(input, target){
 	});
 	$(target).attr('id', 'w_' + $(input).attr('id'));
 	$(target).attr('draggable', true);
-	$(target).on('focus', select_el);
 	$(target).on('dragstart', drag);
 	if(new_container.indexOf('where') >= 0 && $(target).html().indexOf('and_or') < 0){
 		$(target).append('<select name="and_or[' + new_id + ']"><option value="and">and</option><option value="or">or</option></select>');
@@ -105,7 +83,6 @@ function drop(input, target){
 	else if((new_container.indexOf('sort') >= 0 || new_container.indexOf('group') >= 0) && $(target).html().indexOf('then by') < 0){
 		$(target).append('<p>then by...</p>');
 	}
-	el_drag_start.blur;
 }
 
 // DRAG AND DROP
@@ -173,7 +150,6 @@ function drop_table_field(ev, container_id){
 	
 	//attach events
 	$(new_th).attr('draggable',true);
-	$(new_th).on('focus', select_el);
 	$(new_th).on('dragstart', drag);
 
 	//insert column
@@ -195,7 +171,6 @@ function drop_table_field(ev, container_id){
 	//add field to pivot field list
 	$("#pivot_db_field").append('<option value="' + new_id + '">' + new_value + '</option>');
 
-	el_drag_start.blur;
 	el_drag_start = null;old_container=null;new_container=null;
 }
 
@@ -399,7 +374,7 @@ function fill_fields(ev){
 			if(fields[3] > 0) dt_options_html += '<option value="' + fields[0] + '">' + fields[2] + '</option>';
 		});
 		$("#field-container").html(options_html);
-		$("#field-container").children().each(function(){$(this).on('mousedown', $("#field-container > div"), select_el);$(this).on('dragstart', drag);});// $(this).attr('draggable', true);
+		$("#field-container").children().each(function(){$(this).on('dragstart', drag);});// $(this).attr('draggable', true);
 		$("#xaxis_field").html(dt_options_html);
 	});
 }
@@ -479,7 +454,7 @@ $(".link").on("mouseout", function(){this.style.cursor = 'auto';});
 
 //drag and drop
 //field list
-//$('#field-container').children().each(function(){$(this).on('focus', select_el);$(this).on('dragstart', drag);});// $(this).attr('draggable', true);
+$('#field-container').children().each(function(){$(this).on('dragstart', drag);});// $(this).attr('draggable', true);
 
 //SELECT FIELD AREA
 	//select table fields
@@ -506,7 +481,6 @@ $(".link").on("mouseout", function(){this.style.cursor = 'auto';});
 //group by
 $('#wgroupby-0').on('drop', drop_input_field);
 $('#wgroupby-0').on('dragover', allow_drop);
-//$('#wgroupby-0').on('focus', select_el);
 $('#wgroupby-0').on('dragstart', drag);
 $('#wgroupby-0').children('input').first().on('focus', drag_only_alert);
 $('#wgroupby-0').children('input').first().addClass('field-target');
@@ -514,7 +488,6 @@ $('#wgroupby-0').children('input').first().addClass('field-target');
 //sort by
 $('#wsortby-0').on('drop', drop_input_field);
 $('#wsortby-0').on('dragover', allow_drop);
-//$('#wsortby-0').on('focus', select_el);
 $('#wsortby-0').on('dragstart', drag);
 $('#wsortby-0').children('input').first().on('focus', drag_only_alert);
 $('#wsortby-0').children('input').first().addClass('field-target');
@@ -522,7 +495,6 @@ $('#wsortby-0').children('input').first().addClass('field-target');
 //where
 $('#wwhere_0-0').on('drop', drop_input_field);
 $('#wwhere_0-0').on('dragover', allow_drop);
-//$('#wwhere_0-0').on('focus', select_el);
 $('#wwhere_0-0').on('dragstart', drag);
 $('#wwhere_0-0').children('input').first().on('focus', drag_only_alert);
 $('#wwhere_0-0').children('input').first().addClass('field-target');
