@@ -29,14 +29,14 @@ foreach($structure as $row): ?>
 			?>class = "<?php echo $class?>">
 			<?php
 			if (is_array($arr_unsortable_columns) && !in_array($th['field_name'], $arr_unsortable_columns)):
-				if($form_id == 'filter-form'){ //reports that reload pages
-					$submit_url = site_url($report_path . "/display/" . $th['field_name'] . "/" . $link_sort_order);
-					$extra = Array('onclick'=>"return submit_table_sort_link('$form_id', '$submit_url');");
-				}
-				elseif($form_id == 'report_criteria'){ //reports that use ajax
+//				if($form_id == 'filter-form'){ //reports that reload pages
+//					$submit_url = site_url($report_path . "/display/" . $th['field_name'] . "/" . $link_sort_order);
+//					$extra = Array('onclick'=>"return submit_table_sort_link('$form_id', '$submit_url');");
+//				}
+//				elseif($form_id == 'report_criteria'){ //reports that use ajax
 					$submit_url = '#';
 					$extra = Array('onclick'=>"return load_table(null, 'table-canvas" . $report_count . "', $report_count, '". $th['field_name'] . "', '$link_sort_order', '$block');");
-				}
+//				}
 				echo anchor($submit_url, $th['text'], $extra);
 				echo $after_text;
 				//echo "<span id=\"hide-<php echo str_replace('_', '-', $th['field_name']); >\" class='hide-column'>X</span>";
