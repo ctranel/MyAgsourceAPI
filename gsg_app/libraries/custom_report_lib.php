@@ -95,6 +95,7 @@ class Custom_report_lib
 			,'avg_row' => $this->input->post('avg_row')
 			,'bench_row' => $this->input->post('bench_row')
 			,'pivot_db_field' => empty($pivot_db_field) ? NULL : $pivot_db_field
+			,'is_summary' => $this->input->post('cow_or_summary') == 'cow' ? 0 : 1
 		);
 		$this->block_id = $this->custom_report_model->create_block($arr_block_data);
 //		if(!$this->block_id) $this->cancel_add();
@@ -182,10 +183,10 @@ echo "group_by <br>";
 	//chart columns
 	protected function trend_columns(){
 		//$bool_cols_added = TRUE; //set to true so that if there are no columns to add, the rest of the report can be written
-		$arr_col_vals = $this->input->post('trendcolumn');
-		$arr_aggregate_vals = $this->input->post('trendaggregate');
-		$arr_chart_type = $this->input->post('trendgraph_type');
-		$arr_axis_index_vals = $this->input->post('trendyaxis');
+		$arr_col_vals = $this->input->post('column');
+		$arr_aggregate_vals = $this->input->post('aggregate');
+		$arr_chart_type = $this->input->post('graph_type');
+		$arr_axis_index_vals = $this->input->post('yaxis');
 		if(isset($arr_col_vals) && is_array($arr_col_vals)){
 			$arr_column_data = array();
 			$cnt = 1;

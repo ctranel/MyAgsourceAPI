@@ -20,7 +20,7 @@ class Custom_report_model extends CI_Model {
 	 *
 	 **/
 	function create_block($data){
-		$this->db->insert('users.dbo.blocks', $data);
+		$this->db->insert($this->tables['blocks'], $data);
 		if($this->db->affected_rows() <= 0){
 			$this->error = "Could not create report";
 			return FALSE;
@@ -205,7 +205,7 @@ class Custom_report_model extends CI_Model {
 		$tmp = $this->db
 		->select('pb.list_order, b.name')
 		->from('users.dbo.pages_blocks pb')
-		->join('users.dbo.blocks b', 'pb.block_id = b.id', 'left')
+		->join($this->tables['blocks'] . ' b', 'pb.block_id = b.id', 'left')
 		->where('pb.page_id', $page_id)
 		->order_by('pb.list_order')
 		->get()->result_array();
