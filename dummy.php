@@ -8,7 +8,7 @@ if(isset($_GET['debugger_connect']) && $_GET['debugger_connect'] == 1) {
 		debugger_connect();
 		exit();
 	} else {
-		echo "No connector is installed afafasfa.";
+		echo "No connector is installed afafaghkgkgsfa.";
 	}
 }
 ?>
