@@ -8,7 +8,7 @@ ssh://kmarshall@feweb.verona.crinet/var/local/repos/MyAgsource.git
 
 New > Project from Existing directory
 Select the new clone in your local git folder
-For example: C:\Users\kmarshall\git\MyAgsource\.git
+For example: C:\Users\kmarshall\git\MyAgsource
 
 Once project is loaded into PHP Explorer,
   right click on topmost project folder.
