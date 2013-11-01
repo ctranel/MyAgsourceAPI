@@ -5,11 +5,11 @@ class Land extends CI_Controller {
 	}
 	
 	function index(){
-		redirect(site_url('prod/sample'));
+		redirect(site_url('prod/test_day'));
 	}
 	
 	function land(){
-		redirect(site_url('prod/sample'));
+		redirect(site_url('prod/test_day'));
 	}
 	
 	function log_page(){

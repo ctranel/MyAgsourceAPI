@@ -188,6 +188,7 @@ class Report_model extends CI_Model {
 			->order_by('list_order')
 			->get('users.dbo.v_block_field_data')
 			->result_array();
+//			var_dump($arr_field_data);
 		$header_data = $this->get_select_field_structure($block_in);
 		if(is_array($arr_field_data) && !empty($arr_field_data)){
 			foreach($arr_field_data as $fd){
