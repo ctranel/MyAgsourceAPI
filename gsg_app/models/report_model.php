@@ -408,7 +408,7 @@ class Report_model extends CI_Model {
 		$this->prep_sort($arr_sort_by, $arr_sort_order); // the prep_sort function adds the sort field to the active record object
 
 		//add select fields to query
-$select_fields[] = 'd'; //uncomment to dump search query to screen
+//$select_fields[] = 'd'; //uncomment to dump search query to screen
 		$this->{$this->db_group_name}->select($select_fields, FALSE);
 		$ret = $this->{$this->db_group_name}->get()->result_array();
 		$this->num_results = count($ret);
