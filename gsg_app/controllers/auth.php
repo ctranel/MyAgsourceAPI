@@ -17,11 +17,11 @@ class Auth extends Ionauth {
 		$this->load->library('form_validation');
 		$this->load->helper('cookie');
 
-		/* Load the profile.php config file if it exists
+		/* Load the profile.php config file if it exists*/
 		$this->config->load('profiler', false, true);
 		if ($this->config->config['enable_profiler']) {
 			$this->output->enable_profiler(TRUE);
-		} */
+		} 
 	}
 	
 	function index(){
