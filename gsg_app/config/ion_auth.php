@@ -53,7 +53,9 @@
 	
 	//HERD DB tables
 	$config['tables']['herds']    				= 'herd.dbo.herd_id';
-	$config['tables']['t13_herd_info']			= 'herd.dbo.t13_herd_info'; // Kevin - for dynamic test_date table headers
+
+	//RPM DB tables
+	$config['tables']['t13_herd_info']			= 'rpm.dbo.t13_herd_info'; // Kevin - for dynamic test_date table headers
 	
 	/**
 	 * Meta sections to be included with profile.
