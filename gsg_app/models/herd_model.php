@@ -284,7 +284,7 @@ class Herd_model extends CI_Model {
 		$arr_results = $this->db->select('email')
 		->from('users')
 		->join('users_herd_meta', 'users.id = users_herd_meta.user_id')
-->join('users_groups', 'users.id = users_groups.user_id')
+		->join('users_groups', 'users.id = users_groups.user_id')
 		->where('users_herd_meta.herd_code', $herd_code)
 		->where('users.active', 1)
 		->where('users_groups.group_id', 2)
@@ -293,4 +293,25 @@ class Herd_model extends CI_Model {
 		if(is_array($arr_results) && !empty($arr_results)) return $arr_results;
 		else return FALSE;
 	}
+
+	/**
+	 * get_herd_test_dates_7
+	 * @param string herd code
+	 * @return array of test_dates from rpm.dbo.t13_herd_info
+	 * @author Kevin Marshall
+	 **/
+	
+	public function get_herd_test_dates_7($herd_code){
+		$arr_results = $this->db->select('test_date_1,test_date_2,test_date_3,test_date_4,test_date_5,test_date_6,test_date_7')
+		->from('t13_herd_info')
+		->where('herd_code', $herd_code)
+		->get()
+		->result_array();
+		if(is_array($arr_results) && !empty($arr_results)) return $arr_results;
+		else return FALSE;
+	}
+
+	
+	
+	
 }
