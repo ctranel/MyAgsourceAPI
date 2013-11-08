@@ -17,62 +17,59 @@
 *
 */
 	$config['use_mongodb'] = FALSE;
-	$config['collections']['users']          = 'users';
-	$config['collections']['groups']         = 'groups';
-	$config['collections']['login_attempts'] = 'login_attempts';
+	$config['collections']['users']          	= 'users';
+	$config['collections']['groups']         	= 'groups';
+	$config['collections']['login_attempts'] 	= 'login_attempts';
 
 	/**
 	 * Tables.
 	 **/
-	$config['tables']['lookup_display_types'] = 'users.dbo.lookup_display_types';
-	$config['tables']['lookup_chart_types'] = 'users.dbo.lookup_chart_types';
-	$config['tables']['lookup_scopes'] = 'users.dbo.lookup_scopes';
-	
-	$config['tables']['consultants_herds']    = 'users.dbo.service_groups_herds';
-	$config['tables']['users_service_groups']    = 'users.dbo.users_service_groups';
-	$config['tables']['service_groups']    = 'address.dbo.service_group';
-	
-	$config['tables']['super_sections']    = 'users.dbo.super_sections';
-	$config['tables']['sections']    = 'users.dbo.sections';
-	$config['tables']['pages']  = 'users.dbo.pages';
-	$config['tables']['pages_blocks']  = 'users.dbo.pages_blocks';
-	$config['tables']['blocks']  = 'users.dbo.blocks';
-	$config['tables']['access_log']  = 'users.dbo.access_log';
-	
-	$config['tables']['users_sections']    = 'users.dbo.users_sections';
-	$config['tables']['groups']  = 'users.dbo.groups';
+	//USERS DB tables
+	$config['tables']['lookup_display_types']	= 'users.dbo.lookup_display_types';
+	$config['tables']['lookup_chart_types'] 	= 'users.dbo.lookup_chart_types';
+	$config['tables']['lookup_scopes'] 			= 'users.dbo.lookup_scopes';
+	$config['tables']['consultants_herds']    	= 'users.dbo.service_groups_herds';
+	$config['tables']['users_service_groups']   = 'users.dbo.users_service_groups';
+	$config['tables']['service_groups']    		= 'address.dbo.service_group';
+	$config['tables']['super_sections']    		= 'users.dbo.super_sections';
+	$config['tables']['sections']    			= 'users.dbo.sections';
+	$config['tables']['pages']  				= 'users.dbo.pages';
+	$config['tables']['pages_blocks']  			= 'users.dbo.pages_blocks';
+	$config['tables']['blocks']  				= 'users.dbo.blocks';
+	$config['tables']['access_log']  			= 'users.dbo.access_log';
+	$config['tables']['users_sections']    		= 'users.dbo.users_sections';
+	$config['tables']['groups']  				= 'users.dbo.groups';
 	$config['tables']['users_dhi_supervisors']  = 'users.dbo.users_dhi_supervisors';//address.dbo.dhi_supervisor';
-	$config['tables']['regions']  = 'users.dbo.regions';
-	$config['tables']['users_regions']  = 'users.dbo.users_regions';
-	$config['tables']['users']   = 'users.dbo.users';
-	$config['tables']['users_groups']    = 'users.dbo.users_groups';
-//	$config['tables']['meta']    = 'users_meta';
-	$config['tables']['users_herds']    = 'users.dbo.users_herds';
-	$config['tables']['login_attempts']  = 'users.dbo.login_attempts';
-	$config['tables']['tasks']  = 'users.dbo.tasks';
-	$config['tables']['groups_tasks']  = 'users.dbo.groups_tasks';
+	$config['tables']['regions']  				= 'users.dbo.regions';
+	$config['tables']['users_regions']  		= 'users.dbo.users_regions';
+	$config['tables']['users']   				= 'users.dbo.users';
+	$config['tables']['users_groups']    		= 'users.dbo.users_groups';
+	$config['tables']['users_herds']    		= 'users.dbo.users_herds';
+	$config['tables']['login_attempts']  		= 'users.dbo.login_attempts';
+	$config['tables']['tasks']  				= 'users.dbo.tasks';
+	$config['tables']['groups_tasks']  			= 'users.dbo.groups_tasks';
+	$config['tables']['herds_sections']    		= 'users.dbo.herds_sections';
+	$config['tables']['herds_regions']    		= 'users.dbo.herds_regions';
 	
-	//herds
-	$config['tables']['herds']    = 'herd.dbo.herd_id';//users.dbo.herds';
-	$config['tables']['herds_sections']    = 'users.dbo.herds_sections';
-	$config['tables']['herds_regions']    = 'users.dbo.herds_regions';
+	//HERD DB tables
+	$config['tables']['herds']    				= 'herd.dbo.herd_id';
+	$config['tables']['t13_herd_info']			= 'herd.dbo.t13_herd_info'; // Kevin - for dynamic test_date table headers
 	
 	/**
 	 * Meta sections to be included with profile.
 	 * Each should have a config setting for 'towrite' 'tables', 'join' and 'columns'
 	 **/
-	$config['meta_sections']         = array('users_herds', 'users_dhi_supervisors', 'users_regions', 'users_sections');//'meta', 
-	$config['herd_meta_sections']         = array('herds_sections');
+	$config['meta_sections']  			       = array('users_herds', 'users_dhi_supervisors', 'users_regions', 'users_sections');//'meta', 
+	$config['herd_meta_sections']   		   = array('herds_sections');
 
 	/**
 	 * Fields from meta table that must be present in order to write to the meta table
 	 * Note that these fields are not required on the user record
 	 **/
-	$config['towrite'] = array(
-		'users_herds'		=> array('herd_code'),
+	$config['towrite'] 	= array(
+		'users_herds'	=> array('herd_code'),
 		'users_regions'	=> array('region_id'),
 		'dhi_supervisor'=> array('supervisor_num','region_id'),
-		//'meta'		=> array(),
 		'users_sections'=> array('section_id', ''),
 		'herds_sections'=> array('section_id')
 	);
@@ -83,14 +80,13 @@
  | "meta sections" need to be user_id, "herd_meta_sections" need to be herd_code ("groups" are neither)
  */
 	$config['join'] = array(
-		'groups'	=> 'group_id',//from ion_auth
-		'users'		=> 'user_id', //from ion_auth
-		'users_herds'		=> 'user_id',
-		'users_regions'	=> 'user_id',
-		'users_dhi_supervisors'=> 'user_id',
-		//'meta'		=> 'user_id',
-		'users_sections'=> 'user_id',
-		'herds_sections'=> 'herd_code'
+		'groups'				=> 'group_id',//from ion_auth
+		'users'					=> 'user_id', //from ion_auth
+		'users_herds'			=> 'user_id',
+		'users_regions'			=> 'user_id',
+		'users_dhi_supervisors'	=> 'user_id',
+		'users_sections'		=> 'user_id',
+		'herds_sections'		=> 'herd_code'
 	);
 
 
@@ -100,11 +96,10 @@
 	 **/
 	$config['columns'] = array(
 		'users_herds'		=> array('herd_code'),
-		'users_regions'	=> array('region_id'),
-		'dhi_supervisor'=> array('supervisor_num', 'region_id'),
-		//'meta'		=> array('first_name', 'last_name', 'company', 'phone'),
-		'users_sections'=> array('section_id', 'access_level'),
-		'herds_sections'=> array('section_id', 'access_level')
+		'users_regions'		=> array('region_id'),
+		'dhi_supervisor'	=> array('supervisor_num', 'region_id'),
+		'users_sections'	=> array('section_id', 'access_level'),
+		'herds_sections'	=> array('section_id', 'access_level')
 	);
 	
 /*
@@ -143,27 +138,26 @@ $config['max_rounds']     = 9;
  | The controller should check this function and act
  | appropriately. If this variable set to 0, there is no maximum.
  */
-$config['default_herd']			= "35999571";
-$config['site_title']           = "MyAgSource"; 		// Site Title, example.com
-$config['admin_email']          = "ctranel@agsource.com"; 	// Admin Email, admin@example.com
-$config['cust_serv_company']	  = "AgSource Cooperative Services"; //custom CDT
-$config['cust_serv_email']		   = "ctranel@agsource.com"; //custom CDT
-$config['cust_serv_phone']		   = "ctranel@agsource.com"; //custom CDT
-//$config['from_email']		   = "newdata@crinet.com";  // custom CDT
-$config['default_group']        = 'Producers'; 			// Default group, use name
-$config['admin_group']          = 'admin'; 				// Default administrators group, use name
-$config['manager_group']         = array('Manager','Genex Admin'); //custom CDT
-$config['identity']             = 'email'; 				// A database column which is used to login with
-$config['min_password_length']  = 8; 					// Minimum Required Length of Password
-$config['max_password_length']  = 20; 					// Maximum Allowed Length of Password
-$config['email_activation']     = TRUE; 				// Email Activation for registration
-$config['manual_activation']    = FALSE; 				// Manual Activation for registration
-$config['remember_users']       = TRUE; 				// Allow users to be remembered and enable auto-login
-$config['user_expire']          = (60 * 60 * 24 * 90); 	//90 Days				// How long to remember the user (seconds)
-$config['user_extend_on_login'] = TRUE; 				// Extend the users cookies everytime they auto-login
-$config['track_login_attempts'] = FALSE;				// Track the number of failed login attempts for each user or ip.
-$config['maximum_login_attempts']     = 3; 				// The maximum number of failed login attempts.
-$config['forgot_password_expiration'] = 0; 				// The number of seconds after which a forgot password request will expire. If set to 0, forgot password requests will not expire.
+$config['default_herd']					= "35999571";
+$config['site_title']           		= "MyAgSource"; 		// Site Title, example.com
+$config['admin_email']          		= "ctranel@agsource.com"; 	// Admin Email, admin@example.com
+$config['cust_serv_company']	  		= "AgSource Cooperative Services"; //custom CDT
+$config['cust_serv_email']		   		= "ctranel@agsource.com"; //custom CDT
+$config['cust_serv_phone']		   		= "ctranel@agsource.com"; //custom CDT
+$config['default_group']        		= 'Producers'; 			// Default group, use name
+$config['admin_group']          		= 'admin'; 				// Default administrators group, use name
+$config['manager_group']         		= array('Manager','Genex Admin'); //custom CDT
+$config['identity']             		= 'email'; 				// A database column which is used to login with
+$config['min_password_length']  		= 8; 					// Minimum Required Length of Password
+$config['max_password_length']  		= 20; 					// Maximum Allowed Length of Password
+$config['email_activation']     		= TRUE; 				// Email Activation for registration
+$config['manual_activation']    		= FALSE; 				// Manual Activation for registration
+$config['remember_users']       		= TRUE; 				// Allow users to be remembered and enable auto-login
+$config['user_expire']          		= (60 * 60 * 24 * 90); 	//90 Days				// How long to remember the user (seconds)
+$config['user_extend_on_login'] 		= TRUE; 				// Extend the users cookies everytime they auto-login
+$config['track_login_attempts'] 		= FALSE;				// Track the number of failed login attempts for each user or ip.
+$config['maximum_login_attempts']     	= 3; 				// The maximum number of failed login attempts.
+$config['forgot_password_expiration'] 	= 0; 				// The number of seconds after which a forgot password request will expire. If set to 0, forgot password requests will not expire.
 
 /*
  | -------------------------------------------------------------------------
