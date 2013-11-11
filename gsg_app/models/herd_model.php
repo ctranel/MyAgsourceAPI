@@ -302,7 +302,8 @@ class Herd_model extends CI_Model {
 	 **/
 	
 	public function get_herd_test_dates_7($herd_code){
-		$arr_results = $this->db->select('test_date_1,test_date_2,test_date_3,test_date_4,test_date_5,test_date_6,test_date_7')
+		$rpmdb = $this->load->database('developmentRPM', TRUE);
+		$arr_results = $rpmdb->select('test_date_1,test_date_2,test_date_3,test_date_4,test_date_5,test_date_6,test_date_7')
 		->from('t13_herd_info')
 		->where('herd_code', $herd_code)
 		->get()
