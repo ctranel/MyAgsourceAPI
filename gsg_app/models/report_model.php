@@ -188,7 +188,6 @@ class Report_model extends CI_Model {
 			->order_by('list_order')
 			->get('users.dbo.v_block_field_data')
 			->result_array();
-//			var_dump($arr_field_data);
 		$header_data = $this->get_select_field_structure($block_in);
 		if(is_array($arr_field_data) && !empty($arr_field_data)){
 			foreach($arr_field_data as $fd){
@@ -283,6 +282,13 @@ class Report_model extends CI_Model {
 			
 		if(is_array($arr_groupings) && !empty($arr_groupings)){
 			foreach($arr_groupings as $h){
+				$this->load->model('herd_model');
+				
+//				var_dump($this->herd_model->get_herd_test_dates_7($this->session->userdata('herd_code')));
+//				switch($h) {
+//					case "Test Date -6":
+//						$h = $this->herd_model->get_herd_test_dates_7($this->session->userdata('herd_code'))[];
+					
 				$arr_ref[$h['id']] = (string)$h['text'];
 				$arr_order[(string)$h['text']] = $h['list_order'];
 			}
