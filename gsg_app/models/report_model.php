@@ -281,17 +281,19 @@ class Report_model extends CI_Model {
 		}
 			
 		if(is_array($arr_groupings) && !empty($arr_groupings)){
-			foreach($arr_groupings as $h){
-				$this->load->model('herd_model');
-				
-//				var_dump($this->herd_model->get_herd_test_dates_7($this->session->userdata('herd_code')));
-//				switch($h) {
-//					case "Test Date -6":
-//						$h = $this->herd_model->get_herd_test_dates_7($this->session->userdata('herd_code'))[];
-					
-				$arr_ref[$h['id']] = (string)$h['text'];
-				$arr_order[(string)$h['text']] = $h['list_order'];
+			$this->load->model('herd_model');
+			$arr_dates = $this->herd_model->get_test_dates_7_short($this->session->userdata('herd_code'));
+			foreach($arr_groupings as &$ag){
+				$arr_ref[$ag['id']] = (string)$ag['text'];
+				$arr_order[(string)$ag['text']] = $ag['list_order'];
+				foreach($arr_dates[0] as $key => $value){
+					if ($key == $ag['text']) {
+						$ag['text'] = $value;
+						break;
+					}
+				}
 			}
+
 			foreach($arr_groupings as $h){
 				$h['text'] = (string)$h['text'];
 				if($h['parent_id'] == NULL) {
@@ -302,6 +304,7 @@ class Report_model extends CI_Model {
 				}
 			}
 		}
+
 		
 		return array('arr_ref' => $arr_ref, 'arr_fields' => $arr_fields, 'arr_order' => $arr_order);
 	}

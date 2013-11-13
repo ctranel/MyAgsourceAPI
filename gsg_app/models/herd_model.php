@@ -301,10 +301,10 @@ class Herd_model extends CI_Model {
 	 * @author Kevin Marshall
 	 **/
 	
-	public function get_herd_test_dates_7($herd_code){
+	public function get_test_dates_7($herd_code){
 		$rpmdb = $this->load->database('developmentRPM', TRUE);
 		$arr_results = $rpmdb->select('test_date_1,test_date_2,test_date_3,test_date_4,test_date_5,test_date_6,test_date_7')
-		->from('t13_herd_info')
+		->from('vma_Dates_Last_7_Tests')
 		->where('herd_code', $herd_code)
 		->get()
 		->result_array();
@@ -312,6 +312,16 @@ class Herd_model extends CI_Model {
 		else return FALSE;
 	}
 
+	public function get_test_dates_7_short($herd_code){
+		$rpmdb = $this->load->database('developmentRPM', TRUE);
+		$arr_results = $rpmdb->select('short_date_1,short_date_2,short_date_3,short_date_4,short_date_5,short_date_6,short_date_7')
+		->from('vma_Dates_Last_7_Tests')
+		->where('herd_code', $herd_code)
+		->get()
+		->result_array();
+		if(is_array($arr_results) && !empty($arr_results)) return $arr_results;
+		else return FALSE;
+	}
 	
 	
 	
