@@ -73,11 +73,13 @@ abstract class parent_report extends CI_Controller {
 			redirect(site_url('change_herd/select'));			
 		}
 		$this->section_id = $this->{$this->primary_model}->get_section_id();
-		/* Load the profile.php config file if it exists
-		$this->config->load('profiler', false, true);
-		if ($this->config->config['enable_profiler']) {
-			$this->output->enable_profiler(TRUE);
-		} */
+		/* Load the profile.php config file if it exists*/
+		if (ENVIRONMENT == 'development') {
+			$this->config->load('profiler', false, true);
+			if ($this->config->config['enable_profiler']) {
+				$this->output->enable_profiler(TRUE);
+			} 
+		}
 	}
 
 	protected function authorize(){
