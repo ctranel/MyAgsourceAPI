@@ -279,7 +279,9 @@ class Report_model extends CI_Model {
 				WHERE bf.block_id = " . $block_in
 			)->result_array();
 		}
-			
+
+		//KLM - Added logic to convert header text to date text from herd_model function get_test_dates_7_short
+		
 		if(is_array($arr_groupings) && !empty($arr_groupings)){
 			$this->load->model('herd_model');
 			$arr_dates = $this->herd_model->get_test_dates_7_short($this->session->userdata('herd_code'));
@@ -293,7 +295,7 @@ class Report_model extends CI_Model {
 					}
 				}
 			}
-
+		
 			foreach($arr_groupings as $h){
 				$h['text'] = (string)$h['text'];
 				if($h['parent_id'] == NULL) {

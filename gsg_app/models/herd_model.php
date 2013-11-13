@@ -311,6 +311,16 @@ class Herd_model extends CI_Model {
 		else return FALSE;
 	}
 
+	public function get_test_dates_7_short($herd_code){
+		$rpmdb = $this->load->database('developmentRPM', TRUE);
+		$arr_results = $rpmdb->select('short_date_1,short_date_2,short_date_3,short_date_4,short_date_5,short_date_6,short_date_7')
+		->from('vma_Dates_Last_7_Tests')
+		->where('herd_code', $herd_code)
+		->get()
+		->result_array();
+		if(is_array($arr_results) && !empty($arr_results)) return $arr_results;
+		else return FALSE;
+	}
 	
 	
 	
