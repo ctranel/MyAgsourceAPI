@@ -295,6 +295,7 @@ class Report_model extends CI_Model {
 					}
 				}
 			}
+			unset($ag);
 		
 			foreach($arr_groupings as $h){
 				$h['text'] = (string)$h['text'];
