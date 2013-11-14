@@ -1,6 +1,29 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+
+/* -----------------------------------------------------------------
+ *	CLASS comments
+ *  @file: report_parent.php
+ *  @author: kmarshall
+ *  @date: Nov 14, 2013
+ *
+ *  @description: First created by Chris Tranel based upon CI_controller.
+ *
+ * -----------------------------------------------------------------
+ */
+
+/* -----------------------------------------------------------------
+ *  UPDATE comment
+ *  @author: kmarshall
+ *  @date: Nov 14, 2013
+ *
+ *  @description: Cleaned up file/class as a whole, modularized long sections of code into functions
+ *  and finished filters coding.
+ *  
+ *  -----------------------------------------------------------------
+ */
+
+
 abstract class parent_report extends CI_Controller {
-	//protected $report_table_view;
 	protected $section_id;
 	protected $report_form_id;
 	protected $arr_page_filters = array(); //two dimensional of filters on the page, includes 3 keys, e.g.: array('db_field_name' => 'pstring', 'name' => 'PString', 'default_value' => array(0));
@@ -9,7 +32,6 @@ abstract class parent_report extends CI_Controller {
 	protected $arr_sort_by = array();
 	protected $arr_sort_order = array();
 	protected $pstring;
-//	protected $arr_pstring;
 	protected $herd_code;
 	protected $product_name;
 	protected $report_path;
