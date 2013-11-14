@@ -9,6 +9,26 @@
 | page of the User Guide.
 |
 | -------------------------------------------------------------------
+| DB SPECIFICATION TEMPLATE
+| -------------------------------------------------------------------
+
+| $db['default']['hostname'] = "localhost";
+| $db['default']['username'] = "root";
+| $db['default']['password'] = "";
+| $db['default']['database'] = "database_name";
+| $db['default']['dbdriver'] = "mysql";
+| $db['default']['dbprefix'] = "";
+| $db['default']['pconnect'] = TRUE;
+| $db['default']['db_debug'] = FALSE;
+| $db['default']['cache_on'] = FALSE;
+| $db['default']['cachedir'] = "";
+| $db['default']['char_set'] = "utf8";
+| $db['default']['dbcollat'] = "utf8_general_ci";
+| $db['default']['swap_pre'] = "";
+| $db['default']['autoinit'] = TRUE;
+| $db['default']['stricton'] = FALSE;
+|
+| -------------------------------------------------------------------
 | EXPLANATION OF VARIABLES
 | -------------------------------------------------------------------
 |
@@ -32,24 +52,16 @@
 |
 | The $active_record variables lets you determine whether or not to load
 | the active record class
+
 */
 
-$active_group = "default";
+$active_group = "default"; //Chris: set up for users database on testdare/myagsource
 $active_record = TRUE;
 $db_server = 'myagsource';
 
-//default is the user database
 $db['default']['hostname'] = 'testdare.verona.crinet\\' . $db_server;
 $db['default']['username'] = 'myags_admin';//'webuser';
 $db['default']['password'] = 'DHI4web*';//'m1$AgSourze';
-/* agswww server
-$db['default']['hostname'] = "localhost";
-$db['default']['username'] = "ctranel";
-$db['default']['password'] = "wahH0ahh"; */
-/* local(ct) mysql
-$db['default']['hostname'] = "localhost";
-$db['default']['username'] = "dairymanager"; // 
-$db['default']['password'] = "agsource"; // newdata */
 $db['default']['database'] = "users";
 $db['default']['dbdriver'] = 'mssql';//"mysqli";
 $db['default']['dbprefix'] = "";
@@ -62,21 +74,8 @@ $db['default']['dbcollat'] = 'sql_latin1_general_cp1_ci_as';
 $db['default']['swap_pre'] = '';
 $db['default']['autoinit'] = TRUE;
 $db['default']['stricton'] = FALSE;
-/* echo '<pre>';
-     print_r($db['default']);
-  echo '</pre>';
 
-  echo 'Trying to connect to database: ' .$db['default']['database'];
-  $dbh=mssql_connect
-  (
-    $db['default']['hostname'],
-    $db['default']['username'],
-    $db['default']['password'])
-    or die('Cannot connect to the database because: ' . mysql_error());
-    mysql_select_db ($db['default']['database']);
 
-    echo '<br />   Connected OK:'  ;
-    die( 'file: ' .__FILE__ . '--> Line: ' .__LINE__); */
 
 $db['herd']['hostname'] = 'testdare.verona.crinet\\' . $db_server;
 $db['herd']['username'] = 'myags_admin';//'webuser';
@@ -143,23 +142,7 @@ $db['gsg']['dbcollat'] = "sql_latin1_general_cp1_ci_as";
 $db['gsg']['swap_pre'] = '';
 $db['gsg']['autoinit'] = TRUE;
 $db['gsg']['stricton'] = FALSE;
-/*
-$db['bench']['hostname'] = "localhost";
-$db['bench']['username'] = "ctranel"; // newdata
-$db['bench']['password'] = "wahH0ahh"; // newdata
-$db['bench']['database'] = "benchmarks";
-$db['bench']['dbdriver'] = "mysqli";
-$db['bench']['dbprefix'] = "";
-$db['bench']['pconnect'] = FALSE;
-$db['bench']['db_debug'] = TRUE;
-$db['bench']['cache_on'] = TRUE;
-$db['bench']['cachedir'] = "";
-$db['bench']['char_set'] = "utf8";
-$db['bench']['dbcollat'] = "utf8_general_ci";
-$db['bench']['swap_pre'] = '';
-$db['bench']['autoinit'] = TRUE;
-$db['bench']['stricton'] = FALSE;
-*/
+
 $db['alert']['hostname'] = 'testdare.verona.crinet\\' . $db_server;
 $db['alert']['username'] = 'myags_admin';//'webuser';
 $db['alert']['password'] = 'DHI4web*';//'m1$AgSourze';
@@ -239,23 +222,7 @@ $db['herd_summary']['dbcollat'] = "sql_latin1_general_cp1_ci_as";
 $db['herd_summary']['swap_pre'] = '';
 $db['herd_summary']['autoinit'] = TRUE;
 $db['herd_summary']['stricton'] = FALSE;
-/*
-$db['custom_report']['hostname'] = "localhost";
-$db['custom_report']['username'] = "ctranel"; // newdata
-$db['custom_report']['password'] = "wahH0ahh"; // newdata
-$db['custom_report']['database'] = "custom_report";
-$db['custom_report']['dbdriver'] = "mysqli";
-$db['custom_report']['dbprefix'] = "";
-$db['custom_report']['pconnect'] = FALSE;
-$db['custom_report']['db_debug'] = TRUE;
-$db['custom_report']['cache_on'] = TRUE;
-$db['custom_report']['cachedir'] = "";
-$db['custom_report']['char_set'] = "utf8";
-$db['custom_report']['dbcollat'] = "utf8_general_ci";
-$db['custom_report']['swap_pre'] = '';
-$db['custom_report']['autoinit'] = TRUE;
-$db['custom_report']['stricton'] = FALSE;
-*/
+
 $db['fresh_cow_summary']['hostname'] = 'testdare.verona.crinet\\' . $db_server;
 $db['fresh_cow_summary']['username'] = 'myags_admin';//'webuser';
 $db['fresh_cow_summary']['password'] = 'DHI4web*';//'m1$AgSourze';
@@ -272,22 +239,5 @@ $db['fresh_cow_summary']['swap_pre'] = '';
 $db['fresh_cow_summary']['autoinit'] = TRUE;
 $db['fresh_cow_summary']['stricton'] = FALSE;
 
-/*
-$db['display']['hostname'] = 'testdare.verona.crinet\\' . $db_server;
-$db['display']['username'] = 'webuser';//'myags_admin';
-$db['display']['password'] = 'm1$AgSourze';//'DHI4web*';
-$db['display']['database'] = "users";//"genetic_selection_guide";publication_name
-$db['display']['dbdriver'] = "mssql";
-$db['display']['dbprefix'] = "";
-$db['display']['pconnect'] = FALSE;
-$db['display']['db_debug'] = TRUE;
-$db['display']['cache_on'] = TRUE;
-$db['display']['cachedir'] = "";
-$db['display']['char_set'] = "windows-1252";
-$db['display']['dbcollat'] = "sql_latin1_general_cp1_ci_as";
-$db['display']['swap_pre'] = '';
-$db['display']['autoinit'] = TRUE;
-$db['display']['stricton'] = FALSE;
-*/
 /* End of file database.php */
 /* Location: ./system/application/config/database.php */
