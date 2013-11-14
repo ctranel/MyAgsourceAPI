@@ -60,8 +60,8 @@ $active_record = TRUE;
 $db_server = 'myagsource';
 
 $db['default']['hostname'] = 'testdare.verona.crinet\\' . $db_server;
-$db['default']['username'] = 'myags_admin';//'webuser';
-$db['default']['password'] = 'DHI4web*';//'m1$AgSourze';
+$db['default']['username'] = 'webuser';
+$db['default']['password'] = 'm1$AgSourze';
 $db['default']['database'] = "users";
 $db['default']['dbdriver'] = 'mssql';//"mysqli";
 $db['default']['dbprefix'] = "";
@@ -78,8 +78,8 @@ $db['default']['stricton'] = FALSE;
 
 
 $db['herd']['hostname'] = 'testdare.verona.crinet\\' . $db_server;
-$db['herd']['username'] = 'myags_admin';//'webuser';
-$db['herd']['password'] = 'DHI4web*';//'m1$AgSourze';
+$db['herd']['username'] = 'webuser';
+$db['herd']['password'] = 'm1$AgSourze';
 $db['herd']['database'] = "herd";//"genetic_selection_guide";publication_name
 $db['herd']['dbdriver'] = "mssql";
 $db['herd']['dbprefix'] = "";
@@ -93,26 +93,9 @@ $db['herd']['swap_pre'] = '';
 $db['herd']['autoinit'] = TRUE;
 $db['herd']['stricton'] = FALSE;
 
-$db['developmentRPM']['hostname'] = 'testdare.verona.crinet\\' . $db_server;
-$db['developmentRPM']['username'] = 'myags_admin';//'webuser';
-$db['developmentRPM']['password'] = 'DHI4web*';//'m1$AgSourze';
-$db['developmentRPM']['database'] = "rpm";//"genetic_selection_guide";publication_name
-$db['developmentRPM']['dbdriver'] = "mssql";
-$db['developmentRPM']['dbprefix'] = "";
-$db['developmentRPM']['pconnect'] = FALSE;
-$db['developmentRPM']['db_debug'] = TRUE;
-$db['developmentRPM']['cache_on'] = TRUE;
-$db['developmentRPM']['cachedir'] = "";
-$db['developmentRPM']['char_set'] = "windows-1252";
-$db['developmentRPM']['dbcollat'] = "sql_latin1_general_cp1_ci_as";
-$db['developmentRPM']['swap_pre'] = '';
-$db['developmentRPM']['autoinit'] = TRUE;
-$db['developmentRPM']['stricton'] = FALSE;
-
-
 $db['reports']['hostname'] = 'testdare.verona.crinet\\' . $db_server;
-$db['reports']['username'] = 'myags_admin';//'webuser';
-$db['reports']['password'] = 'DHI4web*';//'m1$AgSourze';
+$db['reports']['username'] = 'webuser';
+$db['reports']['password'] = 'm1$AgSourze';
 $db['reports']['database'] = "rpm";//"report_card";
 $db['reports']['dbdriver'] = "mssql";
 $db['reports']['dbprefix'] = "";
@@ -128,8 +111,8 @@ $db['reports']['stricton'] = FALSE;
 
 
 $db['gsg']['hostname'] = 'testdare.verona.crinet\\' . $db_server;
-$db['gsg']['username'] = 'webuser';//'myags_admin';
-$db['gsg']['password'] = 'm1$AgSourze';//'DHI4web*';
+$db['gsg']['username'] = 'webuser';
+$db['gsg']['password'] = 'm1$AgSourze';
 $db['gsg']['database'] = "rpm";//"genetic_selection_guide";
 $db['gsg']['dbdriver'] = "mssql";
 $db['gsg']['dbprefix'] = "";
@@ -144,8 +127,8 @@ $db['gsg']['autoinit'] = TRUE;
 $db['gsg']['stricton'] = FALSE;
 
 $db['alert']['hostname'] = 'testdare.verona.crinet\\' . $db_server;
-$db['alert']['username'] = 'myags_admin';//'webuser';
-$db['alert']['password'] = 'DHI4web*';//'m1$AgSourze';
+$db['alert']['username'] = 'webuser';
+$db['alert']['password'] = 'm1$AgSourze';
 $db['alert']['database'] = "rpm";//"genetic_selection_guide";//dairymanager";
 $db['alert']['dbdriver'] = "mssql";
 $db['alert']['dbprefix'] = "";
@@ -160,8 +143,8 @@ $db['alert']['autoinit'] = TRUE;
 $db['alert']['stricton'] = FALSE;
 
 $db['rep_card']['hostname'] = 'testdare.verona.crinet\\' . $db_server;
-$db['rep_card']['username'] = 'myags_admin';//'webuser';
-$db['rep_card']['password'] = 'DHI4web*';//'m1$AgSourze';
+$db['rep_card']['username'] = 'webuser';
+$db['rep_card']['password'] = 'm1$AgSourze';
 $db['rep_card']['database'] = "rpm";//"report_card";
 $db['rep_card']['dbdriver'] = "mssql";
 $db['rep_card']['dbprefix'] = "";
@@ -176,8 +159,8 @@ $db['rep_card']['autoinit'] = TRUE;
 $db['rep_card']['stricton'] = FALSE;
 
 $db['uhm_summary']['hostname'] = 'testdare.verona.crinet\\' . $db_server;
-$db['uhm_summary']['username'] = 'myags_admin';//'webuser';
-$db['uhm_summary']['password'] = 'DHI4web*';//'m1$AgSourze';
+$db['uhm_summary']['username'] = 'webuser';
+$db['uhm_summary']['password'] = 'm1$AgSourze';
 $db['uhm_summary']['database'] = "rpm";//"uhm_summary";
 $db['uhm_summary']['dbdriver'] = "mssql";
 $db['uhm_summary']['dbprefix'] = "";
@@ -192,8 +175,8 @@ $db['uhm_summary']['autoinit'] = TRUE;
 $db['uhm_summary']['stricton'] = FALSE;
 
 $db['uhm_cow']['hostname'] = 'testdare.verona.crinet\\' . $db_server;
-$db['uhm_cow']['username'] = 'myags_admin';//'webuser';
-$db['uhm_cow']['password'] = 'DHI4web*';//'m1$AgSourze';
+$db['uhm_cow']['username'] = 'webuser';
+$db['uhm_cow']['password'] = 'm1$AgSourze';
 $db['uhm_cow']['database'] = "rpm";//"uhm_cow";
 $db['uhm_cow']['dbdriver'] = "mssql";
 $db['uhm_cow']['dbprefix'] = "";
@@ -208,8 +191,8 @@ $db['uhm_cow']['autoinit'] = TRUE;
 $db['uhm_cow']['stricton'] = FALSE;
 
 $db['herd_summary']['hostname'] = 'testdare.verona.crinet\\' . $db_server;
-$db['herd_summary']['username'] = 'myags_admin';//'webuser';
-$db['herd_summary']['password'] = 'DHI4web*';//'m1$AgSourze';
+$db['herd_summary']['username'] = 'webuser';
+$db['herd_summary']['password'] = 'm1$AgSourze';
 $db['herd_summary']['database'] = "rpm";//"herd_summary";
 $db['herd_summary']['dbdriver'] = "mssql";
 $db['herd_summary']['dbprefix'] = "";
@@ -224,8 +207,8 @@ $db['herd_summary']['autoinit'] = TRUE;
 $db['herd_summary']['stricton'] = FALSE;
 
 $db['fresh_cow_summary']['hostname'] = 'testdare.verona.crinet\\' . $db_server;
-$db['fresh_cow_summary']['username'] = 'myags_admin';//'webuser';
-$db['fresh_cow_summary']['password'] = 'DHI4web*';//'m1$AgSourze';
+$db['fresh_cow_summary']['username'] = 'webuser';
+$db['fresh_cow_summary']['password'] = 'm1$AgSourze';
 $db['fresh_cow_summary']['database'] = "rpm";//"fresh_cow_summary";
 $db['fresh_cow_summary']['dbdriver'] = "mssql";
 $db['fresh_cow_summary']['dbprefix'] = "";

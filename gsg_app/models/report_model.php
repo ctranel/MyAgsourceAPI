@@ -179,11 +179,14 @@ class Report_model extends CI_Model {
 		$arr_numeric_types = array('bigint','decimal','int','money','smallmoney','numeric','smallint','tinyint','float','real');
 		$arr_field_child = array();
 		$arr_table_ref_cnt = array();
-
 		$this->arr_group_by_field = $this->get_group_by_fields($block_in);
 		$tmp_arr_pstring = $this->session->userdata('arr_pstring');
 		if(!is_array($tmp_arr_pstring) || empty($tmp_arr_pstring)) $this->{$this->db_group_name}->where('db_field_name != ', 'pstring');
-		$arr_field_data = $this->{$this->db_group_name}
+				// cmmd
+		echo 'HELLOOXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';
+		var_dump($this->db_group_name);
+		//die();
+			$arr_field_data = $this->{$this->db_group_name}
 			->where('block_id', $block_in)
 			->order_by('list_order')
 			->get('users.dbo.v_block_field_data')

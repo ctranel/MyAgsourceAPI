@@ -169,7 +169,7 @@ abstract class parent_report extends CI_Controller {
 		}
 		//SET ARRAY OF BLOCK DISPLAY INFORMATION
 		if(isset($arr_block_in) && !empty($arr_block_in) && !is_array($arr_block_in)) $arr_block_in = array($arr_block_in);
-		if($this->data_dump){
+	 	if($this->data_dump){
 			$arr_tables = array();
 			$arr_charts = array();
 			if(isset($this->{$this->primary_model}->arr_blocks) && is_array($this->{$this->primary_model}->arr_blocks)){
@@ -181,7 +181,7 @@ abstract class parent_report extends CI_Controller {
 			$arr_blocks = array('table' => $arr_tables, 'chart' => $arr_charts);
 		}
 		else $arr_blocks = $this->{$this->primary_model}->arr_blocks[$this->page]['display'];
-		if(empty($this->herd_code) || strlen($this->herd_code) != 8){
+	 	if(empty($this->herd_code) || strlen($this->herd_code) != 8){
 			$this->session->set_flashdata('message', 'Please select a valid herd.');
 			redirect(site_url($this->report_path));
 		}
@@ -210,8 +210,9 @@ abstract class parent_report extends CI_Controller {
 			}
 		}
 		else{
-			$this->load->library('form_validation');
+	 		$this->load->library('form_validation');
 			//validate form input for filters
+	
 			foreach($this->arr_page_filters as $k=>$f){ //key is the db field name
 			//if range, create 2 fields, to and from.  Default value stored in DB as pipe-delimited
 				if($f['type'] == 'range' || $f['type'] == 'date range'){
@@ -247,6 +248,7 @@ abstract class parent_report extends CI_Controller {
 				}
 			}
 		}
+	
 		if(validation_errors()) $this->{$this->primary_model}->arr_messages[] = validation_errors();
 		$arr_filter_text = $this->reports->filters_to_text($this->arr_filter_criteria, $this->{$this->primary_model}->arr_pstring);
 		$log_filter_text = is_array($arr_filter_text) && !empty($arr_filter_text)?implode('; ', $arr_filter_text):'';
@@ -379,6 +381,8 @@ abstract class parent_report extends CI_Controller {
 							'odd_even' => $odd_even,
 							'block' => $k
 						);
+						
+						
 						$arr_chart[$display][] = $this->load->view($display, $arr_blk_data, TRUE);
 						//add js line to populate the block after the page loads
 						$tmp_container_div = $display == 'chart' ? 'graph-canvas' . $x : 'table-canvas' . $x;
@@ -390,6 +394,8 @@ abstract class parent_report extends CI_Controller {
 			}
 		}
 		//set up page header
+
+		
 		if(is_array($this->page_header_data)){
 			$arr_sec_nav_data = array(
 				'arr_pages' => $this->as_ion_auth->arr_user_sections,//$this->access_log_model->get_pages_by_criteria(array('section_id' => $this->section_id))->result_array(),
