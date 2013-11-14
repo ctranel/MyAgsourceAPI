@@ -645,7 +645,8 @@ class Ion_auth_model extends Ion_auth_parent_model
 			if($group_id == 2){ //if this is a producer
 			//if(!$this->has_permission("View Non-owned Herds")){
 				if(isset($herd_code) && !empty($herd_code)){
-					$tmp_arr_sections = $this->get_super_sections_by_herd($herd_code)->result_array();
+					//$tmp_arr_sections = $this->get_super_sections_by_herd($herd_code)->result_array();
+					$tmp_arr_sections = $this->get_super_sections_by_herd($herd_code);
 				}
 			}
 			else{
@@ -680,6 +681,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * @param string $herd_code
 	 * @return array of section data for given user
 	 * @author Chris Tranel
+	 * 11/14/13: CMMD: remove result array.
 	 **/
 	public function get_subscribed_sections_array($group_id, $user_id, $super_section_id, $herd_code = FALSE) {
 		if(is_array($group_id)) {
@@ -697,7 +699,8 @@ class Ion_auth_model extends Ion_auth_parent_model
 			if($group_id == 2){ //if this is a producer
 			//if(!$this->has_permission("View Non-owned Herds")){
 				if(isset($herd_code) && !empty($herd_code)){
-					$tmp_arr_sections = $this->get_sections_by_herd($herd_code)->result_array();
+					//$tmp_arr_sections = $this->get_sections_by_herd($herd_code)->result_array();
+					$tmp_arr_sections = $this->get_sections_by_herd($herd_code);
 				}
 			}
 			else{
@@ -751,11 +754,13 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * @param string herd_code
 	 * @return boolean
 	 * @author Chris Tranel
+	 * 11/14/13: CMMD: Fixed FROM clause.
 	 **/
 	public function user_owns_herd($herd_code) {
 		$results = $this->db
 		->select('id')
-		->from('users')
+		//->from('users')
+		->from($this->tables['users'])
 		->join($this->tables['users_herds'], $this->tables['users'] . '.id = ' . $this->tables['users_herds'] . '.user_id')
 		->where($this->tables['users_herds'] . ".herd_code = '" . $herd_code . "'")
 		->where($this->tables['users'] . '.id = ' . $this->session->userdata('user_id'))
@@ -771,10 +776,11 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * @param string herd_code
 	 * @return array of section data for given user
 	 * @author Chris Tranel
+	 * 11/14/13: CMMD remove result array -- already in an array.
 	 **/
 	public function herd_is_subscribed($section_id, $herd_code) {
-		$this->db->where($this->tables['sections'] . '.id', $section_id);
-		return $this->get_sections()->result_array();
+		//return $this->get_sections()->result_array();
+		return $this->get_sections();
 	}
 	
 	/**
@@ -836,14 +842,11 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * @method get_super_sections_by_scope array
 	 * @param string scope
 	 * @return array of section data for given user
+	 * 	 * 11/14/13: CMMD: return all active super_sections all the time.
 	 * @author Chris Tranel
 	 **/
 	public function get_super_sections_by_scope($scope) {
-		$this->db
-		->select($this->tables['super_sections'] . '.*')
-		->join($this->tables['lookup_scopes'], $this->tables['super_sections'] . '.scope_id = ' . $this->tables['lookup_scopes'] . '.id', 'left')
-		->where($this->tables['lookup_scopes'] . '.name', $scope);
-		return $this->get_super_sections()->result_array();
+		return $this->get_super_sections();
 	}
 	
 		/**
@@ -851,11 +854,10 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * @param string scope
 	 * @return array of section data for given user
 	 * @author Chris Tranel
+	 * 11/14/13: CMMD: return all active sections all the time.
 	 **/
 	public function get_sections_by_scope($scope) {
-		$this->db->join($this->tables['lookup_scopes'], $this->tables['sections'] . '.scope_id = ' . $this->tables['lookup_scopes'] . '.id', 'left')
-		->where($this->tables['lookup_scopes'] . '.name', $scope);
-		return $this->get_sections()->result_array();
+		return $this->get_sections();
 	}
 	
 	/**
@@ -900,13 +902,14 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * @method get_super_sections
 	 * @return array of section data
 	 * @author Chris Tranel
+	 * Revised 11/14/13: CMMD return array
 	 **/
 	public function get_super_sections() {
 		$this->db
 			->where($this->tables['super_sections'] . '.active', 1)
 			->order_by($this->tables['super_sections'] . '.list_order', 'asc')
 			->from($this->tables['super_sections']);
-		return $this->db->get();
+		return $this->db->get()->result_array();
 	}
 	
     /**
@@ -919,7 +922,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 			->where($this->tables['sections'] . '.active', 1)
 			->order_by('list_order', 'asc')
 			->from($this->tables['sections']);
-		return $this->db->get();
+		return $this->db->get()->result_array();
 	}
 	
 	/**
@@ -954,28 +957,21 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 *
 	 * @return array of super_section data for given user
 	 * @author Chris Tranel
+	 * Revised: 11/14/13: CMMD: get all super sections all the time.
 	 **/
 	public function get_super_sections_by_user($user_id){
-		$this->db
-		->select($this->tables['super_sections'] . '.id, ' . $this->tables['super_sections'] . '.name, ' . $this->tables['super_sections'] . '.path, ' . $this->tables['super_sections'] . '.list_order')
-		->distinct()
-		->join($this->tables['sections'], $this->tables['super_sections'] . '.id = ' . $this->tables['sections'] . '.super_section_id', 'left')
-		//->join($this->tables['users_sections'], $this->tables['users_sections'] . '.section_id = ' . $this->tables['sections'] . '.id', 'inner')
-		->where("(" . $this->tables['sections'] . '.user_id IS NULL OR ' . $this->tables['sections'] . '.user_id = ' . $user_id . ")");
-		//->where("(" . $this->tables['sections'] . '.user_id IS NULL OR ' . $this->tables['sections'] . '.user_id = ' . $user_id . ' OR ' . $this->tables['users_sections'] . '.user_id = ' . $user_id . ")");
-		//->where($this->tables['users_sections'] . '.user_id', $user_id);
 		return $this->get_super_sections();
 	}
 	
 	/**
-	 * get_herd_super_sections
+	 * get_super_sections_by_herd
 	 *
 	 * @return array of super_section data for given herd
 	 * @author Chris Tranel
+	 * Revised: 11/14/13: CMMD: renamed function. 
+	 * 							Get all supersections all the time.
 	 **/
-	public function get_herd_super_sections(){
-		$this->db
-		->where($this->tables['super_sections'] . '.scope_id', 2); // 2 = subscription
+	public function get_super_sections_by_herd(){
 		return $this->get_super_sections();
 	}
 
@@ -1157,11 +1153,9 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * @param string herd code
 	 * @return array of section data for given herd
 	 * @author Chris Tranel
+	 * 11/14/13: CMMD: return all active sections all the time.
 	 **/
 	private function get_sections_by_herd($herd_code){
-		$this->db->select($this->tables['sections'] . '.id, ' . $this->tables['sections'] . '.name, ' . $this->tables['sections'] . '.path, ' . $this->tables['herds_sections'] . '.access_level')
-		->join($this->tables['herds_sections'], $this->tables['herds_sections'] . '.section_id = ' . $this->tables['sections'] . '.id', 'left')
-		->where('herd_code', $herd_code);
 		return $this->get_sections();
 	}
 

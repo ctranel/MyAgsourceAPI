@@ -259,10 +259,12 @@ class Herd_model extends CI_Model {
 	 * @param string herd code
 	 * @return bool
 	 * @author Chris Tranel
+	 * 11/14/13: CMMD: fixed from clause.
 	 **/
 	public function herd_is_registered($herd_code){
 		$arr_results = $this->db->select('herd_code')
-		->from('users')
+		//->from('users')
+		->from($this->tables['users'])
 		->join('users_herd_meta', 'users.id = users_herd_meta.user_id')
 		->join('users_groups', 'users.id = users_groups.user_id')
 		->where('users_herd_meta.herd_code', $herd_code)
@@ -279,10 +281,12 @@ class Herd_model extends CI_Model {
 	 * @param string herd code
 	 * @return array of e-mail addresses
 	 * @author Chris Tranel
+	 * 11/14/13: CMMD: Fixed from clause.
 	 **/
 	public function get_herd_emails($herd_code){
 		$arr_results = $this->db->select('email')
-		->from('users')
+		//->from('users')
+		->from($this->tables['users'])
 		->join('users_herd_meta', 'users.id = users_herd_meta.user_id')
 		->join('users_groups', 'users.id = users_groups.user_id')
 		->where('users_herd_meta.herd_code', $herd_code)

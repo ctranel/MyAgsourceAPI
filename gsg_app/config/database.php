@@ -93,6 +93,23 @@ $db['herd']['swap_pre'] = '';
 $db['herd']['autoinit'] = TRUE;
 $db['herd']['stricton'] = FALSE;
 
+$db['developmentRPM']['hostname'] = 'testdare.verona.crinet\\' . $db_server;
+$db['developmentRPM']['username'] = 'webuser';
+$db['developmentRPM']['password'] = 'm1$AgSourze';
+$db['developmentRPM']['database'] = "rpm";//"genetic_selection_guide";publication_name
+$db['developmentRPM']['dbdriver'] = "mssql";
+$db['developmentRPM']['dbprefix'] = "";
+$db['developmentRPM']['pconnect'] = FALSE;
+$db['developmentRPM']['db_debug'] = TRUE;
+$db['developmentRPM']['cache_on'] = TRUE;
+$db['developmentRPM']['cachedir'] = "";
+$db['developmentRPM']['char_set'] = "windows-1252";
+$db['developmentRPM']['dbcollat'] = "sql_latin1_general_cp1_ci_as";
+$db['developmentRPM']['swap_pre'] = '';
+$db['developmentRPM']['autoinit'] = TRUE;
+$db['developmentRPM']['stricton'] = FALSE;
+
+
 $db['reports']['hostname'] = 'testdare.verona.crinet\\' . $db_server;
 $db['reports']['username'] = 'webuser';
 $db['reports']['password'] = 'm1$AgSourze';
