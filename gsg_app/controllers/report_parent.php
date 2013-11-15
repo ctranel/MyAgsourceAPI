@@ -36,7 +36,7 @@ abstract class parent_report extends CI_Controller {
 	protected $product_name;
 	protected $report_path;
 	protected $primary_model;
-	protected $section_path;
+	protected $section_path; //The path to the site section; set in constructor to point to the controller name
 	protected $page_header_data;
 	protected $report_data;
 	protected $display;
@@ -55,45 +55,79 @@ abstract class parent_report extends CI_Controller {
 	protected $pivot_db_field;
 	
 	function __construct(){
+		
+		// construct CI_Controller
 		parent::__construct();
+
+/* ----  BEGIN debugging code - for testing only --------DEBUG_SEARCH_TAG
+ *  Remove before deploying
+ *  @author: kmarshall
+ *  @date: Nov 14, 2013
+ *
+ */
+ 		$this->load->library('session');
+//		[data] = stuff you want to see in profiler session data	
+/* 
+ *  ----  END debugging code - for testing only------------------------------------
+ */
+		
+		//Set up several class variables based upon uri - See http://ellislab.com/codeigniter%20/user-guide/libraries/uri.html
+
 		$this->section_path = $this->router->fetch_class(); //this should match the name of this file (minus ".php".  Also used as base for css and js file names and model directory name
+		//NOTE: fetch_class grabs the controller class regardless of rerouted URI
+
 		if($this->uri->segment(1) != $this->section_path){
+			//Likely called with all reports as the section is almost always superceded by the parent_section name
 			$this->section_path = $this->uri->segment(1) . '/' . $this->section_path;
+			//Example: Above results in section_path = summary_reports/herd_summary for herd_summary section
 		} 
 		$this->page = $this->router->fetch_method();
-		$this->block = $this->uri->segment(5);
+		$this->block = $this->uri->segment(3);  //grabs block name in most cases: hs_prod in summary_reports/herd_summary/hs_prod
 		$this->report_path = $this->section_path . '/' . $this->page;
-		$this->primary_model = $this->block . '_model';
-		$this->report_form_id = 'report_criteria';//filter-form';
+//DELETE		$this->primary_model = $this->block . '_model';
+//DELETE		$this->report_form_id = 'report_criteria';//filter-form';
+
+		//Get the herd_code from the session if it is 8 chars long, otherwise set to NULL
 		$this->herd_code = strlen($this->session->userdata('herd_code')) == 8?$this->session->userdata('herd_code'):NULL;
+
+		//Set 
 		$this->page_header_data['user_sections'] = $this->as_ion_auth->arr_user_super_sections;
-		if($this->authorize()) {
+		if($this->authorize()) {  //If logged in, session not expired, etc
 			$this->load->library('reports');
 			$this->reports->herd_code = $this->herd_code;
-			$tmp_dir = explode('/', $this->section_path);
-			$tmp_dir = $tmp_dir[(count($tmp_dir) - 1)] . '_model';
+//DELETE	$tmp_dir = explode('/', $this->section_path);
+//DELETE	$tmp_dir = $tmp_dir[(count($tmp_dir) - 1)] . '_model';
+	
+			$class = $this->router->fetch_class();  			//get name of model for most animal reports
+					
+			//load model for parent_section/section/page reports (most summary reports)
 			if(file_exists(APPPATH . 'models/' . $this->section_path . '/' . $this->primary_model . '.php')){
 				$this->load->model($this->section_path . '/' . $this->primary_model, '', FALSE, $this->section_path);
 			}
-			elseif(file_exists(APPPATH . 'models/' . $this->section_path . '/' . $tmp_dir . '.php')){
-				$this->load->model($this->section_path . '/' . $tmp_dir, '', FALSE, $this->section_path);
-				$this->primary_model = $tmp_dir;
+			//load model for parent/section reports (most animal reports)
+			elseif(file_exists(APPPATH . 'models/' . $this->section_path . '/' . $class . '.php')){
+				$this->load->model($this->section_path . '/' . $class, '', FALSE, $this->section_path);
+				$this->primary_model = $class;
 			}
+			//else default to catch-all report model class
 			else{
 				$this->load->model('report_model', '', FALSE, $this->section_path);
 				$this->primary_model = 'report_model';
 			}
 		}
-		else {
+		else {  //redirect to login if not logged in or session is expired
 			if($this->session->flashdata('message')) $this->session->keep_flashdata('message');
 			if($this->uri->segment(3) != 'ajax_report') $this->session->set_flashdata('redirect_url', $this->uri->uri_string());
 			redirect(site_url('auth/login'));
 		}
 		
-		if($this->session->userdata('herd_code') == '' || $this->session->userdata('herd_code') == '35990571'){
+//DELETE  || $this->session->userdata('herd_code') == '35990571')  <- was part of if below... relic from gsg
+		if($this->session->userdata('herd_code') == ''){  		// send user to herd select screen if no herd_code selected
 			$this->session->keep_flashdata('redirect_url');
 			redirect(site_url('change_herd/select'));			
 		}
+
+		
 		$this->section_id = $this->{$this->primary_model}->get_section_id();
 		/* Load the profile.php config file if it exists*/
 		if (ENVIRONMENT == 'development') {
