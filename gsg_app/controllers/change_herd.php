@@ -10,11 +10,13 @@ class Change_herd extends CI_Controller {
 			redirect(site_url('auth/login'));
 		}
 		$this->page_header_data['user_sections'] = $this->as_ion_auth->arr_user_super_sections;
-		/* Load the profile.php config file if it exists
-		$this->config->load('profiler', false, true);
-		if ($this->config->config['enable_profiler']) {
-			$this->output->enable_profiler(TRUE);
-		} */
+		/* Load the profile.php config file if it exists */
+		if (ENVIRONMENT == 'development') {
+			$this->config->load('profiler', false, true);
+			if ($this->config->config['enable_profiler']) {
+				$this->output->enable_profiler(TRUE);
+			} 
+		}
 	}
 
 	function index(){
