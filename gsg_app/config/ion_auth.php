@@ -16,11 +16,19 @@
 * Original Author name has been kept but that does not mean that the method has not been modified.
 *
 */
+/* -----------------------------------------------------------------
+ *  UPDATE comment
+ *  @author: carolmd
+ *  @date: Nov 15, 2013
+ *
+ *  @description: Added any remaining tables that were referenced anywhere in Myagsource.
+ *  
+ *  -----------------------------------------------------------------
+ */
 	$config['use_mongodb'] = FALSE;
 	$config['collections']['users']          	= 'users';
 	$config['collections']['groups']         	= 'groups';
 	$config['collections']['login_attempts'] 	= 'login_attempts';
-
 	/**
 	 * Tables.
 	 **/
@@ -39,7 +47,7 @@
 	$config['tables']['access_log']  			= 'users.dbo.access_log';
 	$config['tables']['users_sections']    		= 'users.dbo.users_sections';
 	$config['tables']['groups']  				= 'users.dbo.groups';
-	$config['tables']['users_dhi_supervisors']  = 'users.dbo.users_dhi_supervisors';//address.dbo.dhi_supervisor';
+	$config['tables']['users_dhi_supervisors']  = 'address.dbo.dhi_supervisor';
 	$config['tables']['regions']  				= 'users.dbo.regions';
 	$config['tables']['users_regions']  		= 'users.dbo.users_regions';
 	$config['tables']['users']   				= 'users.dbo.users';

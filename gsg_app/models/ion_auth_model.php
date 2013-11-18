@@ -654,7 +654,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 					$user_id = $this->session->userdata('user_id');
 				}
 				if(isset($user_id) && !empty($user_id)){
-					$tmp_arr_sections = $this->get_super_sections_by_user($user_id)->result_array();
+					$tmp_arr_sections = $this->get_super_sections_by_user($user_id);
 				}
 			}
 			return $tmp_arr_sections;
@@ -708,7 +708,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 					$user_id = $this->session->userdata('user_id');
 				}
 				if(isset($user_id) && !empty($user_id)){
-					$tmp_arr_sections = $this->get_sections_by_user($user_id)->result_array();
+					$tmp_arr_sections = $this->get_sections_by_user($user_id);
 				}
 			}
 			return $tmp_arr_sections;
@@ -1291,6 +1291,15 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * @return array of consultant records, keyed by consultant status
 	 * @author Chris Tranel
 	 **/
+	/* -----------------------------------------------------------------
+	 *  UPDATE comment
+	 *  @author: carolmd
+	 *  @date: Nov 14, 2013
+	 *
+	 *  @description: fixed the JOIN stmt 
+	 *  
+	 *  -----------------------------------------------------------------
+	 */
 	public function get_consultants_by_herd($herd_code){
 		$result = $this->db
 		->select($this->tables['consultants_herds'] . '.*, ' . $this->tables['users'] . '.first_name, ' . $this->tables['users'] . '.last_name, ' . $this->tables['service_groups'] . '.account_name')
@@ -1311,7 +1320,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 		$result = $this->db
 		->select($this->tables['consultants_herds'] . '.*, ' . $this->tables['users'] . '.first_name, ' . $this->tables['users'] . '.last_name, ' . $this->tables['service_groups'] . '.account_name')
 		->from($this->tables['consultants_herds'])
-		->join('users', $this->tables['consultants_herds'] . '.user_id = ' . $this->tables['users'] . '.id')
+		->join($this->tables['users'], $this->tables['consultants_herds'] . '.user_id = ' . $this->tables['users'] . '.id')
 		->join($this->tables['users_service_groups'], $this->tables['users'] . '.id = ' . $this->tables['users_service_groups'] . '.user_id')
 		->join($this->tables['service_groups'], $this->tables['users_service_groups'] . '.sg_account_num = ' . $this->tables['service_groups'] . '.account_num')
 		->where("((" . $this->tables['consultants_herds'] . ".exp_date IS NOT NULL AND " . $this->tables['consultants_herds'] . ".exp_date <= GETDATE()) AND " . $this->tables['consultants_herds'] . ".request_status_id = 1)")

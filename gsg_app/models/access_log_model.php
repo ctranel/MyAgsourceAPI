@@ -4,8 +4,18 @@ class Access_log_model extends Report_Model {
 	public function __construct(){
 		parent::__construct();
 		$this->db_group_name = 'default';
-		$this->{$this->db_group_name} = $this->load->database($this->db_group_name, TRUE);
-		/*in the case of the access log model, the section id is set AFTER the parent is called so that the reference
+		/* -----------------------------------------------------------------
+		 *  UPDATE comment
+		 *  @author: carolmd
+		 *  @date: Nov 15, 2013
+		 *
+		 *  @description: changed to load default db.
+		 *    
+		 *  -----------------------------------------------------------------
+		 */
+		//$this->{$this->db_group_name} = $this->load->database($this->db_group_name, TRUE);
+		$this->{$this->db_group_name} = $this->load->database('default', TRUE);
+				/*in the case of the access log model, the section id is set AFTER the parent is called so that the reference
 		 * back to the access log model does not cause problem.  That is the only other model that call the get block links method.
 		 */ 
 		$this->section_id = '3';

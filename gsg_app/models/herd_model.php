@@ -1,6 +1,14 @@
 <?php
 class Herd_model extends CI_Model {
-
+/* -----------------------------------------------------------------
+ *  UPDATE comment
+ *  @author: carolmd
+ *  @date: Nov 18, 2013
+ *
+ *  @description: Changed all load->database(...) to load the default db.
+ *  
+ *  -----------------------------------------------------------------
+ */
 	protected $tables;
 	
 	public function __construct(){
@@ -240,7 +248,7 @@ class Herd_model extends CI_Model {
 	 **/
 	public function get_pstring_array($herd_code, $include_all = TRUE) {
 		//$this->pstring_group_name = 'pstring';
-		$pstring_db = $this->load->database('herd', TRUE);
+		$pstring_db = $this->load->database('default', TRUE);
 		$arr_results = $pstring_db->select('pstring, publication_name')
 		//->distinct()
 		//->where('pstring IS NOT NULL', NULL, FALSE)
@@ -304,10 +312,19 @@ class Herd_model extends CI_Model {
 	 * @return array of test_dates from rpm.dbo.t13_herd_info
 	 * @author Kevin Marshall
 	 **/
+	/* -----------------------------------------------------------------
+	 *  UPDATE comment
+	 *  @author: carolmd
+	 *  @date: Nov 18, 2013
+	 *
+	 *  @description: Fixed the FROM clause to use config table.
+	 *  
+	 *  -----------------------------------------------------------------
+	 */
 	
 	public function get_herd_test_dates_7($herd_code){
 		$arr_results = $this->db->select('test_date_1,test_date_2,test_date_3,test_date_4,test_date_5,test_date_6,test_date_7')
-		->from('t13_herd_info')
+		->from($this->tables['t13_herd_info'])
 		->where('herd_code', $herd_code)
 		->get()
 		->result_array();
@@ -316,9 +333,18 @@ class Herd_model extends CI_Model {
 	}
 
 	public function get_test_dates_7_short($herd_code){
-		$rpmdb = $this->load->database('developmentRPM', TRUE);
+		/* -----------------------------------------------------------------
+		 *  UPDATE comment
+		 *  @author: carolmd
+		 *  @date: Nov 18, 2013
+		 *
+		 *  @description: Fix the FROM clause to use the config tables.
+		 *  
+		 *  -----------------------------------------------------------------
+		 */
+		$rpmdb = $this->load->database('default', TRUE);
 		$arr_results = $rpmdb->select('short_date_1,short_date_2,short_date_3,short_date_4,short_date_5,short_date_6,short_date_7')
-		->from('vma_Dates_Last_7_Tests')
+		->from($this->tables['vma_Dates_Last_7_Tests'])
 		->where('herd_code', $herd_code)
 		->get()
 		->result_array();

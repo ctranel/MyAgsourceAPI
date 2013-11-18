@@ -49,7 +49,16 @@ class Report_model extends CI_Model {
 		 */
 		$this->arr_pstring = $this->herd_model->get_pstring_array($this->session->userdata('herd_code'));
 		$this->tables  = $this->config->item('tables', 'ion_auth');
-		$this->db_group_name = 'reports';
+/* -----------------------------------------------------------------
+ *  UPDATE comment
+ *  @author: carolmd
+ *  @date: Nov 15, 2013
+ *
+ *  @description: changed to load the default database instead of the reports database.
+ *  
+ *  -----------------------------------------------------------------
+ */
+		$this->db_group_name = 'default';
 		$this->{$this->db_group_name} = $this->load->database($this->db_group_name, TRUE);
 		if(isset($section_path)) $this->section_id = $this->ion_auth_model->get_section_id_by_path($section_path);
 		if(isset($this->section_id)) $this->arr_blocks = $this->access_log_model->get_block_links($this->section_id);
@@ -182,10 +191,19 @@ class Report_model extends CI_Model {
 		$this->arr_group_by_field = $this->get_group_by_fields($block_in);
 		$tmp_arr_pstring = $this->session->userdata('arr_pstring');
 		if(!is_array($tmp_arr_pstring) || empty($tmp_arr_pstring)) $this->{$this->db_group_name}->where('db_field_name != ', 'pstring');
-				// cmmd
-		echo 'HELLOOXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';
-		var_dump($this->db_group_name);
+/* ----  BEGIN debugging code - for testing only --------DEBUG_SEARCH_TAG
+ *  Remove before deploying
+ *  @author: carolmd
+ *  @date: Nov 15, 2013
+ *
+ */
+		//echo 'REPORT MODEL DB_GROUP_NAME';
+		//var_dump($this->db_group_name);
 		//die();
+		
+/* 
+ *  ----  END debugging code - for testing only------------------------------------
+ */	
 			$arr_field_data = $this->{$this->db_group_name}
 			->where('block_id', $block_in)
 			->order_by('list_order')
