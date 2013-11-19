@@ -1,6 +1,14 @@
 <?php
 /* parent of all report models */
-
+/* -----------------------------------------------------------------
+ *  UPDATE comment
+*  @author: carolmd
+*  @date: Nov 15, 2013
+*
+*  @description: changed to load the default database instead of the reports database.
+*
+*  -----------------------------------------------------------------
+*/
 class Report_model extends CI_Model {
 	protected $section_id;
 	public $arr_tables;
@@ -49,15 +57,7 @@ class Report_model extends CI_Model {
 		 */
 		$this->arr_pstring = $this->herd_model->get_pstring_array($this->session->userdata('herd_code'));
 		$this->tables  = $this->config->item('tables', 'ion_auth');
-/* -----------------------------------------------------------------
- *  UPDATE comment
- *  @author: carolmd
- *  @date: Nov 15, 2013
- *
- *  @description: changed to load the default database instead of the reports database.
- *  
- *  -----------------------------------------------------------------
- */
+
 		$this->db_group_name = 'default';
 		$this->{$this->db_group_name} = $this->load->database($this->db_group_name, TRUE);
 		if(isset($section_path)) $this->section_id = $this->ion_auth_model->get_section_id_by_path($section_path);

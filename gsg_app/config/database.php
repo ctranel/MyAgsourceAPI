@@ -1,5 +1,18 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /*
+ * /* -----------------------------------------------------------------
+ *  UPDATE comment
+ *  @author: carolmd
+ *  @date: Nov 18, 2013
+ *
+ *  @description: Kept the 'default' database connection. 
+ *  Removed all the other database connections. 
+ *  Revisions in several other files was needed to complete this change.
+ *  
+ *  
+ *  -----------------------------------------------------------------
+ */
+/*
 | -------------------------------------------------------------------
 | DATABASE CONNECTIVITY SETTINGS
 | -------------------------------------------------------------------
