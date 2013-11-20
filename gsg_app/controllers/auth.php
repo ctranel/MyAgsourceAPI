@@ -543,17 +543,6 @@ class Auth extends Ionauth {
 				$obj_user->section_id = $this->as_ion_auth->set_form_array($tmp_array, 'id', 'id'); // populate array of sections for which user is enrolled
 				$tmp_array = $this->input->post('section_id');
 				$arr_form_section_id = isset($tmp_array) && is_array($tmp_array) ? $tmp_array : $obj_user->section_id;
-/* ----  BEGIN debugging code - for testing only --------DEBUG_SEARCH_TAG
- *  Remove before deploying
- *  @author: carolmd
- *  @date: Nov 19, 2013
- *
- */
-//			echo 'line 545';
-// var_dump($arr_form_section_id);
-/* 
- *  ----  END debugging code - for testing only------------------------------------
- */
 				}
 
 			$this->data['sections_selected'] = $arr_form_section_id;
@@ -701,17 +690,6 @@ class Auth extends Ionauth {
 			$tmp_array = $this->input->post('section_id');
 //			$arr_form_section_id = $this->form_validation->set_value('section_id');//, $obj_user->section_id);
 			$arr_form_section_id = isset($tmp_array) && is_array($tmp_array) ? $tmp_array : $obj_user->section_id;
-/* ----  BEGIN debugging code - for testing only --------DEBUG_SEARCH_TAG
- *  Remove before deploying
- *  @author: carolmd
- *  @date: Nov 19, 2013
- *
- */
-//			echo 'line 708 ';
- //var_dump($arr_form_section_id);
-/* 
- *  ----  END debugging code - for testing only------------------------------------
- */
 			$this->data['sections_selected'] = $arr_form_section_id;
 			$this->data['section_id'] = 'id="section_id"';
 			//note: active group id should always be 9
@@ -1299,17 +1277,6 @@ class Auth extends Ionauth {
 				$obj_user->section_id = $this->as_ion_auth->set_form_array($this->ion_auth_model->get_subscribed_sections_array($obj_user->arr_groups, $user_id, $this->as_ion_auth->super_section_id), 'id', 'id'); // populate array of sections for which user is enrolled
 				$arr_form_section_id = $this->form_validation->set_value('section_id[]', $obj_user->section_id);
 				$this->data['section_selected'] = $arr_form_section_id;
-/* ----  BEGIN debugging code - for testing only --------DEBUG_SEARCH_TAG
- *  Remove before deploying
- *  @author: carolmd
- *  @date: Nov 19, 2013
- *
- */
- //echo 'edit user';
-// var_dump($this->session->userdata('arr_regions'));
-/* 
- *  ----  END debugging code - for testing only------------------------------------
- */
 				$arr_form_region_id = $this->form_validation->set_value('region_id[]', !empty($obj_user->region_id) ? $obj_user->region_id : $this->session->userdata('arr_regions'));
 				$this->data['region_selected'] = $arr_form_region_id;
 				$form_supervisor_num = $this->form_validation->set_value('supervisor_num', !empty($obj_user->supervisor_num) ? $obj_user->supervisor_num : $this->session->userdata('supervisor_num'));

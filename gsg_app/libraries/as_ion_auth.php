@@ -576,16 +576,7 @@ echo ' carolmd get_region_dropdown_data';
 	 *
 	 **/
 	public function get_sections_array($group_id, $user_id, $herd_code, $super_section_id = NULL, $arr_scope = NULL){
-/* ----  BEGIN debugging code - for testing only --------DEBUG_SEARCH_TAG
- *  Remove before deploying
- *  @author: carolmd
- *  @date: Nov 19, 2013
- *
- */
- //echo 'get_sections_array ';
-/* 
- *  ----  END debugging code - for testing only------------------------------------
- */		if(isset($arr_scope) && is_array($arr_scope)){
+		if(isset($arr_scope) && is_array($arr_scope)){
 			$tmp_array = array();
 			foreach($arr_scope as $s){
 				switch ($s) {

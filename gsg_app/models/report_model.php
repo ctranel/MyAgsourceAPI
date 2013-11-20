@@ -191,19 +191,6 @@ class Report_model extends CI_Model {
 		$this->arr_group_by_field = $this->get_group_by_fields($block_in);
 		$tmp_arr_pstring = $this->session->userdata('arr_pstring');
 		if(!is_array($tmp_arr_pstring) || empty($tmp_arr_pstring)) $this->{$this->db_group_name}->where('db_field_name != ', 'pstring');
-/* ----  BEGIN debugging code - for testing only --------DEBUG_SEARCH_TAG
- *  Remove before deploying
- *  @author: carolmd
- *  @date: Nov 15, 2013
- *
- */
-		//echo 'REPORT MODEL DB_GROUP_NAME';
-		//var_dump($this->db_group_name);
-		//die();
-		
-/* 
- *  ----  END debugging code - for testing only------------------------------------
- */	
 			$arr_field_data = $this->{$this->db_group_name}
 			->where('block_id', $block_in)
 			->order_by('list_order')

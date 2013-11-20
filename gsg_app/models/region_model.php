@@ -8,19 +8,6 @@ class Region_model extends CI_Model {
 	 * @author Chris Tranel
 	 **/
 	public function get_region_by_field($field, $value) {
-		/* ----  BEGIN debugging code - for testing only --------DEBUG_SEARCH_TAG
-		 *  Remove before deploying
-		 *  @author: carolmd
-		 *  @date: Nov 20, 2013
-		 *
-		 */
-		//echo ' get_region_by_field. $field: ';
-		//echo $field;
-		//echo ' $value: ';
-		//var_dump ($value);
-		/* 
-		 *  ----  END debugging code - for testing only------------------------------------
-		 */
 		if(is_array($value)) $this->db->where_in($field, $value);
 		else $this->db->where($field, $value);
 	    $this->db->limit(1);
@@ -36,19 +23,6 @@ class Region_model extends CI_Model {
 	public function get_regions($limit=NULL, $offset=NULL) {
 		if (isset($limit) && isset($offset))
 		$this->db->limit($limit, $offset);
-		/* ----  BEGIN debugging code - for testing only --------DEBUG_SEARCH_TAG
-		 *  Remove before deploying
-		 *  @author: carolmd
-		 *  @date: Nov 19, 2013
-		 *
-		 */
-		//echo 'dump results: ';
-		//$results = array();
-		//$results = $this->db->get($this->ion_auth_model->tables['regions'])->result();
-		//var_dump ($results);
-		/* 
-		 *  ----  END debugging code - for testing only------------------------------------
-		 */
 		return $this->db->get($this->ion_auth_model->tables['regions'])->result();
 	}
 	/**
