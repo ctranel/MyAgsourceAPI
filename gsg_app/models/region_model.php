@@ -14,10 +14,10 @@ class Region_model extends CI_Model {
 		 *  @date: Nov 20, 2013
 		 *
 		 */
-		echo ' get_region_by_field. $field: ';
-		echo $field;
-		echo ' $value: ';
-		var_dump ($value);
+		//echo ' get_region_by_field. $field: ';
+		//echo $field;
+		//echo ' $value: ';
+		//var_dump ($value);
 		/* 
 		 *  ----  END debugging code - for testing only------------------------------------
 		 */
@@ -42,10 +42,10 @@ class Region_model extends CI_Model {
 		 *  @date: Nov 19, 2013
 		 *
 		 */
-		echo 'dump results: ';
-		$results = array();
-		$results = $this->db->get($this->ion_auth_model->tables['regions'])->result();
-		var_dump ($results);
+		//echo 'dump results: ';
+		//$results = array();
+		//$results = $this->db->get($this->ion_auth_model->tables['regions'])->result();
+		//var_dump ($results);
 		/* 
 		 *  ----  END debugging code - for testing only------------------------------------
 		 */

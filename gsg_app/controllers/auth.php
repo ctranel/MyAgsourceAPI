@@ -549,8 +549,8 @@ class Auth extends Ionauth {
  *  @date: Nov 19, 2013
  *
  */
-			echo 'line 545';
- var_dump($arr_form_section_id);
+//			echo 'line 545';
+// var_dump($arr_form_section_id);
 /* 
  *  ----  END debugging code - for testing only------------------------------------
  */
@@ -707,8 +707,8 @@ class Auth extends Ionauth {
  *  @date: Nov 19, 2013
  *
  */
-			echo 'line 708 ';
- var_dump($arr_form_section_id);
+//			echo 'line 708 ';
+ //var_dump($arr_form_section_id);
 /* 
  *  ----  END debugging code - for testing only------------------------------------
  */
@@ -1305,8 +1305,8 @@ class Auth extends Ionauth {
  *  @date: Nov 19, 2013
  *
  */
- echo 'edit user';
- var_dump($this->session->userdata('arr_regions'));
+ //echo 'edit user';
+// var_dump($this->session->userdata('arr_regions'));
 /* 
  *  ----  END debugging code - for testing only------------------------------------
  */

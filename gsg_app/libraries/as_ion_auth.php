@@ -582,7 +582,7 @@ echo ' carolmd get_region_dropdown_data';
  *  @date: Nov 19, 2013
  *
  */
- echo 'get_sections_array ';
+ //echo 'get_sections_array ';
 /* 
  *  ----  END debugging code - for testing only------------------------------------
  */		if(isset($arr_scope) && is_array($arr_scope)){

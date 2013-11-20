@@ -302,8 +302,8 @@ class Ion_auth_model extends Ion_auth_parent_model
 		*  @date: Nov 19, 2013
 		*
 		*/
-		echo 'get_field_users_by_region. region_in:';
-		echo $region_in;
+		//echo 'get_field_users_by_region. region_in:';
+		//echo $region_in;
 		/*
 		 *  ----  END debugging code - for testing only------------------------------------
 		*/
@@ -360,8 +360,8 @@ class Ion_auth_model extends Ion_auth_parent_model
 		 *  @date: Nov 19, 2013
 		 *
 		 */
-		 echo ' get_users_region_array. ARR_DB_REGIONS: ';
-		 var_dump($arr_db_regions);
+		// echo ' get_users_region_array. ARR_DB_REGIONS: ';
+		// var_dump($arr_db_regions);
 		/* 
 		 *  ----  END debugging code - for testing only------------------------------------
 		 */
@@ -386,8 +386,8 @@ class Ion_auth_model extends Ion_auth_parent_model
 		*  @date: Nov 19, 2013
 		*
 		*/
-		echo ' get_users_region_array 2 ';
-		var_dump($arr_return);
+		//echo ' get_users_region_array 2 ';
+		//var_dump($arr_return);
 		/*
 		 *  ----  END debugging code - for testing only------------------------------------
 		*/
@@ -652,8 +652,8 @@ class Ion_auth_model extends Ion_auth_parent_model
 		 *  @date: Nov 19, 2013
 		 *
 		 */
-		 echo 'get_child_regions_array. region_in:';
-		 echo $region_in;
+		// echo 'get_child_regions_array. region_in:';
+		// echo $region_in;
 		/* 
 		 *  ----  END debugging code - for testing only------------------------------------
 		 */
@@ -745,7 +745,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 		*  @date: Nov 19, 2013
 		*
 		*/
-		echo 'get_subscribed_sections_array '; 
+		//echo 'get_subscribed_sections_array '; 
 		//var_dump($this->db->get()->result_array());//die();
 		/*
 		 *  ----  END debugging code - for testing only------------------------------------
@@ -813,7 +813,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 		*  @date: Nov 19, 2013
 		*
 		*/
-		echo 'get_unmanaged_sections_array ';
+		//echo 'get_unmanaged_sections_array ';
 		//var_dump($this->db->get()->result_array());//die();
 		/*
 		 *  ----  END debugging code - for testing only------------------------------------
@@ -875,7 +875,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 		*  @date: Nov 19, 2013
 		*
 		*/
-		echo 'get_keyed_section_array ';
+		//echo 'get_keyed_section_array ';
 		//var_dump($this->db->get()->result_array());//die();
 		/*
 		 *  ----  END debugging code - for testing only------------------------------------
@@ -1018,7 +1018,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 		*  @date: Nov 19, 2013
 		*
 		*/
-		echo 'get_sections';
+		//echo 'get_sections';
 		//var_dump($this->db->get()->result_array());//die();
 		/*
 		 *  ----  END debugging code - for testing only------------------------------------
@@ -1203,8 +1203,8 @@ class Ion_auth_model extends Ion_auth_parent_model
 		*  @date: Nov 19, 2013
 		*
 		*/
-		echo ' get_dhi_supervisor_nums_by_region. arr_region_in: ';
-		echo $arr_region_in;
+		//echo ' get_dhi_supervisor_nums_by_region. arr_region_in: ';
+		//echo $arr_region_in;
 		/*
 		 *  ----  END debugging code - for testing only------------------------------------
 		*/
