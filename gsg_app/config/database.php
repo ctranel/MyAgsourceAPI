@@ -72,8 +72,8 @@ $active_record = TRUE;
 $db_server = 'myagsource';
 
 $db['default']['hostname'] = 'testdare.verona.crinet\\' . $db_server;
-$db['default']['username'] = 'webuser';
-$db['default']['password'] = 'm1$AgSourze';
+$db['default']['username'] = 'myags_admin';//'webuser';
+$db['default']['password'] = 'DHI4web*';//m1$AgSourze';
 $db['default']['database'] = "users";
 $db['default']['dbdriver'] = 'mssql';//"mysqli";
 $db['default']['dbprefix'] = "";

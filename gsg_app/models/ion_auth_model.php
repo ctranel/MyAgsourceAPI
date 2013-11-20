@@ -947,7 +947,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 	public function get_sections_by_scope($scope) {
 		$this->db->join($this->tables['lookup_scopes'], $this->tables['sections'] . '.scope_id = ' . $this->tables['lookup_scopes'] . '.id', 'left')
 		->where($this->tables['lookup_scopes'] . '.name', $scope);
-		return $this->get_sections()->result_array();
+		return $this->get_sections();
 	}
 	
 	/**
