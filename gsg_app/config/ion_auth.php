@@ -69,7 +69,17 @@
 	 * Meta sections to be included with profile.
 	 * Each should have a config setting for 'towrite' 'tables', 'join' and 'columns'
 	 **/
-	$config['meta_sections']  			       = array('users_herds', 'users_dhi_supervisors', 'users_regions', 'users_sections');//'meta', 
+	/* -----------------------------------------------------------------
+	 *  UPDATE comment
+	 *  @author: carolmd
+	 *  @date: Nov 19, 2013
+	 *
+	 *  @description: took out users_dhi_supervisors.
+	 *  
+	 *  -----------------------------------------------------------------
+	 */
+	//$config['meta_sections']  			       = array('users_herds', 'users_dhi_supervisors', 'users_regions', 'users_sections');//'meta', 
+	$config['meta_sections']  			       = array('users_herds',  'users_regions', 'users_sections');//'meta', 
 	$config['herd_meta_sections']   		   = array('herds_sections');
 
 	/**
@@ -94,7 +104,7 @@
 		'users'					=> 'user_id', //from ion_auth
 		'users_herds'			=> 'user_id',
 		'users_regions'			=> 'user_id',
-		'users_dhi_supervisors'	=> 'user_id',
+//		'users_dhi_supervisors'	=> 'supervisor_num', // commented out. changed this from user_id
 		'users_sections'		=> 'user_id',
 		'herds_sections'		=> 'herd_code'
 	);

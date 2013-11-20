@@ -296,6 +296,18 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 **/
 	public function get_field_users_by_region($region_id)
 	{
+		/* ----  BEGIN debugging code - for testing only --------DEBUG_SEARCH_TAG
+		 *  Remove before deploying
+		*  @author: carolmd
+		*  @date: Nov 19, 2013
+		*
+		*/
+		echo 'get_field_users_by_region. region_in:';
+		echo $region_in;
+		/*
+		 *  ----  END debugging code - for testing only------------------------------------
+		*/
+		
 		if(!isset($region_id)) return FALSE;
 		if(!is_array($region_id)) $region_id = array($region_id);
 		$this->db->where($this->tables['users_regions'], $region_id);
@@ -342,11 +354,43 @@ class Ion_auth_model extends Ion_auth_parent_model
 			->result_array();
 
 		$arr_return = array();
+		/* ----  BEGIN debugging code - for testing only --------DEBUG_SEARCH_TAG
+		 *  Remove before deploying
+		 *  @author: carolmd
+		 *  @date: Nov 19, 2013
+		 *
+		 */
+		 echo ' get_users_region_array. ARR_DB_REGIONS: ';
+		 var_dump($arr_db_regions);
+		/* 
+		 *  ----  END debugging code - for testing only------------------------------------
+		 */
 		if(is_array($arr_db_regions) && !empty($arr_db_regions)){
 			foreach($arr_db_regions as $r){
-				$arr_return[$r['id']] = $r['region_name'];
+				/* -----------------------------------------------------------------
+				 *  UPDATE comment
+				 *  @author: carolmd
+				 *  @date: Nov 19, 2013
+				 *
+				 *  @description: changed to return region_id instead of name.
+				 *  
+				 *  -----------------------------------------------------------------
+				 */
+				//$arr_return[$r['id']] = $r['region_name'];
+				$arr_return[$r['id']] = $r['id'];
 			}
 		}
+		/* ----  BEGIN debugging code - for testing only --------DEBUG_SEARCH_TAG
+		 *  Remove before deploying
+		*  @author: carolmd
+		*  @date: Nov 19, 2013
+		*
+		*/
+		echo ' get_users_region_array 2 ';
+		var_dump($arr_return);
+		/*
+		 *  ----  END debugging code - for testing only------------------------------------
+		*/
 		return $arr_return;
 	}
 	
@@ -602,6 +646,17 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * @author Chris Tranel
 	 **/
 	public function get_child_regions_array($region_in = FALSE) {
+		/* ----  BEGIN debugging code - for testing only --------DEBUG_SEARCH_TAG
+		 *  Remove before deploying
+		 *  @author: carolmd
+		 *  @date: Nov 19, 2013
+		 *
+		 */
+		 echo 'get_child_regions_array. region_in:';
+		 echo $region_in;
+		/* 
+		 *  ----  END debugging code - for testing only------------------------------------
+		 */
 		$region_id = $region_in ? $region_in : $this->session->userdata('arr_regions');
 		if(empty($region_id) === FALSE){
 			$reg_txt = implode(',', array_keys($region_id));
@@ -684,6 +739,17 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * 11/14/13: CMMD: remove result array.
 	 **/
 	public function get_subscribed_sections_array($group_id, $user_id, $super_section_id, $herd_code = FALSE) {
+		/* ----  BEGIN debugging code - for testing only --------DEBUG_SEARCH_TAG
+		 *  Remove before deploying
+		*  @author: carolmd
+		*  @date: Nov 19, 2013
+		*
+		*/
+		echo 'get_subscribed_sections_array '; 
+		//var_dump($this->db->get()->result_array());//die();
+		/*
+		 *  ----  END debugging code - for testing only------------------------------------
+		*/
 		if(is_array($group_id)) {
 			if(in_array(2, $group_id) && count($group_id) == 1) $group_id = 2;
 		}
@@ -741,6 +807,18 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * @author Chris Tranel
 	 **/
 	public function get_unmanaged_sections_array($group_id, $user_id, $herd_code = FALSE) {
+		/* ----  BEGIN debugging code - for testing only --------DEBUG_SEARCH_TAG
+		 *  Remove before deploying
+		*  @author: carolmd
+		*  @date: Nov 19, 2013
+		*
+		*/
+		echo 'get_unmanaged_sections_array ';
+		//var_dump($this->db->get()->result_array());//die();
+		/*
+		 *  ----  END debugging code - for testing only------------------------------------
+		*/
+		
 		//$this->load->model('dm_model');
 		if(false){//$credentials = $this->dm_model->get_credentials()) {
 			$this->db->where($this->tables['sections'] . '.id', 6);
@@ -791,6 +869,17 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * @author Chris Tranel
 	 **/
 	public function get_keyed_section_array($arr_scope = NULL) {
+		/* ----  BEGIN debugging code - for testing only --------DEBUG_SEARCH_TAG
+		 *  Remove before deploying
+		*  @author: carolmd
+		*  @date: Nov 19, 2013
+		*
+		*/
+		echo 'get_keyed_section_array ';
+		//var_dump($this->db->get()->result_array());//die();
+		/*
+		 *  ----  END debugging code - for testing only------------------------------------
+		*/
 		$this->db
 		->select($this->tables['sections'] . '.id, ' . $this->tables['sections'] . '.name AS name')
 		->join($this->tables['lookup_scopes'], $this->tables['sections'] . '.scope_id = ' . $this->tables['lookup_scopes'] . '.id', 'left')
@@ -854,10 +943,11 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * @param string scope
 	 * @return array of section data for given user
 	 * @author Chris Tranel
-	 * 11/14/13: CMMD: return all active sections all the time.
 	 **/
 	public function get_sections_by_scope($scope) {
-		return $this->get_sections();
+		$this->db->join($this->tables['lookup_scopes'], $this->tables['sections'] . '.scope_id = ' . $this->tables['lookup_scopes'] . '.id', 'left')
+		->where($this->tables['lookup_scopes'] . '.name', $scope);
+		return $this->get_sections()->result_array();
 	}
 	
 	/**
@@ -922,6 +1012,18 @@ class Ion_auth_model extends Ion_auth_parent_model
 			->where($this->tables['sections'] . '.active', 1)
 			->order_by('list_order', 'asc')
 			->from($this->tables['sections']);
+		/* ----  BEGIN debugging code - for testing only --------DEBUG_SEARCH_TAG
+		 *  Remove before deploying
+		*  @author: carolmd
+		*  @date: Nov 19, 2013
+		*
+		*/
+		echo 'get_sections';
+		//var_dump($this->db->get()->result_array());//die();
+		/*
+		 *  ----  END debugging code - for testing only------------------------------------
+		*/
+		
 		return $this->db->get()->result_array();
 	}
 	
@@ -988,7 +1090,17 @@ class Ion_auth_model extends Ion_auth_parent_model
 		->where("(" . $this->tables['sections'] . '.user_id IS NULL OR ' . $this->tables['sections'] . '.user_id = ' . $user_id . ")");
 		//->where("(" . $this->tables['sections'] . '.user_id IS NULL OR ' . $this->tables['sections'] . '.user_id = ' . $user_id . ' OR ' . $this->tables['users_sections'] . '.user_id = ' . $user_id . ")")
 		//->where($this->tables['users_sections'] . '.user_id', $user_id);
-		return $this->get_sections();
+		/* ----  BEGIN debugging code - for testing only --------DEBUG_SEARCH_TAG
+		 *  Remove before deploying
+		 *  @author: carolmd
+		 *  @date: Nov 19, 2013
+		 *
+		 */
+		 //var_dump($this->get_sections());die();
+		/* 
+		 *  ----  END debugging code - for testing only------------------------------------
+		 */
+		 return $this->get_sections();
 	}
 	
 	/**
@@ -1085,6 +1197,17 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * @author Chris Tranel
 	 **/
 	public function get_dhi_supervisor_nums_by_region($arr_region_id = FALSE) {
+				/* ----  BEGIN debugging code - for testing only --------DEBUG_SEARCH_TAG
+		 *  Remove before deploying
+		*  @author: carolmd
+		*  @date: Nov 19, 2013
+		*
+		*/
+		echo ' get_dhi_supervisor_nums_by_region. arr_region_in: ';
+		echo $arr_region_in;
+		/*
+		 *  ----  END debugging code - for testing only------------------------------------
+		*/
 		$this->db->select('supervisor_num');
 		if($arr_region_id) $this->db->where_in('region_id', $arr_region_id);
 		$db_tmp_obj = $this->get_dhi_supervisors();
@@ -1153,9 +1276,11 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * @param string herd code
 	 * @return array of section data for given herd
 	 * @author Chris Tranel
-	 * 11/14/13: CMMD: return all active sections all the time.
 	 **/
 	private function get_sections_by_herd($herd_code){
+		$this->db->select($this->tables['sections'] . '.id, ' . $this->tables['sections'] . '.name, ' . $this->tables['sections'] . '.path, ' . $this->tables['herds_sections'] . '.access_level')
+		->join($this->tables['herds_sections'], $this->tables['herds_sections'] . '.section_id = ' . $this->tables['sections'] . '.id', 'left')
+		->where('herd_code', $herd_code);
 		return $this->get_sections();
 	}
 

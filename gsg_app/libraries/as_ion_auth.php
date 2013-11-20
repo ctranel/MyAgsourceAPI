@@ -101,7 +101,19 @@ class As_ion_auth extends Ion_auth {
 			$tmp = $this->session->userdata('herd_code');
 			$arr_scope = array('subscription','public','unmanaged');
 			if($this->is_admin) $arr_scope[] = 'admin';
-			$this->arr_user_super_sections = $this->get_super_sections_array($this->session->userdata('active_group_id'), $this->session->userdata('user_id'), $this->session->userdata('herd_code'), $arr_scope);
+			/* -----------------------------------------------------------------
+			 *  UPDATE comment
+			 *  @author: carolmd
+			 *  @date: Nov 19, 2013
+			 *
+			 *  @description: changed so it gets all super-sections for all users.
+			 *  This change made the topmost menu show only one set of super-sections. 
+			 *  Before, it was showing 2 or 3 sets.
+			 *  
+			 *  -----------------------------------------------------------------
+			 */
+			//$this->arr_user_super_sections = $this->get_super_sections_array($this->session->userdata('active_group_id'), $this->session->userdata('user_id'), $this->session->userdata('herd_code'), $arr_scope);
+			$this->arr_user_super_sections = $this->get_super_sections();
 			$this->arr_user_sections = $this->get_sections_array($this->session->userdata('active_group_id'), $this->session->userdata('user_id'), $this->session->userdata('herd_code'), $this->super_section_id, $arr_scope);
 		}
 		if(!isset($tmp) || empty($tmp) !== FALSE) {
@@ -345,11 +357,14 @@ class As_ion_auth extends Ion_auth {
 	 *
 	 **/
 	public function get_region_dropdown_data(){
+echo ' carolmd get_region_dropdown_data';
 		$ret_array = array();
 		if($this->is_admin){
 			$arr_group_obj = $this->region_model->get_regions();
 		}
 		else{
+			echo 'carolmd is not admin ';
+			var_dump($this->session->userdata('arr_regions'));
 			$arr_group_obj = $this->region_model->get_region_by_field('id', $this->session->userdata('arr_regions'));
 		}
 		if(is_array($arr_group_obj)) {
@@ -561,7 +576,16 @@ class As_ion_auth extends Ion_auth {
 	 *
 	 **/
 	public function get_sections_array($group_id, $user_id, $herd_code, $super_section_id = NULL, $arr_scope = NULL){
-		if(isset($arr_scope) && is_array($arr_scope)){
+/* ----  BEGIN debugging code - for testing only --------DEBUG_SEARCH_TAG
+ *  Remove before deploying
+ *  @author: carolmd
+ *  @date: Nov 19, 2013
+ *
+ */
+ echo 'get_sections_array ';
+/* 
+ *  ----  END debugging code - for testing only------------------------------------
+ */		if(isset($arr_scope) && is_array($arr_scope)){
 			$tmp_array = array();
 			foreach($arr_scope as $s){
 				switch ($s) {

@@ -543,7 +543,18 @@ class Auth extends Ionauth {
 				$obj_user->section_id = $this->as_ion_auth->set_form_array($tmp_array, 'id', 'id'); // populate array of sections for which user is enrolled
 				$tmp_array = $this->input->post('section_id');
 				$arr_form_section_id = isset($tmp_array) && is_array($tmp_array) ? $tmp_array : $obj_user->section_id;
-			}
+/* ----  BEGIN debugging code - for testing only --------DEBUG_SEARCH_TAG
+ *  Remove before deploying
+ *  @author: carolmd
+ *  @date: Nov 19, 2013
+ *
+ */
+			echo 'line 545';
+ var_dump($arr_form_section_id);
+/* 
+ *  ----  END debugging code - for testing only------------------------------------
+ */
+				}
 
 			$this->data['sections_selected'] = $arr_form_section_id;
 			$this->data['section_id'] = 'id="section_id"';
@@ -690,7 +701,17 @@ class Auth extends Ionauth {
 			$tmp_array = $this->input->post('section_id');
 //			$arr_form_section_id = $this->form_validation->set_value('section_id');//, $obj_user->section_id);
 			$arr_form_section_id = isset($tmp_array) && is_array($tmp_array) ? $tmp_array : $obj_user->section_id;
-
+/* ----  BEGIN debugging code - for testing only --------DEBUG_SEARCH_TAG
+ *  Remove before deploying
+ *  @author: carolmd
+ *  @date: Nov 19, 2013
+ *
+ */
+			echo 'line 708 ';
+ var_dump($arr_form_section_id);
+/* 
+ *  ----  END debugging code - for testing only------------------------------------
+ */
 			$this->data['sections_selected'] = $arr_form_section_id;
 			$this->data['section_id'] = 'id="section_id"';
 			//note: active group id should always be 9
@@ -1278,15 +1299,25 @@ class Auth extends Ionauth {
 				$obj_user->section_id = $this->as_ion_auth->set_form_array($this->ion_auth_model->get_subscribed_sections_array($obj_user->arr_groups, $user_id, $this->as_ion_auth->super_section_id), 'id', 'id'); // populate array of sections for which user is enrolled
 				$arr_form_section_id = $this->form_validation->set_value('section_id[]', $obj_user->section_id);
 				$this->data['section_selected'] = $arr_form_section_id;
-
+/* ----  BEGIN debugging code - for testing only --------DEBUG_SEARCH_TAG
+ *  Remove before deploying
+ *  @author: carolmd
+ *  @date: Nov 19, 2013
+ *
+ */
+ echo 'edit user';
+ var_dump($this->session->userdata('arr_regions'));
+/* 
+ *  ----  END debugging code - for testing only------------------------------------
+ */
 				$arr_form_region_id = $this->form_validation->set_value('region_id[]', !empty($obj_user->region_id) ? $obj_user->region_id : $this->session->userdata('arr_regions'));
 				$this->data['region_selected'] = $arr_form_region_id;
 				$form_supervisor_num = $this->form_validation->set_value('supervisor_num', !empty($obj_user->supervisor_num) ? $obj_user->supervisor_num : $this->session->userdata('supervisor_num'));
-				
+echo 'line 1316';				
 				//set the flash data error message if there is one
 /****** MESSAGE NEEDS TO GO TO HEADER, NOT PAGE ****/
 				$this->data['message'] = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
-				
+echo 'line 1320';				
 				$this->data['first_name'] = array('name' => 'first_name',
 					'id' => 'first_name',
 					'type' => 'text',
@@ -1295,6 +1326,7 @@ class Auth extends Ionauth {
 					'value' => $this->form_validation->set_value('first_name', $obj_user->first_name),
 					'class' => 'require'
 				);
+echo 'line 1329';
 				$this->data['last_name'] = array('name' => 'last_name',
 					'id' => 'last_name',
 					'type' => 'text',
@@ -1303,6 +1335,7 @@ class Auth extends Ionauth {
 					'value' => $this->form_validation->set_value('last_name', $obj_user->last_name),
 					'class' => 'require'
 				);
+echo 'line 1338';
 				$this->data['email'] = array('name' => 'email',
 					'id' => 'email',
 					'type' => 'text',
@@ -1311,9 +1344,12 @@ class Auth extends Ionauth {
 					'value' => $this->form_validation->set_value('email', $obj_user->email),
 					'class' => 'require'
 				);
+echo 'line 1347';
 				//if($this->as_ion_auth->is_admin || $this->as_ion_auth->is_manager){ // and the manager is editing a non-manager
 					$this->data['group_options'] = $this->as_ion_auth->get_group_dropdown_data();
+echo 'line 1350';
 					$this->data['group_id'] = 'id="group_id" class = "require" multiple size="4"';
+echo 'line 1352';
 				//}
 				/*else {
 					$this->data['group_id'] = array('name' => 'group_id',
@@ -1324,17 +1360,20 @@ class Auth extends Ionauth {
 				}*/
 
 				if($this->as_ion_auth->has_permission("Assign Sections")){
+echo 'line 1363 ';
 					$this->data['section_id'] = 'id="section_id"';
 					$this->data['section_options'] = $this->ion_auth_model->get_keyed_section_array(array('subscription'));
-						$this->data[] = $obj_user->section_id;
+					$this->data[] = $obj_user->section_id;
 				}
-
 				//if(in_array('3', $arr_form_group_id) || in_array('5', $arr_form_group_id) || in_array('6', $arr_form_group_id) || in_array('7', $arr_form_group_id) || in_array('8', $arr_form_group_id)){
 				//	if($this->as_ion_auth->is_admin){
 						$this->data['region_options'] = $this->as_ion_auth->get_region_dropdown_data();
+echo 'line 1371 ';
 						$this->data['region_selected'] = $this->form_validation->set_value('region_id[]', $obj_user->region_id);
+echo 'line 1373 ';
 						if(in_array('3', $arr_form_group_id) || in_array('5', $arr_form_group_id) || in_array('6', $arr_form_group_id) || in_array('7', $arr_form_group_id) || in_array('8', $arr_form_group_id)) $this->data['region_id'] = 'class = "require"';
 						else $this->data['region_id'] = 'class = "require"';
+echo 'line 1376 ';
 				//	}
 				/*	else {
 						$this->data['region_id[]'] = array('name' => 'region_id[]',
@@ -1347,6 +1386,7 @@ class Auth extends Ionauth {
 				//if(in_array('5', $arr_form_group_id) || in_array('7', $arr_form_group_id) || in_array('8', $arr_form_group_id)){
 				//	if($this->as_ion_auth->is_admin || $this->as_ion_auth->is_manager){
 						$this->data['supervisor_num_options'] = !empty($arr_form_region_id)?$this->as_ion_auth->get_dhi_supervisor_dropdown_data($arr_form_region_id):array();
+echo 'line 1389 ';
 						$this->data['supervisor_num_selected'] = $this->form_validation->set_value('supervisor_num', 0);//$obj_user->supervisor_num);
 						if(!empty($this->data['supervisor_num_options'])){
 							$this->data['supervisor_num'] = 'class = "require"';
