@@ -160,8 +160,21 @@ class As_ion_auth extends Ion_auth {
 	 * @author Chris Tranel
 	 **/
 	public function is_admin() {
-		$tmp_array = $this->session->userdata('arr_groups');
-		return $tmp_array[$this->session->userdata('active_group_id')] == $this->config->item('admin_group', 'ion_auth');
+		/* -----------------------------------------------------------------
+		 *  UPDATE comment
+		 *  @author: carolmd
+		 *  @date: Nov 22, 2013
+		 *
+		 *  @description: fixed this to return true or false.
+		 *  
+		 *  -----------------------------------------------------------------
+		 */
+		$active_group = strval($this->session->userdata('active_group_id'));
+		if ($active_group === $this->config->item('admin_group', 'ion_auth')) {
+		return TRUE; 
+		}
+		else { return FALSE;
+		}
 	}
 
 	/**
