@@ -71,6 +71,8 @@ abstract class parent_report extends CI_Controller {
  *  ----  END debugging code - for testing only------------------------------------
  */
 		
+ 		$this->load->model('filter_model');
+ 		
 		//Set up several class variables based upon uri - See http://ellislab.com/codeigniter%20/user-guide/libraries/uri.html
 
 		$this->section_path = $this->router->fetch_class(); //this should match the name of this file (minus ".php".  Also used as base for css and js file names and model directory name
@@ -167,6 +169,9 @@ abstract class parent_report extends CI_Controller {
   			exit;
 		}
 
+		return true;
+		
+/*DELETE
 		$pass_unsubscribed_test = $this->as_ion_auth->has_permission("View Unsubscribed Herds") || $this->ion_auth_model->herd_is_subscribed($this->section_id, $this->herd_code);
 		$pass_view_nonowned_test = $this->as_ion_auth->has_permission("View Non-owned Herds") || $this->ion_auth_model->user_owns_herd($this->herd_code);
 		if(!$pass_view_nonowned_test) $pass_view_nonowned_test = $this->as_ion_auth->has_permission("View non-own w permission") && $this->ion_auth_model->consultant_has_access($this->session->userdata('user_id'), $this->herd_code, $this->section_id);
@@ -208,6 +213,8 @@ abstract class parent_report extends CI_Controller {
 			exit;
 		}
 		return FALSE;
+
+	END DELETE */
 	}
 	
 	function index(){
@@ -215,16 +222,23 @@ abstract class parent_report extends CI_Controller {
 	}
 
 	function display($arr_block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL, $json_filter_data = NULL){
-		//SET PSTRING
+		//Get Pstrings from DB
 		$this->arr_pstring = $this->herd_model->get_pstring_array($this->session->userdata('herd_code'));
 		$tmp = current($this->{$this->primary_model}->arr_pstring);
+		//Set Pstring in session data
 		$this->pstring = $this->session->userdata('pstring');
+
+		//If no Pstring, set to default of 0
 		if(!isset($this->pstring) || empty($this->pstring)){
 			$this->pstring = isset($this->{$this->primary_model}->arr_pstring) && is_array($tmp)?$tmp['pstring'] . '':'0';
 			$this->session->set_userdata('pstring', $this->pstring);
 		}
-		//SET ARRAY OF BLOCK DISPLAY INFORMATION
+
+		//Create block info as array in arr_block_in if not an array
 		if(isset($arr_block_in) && !empty($arr_block_in) && !is_array($arr_block_in)) $arr_block_in = array($arr_block_in);
+
+/* DELETE
+ * 
 		if($this->data_dump){
 			$arr_tables = array();
 			$arr_charts = array();
@@ -236,17 +250,22 @@ abstract class parent_report extends CI_Controller {
 			}
 			$arr_blocks = array('table' => $arr_tables, 'chart' => $arr_charts);
 		}
-		else $arr_blocks = $this->{$this->primary_model}->arr_blocks[$this->page]['display'];
+		else  */
+		$arr_blocks = $this->{$this->primary_model}->arr_blocks[$this->page]['display'];
+		//Check for valid herd_code
 		if(empty($this->herd_code) || strlen($this->herd_code) != 8){
 			$this->session->set_flashdata('message', 'Please select a valid herd.');
 			redirect(site_url($this->report_path));
 		}
 
 //FILTERS
-	//always have filters for pstring (and page?)
-		$arr_params = (array)json_decode(urldecode($json_filter_data));
-		if(isset($arr_params['csrf_test_name']) && $arr_params['csrf_test_name'] != $this->security->get_csrf_hash()) die("I don't recognize your browser session, your session may have expired, or you may have cookies turned off.");
-		unset($arr_params['csrf_test_name']);
+
+		$this->load->library('filters');
+
+		//set arr_params to filter data from json		
+		$arr_params = $this->filters->get_filter_array($json_filter_data);
+
+		
 		$this->_set_filters($this->page, $arr_params);
 		//if params were passed to the function
 		if(isset($arr_params) && is_array($arr_params)){
@@ -770,7 +789,7 @@ abstract class parent_report extends CI_Controller {
 	}
 	
 	protected function _set_filters($page_in, $arr_params){	//FILTERS
-		$this->arr_page_filters = $this->access_log_model->get_page_filters($this->section_id, $page_in);
+		$this->arr_page_filters = $this->filter_model->get_page_filters($this->section_id, $page_in);
 		//always have filters for herd & pstring (and page?)
 		if(array_key_exists('pstring', $this->arr_page_filters) === FALSE){ //all queries need to specify pstring
 			$this->arr_page_filters['pstring'] = array('db_field_name' => 'pstring', 'name' => 'PString', 'type' => 'select multiple', 'default_value' => array(0));
