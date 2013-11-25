@@ -1,5 +1,13 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
-
+/* -----------------------------------------------------------------
+ *  UPDATE comment
+ *  @author: carolmd
+ *  @date: Nov 25, 2013
+ *
+ *  @description: Default group in ion_auth is now the id number , not the name. Changed code as needed.
+ *  
+ *  -----------------------------------------------------------------
+ */
 require_once APPPATH . 'controllers/ionauth.php';
 
 class Auth extends Ionauth {
@@ -1012,9 +1020,8 @@ class Auth extends Ionauth {
 			redirect(site_url("auth/login"), 'refresh');
 		}
 		else { //display the create user form
-				//get default group_id
-			$default_group_name = $this->config->item('default_group', 'ion_auth');
-			$default_group_id = $this->ion_auth_model->get_group_by_name($default_group_name)->id;
+				//get default group_id 
+			$default_group_id = $this->config->item('default_group', 'ion_auth');
 			$arr_form_group_id = $this->form_validation->set_value('group_id[]', array($default_group_id));
 			$this->data['group_selected'] = $arr_form_group_id;
 
@@ -1280,11 +1287,10 @@ class Auth extends Ionauth {
 				$arr_form_region_id = $this->form_validation->set_value('region_id[]', !empty($obj_user->region_id) ? $obj_user->region_id : $this->session->userdata('arr_regions'));
 				$this->data['region_selected'] = $arr_form_region_id;
 				$form_supervisor_num = $this->form_validation->set_value('supervisor_num', !empty($obj_user->supervisor_num) ? $obj_user->supervisor_num : $this->session->userdata('supervisor_num'));
-echo 'line 1316';				
+			
 				//set the flash data error message if there is one
 /****** MESSAGE NEEDS TO GO TO HEADER, NOT PAGE ****/
 				$this->data['message'] = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
-echo 'line 1320';				
 				$this->data['first_name'] = array('name' => 'first_name',
 					'id' => 'first_name',
 					'type' => 'text',
@@ -1293,7 +1299,6 @@ echo 'line 1320';
 					'value' => $this->form_validation->set_value('first_name', $obj_user->first_name),
 					'class' => 'require'
 				);
-echo 'line 1329';
 				$this->data['last_name'] = array('name' => 'last_name',
 					'id' => 'last_name',
 					'type' => 'text',
@@ -1302,7 +1307,6 @@ echo 'line 1329';
 					'value' => $this->form_validation->set_value('last_name', $obj_user->last_name),
 					'class' => 'require'
 				);
-echo 'line 1338';
 				$this->data['email'] = array('name' => 'email',
 					'id' => 'email',
 					'type' => 'text',
@@ -1311,12 +1315,9 @@ echo 'line 1338';
 					'value' => $this->form_validation->set_value('email', $obj_user->email),
 					'class' => 'require'
 				);
-echo 'line 1347';
 				//if($this->as_ion_auth->is_admin || $this->as_ion_auth->is_manager){ // and the manager is editing a non-manager
 					$this->data['group_options'] = $this->as_ion_auth->get_group_dropdown_data();
-echo 'line 1350';
 					$this->data['group_id'] = 'id="group_id" class = "require" multiple size="4"';
-echo 'line 1352';
 				//}
 				/*else {
 					$this->data['group_id'] = array('name' => 'group_id',
@@ -1327,20 +1328,17 @@ echo 'line 1352';
 				}*/
 
 				if($this->as_ion_auth->has_permission("Assign Sections")){
-echo 'line 1363 ';
 					$this->data['section_id'] = 'id="section_id"';
 					$this->data['section_options'] = $this->ion_auth_model->get_keyed_section_array(array('subscription'));
 					$this->data[] = $obj_user->section_id;
 				}
 				//if(in_array('3', $arr_form_group_id) || in_array('5', $arr_form_group_id) || in_array('6', $arr_form_group_id) || in_array('7', $arr_form_group_id) || in_array('8', $arr_form_group_id)){
 				//	if($this->as_ion_auth->is_admin){
+
 						$this->data['region_options'] = $this->as_ion_auth->get_region_dropdown_data();
-echo 'line 1371 ';
 						$this->data['region_selected'] = $this->form_validation->set_value('region_id[]', $obj_user->region_id);
-echo 'line 1373 ';
 						if(in_array('3', $arr_form_group_id) || in_array('5', $arr_form_group_id) || in_array('6', $arr_form_group_id) || in_array('7', $arr_form_group_id) || in_array('8', $arr_form_group_id)) $this->data['region_id'] = 'class = "require"';
 						else $this->data['region_id'] = 'class = "require"';
-echo 'line 1376 ';
 				//	}
 				/*	else {
 						$this->data['region_id[]'] = array('name' => 'region_id[]',
@@ -1353,7 +1351,6 @@ echo 'line 1376 ';
 				//if(in_array('5', $arr_form_group_id) || in_array('7', $arr_form_group_id) || in_array('8', $arr_form_group_id)){
 				//	if($this->as_ion_auth->is_admin || $this->as_ion_auth->is_manager){
 						$this->data['supervisor_num_options'] = !empty($arr_form_region_id)?$this->as_ion_auth->get_dhi_supervisor_dropdown_data($arr_form_region_id):array();
-echo 'line 1389 ';
 						$this->data['supervisor_num_selected'] = $this->form_validation->set_value('supervisor_num', 0);//$obj_user->supervisor_num);
 						if(!empty($this->data['supervisor_num_options'])){
 							$this->data['supervisor_num'] = 'class = "require"';

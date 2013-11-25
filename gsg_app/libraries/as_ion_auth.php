@@ -291,7 +291,7 @@ class As_ion_auth extends Ion_auth {
 	 *
 	 **/
 	public function get_herds_by_group($group_in = false, $region_in = false){
-		$group_id = ($group_in) ? $this->ion_auth_model->get_group_by_name($group)->id : $this->session->userdata('active_group_id');
+		$group_id = $this->session->userdata('active_group_id');
 		$region_num = $region_in ? $region_in : $this->session->userdata('region_num');
 		switch($group_id){
 			case '2': //producer
@@ -370,7 +370,6 @@ class As_ion_auth extends Ion_auth {
 	 *
 	 **/
 	public function get_region_dropdown_data(){
-echo ' carolmd get_region_dropdown_data';
 		$ret_array = array();
 		if($this->is_admin){
 			$arr_group_obj = $this->region_model->get_regions();

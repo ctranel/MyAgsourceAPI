@@ -78,7 +78,7 @@
 	 *  
 	 *  -----------------------------------------------------------------
 	 */
-	//$config['meta_sections']  			       = array('users_herds', 'users_dhi_supervisors', 'users_regions', 'users_sections');//'meta', 
+	$config['meta_sections']  			       = array('users_herds', 'users_dhi_supervisors', 'users_regions', 'users_sections');//'meta', 
 	$config['meta_sections']  			       = array('users_herds',  'users_regions', 'users_sections');//'meta', 
 	$config['herd_meta_sections']   		   = array('herds_sections');
 
@@ -89,7 +89,7 @@
 	$config['towrite'] 	= array(
 		'users_herds'	=> array('herd_code'),
 		'users_regions'	=> array('region_id'),
-		'dhi_supervisor'=> array('supervisor_num','region_id'),
+		'users'=> array('association_num'),
 		'users_sections'=> array('section_id', ''),
 		'herds_sections'=> array('section_id')
 	);
@@ -104,7 +104,7 @@
 		'users'					=> 'user_id', //from ion_auth
 		'users_herds'			=> 'user_id',
 		'users_regions'			=> 'user_id',
-//		'users_dhi_supervisors'	=> 'supervisor_num', // commented out. changed this from user_id
+		'users_dhi_supervisors'	=> 'affiliate_num', // commented out. changed this from user_id
 		'users_sections'		=> 'user_id',
 		'herds_sections'		=> 'herd_code'
 	);
@@ -117,7 +117,7 @@
 	$config['columns'] = array(
 		'users_herds'		=> array('herd_code'),
 		'users_regions'		=> array('region_id'),
-		'dhi_supervisor'	=> array('supervisor_num', 'region_id'),
+		'dhi_supervisor'	=> array('supervisor_num', 'affiliate_num'),
 		'users_sections'	=> array('section_id', 'access_level'),
 		'herds_sections'	=> array('section_id', 'access_level')
 	);

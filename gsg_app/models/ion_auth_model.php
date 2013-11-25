@@ -12,6 +12,17 @@
  * Requirements: PHP5 or above
  *
  */
+/* -----------------------------------------------------------------
+ *  UPDATE comment
+ *  @author: carolmd
+ *  @date: Nov 25, 2013
+ *
+ *  @description: Removed get_group_by_name. No longer needed anywhere, 
+ *  				because default and active group fields are now group_id instead of name.
+ *  
+ *  
+ *  -----------------------------------------------------------------
+ */
 require_once APPPATH . 'models/ion_auth_parent_model.php';
 
 class Ion_auth_model extends Ion_auth_parent_model
@@ -351,22 +362,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 		return $arr_return;
 	}
 	
-	/**
-	 * @method get_group_by_name
-	 *
-	 * @param string group name
-	 * @return object
-	 * @author Ben Edmunds
-	 **/
-	public function get_group_by_name($name)
-	{
-		$this->db->where('name', $name);
-
-		return $this->db->get($this->tables['groups'])
-		->row();
-	}
-
-
+	
 	/**
 	 * @method get_child_groups
 	 *
@@ -1086,9 +1082,18 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * @return array of objects with field tech numbers
 	 * @author Chris Tranel
 	 **/
+	/* -----------------------------------------------------------------
+	 *  UPDATE comment
+	 *  @author: carolmd
+	 *  @date: Nov 25, 2013
+	 *
+	 *  @description: changed lookup from region_id to affiliate_num.
+	 *  
+	 *  -----------------------------------------------------------------
+	 */
 	public function get_dhi_supervisor_nums_by_region($arr_region_id = FALSE) {
 		$this->db->select('supervisor_num');
-		if($arr_region_id) $this->db->where_in('region_id', $arr_region_id);
+		if($arr_region_id) $this->db->where_in('CONVERT(int, association_num)', $arr_region_id);
 		$db_tmp_obj = $this->get_dhi_supervisors();
 		if(is_array($db_tmp_obj)) {
 			return $db_tmp_obj;
