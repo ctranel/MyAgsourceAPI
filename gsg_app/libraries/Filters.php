@@ -118,7 +118,7 @@ class Filters{
 		$this->log_filter_text = is_array($arr_filter_text) && !empty($arr_filter_text)?implode('; ', $arr_filter_text):'';
 		
 		//if params were passed to the function
-		if(isset($arr_params) && is_array($arr_params)){
+/*		if(isset($arr_params) && is_array($arr_params)){
 			foreach($arr_params as $k => $v){
 				$this->criteria[$k] = $v;
 			}
@@ -130,10 +130,15 @@ class Filters{
 				$arr_filters_list[] = $f['db_field_name'];
 				$this->ci->form_validation->set_rules($f['db_field_name'], $f['name']);
 			}
+			
 		}
 		else{
+			var_dump($arr_filters_list);
+			die();
+				
 			//validate form input for filters
 			foreach($arr_page_filters as $k=>$f){ //key is the db field name
+				$c++;
 				//if range, create 2 fields, to and from.  Default value stored in DB as pipe-delimited
 				if($f['type'] == 'range' || $f['type'] == 'date range'){
 					if(!isset($f['default_value'])) $f['default_value'] = '|';
@@ -141,8 +146,10 @@ class Filters{
 				}
 				elseif(!isset($this->criteria[$k])) $this->criteria[$k] = $f['default_value'];
 				$arr_filters_list[] = $f['db_field_name'];
+				
 				$this->ci->form_validation->set_rules($f['db_field_name'], $f['name']);
 			}
+				
 			if ($this->ci->form_validation->run() == TRUE) { //successful submission
 				foreach($arr_page_filters as $k=>$f){ //key is the db field name
 					if($k == 'page') $this->criteria['page'] = $this->arr_pages[$this->input->post('page', TRUE)]['name'];
@@ -167,7 +174,7 @@ class Filters{
 					else $this->criteria[$f['db_field_name']] = $f['default_value'];
 				}
 			}
-		}
+		} */
 		if(validation_errors()) $this->primary_model->arr_messages[] = validation_errors();
 		$arr_filter_text = $this->ci->reports->filters_to_text($this->criteria, $this->primary_model->arr_pstring);
 		$log_filter_text = is_array($arr_filter_text) && !empty($arr_filter_text)?implode('; ', $arr_filter_text):'';
