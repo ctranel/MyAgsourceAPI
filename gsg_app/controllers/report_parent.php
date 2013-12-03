@@ -636,8 +636,7 @@ abstract class parent_report extends CI_Controller {
 		else { //if no form has been successfully submitted, set to defaults
 			foreach($this->arr_page_filters as $f){
 				if($f['db_field_name'] == 'pstring' && (!isset($f['default_value']) || empty($f['default_value']))){
-					//$tmp = current($this->{$this->primary_model}->arr_pstring);
-					$this->arr_filter_criteria['pstring'] = $this->pstring;//isset($this->{$this->primary_model}->arr_pstring) && is_array($tmp)?array($tmp['pstring']):array(0);
+					$this->arr_filter_criteria['pstring'] = $this->pstring;
 				}
 				elseif($f['db_field_name'] == 'test_date' && (!isset($f['default_value']) || empty($f['default_value']))){
 					$this->arr_filter_criteria['test_date'] = $this->{$this->primary_model}->get_recent_dates();
