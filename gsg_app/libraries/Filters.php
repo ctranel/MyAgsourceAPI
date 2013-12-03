@@ -117,64 +117,6 @@ class Filters{
 		$arr_filter_text = $this->ci->reports->filters_to_text($this->criteria, $this->primary_model->arr_pstring);
 		$this->log_filter_text = is_array($arr_filter_text) && !empty($arr_filter_text)?implode('; ', $arr_filter_text):'';
 		
-		//if params were passed to the function
-/*		if(isset($arr_params) && is_array($arr_params)){
-			foreach($arr_params as $k => $v){
-				$this->criteria[$k] = $v;
-			}
-			foreach($arr_page_filters as $k=>$f){ //key is the db field name
-				//if range, create 2 fields, to and from.  Default value stored in DB as pipe-delimited
-				if($f['type'] == 'range' || $f['type'] == 'date range'){
-					if(!isset($f['default_value'])) $f['default_value'] = '|';
-				}
-				$arr_filters_list[] = $f['db_field_name'];
-				$this->ci->form_validation->set_rules($f['db_field_name'], $f['name']);
-			}
-			
-		}
-		else{
-			var_dump($arr_filters_list);
-			die();
-				
-			//validate form input for filters
-			foreach($arr_page_filters as $k=>$f){ //key is the db field name
-				$c++;
-				//if range, create 2 fields, to and from.  Default value stored in DB as pipe-delimited
-				if($f['type'] == 'range' || $f['type'] == 'date range'){
-					if(!isset($f['default_value'])) $f['default_value'] = '|';
-					list($this->criteria[$k . '_dbfrom'], $this->criteria[$k . '_dbto']) = explode('|', $f['default_value']);
-				}
-				elseif(!isset($this->criteria[$k])) $this->criteria[$k] = $f['default_value'];
-				$arr_filters_list[] = $f['db_field_name'];
-				
-				$this->ci->form_validation->set_rules($f['db_field_name'], $f['name']);
-			}
-				
-			if ($this->ci->form_validation->run() == TRUE) { //successful submission
-				foreach($arr_page_filters as $k=>$f){ //key is the db field name
-					if($k == 'page') $this->criteria['page'] = $this->arr_pages[$this->input->post('page', TRUE)]['name'];
-					elseif($f['type'] == 'range' || $f['type'] == 'date range'){
-						$this->criteria[$k . '_dbfrom'] = $this->input->post($k . '_dbfrom', TRUE);
-						$this->criteria[$k . '_dbto'] = $this->input->post($k . '_dbto', TRUE);
-					}
-					else $this->criteria[$k] = $this->input->post($k, TRUE);
-					if($f['type'] == 'select multiple' && !$this->criteria[$k] && $k != 'pstring') {
-						$this->criteria[$k] = array();
-					}
-				}
-			}
-			else { //if no form has been successfully submitted, set to defaults
-				foreach($arr_page_filters as $f){
-					if($f['db_field_name'] == 'pstring' && (!isset($f['default_value']) || empty($f['default_value']))){
-						$this->criteria['pstring'] = $this->pstring;
-					}
-					elseif($f['db_field_name'] == 'test_date' && (!isset($f['default_value']) || empty($f['default_value']))){
-						$this->criteria['test_date'] = $this->primary_model->get_recent_dates();
-					}
-					else $this->criteria[$f['db_field_name']] = $f['default_value'];
-				}
-			}
-		} */
 		if(validation_errors()) $this->primary_model->arr_messages[] = validation_errors();
 		$arr_filter_text = $this->ci->reports->filters_to_text($this->criteria, $this->primary_model->arr_pstring);
 		$log_filter_text = is_array($arr_filter_text) && !empty($arr_filter_text)?implode('; ', $arr_filter_text):'';
