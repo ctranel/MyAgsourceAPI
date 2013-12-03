@@ -1,20 +1,41 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+
+/* -----------------------------------------------------------------
+ *	CLASS comments
+ *  @file: report_parent.php
+ *  @author: kmarshall
+ *  @date: Nov 14, 2013
+ *
+ *  @description: First created by Chris Tranel based upon CI_controller.
+ *
+ * -----------------------------------------------------------------
+ */
+
+/* -----------------------------------------------------------------
+ *  UPDATE comment
+ *  @author: kmarshall
+ *  @date: Nov 14, 2013
+ *
+ *  @description: Cleaned up file/class as a whole, modularized long sections of code into functions
+ *  and finished filters coding.
+ *  
+ *  -----------------------------------------------------------------
+ */
+
+
 abstract class parent_report extends CI_Controller {
-	//protected $report_table_view;
 	protected $section_id;
 	protected $report_form_id;
-	protected $arr_page_filters = array(); //two dimensional of filters on the page, includes 3 keys, e.g.: array('db_field_name' => 'pstring', 'name' => 'PString', 'default_value' => array(0));
 	protected $arr_filter_criteria = array(); //data for filtering results, the db_field_name key value of $this->arr_page_filters is a key for this array
 	protected $log_filter_text;
 	protected $arr_sort_by = array();
 	protected $arr_sort_order = array();
 	protected $pstring;
-//	protected $arr_pstring;
 	protected $herd_code;
 	protected $product_name;
 	protected $report_path;
 	protected $primary_model;
-	protected $section_path;
+	protected $section_path; //The path to the site section; set in constructor to point to the controller name
 	protected $page_header_data;
 	protected $report_data;
 	protected $display;
@@ -33,45 +54,69 @@ abstract class parent_report extends CI_Controller {
 	protected $pivot_db_field;
 	
 	function __construct(){
+		
+		// construct CI_Controller
 		parent::__construct();
+		
+ 		$this->load->model('filter_model');
+ 		
+		//Set up several class variables based upon uri - See http://ellislab.com/codeigniter%20/user-guide/libraries/uri.html
+
 		$this->section_path = $this->router->fetch_class(); //this should match the name of this file (minus ".php".  Also used as base for css and js file names and model directory name
+		//NOTE: fetch_class grabs the controller class regardless of rerouted URI
+
 		if($this->uri->segment(1) != $this->section_path){
+			//Likely called with all reports as the section is almost always superceded by the parent_section name
 			$this->section_path = $this->uri->segment(1) . '/' . $this->section_path;
+			//Example: Above results in section_path = summary_reports/herd_summary for herd_summary section
 		} 
 		$this->page = $this->router->fetch_method();
-		$this->block = $this->uri->segment(5);
+		$this->block = $this->uri->segment(3);  //grabs block name in most cases: hs_prod in summary_reports/herd_summary/hs_prod
 		$this->report_path = $this->section_path . '/' . $this->page;
-		$this->primary_model = $this->block . '_model';
-		$this->report_form_id = 'report_criteria';//filter-form';
+//DELETE		$this->primary_model = $this->block . '_model';
+//DELETE		$this->report_form_id = 'report_criteria';//filter-form';
+
+		//Get the herd_code from the session if it is 8 chars long, otherwise set to NULL
 		$this->herd_code = strlen($this->session->userdata('herd_code')) == 8?$this->session->userdata('herd_code'):NULL;
+
+		//Set 
 		$this->page_header_data['user_sections'] = $this->as_ion_auth->arr_user_super_sections;
-		if($this->authorize()) {
+		if($this->authorize()) {  //If logged in, session not expired, etc
 			$this->load->library('reports');
 			$this->reports->herd_code = $this->herd_code;
-			$tmp_dir = explode('/', $this->section_path);
-			$tmp_dir = $tmp_dir[(count($tmp_dir) - 1)] . '_model';
+//DELETE	$tmp_dir = explode('/', $this->section_path);
+//DELETE	$tmp_dir = $tmp_dir[(count($tmp_dir) - 1)] . '_model';
+	
+			$class = $this->router->fetch_class();  			//get name of model for most animal reports
+					
+			//load model for parent_section/section/page reports (most summary reports)
 			if(file_exists(APPPATH . 'models/' . $this->section_path . '/' . $this->primary_model . '.php')){
 				$this->load->model($this->section_path . '/' . $this->primary_model, '', FALSE, $this->section_path);
 			}
-			elseif(file_exists(APPPATH . 'models/' . $this->section_path . '/' . $tmp_dir . '.php')){
-				$this->load->model($this->section_path . '/' . $tmp_dir, '', FALSE, $this->section_path);
-				$this->primary_model = $tmp_dir;
+			//load model for parent/section reports (most animal reports)
+			elseif(file_exists(APPPATH . 'models/' . $this->section_path . '/' . $class . '.php')){
+				$this->load->model($this->section_path . '/' . $class, '', FALSE, $this->section_path);
+				$this->primary_model = $class;
 			}
+			//else default to catch-all report model class
 			else{
 				$this->load->model('report_model', '', FALSE, $this->section_path);
 				$this->primary_model = 'report_model';
 			}
 		}
-		else {
+		else {  //redirect to login if not logged in or session is expired
 			if($this->session->flashdata('message')) $this->session->keep_flashdata('message');
 			if($this->uri->segment(3) != 'ajax_report') $this->session->set_flashdata('redirect_url', $this->uri->uri_string());
 			redirect(site_url('auth/login'));
 		}
 		
-		if($this->session->userdata('herd_code') == '' || $this->session->userdata('herd_code') == '35990571'){
+//DELETE  || $this->session->userdata('herd_code') == '35990571')  <- was part of if below... relic from gsg
+		if($this->session->userdata('herd_code') == ''){  		// send user to herd select screen if no herd_code selected
 			$this->session->keep_flashdata('redirect_url');
 			redirect(site_url('change_herd/select'));			
 		}
+
+		
 		$this->section_id = $this->{$this->primary_model}->get_section_id();
 		/* Load the profile.php config file if it exists*/
 		if (ENVIRONMENT == 'development') {
@@ -111,6 +156,9 @@ abstract class parent_report extends CI_Controller {
   			exit;
 		}
 
+		return true;
+		
+/*DELETE
 		$pass_unsubscribed_test = $this->as_ion_auth->has_permission("View Unsubscribed Herds") || $this->ion_auth_model->herd_is_subscribed($this->section_id, $this->herd_code);
 		$pass_view_nonowned_test = $this->as_ion_auth->has_permission("View Non-owned Herds") || $this->ion_auth_model->user_owns_herd($this->herd_code);
 		if(!$pass_view_nonowned_test) $pass_view_nonowned_test = $this->as_ion_auth->has_permission("View non-own w permission") && $this->ion_auth_model->consultant_has_access($this->session->userdata('user_id'), $this->herd_code, $this->section_id);
@@ -152,6 +200,8 @@ abstract class parent_report extends CI_Controller {
 			exit;
 		}
 		return FALSE;
+
+	END DELETE */
 	}
 	
 	function index(){
@@ -159,17 +209,25 @@ abstract class parent_report extends CI_Controller {
 	}
 
 	function display($arr_block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL, $json_filter_data = NULL){
-		//SET PSTRING
+		//Get Pstrings from DB
 		$this->arr_pstring = $this->herd_model->get_pstring_array($this->session->userdata('herd_code'));
+		//get current element from array
 		$tmp = current($this->{$this->primary_model}->arr_pstring);
+		// set $this->pstring to pstring in session data
 		$this->pstring = $this->session->userdata('pstring');
+
+		//If no Pstring, set to default of 0
 		if(!isset($this->pstring) || empty($this->pstring)){
 			$this->pstring = isset($this->{$this->primary_model}->arr_pstring) && is_array($tmp)?$tmp['pstring'] . '':'0';
 			$this->session->set_userdata('pstring', $this->pstring);
 		}
-		//SET ARRAY OF BLOCK DISPLAY INFORMATION
+
+		//Create block info as array in arr_block_in if not an array
 		if(isset($arr_block_in) && !empty($arr_block_in) && !is_array($arr_block_in)) $arr_block_in = array($arr_block_in);
-	 	if($this->data_dump){
+
+/* DELETE
+ * 
+		if($this->data_dump){
 			$arr_tables = array();
 			$arr_charts = array();
 			if(isset($this->{$this->primary_model}->arr_blocks) && is_array($this->{$this->primary_model}->arr_blocks)){
@@ -180,87 +238,37 @@ abstract class parent_report extends CI_Controller {
 			}
 			$arr_blocks = array('table' => $arr_tables, 'chart' => $arr_charts);
 		}
-		else $arr_blocks = $this->{$this->primary_model}->arr_blocks[$this->page]['display'];
-	 	if(empty($this->herd_code) || strlen($this->herd_code) != 8){
+		else  */
+		$arr_blocks = $this->{$this->primary_model}->arr_blocks[$this->page]['display'];
+		//Check for valid herd_code
+		if(empty($this->herd_code) || strlen($this->herd_code) != 8){
 			$this->session->set_flashdata('message', 'Please select a valid herd.');
 			redirect(site_url($this->report_path));
 		}
 
 //FILTERS
-	//always have filters for pstring (and page?)
-		$arr_params = (array)json_decode(urldecode($json_filter_data));
-		if(isset($arr_params['csrf_test_name']) && $arr_params['csrf_test_name'] != $this->security->get_csrf_hash()) die("I don't recognize your browser session, your session may have expired, or you may have cookies turned off.");
-		unset($arr_params['csrf_test_name']);
-		$this->_set_filters($this->page, $arr_params);
-		//if params were passed to the function
-		if(isset($arr_params) && is_array($arr_params)){
-			foreach($arr_params as $k => $v){
-				$this->arr_filter_criteria[$k] = $v;
-			}
-			$this->load->library('form_validation');
-			foreach($this->arr_page_filters as $k=>$f){ //key is the db field name
-			//if range, create 2 fields, to and from.  Default value stored in DB as pipe-delimited
-				if($f['type'] == 'range' || $f['type'] == 'date range'){
-					if(!isset($f['default_value'])) $f['default_value'] = '|';
-					//list($this->arr_filter_criteria[$k . '_dbfrom'], $this->arr_filter_criteria[$k . '_dbto']) = explode('|', $f['default_value']);
-				}
-				//elseif(!isset($this->arr_filter_criteria[$k])) $this->arr_filter_criteria[$k] = $f['default_value'];
-				$arr_filters_list[] = $f['db_field_name'];
-				$this->form_validation->set_rules($f['db_field_name'], $f['name']);
-			}
-		}
-		else{
-	 		$this->load->library('form_validation');
-			//validate form input for filters
-	
-			foreach($this->arr_page_filters as $k=>$f){ //key is the db field name
-			//if range, create 2 fields, to and from.  Default value stored in DB as pipe-delimited
-				if($f['type'] == 'range' || $f['type'] == 'date range'){
-					if(!isset($f['default_value'])) $f['default_value'] = '|';
-					list($this->arr_filter_criteria[$k . '_dbfrom'], $this->arr_filter_criteria[$k . '_dbto']) = explode('|', $f['default_value']);
-				}
-				elseif(!isset($this->arr_filter_criteria[$k])) $this->arr_filter_criteria[$k] = $f['default_value'];
-				$arr_filters_list[] = $f['db_field_name'];
-				$this->form_validation->set_rules($f['db_field_name'], $f['name']);
-			}
-			if ($this->form_validation->run() == TRUE) { //successful submission
-				foreach($this->arr_page_filters as $k=>$f){ //key is the db field name
-					if($k == 'page') $this->arr_filter_criteria['page'] = $this->arr_pages[$this->input->post('page', TRUE)]['name'];
-					elseif($f['type'] == 'range' || $f['type'] == 'date range'){
-						$this->arr_filter_criteria[$k . '_dbfrom'] = $this->input->post($k . '_dbfrom', TRUE);
-						$this->arr_filter_criteria[$k . '_dbto'] = $this->input->post($k . '_dbto', TRUE);
-					}
-					else $this->arr_filter_criteria[$k] = $this->input->post($k, TRUE);
-					if($f['type'] == 'select multiple' && !$this->arr_filter_criteria[$k] && $k != 'pstring') {
-						$this->arr_filter_criteria[$k] = array();
-					}
-				}
-			}
-			else { //if no form has been successfully submitted, set to defaults
-				foreach($this->arr_page_filters as $f){
-					if($f['db_field_name'] == 'pstring' && (!isset($f['default_value']) || empty($f['default_value']))){
-						$this->arr_filter_criteria['pstring'] = $this->pstring;//isset($this->{$this->primary_model}->arr_pstring) && is_array($tmp)?array($tmp['pstring']):array(0);
-					}
-					elseif($f['db_field_name'] == 'test_date' && (!isset($f['default_value']) || empty($f['default_value']))){
-						$this->arr_filter_criteria['test_date'] = $this->{$this->primary_model}->get_recent_dates();
-					}
-					else $this->arr_filter_criteria[$f['db_field_name']] = $f['default_value'];
-				}
-			}
-		}
-	
-		if(validation_errors()) $this->{$this->primary_model}->arr_messages[] = validation_errors();
-		$arr_filter_text = $this->reports->filters_to_text($this->arr_filter_criteria, $this->{$this->primary_model}->arr_pstring);
-		$log_filter_text = is_array($arr_filter_text) && !empty($arr_filter_text)?implode('; ', $arr_filter_text):'';
-		$filter_data = array(
-			'arr_filters'=>isset($arr_filters_list) && is_array($arr_filters_list)?$arr_filters_list:array(),
-			'filter_selected'=>$this->arr_filter_criteria,
-			'report_path'=>$this->report_path,
-			'arr_pstring'=>$this->{$this->primary_model}->arr_pstring,
-			//'arr_pages' => $this->access_log_model->get_pages_by_criteria(array('section_id' => $this->section_id))->result_array()
-			//'page' => $this->arr_filter_criteria['page']
-		);
-//END FILTERS
+
+		include(APPPATH.'libraries/Filters.php');
+		//set arr_params to filter data from json
+		$arr_params = Filters::get_filter_array($json_filter_data);
+		
+		//prep data for filter library
+		$filter_lib_data = array(	'page'=>$this->page,
+									'params'=>$arr_params,
+									'section'=>$this->section_id,
+									'criteria'=>$this->arr_filter_criteria,
+									'primary_model'=>$this->{$this->primary_model},
+									'log_filter_text'=>$this->log_filter_text,
+									'report_path'=>$this->report_path);
+		
+		//load required libraries
+		$this->load->library('filters',$filter_lib_data);
+		$this->load->library('form_validation');
+
+		$arr_filter_data = $this->filters->set_filters();
+		
+		$this->arr_filter_criteria = $arr_filter_data['filter_selected'];
+
 		if ($display_format == 'csv'){
 			$data = array();
 			if(isset($arr_blocks['table']) && is_array($arr_blocks['table'])){
@@ -295,7 +303,7 @@ abstract class parent_report extends CI_Controller {
 			}
 			exit;
 		}
-		elseif ($display_format == 'pdf' && !is_null($arr_block_in)) {
+/*		elseif ($display_format == 'pdf' && !is_null($arr_block_in)) {
 			$this->load->helper('table_header');
 			$data = array();
 			$herd_data = $this->herd_model->header_info($this->session->userdata('herd_code'));
@@ -332,7 +340,7 @@ abstract class parent_report extends CI_Controller {
 			$this->access_log_model->write_entry($this->{$this->primary_model}->arr_blocks[$this->page]['page_id'], 'pdf', $this->reports->sort_text_brief($this->arr_sort_by, $this->arr_sort_order), $this->log_filter_text);
 			$this->reports->create_pdf($block, $this->product_name, NULL, $herd_data, 'P');
 			exit;
-		}
+		} */
 
 		// render page
 		$this->carabiner->css('chart.css');
@@ -461,7 +469,7 @@ abstract class parent_report extends CI_Controller {
 			'print_all' => $this->print_all,
 			'report_path' => $this->report_path
 		);
-		if(isset($filter_data)) $data['filters'] = $this->load->view($report_filter_path, $filter_data, TRUE);
+		if(isset($arr_filter_data)) $data['filters'] = $this->load->view($report_filter_path, $arr_filter_data, TRUE);
 		if((is_array($arr_nav_data['arr_pages']) && count($arr_nav_data['arr_pages']) > 1) || (is_array($arr_nav_data['arr_pstring']) && count($arr_nav_data['arr_pstring']) > 1)) $data['report_nav'] = $this->load->view($report_nav_path, $arr_nav_data, TRUE);
 		
 		//$this->access_log_model->write_entry($this->{$this->primary_model}->arr_blocks[$this->page]['page_id'], 'web');
@@ -480,11 +488,12 @@ abstract class parent_report extends CI_Controller {
 		$page = urldecode($page);
 		$block = urldecode($block);
 		$sort_by = urldecode($sort_by);
+
 		
 		if(isset($json_filter_data)){
-			$arr_params = (array)json_decode(urldecode($json_filter_data));
-			if(isset($arr_params['csrf_test_name']) && $arr_params['csrf_test_name'] != $this->security->get_csrf_hash()) die("I don't recognize your browser session, your session may have expired, or you may have cookies turned off.");
-			unset($arr_params['csrf_test_name']);
+			include(APPPATH.'libraries/Filters.php');
+			//set arr_params to filter data from json
+			$arr_params = Filters::get_filter_array($json_filter_data);
 			//ASSUMING ONLY ONE PSTRING WILL BE SELECTED FOR NOW
 			$pstring = (!isset($arr_params['pstring']) || empty($arr_params['pstring'][0]))?'0':$arr_params['pstring'][0];
 			$this->session->set_userdata('pstring', $pstring);
@@ -718,9 +727,9 @@ abstract class parent_report extends CI_Controller {
 		}
 		$this->display = 'table';
 	}
-	
+
 	protected function _set_filters($page_in, $arr_params){	//FILTERS
-		$this->arr_page_filters = $this->access_log_model->get_page_filters($this->section_id, $page_in);
+		$this->arr_page_filters = $this->filter_model->get_page_filters($this->section_id, $page_in);
 		//always have filters for herd & pstring (and page?)
 		if(array_key_exists('pstring', $this->arr_page_filters) === FALSE){ //all queries need to specify pstring
 			$this->arr_page_filters['pstring'] = array('db_field_name' => 'pstring', 'name' => 'PString', 'type' => 'select multiple', 'default_value' => array(0));
@@ -729,7 +738,7 @@ abstract class parent_report extends CI_Controller {
 		}
 		//herd code is not a part of the filter form (yet), so we hard-code it
 		$this->arr_filter_criteria['herd_code'] = $this->session->userdata('herd_code');
-		
+	
 		//iterate through page filter options
 		foreach($this->arr_page_filters as $k=>$f){ //key is the db field name
 			//if range, create 2 fields, to and from.  Default value stored in DB as pipe-delimited
@@ -745,7 +754,7 @@ abstract class parent_report extends CI_Controller {
 		});
 		if (is_array($arr_params) && !empty($arr_params)) {
 			foreach($this->arr_page_filters as $k=>$f){ //key is the db field name
-				
+	
 				if($k == 'page') $this->arr_filter_criteria['page'] = $this->arr_pages[$arr_params['page']]['name'];
 				elseif($f['type'] == 'range' || $f['type'] == 'date range'){
 					if(!isset($arr_params[$k . '_dbfrom']) || !isset($arr_params[$k . '_dbto'])) continue;
@@ -754,9 +763,9 @@ abstract class parent_report extends CI_Controller {
 				}
 				elseif($f['type'] == 'select multiple'){
 					if(isset($arr_params[$k]) && is_array($arr_params[$k])){
-						 foreach($arr_params[$k] as $k1=>$v1){
+						foreach($arr_params[$k] as $k1=>$v1){
 							$arr_params[$k][$k1] = explode('|', $v1);
-						 } 
+						}
 						$arr_params[$k] = array_flatten($arr_params[$k]);
 						$this->arr_filter_criteria[$k] = $arr_params[$k];
 					}
@@ -797,5 +806,7 @@ abstract class parent_report extends CI_Controller {
 		return $filter_data;
 		//END FILTERS
 	}
+	
+	
 }
 
