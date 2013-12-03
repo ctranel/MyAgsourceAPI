@@ -71,9 +71,7 @@ class Herd_model extends CI_Model {
 	function get_herds_by_region($region_id){
 		if(!isset($region_id)) return FALSE;
 		if(!is_array($region_id)) $region_id = array($region_id);
-		$this->db
-		//->join('herds_regions', 'region.id = herds_regions.region_id')
-		->where_in($this->tables['herds_regions'] . '.region_id', $region_id);
+		$this->db->where_in($this->tables['herds_regions'] . '.region_id', $region_id);
 		return $this->get_herds();
 	}
 
@@ -107,11 +105,6 @@ class Herd_model extends CI_Model {
 	public function get_herds_by_criteria($criteria=NULL, $limit=NULL, $offset=NULL, $order_by=NULL)
 	{
 		$this->db->where($criteria);
-		//if(is_array($criteria)){
-		//	foreach($criteria as $k=>$v){
-		//		$this->db->where($k, $v);
-		//	}
-		//}
 		return $this->get_herds($limit, $offset, $order_by);
 	}
 
@@ -159,12 +152,10 @@ class Herd_model extends CI_Model {
 		->join($this->tables['herds_regions'], 'h.herd_code = ' . $this->tables['herds_regions'] . '.herd_code', 'LEFT')
 		->join($this->tables['regions'], $this->tables['herds_regions'] . '.region_id = ' . $this->tables['regions'] . '.id', 'LEFT')
 		->where("h.member_status_code = 'A'");
-		//->join($this->tables['companies'], $this->tables['regions'] . '.company_id = ' . $this->tables['companies'] . '.id', 'LEFT');
 		
 		if(isset($order_by))$this->db->order_by($order_by);
 		if (isset($limit) && isset($offset)) $this->db->limit($limit, $offset);
 		elseif(isset($limit)) $this->db->limit($limit);
-		//if(!$this->as_ion_auth->has_permission('View Other Companies')) $this->db->where($this->tables['regions'] . '.company_id', $this->session->userdata('company_id'));
 		$results = $this->db->get($this->tables['herds'] . ' h');
 		return $results;
 	}
@@ -250,12 +241,8 @@ class Herd_model extends CI_Model {
 	 * @author Chris Tranel
 	 **/
 	public function get_pstring_array($herd_code, $include_all = TRUE) {
-		//$this->pstring_group_name = 'pstring';
 		$pstring_db = $this->load->database('default', TRUE);
 		$arr_results = $pstring_db->select('pstring, publication_name')
-		//->distinct()
-		//->where('pstring IS NOT NULL', NULL, FALSE)
-		//->where('pstring > 0', NULL, FALSE)
 		->where('herd_code', $herd_code)
 		->order_by('pstring', 'asc')
 		->get('herd.dbo.pstring_definition')
@@ -264,6 +251,25 @@ class Herd_model extends CI_Model {
 		if($include_all) array_unshift($arr_results, array('pstring'=>0, 'publication_name'=>'All PStrings'));
 		return $arr_results;
 	}
+	
+	/**
+	 * get_tstring_array
+	 * @param string herd code
+	 * @return array (tstring) - for now using string_summary table.  
+	 * 			FUTURE?: Reports requiring historical tstrings will need to use milking_times table.
+	 * @author Kevin Marshall
+	 **/
+	public function get_tstring_array($herd_code) {
+		$tstring_db = $this->load->database('default', TRUE);
+		$arr_results = $tstring_db->select('tstring')
+		->where('herd_code', $herd_code)
+		->order_by('tstring', 'asc')
+		->get('rpm.dbo.string_summary')
+		->result_array();
+
+		return $arr_results;
+	}
+	
 
 	/**
 	 * herd_is_registered
@@ -274,7 +280,6 @@ class Herd_model extends CI_Model {
 	 **/
 	public function herd_is_registered($herd_code){
 		$arr_results = $this->db->select('herd_code')
-		//->from('users')
 		->from($this->tables['users'])
 		->join('users_herd_meta', 'users.id = users_herd_meta.user_id')
 		->join('users_groups', 'users.id = users_groups.user_id')
@@ -296,7 +301,6 @@ class Herd_model extends CI_Model {
 	 **/
 	public function get_herd_emails($herd_code){
 		$arr_results = $this->db->select('email')
-		//->from('users')
 		->from($this->tables['users'])
 		->join('users_herd_meta', 'users.id = users_herd_meta.user_id')
 		->join('users_groups', 'users.id = users_groups.user_id')
