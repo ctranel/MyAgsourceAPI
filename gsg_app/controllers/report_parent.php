@@ -159,9 +159,13 @@ abstract class parent_report extends CI_Controller {
 	}
 
 	function display($arr_block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL, $json_filter_data = NULL){
+		
 		//Get Pstrings from DB
 		$this->arr_pstring = $this->herd_model->get_pstring_array($this->session->userdata('herd_code'));
+		//Get Tstrings from DB
+		$this->arr_tstring = $this->herd_model->get_tstring_array($this->session->userdata('herd_code'));
 		//get current element from array
+		$this->session->set_userdata('arr_tstring', $this->arr_tstring);
 		$tmp = current($this->{$this->primary_model}->arr_pstring);
 		// set $this->pstring to pstring in session data
 		$this->pstring = $this->session->userdata('pstring');
@@ -171,7 +175,13 @@ abstract class parent_report extends CI_Controller {
 			$this->pstring = isset($this->{$this->primary_model}->arr_pstring) && is_array($tmp)?$tmp['pstring'] . '':'0';
 			$this->session->set_userdata('pstring', $this->pstring);
 		}
-
+		
+		//If no Tstring, set to default of 0
+		if(!isset($this->tstring) || empty($this->tstring)){
+			$this->tstring = array(0);
+		}
+		$this->session->set_userdata('tstring', $this->tstring);
+				
 		//Create block info as array in arr_block_in if not an array
 		if(isset($arr_block_in) && !empty($arr_block_in) && !is_array($arr_block_in)) $arr_block_in = array($arr_block_in);
 
@@ -187,7 +197,7 @@ abstract class parent_report extends CI_Controller {
 		include(APPPATH.'libraries/Filters.php');
 		//set arr_params to filter data from json
 		$arr_params = Filters::get_filter_array($json_filter_data);
-		
+
 		//prep data for filter library
 		$filter_lib_data = array(	'page'=>$this->page,
 									'params'=>$arr_params,
@@ -367,8 +377,6 @@ abstract class parent_report extends CI_Controller {
 			'report_path' => $this->report_path
 		);
 		if(isset($arr_filter_data)) $data['filters'] = $this->load->view($report_filter_path, $arr_filter_data, TRUE);
-		var_dump($arr_filter_data);
-		die();
 		if((is_array($arr_nav_data['arr_pages']) && count($arr_nav_data['arr_pages']) > 1) || (is_array($arr_nav_data['arr_pstring']) && count($arr_nav_data['arr_pstring']) > 1)) $data['report_nav'] = $this->load->view($report_nav_path, $arr_nav_data, TRUE);
 		
 		$this->load->view('report', $data);
