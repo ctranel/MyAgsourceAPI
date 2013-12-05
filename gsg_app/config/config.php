@@ -217,7 +217,20 @@ $config['directory_trigger']	= 'd'; // experimental not currently in use
 | your log files will fill up very fast.
 |
 */
-$config['log_threshold'] = 0;
+	switch (ENVIRONMENT)
+	{
+		case 'development':
+			$config['log_threshold'] = 4;
+			break;
+		case 'testing':
+			$config['log_threshold'] = 2;
+			break;
+		case 'production':
+			$config['log_threshold'] = 0;
+			break;
+		default:
+			exit('The application environment is not set correctly.');
+	}
 
 /*
 |--------------------------------------------------------------------------
