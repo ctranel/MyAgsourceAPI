@@ -241,7 +241,20 @@ $config['directory_trigger']	= 'd'; // experimental not currently in use
 | system/logs/ folder.  Use a full server path with trailing slash.
 |
 */
-$config['log_path'] = '';
+	switch (ENVIRONMENT)
+	{
+		case 'development':
+			$config['log_path'] = 'C:\\MyAgSource\\logs\\';
+			break;
+		case 'testing':
+			$config['log_path'] = '';
+			break;
+		case 'production':
+			$config['log_path'] = '';
+			break;
+		default:
+			exit('The application environment is not set correctly.');
+	}
 
 /*
 |--------------------------------------------------------------------------
