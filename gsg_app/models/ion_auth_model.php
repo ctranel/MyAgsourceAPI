@@ -121,35 +121,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 **/
 	public function login($identity, $password, $remember=FALSE){
 		$this->ion_auth->set_hook('post_login_successful', 'set_session_meta', 'Ion_auth_model', '_set_session_meta');
-		log_message('debug', 'TESTING LOGIN XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX');
-		/* ----  BEGIN debugging code - for testing only --------DEBUG_SEARCH_TAG
-		 *  Remove before deploying
-		 *  @author: carolmd
-		 *  @date: Dec 5, 2013
-		 *
-		 */
-		/*
-		$pathTEST->_log_path = ($config['log_path'] != '') ? $config['log_path'] : APPPATH.'logs/';
-		var_dump($config['log_path']);
-		echo 'xxxxxxxxxxxxxxxxxxxxx';
-		var_dump($pathTEST); 
-		echo 'yyyyyy';
-		var_dump(APPPATH);
-		if ( ! is_dir($this->_log_path) )
-		{
-			echo 'path is not a directory. logging not enabled.';
-			$this->_enabled = FALSE;
-		}
-		if ( ! is_really_writable($this->_log_path))
-		{
-			echo 'log path not writeable. logging not enabled.';
-			$this->_enabled = FALSE;
-		}
-		die();
-		*/
-		/* 
-		 *  ----  END debugging code - for testing only------------------------------------
-		 */
+		log_message('debug', 'DEBUG.......................models/ion_auth_model/login ');
 		return parent::login($identity, $password, $remember);
 	}
 
@@ -165,7 +137,6 @@ class Ion_auth_model extends Ion_auth_parent_model
 		$session_data['arr_groups'] = $arr_groups;
 		$arr_regions = $this->get_users_region_array($this->session->userdata('user_id'));
 		$session_data['arr_regions'] = $arr_regions;
-		//@todogroups set active group to current element for now, should add default group to user record
 		$session_data['active_group_id'] = key($arr_groups);
 
 		// write select query for each meta section
