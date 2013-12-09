@@ -35,12 +35,15 @@ class Auth extends Ionauth {
 	}
 	
 	function index(){
+		log_message('debug', 'DEBUG.......................controllers/auth.php index() ');
+		
 		$this->load->model('herd_model');
 		$this->load->model('alert_model');
 		if(!isset($this->as_ion_auth) || !$this->as_ion_auth->logged_in()){
 			$this->session->keep_flashdata('redirect_url');
 			redirect(site_url('auth/login'));
 		}
+		
 		if(is_array($this->page_header_data)){
 			$this->page_header_data = array_merge($this->page_header_data,
 					array(
@@ -800,16 +803,9 @@ class Auth extends Ionauth {
 	//CDT overrides built-in function to allow us to redirect user to the original page they requested after login in
 	function login()
 	{
-		$redirect_url = set_redirect_url('login');
-		// set redirect url
-		//$this->session->keep_flashdata('redirect_url');
-/*		$tmp = $this->session->flashdata('redirect_url');
-		$redirect_url = $tmp !== FALSE ? $tmp : $this->as_ion_auth->referrer;
-		//if(strpos($redirect_url, 'auth') !== FALSE) $redirect_url = 'auth/index';
-		if(strpos($redirect_url, 'login') || strpos($redirect_url, 'logout')) $redirect_url = '';
+		log_message('debug', 'DEBUG.......................controllers/auth.php login() ');
 		
-		$this->session->set_flashdata('redirect_url', $redirect_url);
-*/
+		$redirect_url = set_redirect_url('login');
 		$this->data['title'] = "Login";
 
 		//validate form input
@@ -822,10 +818,10 @@ class Auth extends Ionauth {
 			$remember = (bool) $this->input->post('remember');
 
 			if ($this->ion_auth->login($this->input->post('identity'), $this->input->post('password'), $remember))
-			{ //if the login is successful
-				//redirect them back to the home page
+			{ 
 				$this->access_log_model->write_entry(1); //1 is the page code for login for the user management section
 				$this->session->set_flashdata('message', $this->as_ion_auth->messages());
+				$redirect_url = $this->get_initial_redirect();
 				redirect(site_url($redirect_url));
 			}
 			else
@@ -1471,6 +1467,62 @@ class Auth extends Ionauth {
 		}
 		redirect(site_url($this->as_ion_auth->referrer));
 	}
+	/* -----------------------------------------------------------------
+	 *  Function get_initial_redirect
+	 *  @author: carolmd
+	 *  @date: Dec 6, 2013
+	 *
+	 *  @description: Determine if this user should go directly to the home page or to the change_herd/select page.
+	 *                If user is a producer, always go to the home page. 
+	 *                If user is admin, rss, or emrss : go to change_herd page.
+	 *                Otherwise, if the user can view >1 herd, go to the change_herd page.
+	 *  			  Also sets the initial herd code in the userdata.
+	 *  -----------------------------------------------------------------
+	 */
+	function get_initial_redirect() {
+		// set the user_data with a valid herd code.
+		$tmp_obj = $this->as_ion_auth->get_herds_by_group($this->session->userdata('active_group_id'),NULL, 2);
+
+		$herd_array = $tmp_obj->result_array();
+		if (count($herd_array) > 0) { 	
+			// set initial herd code in user_data
+			$this->session->set_userdata('herd_code', $herd_array[0]["herd_code"]);
+		}
+		else {
+
+			// found no herds for this user.
+			$this->session->set_flashdata('message', 'A list of herds could not be generated for your account.  If you believe this is an error, please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . '.');
+			//$this->session->set_flashdata('redirect_url',$this->session->flashdata('redirect_url'));
+			$this->session->set_userdata('herd_code', $this->config->item('default_herd'));
+			return('');
+			break;
+		}
+		
+		if ($this->as_ion_auth->is_admin()) {
+			return('change_herd/select');
+			break;
+		} 
+		if ($this->as_ion_auth->is_producer()) {
+			return(''); //blank goes to home page.
+			break;
+		}
+		if ($this->as_ion_auth->is_rss()) {
+			return('change_herd/select');
+			break;
+		}
+		if ($this->as_ion_auth->is_emrss()) {
+			return('change_herd/select');
+			break;
+		}
+		// all other groups: go to change herd IF user has >1 herd. Otherwise, go to home page.
+		if (count($herd_array) > 1) {
+			return('change_herd/select');
+			break;
+		}
+		// If you fall through to here, go to the home page.
+		return('');
+	}
+	
 	
 	// used with dashboard graph
 	function graph_snapshot($report, $type = NULL) {
