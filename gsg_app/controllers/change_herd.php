@@ -115,7 +115,7 @@ class Change_herd extends CI_Controller {
 	}
 
 /**
- * @method select() - option list and input field to select a herd (text field auto-selects options list valur).
+ * @method select() - option list and input field to select a herd (text field auto-selects options list value).
  * 			sets session herd code on successfull submissions.
  *
  * @access	public
@@ -149,32 +149,26 @@ class Change_herd extends CI_Controller {
 		else
 		{
 			$this->data['message'] = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
-
-			$tmp_obj = $this->as_ion_auth->get_herds_by_group(NULL, NULL , TRUE);
-			if(is_string($tmp_obj)){ //producers will return a string instead of the database object
-				$this->session->set_userdata('herd_code', $tmp_obj);
-				$this->session->set_userdata('arr_pstring', $this->herd_model->get_pstring_array($tmp_obj, FALSE));
-				redirect(site_url($redirect_url));
-			}
-			elseif(is_object($tmp_obj)){
-				$tmp_obj = $tmp_obj->result_array();
+			$tmp_obj = $this->as_ion_auth->get_herds_by_group($this->session->userdata('active_group_id'), NULL);
+			$herd_array = $tmp_obj->result_array();
+			if (count($herd_array) > 0) {
 				$this->load->library('herd_manage');
-				$this->data['arr_herd_data'] = $this->herd_manage->set_herd_dropdown_array($tmp_obj);
+				$this->data['arr_herd_data'] = $this->herd_manage->set_herd_dropdown_array($herd_array);
 				unset($tmp_obj);
-			}
-			else{
-				$this->session->set_flashdata('message', 'A list of herds could not be generated for your account.  If you believe this is an error, please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . '.');
-				//$this->session->set_flashdata('redirect_url',$this->session->flashdata('redirect_url'));
-				redirect(site_url($redirect_url));
-			}
-
-			$this->data['herd_code_fill'] = array('name' => 'herd_code_fill',
-				'id' => 'herd_code_fill',
-				'type' => 'text',
-				'size' => '8',
-				'maxlength' => '8',
-				'value' => $this->form_validation->set_value('herd_code_fill'),
-			);
+				}
+				else{
+					$this->session->set_flashdata('message', 'A list of herds could not be generated for your account.  If you believe this is an error, please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . '.');
+					//$this->session->set_flashdata('redirect_url',$this->session->flashdata('redirect_url'));
+					redirect(site_url($redirect_url));
+				}
+	
+				$this->data['herd_code_fill'] = array('name' => 'herd_code_fill',
+					'id' => 'herd_code_fill',
+					'type' => 'text',
+					'size' => '8',
+					'maxlength' => '8',
+					'value' => $this->form_validation->set_value('herd_code_fill'),
+				);
 
 
 			if(is_array($this->page_header_data)){
@@ -200,5 +194,4 @@ class Change_herd extends CI_Controller {
 			$this->load->view('herd_selection', $this->data);
 		}
 	}
-
 }
