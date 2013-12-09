@@ -164,10 +164,27 @@ $config['admin_email']          = "ghartmann@agsource.com"; 	// Admin Email, adm
 $config['cust_serv_company']	  = "AgSource Cooperative Services"; //custom CDT
 $config['cust_serv_email']		   = "ghartmann@agsource.com"; //custom CDT
 $config['cust_serv_phone']		   = "ghartmann@agsource.com"; //custom CDT
+/* -----------------------------------------------------------------
+ *  UPDATE comment
+ *  @author: carolmd
+ *  @date: Dec 6, 2013
+ *
+ *  @description: Gordon revised this to use group_id instead of name. This simplifies using it for lookup later.
+ *                NOTE: if new groups are added, they must be added here. 
+ *                	    The config values are used in libraries/as_ion_auth  , so that would also need to be modified.
+ *  
+ *  -----------------------------------------------------------------
+ */
+$config['default_group']        		= '2'; 			// Default group
+$config['producer_group']        		= '2'; 			// 
+$config['admin_group']          		= '1'; 				// Default administrators group
+$config['manager_group']         		= '3'; 
+$config['field_tech_group']         	= '5'; 
+$config['rss_group']         			= '8'; 
+$config['consultant_group']         	= '9'; 
+$config['association_group']         	= '10';
+$config['emrss_group']       		  	= '11';
 
-$config['default_group']        		= '2'; 			// Default group, use name
-$config['admin_group']          		= '1'; 				// Default administrators group, use name
-$config['manager_group']         		= array('Manager','Genex Admin'); //custom CDT
 $config['identity']             		= 'email'; 				// A database column which is used to login with
 $config['min_password_length']  		= 8; 					// Minimum Required Length of Password
 $config['max_password_length']  		= 20; 					// Maximum Allowed Length of Password
