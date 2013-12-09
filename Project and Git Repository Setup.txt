@@ -108,6 +108,8 @@ click Commit and Push to upload the change to the test server
 repository.  The test server repository in turn uploads the changes
 to the test server's apache instance via a git hook.  Also by pushing,
 you are making your changes available on our common remote repository.
-The other programs can then get your changes with a simple Team>Pull.
+The other programmers can then get your changes with a simple Team>Pull.
+To test the Commit and Push feature, feel free to alter dummy.php and
+Commit and Push your changes to the feweb remote repository.
 
-Now you're all set to get started!
+Now you're all set to start development on MyAgsource.  Good luck!
