@@ -68,11 +68,11 @@ class Herd_model extends CI_Model {
 	 * @return array of object herd
 	 * @author Chris Tranel
 	 **/
-	function get_herds_by_region($region_id){
+	function get_herds_by_region($region_id, $limit = NULL){
 		if(!isset($region_id)) return FALSE;
 		if(!is_array($region_id)) $region_id = array($region_id);
 		$this->db->where_in($this->tables['herds_regions'] . '.region_id', $region_id);
-		return $this->get_herds();
+		return $this->get_herds($limit);
 	}
 
 	/**
@@ -89,8 +89,47 @@ class Herd_model extends CI_Model {
 		->where('(consultants_herds.exp_date > CURDATE() OR consultants_herds.exp_date IS NULL)')
 		->where('request_status_id', 1);
 		return $this->get_herds();
+		
+		
 	}
-
+	/**
+	 * @method get_herds_by_user
+	 *
+	 * @param int user id
+	 * @return simple array of herd codes
+	 *         empty array if no herds found.
+	 * @author Carol McCullough-Dieter
+	 * @description This function queries the users_herds table and the herd_id table,
+	 *           excluding herds that are expired for this user
+	 *           and also excluding herds that are not active.
+	 *           This uses a more direct way to code the query...easier to read, IMHO.
+	 **/
+	public function get_herds_by_user($user_id, $limit = FALSE){
+/*		$this->load->helper('multid_array_helper');
+		$query = $this->db
+				->query('SELECT ' . $this->tables['users_herds'] . '.herd_code '
+					. ' FROM '. $this->tables['users_herds']
+					. ' INNER JOIN ' . $this->tables['herds'] 
+					. ' ON '  . $this->tables['herds'] . '.herd_code = ' . $this->tables['users_herds'] . '.herd_code '
+					. ' WHERE ' . $this->tables['users_herds'] . '.user_id = ' . $user_id
+					. ' AND '. $this->tables['herds'] . '.dhi_quit_date IS NULL ' 
+					. ' AND (' . $this->tables['users_herds'] . '.expire_date >'. now()
+					. ' OR ' . $this->tables['users_herds'] . '.expire_date IS NULL) '
+					. ' ORDER BY ' . $this->tables['users_herds'] . '.herd_code ' );
+		$result = $query->result_array();
+		
+		$result_out = array_flatten($result);
+		return $result_out;
+*/		
+		if(!$user_id) $user_id = $this->session->userdata('user_id');
+		$this->db->join($this->tables['users_herds'] . ' u ', 'h.herd_code = u.herd_code')
+		->where('u.user_id', $user_id)
+		->where ('u.status',1)
+		->where(' (u.expire_date >'. now() . ' OR  u.expire_date IS NULL) ');
+		return $this->get_herds($limit,NULL);
+		
+		
+	}
 
 	/**
 	 * get_herds_by_criteria
@@ -151,7 +190,7 @@ class Herd_model extends CI_Model {
 				,h.[dhi_affiliate_num],h.[supervisor_num],h.[owner_privacy],h.[records_release_code]')
 		->join($this->tables['herds_regions'], 'h.herd_code = ' . $this->tables['herds_regions'] . '.herd_code', 'LEFT')
 		->join($this->tables['regions'], $this->tables['herds_regions'] . '.region_id = ' . $this->tables['regions'] . '.id', 'LEFT')
-		->where("h.member_status_code = 'A'");
+		->where("h.dhi_quit_date IS NULL");
 		
 		if(isset($order_by))$this->db->order_by($order_by);
 		if (isset($limit) && isset($offset)) $this->db->limit($limit, $offset);
