@@ -151,6 +151,9 @@ class Change_herd extends CI_Controller {
 			$this->data['message'] = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
 			$tmp_obj = $this->as_ion_auth->get_herds_by_group($this->session->userdata('active_group_id'), NULL);
 			$herd_array = $tmp_obj->result_array();
+			// ----  BEGIN debugging code - for testing only --------DEBUG_SEARCH_TAG
+						log_message('debug','---- LOG VARIABLE LAST QUERY---- '.$this->db->last_query());
+			// ----  END debugging code - for testing only------------------------------------
 			if (count($herd_array) > 0) {
 				$this->load->library('herd_manage');
 				$this->data['arr_herd_data'] = $this->herd_manage->set_herd_dropdown_array($herd_array);
