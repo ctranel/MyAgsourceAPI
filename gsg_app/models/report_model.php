@@ -55,6 +55,8 @@ class Report_model extends CI_Model {
 		/*in the case of the access log model, the section id is set AFTER the parent (this file/class) is called so that the reference
 		 * back to the access log model does not cause problem.  That is the only other model that calls the get block links method.
 		 */
+		log_message('debug', 'DEBUG.......................models/report_model/__construct('.$section_path.') ');
+		
 		$this->arr_pstring = $this->herd_model->get_pstring_array($this->session->userdata('herd_code'));
 		$this->tables  = $this->config->item('tables', 'ion_auth');
 
