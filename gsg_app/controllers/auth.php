@@ -548,8 +548,7 @@ class Auth extends Ionauth {
 //				$user_id = $this->input->post('user_id');
 				$user_id = $this->session->userdata('user_id');
 				$obj_user = $this->ion_auth_model->user($user_id)->row();
-				$obj_user->arr_groups = array_keys($this->ion_auth_model->get_users_group_array($obj_user->id));
-				//note: active group id should always be 2
+				$obj_user->arr_groups = $this->ion_auth_model->get_users_group($obj_user->id);
 				$tmp_array = $this->as_ion_auth->get_sections_array(2, $user_id, $obj_user->herd_code, NULL, array('subscription','public','unmanaged'));
 				$obj_user->section_id = $this->as_ion_auth->set_form_array($tmp_array, 'id', 'id'); // populate array of sections for which user is enrolled
 				$tmp_array = $this->input->post('section_id');
@@ -692,7 +691,7 @@ class Auth extends Ionauth {
 //			$user_id = $this->input->post('user_id');
 			$user_id = $this->session->userdata('user_id');
 			$obj_user = $this->ion_auth_model->user($user_id)->row();
-			$obj_user->arr_groups = array_keys($this->ion_auth_model->get_users_group_array($obj_user->id));
+			$obj_user->arr_groups = $this->ion_auth_model->get_users_group($obj_user->id);
 			
 			//note: active group id should always be 9
 			$tmp_array = $this->as_ion_auth->get_sections_array(9, $user_id, $obj_user->herd_code, NULL, array('subscription','public','unmanaged'));
@@ -819,6 +818,12 @@ class Auth extends Ionauth {
 
 			if ($this->ion_auth->login($this->input->post('identity'), $this->input->post('password'), $remember))
 			{ 
+				log_message('debug', 'DEBUG.......................controllers/auth.php login() form validation true');
+				
+				// ----  BEGIN debugging code - for testing only --------DEBUG_SEARCH_TAG
+				//var_dump($this->session->userdata);
+				//die();
+				// ----  END debugging code - for testing only------------------------------------
 				$this->access_log_model->write_entry(1); //1 is the page code for login for the user management section
 				$this->session->set_flashdata('message', $this->as_ion_auth->messages());
 				$redirect_url = $this->get_initial_redirect();
@@ -1268,11 +1273,11 @@ class Auth extends Ionauth {
 			}
 			else { //display the edit user form
 				if(isset($obj_user) === FALSE) $obj_user = $this->ion_auth_model->user($user_id)->row();
-				$obj_user->arr_groups = array_keys($this->ion_auth_model->get_users_group_array($obj_user->id));
+				$obj_user->arr_groups = $this->ion_auth_model->get_users_group($obj_user->id);
 				//get default group_id
 				if(empty($obj_user->arr_groups)){ //if no group is set, set the default group
-					$default_group_name = $this->config->item('default_group', 'ion_auth');
-					$obj_user->arr_groups = array($this->ion_auth_model->get_group_by_name($default_group_name)->id);
+					$default_group_id = $this->config->item('default_group', 'ion_auth');
+					$obj_user->arr_groups = array($default_group_id);
 				}
 				$arr_form_group_id = $this->form_validation->set_value('group_id[]', $obj_user->arr_groups);
 				$this->data['group_selected'] = $arr_form_group_id;
