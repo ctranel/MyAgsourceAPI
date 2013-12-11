@@ -316,6 +316,8 @@ class Herd_model extends CI_Model {
 	 * @return bool
 	 * @author Chris Tranel
 	 * 11/14/13: CMMD: fixed from clause.
+	 * @todo is this used? (CMMD) I don't think we need it. If it IS used, fix the stmt so it does not use users_groups. If not, delete the function.
+	 *     
 	 **/
 	public function herd_is_registered($herd_code){
 		$arr_results = $this->db->select('herd_code')
@@ -337,6 +339,7 @@ class Herd_model extends CI_Model {
 	 * @return array of e-mail addresses
 	 * @author Chris Tranel
 	 * 11/14/13: CMMD: Fixed from clause.
+	 * @todo CMMD is this used? If so, remove users_groups table. If not, delete function.
 	 **/
 	public function get_herd_emails($herd_code){
 		$arr_results = $this->db->select('email')

@@ -132,12 +132,24 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * @return bool
 	 * @author Chris Tranel CDT
 	 **/
+	/* -----------------------------------------------------------------
+	 *  UPDATE comment
+	 *  @author: carolmd
+	 *  @date: Dec 9, 2013
+	 *
+	 *  @description: revised the arr_groups so it contains a single group_id.
+	 *  
+	 *  -----------------------------------------------------------------
+	 */
 	protected function _set_session_meta(){
-		$arr_groups = $this->get_users_group_array($this->session->userdata('user_id'));
-		$session_data['arr_groups'] = $arr_groups;
+		$group_id = $this->get_users_group($this->session->userdata('user_id'));
+		// ----  BEGIN debugging code - for testing only --------DEBUG_SEARCH_TAG
+					log_message('debug','---- ion-auth_model __set_session_meta LOG VARIABLE group_id---- '.$group_id);
+		// ----  END debugging code - for testing only------------------------------------
+		$session_data['arr_groups'] = array($group_id);
 		$arr_regions = $this->get_users_region_array($this->session->userdata('user_id'));
 		$session_data['arr_regions'] = $arr_regions;
-		$session_data['active_group_id'] = key($arr_groups);
+		$session_data['active_group_id'] = $group_id;
 
 		// write select query for each meta section
 		if (!empty($this->meta_sections)){
@@ -150,8 +162,17 @@ class Ion_auth_model extends Ion_auth_parent_model
 				}
 			}
 		}
-
-		if (!empty($this->herd_meta_sections) && in_array('2', $arr_groups)){ //get herd data for producers
+/* -----------------------------------------------------------------
+ *  UPDATE comment
+ *  @author: carolmd
+ *  @date: Dec 9, 2013
+ *
+ *  @description: changed to get herd meta data for everyone.
+ *  
+ *  -----------------------------------------------------------------
+ */
+//		if (!empty($this->herd_meta_sections) && in_array('2', $arr_groups)){ //get herd data for producers
+		if (!empty($this->herd_meta_sections) ){ //get herd data
 			foreach($this->herd_meta_sections as $s){
 				if (!empty($this->columns[$s])) {
 					foreach ($this->columns[$s] as $field){
@@ -173,7 +194,16 @@ class Ion_auth_model extends Ion_auth_parent_model
 				}
 			}
 		}
-		if (!empty($this->herd_meta_sections) && in_array('2', $arr_groups)){
+		/* -----------------------------------------------------------------
+		 *  UPDATE comment
+		 *  @author: carolmd
+		 *  @date: Dec 9, 2013
+		 *
+		 *  @description: Revised to gather herd meta data for all users.
+		 *  
+		 *  -----------------------------------------------------------------
+		 */
+		if (!empty($this->herd_meta_sections)){
 			foreach($this->herd_meta_sections as $s){
 				if (!empty($this->columns[$s])) {
 					foreach ($this->columns[$s] as $col){
@@ -199,6 +229,15 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * @return object Users
 	 * @author Chris Tranel CDT
 	 **/
+	/* -----------------------------------------------------------------
+	 *  UPDATE comment
+	 *  @author: carolmd
+	 *  @date: Dec 9, 2013
+	 *
+	 *  @description: removed join criteria on users_groups.
+	 *  
+	 *  -----------------------------------------------------------------
+	 */
 	public function users($group=FALSE, $limit=NULL, $offset=NULL, $arr_joins = NULL)
 	{
 		if (!empty($this->meta_sections)){
@@ -225,20 +264,39 @@ class Ion_auth_model extends Ion_auth_parent_model
 				}
 			}
 		}
+		/* -----------------------------------------------------------------
+		 *  UPDATE comment
+		 *  @author: carolmd
+		 *  @date: Dec 9, 2013
+		 *
+		 *  @description: removed table users_groups , use users table instead.
+		 *  
+		 *  -----------------------------------------------------------------
+		 */
 		$this->db->join(
-		    $this->tables['users_groups'], 
-		    $this->tables['users_groups'].'.user_id = ' . $this->tables['users'].'.id', 
+		    $this->tables['groups'], 
+		    $this->tables['groups'].'.id = ' . $this->tables['users'].'.group_id', 
 		    'inner'
 		);
+
 		if(isset($arr_joins) && is_array($arr_joins)){
 			foreach($arr_joins as $j){
 				$this->db->join($j['table'], $j['condition'], $j['type']);
 			}
 		}
-		
-		$this->db->select("CAST(REPLACE((SELECT group_id AS [data()] FROM " . $this->tables['users_groups'] . " AS groups2 WHERE " . $this->tables['users_groups'] . ".user_id = groups2.user_id ORDER BY group_id FOR xml path('')), ' ', ', ') AS VARCHAR(45)) AS arr_groups",FALSE);
+		/* -----------------------------------------------------------------
+		 *  UPDATE comment
+		 *  @author: carolmd
+		 *  @date: Dec 9, 2013
+		 *
+		 *  @description: removed references to users_groups.
+		 *  
+		 *  -----------------------------------------------------------------
+		 */
+		//$this->db->select("CAST(REPLACE((SELECT group_id AS [data()] FROM " . $this->tables['users_groups'] . " AS groups2 WHERE " . $this->tables['users_groups'] . ".user_id = groups2.user_id ORDER BY group_id FOR xml path('')), ' ', ', ') AS VARCHAR(45)) AS arr_groups",FALSE);
 		//$this->db->select("(SELECT GROUP_CONCAT(group_id) FROM " . $this->tables['users_groups'] . " AS groups2 WHERE " . $this->tables['users_groups'] . ".user_id = groups2.user_id) AS groups",FALSE);
 		//$this->db->distinct();
+		log_message('debug', 'DEBUG.......................models/ion_auth_model/__users('.$group.', '.$limit.', '.$offset.', '.$arr_joins.')');
 		
 		if($limit) $this->db->limit($limit, $offset);
 		$this->db->distinct();
@@ -316,22 +374,50 @@ class Ion_auth_model extends Ion_auth_parent_model
 	}
 	
 	/**
-	 * @method get_user_group_array
+	 * @method get_user_group
 	 *
 	 * @param int user id
-	 * @return array group_id=>group_name
+	 * @return group_id
 	 * @author Chris Tranel
 	 **/
-	public function get_users_group_array($id=false) {
-		$this->db->where($this->tables['groups'] . '.status', 1);
-		$arr_db_groups = parent::get_users_groups($id)->result_array();
-		$arr_return = array();
-		if(is_array($arr_db_groups) && !empty($arr_db_groups)){
-			foreach($arr_db_groups as $g){
-				$arr_return[$g['id']] = $g['name'];
-			}
-		}
-		return $arr_return;
+	/* -----------------------------------------------------------------
+	 *  UPDATE comment
+	*  @author: carolmd
+	*  @date: Dec 9, 2013
+	*
+	*  @description: Changed this to find user's group_id from the users table.
+	*  				Returns int.
+	*  -----------------------------------------------------------------
+	*/
+	public function get_users_group($id=false) {
+		log_message('debug', 'DEBUG.......................models/ion_auth_model/get_users_group('.$id.') ');
+		$this->db
+			->where('id',  $id)
+		    ->select('group_id');
+		$group_mdarray = $this->db
+		           ->get($this->tables['users'])
+		           ->result_array();
+		$group_id = $group_mdarray[0]["group_id"];
+		
+/* ----  BEGIN debugging code - for testing only --------DEBUG_SEARCH_TAG
+ *  Remove before deploying
+ *  @author: carolmd
+ *  @date: Dec 10, 2013
+ *
+ */
+//		echo $this->db->last_query();
+//		echo $group_mdarray[0]["group_id"];
+//		var_dump($group_mdarray);
+//		die();
+		//echo '            group_arr: ';
+		//var_dump($group_arr);
+		//echo '            group_id: ';
+		//var_dump($group_id); die();
+		
+/* 
+ *  ----  END debugging code - for testing only------------------------------------
+ */		
+		return $group_id;
 	}
 
 	/**
@@ -1009,6 +1095,8 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * @author Chris Tranel
 	 **/
 	public function get_task_permissions($section_id = ''){
+		log_message('debug', 'DEBUG.......................models/ion_auth_model/get_task_permissions('.$section_id.') ');
+		
 		$this->load->helper('multid_array_helper');
 		$results = $this->db->select('name, description')
 		->join($this->tables['groups_tasks'] . ' gt', 't.id = gt.task_id', 'left')
