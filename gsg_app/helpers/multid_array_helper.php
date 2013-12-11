@@ -126,7 +126,7 @@ if ( ! function_exists('array_flatten')) {
 function array_flatten_wkeys($array, $preserve_keys = 1, &$newArray = Array()) {
 	foreach ($array as $key => $child) {
 		if (is_array($child)) {
-			$newArray =& array_flatten($child, $preserve_keys, $newArray);
+			$newArray =& array_flatten_wkeys($child, $preserve_keys, $newArray);
 		} elseif ($preserve_keys + is_string($key) > 1) {
 			$newArray[$key] = $child;
 		} else {
