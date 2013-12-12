@@ -15,6 +15,7 @@
  *  
  *  -----------------------------------------------------------------
  */
+
 require_once APPPATH . 'libraries/Ion_auth.php';
 class As_ion_auth extends Ion_auth {
 
@@ -517,8 +518,18 @@ class As_ion_auth extends Ion_auth {
 			$arr_group_obj = $this->region_model->get_regions();
 		}
 		else{
-			echo 'carolmd is not admin ';
-			var_dump($this->session->userdata('arr_regions'));
+			/* ----  BEGIN debugging code - for testing only --------DEBUG_SEARCH_TAG
+			 *  Remove before deploying
+			 *  @author: carolmd
+			 *  @date: Dec 12, 2013
+			 *
+			 */
+			//echo 'carolmd is not admin ';
+			//var_dump($this->session->userdata('arr_regions'));
+				
+			/* 
+			 *  ----  END debugging code - for testing only------------------------------------
+			 */
 			$arr_group_obj = $this->region_model->get_region_by_field('id', $this->session->userdata('arr_regions'));
 		}
 		if(is_array($arr_group_obj)) {
@@ -779,12 +790,14 @@ class As_ion_auth extends Ion_auth {
 	 * @param int form group id -- group id for which change is being attempted
 	 * @return boolean
 	 * @access public
+	 * @todo fix this to allow only administrators? to assign a user's group??
+	 * @todo change to accept single value instead of array.
 	 *
 	 **/
 	public function group_assignable($arr_form_group_id){
 		$session_group_id = $this->session->userdata('active_group_id');
 		if($this->logged_in() === FALSE){
-			$arr_tmp = array_intersect($arr_form_group_id, array('2', '9')); //if select groups include only 2 and 9 (producer and consultant)
+			$arr_tmp = array_intersect($arr_form_group_id, array($this->config->item('producer_group', 'ion_auth'), $this->config->item('consultant_group', 'ion_auth'))); //if select groups include only 2 and 9 (producer and consultant)
 			if(count($arr_tmp) == count($arr_form_group_id)) return TRUE;
 		}
 		elseif($this->is_admin) return TRUE;
@@ -797,28 +810,16 @@ class As_ion_auth extends Ion_auth {
 				case 1:
 					return TRUE;
 					break;
-				case 3:
-					$arr_tmp = array_intersect($arr_form_group_id, array('2', '3', '5', '8', '9'));
-					if(count($arr_tmp) == count($arr_form_group_id)) return TRUE;
-//					if($arr_form_group_id == 2 || $arr_form_group_id == 3 || $arr_form_group_id == 5 || $arr_form_group_id == 8 || $arr_form_group_id == 9)
-					break;
-				case 4:
-					$arr_tmp = array_intersect($arr_form_group_id, array('2', '4', '9'));
-					if(count($arr_tmp) == count($arr_form_group_id)) return TRUE;
-//					if($arr_form_group_id == 2 || $arr_form_group_id == 4 || $arr_form_group_id == 9) return TRUE;
-					break;
 				case 5:
-					$arr_tmp = array_intersect($arr_form_group_id, array('2', '5', '9'));
+					$arr_tmp = array_intersect($arr_form_group_id, 
+						array($this->config->item('producer_group', 'ion_auth'), 
+							  $this->config->item('field_tech_group', 'ion_auth'), 
+							  $this->config->item('consultant_group', 'ion_auth')));
 					if(count($arr_tmp) == count($arr_form_group_id)) return TRUE;
 //					if($arr_form_group_id == 2 || $arr_form_group_id == 5 || $arr_form_group_id == 9) return TRUE;
 					break;
-				case 6:
-					$arr_tmp = array_intersect($arr_form_group_id, array('6', '7'));
-					if(count($arr_tmp) == count($arr_form_group_id)) return TRUE;
-//					if($arr_form_group_id == 6 || $arr_form_group_id == 7) return TRUE;
-					break;
 				case 8:
-					$arr_tmp = array_intersect($arr_form_group_id, array('2', '8', '9'));
+					$arr_tmp = array_intersect($arr_form_group_id, array($this->config->item('producer_group', 'ion_auth'), $this->config->item('consultant_group', 'ion_auth')));
 					if(count($arr_tmp) == count($arr_form_group_id)) return TRUE;
 //					if($arr_form_group_id == 2 || $arr_form_group_id == 8 || $arr_form_group_id == 9) return TRUE;
 					break;

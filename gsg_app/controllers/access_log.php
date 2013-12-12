@@ -24,7 +24,7 @@ class Access_log extends parent_report {
 		/* -----------------------------------------------------------------
 		 *  UPDATE comment
 		*  @author: carolmd
-		*  @date: Dec 12, 2013     
+		*  @date: Dec 12, 2013
 		*
 		*  @description: disabled this function for now, so BETA can be deployed
 		*
