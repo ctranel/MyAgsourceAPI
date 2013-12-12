@@ -43,7 +43,7 @@ class Filters{
 	}
 
 	public static function get_filter_array($json_array){
-		//always have filters for pstring (and page?)
+		//get arguments from json
 		$ci =& get_instance();
 		$arr_params = (array)json_decode(urldecode($json_array));
 		if(isset($arr_params['csrf_test_name']) && $arr_params['csrf_test_name'] != $ci->security->get_csrf_hash()) die("I don't recognize your browser session, your session may have expired, or you may have cookies turned off.");
@@ -51,14 +51,17 @@ class Filters{
 		return $arr_params;
 	}
 
-	public function set_filters(){
+	public function set_filters($is_summary = TRUE){
+		//get filters from DB for the current page
 		$arr_page_filters = $this->ci->filter_model->get_page_filters($this->sect_id, $this->page);
+		
 		//always have filters for herd & pstring (and page?)
 		if(array_key_exists('pstring', $arr_page_filters) === FALSE){ //all queries need to specify pstring
 			$arr_page_filters['pstring'] = array('db_field_name' => 'pstring', 'name' => 'PString', 'type' => 'select multiple', 'default_value' => array(0));
 			if(isset($this->arr_params['pstring']) === FALSE) $this->arr_params['pstring'] = array(0);
 		}
 
+		//get herd code from session data
 		$this->criteria['herd_code'] = $this->ci->session->userdata('herd_code');
 	
 		//iterate through page filter options
@@ -71,6 +74,7 @@ class Filters{
 			elseif(!isset($this->criteria[$k])) $this->criteria[$k] = $f['default_value'];
 			$arr_filters_list[] = $f['db_field_name'];
 		}
+		
 		$this->arr_params = array_filter($this->arr_params, function($val){
 			return ($val !== FALSE && $val !== NULL && $val !== '');
 		});
@@ -116,16 +120,12 @@ class Filters{
 		if(validation_errors()) $this->primary_model->arr_messages[] = validation_errors();
 		$arr_filter_text = $this->ci->reports->filters_to_text($this->criteria, $this->primary_model->arr_pstring);
 		$this->log_filter_text = is_array($arr_filter_text) && !empty($arr_filter_text)?implode('; ', $arr_filter_text):'';
-		
-		if(validation_errors()) $this->primary_model->arr_messages[] = validation_errors();
-		$arr_filter_text = $this->ci->reports->filters_to_text($this->criteria, $this->primary_model->arr_pstring);
-		$log_filter_text = is_array($arr_filter_text) && !empty($arr_filter_text)?implode('; ', $arr_filter_text):'';
+		//create array of all filter data		
 		$filter_data = array(
 				'arr_filters'=>isset($arr_filters_list) && is_array($arr_filters_list)?$arr_filters_list:array(),
 				'filter_selected'=>$this->criteria,
 				'report_path'=>$this->report_path,
-				'arr_pstring'=>$this->primary_model->arr_pstring);
-
+				'arr_pstring'=>$this->primary_model->arr_pstring);				
 		return $filter_data;
 	}
 	

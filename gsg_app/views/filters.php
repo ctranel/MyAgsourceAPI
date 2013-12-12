@@ -25,6 +25,7 @@
 				endif;
 				break;
 			case 'tstring':
+				$arr_tstring = $this->session->userdata('arr_tstring');
 				if(!empty($arr_tstring) && count($arr_tstring) > 1):
 					echo form_fieldset('Pen', array('id' => 'pages-fieldset'));
 						$top=count($arr_tstring);
