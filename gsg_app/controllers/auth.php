@@ -240,7 +240,20 @@ class Auth extends Ionauth {
 	}
 
 	function manage_consult(){
-		if((!$this->as_ion_auth->logged_in())){
+	/* -----------------------------------------------------------------
+	 *  UPDATE comment
+	*  @author: carolmd
+	*  @date: Dec 12, 2013
+	*
+	*  @description: disabled this function for now, so BETA can be deployed
+	*
+	*  -----------------------------------------------------------------
+	*/
+	$this->session->set_flashdata('message', "Manage Consultant temporarily disabled.");
+	redirect(site_url("auth"), 'refresh');
+	// *******************************************************************************
+	
+				if((!$this->as_ion_auth->logged_in())){
        		$this->session->keep_flashdata('message');
 			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
        		redirect(site_url('auth/login'));
@@ -344,6 +357,19 @@ class Auth extends Ionauth {
 	}
 	
 	function consult_manage_herds(){
+		/* -----------------------------------------------------------------
+		 *  UPDATE comment
+		*  @author: carolmd
+		*  @date: Dec 12, 2013
+		*
+		*  @description: disabled this function for now, so BETA can be deployed
+		*
+		*  -----------------------------------------------------------------
+		*/
+		$this->session->set_flashdata('message', "Consultant Manage Herds temporarily disabled.");
+		redirect(site_url("auth"), 'refresh');
+				// *******************************************************************************
+		
 		if((!$this->as_ion_auth->logged_in())){
        		$this->session->keep_flashdata('message');
 			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
@@ -480,6 +506,19 @@ class Auth extends Ionauth {
 	
 	//Producers only, give consultant permission to view herd
 	function consult_access($cuid = NULL) {
+		/* -----------------------------------------------------------------
+		 *  UPDATE comment
+		*  @author: carolmd
+		*  @date: Dec 12, 2013
+		*
+		*  @description: disabled this function for now, so BETA can be deployed
+		*
+		*  -----------------------------------------------------------------
+		*/
+		$this->session->set_flashdata('message', "Consultant Access temporarily disabled.");
+		redirect(site_url("auth"), 'refresh');
+		// *******************************************************************************
+		
 		if((!$this->as_ion_auth->logged_in())){
        		$this->session->keep_flashdata('message');
 			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
@@ -636,6 +675,19 @@ class Auth extends Ionauth {
 
 		//Consultants only, request permission to view herd
 	function consult_request() {
+		/* -----------------------------------------------------------------
+		 *  UPDATE comment
+		*  @author: carolmd
+		*  @date: Dec 12, 2013
+		*
+		*  @description: disabled this function for now, so BETA can be deployed
+		*
+		*  -----------------------------------------------------------------
+		*/
+		$this->session->set_flashdata('message', "Request Herd temporarily disabled.");
+		redirect(site_url("auth"), 'refresh');
+				// *******************************************************************************
+		
 		if((!$this->as_ion_auth->logged_in())){
        		$this->session->keep_flashdata('message');
 			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
@@ -759,6 +811,18 @@ class Auth extends Ionauth {
 	}
 
 	function list_accounts(){
+	/* -----------------------------------------------------------------
+	 *  UPDATE comment
+	*  @author: carolmd
+	*  @date: Dec 12, 2013
+	*
+	*  @description: disabled this function for now, so BETA can be deployed
+	*
+	*  -----------------------------------------------------------------
+	*/
+	$this->session->set_flashdata('message', "List Accounts temporarily disabled.");
+	redirect(site_url("auth"), 'refresh');
+	// *******************************************************************************
 		if(!$this->as_ion_auth->has_permission("Manage Other Accounts")){
        		$this->session->set_flashdata('message',  $this->session->flashdata('message') . "You do not have permission to edit user accounts.");
        		redirect(site_url("auth/index"), 'refresh');
@@ -926,6 +990,19 @@ class Auth extends Ionauth {
 	//deactivate the user
 	function deactivate($id = NULL)
 	{
+	/* -----------------------------------------------------------------
+	 *  UPDATE comment
+	*  @author: carolmd
+	*  @date: Dec 12, 2013
+	*
+	*  @description: disabled this function for now, so BETA can be deployed
+	*
+	*  -----------------------------------------------------------------
+	*/
+	$this->session->set_flashdata('message', "Deactivate User temporarily disabled.");
+	redirect(site_url("auth"), 'refresh');
+	// *******************************************************************************
+	
 		if(is_array($this->page_header_data)){
 			$this->page_header_data = array_merge($this->page_header_data,
 				array(
@@ -945,6 +1022,19 @@ class Auth extends Ionauth {
 //@todo : verify that producer are not allowed to add or modify groups
 	function create_user()
 	{
+		/* -----------------------------------------------------------------
+		 *  UPDATE comment
+		*  @author: carolmd
+		*  @date: Dec 12, 2013
+		*
+		*  @description: disabled this function for now, so BETA can be deployed
+		*
+		*  -----------------------------------------------------------------
+		*/
+		$this->session->set_flashdata('message', "Add Account temporarily disabled.");
+		redirect(site_url("auth"), 'refresh');
+				// *******************************************************************************
+		
 		$this->data['title'] = "Create Account";
 
 		//validate form input
@@ -1174,6 +1264,18 @@ class Auth extends Ionauth {
 
 	//create a new user
 	function edit_user($user_id = FALSE) {
+	/* -----------------------------------------------------------------
+	 *  UPDATE comment
+	 *  @author: carolmd
+	 *  @date: Dec 12, 2013
+	 *
+	 *  @description: disabled this function for now, so BETA can be deployed
+	 *  
+	 *  -----------------------------------------------------------------
+	 */
+		$this->session->set_flashdata('message', "Edit Account temporarily disabled.");
+		redirect(site_url("auth"), 'refresh');
+	// *******************************************************************************
 		if($user_id === FALSE) $user_id = $this->session->userdata('user_id');
 		//does the logged in user have permission to edit this user?
 		if (!$this->as_ion_auth->logged_in()) {
