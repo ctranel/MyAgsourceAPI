@@ -266,11 +266,24 @@ class Carabiner {
 	public function __construct()
 	{
 		$this->CI =& get_instance();
-		log_message('debug', 'Carabiner: Library initialized.');
+
+		$msg = '----INST---- CARAB  Carabiner: Library initialized.';
+		for($i=strlen($msg);$i<120;$i++) {
+			$msg = $msg." ";
+		}
+		$msg = $msg."OK";
+		log_message('info', $msg);
+		
 		
 		if( $this->CI->config->load('carabiner', TRUE, TRUE) ){
 		
-			log_message('debug', 'Carabiner: config loaded from config file.');
+			$msg = "----INST---- CARAB  Carabiner: config loaded from config file.";
+			for($i=strlen($msg);$i<120;$i++) {
+				$msg = $msg." ";
+			}
+			$msg = $msg."OK";
+			log_message('info', $msg);
+				
 			
 			$carabiner_config = $this->CI->config->item('carabiner');
 			$this->config($carabiner_config);
@@ -321,7 +334,14 @@ class Carabiner {
 		$this->script_uri = $this->base_uri.$this->script_dir;
 		$this->style_uri = $this->base_uri.$this->style_dir;
 		$this->cache_uri = $this->base_uri.$this->cache_dir;
-		log_message('debug', 'Carabiner: library configured.');
+
+		$msg = "------------ CONFIG Carabiner: library configured.";
+		for($i=strlen($msg);$i<120;$i++) {
+			$msg = $msg." ";
+		}
+		$msg = $msg."OK";
+		log_message('info', $msg);
+	
 	}
 	
 	
