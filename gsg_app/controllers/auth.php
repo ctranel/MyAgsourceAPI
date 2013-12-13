@@ -1588,8 +1588,7 @@ class Auth extends Ionauth {
 	 */
 	function get_initial_redirect() {
 		// set the user_data with a valid herd code.
-		$tmp_obj = $this->as_ion_auth->get_herds_by_group($this->session->userdata('active_group_id'),NULL, 2);
-
+		$tmp_obj = $this->as_ion_auth->get_herds_by_group($this->session->userdata('active_group_id'),$this->session->userdata('arr_regions'), 2);
 		$herd_array = $tmp_obj->result_array();
 		if (count($herd_array) > 0) { 	
 			// set initial herd code in user_data
@@ -1598,7 +1597,8 @@ class Auth extends Ionauth {
 		else {
 
 			// found no herds for this user.
-			$this->session->set_flashdata('message', 'A list of herds could not be generated for your account.  If you believe this is an error, please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . '.');
+			$this->session->set_flashdata('message', 'A list of herds could not be generated for your account.  If you believe this is an error, please contact ' 
+										. $this->config->item('cust_serv_company', 'ion_auth') . ' at ' . $this->config->item('cust_serv_email', 'ion_auth') . ' or ' . $this->config->item('cust_serv_phone', 'ion_auth') . '.');
 			//$this->session->set_flashdata('redirect_url',$this->session->flashdata('redirect_url'));
 			$this->session->set_userdata('herd_code', $this->config->item('default_herd'));
 			return('');
