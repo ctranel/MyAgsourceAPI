@@ -419,7 +419,7 @@ class As_ion_auth extends Ion_auth {
 	/**
 	 * @method get_herds_by_group()
 	 * @param string group name, defaults to logged in user's group
-	 * @param string region number, defaults to logged in user's region number
+	 * @param array of regions, defaults to logged in user's region array
 	 * @return mixed array of herds or boolean
 	 * @access public
 	 *
@@ -429,17 +429,16 @@ class As_ion_auth extends Ion_auth {
 	 *  @author: carolmd
 	 *  @date: Dec 6, 2013
 	 *
-	 *  @description: Revised function to get herds by looking at users_herds for all but these groups: 
-	 *  				 	admin (sees all herds)
-	 *  					RSS (sees all herds) 
-	 *  					association (sees all herds in the user's region(aka association)
+	 *  @description: Revised function to get herds by user (looking at users_herds table), 
+	 *  				By region (looking at the users table and the herd.dbo.herd_id table.)
+	 *                  Or all herds. 
 	 *  
 	 *                Modified case stmt to use values in CONFIG instead of hard coded values for group_id.
 	 *                Added LIMIT value into input parameters.
 	 *  -----------------------------------------------------------------
 	 */
-	public function get_herds_by_group($group_in = false, $region_in = false, $limit_in = NULL){
-		log_message('debug', 'DEBUG.......................libraries/as_ion_auth/get_herds_by_group('.$group_in.', '.$region_in.', '.$limit_in.') ');
+	public function get_herds_by_group($group_in = false, $region_arr_in = false, $limit_in = NULL){
+		log_message('debug', 'DEBUG.......................libraries/as_ion_auth/get_herds_by_group('.$group_in.',  '.$limit_in.') ');
 		If (!isset($group_in) or empty($group_in)) {
 			// no group id -- fail this function.
 			return FALSE;
@@ -452,22 +451,22 @@ class As_ion_auth extends Ion_auth {
 				return $this->herd_model->get_herds_by_user($this->session->userdata('user_id'), $limit_in);
 				break;
 			case $this->config->item('manager_group', 'ion_auth'):
-				return $this->herd_model->get_herds_by_user($this->session->userdata('user_id'), $limit_in);
+				return $this->herd_model->get_herds_by_region($region_arr_in, $limit_in);
 				break;
 			case $this->config->item('field_tech_group', 'ion_auth'):
 				return $this->herd_model->get_herds_by_user($this->session->userdata('user_id'), $limit_in);
 				break;
 			case $this->config->item('rss_group', 'ion_auth'):
-				return $this->herd_model->get_herds($limit_in);
+				return $this->herd_model->get_herds_by_region($region_arr_in,$limit_in);
 				break;
 			case $this->config->item('consultant_group', 'ion_auth'):
 				return $this->herd_model->get_herds_by_user($this->session->userdata('user_id'), $limit_in);
 				break;
 			case $this->config->item('association_group', 'ion_auth'):
-				return $this->herd_model->get_herds_by_region($region_in, $limit_in);
+				return $this->herd_model->get_herds_by_region($region_arr_in, $limit_in);
 				break;
 			case $this->config->item('emrss_group', 'ion_auth'):
-				return $this->herd_model->get_herds_by_user($this->session->userdata('user_id'), $limit_in);
+				return $this->herd_model->get_herds($limit_in);
 				break;
 				default:
 				return false;
