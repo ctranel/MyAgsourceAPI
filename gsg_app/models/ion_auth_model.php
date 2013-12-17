@@ -398,25 +398,6 @@ class Ion_auth_model extends Ion_auth_parent_model
 		           ->get($this->tables['users'])
 		           ->result_array();
 		$group_id = $group_mdarray[0]["group_id"];
-		
-/* ----  BEGIN debugging code - for testing only --------DEBUG_SEARCH_TAG
- *  Remove before deploying
- *  @author: carolmd
- *  @date: Dec 10, 2013
- *
- */
-//		echo $this->db->last_query();
-//		echo $group_mdarray[0]["group_id"];
-//		var_dump($group_mdarray);
-//		die();
-		//echo '            group_arr: ';
-		//var_dump($group_arr);
-		//echo '            group_id: ';
-		//var_dump($group_id); die();
-		
-/* 
- *  ----  END debugging code - for testing only------------------------------------
- */		
 		return $group_id;
 	}
 
@@ -427,25 +408,28 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * @return array group_id=>group_name
 	 * @author Chris Tranel
 	 **/
+	/* -----------------------------------------------------------------
+	 *  UPDATE comment
+	 *  @author: carolmd
+	 *  @date: Dec 12, 2013
+	 *
+	 *  @description: Changed this function to get user's region_id (aka association_num) from the users table.
+	 *  
+	 *  -----------------------------------------------------------------
+	 */
 	public function get_users_region_array($id=false) {
 		//if no id was passed use the current users id
 		$id || $id = $this->session->userdata('user_id');
-		
-		$arr_db_regions = $this->db
-			->select($this->tables['regions'] . '.id, ' . $this->tables['regions'] . '.region_name')
-			->join($this->tables['regions'], $this->tables['users_regions'] . '.region_id = ' . $this->tables['regions'] . '.id')
-		    ->where($this->tables['users_regions'].'.user_id', $id)
-			->where($this->tables['regions'] . '.status', 1)
-			->get($this->tables['users_regions'])
-			->result_array();
-
-		$arr_return = array();
-		if(is_array($arr_db_regions) && !empty($arr_db_regions)){
-			foreach($arr_db_regions as $r){
-				$arr_return[$r['id']] = $r['id'];
-			}
-		}
-		return $arr_return;
+		log_message('debug', 'DEBUG.......................models/ion_auth_model/get_users_region_array('.$id.') ');
+		$this->db
+		->where('id',  $id)
+		->select('association_num');
+		$assoc_mdarray = $this->db
+		->get($this->tables['users'])
+		->result_array();
+		$assoc_id = $assoc_mdarray[0]["association_num"];
+		$assoc_arr = array($assoc_id);
+		return array($assoc_arr);
 	}
 	
 	

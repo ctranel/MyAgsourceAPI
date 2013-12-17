@@ -136,24 +136,36 @@ class Change_herd extends CI_Controller {
 			redirect(site_url($redirect_url));
 		}
 		//validate form input
+		$selected_herd = $this->input->post('herd_code'); // from the pick list.
+		$typed_in_herd = $this->input->post('herd_code_fill');
+		// use the filled-in field if it is not blank. It overrides the pick list.
+		if ($typed_in_herd > 0) {
+			$selected_herd = $typed_in_herd;
+				log_message('debug','---- LOG MESSAGE ---- change_herd/select.  validating typed in herd:' .$typed_in_herd.':');
+			$tmp_obj = $this->as_ion_auth->get_herds_by_group($this->session->userdata('active_group_id'), $this->session->userdata('arr_regions'));
+			$valid_herd_array = array_flatten($tmp_obj->result_array());
+			unset($tmp_obj);
+			if (!in_array($selected_herd,$valid_herd_array)) {
+				$this->session->set_flashdata('message', 'Invalid herd code, or you do not have access to this herd. Please try again.');
+				redirect(site_url('change_herd/select'),'refresh');
+			}
+		} // end validation of typed in herd code.
 		$this->load->library('form_validation');
-		$this->form_validation->set_rules('herd_code', 'Herd', 'required|max_length[8]');
+		$this->form_validation->set_rules('herd_code', 'Herd', 'required|exact_length[8]');
 		//$this->form_validation->set_rules('herd_code_fill', 'Type Herd Code');
 
-		if ($this->form_validation->run() == TRUE) { //successful submission
-			$this->session->set_userdata('herd_code', $this->input->post('herd_code'));
-			$this->session->set_userdata('arr_pstring', $this->herd_model->get_pstring_array($this->input->post('herd_code'), FALSE));
-			$this->access_log_model->write_entry(2); //2 is the page code for herd change
-			redirect(site_url($redirect_url));
+		if ($this->form_validation->run() == TRUE)  { //successful submission
+				// good herd code selected, redirect to previous page.
+				$this->session->set_userdata('herd_code', $selected_herd);
+				$this->session->set_userdata('arr_pstring', $this->herd_model->get_pstring_array($selected_herd, FALSE));
+				$this->access_log_model->write_entry(2); //2 is the page code for herd change
+				redirect(site_url($redirect_url));
 		}
 		else
 		{
 			$this->data['message'] = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
 			$tmp_obj = $this->as_ion_auth->get_herds_by_group($this->session->userdata('active_group_id'), NULL);
 			$herd_array = $tmp_obj->result_array();
-			// ----  BEGIN debugging code - for testing only --------DEBUG_SEARCH_TAG
-						log_message('debug','---- LOG VARIABLE LAST QUERY---- '.$this->db->last_query());
-			// ----  END debugging code - for testing only------------------------------------
 			if (count($herd_array) > 0) {
 				$this->load->library('herd_manage');
 				$this->data['arr_herd_data'] = $this->herd_manage->set_herd_dropdown_array($herd_array);
@@ -195,6 +207,6 @@ class Change_herd extends CI_Controller {
 			$this->data['page_footer'] = $this->load->view('page_footer', $this->page_footer_data, TRUE);
 
 			$this->load->view('herd_selection', $this->data);
-		}
+		} // end ELSE -- form validation failed.
 	}
 }

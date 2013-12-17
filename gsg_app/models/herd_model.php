@@ -68,10 +68,27 @@ class Herd_model extends CI_Model {
 	 * @return array of object herd
 	 * @author Chris Tranel
 	 **/
-	function get_herds_by_region($region_id, $limit = NULL){
-		if(!isset($region_id)) return FALSE;
-		if(!is_array($region_id)) $region_id = array($region_id);
-		$this->db->where_in($this->tables['herds_regions'] . '.region_id', $region_id);
+	/* -----------------------------------------------------------------
+	 *  UPDATE comment
+	 *  @author: carolmd
+	 *  @date: Dec 12, 2013
+	 *
+	 *  @description: Revised this to query the herd_id table, using the association_num to match $region_id
+	 *                instead of using the herds_region table.
+	 *  
+	 *  -----------------------------------------------------------------
+	 */
+	function get_herds_by_region($region_arr_in, $limit = NULL){
+		$this->load->helper('multid_array_helper');
+		// incoming array might be a multi-dimentional array. If so, need to flatten it into simple array before it can be used in the where clause.
+		$region_arr_in = array_flatten($region_arr_in);
+		If (!isset($region_arr_in) or empty($region_arr_in)) {
+			// no region(s) were sent to this function -- fail this function.
+			return FALSE;
+		}	
+		
+		if(!is_array($region_arr_in)) $region_arr_in = array($region_arr_in);
+		$this->db->where_in('association_num', $region_arr_in);
 		return $this->get_herds($limit);
 	}
 
@@ -102,25 +119,9 @@ class Herd_model extends CI_Model {
 	 * @description This function queries the users_herds table and the herd_id table,
 	 *           excluding herds that are expired for this user
 	 *           and also excluding herds that are not active.
-	 *           This uses a more direct way to code the query...easier to read, IMHO.
 	 **/
 	public function get_herds_by_user($user_id, $limit = FALSE){
-/*		$this->load->helper('multid_array_helper');
-		$query = $this->db
-				->query('SELECT ' . $this->tables['users_herds'] . '.herd_code '
-					. ' FROM '. $this->tables['users_herds']
-					. ' INNER JOIN ' . $this->tables['herds'] 
-					. ' ON '  . $this->tables['herds'] . '.herd_code = ' . $this->tables['users_herds'] . '.herd_code '
-					. ' WHERE ' . $this->tables['users_herds'] . '.user_id = ' . $user_id
-					. ' AND '. $this->tables['herds'] . '.dhi_quit_date IS NULL ' 
-					. ' AND (' . $this->tables['users_herds'] . '.expire_date >'. now()
-					. ' OR ' . $this->tables['users_herds'] . '.expire_date IS NULL) '
-					. ' ORDER BY ' . $this->tables['users_herds'] . '.herd_code ' );
-		$result = $query->result_array();
 		
-		$result_out = array_flatten($result);
-		return $result_out;
-*/		
 		if(!$user_id) $user_id = $this->session->userdata('user_id');
 		$this->db->join($this->tables['users_herds'] . ' u ', 'h.herd_code = u.herd_code')
 		->where('u.user_id', $user_id)
@@ -182,14 +183,21 @@ class Herd_model extends CI_Model {
 	 * @access public
 	 * @author Chris Tranel
 	 **/
+	/* -----------------------------------------------------------------
+	 *  UPDATE comment
+	 *  @author: carolmd
+	 *  @date: Dec 12, 2013
+	 *
+	 *  @description: Revised to NOT use herds_regions table. 
+	 *  
+	 *  -----------------------------------------------------------------
+	 */
 	public function get_herds($limit=NULL, $offset=NULL, $order_by='herd_owner')
 	{
 		$this->db
 		->select('h.[herd_code],h.[farm_name],h.[herd_owner],h.[contact_fn],h.[contact_ln],h.[address_1],h.[address_2]
 				,h.[city],h.[state],h.[zip_5],h.[zip_4],h.[primary_area_code],h.[primary_phone_num],h.[association_num]
 				,h.[dhi_affiliate_num],h.[supervisor_num],h.[owner_privacy],h.[records_release_code]')
-		->join($this->tables['herds_regions'], 'h.herd_code = ' . $this->tables['herds_regions'] . '.herd_code', 'LEFT')
-		->join($this->tables['regions'], $this->tables['herds_regions'] . '.region_id = ' . $this->tables['regions'] . '.id', 'LEFT')
 		->where("h.dhi_quit_date IS NULL");
 		
 		if(isset($order_by))$this->db->order_by($order_by);
