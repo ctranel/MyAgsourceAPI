@@ -97,49 +97,49 @@ class Custom_report extends CI_Controller {
 			
 			//REPORT (BLOCK)
 			$this->form_validation->set_rules('block_id', 'Block ID'); //null if adding
-			$this->form_validation->set_rules('report_name', 'Report Name', 'trim | required | max_length[25]');
-			$this->form_validation->set_rules('report_description', 'Report Description', 'trim | max_length[75]');
+			$this->form_validation->set_rules('report_name', 'Report Name', 'trim|required|max_length[25]');
+			$this->form_validation->set_rules('report_description', 'Report Description', 'trim|max_length[75]');
 			$this->form_validation->set_rules('section_id', 'Section ID');
 			$this->form_validation->set_rules('page_id', 'Page ID');
 			$this->form_validation->set_rules('insert_after', 'Insert After');
 			$this->form_validation->set_rules('report_display_id', 'Report Display Type');
-			$this->form_validation->set_rules('max_rows', 'Max # of Rows', 'trim | max_length[3]');
+			$this->form_validation->set_rules('max_rows', 'Max # of Rows', 'trim|max_length[3]');
 			$this->form_validation->set_rules('chart_type_id', 'Report Chart Type');
 			//REPORT FIELDS
 			$this->form_validation->set_rules('column[]', 'Field');
 			$this->form_validation->set_rules('aggregate[]', 'Field Calculation');
 			$this->form_validation->set_rules('block_header_group_id[]', 'Table Header Group');
-			$this->form_validation->set_rules('table_header_text[]', 'Table Header Text', 'trim | max_length[30]'); //for the field itself, not the header group
+			$this->form_validation->set_rules('table_header_text[]', 'Table Header Text', 'trim|max_length[30]'); //for the field itself, not the header group
 			$this->form_validation->set_rules('series_chart_type_id[]', 'Series Type');
 			//GROUP BY
 			$this->form_validation->set_rules('grouping_field_id[]', 'Grouping Field');
-			$this->form_validation->set_rules('grouping_order[]', 'Grouping Order', 'trim | max_length[1]');
+			$this->form_validation->set_rules('grouping_order[]', 'Grouping Order', 'trim|max_length[1]');
 			//WHERE GROUP
 			$this->form_validation->set_rules('where_group_parent_id[]', 'Where Group Parent');
-			$this->form_validation->set_rules('where_group_operator[]', 'Where Group Operator', 'trim | max_length[1]');
+			$this->form_validation->set_rules('where_group_operator[]', 'Where Group Operator', 'trim|max_length[1]');
 			//WHERE
 			$this->form_validation->set_rules('where_field_id[]', 'Where Field');
 			$this->form_validation->set_rules('where_group_id[]', 'Where Group');
-			$this->form_validation->set_rules('where_condition[]', 'Where Condition', 'trim | max_length[255]');
+			$this->form_validation->set_rules('where_condition[]', 'Where Condition', 'trim|max_length[255]');
 			//SORT
 			$this->form_validation->set_rules('sort_field_id[]', 'Sort Field');
-			$this->form_validation->set_rules('sort_order[]', 'Sort Order', 'trim | max_length[4]');
-			$this->form_validation->set_rules('sort_list_order[]', 'Sort List Order', 'trim | max_length[1]');
+			$this->form_validation->set_rules('sort_order[]', 'Sort Order', 'trim|max_length[4]');
+			$this->form_validation->set_rules('sort_list_order[]', 'Sort List Order', 'trim|max_length[1]');
 			//REPORT HEADER GROUP (table)
 			$this->form_validation->set_rules('header_group_parent_id[]', 'Header Group Parent');
-			$this->form_validation->set_rules('header_group_text[]', 'Header Group Text', 'trim | max_length[50]');
+			$this->form_validation->set_rules('header_group_text[]', 'Header Group Text', 'trim|max_length[50]');
 			//BLOCK AXES (chart)
 			$this->form_validation->set_rules('axes_x_or_y[]', 'Axes X or Y');
 			$this->form_validation->set_rules('axes_field_id[]', 'Field');
-			$this->form_validation->set_rules('axes_text[]', 'Axes Label', 'trim | max_length[50]');
-			$this->form_validation->set_rules('axes_min[]', 'Axes Minimum Value', 'trim | max_length[6]');
-			$this->form_validation->set_rules('axes_max[]', 'Axes Maximum Value', 'trim | max_length[6]');
+			$this->form_validation->set_rules('axes_text[]', 'Axes Label', 'trim|max_length[50]');
+			$this->form_validation->set_rules('axes_min[]', 'Axes Minimum Value', 'trim|max_length[6]');
+			$this->form_validation->set_rules('axes_max[]', 'Axes Maximum Value', 'trim|max_length[6]');
 			$this->form_validation->set_rules('axes_opposite[]', 'Opposite Side');
 			$this->form_validation->set_rules('axes_data_type[]', 'Data Type'); //(datetime, linear)
-			$this->form_validation->set_rules('axes_order[]', 'Axes Order', 'trim | max_length[1]');
+			$this->form_validation->set_rules('axes_order[]', 'Axes Order', 'trim|max_length[1]');
 			//CHART CATEGORIES (chart)
-			$this->form_validation->set_rules('category_name[]', 'Category Name', 'trim | max_length[1]');
-			$this->form_validation->set_rules('category_order[]', 'Category Order', 'trim | max_length[1]');
+			$this->form_validation->set_rules('category_name[]', 'Category Name', 'trim|max_length[1]');
+			$this->form_validation->set_rules('category_order[]', 'Category Order', 'trim|max_length[1]');
 			
 			$is_validated = $this->form_validation->run();
 			if ($is_validated === TRUE) {
