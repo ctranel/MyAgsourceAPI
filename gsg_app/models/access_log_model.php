@@ -3,6 +3,7 @@ require_once APPPATH . 'models/report_model.php';
 class Access_log_model extends Report_Model {
 	public function __construct(){
 		parent::__construct();
+		log_message('debug', 'DEBUG.......................models/access_log_model/__construct() ');
 		$this->db_group_name = 'default';
 		/* -----------------------------------------------------------------
 		 *  UPDATE comment
@@ -100,6 +101,15 @@ class Access_log_model extends Report_Model {
 	 * @author Chris Tranel
 	 **/
 	function prep_select_fields($arr_fields) {
+		log_message('debug', 'DEBUG.......................models/access_log_model/write_entry('.$page_id.', '. $format. ', '.$sort.', '. $filters.') ');
+		// ----  BEGIN debugging code - for testing only --------DEBUG_SEARCH_TAG
+				$c = 0;
+				$arr_temp = array_flatten_wkeys($arr_fields,2);
+				foreach($arr_temp as $k=>$v) {
+					log_message('debug','---- LOG ARRAY ---- Item '.$c.' -- key: '.$k.' value: '.$v);
+					$c++;
+				}
+		// ----  END debugging code - for testing only------------------------------------
 		if(is_array($arr_fields)){
 			// resolve field name/data/format exceptions
 			if (($key = array_search('page_id', $arr_fields)) !== FALSE) {
@@ -115,6 +125,7 @@ class Access_log_model extends Report_Model {
 				$this->{$this->db_group_name}->join($this->tables['regions'], $this->tables['access_log'] . '.user_region_id = ' . $this->tables['regions'] . '.id');
 			}
 			if (($key = array_search('group_id', $arr_fields)) !== FALSE) {
+				/* @todo CMMD next line--- shouldn't this be groups.id as group_id? */
 				$arr_fields[$key] = 'groups.name AS group_id';
 				$this->db->join('groups', 'access_log.group_id = groups.id');
 			}
@@ -246,6 +257,7 @@ class Access_log_model extends Report_Model {
 	 * @author Chris Tranel
 	 **/
 	public function get_block_display_types() {
+		log_message('debug', 'DEBUG.......................models/access_log_model/get_block_display_types() ');
 		return $this->{$this->db_group_name}
 			//->where($this->tables['lookup_display_types'] . '.active', 1)
 			->get($this->tables['lookup_display_types']);
@@ -257,6 +269,7 @@ class Access_log_model extends Report_Model {
 	 * @author Chris Tranel
 	 **/
 	public function get_chart_display_types() {
+		log_message('debug', 'DEBUG.......................models/access_log_model/get_chart_display_types() ');
 		return $this->{$this->db_group_name}
 			//->where($this->tables['lookup_chart_types'] . '.active', 1)
 			->get($this->tables['lookup_chart_types']);
@@ -270,6 +283,7 @@ class Access_log_model extends Report_Model {
 	 * @author Chris Tranel
 	 **/
 	public function get_block_links($section_id = NULL) {
+		log_message('debug', 'DEBUG.......................models/access_log_model/get_block_links('.$section_id.') ');
 		$arr_return = array();
 		if(isset($section_id)) $this->{$this->db_group_name}->where('p.section_id', $section_id);
 		$result = $this->{$this->db_group_name}
@@ -336,7 +350,27 @@ class Access_log_model extends Report_Model {
 	 * @author Chris Tranel
 	 **/
 	function write_entry($page_id, $format='web', $sort=NULL, $filters=NULL){
-		if($this->session->userdata('user_id') == 1) return 1; //do not record admin action
+		/* ----  BEGIN debugging code - for testing only --------DEBUG_SEARCH_TAG
+		 *  Remove before deploying
+		 *  @author: carolmd
+		 *  @date: Dec 9, 2013
+		 *
+		 */
+		 //var_dump($this->session->userdata);die();
+		/* 
+		 *  ----  END debugging code - for testing only------------------------------------
+		 */
+		log_message('debug', 'DEBUG.......................models/access_log_model/write_entry('.$page_id.', '. $format. ', '.$sort.', '. $filters.') ');
+		/* -----------------------------------------------------------------
+		 *  UPDATE comment
+		 *  @author: carolmd
+		 *  @date: Dec 10, 2013
+		 *
+		 *  @description: Changed next line to look at user group id instead of user_id = 1.
+		 *  
+		 *  -----------------------------------------------------------------
+		 */
+		if($this->as_ion_auth->is_admin()) return 1; //do not record admin action
 		$tmp_array = array(
 			'page_id'=>$page_id,
 			'format'=>$format,

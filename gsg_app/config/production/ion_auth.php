@@ -16,6 +16,17 @@
 * Original Author name has been kept but that does not mean that the method has not been modified.
 *
 */
+/* -----------------------------------------------------------------
+ *  UPDATE comment
+*  @author: carolmd
+*  @date: Dec 9, 2013
+*
+*  @description: removed users_group table and users_regions table.
+*                The values that were stored there are now stored in the users table.
+*                Changes will be made to any references that used these two tables.
+*
+*  -----------------------------------------------------------------
+*/
 	$config['use_mongodb'] = FALSE;
 	$config['collections']['users']          = 'users';
 	$config['collections']['groups']         = 'groups';
@@ -43,9 +54,9 @@
 	$config['tables']['groups']  = 'users.dbo.groups';
 	$config['tables']['users_dhi_supervisors']  = 'users.dbo.users_dhi_supervisors';//address.dbo.dhi_supervisor';
 	$config['tables']['regions']  = 'users.dbo.regions';
-	$config['tables']['users_regions']  = 'users.dbo.users_regions';
+//	$config['tables']['users_regions']  = 'users.dbo.users_regions';
 	$config['tables']['users']   = 'users.dbo.users';
-	$config['tables']['users_groups']    = 'users.dbo.users_groups';
+//	$config['tables']['users_groups']    = 'users.dbo.users_groups';
 //	$config['tables']['meta']    = 'users_meta';
 	$config['tables']['users_herds']    = 'users.dbo.users_herds';
 	$config['tables']['login_attempts']  = 'users.dbo.login_attempts';

@@ -98,7 +98,7 @@ if ( ! function_exists('array_flatten')) {
 	/**
 	 * Flattening a multi-dimensional array into a
 	 * single-dimensional one. The resulting keys are a
-	 * string-separated list of the original keys:
+	 * string-separated list of the original keys:  <- found to be false... see array_flatten_wkeys
 	 *
 	 * @param array array to flatten
 	 * @return flattened array
@@ -114,6 +114,28 @@ if ( ! function_exists('array_flatten')) {
 		return $arr_return;
 	}
 }
+
+
+	/**
+	 * @param $array array to be flattened
+	 * @param number $preserve_keys : 0 = preserve none, 1 = preserve string keys only, 2 = all keys 
+	 * @param array to be returned if wanting it passed by ref
+	 * @return Ambigous flattened array with keys preserved as desired
+	 */
+
+function array_flatten_wkeys($array, $preserve_keys = 1, &$newArray = Array()) {
+	foreach ($array as $key => $child) {
+		if (is_array($child)) {
+			$newArray =& array_flatten_wkeys($child, $preserve_keys, $newArray);
+		} elseif ($preserve_keys + is_string($key) > 1) {
+			$newArray[$key] = $child;
+		} else {
+			$newArray[] = $child;
+		}
+	}
+	return $newArray;
+}
+
 /**
 if ( ! function_exists('array_flatten_sep')) {
 

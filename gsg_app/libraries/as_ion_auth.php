@@ -6,6 +6,15 @@
 * Description:  Extends Ben Edmunds Ion Auth library.
 * Requirements: PHP5.3 or above
 */
+/* -----------------------------------------------------------------
+ *  UPDATE comment
+ *  @author: carolmd
+ *  @date: Dec 9, 2013
+ *
+ *  @description: removed strval function from all the is_<group name> functions. Group_id is int.
+ *  
+ *  -----------------------------------------------------------------
+ */
 
 require_once APPPATH . 'libraries/Ion_auth.php';
 class As_ion_auth extends Ion_auth {
@@ -169,24 +178,121 @@ class As_ion_auth extends Ion_auth {
 		 *  
 		 *  -----------------------------------------------------------------
 		 */
-		$active_group = strval($this->session->userdata('active_group_id'));
+		$active_group = $this->session->userdata('active_group_id');
 		if ($active_group === $this->config->item('admin_group', 'ion_auth')) {
 		return TRUE; 
 		}
 		else { return FALSE;
 		}
 	}
-
+	/**
+	 * @method is_producer
+	 *
+	 * @return bool
+	 * @author Carol McCullough-Dieter
+	 * @comment: Compares user's active_group_id to the config value for the producer group.
+	 **/
+	public function is_producer() {
+		$active_group = $this->session->userdata('active_group_id');
+		if ($active_group === $this->config->item('producer_group', 'ion_auth')) {
+			return TRUE;
+		}
+		else { return FALSE;
+		}
+	}
+	/**
+	 * @method is_emrss
+	 *
+	 * @return bool
+	 * @author Carol McCullough-Dieter
+	 * @comment: Compares user's active_group_id to the config value for the emrss group.
+	 **/
+	public function is_emrss() {
+		$active_group = $this->session->userdata('active_group_id');
+		if ($active_group === $this->config->item('rss_group', 'ion_auth')) {
+			return TRUE;
+		}
+		else { return FALSE;
+		}
+	}
+	/**
+	 * @method is_rss
+	 *
+	 * @return bool
+	 * @author Carol McCullough-Dieter
+	 * @comment: Compares user's active_group_id to the config value for the rss group.
+	 **/
+	public function is_rss() {
+		$active_group = $this->session->userdata('active_group_id');
+		if ($active_group === $this->config->item('rss_group', 'ion_auth')) {
+			return TRUE;
+		}
+		else { return FALSE;
+		}
+	}
+	/**
+	 * @method is_consultant
+	 *
+	 * @return bool
+	 * @author Carol McCullough-Dieter
+	 * @comment: Compares user's active_group_id to the config value for the consultant group.
+	 **/
+	public function is_consultant() {
+		$active_group = $this->session->userdata('active_group_id');
+		if ($active_group === $this->config->item('consultant_group', 'ion_auth')) {
+			return TRUE;
+		}
+		else { return FALSE;
+		}
+	}
+	/**
+	 * @method is_association
+	 *
+	 * @return bool
+	 * @author Carol McCullough-Dieter
+	 * @comment: Compares user's active_group_id to the config value for the association group.
+	 **/
+	public function is_association() {
+		$active_group = $this->session->userdata('active_group_id');
+		if ($active_group === $this->config->item('association_group', 'ion_auth')) {
+			return TRUE;
+		}
+		else { return FALSE;
+		}
+	}
+	/**
+	 * @method is_field_tech
+	 *
+	 * @return bool
+	 * @author Carol McCullough-Dieter
+	 * @comment: Compares user's active_group_id to the config value for the field tech group.
+	 **/
+	public function is_field_tech() {
+		$active_group = $this->session->userdata('active_group_id');
+		if ($active_group === $this->config->item('field_tech_group', 'ion_auth')) {
+			return TRUE;
+		}
+		else { return FALSE;
+		}
+	}
 	/**
 	 * @method is_manager
 	 *
 	 * @return bool
 	 * @author Chris Tranel
 	 **/
+	/* -----------------------------------------------------------------
+	 *  UPDATE comment
+	 *  @author: carolmd
+	 *  @date: Dec 6, 2013
+	 *
+	 *  @description: Revised function to not use an array, since active_group_id is always one value.
+	 *  
+	 *  -----------------------------------------------------------------
+	 */
 	public function is_manager() {
-		$tmp_array = $this->session->userdata('arr_groups');
 		$manager_group = $this->config->item('manager_group', 'ion_auth');
-		return in_array($tmp_array[$this->session->userdata('active_group_id')], $manager_group) === FALSE ? FALSE : TRUE;
+		return ($this->session->userdata('active_group_id') === $manager_group);
 		//return $this->in_group($manager_group);
 	}
 
@@ -197,15 +303,28 @@ class As_ion_auth extends Ion_auth {
 	 * @access public
 	 *
 	 **/
+	/* -----------------------------------------------------------------
+	 *  UPDATE comment
+	 *  @author: carolmd
+	 *  @date: Dec 9, 2013
+	 *
+	 *  @description: revised so that only admin users are allowed to edit users.
+	 *  
+	 *  -----------------------------------------------------------------
+	 */
 	public function is_child_user($child_id){ //, $parent_id = FALSE
 /*		if (!$parent_id){
 			$parent_id = $this->session->userdata('user_id');
 		} */
-		$obj_user = $this->ion_auth_model->user($this->session->userdata('user_id'))->row();
-		$obj_user->arr_groups = array_keys($this->ion_auth_model->get_users_group_array($obj_user->id));
+//		$obj_user = $this->ion_auth_model->user($this->session->userdata('user_id'))->row();
+//		$obj_user->arr_groups = $this->ion_auth_model->get_users_group($obj_user->id);
 		if($this->is_admin){
 			return TRUE;
 		}
+		else {
+			return FALSE;
+		}
+/* removed all this other logic. Only admin can edit users.
 		if($this->is_manager){
 			return ($this->ion_auth_model->is_child_producer_user_by_region($obj_user->region_id, $child_id) || $this->ion_auth_model->is_child_field_user_by_region($obj_user->region_id, $child_id));
 		}
@@ -215,6 +334,7 @@ class As_ion_auth extends Ion_auth {
 		else {
 			return false;
 		}
+*/
 	}
 
 	/**
@@ -223,17 +343,31 @@ class As_ion_auth extends Ion_auth {
 	 * @access public
 	 *
 	 **/
+	/* -----------------------------------------------------------------
+	 *  UPDATE comment
+	 *  @author: carolmd
+	 *  @date: Dec 9, 2013
+	 *
+	 *  @description: Revised so that only admin can edit users.
+	 *  
+	 *  -----------------------------------------------------------------
+	 */
 	public function get_child_users(){ //$user_id = FALSE
 /*		if (!$user_id){
 			$user_id = $this->session->userdata('user_id');
 		} */
 		
-		$obj_user = $this->ion_auth_model->user($this->session->userdata('user_id'))->row();
-		$obj_user->arr_groups = array_keys($this->ion_auth_model->get_users_group_array($obj_user->id));
+		//$obj_user = $this->ion_auth_model->user($this->session->userdata('user_id'))->row();
+		//$obj_user->arr_groups = $this->ion_auth_model->get_users_group($obj_user->id);
 		
 		if($this->is_admin){
 			return $this->ion_auth_model->users()->result_array();
 		}
+		else {
+			return FALSE;
+		}
+/* Commented out all remaining code. No others can edit users.
+ * 
 		if($this->is_manager){
 			$arr_tmp1 = $this->ion_auth_model->get_producer_users_by_region($obj_user->region_id)->result_array();
 			$arr_tmp2 = $this->ion_auth_model->get_field_users_by_region($obj_user->region_id)->result_array();
@@ -246,6 +380,7 @@ class As_ion_auth extends Ion_auth {
 		else { // Genex groups or producers
 			return array();
 		}
+*/
 	}
 
 	/**
@@ -284,49 +419,56 @@ class As_ion_auth extends Ion_auth {
 	/**
 	 * @method get_herds_by_group()
 	 * @param string group name, defaults to logged in user's group
-	 * @param string region number, defaults to logged in user's region number
+	 * @param array of regions, defaults to logged in user's region array
 	 * @return mixed array of herds or boolean
 	 * @access public
-	 * @todo: additional function to call this function for each member of group array
 	 *
 	 **/
-	public function get_herds_by_group($group_in = false, $region_in = false){
-		$group_id = $this->session->userdata('active_group_id');
-		$region_num = $region_in ? $region_in : $this->session->userdata('region_num');
-		switch($group_id){
-			case '2': //producer
-				return $this->herd_model->get_herds_by_producer($this->session->userdata('?'));
-				//return $this->session->userdata('herd_code');
+	/* -----------------------------------------------------------------
+	 *  UPDATE comment
+	 *  @author: carolmd
+	 *  @date: Dec 6, 2013
+	 *
+	 *  @description: Revised function to get herds by user (looking at users_herds table), 
+	 *  				By region (looking at the users table and the herd.dbo.herd_id table.)
+	 *                  Or all herds. 
+	 *  
+	 *                Modified case stmt to use values in CONFIG instead of hard coded values for group_id.
+	 *                Added LIMIT value into input parameters.
+	 *  -----------------------------------------------------------------
+	 */
+	public function get_herds_by_group($group_in = false, $region_arr_in = false, $limit_in = NULL){
+		log_message('debug', 'DEBUG.......................libraries/as_ion_auth/get_herds_by_group('.$group_in.',  '.$limit_in.') ');
+		If (!isset($group_in) or empty($group_in)) {
+			// no group id -- fail this function.
+			return FALSE;
+		}
+		switch($group_in){
+			case $this->config->item('admin_group', 'ion_auth'):
+				return $this->herd_model->get_herds($limit_in);
 				break;
-			case '5': //tech
-				$tmp = $this->session->userdata('supervisor_num');
-				if(!empty($tmp)){
-					return $this->herd_model->get_herds_by_tech_num($this->session->userdata('supervisor_num'));
-				}
-				else return false;
+			case $this->config->item('producer_group', 'ion_auth'):
+				return $this->herd_model->get_herds_by_user($this->session->userdata('user_id'), $limit_in);
 				break;
-			case '3': //manager
-				if($region_num > ''){
-					return $this->herd_model->get_herds_by_region($region_num);
-				}
-				else return false;
+			case $this->config->item('manager_group', 'ion_auth'):
+				return $this->herd_model->get_herds_by_region($region_arr_in, $limit_in);
 				break;
-			case '8': //RSS (Region Support Specialist)
-				if($region_num > ''){
-					return $this->herd_model->get_herds_by_region($region_num);
-				}
-				else return false;
+			case $this->config->item('field_tech_group', 'ion_auth'):
+				return $this->herd_model->get_herds_by_user($this->session->userdata('user_id'), $limit_in);
 				break;
-			case '4': //DSR
-				return $this->herd_model->get_herds(null, null);
+			case $this->config->item('rss_group', 'ion_auth'):
+				return $this->herd_model->get_herds_by_region($region_arr_in,$limit_in);
 				break;
-			case '9': //Consultants
-				return $this->herd_model->get_herds_by_consultant();
+			case $this->config->item('consultant_group', 'ion_auth'):
+				return $this->herd_model->get_herds_by_user($this->session->userdata('user_id'), $limit_in);
 				break;
-			case '1': //admin
-				return $this->herd_model->get_herds(null, null);
+			case $this->config->item('association_group', 'ion_auth'):
+				return $this->herd_model->get_herds_by_region($region_arr_in, $limit_in);
 				break;
-			default:
+			case $this->config->item('emrss_group', 'ion_auth'):
+				return $this->herd_model->get_herds($limit_in);
+				break;
+				default:
 				return false;
 		}
 	}
@@ -375,8 +517,18 @@ class As_ion_auth extends Ion_auth {
 			$arr_group_obj = $this->region_model->get_regions();
 		}
 		else{
-			echo 'carolmd is not admin ';
-			var_dump($this->session->userdata('arr_regions'));
+			/* ----  BEGIN debugging code - for testing only --------DEBUG_SEARCH_TAG
+			 *  Remove before deploying
+			 *  @author: carolmd
+			 *  @date: Dec 12, 2013
+			 *
+			 */
+			//echo 'carolmd is not admin ';
+			//var_dump($this->session->userdata('arr_regions'));
+				
+			/* 
+			 *  ----  END debugging code - for testing only------------------------------------
+			 */
 			$arr_group_obj = $this->region_model->get_region_by_field('id', $this->session->userdata('arr_regions'));
 		}
 		if(is_array($arr_group_obj)) {
@@ -439,6 +591,8 @@ class As_ion_auth extends Ion_auth {
 	 * @author Chris Tranel
 	 **/
 	public function subscribed_section($section_id){
+		log_message('debug', 'DEBUG.......................libraries/as_ion_auth/subscribed_section('.$section_id.') ');
+		
 		return TRUE;
 		$tmp_array = $this->arr_user_sections;
 		if(isset($tmp_array) && is_array($tmp_array)){
@@ -458,6 +612,7 @@ class As_ion_auth extends Ion_auth {
 	 * @author Chris Tranel
 	 **/
 	public function get_promo_sections($user_id = FALSE){
+		log_message('debug', 'DEBUG.......................libraries/as_ion_auth/get_promo_sections('.$user_id.' ');
 		if (!$user_id){
 			$user_id = $this->session->userdata('user_id');
 		}
@@ -634,12 +789,14 @@ class As_ion_auth extends Ion_auth {
 	 * @param int form group id -- group id for which change is being attempted
 	 * @return boolean
 	 * @access public
+	 * @todo fix this to allow only administrators? to assign a user's group??
+	 * @todo change to accept single value instead of array.
 	 *
 	 **/
 	public function group_assignable($arr_form_group_id){
 		$session_group_id = $this->session->userdata('active_group_id');
 		if($this->logged_in() === FALSE){
-			$arr_tmp = array_intersect($arr_form_group_id, array('2', '9')); //if select groups include only 2 and 9 (producer and consultant)
+			$arr_tmp = array_intersect($arr_form_group_id, array($this->config->item('producer_group', 'ion_auth'), $this->config->item('consultant_group', 'ion_auth'))); //if select groups include only 2 and 9 (producer and consultant)
 			if(count($arr_tmp) == count($arr_form_group_id)) return TRUE;
 		}
 		elseif($this->is_admin) return TRUE;
@@ -652,28 +809,16 @@ class As_ion_auth extends Ion_auth {
 				case 1:
 					return TRUE;
 					break;
-				case 3:
-					$arr_tmp = array_intersect($arr_form_group_id, array('2', '3', '5', '8', '9'));
-					if(count($arr_tmp) == count($arr_form_group_id)) return TRUE;
-//					if($arr_form_group_id == 2 || $arr_form_group_id == 3 || $arr_form_group_id == 5 || $arr_form_group_id == 8 || $arr_form_group_id == 9)
-					break;
-				case 4:
-					$arr_tmp = array_intersect($arr_form_group_id, array('2', '4', '9'));
-					if(count($arr_tmp) == count($arr_form_group_id)) return TRUE;
-//					if($arr_form_group_id == 2 || $arr_form_group_id == 4 || $arr_form_group_id == 9) return TRUE;
-					break;
 				case 5:
-					$arr_tmp = array_intersect($arr_form_group_id, array('2', '5', '9'));
+					$arr_tmp = array_intersect($arr_form_group_id, 
+						array($this->config->item('producer_group', 'ion_auth'), 
+							  $this->config->item('field_tech_group', 'ion_auth'), 
+							  $this->config->item('consultant_group', 'ion_auth')));
 					if(count($arr_tmp) == count($arr_form_group_id)) return TRUE;
 //					if($arr_form_group_id == 2 || $arr_form_group_id == 5 || $arr_form_group_id == 9) return TRUE;
 					break;
-				case 6:
-					$arr_tmp = array_intersect($arr_form_group_id, array('6', '7'));
-					if(count($arr_tmp) == count($arr_form_group_id)) return TRUE;
-//					if($arr_form_group_id == 6 || $arr_form_group_id == 7) return TRUE;
-					break;
 				case 8:
-					$arr_tmp = array_intersect($arr_form_group_id, array('2', '8', '9'));
+					$arr_tmp = array_intersect($arr_form_group_id, array($this->config->item('producer_group', 'ion_auth'), $this->config->item('consultant_group', 'ion_auth')));
 					if(count($arr_tmp) == count($arr_form_group_id)) return TRUE;
 //					if($arr_form_group_id == 2 || $arr_form_group_id == 8 || $arr_form_group_id == 9) return TRUE;
 					break;

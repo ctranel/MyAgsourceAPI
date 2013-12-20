@@ -25,9 +25,7 @@ class Report_model extends CI_Model {
 	protected $arr_date_fields = array(); //DB list of fields
 	protected $arr_datetime_fields = array(); //DB list of fields
 	protected $arr_timespan_fields = array(); //DB list of fields
-//	protected $arr_notnull_fields = array(); //DB list of fields, used for PCDart file import
 	protected $arr_numeric_fields = array(); //DB list of fields
-//	protected $arr_zero_is_null_fields = array();
 	protected $arr_field_sort = array(); //DB field name is key, default sort order
 	protected $arr_pdf_widths = array(); //DB field name is key
 	protected $arr_aggregates = array(); //numeric key, must be in same order as $arr_select_fields (array_flatten($this->arr_fields), only located in search function)
@@ -55,6 +53,8 @@ class Report_model extends CI_Model {
 		/*in the case of the access log model, the section id is set AFTER the parent (this file/class) is called so that the reference
 		 * back to the access log model does not cause problem.  That is the only other model that calls the get block links method.
 		 */
+		log_message('debug', 'DEBUG.......................models/report_model/__construct('.$section_path.') ');
+		
 		$this->arr_pstring = $this->herd_model->get_pstring_array($this->session->userdata('herd_code'));
 		$this->tables  = $this->config->item('tables', 'ion_auth');
 
@@ -514,15 +514,9 @@ class Report_model extends CI_Model {
 					}
 					else {
 						$v = array_filter($v, create_function('$a', 'return (!empty($a) || $a === "0");'));
-						//$v = array_filter($v);
 						if(empty($v)) continue;
 					}
-					/*if(($tmp_key = array_search('NULL', $v)) !== FALSE){
-						unset($v[$tmp_key]);
-						$text = implode(',', $v);
-						$this->{$this->db_group_name}->where("($k IN ( $text ))");
-					}
-					else */ $this->{$this->db_group_name}->where_in($k, $v);
+					$this->{$this->db_group_name}->where_in($k, $v);
 				}
 				else { //is not an array
 					if(substr($k, -5) == "_dbto"){ //ranges
@@ -566,11 +560,7 @@ class Report_model extends CI_Model {
 			$sort_order = (strtoupper($arr_sort_order[$c]) == 'DESC') ? 'DESC' : 'ASC';
 			$table = isset($this->arr_field_table[$arr_sort_by[$c]]) && !empty($this->arr_field_table[$arr_sort_by[$c]])?$this->arr_field_table[$arr_sort_by[$c]] . '.':$this->primary_table_name . '.';
 			if((!is_array($this->arr_unsortable_columns) || in_array($arr_sort_by[$c], $this->arr_unsortable_columns) === FALSE) && !empty($arr_sort_by[$c])){
-				//if($this->arr_field_sort[$arr_sort_by[$c]] == 'ASC'){
-					//put the select in an array in case the field includes a function with commas between parameters 
-				//	$this->{$this->db_group_name}->select(array('ISNULL(' . $table . $arr_sort_by[$c] . ', 1) AS isnull' . $c), FALSE);
-				//	$this->{$this->db_group_name}->order_by('isnull' . $c, $sort_order);
-				//}
+				//put the select in an array in case the field includes a function with commas between parameters 
 				if(is_array($this->arr_natural_sort_fields) && in_array($arr_sort_by[$c], $this->arr_natural_sort_fields) !== FALSE){
 					$this->{$this->db_group_name}->order_by('users.dbo.naturalize(' . $table . $arr_sort_by[$c] . ')', $sort_order);
 				}
@@ -726,11 +716,9 @@ $bool_bench_column = FALSE;
 			->where('pstring', $this->session->userdata('pstring'))
 			->where($date_field . ' IS NOT NULL')
 			->order_by($this->primary_table_name . '.' . $date_field, 'desc');
-			//->join('herd.dbo.herd_test_results', 'herd.dbo.herd_id.herd_code = herd.dbo.herd_test_results.herd_code','left');
 		if(isset($num_dates) && !empty($num_dates)) $this->{$this->db_group_name}->limit($num_dates);		
 		$result = $this->db->get($this->primary_table_name)->result_array();
 		if(is_array($result) && !empty($result)){
-			//if($num_dates == 1) return $result[0][$date_field];
 			return array_flatten($result);
 		} 
 		else return FALSE;
@@ -749,13 +737,6 @@ FROM (SELECT DISTINCT TOP " . ($num_dates + 1) . " " . $date_field . "
 	WHERE herd_code = '" . $this->session->userdata('herd_code') . "' AND pstring = '" . $this->session->userdata('pstring') . "' AND " . $date_field . " IS NOT NULL
 	ORDER BY " . $date_field . " DESC) a";
 		$result = $this->{$this->db_group_name}->query($sql)->result_array();
-		
-/*			->select("FORMATs(" . $date_field . ", '" . $date_format . "', 'en-US') AS " . $date_field, FALSE)
-			->where('herd_code', $this->session->userdata('herd_code'))
-			->order_by('herd.dbo.herd_test_results.' . $date_field, 'desc');
-		if(isset($num_dates) && !empty($num_dates)) $this->{$this->db_group_name}->limit(1, ($num_dates));		
-		$result = $this->{$this->db_group_name}->get('herd.dbo.herd_test_results')->result_array();
-*/		
 		if(isset($num_dates) === FALSE || ($num_dates) > (count($result) -1)) $num_dates = (count($result) -1);
 		if(is_array($result) && !empty($result)) return $result[($num_dates)][$date_field];
 		else return FALSE;
@@ -863,36 +844,6 @@ FROM (SELECT DISTINCT TOP " . ($num_dates + 1) . " " . $date_field . "
 		else return FALSE;
 	}
 	
-	/**
-	 * @method get_12_mo_avg_graph_data()
-	 * @param array database field names included on graph
-	 * @param string herd code
-	 * @param int number of tests to include on report
-	 * @param string date field used on graph (test_date)
-	 * @return array of data for the chart
-	 * @access public
-	 *
-	function get_12_mo_avg_graph_data($arr_fieldname, $herd_code, $num_tests = 12, $date_field = 'test_date', $arr_categories = NULL){
-		if(is_array($arr_fieldname) && !empty($arr_fieldname)) {
-			$select_str = '';
-			foreach($arr_fieldname AS $f){
-				$select_str .= 'ROUND(AVG(' . $f . ' * 1.0), 0) AS ' . $f . ', ';
-			}
-			$this->{$this->db_group_name}
-			//->select($date_field)
-			->select(substr($select_str, 0, -2), FALSE);	
-		} 
-		$data = $this->{$this->db_group_name}
-		->where('herd_code', $this->session->userdata('herd_code'))
-		//->order_by($date_field, 'desc', FALSE)
-		->limit($num_tests)
-		->get($this->primary_table_name)
-		->result_array();
-		if(isset($arr_categories) && is_array($arr_categories)) $return_val = $this->set_row_to_series($data, $arr_fieldname, $arr_categories);
-		else $return_val = $this->set_longitudinal_data($data, $date_field);
-		return $return_val;
-	}
-	 **/
 	
 	/**
 	 * @method get_graph_data()
@@ -928,7 +879,7 @@ FROM (SELECT DISTINCT TOP " . ($num_dates + 1) . " " . $date_field . "
 	 **/
 	protected function set_longitudinal_data($data, $date_field = 'test_date'){
 		$count = count($data);
-		for($x = 0; $x < $count; $x++){//($x = $count-1; $x >=0; $x--){
+		for($x = 0; $x < $count; $x++){
 			$arr_y_values = $data[$x];
 
 			$arr_fields = array_keys($arr_y_values);
@@ -944,8 +895,6 @@ FROM (SELECT DISTINCT TOP " . ($num_dates + 1) . " " . $date_field . "
 				$arr_d = explode('-', $data[$x][$date_field]);
 				foreach($arr_fields as $k=>$f){
 					$tmp_data = is_numeric($data[$x][$f]) ? (float)$data[$x][$f] : $data[$x][$f];
-					//YYYY-MM-DD: $arr_return[$k][] = array((mktime(0, 0, 0, $arr_d[1], $arr_d[2],$arr_d[0]) * 1000), $tmp_data);
-					//MM-DD-YYYY:
 					$arr_return[$k][] = array((mktime(0, 0, 0, $arr_d[0], $arr_d[1],$arr_d[2]) * 1000), $tmp_data);
 				}
 			}
@@ -1036,29 +985,4 @@ FROM (SELECT DISTINCT TOP " . ($num_dates + 1) . " " . $date_field . "
 		return $arr_series;
 	}
 	
-	/**
-	 * @method get_snapshot_data()
-	 * @param array of field name base text (for percentages, add '_pct')
-	 * @return array of data for the graph
-	 * @access private
-	 *
-	private function set_snapshot_data($data, $arr_fieldname_base){
-//		$this->{$this->db_group_name}->order_by('test_date', 'desc')
-//			->limit(1);
-//		$data = $this->{$this->db_group_name}->get($this->tables['rpm_uhm_new'])->result_array();
-		if(is_array($data) && !empty($data)){
-			$data = $data[0];
-//			$percentiles = $this->get_percentiles($data, $this->tables['rpm_uhm_new'], $this->test_date);
-//			$percentiles = $percentiles[0];
-			
-			foreach($data as $k=>$v){
-				$arr_return[] = array('y'=>$percentiles[$k], 'value'=>$v);
-			}
-			
-			$arr_bench = $this->get_bench_graph_data($arr_fieldname_base);
-			return array($arr_return, $arr_bench);
-		}
-		else return FALSE;
-	}
-	 **/
 }

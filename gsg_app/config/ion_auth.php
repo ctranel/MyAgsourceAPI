@@ -25,6 +25,17 @@
  *  
  *  -----------------------------------------------------------------
  */
+/* -----------------------------------------------------------------
+ *  UPDATE comment
+ *  @author: carolmd
+ *  @date: Dec 9, 2013
+ *
+ *  @description: removed users_group table.
+ *                The values that were stored there are now stored in the users table.
+ *                Changes will be made to any references that used this table.
+ *  
+ *  -----------------------------------------------------------------
+ */
 	$config['use_mongodb'] = FALSE;
 	$config['collections']['users']          	= 'users';
 	$config['collections']['groups']         	= 'groups';
@@ -51,7 +62,8 @@
 	$config['tables']['regions']  				= 'users.dbo.regions';
 	$config['tables']['users_regions']  		= 'users.dbo.users_regions';
 	$config['tables']['users']   				= 'users.dbo.users';
-	$config['tables']['users_groups']    		= 'users.dbo.users_groups';
+//	$config['tables']['users_groups']    		= 'users.dbo.users_groups';
+	$config['tables']['meta']    				= 'users_meta'; 
 	$config['tables']['users_herds']    		= 'users.dbo.users_herds';
 	$config['tables']['login_attempts']  		= 'users.dbo.login_attempts';
 	$config['tables']['tasks']  				= 'users.dbo.tasks';
@@ -72,14 +84,14 @@
 	/* -----------------------------------------------------------------
 	 *  UPDATE comment
 	 *  @author: carolmd
-	 *  @date: Nov 19, 2013
+	 *  @date: Dec 10, 2013
 	 *
-	 *  @description: took out users_dhi_supervisors.
+	 *  @description: Removed users_herds.
 	 *  
 	 *  -----------------------------------------------------------------
 	 */
-	$config['meta_sections']  			       = array('users_herds', 'users_dhi_supervisors', 'users_regions', 'users_sections');//'meta', 
-	$config['meta_sections']  			       = array('users_herds',  'users_regions', 'users_sections');//'meta', 
+	$config['meta_sections']  			       = array( 'users_dhi_supervisors', 'users_regions', 'users_sections');//'meta', 
+	$config['meta_sections']  			       = array( 'users_regions', 'users_sections');//'meta', 
 	$config['herd_meta_sections']   		   = array('herds_sections');
 
 	/**
@@ -87,7 +99,6 @@
 	 * Note that these fields are not required on the user record
 	 **/
 	$config['towrite'] 	= array(
-		'users_herds'	=> array('herd_code'),
 		'users_regions'	=> array('region_id'),
 		'users'=> array('association_num'),
 		'users_sections'=> array('section_id', ''),
@@ -102,20 +113,16 @@
 	$config['join'] = array(
 		'groups'				=> 'group_id',//from ion_auth
 		'users'					=> 'user_id', //from ion_auth
-		'users_herds'			=> 'user_id',
 		'users_regions'			=> 'user_id',
-		'users_dhi_supervisors'	=> 'affiliate_num', // commented out. changed this from user_id
+		'users_dhi_supervisors'	=> 'affiliate_num', // correction for address.dbo.dhi_supervisors.
 		'users_sections'		=> 'user_id',
 		'herds_sections'		=> 'herd_code'
 	);
-
-
 	/**
 	 * Columns in your meta table,
 	 * id not required.
 	 **/
 	$config['columns'] = array(
-		'users_herds'		=> array('herd_code'),
 		'users_regions'		=> array('region_id'),
 		'dhi_supervisor'	=> array('supervisor_num', 'affiliate_num'),
 		'users_sections'	=> array('section_id', 'access_level'),
@@ -158,16 +165,47 @@ $config['max_rounds']     = 9;
  | The controller should check this function and act
  | appropriately. If this variable set to 0, there is no maximum.
  */
-$config['default_herd']		="35999571";
+$config['default_herd']			="35999571";
 $config['site_title']           = "MyAgSource"; 		// Site Title, example.com
 $config['admin_email']          = "ghartmann@agsource.com"; 	// Admin Email, admin@example.com
-$config['cust_serv_company']	  = "AgSource Cooperative Services"; //custom CDT
-$config['cust_serv_email']		   = "ghartmann@agsource.com"; //custom CDT
-$config['cust_serv_phone']		   = "ghartmann@agsource.com"; //custom CDT
-
-$config['default_group']        		= '2'; 			// Default group, use name
-$config['admin_group']          		= '1'; 				// Default administrators group, use name
-$config['manager_group']         		= array('Manager','Genex Admin'); //custom CDT
+$config['cust_serv_company']	= "AgSource Cooperative Services"; //custom CDT
+$config['cust_serv_email']		= "ghartmann@agsource.com"; //custom CDT
+$config['cust_serv_phone']		= "ghartmann@agsource.com"; //custom CDT
+/* ----------------------------------------------------------------
+ * GROUP ID SECTION
+ * 
+ * Note: : if new groups are added, they must be added here. 
+ *                	    The config values are used in libraries/as_ion_auth  , so that would also need to be modified.
+ *                      To add a new group id: 
+ *                      	Insert row into group_id table. 
+ *                      	Insert rows into group_tasks table.
+ *                      	Add config entry here. 
+ *                      	Add new function in libraries/as_ion_auth with name of  is_xxxx (xxx=group name) 
+ *                      	Add logic wherever needed to implement the new group. (search for areas that use config['producer_group'] for clues)
+ */
+/* -----------------------------------------------------------------
+ *  UPDATE comment
+ *  @author: carolmd
+ *  @date: Dec 6, 2013
+ *
+ *  @description: Gordon revised this to use group_id instead of name. This simplifies using it for lookup later.
+ *  
+ *  -----------------------------------------------------------------
+ */
+$config['default_group']        		= '2'; 			// Default group
+$config['producer_group']        		= '2'; 			// 
+$config['admin_group']          		= '1'; 			// Default administrators group
+$config['manager_group']         		= '3'; 
+$config['field_tech_group']         	= '5'; 
+$config['rss_group']         			= '8'; 
+$config['consultant_group']         	= '9'; 
+$config['association_group']         	= '10';
+$config['emrss_group']       		  	= '11';
+/* 
+ * ----------------------------------------------------------------
+ * USER LOGIN SECTION
+ * --------------------------------------------------------------
+ */
 $config['identity']             		= 'email'; 				// A database column which is used to login with
 $config['min_password_length']  		= 8; 					// Minimum Required Length of Password
 $config['max_password_length']  		= 20; 					// Maximum Allowed Length of Password

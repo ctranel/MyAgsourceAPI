@@ -43,7 +43,7 @@ class Filters{
 	}
 
 	public static function get_filter_array($json_array){
-		//always have filters for pstring (and page?)
+		//get arguments from json
 		$ci =& get_instance();
 		$arr_params = (array)json_decode(urldecode($json_array));
 		if(isset($arr_params['csrf_test_name']) && $arr_params['csrf_test_name'] != $ci->security->get_csrf_hash()) die("I don't recognize your browser session, your session may have expired, or you may have cookies turned off.");
@@ -51,14 +51,17 @@ class Filters{
 		return $arr_params;
 	}
 
-	public function set_filters(){
+	public function set_filters($is_summary = TRUE){
+		//get filters from DB for the current page
 		$arr_page_filters = $this->ci->filter_model->get_page_filters($this->sect_id, $this->page);
+		
 		//always have filters for herd & pstring (and page?)
 		if(array_key_exists('pstring', $arr_page_filters) === FALSE){ //all queries need to specify pstring
 			$arr_page_filters['pstring'] = array('db_field_name' => 'pstring', 'name' => 'PString', 'type' => 'select multiple', 'default_value' => array(0));
 			if(isset($this->arr_params['pstring']) === FALSE) $this->arr_params['pstring'] = array(0);
 		}
 
+		//get herd code from session data
 		$this->criteria['herd_code'] = $this->ci->session->userdata('herd_code');
 	
 		//iterate through page filter options
@@ -71,6 +74,7 @@ class Filters{
 			elseif(!isset($this->criteria[$k])) $this->criteria[$k] = $f['default_value'];
 			$arr_filters_list[] = $f['db_field_name'];
 		}
+		
 		$this->arr_params = array_filter($this->arr_params, function($val){
 			return ($val !== FALSE && $val !== NULL && $val !== '');
 		});
@@ -116,74 +120,12 @@ class Filters{
 		if(validation_errors()) $this->primary_model->arr_messages[] = validation_errors();
 		$arr_filter_text = $this->ci->reports->filters_to_text($this->criteria, $this->primary_model->arr_pstring);
 		$this->log_filter_text = is_array($arr_filter_text) && !empty($arr_filter_text)?implode('; ', $arr_filter_text):'';
-		
-		//if params were passed to the function
-/*		if(isset($arr_params) && is_array($arr_params)){
-			foreach($arr_params as $k => $v){
-				$this->criteria[$k] = $v;
-			}
-			foreach($arr_page_filters as $k=>$f){ //key is the db field name
-				//if range, create 2 fields, to and from.  Default value stored in DB as pipe-delimited
-				if($f['type'] == 'range' || $f['type'] == 'date range'){
-					if(!isset($f['default_value'])) $f['default_value'] = '|';
-				}
-				$arr_filters_list[] = $f['db_field_name'];
-				$this->ci->form_validation->set_rules($f['db_field_name'], $f['name']);
-			}
-			
-		}
-		else{
-			var_dump($arr_filters_list);
-			die();
-				
-			//validate form input for filters
-			foreach($arr_page_filters as $k=>$f){ //key is the db field name
-				$c++;
-				//if range, create 2 fields, to and from.  Default value stored in DB as pipe-delimited
-				if($f['type'] == 'range' || $f['type'] == 'date range'){
-					if(!isset($f['default_value'])) $f['default_value'] = '|';
-					list($this->criteria[$k . '_dbfrom'], $this->criteria[$k . '_dbto']) = explode('|', $f['default_value']);
-				}
-				elseif(!isset($this->criteria[$k])) $this->criteria[$k] = $f['default_value'];
-				$arr_filters_list[] = $f['db_field_name'];
-				
-				$this->ci->form_validation->set_rules($f['db_field_name'], $f['name']);
-			}
-				
-			if ($this->ci->form_validation->run() == TRUE) { //successful submission
-				foreach($arr_page_filters as $k=>$f){ //key is the db field name
-					if($k == 'page') $this->criteria['page'] = $this->arr_pages[$this->input->post('page', TRUE)]['name'];
-					elseif($f['type'] == 'range' || $f['type'] == 'date range'){
-						$this->criteria[$k . '_dbfrom'] = $this->input->post($k . '_dbfrom', TRUE);
-						$this->criteria[$k . '_dbto'] = $this->input->post($k . '_dbto', TRUE);
-					}
-					else $this->criteria[$k] = $this->input->post($k, TRUE);
-					if($f['type'] == 'select multiple' && !$this->criteria[$k] && $k != 'pstring') {
-						$this->criteria[$k] = array();
-					}
-				}
-			}
-			else { //if no form has been successfully submitted, set to defaults
-				foreach($arr_page_filters as $f){
-					if($f['db_field_name'] == 'pstring' && (!isset($f['default_value']) || empty($f['default_value']))){
-						$this->criteria['pstring'] = $this->pstring;
-					}
-					elseif($f['db_field_name'] == 'test_date' && (!isset($f['default_value']) || empty($f['default_value']))){
-						$this->criteria['test_date'] = $this->primary_model->get_recent_dates();
-					}
-					else $this->criteria[$f['db_field_name']] = $f['default_value'];
-				}
-			}
-		} */
-		if(validation_errors()) $this->primary_model->arr_messages[] = validation_errors();
-		$arr_filter_text = $this->ci->reports->filters_to_text($this->criteria, $this->primary_model->arr_pstring);
-		$log_filter_text = is_array($arr_filter_text) && !empty($arr_filter_text)?implode('; ', $arr_filter_text):'';
+		//create array of all filter data		
 		$filter_data = array(
 				'arr_filters'=>isset($arr_filters_list) && is_array($arr_filters_list)?$arr_filters_list:array(),
 				'filter_selected'=>$this->criteria,
 				'report_path'=>$this->report_path,
-				'arr_pstring'=>$this->primary_model->arr_pstring);
-
+				'arr_pstring'=>$this->primary_model->arr_pstring);				
 		return $filter_data;
 	}
 	
