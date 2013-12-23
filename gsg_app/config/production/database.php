@@ -40,8 +40,8 @@ $db_server = 'myagsource';
 
 //default is the user database
 $db['default']['hostname'] = '173.229.1.155' ;//testdare.verona.crinet\\' . $db_server;
-$db['default']['username'] = 'myags_admin';//'webuser';//'sa';
-$db['default']['password'] = 'DHI4web*';//'m1$AgSourze';//'ag2013!SQL';
+$db['default']['username'] = 'webuser';
+$db['default']['password'] = 'm1$AgS_R0';
 /* agswww server
 $db['default']['hostname'] = "localhost";
 $db['default']['username'] = "ctranel";
