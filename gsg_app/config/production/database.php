@@ -1,4 +1,27 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+ /* -----------------------------------------------------------------
+ *  UPDATE comment
+ *  @author: carolmd
+ *  @date: Nov 18, 2013
+ *
+ *  @description: Kept the 'default' database connection. 
+ *  Removed all the other database connections. 
+ *  Revisions in several other files was needed to complete this change.
+ *  
+ *  
+ *  -----------------------------------------------------------------
+ */
+/* -----------------------------------------------------------------
+ *  UPDATE comment
+ *  @author: carolmd
+ *  @date: Dec 17, 2013
+ *
+ *  @description: Changed default login from administrator to regular user id "webuser".
+ *                This is for security purposes, so if any malicious SQL does get introduced through the web, it will 
+ *                not be able to do much damage to our data.
+ *  
+ *  -----------------------------------------------------------------
+ */
 /*
 | -------------------------------------------------------------------
 | DATABASE CONNECTIVITY SETTINGS
@@ -7,6 +30,26 @@
 |
 | For complete instructions please consult the "Database Connection"
 | page of the User Guide.
+|
+| -------------------------------------------------------------------
+| DB SPECIFICATION TEMPLATE
+| -------------------------------------------------------------------
+|
+| $db['default']['hostname'] = "localhost";
+| $db['default']['username'] = "root";
+| $db['default']['password'] = "";
+| $db['default']['database'] = "database_name";
+| $db['default']['dbdriver'] = "mysql";
+| $db['default']['dbprefix'] = "";
+| $db['default']['pconnect'] = TRUE;
+| $db['default']['db_debug'] = FALSE;
+| $db['default']['cache_on'] = FALSE;
+| $db['default']['cachedir'] = "";
+| $db['default']['char_set'] = "utf8";
+| $db['default']['dbcollat'] = "utf8_general_ci";
+| $db['default']['swap_pre'] = "";
+| $db['default']['autoinit'] = TRUE;
+| $db['default']['stricton'] = FALSE;
 |
 | -------------------------------------------------------------------
 | EXPLANATION OF VARIABLES
@@ -42,14 +85,6 @@ $db_server = 'myagsource';
 $db['default']['hostname'] = '173.229.1.155' ;//testdare.verona.crinet\\' . $db_server;
 $db['default']['username'] = 'webuser';
 $db['default']['password'] = 'm1$AgS_R0';
-/* agswww server
-$db['default']['hostname'] = "localhost";
-$db['default']['username'] = "ctranel";
-$db['default']['password'] = "wahH0ahh"; */
-/* local(ct) mysql
-$db['default']['hostname'] = "localhost";
-$db['default']['username'] = "dairymanager"; // 
-$db['default']['password'] = "agsource"; // newdata */
 $db['default']['database'] = "users";
 $db['default']['dbdriver'] = 'mssql';//"mysqli";
 $db['default']['dbprefix'] = "";
@@ -63,86 +98,16 @@ $db['default']['swap_pre'] = '';
 $db['default']['autoinit'] = TRUE;
 $db['default']['stricton'] = FALSE;
  
-/* echo '<pre>';
-     print_r($db['default']);
-  echo '</pre>';
-
-  echo 'Trying to connect to database: ' .$db['default']['database'];
-  $dbh=mssql_connect
-  (
-    $db['default']['hostname'],
-    $db['default']['username'],
-    $db['default']['password'])
-    or die('Cannot connect to the database because: ' . mysql_error());
-    mysql_select_db ($db['default']['database']);
-
-    echo '<br />   Connected OK:'  ;
-    print( 'file: ' .__FILE__ . '--> Line: ' .__LINE__); 
-*/
-$db['herd']['hostname'] = '173.229.1.155' ;//'testdare.verona.crinet\\' . $db_server;
-$db['herd']['username'] = 'myags_admin';//'webuser';//
-$db['herd']['password'] = 'DHI4web*';//'m1$AgSourze';//
-$db['herd']['database'] = "herd";//"genetic_selection_guide";publication_name
-$db['herd']['dbdriver'] = "mssql";
-$db['herd']['dbprefix'] = "";
-$db['herd']['pconnect'] = FALSE;
-$db['herd']['db_debug'] = TRUE;
-$db['herd']['cache_on'] = TRUE;
-$db['herd']['cachedir'] = "";
-$db['herd']['char_set'] = "windows-1252";
-$db['herd']['dbcollat'] = "sql_latin1_general_cp1_ci_as";
-$db['herd']['swap_pre'] = '';
-$db['herd']['autoinit'] = TRUE;
-$db['herd']['stricton'] = FALSE;
-/* echo '<pre>';
-     print_r($db['default']);
-  echo '</pre>';
-
-  echo 'Trying to connect to database: ' .$db['default']['database'];
-  $dbh=mssql_connect
-  (
-    $db['default']['hostname'],
-    $db['default']['username'],
-    $db['default']['password'])
-    or die('Cannot connect to the database because: ' . mysql_error());
-    mysql_select_db ($db['default']['database']);
-
-    echo '<br />   Connected OK:'  ;
-    print( 'file: ' .__FILE__ . '--> Line: ' .__LINE__); 
-*/
-
-$db['reports']['hostname'] = '173.229.1.155' ;//'testdare.verona.crinet\\' . $db_server;
-$db['reports']['username'] = 'myags_admin';//'webuser';
-$db['reports']['password'] = 'DHI4web*';//'m1$AgSourze';
-$db['reports']['database'] = "rpm";//"report_card";
-$db['reports']['dbdriver'] = "mssql";
-$db['reports']['dbprefix'] = "";
-$db['reports']['pconnect'] = FALSE;
-$db['reports']['db_debug'] = TRUE;
-$db['reports']['cache_on'] = TRUE;
-$db['reports']['cachedir'] = "";
-$db['reports']['char_set'] = "windows-1252";
-$db['reports']['dbcollat'] = "sql_latin1_general_cp1_ci_as";
-$db['reports']['swap_pre'] = '';
-$db['reports']['autoinit'] = TRUE;
-$db['reports']['stricton'] = FALSE;
-/* echo '<pre>';
-     print_r($db['default']);
-  echo '</pre>';
-
-  echo 'Trying to connect to database: ' .$db['default']['database'];
-  $dbh=mssql_connect
-  (
-    $db['default']['hostname'],
-    $db['default']['username'],
-    $db['default']['password'])
-    or die('Cannot connect to the database because: ' . mysql_error());
-    mysql_select_db ($db['default']['database']);
-
-    echo '<br />   Connected OK:'  ;
-    print( 'file: ' .__FILE__ . '--> Line: ' .__LINE__); 
-*/
-
-
+/* -----------------------------------------------------------------
+ *  UPDATE comment
+ *  @author: carolmd
+ *  @date: Nov 18, 2013
+ *
+ *  @description: removed all the other database connections. 
+ *  Always  use default.
+ *  
+ *  
+ *  -----------------------------------------------------------------
+ */
 /* End of file database.php */
 /* Location: ./system/application/config/database.php */
