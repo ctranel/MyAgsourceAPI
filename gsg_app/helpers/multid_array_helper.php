@@ -175,7 +175,7 @@ function steamroller(array $arr_in, $node_separator = ".") {
 	
 	$new_count = array(0=>0);
 	$arr_out = array();
-	steamroll($arr_out,$arr, $new_count,".");	
+	steamroll($arr_out,$arr, $new_count);	
 	
 	return $arr_out;
 }
