@@ -144,7 +144,7 @@ function rollcount(array &$count, &$depth, $separator) {
 	return $out.":";
 }
 
-function steamroll(array &$output, array &$arr, array &$count, &$depth = 0, $separator) {
+function steamroll(array &$output, array &$arr, array &$count, &$depth, $separator) {
 
 	foreach($arr as $k => $v) {
 		$key = rollcount($count, $depth, $separator).$k;
@@ -175,7 +175,8 @@ function steamroller(array $arr_in, $node_separator = ".") {
 	
 	$new_count = array(0=>0);
 	$arr_out = array();
-	steamroll($arr_out,$arr, $new_count);	
+	$depth = 0;	
+	steamroll($arr_out, $arr_in, $new_count, $depth, $node_separator);	
 	
 	return $arr_out;
 }
