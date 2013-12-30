@@ -226,7 +226,7 @@ $config['directory_trigger']	= 'd'; // experimental not currently in use
 			$config['log_threshold'] = 2;
 			break;
 		case 'production':
-			$config['log_threshold'] = 0;
+			$config['log_threshold'] = 4;
 			break;
 		default:
 			exit('The application environment is not set correctly.');
