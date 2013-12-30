@@ -386,7 +386,7 @@ $config['csrf_expire'] = 7200;
 			$config['compress_output'] = FALSE;
 		break;
 		case 'production':
-			$config['compress_output'] = TRUE;
+			$config['compress_output'] = FALSE;
 		break;
 		default:
 			exit('The application environment is not set correctly.');

@@ -90,7 +90,7 @@
 	 *  
 	 *  -----------------------------------------------------------------
 	 */
-	$config['meta_sections']  			       = array( 'users_dhi_supervisors', 'users_regions', 'users_sections');//'meta', 
+// DELETE	$config['meta_sections']  			       = array( 'users_dhi_supervisors', 'users_regions', 'users_sections');//'meta', 
 	$config['meta_sections']  			       = array( 'users_regions', 'users_sections');//'meta', 
 	$config['herd_meta_sections']   		   = array('herds_sections');
 

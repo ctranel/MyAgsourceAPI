@@ -120,7 +120,7 @@ if ( ! function_exists('array_flatten')) {
 	 * @param $array array to be flattened
 	 * @param number $preserve_keys : 0 = preserve none, 1 = preserve string keys only, 2 = all keys 
 	 * @param array to be returned if wanting it passed by ref
-	 * @return Ambigous flattened array with keys preserved as desired
+	 * @return Ambiguous flattened array with keys preserved as desired - note: unexpected results if there are any duplicate keys
 	 */
 
 function array_flatten_wkeys($array, $preserve_keys = 1, &$newArray = Array()) {
@@ -134,6 +134,51 @@ function array_flatten_wkeys($array, $preserve_keys = 1, &$newArray = Array()) {
 		}
 	}
 	return $newArray;
+}
+
+function rollcount(array &$count, &$depth, $separator) {
+	$out = $count[$depth];
+	for ($i=0;$i<$depth;$i++) {
+		$out = $count[$i].$separator.$out;
+	}
+	return $out.":";
+}
+
+function steamroll(array &$output, array &$arr, array &$count, &$depth, $separator) {
+
+	foreach($arr as $k => $v) {
+		$key = rollcount($count, $depth, $separator).$k;
+		if (is_array($v) && empty($v)) {
+			$output[$key] = "Array(empty)";
+		}
+		elseif (is_array($v)) {
+			$output[$key] = "Array";
+			$depth++;
+			$count[$depth]=0;
+			steamroll($output, $v, $count, $depth, $separator);
+		}
+		else {
+			$output[$key] = $v;
+		}
+		$count[$depth]++;
+	}
+	$depth--;
+}
+
+	/**
+	 * @param $arr_in array to be flattened
+	 * @param $node_separator character used to separate keynode indices
+	 * @return an single dimension array with nodeindices concatenated to keys and values as values
+	 */
+
+function steamroller(array $arr_in, $node_separator = ".") {
+	
+	$new_count = array(0=>0);
+	$arr_out = array();
+	$depth = 0;	
+	steamroll($arr_out, $arr_in, $new_count, $depth, $node_separator);	
+	
+	return $arr_out;
 }
 
 /**

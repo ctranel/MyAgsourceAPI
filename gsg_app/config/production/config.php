@@ -14,8 +14,8 @@
 	switch (ENVIRONMENT)
 	{
 		case 'development':
-			$config['base_url']	= "http://localhost/app/";
-			$config['base_url_assets']	= "http://localhost/app/";
+			$config['base_url']	= "http://localhost/MyAgSource/";
+			$config['base_url_assets']	= "http://localhost/MyAgSource/";
 		break;
 		case 'testing':
 			$config['base_url']	= "http://feweb.verona.crinet/myagsource/";
@@ -217,7 +217,20 @@ $config['directory_trigger']	= 'd'; // experimental not currently in use
 | your log files will fill up very fast.
 |
 */
-$config['log_threshold'] = 0;
+	switch (ENVIRONMENT)
+	{
+		case 'development':
+			$config['log_threshold'] = 4;
+			break;
+		case 'testing':
+			$config['log_threshold'] = 2;
+			break;
+		case 'production':
+			$config['log_threshold'] = 0;
+			break;
+		default:
+			exit('The application environment is not set correctly.');
+	}
 
 /*
 |--------------------------------------------------------------------------
@@ -228,7 +241,20 @@ $config['log_threshold'] = 0;
 | system/logs/ folder.  Use a full server path with trailing slash.
 |
 */
-$config['log_path'] = '';
+	switch (ENVIRONMENT)
+	{
+		case 'development':
+			$config['log_path'] = 'C:\\MyAgSource\\logs\\';
+			break;
+		case 'testing':
+			$config['log_path'] = '';
+			break;
+		case 'production':
+			$config['log_path'] = '';
+			break;
+		default:
+			exit('The application environment is not set correctly.');
+	}
 
 /*
 |--------------------------------------------------------------------------
