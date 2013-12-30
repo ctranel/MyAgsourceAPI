@@ -4,11 +4,11 @@
  *  @author: carolmd
  *  @date: Nov 18, 2013
  *
- *  @description: Kept the 'default' database connection. 
- *  Removed all the other database connections. 
+ *  @description: Kept the 'default' database connection.
+ *  Removed all the other database connections.
  *  Revisions in several other files was needed to complete this change.
- *  
- *  
+ *
+ *
  *  -----------------------------------------------------------------
  */
 /* -----------------------------------------------------------------
@@ -17,9 +17,9 @@
  *  @date: Dec 17, 2013
  *
  *  @description: Changed default login from administrator to regular user id "webuser".
- *                This is for security purposes, so if any malicious SQL does get introduced through the web, it will 
+ *                This is for security purposes, so if any malicious SQL does get introduced through the web, it will
  *                not be able to do much damage to our data.
- *  
+ *
  *  -----------------------------------------------------------------
  */
 /*
@@ -100,6 +100,7 @@ switch (ENVIRONMENT)
 		$db['default']['swap_pre'] = '';
 		$db['default']['autoinit'] = TRUE;
 		$db['default']['stricton'] = FALSE;
+		break;
 	case 'testing':
 		$db['default']['hostname'] = 'testdare.verona.crinet\\' . $db_server;
 		$db['default']['username'] = 'webuser';
@@ -116,6 +117,7 @@ switch (ENVIRONMENT)
 		$db['default']['swap_pre'] = '';
 		$db['default']['autoinit'] = TRUE;
 		$db['default']['stricton'] = FALSE;
+		break;
 	case 'production':
 		//default is the user database
 		$db['default']['hostname'] = '173.229.1.155' ;
@@ -133,8 +135,9 @@ switch (ENVIRONMENT)
 		$db['default']['swap_pre'] = '';
 		$db['default']['autoinit'] = TRUE;
 		$db['default']['stricton'] = FALSE;
+		break;
 	default:
-		exit('The application environment is not set correctly.');
+		exit('The application environment is not set correctly - database.');
 }
 
 
@@ -148,10 +151,10 @@ switch (ENVIRONMENT)
  *  @author: carolmd
  *  @date: Nov 18, 2013
  *
- *  @description: removed all the other database connections. 
+ *  @description: removed all the other database connections.
  *  Always  use default.
- *  
- *  
+ *
+ *
  *  -----------------------------------------------------------------
  */
 /* End of file database.php */
