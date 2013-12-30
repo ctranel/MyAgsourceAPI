@@ -26,7 +26,7 @@
 			$config['base_url_assets']	= "http://www.myagsource.com/myagsource/";
 		break;
 		default:
-			exit('The application environment is not set correctly.');
+			exit('The application environment is not set correctly. - base_url');
 	}
 
 /*
@@ -62,7 +62,7 @@
 			$config['index_page'] = "index.php/";
 		break;
 		default:
-			exit('The application environment is not set correctly.');
+			exit('The application environment is not set correctly - index_page.');
 	}
 
 /*
@@ -229,7 +229,7 @@ $config['directory_trigger']	= 'd'; // experimental not currently in use
 			$config['log_threshold'] = 4;
 			break;
 		default:
-			exit('The application environment is not set correctly.');
+			exit('The application environment is not set correctly - log_threshold.');
 	}
 
 /*
@@ -253,7 +253,7 @@ $config['directory_trigger']	= 'd'; // experimental not currently in use
 			$config['log_path'] = '';
 			break;
 		default:
-			exit('The application environment is not set correctly.');
+			exit('The application environment is not set correctly - log_path.');
 	}
 
 /*
@@ -389,7 +389,7 @@ $config['csrf_expire'] = 7200;
 			$config['compress_output'] = FALSE;
 		break;
 		default:
-			exit('The application environment is not set correctly.');
+			exit('The application environment is not set correctly - compress_output.');
 	}
 
 /*
