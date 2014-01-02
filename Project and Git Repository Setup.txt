@@ -1,40 +1,115 @@
-Egit/Project setup
+Egit/MyAgSource Project setup
 
-In Git Repositories:
-Clone remote repository.
+Note: In all places, MyAgSource currently has its
+M, A and S capitalized.  This is important when creating
+directories, entering URLs, etc.
 
-You'll need the URI.  URI for MyAgsource for example:
-ssh://kmarshall@feweb.verona.crinet/var/local/repos/MyAgsource.git
+1. To get started, first get a working copy of Zend Eclipse.
+You will find this at the hidden URL of:
+http://www.eclipse.org/pdt/downloads
+(pdt meaning php developer tools)
 
-New > Project from Existing directory
+2. Extract the zip file to the directory you'd like Eclipse in.
+I personally avoid the program files directory due to its
+virtualization issues in recent versions of Windows.  I went with
+just C:\Eclipse
+
+3. Run Eclipse.  You may also want to right-click on the executable
+and pin it to taskbar and/or start menu.
+
+4a. Next, in Eclipse, go to Help>Check for Updates.
+
+4b.While Eclipse is updating itself, get a login for the feweb
+server from the linux server admin (currently Rich Pinkall-Pollei).
+He will email you your new login and password.
+
+4c. When done, Eclipse will ask to restart.
+
+5. Go to Help> Install New Software.  In the Work With: box, enter:
+download.eclipse.org/egit/updates
+
+6. In Eclipse, go to Window>Show View>Other...
+From the list choose Git>Git Repositories
+
+7. With the view open, click Clone a repository
+
+8. Follow the steps.  Be sure the repository is being copied
+to C:\Users\<yourwinloginname>\git\MyAgSource.
+You'll also need the URI.  URI for the MyAgsource repository is:
+ssh://kmarshall@feweb.verona.crinet/var/local/repos/MyAgsource
+Substitue my login with yours, enter your password and check
+Keep in Secure Store so you can "Commit and Push", etc without
+having to enter your password each time.
+
+9. Go to File>New > PHP Project from Existing directory
 Select the new clone in your local git folder
-For example: C:\Users\kmarshall\git\MyAgsource
+For example: C:\Users\<yourwinloginname>\git\MyAgsource
+and follow the remaining steps (everything should already
+be correct... don't import existing projects, there are none).
 
-Once project is loaded into PHP Explorer,
-  right click on topmost project folder.
-Choose Automatic Upload and enable it.
+10. Install a copy of ZendServer on your machine.  Be sure to
+install it to C:\Program Files (x86)\.  This will put it in
+the same place as the other developers for ease of debugging.
+If done properly, Apache's deployment folder htdocs will be:
+C:\Program Files (x86)\Zend\Apache2\htdocs
 
-Then point it to Local Connection and the htdocs folder
-  of your localhost.
+11. Navigate to htdocs in Windows Explorer (file browser).
+Make a new folder in htdocs called MyAgSource.
+
+12. Once Zend Server is installed, the MyAgSource directory is
+made and the project is loaded in Eclipse's PHP Explorer, right
+click on the topmost project folder and go to Properties.
+Choose Automatic Upload.  First, enable it and choose local
+connection.  Then browse to:
+C:\Program Files (x86)\Zend\Apache2\htdocs\MyAgSource.
+Hit OK to select it for your local connection.
+IMPORTANT - Local Connection should point to:
+C:\Program Files (x86)\Zend\Apache2\htdocs\MyAgSource
+It is important the folder name for the local connection
+should be the same as other programmers' on the same project
+so urls on each machine are identical for troubleshooting
+purposes.  Hit Ok when done.
+
+13. If it works properly, you'll get 2 prompts: the first will
+be Eclipse wanting to establish write privileges, the 2nd wanting
+to perform an upload now.  Click Ok/Yes to both.
+
+14. Get a working copy of index.php from a colleague index.php.
+It should not be tracked and SHOULD be ignored as each machine in
+turn will need index.php to be configured properly for CodeIgniter
+to work with your machine's directory structure.
+index.php should have its environment variable set to 'development'
+for programmers' machines, 'testing' for the test server and
+'production' for the live server.  Save a copy of index.php to your
+htdocs/MyAgSource directory and then you can add it to the project
+via File>Import.
   
-For example: C:\Program Files (x86)\Zend\Apache2\htdocs\app
+15. You will also need to get a copy of the as_sys folder and put it
+in your Apache2 folder (same folder your htdocs directory is in).
+as_sys contains MyAgSource's custom codeigniter system files.
 
-Finally, get a working copy of index.php from a colleague or make
-  one.  index.php should not be tracked and SHOULD be ignored as
-  each machine in turn will need index.php to track the specific
-  directory tree locally.  index.php should have its environment
-  variable set to 'development' for programmers' machines,
-  'testing' for the test server and 'production' for the live
-  server.
+16. Finally, you may need to change the php.ini file in your
+C:\Program Files (x86\Zend\ZendServer\etc\ folder.  Do a search for
+date.timezone, uncomment it (remove the semi-colon) and change it to:
+date.timezone = "America/Chicago"
 
-The folder name for the local connection should be the same as
-  other programmers' on the same project so urls on each machine
-  are identical for troubleshooting purposes.
-  
-When everything is working, saving a file locally will
-  automatically upload to the localhost for easy debugging.
-  If it works correctly, Commit and Push to upload the change to
-  the test server repository which in turn uploads to the test
-  server host via a hook.  It will also allow other programmers
-  to pull and retrieve your changes.
-  
+17. If you've done everything correctly, opening up Google Chrome
+and navigating to:
+http://localhost/MyAgsource/
+will load the MyAgSource site on your local machine.
+
+Final Note: When everything is working, saving a file in Eclipse
+will automatically upload it to Apache's deployment folder (the
+local connection we specified above).  You can then refresh the
+site on localhost and be able to see your changes immediately.
+If your changes work correctly, right-click the file and Team>Commit...
+Enter a description of your change into the git comment box and then
+click Commit and Push to upload the change to the test server
+repository.  The test server repository in turn uploads the changes
+to the test server's apache instance via a git hook.  Also by pushing,
+you are making your changes available on our common remote repository.
+The other programmers can then get your changes with a simple Team>Pull.
+To test the Commit and Push feature, feel free to alter dummy.php and
+Commit and Push your changes to the feweb remote repository.
+
+Now you're all set to start development on MyAgsource.  Good luck!

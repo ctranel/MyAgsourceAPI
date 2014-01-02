@@ -9,7 +9,13 @@
 <?php echo form_open($form_url, array('name'=>'filter-form', 'id'=>'filter-form'));?>
 <p></p>
 <?php if(is_array($arr_filters)):
+
+	 
 	 foreach($arr_filters as $f):
+	 	// ----  BEGIN debugging code - for testing only --------DEBUG_SEARCH_TAG
+	 				log_message('debug','---- LOG VARIABLE ---- $f: '.$f);
+	 	// ----  END debugging code - for testing only------------------------------------
+	 
 		switch($f): 
 			case 'pstring':
 				if(!empty($arr_pstring) && count($arr_pstring) > 1):
@@ -25,6 +31,7 @@
 				endif;
 				break;
 			case 'tstring':
+				$arr_tstring = $this->session->userdata('arr_tstring');
 				if(!empty($arr_tstring) && count($arr_tstring) > 1):
 					echo form_fieldset('Pen', array('id' => 'pages-fieldset'));
 						$top=count($arr_tstring);
@@ -98,6 +105,12 @@
 					and <?php echo form_input(array('name'=>'curr_lact_dim_dbto', 'value'=>$filter_selected['curr_lact_dim_dbto'], 'size'=>'3', 'maxlength'=>'3', 'id'=>'curr_lact_dim_dbto')); ?>
 				</p>
 				<?php break;
+			case 'curr_ltd_dim':
+				echo form_fieldset('DIM Range', array('id' => 'curr_ltd_dim-fieldset')); ?>
+					Between <?php echo form_input(array('name'=>'curr_ltd_dim_dbfrom', 'value'=>$filter_selected['curr_ltd_dim_dbfrom'], 'size'=>'3', 'maxlength'=>'3', 'id'=>'curr_ltd_dim_dbfrom')); ?>
+					and <?php echo form_input(array('name'=>'curr_ltd_dim_dbto', 'value'=>$filter_selected['curr_ltd_dim_dbto'], 'size'=>'3', 'maxlength'=>'3', 'id'=>'curr_ltd_dim_dbto')); ?>
+				<?php echo form_fieldset_close();
+				break;
 			case 'curr_lact_dim':
 				echo form_fieldset('DIM Range', array('id' => 'dam_lact_num-fieldset')); ?>
 					Between <?php echo form_input(array('name'=>'curr_lact_dim_dbfrom', 'value'=>$filter_selected['curr_lact_dim_dbfrom'], 'size'=>'3', 'maxlength'=>'3', 'id'=>'curr_lact_dim_dbfrom')); ?>
@@ -111,7 +124,13 @@
 					and <?php echo form_input(array('name'=>'age_months_dbto', 'value'=>$filter_selected['age_months_dbto'], 'size'=>'4', 'maxlength'=>'4', 'id'=>'age_months_dbto')); ?>
 				<?php echo form_fieldset_close();
 				break;
-			endswitch; 
+			case 'scc_cnt_1':
+				echo form_fieldset('SCC Count Range', array('id' => 'scc_cnt_1-fieldset')); ?>
+					Between <?php echo form_input(array('name'=>'scc_cnt_1_dbfrom', 'value'=>$filter_selected['scc_cnt_1_dbfrom'], 'size'=>'5', 'maxlength'=>'5', 'id'=>'scc_cnt_1_dbfrom')); ?>
+					and <?php echo form_input(array('name'=>'scc_cnt_1_dbto', 'value'=>$filter_selected['scc_cnt_1_dbto'], 'size'=>'5', 'maxlength'=>'5', 'id'=>'scc_cnt_1_dbto')); ?>
+				<?php echo form_fieldset_close();
+				break;
+		endswitch; 
 	endforeach;
 endif; ?>
 <div class="submit"><?php echo form_submit('filter_submit', 'Apply Filter');?>&nbsp;&nbsp;&nbsp;<?php echo form_button('reset_filter', 'Reset Filter', 'onclick="form_reset()"')?>

@@ -1,4 +1,6 @@
-<?php if(isset($page_header) !== false) echo $page_header; ?>
+<?php 
+			log_message('debug', 'DEBUG.......................views/auth/login.php ');
+			if(isset($page_header) !== false) echo $page_header; ?>
 <div class='mainInfo'>
 
 	<?php if(isset($page_heading) !== false) echo heading($page_heading); ?>

@@ -22,11 +22,11 @@
 			$config['base_url_assets']	= "http://feweb.verona.crinet/myagsource/";
 		break;
 		case 'production':
-			$config['base_url']	= "http://173.229.1.156/myagsource/";
-			$config['base_url_assets']	= "http://173.229.1.156/myagsource/";
+			$config['base_url']	= "http://www.myagsource.com/myagsource/";
+			$config['base_url_assets']	= "http://www.myagsource.com/myagsource/";
 		break;
 		default:
-			exit('The application environment is not set correctly - t_base_url.');
+			exit('The application environment is not set correctly. - base_url');
 	}
 
 /*
@@ -62,7 +62,7 @@
 			$config['index_page'] = "index.php/";
 		break;
 		default:
-			exit('The application environment is not set correctly - t_index_page.');
+			exit('The application environment is not set correctly - index_page.');
 	}
 
 /*
@@ -229,7 +229,7 @@ $config['directory_trigger']	= 'd'; // experimental not currently in use
 			$config['log_threshold'] = 0;
 			break;
 		default:
-			exit('The application environment is not set correctly - t_log_threshold.');
+			exit('The application environment is not set correctly - log_threshold.');
 	}
 
 /*
@@ -253,7 +253,7 @@ $config['directory_trigger']	= 'd'; // experimental not currently in use
 			$config['log_path'] = '';
 			break;
 		default:
-			exit('The application environment is not set correctly - t_log_path.');
+			exit('The application environment is not set correctly - log_path.');
 	}
 
 /*
@@ -389,7 +389,7 @@ $config['csrf_expire'] = 7200;
 			$config['compress_output'] = FALSE;
 		break;
 		default:
-			exit('The application environment is not set correctly - t_compress_output.');
+			exit('The application environment is not set correctly - compress_output.');
 	}
 
 /*

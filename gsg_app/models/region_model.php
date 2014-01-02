@@ -1,6 +1,21 @@
 <?php
 class Region_model extends CI_Model {
 	public $error;
+	/* -----------------------------------------------------------------
+	 *  UPDATE comment
+	 *  @author: carolmd
+	 *  @date: Nov 25, 2013
+	 *
+	 *  @description: Added custruct function to allow loading ion_auth tables config.
+	 *  
+	 *  -----------------------------------------------------------------
+	 */
+	public function __construct(){
+		parent::__construct();
+		//initialize db tables data
+		$this->tables  = $this->config->item('tables', 'ion_auth');
+	}
+	
 	/**
 	 * get_region_by_name
 	 *
@@ -23,8 +38,7 @@ class Region_model extends CI_Model {
 	public function get_regions($limit=NULL, $offset=NULL) {
 		if (isset($limit) && isset($offset))
 		$this->db->limit($limit, $offset);
-
-		return $this->db->get($this->ion_auth_model->tables['regions'])->result();
+		return $this->db->get($this->tables['regions'])->result();
 	}
 	/**
 	 * create_region

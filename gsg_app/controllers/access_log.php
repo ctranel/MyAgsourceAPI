@@ -4,12 +4,35 @@ class Access_log extends parent_report {
 	protected $arr_filters;
 	protected $arr_keyed_pages;
 	protected $arr_keyed_sections;
-	protected $arr_keyed_pages; //[section_id][id]=name
+	/* -----------------------------------------------------------------
+	 *  UPDATE comment
+	 *  @author: carolmd
+	 *  @date: Dec 12, 2013
+	 *
+	 *  @description: commented out the next line because was getting an error: 
+	 *  Fatal error: Cannot redeclare Access_log::$arr_keyed_pages in C:\Program Files (x86)\Zend\Apache2\htdocs\MyAgSource\gsg_app\controllers\access_log.php on line 7
+	 *  
+	 *  -----------------------------------------------------------------
+	 */
+	//protected $arr_keyed_pages; //[section_id][id]=name
 
 	function __construct(){
+
 		$this->section_path = 'access_log'; //this should match the name of this file (minus ".php".  Also used as base for css and js file names
 		$this->primary_model = 'access_log_model';
 		parent::__construct();
+		/* -----------------------------------------------------------------
+		 *  UPDATE comment
+		*  @author: carolmd
+		*  @date: Dec 12, 2013
+		*
+		*  @description: disabled this function for now, so BETA can be deployed
+		*
+		*  -----------------------------------------------------------------
+		*/
+		$this->session->set_flashdata('message', "Display Access Log temporarily disabled.");
+		redirect(site_url("auth"), 'refresh');
+		// *******************************************************************************
 		$this->section_id = 3;
 		$this->report_form_id = 'filter-form';
 		$this->product_name = 'Access Log';
@@ -18,7 +41,8 @@ class Access_log extends parent_report {
 		if($this->authorize()) { //authorize function is in report parent class
 			if(!$this->as_ion_auth->is_admin){
 				$this->session->set_flashdata('message', 'You must be an administrator to access ' . $this->product_name);
-				redirect(site_url('alert/display'));
+				redirect(site_url("auth"), 'refresh');
+				
 			}
 			$this->load->library('reports');
 			$this->reports->herd_code = $this->herd_code;
@@ -29,6 +53,7 @@ class Access_log extends parent_report {
 			$this->arr_keyed_pages = $this->access_log_model->get_keyed_page_array();
 		}
 		else {
+			
 			if($this->session->flashdata('message')) $this->session->keep_flashdata('message');
 			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
 			redirect(site_url('auth/index'), 'refresh');
@@ -41,11 +66,35 @@ class Access_log extends parent_report {
 	}
 
 	function index(){
+		/* -----------------------------------------------------------------
+		 *  UPDATE comment
+		*  @author: carolmd
+		*  @date: Dec 12, 2013
+		*
+		*  @description: disabled this function for now, so BETA can be deployed
+		*
+		*  -----------------------------------------------------------------
+		*/
+		$this->session->set_flashdata('message', "Display Access Log temporarily disabled.");
+		redirect(site_url("auth"), 'refresh');
+		// *******************************************************************************
 		redirect(site_url('access_log/display'));
 	}
 
 	function display($sort_by = 'access_time', $sort_order = 'DESC', $display_format = NULL, $section_id = '') {
-		$this->load->helper('multid_array');
+	/* -----------------------------------------------------------------
+	*  UPDATE comment
+	*  @author: carolmd
+	*  @date: Dec 12, 2013
+	*
+	*  @description: disabled this function for now, so BETA can be deployed
+	*
+	*  -----------------------------------------------------------------
+	*/
+	$this->session->set_flashdata('message', "Display Access Log temporarily disabled.");
+	redirect(site_url("auth"), 'refresh');
+	// *******************************************************************************
+	$this->load->helper('multid_array');
 		$this->load->library('form_validation');
 		//not currently used, but makes sorts on multiple fields possible
 		$arr_sort_by = array_values(explode('|', trim(urldecode($sort_by))));

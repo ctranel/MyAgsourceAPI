@@ -14,7 +14,8 @@ class Report_card_model extends Report_model {
 		$this->db_group_name = 'rep_card';
 		$this->arr_herd_size_text = array('any number of', 'less than 100', '100 to 250', '251 to 500', '501 to 1000', 'more than 1000');
 		$this->arr_breed_text = array('HO' => 'Holstein', 'JE' => 'Jersey', '' => 'All Breeds');
-		$this->{$this->db_group_name} = $this->load->database($this->db_group_name, TRUE);
+		$this->{$this->db_group_name} = 'default';
+	//	$this->{$this->db_group_name} = $this->load->database($this->db_group_name, TRUE);
 		$this->arr_pages = $this->access_log_model->get_page_links('4');
 		$this->tables = array('herd_size_percentile_xref' => 'herd_size_percentile_xref', 'benchmarks'=>'rc_percentile', 'herd_history'=>'rc_graph', 'herd_snap'=>'rc ');
 	}

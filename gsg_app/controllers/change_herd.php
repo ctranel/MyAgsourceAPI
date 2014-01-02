@@ -10,11 +10,13 @@ class Change_herd extends CI_Controller {
 			redirect(site_url('auth/login'));
 		}
 		$this->page_header_data['user_sections'] = $this->as_ion_auth->arr_user_super_sections;
-		/* Load the profile.php config file if it exists
-		$this->config->load('profiler', false, true);
-		if ($this->config->config['enable_profiler']) {
-			$this->output->enable_profiler(TRUE);
-		} */
+		/* Load the profile.php config file if it exists */
+		if (ENVIRONMENT == 'development') {
+			$this->config->load('profiler', false, true);
+			if ($this->config->config['enable_profiler']) {
+				$this->output->enable_profiler(TRUE);
+			} 
+		}
 	}
 
 	function index(){
@@ -113,7 +115,7 @@ class Change_herd extends CI_Controller {
 	}
 
 /**
- * @method select() - option list and input field to select a herd (text field auto-selects options list valur).
+ * @method select() - option list and input field to select a herd (text field auto-selects options list value).
  * 			sets session herd code on successfull submissions.
  *
  * @access	public
@@ -134,45 +136,54 @@ class Change_herd extends CI_Controller {
 			redirect(site_url($redirect_url));
 		}
 		//validate form input
+		$selected_herd = $this->input->post('herd_code'); // from the pick list.
+		$typed_in_herd = $this->input->post('herd_code_fill');
+		// use the filled-in field if it is not blank. It overrides the pick list.
+		if ($typed_in_herd > 0) {
+			$selected_herd = $typed_in_herd;
+				log_message('debug','---- LOG MESSAGE ---- change_herd/select.  validating typed in herd:' .$typed_in_herd.':');
+			$tmp_obj = $this->as_ion_auth->get_herds_by_group($this->session->userdata('active_group_id'), $this->session->userdata('arr_regions'));
+			$valid_herd_array = array_flatten($tmp_obj->result_array());
+			unset($tmp_obj);
+			if (!in_array($selected_herd,$valid_herd_array)) {
+				$this->session->set_flashdata('message', 'Invalid herd code, or you do not have access to this herd. Please try again.');
+				redirect(site_url('change_herd/select'),'refresh');
+			}
+		} // end validation of typed in herd code.
 		$this->load->library('form_validation');
-		$this->form_validation->set_rules('herd_code', 'Herd', 'required|max_length[8]');
+		$this->form_validation->set_rules('herd_code', 'Herd', 'required|exact_length[8]');
 		//$this->form_validation->set_rules('herd_code_fill', 'Type Herd Code');
 
-		if ($this->form_validation->run() == TRUE) { //successful submission
-			$this->session->set_userdata('herd_code', $this->input->post('herd_code'));
-			$this->session->set_userdata('arr_pstring', $this->herd_model->get_pstring_array($this->input->post('herd_code'), FALSE));
-			$this->access_log_model->write_entry(2); //2 is the page code for herd change
-			redirect(site_url($redirect_url));
+		if ($this->form_validation->run() == TRUE)  { //successful submission
+				// good herd code selected, redirect to previous page.
+				$this->session->set_userdata('herd_code', $selected_herd);
+				$this->session->set_userdata('arr_pstring', $this->herd_model->get_pstring_array($selected_herd, FALSE));
+				$this->access_log_model->write_entry(2); //2 is the page code for herd change
+				redirect(site_url($redirect_url));
 		}
 		else
 		{
 			$this->data['message'] = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
-
-			$tmp_obj = $this->as_ion_auth->get_herds_by_group(NULL, NULL , TRUE);
-			if(is_string($tmp_obj)){ //producers will return a string instead of the database object
-				$this->session->set_userdata('herd_code', $tmp_obj);
-				$this->session->set_userdata('arr_pstring', $this->herd_model->get_pstring_array($tmp_obj, FALSE));
-				redirect(site_url($redirect_url));
-			}
-			elseif(is_object($tmp_obj)){
-				$tmp_obj = $tmp_obj->result_array();
+			$tmp_obj = $this->as_ion_auth->get_herds_by_group($this->session->userdata('active_group_id'), NULL);
+			$herd_array = $tmp_obj->result_array();
+			if (count($herd_array) > 0) {
 				$this->load->library('herd_manage');
-				$this->data['arr_herd_data'] = $this->herd_manage->set_herd_dropdown_array($tmp_obj);
+				$this->data['arr_herd_data'] = $this->herd_manage->set_herd_dropdown_array($herd_array);
 				unset($tmp_obj);
-			}
-			else{
-				$this->session->set_flashdata('message', 'A list of herds could not be generated for your account.  If you believe this is an error, please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . '.');
-				//$this->session->set_flashdata('redirect_url',$this->session->flashdata('redirect_url'));
-				redirect(site_url($redirect_url));
-			}
-
-			$this->data['herd_code_fill'] = array('name' => 'herd_code_fill',
-				'id' => 'herd_code_fill',
-				'type' => 'text',
-				'size' => '8',
-				'maxlength' => '8',
-				'value' => $this->form_validation->set_value('herd_code_fill'),
-			);
+				}
+				else{
+					$this->session->set_flashdata('message', 'A list of herds could not be generated for your account.  If you believe this is an error, please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . '.');
+					//$this->session->set_flashdata('redirect_url',$this->session->flashdata('redirect_url'));
+					redirect(site_url($redirect_url));
+				}
+	
+				$this->data['herd_code_fill'] = array('name' => 'herd_code_fill',
+					'id' => 'herd_code_fill',
+					'type' => 'text',
+					'size' => '8',
+					'maxlength' => '8',
+					'value' => $this->form_validation->set_value('herd_code_fill'),
+				);
 
 
 			if(is_array($this->page_header_data)){
@@ -196,7 +207,6 @@ class Change_herd extends CI_Controller {
 			$this->data['page_footer'] = $this->load->view('page_footer', $this->page_footer_data, TRUE);
 
 			$this->load->view('herd_selection', $this->data);
-		}
+		} // end ELSE -- form validation failed.
 	}
-
 }

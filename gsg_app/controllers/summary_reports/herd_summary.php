@@ -19,6 +19,7 @@ class Herd_summary extends parent_report {
 	 	$this->product_name = 'Herd Summary Production';
 //		$this->page = 'hs_prod'; //corresponds with DB 'pages' table and function name.
 //		$this->report_path = $this->section_path . '/' . $this->page;
+ 	 
 		parent::display($block_in, $display_format);
 	 }
 	function hs_prod_charts($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL){
