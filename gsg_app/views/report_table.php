@@ -34,8 +34,8 @@
 							elseif(is_object($cr) && property_exists($cr, $field_name)) $value = $cr->$field_name;
 							else $value = '';
 				
-					/* Chris - todo: PROGRAM DB_FIELD LINK INFO */
-							if($field_name == 'barn_name') $value = 
+					/* @todo Chris: PROGRAM DB_FIELD LINK INFO */
+							if(in_array($field_name, array('barn_name', 'control_num', 'visible_id'))) $value = 
 								'<a href="http://newdata.crinet.com/agsourcedm/index.php?action=events&comp_num=507&UserID=35999999&Password=12345&source=myagsource" title="View Cow Data">' . $value . '</a>'; ?>
 							<td>
 								<?php echo $value; ?>
@@ -49,7 +49,7 @@
 					</tr><?php
 					$c++;
 				endforeach;
-			else: //Chris - should generate colspan when creating header, but this will do for now ?>
+			else: //@todo Chris - should generate colspan when creating header, but this will do for now ?>
 				<tr><td colspan="25">No data was found.</td></tr>
 			<?php endif; ?>
 		</tbody>
