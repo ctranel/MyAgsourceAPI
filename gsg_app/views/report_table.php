@@ -35,7 +35,7 @@
 							else $value = '';
 				
 					/* Chris - todo: PROGRAM DB_FIELD LINK INFO */
-							if($field_name == 'barn_name') $value = 
+							if(in_array($field_name, array('barn_name', 'visible_id', 'control_num'))) $value = 
 								'<a href="http://newdata.crinet.com/agsourcedm/index.php?action=events&comp_num=507&UserID=35999999&Password=12345&source=myagsource" title="View Cow Data">' . $value . '</a>'; ?>
 							<td>
 								<?php echo $value; ?>
