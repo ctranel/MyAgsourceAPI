@@ -18,48 +18,213 @@ if (!empty($page_heading)) echo heading($page_heading);
 $arr_cls = array('' => 'b-same', '-' => 'b-down', '+' => 'b-up');
 if(isset($bench_data) && is_array($bench_data)): ?>
 	<table class="tbl"> <!-- 23 rows -->
-		<tr><th class="subcat-heading">Metric</th><th class="subcat-heading">Prev Test</th><th class="subcat-heading">Trend</th><th class="subcat-heading">Curr Test</th><th class="subcat-heading">80th %tile</th></tr>
-		<?php $s = get_trend_symbol($bench_data['prev_daily_milk_production'], $bench_data['curr_daily_milk_production'], TRUE);?>
-		<tr class="odd"><td>Daily Milk Production</td><td><?php echo $bench_data['prev_daily_milk_production']; ?></td><td class="<?php echo $arr_cls[$s]; ?>"><?php echo $s; ?></td><td><?php echo $bench_data['curr_daily_milk_production']; ?></td><td><?php echo $bench_data['bench_daily_milk_production']; ?></td></tr>
- 		<?php $s = get_trend_symbol($bench_data['prev_management_level_milk'], $bench_data['curr_management_level_milk'], TRUE);?>
-		<tr class="even"><td>MLM</td><td><?php echo $bench_data['prev_management_level_milk']; ?></td><td class="<?php echo $arr_cls[$s]; ?>"><?php echo $s; ?></td><td><?php echo $bench_data['curr_management_level_milk']; ?></td><td><?php echo $bench_data['bench_management_level_milk']; ?></td></tr>
- 		<?php $s = get_trend_symbol($bench_data['prev_fat_pct'], $bench_data['curr_fat_pct'], TRUE);?>
-		<tr class="odd"><td>% Fat</td><td><?php echo $bench_data['prev_fat_pct']; ?></td><td class="<?php echo $arr_cls[$s]; ?>"><?php echo $s; ?></td><td><?php echo $bench_data['curr_fat_pct']; ?></td><td><?php echo $bench_data['bench_fat_pct']; ?></td></tr>
- 		<?php $s = get_trend_symbol($bench_data['prev_pro_pct'], $bench_data['curr_pro_pct'], TRUE);?>
-		<tr class="even"><td>% Pro</td><td><?php echo $bench_data['prev_pro_pct']; ?></td><td class="<?php echo $arr_cls[$s]; ?>"><?php echo $s; ?></td><td><?php echo $bench_data['curr_pro_pct']; ?></td><td><?php echo $bench_data['bench_pro_pct']; ?></td></tr>
- 		<?php $s = get_trend_symbol($bench_data['prev_l1_peak_milk'], $bench_data['curr_l1_peak_milk'], TRUE);?>
-		<tr class="odd"><td>Lact 1 Peak Milk</td><td><?php echo $bench_data['prev_l1_peak_milk']; ?></td><td class="<?php echo $arr_cls[$s]; ?>"><?php echo $s; ?></td><td><?php echo $bench_data['curr_l1_peak_milk']; ?></td><td><?php echo $bench_data['bench_l1_peak_milk']; ?></td></tr>
- 		<?php $s = get_trend_symbol($bench_data['prev_l2_peak_milk'], $bench_data['curr_l2_peak_milk'], TRUE);?>
-		<tr class="even"><td>Lact 2 Peak Milk</td><td><?php echo $bench_data['prev_l2_peak_milk']; ?></td><td class="<?php echo $arr_cls[$s]; ?>"><?php echo $s; ?></td><td><?php echo $bench_data['curr_l2_peak_milk']; ?></td><td><?php echo $bench_data['bench_l2_peak_milk']; ?></td></tr>
- 		<?php $s = get_trend_symbol($bench_data['prev_l3_peak_milk'], $bench_data['curr_l3_peak_milk'], TRUE);?>
-		<tr class="odd"><td>Lact 3+ Peak Milk</td><td><?php echo $bench_data['prev_l3_peak_milk']; ?></td><td class="<?php echo $arr_cls[$s]; ?>"><?php echo $s; ?></td><td><?php echo $bench_data['curr_l3_peak_milk']; ?></td><td><?php echo $bench_data['bench_l3_peak_milk']; ?></td></tr>
- 		<?php $s = get_trend_symbol($bench_data['prev_l1_avg_linear_score'], $bench_data['curr_l1_avg_linear_score'], FALSE);?>
-		<tr class="even"><td>Lact 1 Linear Score</td><td><?php echo $bench_data['prev_l1_avg_linear_score']; ?></td><td class="<?php echo $arr_cls[$s]; ?>"><?php echo $s; ?></td><td><?php echo $bench_data['curr_l1_avg_linear_score']; ?></td><td><?php echo $bench_data['bench_l1_avg_linear_score']; ?></td></tr>
- 		<?php $s = get_trend_symbol($bench_data['prev_l4_avg_linear_score'], $bench_data['curr_l4_avg_linear_score'], FALSE);?>
-		<tr class="odd"><td>Lact 2+ Linear Score</td><td><?php echo $bench_data['prev_l4_avg_linear_score']; ?></td><td class="<?php echo $arr_cls[$s]; ?>"><?php echo $s; ?></td><td><?php echo $bench_data['curr_l4_avg_linear_score']; ?></td><td><?php echo $bench_data['bench_l4_avg_linear_score']; ?></td></tr>
- 		<?php $s = get_trend_symbol($bench_data['prev_wtd_avg_scc'], $bench_data['curr_wtd_avg_scc'], FALSE);?>
-		<tr class="even"><td>Weighted Avg SCC</td><td><?php echo $bench_data['prev_wtd_avg_scc']; ?></td><td class="<?php echo $arr_cls[$s]; ?>"><?php echo $s; ?></td><td><?php echo $bench_data['curr_wtd_avg_scc']; ?></td><td><?php echo $bench_data['bench_wtd_avg_scc']; ?></td></tr>
- 		<?php $s = get_trend_symbol($bench_data['prev_l0_new_infection_pct'], $bench_data['curr_l0_new_infection_pct'], FALSE);?>
-		<tr class="odd"><td>% New Infections</td><td><?php echo $bench_data['prev_l0_new_infection_pct']; ?></td><td class="<?php echo $arr_cls[$s]; ?>"><?php echo $s; ?></td><td><?php echo $bench_data['curr_l0_new_infection_pct']; ?></td><td><?php echo $bench_data['bench_l0_new_infection_pct']; ?></td></tr>
- 		<?php $s = get_trend_symbol($bench_data['prev_chronic_cases_pct'], $bench_data['curr_chronic_cases_pct'], FALSE);?>
-		<tr class="even"><td>% Chronic Infections</td><td><?php echo $bench_data['prev_chronic_cases_pct']; ?></td><td class="<?php echo $arr_cls[$s]; ?>"><?php echo $s; ?></td><td><?php echo $bench_data['curr_chronic_cases_pct']; ?></td><td><?php echo $bench_data['bench_chronic_cases_pct']; ?></td></tr>
- 		<?php $s = get_trend_symbol($bench_data['prev_l1_1st_new_infection_pct'], $bench_data['curr_l1_1st_new_infection_pct'], FALSE);?>
-		<tr class="odd"><td>Lact 1 New Infections</td><td><?php echo $bench_data['prev_l1_1st_new_infection_pct']; ?></td><td class="<?php echo $arr_cls[$s]; ?>"><?php echo $s; ?></td><td><?php echo $bench_data['curr_l1_1st_new_infection_pct']; ?></td><td><?php echo $bench_data['bench_l1_1st_new_infection_pct']; ?></td></tr>
- 		<?php $s = get_trend_symbol($bench_data['prev_l4_dry_cow_cured_pct'], $bench_data['curr_l4_dry_cow_cured_pct'], TRUE);?>
-		<tr class="even"><td>Lact 2+ Dry Period Cures</td><td><?php echo $bench_data['prev_l4_dry_cow_cured_pct']; ?></td><td class="<?php echo $arr_cls[$s]; ?>"><?php echo $s; ?></td><td><?php echo $bench_data['curr_l4_dry_cow_cured_pct']; ?></td><td><?php echo $bench_data['bench_l4_dry_cow_cured_pct']; ?></td></tr>
- 		<?php $s = get_trend_symbol($bench_data['prev_avg_tci'], $bench_data['curr_avg_tci'], TRUE);?>
-		<tr class="odd"><td>Avg TCI&reg;</td><td><?php echo $bench_data['prev_avg_tci']; ?></td><td class="<?php echo $arr_cls[$s]; ?>"><?php echo $s; ?></td><td><?php echo $bench_data['curr_avg_tci']; ?></td><td><?php echo $bench_data['bench_avg_tci']; ?></td></tr>
- 		<?php $s = get_trend_symbol($bench_data['prev_service_rate_pct'], $bench_data['curr_service_rate_pct'], TRUE);?>
-		<tr class="even"><td>Service Rate</td><td><?php echo $bench_data['prev_service_rate_pct']; ?></td><td class="<?php echo $arr_cls[$s]; ?>"><?php echo $s; ?></td><td><?php echo $bench_data['curr_service_rate_pct']; ?></td><td><?php echo $bench_data['bench_service_rate_pct']; ?></td></tr>
- 		<?php $s = get_trend_symbol($bench_data['prev_pregnancy_rate_pct'], $bench_data['curr_pregnancy_rate_pct'], TRUE);?>
-		<tr class="odd"><td>Preg Rate</td><td><?php echo $bench_data['prev_pregnancy_rate_pct']; ?></td><td class="<?php echo $arr_cls[$s]; ?>"><?php echo $s; ?></td><td><?php echo $bench_data['curr_pregnancy_rate_pct']; ?></td><td><?php echo $bench_data['bench_pregnancy_rate_pct']; ?></td></tr>
- 		<?php $s = get_trend_symbol($bench_data['prev_pregnancy_loss_pct'], $bench_data['curr_pregnancy_loss_pct'], FALSE);?>
-		<tr class="even"><td>Preg Loss Rate</td><td><?php echo $bench_data['prev_pregnancy_loss_pct']; ?></td><td class="<?php echo $arr_cls[$s]; ?>"><?php echo $s; ?></td><td><?php echo $bench_data['curr_pregnancy_loss_pct']; ?></td><td><?php echo $bench_data['bench_pregnancy_loss_pct']; ?></td></tr>
- 		<?php $s = get_trend_symbol($bench_data['prev_l0_exit_died_percent'], $bench_data['curr_l0_exit_died_percent'], FALSE);?>
-		<tr class="odd"><td>% Died</td><td><?php echo $bench_data['prev_l0_exit_died_percent']; ?></td><td class="<?php echo $arr_cls[$s]; ?>"><?php echo $s; ?></td><td><?php echo $bench_data['curr_l0_exit_died_percent']; ?></td><td><?php echo $bench_data['bench_l0_exit_died_percent']; ?></td></tr>
- 		<?php $s = get_trend_symbol($bench_data['prev_l0_died_60_dim_pct'], $bench_data['curr_l0_died_60_dim_pct'], FALSE);?>
-		<tr class="even"><td>% Died < 60 DIM</td><td><?php echo $bench_data['prev_l0_died_60_dim_pct']; ?></td><td class="<?php echo $arr_cls[$s]; ?>"><?php echo $s; ?></td><td><?php echo $bench_data['curr_l0_died_60_dim_pct']; ?></td><td><?php echo $bench_data['bench_l0_died_60_dim_pct']; ?></td></tr>
-	</table>
+<?php 
+/*		Current Column Order
+		Curr
+		Trend
+		Prev
+		80th
+*/
+//	This array determines column order
+
+	$arr_order = array(
+		0 => "Metric",
+		1 => "Curr",
+		2 => "Trend",
+		3 => "Prev",
+		4 => "80th"
+	);
+
+//	Initialize data arrays
+
+	$arr_Metric = array();
+	$arr_Prev = array();
+	$arr_Trend = array();
+	$arr_Curr = array();
+	$arr_80th = array();
+
+	$arr_columns = array();
+
+//	Populate data arrays
+
+	$arr_Metric[] = '<th class="subcat-heading">Metric</th>';
+	$arr_Metric[] = '<td>Daily Milk Production</td>';
+	$arr_Metric[] = '<td>MLM</td>';
+	$arr_Metric[] = '<td>% Fat</td>';
+	$arr_Metric[] = '<td>% Pro</td>';
+	$arr_Metric[] = '<td>Lact 1 Peak Milk</td>';
+	$arr_Metric[] = '<td>Lact 2 Peak Milk</td>';
+	$arr_Metric[] = '<td>Lact 3+ Peak Milk</td>';
+	$arr_Metric[] = '<td>Lact 1 Linear Score</td>';
+	$arr_Metric[] = '<td>Lact 2+ Linear Score</td>';
+	$arr_Metric[] = '<td>Weighted Avg SCC</td>';
+	$arr_Metric[] = '<td>% New Infections</td>';
+	$arr_Metric[] = '<td>% Chronic Infections</td>';
+	$arr_Metric[] = '<td>Lact 1 New Infections</td>';
+	$arr_Metric[] = '<td>Lact 2+ Dry Period Cures</td>';
+	$arr_Metric[] = '<td>Avg TCI&reg;</td>';
+	$arr_Metric[] = '<td>Service Rate</td>';
+	$arr_Metric[] = '<td>Preg Rate</td>';
+	$arr_Metric[] = '<td>Preg Loss Rate</td>';
+	$arr_Metric[] = '<td>% Died</td>';
+	$arr_Metric[] = '<td>% Died < 60 DIM</td>';
+	
+	$arr_Prev[] = '<th class="subcat-heading">Prev Test</th>';
+	$arr_Prev[] = '<td>'.$bench_data['prev_daily_milk_production'].'</td>';
+	$arr_Prev[] = '<td>'.$bench_data['prev_management_level_milk'].'</td>';
+	$arr_Prev[] = '<td>'.$bench_data['prev_fat_pct'].'</td>';
+	$arr_Prev[] = '<td>'.$bench_data['prev_pro_pct'].'</td>';
+	$arr_Prev[] = '<td>'.$bench_data['prev_l1_peak_milk'].'</td>';
+	$arr_Prev[] = '<td>'.$bench_data['prev_l2_peak_milk'].'</td>';
+	$arr_Prev[] = '<td>'.$bench_data['prev_l3_peak_milk'].'</td>';
+	$arr_Prev[] = '<td>'.$bench_data['prev_l1_avg_linear_score'].'</td>';
+	$arr_Prev[] = '<td>'.$bench_data['prev_l4_avg_linear_score'].'</td>';
+	$arr_Prev[] = '<td>'.$bench_data['prev_wtd_avg_scc'].'</td>';
+	$arr_Prev[] = '<td>'.$bench_data['prev_l0_new_infection_pct'].'</td>';
+	$arr_Prev[] = '<td>'.$bench_data['prev_chronic_cases_pct'].'</td>';
+	$arr_Prev[] = '<td>'.$bench_data['prev_l1_1st_new_infection_pct'].'</td>';
+	$arr_Prev[] = '<td>'.$bench_data['prev_l4_dry_cow_cured_pct'].'</td>';
+	$arr_Prev[] = '<td>'.$bench_data['prev_avg_tci'].'</td>';
+	$arr_Prev[] = '<td>'.$bench_data['prev_service_rate_pct'].'</td>';
+	$arr_Prev[] = '<td>'.$bench_data['prev_pregnancy_rate_pct'].'</td>';
+	$arr_Prev[] = '<td>'.$bench_data['prev_pregnancy_loss_pct'].'</td>';
+	$arr_Prev[] = '<td>'.$bench_data['prev_l0_exit_died_percent'].'</td>';
+	$arr_Prev[] = '<td>'.$bench_data['prev_l0_died_60_dim_pct'].'</td>';
+	
+	$arr_Trend[] = '<th class="subcat-heading">Trend</th>';
+	$s = get_trend_symbol($bench_data['prev_daily_milk_production'], $bench_data['curr_daily_milk_production'], TRUE);
+	$arr_Trend[] = '<td class="'.$arr_cls[$s].'">'.$s.'</td>';
+	$s = get_trend_symbol($bench_data['prev_management_level_milk'], $bench_data['curr_management_level_milk'], TRUE);
+	$arr_Trend[] = '<td class="'.$arr_cls[$s].'">'.$s.'</td>';
+	$s = get_trend_symbol($bench_data['prev_fat_pct'], $bench_data['curr_fat_pct'], TRUE);
+	$arr_Trend[] = '<td class="'.$arr_cls[$s].'">'.$s.'</td>';
+	$s = get_trend_symbol($bench_data['prev_pro_pct'], $bench_data['curr_pro_pct'], TRUE);
+	$arr_Trend[] = '<td class="'.$arr_cls[$s].'">'.$s.'</td>';
+	$s = get_trend_symbol($bench_data['prev_l1_peak_milk'], $bench_data['curr_l1_peak_milk'], TRUE);
+	$arr_Trend[] = '<td class="'.$arr_cls[$s].'">'.$s.'</td>';
+	$s = get_trend_symbol($bench_data['prev_l2_peak_milk'], $bench_data['curr_l2_peak_milk'], TRUE);
+	$arr_Trend[] = '<td class="'.$arr_cls[$s].'">'.$s.'</td>';
+	$s = get_trend_symbol($bench_data['prev_l3_peak_milk'], $bench_data['curr_l3_peak_milk'], TRUE);
+	$arr_Trend[] = '<td class="'.$arr_cls[$s].'">'.$s.'</td>';
+	$s = get_trend_symbol($bench_data['prev_l1_avg_linear_score'], $bench_data['curr_l1_avg_linear_score'], FALSE);
+	$arr_Trend[] = '<td class="'.$arr_cls[$s].'">'.$s.'</td>';
+	$s = get_trend_symbol($bench_data['prev_l4_avg_linear_score'], $bench_data['curr_l4_avg_linear_score'], FALSE);
+	$arr_Trend[] = '<td class="'.$arr_cls[$s].'">'.$s.'</td>';
+	$s = get_trend_symbol($bench_data['prev_wtd_avg_scc'], $bench_data['curr_wtd_avg_scc'], FALSE);
+	$arr_Trend[] = '<td class="'.$arr_cls[$s].'">'.$s.'</td>';
+	$s = get_trend_symbol($bench_data['prev_l0_new_infection_pct'], $bench_data['curr_l0_new_infection_pct'], FALSE);
+	$arr_Trend[] = '<td class="'.$arr_cls[$s].'">'.$s.'</td>';
+	$s = get_trend_symbol($bench_data['prev_chronic_cases_pct'], $bench_data['curr_chronic_cases_pct'], FALSE);
+	$arr_Trend[] = '<td class="'.$arr_cls[$s].'">'.$s.'</td>';
+	$s = get_trend_symbol($bench_data['prev_l1_1st_new_infection_pct'], $bench_data['curr_l1_1st_new_infection_pct'], FALSE);
+	$arr_Trend[] = '<td class="'.$arr_cls[$s].'">'.$s.'</td>';
+	$s = get_trend_symbol($bench_data['prev_l4_dry_cow_cured_pct'], $bench_data['curr_l4_dry_cow_cured_pct'], TRUE);
+	$arr_Trend[] = '<td class="'.$arr_cls[$s].'">'.$s.'</td>';
+	$s = get_trend_symbol($bench_data['prev_avg_tci'], $bench_data['curr_avg_tci'], TRUE);
+	$arr_Trend[] = '<td class="'.$arr_cls[$s].'">'.$s.'</td>';
+	$s = get_trend_symbol($bench_data['prev_service_rate_pct'], $bench_data['curr_service_rate_pct'], TRUE);
+	$arr_Trend[] = '<td class="'.$arr_cls[$s].'">'.$s.'</td>';
+	$s = get_trend_symbol($bench_data['prev_pregnancy_rate_pct'], $bench_data['curr_pregnancy_rate_pct'], TRUE);
+	$arr_Trend[] = '<td class="'.$arr_cls[$s].'">'.$s.'</td>';
+	$s = get_trend_symbol($bench_data['prev_pregnancy_loss_pct'], $bench_data['curr_pregnancy_loss_pct'], FALSE);
+	$arr_Trend[] = '<td class="'.$arr_cls[$s].'">'.$s.'</td>';
+	$s = get_trend_symbol($bench_data['prev_l0_exit_died_percent'], $bench_data['curr_l0_exit_died_percent'], FALSE);
+	$arr_Trend[] = '<td class="'.$arr_cls[$s].'">'.$s.'</td>';
+	$s = get_trend_symbol($bench_data['prev_l0_died_60_dim_pct'], $bench_data['curr_l0_died_60_dim_pct'], FALSE);
+	$arr_Trend[] = '<td class="'.$arr_cls[$s].'">'.$s.'</td>';
+	
+	
+	$arr_Curr[] = '<th class="subcat-heading">Curr Test</th>';
+	$arr_Curr[] = '<td>'.$bench_data['curr_daily_milk_production'].'</td>';
+	$arr_Curr[] = '<td>'.$bench_data['curr_management_level_milk'].'</td>';
+	$arr_Curr[] = '<td>'.$bench_data['curr_fat_pct'].'</td>';
+	$arr_Curr[] = '<td>'.$bench_data['curr_pro_pct'].'</td>';
+	$arr_Curr[] = '<td>'.$bench_data['curr_l1_peak_milk'].'</td>';
+	$arr_Curr[] = '<td>'.$bench_data['curr_l2_peak_milk'].'</td>';
+	$arr_Curr[] = '<td>'.$bench_data['curr_l3_peak_milk'].'</td>';
+	$arr_Curr[] = '<td>'.$bench_data['curr_l1_avg_linear_score'].'</td>';
+	$arr_Curr[] = '<td>'.$bench_data['curr_l4_avg_linear_score'].'</td>';
+	$arr_Curr[] = '<td>'.$bench_data['curr_wtd_avg_scc'].'</td>';
+	$arr_Curr[] = '<td>'.$bench_data['curr_l0_new_infection_pct'].'</td>';
+	$arr_Curr[] = '<td>'.$bench_data['curr_chronic_cases_pct'].'</td>';
+	$arr_Curr[] = '<td>'.$bench_data['curr_l1_1st_new_infection_pct'].'</td>';
+	$arr_Curr[] = '<td>'.$bench_data['curr_l4_dry_cow_cured_pct'].'</td>';
+	$arr_Curr[] = '<td>'.$bench_data['curr_avg_tci'].'</td>';
+	$arr_Curr[] = '<td>'.$bench_data['curr_service_rate_pct'].'</td>';
+	$arr_Curr[] = '<td>'.$bench_data['curr_pregnancy_rate_pct'].'</td>';
+	$arr_Curr[] = '<td>'.$bench_data['curr_pregnancy_loss_pct'].'</td>';
+	$arr_Curr[] = '<td>'.$bench_data['curr_l0_exit_died_percent'].'</td>';
+	$arr_Curr[] = '<td>'.$bench_data['curr_l0_died_60_dim_pct'].'</td>';
+	
+	$arr_80th[] = '<th class="subcat-heading">80th %tile</th>';
+	$arr_80th[] = '<td>'.$bench_data['bench_daily_milk_production'].'</td>';
+	$arr_80th[] = '<td>'.$bench_data['bench_management_level_milk'].'</td>';
+	$arr_80th[] = '<td>'.$bench_data['bench_fat_pct'].'</td>';
+	$arr_80th[] = '<td>'.$bench_data['bench_pro_pct'].'</td>';
+	$arr_80th[] = '<td>'.$bench_data['bench_l1_peak_milk'].'</td>';
+	$arr_80th[] = '<td>'.$bench_data['bench_l2_peak_milk'].'</td>';
+	$arr_80th[] = '<td>'.$bench_data['bench_l3_peak_milk'].'</td>';
+	$arr_80th[] = '<td>'.$bench_data['bench_l1_avg_linear_score'].'</td>';
+	$arr_80th[] = '<td>'.$bench_data['bench_l4_avg_linear_score'].'</td>';
+	$arr_80th[] = '<td>'.$bench_data['bench_wtd_avg_scc'].'</td>';
+	$arr_80th[] = '<td>'.$bench_data['bench_l0_new_infection_pct'].'</td>';
+	$arr_80th[] = '<td>'.$bench_data['bench_chronic_cases_pct'].'</td>';
+	$arr_80th[] = '<td>'.$bench_data['bench_l1_1st_new_infection_pct'].'</td>';
+	$arr_80th[] = '<td>'.$bench_data['bench_l4_dry_cow_cured_pct'].'</td>';
+	$arr_80th[] = '<td>'.$bench_data['bench_avg_tci'].'</td>';
+	$arr_80th[] = '<td>'.$bench_data['bench_service_rate_pct'].'</td>';
+	$arr_80th[] = '<td>'.$bench_data['bench_pregnancy_rate_pct'].'</td>';
+	$arr_80th[] = '<td>'.$bench_data['bench_pregnancy_loss_pct'].'</td>';
+	$arr_80th[] = '<td>'.$bench_data['bench_l0_exit_died_percent'].'</td>';
+	$arr_80th[] = '<td>'.$bench_data['bench_l0_died_60_dim_pct'].'</td>';
+	
+	//	Add arrays in sorted order to arr_columns
+	
+	for ($i = 0; $i < count($arr_order); $i++) {
+		switch($arr_order[$i]) {
+			case 'Metric':
+				$arr_columns[] = $arr_Metric;
+			break;
+			case 'Prev':
+				$arr_columns[] = $arr_Prev;
+				break;
+			case 'Trend':
+				$arr_columns[] = $arr_Trend;
+				break;
+			case 'Curr':
+				$arr_columns[] = $arr_Curr;
+				break;
+			case '80th':
+				$arr_columns[] = $arr_80th;
+				break;
+			default:
+				$arr_columns[] = array();
+		}
+	}
+	
+	$body = '';
+	
+	for ($k = 0; $k < count($arr_Metric); $k++) {
+	
+		if ($k==0) {
+			$body.='<tr>'.PHP_EOL;
+		}
+		elseif ($k%2==1) {
+			$body.='<tr class="odd">';
+		}
+		else {
+			$body.='<tr class="even">';
+		}
+		for ($j = 0; $j < count($arr_order); $j++) {
+			$body.=$arr_columns[$j][$k].PHP_EOL;
+		}
+		$body.='</tr>'.PHP_EOL;
+	}
+		
+	echo $body;
+
+?>
+		</table>
 <?php else: ?>
 	<p>There is no benchmark data available at this time.</p>	
 <?php endif; ?>
