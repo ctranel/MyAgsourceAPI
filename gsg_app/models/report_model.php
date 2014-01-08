@@ -33,6 +33,7 @@ class Report_model extends CI_Model {
 	protected $arr_axis_index = array(); //numeric key, must be in same order as $arr_select_fields (array_flatten($this->arr_fields), only located in search function)
 	protected $arr_bool_display = array(); //numeric key, must be in same order as $arr_select_fields (array_flatten($this->arr_fields), only located in search function)
 	protected $arr_decimal_points = array();//DB field name is key
+	protected $arr_field_links = array();//DB field name is key
 	public $arr_unit_of_measure;//DB field name is key
 	protected $arr_where_field = array();// CODE set in child classes
 	protected $arr_where_operator = array();// CODE set in child classes
@@ -68,6 +69,15 @@ class Report_model extends CI_Model {
 	}
 	function get_fields(){
 		return $this->arr_fields;
+	}
+	function get_decimal_places(){
+		return $this->arr_decimal_points;
+	}
+	function get_numeric_fields(){
+		return $this->arr_numeric_fields;
+	}
+	function get_field_links(){
+		return $this->arr_field_links;
 	}
 	function get_fieldlist_array(){
 		return $this->arr_db_field_list;
@@ -111,6 +121,7 @@ class Report_model extends CI_Model {
 	function add_unsortable_column($column){
 		$this->arr_unsortable_columns[] = $column;
 	}
+
 	/**
 	 * @method get_default_sort()
 	 * @param string block url segment
@@ -199,12 +210,27 @@ class Report_model extends CI_Model {
 		$header_data = $this->get_select_field_structure($block_in);
 		if(is_array($arr_field_data) && !empty($arr_field_data)){
 			foreach($arr_field_data as $fd){
+				//skip over fields that are not set to display--these fields will not be available in views
+				if(empty($fd['display'])) {
+					continue;
+				}
 				$fn = $fd['db_field_name'];
 				$this->arr_db_field_list[] = $fn;
 				$arr_table_ref_cnt[$fd['table_name']] = isset($arr_table_ref_cnt[$fd['table_name']]) ? ($arr_table_ref_cnt[$fd['table_name']] + 1) : 1;
 				$header_data['arr_order'][$fd['name']] = $fd['list_order'];
 				$arr_field_child[$fd['block_header_group_id']][$fd['name']] = $fn; //used to create arr_fields nested array
 				$this->arr_field_sort[$fn] = $fd['default_sort_order'];
+				$tmp_params = $this->get_field_link_params($fd['bsf_id']);
+				$tmp_params = !empty($tmp_params) ? $tmp_params : NULL;
+				if(!array_filter($this->arr_field_links[$fn])){
+					unset($this->arr_field_links[$fn]);
+				}
+				$this->arr_field_links[$fn] = array(
+					'href' => $fd['a_href']
+					,'rel' => $fd['a_rel']
+					,'title' => $fd['a_title']
+					,'params' => $this->get_field_link_params($fd['bsf_id'])
+				);
 				$this->arr_pdf_widths[$fn] = $fd['pdf_width'];
 				$this->arr_aggregates[] = $fd['aggregate'];
 				$this->arr_decimal_points[$fn] = $fd['decimal_points'];
@@ -225,7 +251,7 @@ class Report_model extends CI_Model {
 		 else($this->arr_fields = $arr_field_child);
 
 /*		KEEPING THIS AROUND IN CASE THE NEED FOR THE 'arr_order' FUNCTIONALITY ARISES
- * 		if(is_array($arr_field_child) && !empty($arr_field_child)){
+		if(is_array($arr_field_child) && !empty($arr_field_child)){
 			foreach($arr_field_child as $k=>$fc){
 				// individually insert each field that does not have a parent
 				if(empty($k)){
@@ -368,6 +394,36 @@ class Report_model extends CI_Model {
 		else return FALSE;
 	}
 	
+
+	/*
+	 * return an array with link parameter field name as the key and the db field name from which to pull the value
+	 * 
+	 * @method get_field_link_params()
+	 * @param int block select field string
+	 * @return array
+	 * @author ctranel
+	 */
+	public function get_field_link_params($bsf_id){
+		$arr_return = array();
+		$arr_link_params = $this->{$this->db_group_name}
+		->select('l.parameter_name, f.db_field_name, l.param_value')
+		->from('users.dbo.select_field_link_params l')
+		->join('users.dbo.db_fields f', 'l.param_value_field_id = f.id', 'LEFT')
+		->where(array('l.blocks_select_fields_id'=>$bsf_id))
+		->get()
+		->result_array();
+		
+		if(!is_array($arr_link_params) || empty($arr_link_params)){
+			return $arr_return;
+		}
+		
+		
+		foreach($arr_link_params as $p){
+			$arr_return[$p['parameter_name']] = array('field' => $p['db_field_name'], 'value' => $p['param_value']);
+		}
+		return $arr_return;
+	}
+	
 	/**
 	 * @method search()
 	 * @param string herd code
@@ -470,6 +526,16 @@ class Report_model extends CI_Model {
 				$this->arr_db_field_list[$k] = $new_name;
 				//$arr_select_fields[$k] = $new_name;
 			} 
+		}
+		//also need to add fields whose values will be used in links
+		foreach($this->arr_field_links as $k => $v){
+			if(isset($v['params']) && !empty($v['params'])){
+				foreach($v['params'] as $field => $param){
+					if(isset($param['field']) && !empty($param['field'])){
+						$arr_select_fields[$field] = $param['field'];
+					}
+				}
+			}
 		}
 		return($arr_select_fields);
 	}
@@ -984,5 +1050,4 @@ FROM (SELECT DISTINCT TOP " . ($num_dates + 1) . " " . $date_field . "
 		}
 		return $arr_series;
 	}
-	
 }

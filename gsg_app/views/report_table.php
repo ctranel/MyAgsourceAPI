@@ -1,9 +1,11 @@
-<?php 	//Description: Php script for creating tables in MyAgSource
-		//Created by: Chris Tranel
-
-?>
-
-	<?php if (!empty($table_heading)): ?>
+<?php
+/*
+ * view for the report tables
+ * @author ctranel
+ * 
+ */
+	
+	if (!empty($table_heading)): ?>
 		<h2 class="block">
 			<?php echo $table_heading; ?>
 		</h2>
@@ -26,17 +28,38 @@
 			<?php $c = 1;
 			if(!empty($report_data) && is_array($report_data)):
 				foreach($report_data as $cr):
-					$row_class = $c % 2 == 1?'odd':'even'; ?>
+				$row_class = $c % 2 == 1?'odd':'even'; ?>
 					<tr class="<?php echo $row_class; ?>">
 					<?php if(is_array($fields)):
+						//@todo: pull this logic out of view
 						foreach($fields as $field_display => $field_name):
 							if(is_array($cr) && array_key_exists($field_name, $cr)) $value = $cr[$field_name];
 							elseif(is_object($cr) && property_exists($cr, $field_name)) $value = $cr->$field_name;
 							else $value = '';
-				
-					/* Chris - todo: PROGRAM DB_FIELD LINK INFO */
-							if(in_array($field_name, array('barn_name', 'visible_id', 'control_num'))) $value = 
-								'<a href="http://newdata.crinet.com/agsourcedm/index.php?action=events&comp_num=507&UserID=35999999&Password=12345&source=myagsource" title="View Cow Data">' . $value . '</a>'; ?>
+							if(isset($arr_numeric_fields[$field_name])) $value = number_format($value, $arr_decimal_places[$field_name]);
+							if(isset($arr_field_links[$field_name])){
+								$link = $arr_field_links[$field_name]['href'];
+								$params = '';
+								$site_params = '';
+								$rel = !empty($arr_field_links[$field_name]['rel']) ? ' rel="' . $arr_field_links[$field_name]['rel'] . '"' : '';
+								$title = !empty($arr_field_links[$field_name]['title']) ? ' title="' . $arr_field_links[$field_name]['title'] . '"' : '';
+								if(is_array($arr_field_links[$field_name]['params']) && !empty($arr_field_links[$field_name]['params'])){
+									foreach($arr_field_links[$field_name]['params'] as $k => $v){
+										if(isset($cr[$v['field']])){
+											$params .= "$k=" . urlencode($cr[$v['field']]) . "&";
+											$site_params .= "/" . urlencode($cr[$v['field']]);
+										}
+										else{
+											$params .= "$k=" . urlencode($v['value']) . "&";
+											$site_params .= "/" . urlencode($v['value']);
+										}
+										$params = substr($params, 0, -1);
+									}
+								}
+								if(strpos($link, 'http') === FALSE || strpos($link, 'myagsource.com') !== FALSE) $value = anchor(site_url($link . $site_params), $value, $rel . $title);
+								else $value = anchor(site_url($link . '?' . $params), $value, $rel . $title); // sprintf("<a href=\"%s?%s\"%s%s>%s</a>", $link, $params, $rel, $title, $value);
+							}
+					?>
 							<td>
 								<?php echo $value; ?>
 							</td>
