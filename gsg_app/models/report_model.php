@@ -9,7 +9,6 @@
 *
 *  -----------------------------------------------------------------
 */
-// Testing branch switching
 class Report_model extends CI_Model {
 	protected $section_id;
 	public $arr_tables;
@@ -34,7 +33,6 @@ class Report_model extends CI_Model {
 	protected $arr_axis_index = array(); //numeric key, must be in same order as $arr_select_fields (array_flatten($this->arr_fields), only located in search function)
 	protected $arr_bool_display = array(); //numeric key, must be in same order as $arr_select_fields (array_flatten($this->arr_fields), only located in search function)
 	protected $arr_decimal_points = array();//DB field name is key
-	protected $arr_field_links = array();//DB field name is key
 	public $arr_unit_of_measure;//DB field name is key
 	protected $arr_where_field = array();// CODE set in child classes
 	protected $arr_where_operator = array();// CODE set in child classes
@@ -109,11 +107,9 @@ class Report_model extends CI_Model {
 	function add_sort_field($key, $value = 'ASC'){
 		$this->arr_field_sort[$key] = $value;
 	}
+	
 	function add_unsortable_column($column){
 		$this->arr_unsortable_columns[] = $column;
-	}
-	function fakeit(){
-		echo "wtf!";
 	}
 	/**
 	 * @method get_default_sort()
@@ -203,22 +199,12 @@ class Report_model extends CI_Model {
 		$header_data = $this->get_select_field_structure($block_in);
 		if(is_array($arr_field_data) && !empty($arr_field_data)){
 			foreach($arr_field_data as $fd){
-				//skip over fields that are not set to display--these fields will not be available in views
-				if(empty($fd['display'])) {
-					continue;
-				}
 				$fn = $fd['db_field_name'];
 				$this->arr_db_field_list[] = $fn;
 				$arr_table_ref_cnt[$fd['table_name']] = isset($arr_table_ref_cnt[$fd['table_name']]) ? ($arr_table_ref_cnt[$fd['table_name']] + 1) : 1;
 				$header_data['arr_order'][$fd['name']] = $fd['list_order'];
 				$arr_field_child[$fd['block_header_group_id']][$fd['name']] = $fn; //used to create arr_fields nested array
 				$this->arr_field_sort[$fn] = $fd['default_sort_order'];
-				$this->arr_field_links[$fn] = array(
-					'href' => $fd['a_href']
-					,'rel' => $fd['a_rel']
-					,'title' => $fd['a_title']
-					,'params' => $this->get_field_link_params($fd['bsf_id'])
-				);
 				$this->arr_pdf_widths[$fn] = $fd['pdf_width'];
 				$this->arr_aggregates[] = $fd['aggregate'];
 				$this->arr_decimal_points[$fn] = $fd['decimal_points'];
@@ -380,34 +366,6 @@ class Report_model extends CI_Model {
 			return $join_text;
 		}
 		else return FALSE;
-	}
-	
-	/*
-	 * return an array with link parameter field name as the key and the db field name from which to pull the value
-	 * 
-	 * @method get_field_link_params()
-	 * @param int block select field string
-	 * @author ctranel
-	 */
-	public function get_field_link_params($bsf_id){
-		$arr_return = array();
-		$arr_link_params = $this->{$this->db_group_name}
-		->select('l.parameter_name', 'f.db_field_name')
-		->from('users.dbo.select_field_link_params l')
-		->join('users.dbo.db_fields f', 'l.param_value_field_id = f.id')
-		->where(array('l.blocks_select_field_id'=>$bsf_id))
-		->get()
-		->result_array();
-		
-		if(!is_array($arr_link_params) || empty($arr_link_params)){
-			return $arr_return;
-		}
-		
-		foreach($arr_link_params as $p){
-			$arr_return[$p['parameter_name']] = $p['db_field_name'];
-		}
-		
-		return $arr_return;
 	}
 	
 	/**
