@@ -9,6 +9,7 @@
 *
 *  -----------------------------------------------------------------
 */
+// Testing branch switching
 class Report_model extends CI_Model {
 	protected $section_id;
 	public $arr_tables;
