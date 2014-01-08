@@ -222,15 +222,15 @@ class Report_model extends CI_Model {
 				$this->arr_field_sort[$fn] = $fd['default_sort_order'];
 				$tmp_params = $this->get_field_link_params($fd['bsf_id']);
 				$tmp_params = !empty($tmp_params) ? $tmp_params : NULL;
-				if(!array_filter($this->arr_field_links[$fn])){
-					unset($this->arr_field_links[$fn]);
-				}
 				$this->arr_field_links[$fn] = array(
 					'href' => $fd['a_href']
 					,'rel' => $fd['a_rel']
 					,'title' => $fd['a_title']
 					,'params' => $this->get_field_link_params($fd['bsf_id'])
 				);
+				if(!array_filter($this->arr_field_links[$fn])){
+					unset($this->arr_field_links[$fn]);
+				}
 				$this->arr_pdf_widths[$fn] = $fd['pdf_width'];
 				$this->arr_aggregates[] = $fd['aggregate'];
 				$this->arr_decimal_points[$fn] = $fd['decimal_points'];
@@ -394,7 +394,6 @@ class Report_model extends CI_Model {
 		else return FALSE;
 	}
 	
-
 	/*
 	 * return an array with link parameter field name as the key and the db field name from which to pull the value
 	 * 
