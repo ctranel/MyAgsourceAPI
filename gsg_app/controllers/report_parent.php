@@ -59,7 +59,7 @@ abstract class parent_report extends CI_Controller {
 		// construct CI_Controller
 		parent::__construct();
 		
- 		$this->load->model('filter_model');
+ 		//$this->load->model('filter_model');
  		
 		//Set up several class variables based upon uri - See http://ellislab.com/codeigniter%20/user-guide/libraries/uri.html
 
@@ -594,7 +594,10 @@ abstract class parent_report extends CI_Controller {
 			'fields' => $this->{$this->primary_model}->get_fieldlist_array(),// was $model in place of $this->primary_model
 			'report_data' => $results,
 			'table_heading' => $title,
-			'table_sub_heading' => $subtitle
+			'table_sub_heading' => $subtitle,
+			'arr_numeric_fields' => $this->{$this->primary_model}->get_numeric_fields(),
+			'arr_decimal_places' => $this->{$this->primary_model}->get_decimal_places(),
+			'arr_field_links' => $this->{$this->primary_model}->get_field_links(),
 		);
 		if(isset($this->report_data) && is_array($this->report_data)) {
 			$this->html = $this->load->view('report_table.php', $this->report_data, TRUE);
