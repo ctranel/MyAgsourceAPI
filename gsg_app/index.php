@@ -1,5 +1,5 @@
 <?php
-//FEWEB index.php file
+
 /*
  *---------------------------------------------------------------
  * APPLICATION ENVIRONMENT

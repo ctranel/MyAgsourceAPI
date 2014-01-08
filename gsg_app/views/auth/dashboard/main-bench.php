@@ -224,7 +224,8 @@ if(isset($bench_data) && is_array($bench_data)): ?>
 	echo $body;
 
 ?>
-		</table>
+	
+	</table>
 <?php else: ?>
 	<p>There is no benchmark data available at this time.</p>	
 <?php endif; ?>
