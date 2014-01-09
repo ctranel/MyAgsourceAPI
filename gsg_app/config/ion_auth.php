@@ -34,6 +34,9 @@
  *                The values that were stored there are now stored in the users table.
  *                Changes will be made to any references that used this table.
  *  
+ *  @date: Jan 08, 2014
+ *  
+ *  @description: Changed default emails for support and customer service to myagsource.com .
  *  -----------------------------------------------------------------
  */
 	$config['use_mongodb'] = FALSE;
@@ -167,10 +170,33 @@ $config['max_rounds']     = 9;
  */
 $config['default_herd']			="35999571";
 $config['site_title']           = "MyAgSource"; 		// Site Title, example.com
-$config['admin_email']          = "ghartmann@agsource.com"; 	// Admin Email, admin@example.com
 $config['cust_serv_company']	= "AgSource Cooperative Services"; //custom CDT
-$config['cust_serv_email']		= "ghartmann@agsource.com"; //custom CDT
-$config['cust_serv_phone']		= "ghartmann@agsource.com"; //custom CDT
+
+/* 
+ * email and phone numbers vary by environment.
+ */
+
+switch (ENVIRONMENT)
+{
+	case 'development':
+		$config['admin_email']          = "ghartmann@agsource.com"; 	// Admin Email, admin@example.com
+		$config['cust_serv_email']		= "ghartmann@agsource.com"; //custom CDT
+		$config['cust_serv_phone']		= "1-800-236-0097"; //custom CDT
+		break;
+	case 'testing':
+		$config['admin_email']          = "ghartmann@agsource.com"; 	// Admin Email, admin@example.com
+		$config['cust_serv_email']		= "ghartmann@agsource.com"; //custom CDT
+		$config['cust_serv_phone']		= "1-800-236-0097"; //custom CDT
+		break;
+	case 'production':
+		$config['admin_email']          = "support@myagsource.com"; 	// Admin Email, admin@example.com
+		$config['cust_serv_email']		= "cust_service@myagsource.com"; //custom CDT
+		$config['cust_serv_phone']		= "1-800-236-0097"; //custom CDT		
+		break;
+	default:
+		exit('The application environment is not set correctly - t_base_url.');
+}
+
 /* ----------------------------------------------------------------
  * GROUP ID SECTION
  * 
