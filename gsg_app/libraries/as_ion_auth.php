@@ -13,6 +13,9 @@
  *
  *  @description: removed strval function from all the is_<group name> functions. Group_id is int.
  *  
+ *  @date: Jan 07, 2014
+ *  @description: changed the is_xxx (is_admin, is_producer etc) to use == instead of === due to differences in datatypes.
+ *  
  *  -----------------------------------------------------------------
  */
 
@@ -194,7 +197,7 @@ class As_ion_auth extends Ion_auth {
 	 **/
 	public function is_producer() {
 		$active_group = $this->session->userdata('active_group_id');
-		if ($active_group === $this->config->item('producer_group', 'ion_auth')) {
+		if ($active_group == $this->config->item('producer_group', 'ion_auth')) {
 			return TRUE;
 		}
 		else { return FALSE;
@@ -209,7 +212,7 @@ class As_ion_auth extends Ion_auth {
 	 **/
 	public function is_emrss() {
 		$active_group = $this->session->userdata('active_group_id');
-		if ($active_group === $this->config->item('rss_group', 'ion_auth')) {
+		if ($active_group == $this->config->item('rss_group', 'ion_auth')) {
 			return TRUE;
 		}
 		else { return FALSE;
@@ -224,7 +227,7 @@ class As_ion_auth extends Ion_auth {
 	 **/
 	public function is_rss() {
 		$active_group = $this->session->userdata('active_group_id');
-		if ($active_group === $this->config->item('rss_group', 'ion_auth')) {
+		if ($active_group == $this->config->item('rss_group', 'ion_auth')) {
 			return TRUE;
 		}
 		else { return FALSE;
@@ -239,7 +242,7 @@ class As_ion_auth extends Ion_auth {
 	 **/
 	public function is_consultant() {
 		$active_group = $this->session->userdata('active_group_id');
-		if ($active_group === $this->config->item('consultant_group', 'ion_auth')) {
+		if ($active_group == $this->config->item('consultant_group', 'ion_auth')) {
 			return TRUE;
 		}
 		else { return FALSE;
@@ -254,7 +257,7 @@ class As_ion_auth extends Ion_auth {
 	 **/
 	public function is_association() {
 		$active_group = $this->session->userdata('active_group_id');
-		if ($active_group === $this->config->item('association_group', 'ion_auth')) {
+		if ($active_group == $this->config->item('association_group', 'ion_auth')) {
 			return TRUE;
 		}
 		else { return FALSE;
@@ -269,7 +272,7 @@ class As_ion_auth extends Ion_auth {
 	 **/
 	public function is_field_tech() {
 		$active_group = $this->session->userdata('active_group_id');
-		if ($active_group === $this->config->item('field_tech_group', 'ion_auth')) {
+		if ($active_group == $this->config->item('field_tech_group', 'ion_auth')) {
 			return TRUE;
 		}
 		else { return FALSE;
@@ -292,7 +295,7 @@ class As_ion_auth extends Ion_auth {
 	 */
 	public function is_manager() {
 		$manager_group = $this->config->item('manager_group', 'ion_auth');
-		return ($this->session->userdata('active_group_id') === $manager_group);
+		return ($this->session->userdata('active_group_id') == $manager_group);
 		//return $this->in_group($manager_group);
 	}
 

@@ -20,7 +20,9 @@
  *  @description: Removed get_group_by_name. No longer needed anywhere, 
  *  				because default and active group fields are now group_id instead of name.
  *  
- *  
+ *  @date: Jan 9, 2014
+ *
+ *  @description: removed some debugging code. 
  *  -----------------------------------------------------------------
  */
 require_once APPPATH . 'models/ion_auth_parent_model.php';
@@ -143,9 +145,6 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 */
 	protected function _set_session_meta(){
 		$group_id = $this->get_users_group($this->session->userdata('user_id'));
-		// ----  BEGIN debugging code - for testing only --------DEBUG_SEARCH_TAG
-					log_message('debug','---- ion-auth_model __set_session_meta LOG VARIABLE group_id---- '.$group_id);
-		// ----  END debugging code - for testing only------------------------------------
 		$session_data['arr_groups'] = array($group_id);
 		$arr_regions = $this->get_users_region_array($this->session->userdata('user_id'));
 		$session_data['arr_regions'] = $arr_regions;
