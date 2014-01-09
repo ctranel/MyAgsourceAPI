@@ -210,7 +210,7 @@ class Auth extends Ionauth {
 		);
 		$this->data['widget']['agsource'][] = array(
 			'content' => $this->load->view('auth/dashboard/youtube', NULL, TRUE),
-			'title' => $this->config->item("cust_serv_company") . ' Video'
+			'title' => $this->config->item("cust_serv_company","ion_auth") . ' Video'
 		);
 		$full_width['inner_html'] = $this->load->view('chart', NULL, TRUE);
 		$this->data['widget']['full_width'][] = array(
@@ -555,7 +555,7 @@ class Auth extends Ionauth {
 			$arr_consultant = $this->ion_auth_model->user($this->input->post('consultant_user_id'))->row_array();
 			$arr_consult_groups = explode(',', $arr_consultant['groups']);
 			if(!in_array('9', $arr_consult_groups)){
-				$this->session->set_flashdata('message', 'The user you are attempting to add as a consultant is not a consultant.  Please try again or contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone'));
+				$this->session->set_flashdata('message', 'The user you are attempting to add as a consultant is not a consultant.  Please try again or contact ' . $this->config->item('cust_serv_company','ion_auth') . ' at ' . $this->config->item('cust_serv_email','ion_auth') . ' or ' . $this->config->item('cust_serv_phone','ion_auth'));
 				redirect(site_url('auth/consult_access'));
 			}
 			if ($this->as_ion_auth->allow_consult($arr_relationship_data, $this->input->post('section_id'))) { //if permission is granted successfully
@@ -1060,7 +1060,7 @@ class Auth extends Ionauth {
 		if ($is_validated === TRUE) {
 			$arr_posted_group_id = $this->form_validation->set_value('group_id[]');
 			if(!$this->as_ion_auth->group_assignable($arr_posted_group_id)){
-				$this->session->set_flashdata('message', 'You do not have permissions to create a user with the user group you selected.  Please try again, or contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . '.');
+				$this->session->set_flashdata('message', 'You do not have permissions to create a user with the user group you selected.  Please try again, or contact ' . $this->config->item('cust_serv_company','ion_auth') . ' at ' . $this->config->item('cust_serv_email','ion_auth') . ' or ' . $this->config->item('cust_serv_phone','ion_auth') . '.');
 				redirect("auth/create_user", 'refresh');
 				die();
 			}
@@ -1319,7 +1319,7 @@ class Auth extends Ionauth {
 				if($is_tech_rss_rsm){
 					$arr_posted_group_id = $this->input->post('group_id');
 					if(!$this->as_ion_auth->group_assignable($arr_posted_group_id)){
-						$this->session->set_flashdata('message', 'You do not have permissions to edit a user with the user group you selected.  Please try again, or contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . '.');
+						$this->session->set_flashdata('message', 'You do not have permissions to edit a user with the user group you selected.  Please try again, or contact ' . $this->config->item('cust_serv_company','ion_auth') . ' at ' . $this->config->item('cust_serv_email','ion_auth') . ' or ' . $this->config->item('cust_serv_phone','ion_auth') . '.');
 						redirect(site_url("auth/edit_user/$user_id", 'refresh'));
 						die();
 					}
@@ -1330,7 +1330,7 @@ class Auth extends Ionauth {
 				elseif($is_admin_dsr_consult){
 					$arr_posted_group_id = $this->input->post('group_id');
 					if(!$this->as_ion_auth->group_assignable($arr_posted_group_id)){
-						$this->session->set_flashdata('message', 'You do not have permissions to edit a user with the user group you selected.  Please try again, or contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . '.');
+						$this->session->set_flashdata('message', 'You do not have permissions to edit a user with the user group you selected.  Please try again, or contact ' . $this->config->item('cust_serv_company','ion_auth') . ' at ' . $this->config->item('cust_serv_email','ion_auth') . ' or ' . $this->config->item('cust_serv_phone','ion_auth') . '.');
 						redirect(site_url("auth/edit_user/$user_id"), 'refresh');
 						die();
 					}
@@ -1600,7 +1600,7 @@ class Auth extends Ionauth {
 			$this->session->set_flashdata('message', 'A list of herds could not be generated for your account.  If you believe this is an error, please contact ' 
 										. $this->config->item('cust_serv_company', 'ion_auth') . ' at ' . $this->config->item('cust_serv_email', 'ion_auth') . ' or ' . $this->config->item('cust_serv_phone', 'ion_auth') . '.');
 			//$this->session->set_flashdata('redirect_url',$this->session->flashdata('redirect_url'));
-			$this->session->set_userdata('herd_code', $this->config->item('default_herd'));
+			$this->session->set_userdata('herd_code', $this->config->item('default_herd','ion_auth'));
 			return('');
 			break;
 		}

@@ -18,7 +18,15 @@
 * Requirements: PHP5 or above
 *
 */
-
+/* -----------------------------------------------------------------
+ *  UPDATE comment
+ *  @author: carolmd
+ *  @date: Jan 9, 2014
+ *
+ *  @description: Revised the config for contact information so it changes based on ENVIRONMENT.
+ *  
+ *  -----------------------------------------------------------------
+ */
 class Ion_auth
 {
 	/**
@@ -144,7 +152,6 @@ class Ion_auth
 					$this->email->to($user->email);
 					$this->email->subject($this->config->item('site_title', 'ion_auth') . ' - Forgotten Password Verification');
 					$this->email->message($message);
-
 					if ($this->email->send())
 					{
 						$this->set_message('forgot_password_successful');

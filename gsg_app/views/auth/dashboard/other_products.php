@@ -1,6 +1,16 @@
-<?php if(isset($sections) && is_array($sections)): ?>
+<?php if(isset($sections) && is_array($sections)): 
+/* -----------------------------------------------------------------
+ *  UPDATE comment
+ *  @author: carolmd
+ *  @date: Jan 9, 2014
+ *
+ *  @description: added 'ion_auth' to $this->config->item
+ *  
+ *  -----------------------------------------------------------------
+ */
+?>
 	<div class="widget-content">
-		<div id="past-test"><p>Select any number of the following products and click &quot;Request More Information.&quot;  An <?php $this->config->item("cust_serv_company")?> representative will follow-up with you and answer any questions you have.</p>
+		<div id="past-test"><p>Select any number of the following products and click &quot;Request More Information.&quot;  An <?php $this->config->item("cust_serv_company","ion_auth")?> representative will follow-up with you and answer any questions you have.</p>
 			<form action="auth/section_info" id="benchmark-form" method="post">
 				<?php
 				foreach($sections as $a):

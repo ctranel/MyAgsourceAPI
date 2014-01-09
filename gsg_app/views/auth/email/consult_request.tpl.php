@@ -5,6 +5,6 @@
 	<h1 style="font-size: 1.1em; background-color: #fff; color:#004147;">Consultant Access Requested</h1>
 	<p><?php echo $first_name . ' ' . $last_name; ?><?php if(!empty($company)) echo ' of ' . $company; ?> has requested access to your herd data.  <?php echo anchor('auth/consult_access/'. $id, 'Click this link');?> to allow or deny the requested access.  If that link does not work, please cut and paste the following URL into your browser: <?php echo $this->config->item('base_url') . $this->config->item('index_page') . 'auth/grant_consult/'. $id; ?></p>
 	<p><?php echo $this->config->item("product_name"); ?> gives you access to a number of <?php echo $this->config->item("cust_serv_company"); ?> products with one convenient login.</p>
-	<p>If you have any questions or concerns, please contact <?php echo $this->config->item("cust_serv_company"); ?> at <?php echo $this->config->item("cust_serv_email"); ?> or <?php echo $this->config->item("cust_serv_phone"); ?>.</p>
+	<p>If you have any questions or concerns, please contact <?php echo $this->config->item("cust_serv_company"); ?> at <?php echo $this->config->item("cust_serv_email"); ?> or <?php echo $this->config->item("cust_serv_phone","ion_auth"); ?>.</p>
 </body>
 </html>
