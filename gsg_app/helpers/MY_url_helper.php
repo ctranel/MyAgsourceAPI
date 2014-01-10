@@ -42,7 +42,7 @@ if ( ! function_exists('anchor'))
 
 		if ( ! is_array($uri))
 		{
-			if($uri == '#'){
+			if(substr($uri, 0, 1) == '#'){
 				$site_url = $uri;
 			}
 			else
