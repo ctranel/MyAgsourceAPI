@@ -226,6 +226,7 @@ class Report_model extends CI_Model {
 					'href' => $fd['a_href']
 					,'rel' => $fd['a_rel']
 					,'title' => $fd['a_title']
+					,'class' => $fd['a_class']
 					,'params' => $this->get_field_link_params($fd['bsf_id'])
 				);
 				if(!array_filter($this->arr_field_links[$fn])){

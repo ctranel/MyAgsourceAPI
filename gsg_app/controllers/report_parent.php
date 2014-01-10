@@ -254,6 +254,7 @@ abstract class parent_report extends CI_Controller {
 
 		// render page
 		$this->carabiner->css('chart.css');
+		$this->carabiner->css('popup.css');
 		$this->carabiner->css('report.css');
 		$this->carabiner->css('chart.css', 'print');
 		$this->carabiner->css('report.css', 'print');
@@ -334,14 +335,13 @@ abstract class parent_report extends CI_Controller {
 						'</script>'
 					),
 					'arr_headjs_line'=>array(
-						'{tooltips: "' . $this->config->item("base_url_assets") . 'js/jquery/jquery.qtip-1.0.0.min.js"}',
+						//'{tooltips: "' . $this->config->item("base_url_assets") . 'js/jquery/jquery.qtip-1.0.0.min.js"}',
 						//'{tips_helper: "' . $this->config->item("base_url_assets") . 'js/rc_tooltip.js"}',
-						//'{highcharts: "' . $this->config->item("base_url_assets") . 'js/charts/highcharts.js"}',
-						//'{exporting: "' . $this->config->item("base_url_assets") . 'js/charts/exporting.js"}',
 						'{highcharts: "https://cdnjs.cloudflare.com/ajax/libs/highcharts/3.0.2/highcharts.js"}',
 						'{exporting: "https://cdnjs.cloudflare.com/ajax/libs/highcharts/3.0.2/modules/exporting.js"}',
+						'{popup_helper: "' . $this->config->item("base_url_assets") . 'js/jquery/popup.min.js"}',
 						'{graph_helper: "' . $this->config->item("base_url_assets") . 'js/charts/graph_helper.js"}',
-						'{report_helper: "' . $this->config->item("base_url_assets") . 'js/report_helper.js"}'
+						'{report_helper: "' . $this->config->item("base_url_assets") . 'js/report_helper.js"}',
 					)
 				)
 			);
