@@ -520,18 +520,6 @@ class As_ion_auth extends Ion_auth {
 			$arr_group_obj = $this->region_model->get_regions();
 		}
 		else{
-			/* ----  BEGIN debugging code - for testing only --------DEBUG_SEARCH_TAG
-			 *  Remove before deploying
-			 *  @author: carolmd
-			 *  @date: Dec 12, 2013
-			 *
-			 */
-			//echo 'carolmd is not admin ';
-			//var_dump($this->session->userdata('arr_regions'));
-				
-			/* 
-			 *  ----  END debugging code - for testing only------------------------------------
-			 */
 			$arr_group_obj = $this->region_model->get_region_by_field('id', $this->session->userdata('arr_regions'));
 		}
 		if(is_array($arr_group_obj)) {

@@ -12,9 +12,6 @@
 
 	 
 	 foreach($arr_filters as $f):
-	 	// ----  BEGIN debugging code - for testing only --------DEBUG_SEARCH_TAG
-	 				log_message('debug','---- LOG VARIABLE ---- $f: '.$f);
-	 	// ----  END debugging code - for testing only------------------------------------
 	 
 		switch($f): 
 			case 'pstring':

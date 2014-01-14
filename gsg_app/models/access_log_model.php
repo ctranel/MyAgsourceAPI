@@ -101,15 +101,6 @@ class Access_log_model extends Report_Model {
 	 * @author Chris Tranel
 	 **/
 	function prep_select_fields($arr_fields) {
-		log_message('debug', 'DEBUG.......................models/access_log_model/write_entry('.$page_id.', '. $format. ', '.$sort.', '. $filters.') ');
-		// ----  BEGIN debugging code - for testing only --------DEBUG_SEARCH_TAG
-				$c = 0;
-				$arr_temp = array_flatten_wkeys($arr_fields,2);
-				foreach($arr_temp as $k=>$v) {
-					log_message('debug','---- LOG ARRAY ---- Item '.$c.' -- key: '.$k.' value: '.$v);
-					$c++;
-				}
-		// ----  END debugging code - for testing only------------------------------------
 		if(is_array($arr_fields)){
 			// resolve field name/data/format exceptions
 			if (($key = array_search('page_id', $arr_fields)) !== FALSE) {
@@ -350,17 +341,6 @@ class Access_log_model extends Report_Model {
 	 * @author Chris Tranel
 	 **/
 	function write_entry($page_id, $format='web', $sort=NULL, $filters=NULL){
-		/* ----  BEGIN debugging code - for testing only --------DEBUG_SEARCH_TAG
-		 *  Remove before deploying
-		 *  @author: carolmd
-		 *  @date: Dec 9, 2013
-		 *
-		 */
-		 //var_dump($this->session->userdata);die();
-		/* 
-		 *  ----  END debugging code - for testing only------------------------------------
-		 */
-		log_message('debug', 'DEBUG.......................models/access_log_model/write_entry('.$page_id.', '. $format. ', '.$sort.', '. $filters.') ');
 		/* -----------------------------------------------------------------
 		 *  UPDATE comment
 		 *  @author: carolmd

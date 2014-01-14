@@ -1199,20 +1199,14 @@ class Ion_auth_parent_model extends CI_Model
 
 		//if no id was passed use the current users id
 		$id || $id = $this->session->userdata('user_id');
-		// ----  BEGIN debugging code - for testing only --------DEBUG_SEARCH_TAG
-		log_message('debug','---- LOG VARIABLE USER ID---- '.$id);
-		// ----  END debugging code - for testing only------------------------------------
 		
 		$group_id = $this->db->select($this->tables['users'].'.group_id')
 						->select($this->tables['groups'].'.description')
 		                ->join($this->tables['groups'], $this->tables['users'].'.group_id=' .$this->tables['groups'].'.id' )
 						->where($this->tables['users'].'.id = ' . $id)
 		                ->get($this->tables['users']);
-		// ----  BEGIN debugging code - for testing only --------DEBUG_SEARCH_TAG
-					log_message('debug','---- LOG VARIABLE GROUP ID---- '.$group_id);
-		// ----  END debugging code - for testing only------------------------------------
 		 return array($group_id);
-			}
+	}
 
 	/**
 	 * add_to_group

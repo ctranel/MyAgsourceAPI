@@ -883,11 +883,6 @@ class Auth extends Ionauth {
 			if ($this->ion_auth->login($this->input->post('identity'), $this->input->post('password'), $remember))
 			{ 
 				log_message('debug', 'DEBUG.......................controllers/auth.php login() form validation true');
-				
-				// ----  BEGIN debugging code - for testing only --------DEBUG_SEARCH_TAG
-				//var_dump($this->session->userdata);
-				//die();
-				// ----  END debugging code - for testing only------------------------------------
 				$this->access_log_model->write_entry(1); //1 is the page code for login for the user management section
 				$this->session->set_flashdata('message', $this->as_ion_auth->messages());
 				$redirect_url = $this->get_initial_redirect();
