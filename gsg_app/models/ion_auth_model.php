@@ -123,7 +123,6 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 **/
 	public function login($identity, $password, $remember=FALSE){
 		$this->ion_auth->set_hook('post_login_successful', 'set_session_meta', 'Ion_auth_model', '_set_session_meta');
-		log_message('debug', 'DEBUG.......................models/ion_auth_model/login ');
 		return parent::login($identity, $password, $remember);
 	}
 
@@ -295,7 +294,6 @@ class Ion_auth_model extends Ion_auth_parent_model
 		//$this->db->select("CAST(REPLACE((SELECT group_id AS [data()] FROM " . $this->tables['users_groups'] . " AS groups2 WHERE " . $this->tables['users_groups'] . ".user_id = groups2.user_id ORDER BY group_id FOR xml path('')), ' ', ', ') AS VARCHAR(45)) AS arr_groups",FALSE);
 		//$this->db->select("(SELECT GROUP_CONCAT(group_id) FROM " . $this->tables['users_groups'] . " AS groups2 WHERE " . $this->tables['users_groups'] . ".user_id = groups2.user_id) AS groups",FALSE);
 		//$this->db->distinct();
-		log_message('debug', 'DEBUG.......................models/ion_auth_model/__users('.$group.', '.$limit.', '.$offset.', '.$arr_joins.')');
 		
 		if($limit) $this->db->limit($limit, $offset);
 		$this->db->distinct();
@@ -389,7 +387,6 @@ class Ion_auth_model extends Ion_auth_parent_model
 	*  -----------------------------------------------------------------
 	*/
 	public function get_users_group($id=false) {
-		log_message('debug', 'DEBUG.......................models/ion_auth_model/get_users_group('.$id.') ');
 		$this->db
 			->where('id',  $id)
 		    ->select('group_id');
@@ -419,7 +416,6 @@ class Ion_auth_model extends Ion_auth_parent_model
 	public function get_users_region_array($id=false) {
 		//if no id was passed use the current users id
 		$id || $id = $this->session->userdata('user_id');
-		log_message('debug', 'DEBUG.......................models/ion_auth_model/get_users_region_array('.$id.') ');
 		$this->db
 		->where('id',  $id)
 		->select('association_num');
@@ -1078,7 +1074,6 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * @author Chris Tranel
 	 **/
 	public function get_task_permissions($section_id = ''){
-		log_message('debug', 'DEBUG.......................models/ion_auth_model/get_task_permissions('.$section_id.') ');
 		
 		$this->load->helper('multid_array_helper');
 		$results = $this->db->select('name, description')

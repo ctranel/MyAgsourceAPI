@@ -35,7 +35,6 @@ class Auth extends Ionauth {
 	}
 	
 	function index(){
-		log_message('debug', 'DEBUG.......................controllers/auth.php index() ');
 		
 		$this->load->model('herd_model');
 		$this->load->model('alert_model');
@@ -866,7 +865,6 @@ class Auth extends Ionauth {
 	//CDT overrides built-in function to allow us to redirect user to the original page they requested after login in
 	function login()
 	{
-		log_message('debug', 'DEBUG.......................controllers/auth.php login() ');
 		
 		$redirect_url = set_redirect_url('login');
 		$this->data['title'] = "Login";
@@ -882,7 +880,6 @@ class Auth extends Ionauth {
 
 			if ($this->ion_auth->login($this->input->post('identity'), $this->input->post('password'), $remember))
 			{ 
-				log_message('debug', 'DEBUG.......................controllers/auth.php login() form validation true');
 				$this->access_log_model->write_entry(1); //1 is the page code for login for the user management section
 				$this->session->set_flashdata('message', $this->as_ion_auth->messages());
 				$redirect_url = $this->get_initial_redirect();

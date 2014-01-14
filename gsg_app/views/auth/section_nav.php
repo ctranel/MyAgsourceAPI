@@ -1,5 +1,4 @@
 <?php 
-	 log_message('debug', 'DEBUG.......................views/auth/section_nav.php ');
 	 $class = 'first';
 	 if($this->as_ion_auth->has_permission("Manage Staff") && FALSE): ?>
 		<li class="<?php echo $class; ?>"><?php echo anchor('region','Manage Assoc/Regions', 'class="teal_banner"') ?></li>

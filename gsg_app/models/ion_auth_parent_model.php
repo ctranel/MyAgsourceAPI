@@ -828,7 +828,6 @@ class Ion_auth_parent_model extends CI_Model
 	 **/
 	public function login($identity, $password, $remember=FALSE)
 	{
-		log_message('debug', 'DEBUG.......................models/ion_auth_parent_model/login('.$identity.', '. $password .', '. $remember. ')  ');
 		
 		$this->trigger_events('pre_login');
 

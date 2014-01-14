@@ -3,7 +3,6 @@ require_once APPPATH . 'models/report_model.php';
 class Access_log_model extends Report_Model {
 	public function __construct(){
 		parent::__construct();
-		log_message('debug', 'DEBUG.......................models/access_log_model/__construct() ');
 		$this->db_group_name = 'default';
 		/* -----------------------------------------------------------------
 		 *  UPDATE comment
@@ -248,7 +247,6 @@ class Access_log_model extends Report_Model {
 	 * @author Chris Tranel
 	 **/
 	public function get_block_display_types() {
-		log_message('debug', 'DEBUG.......................models/access_log_model/get_block_display_types() ');
 		return $this->{$this->db_group_name}
 			//->where($this->tables['lookup_display_types'] . '.active', 1)
 			->get($this->tables['lookup_display_types']);
@@ -260,7 +258,6 @@ class Access_log_model extends Report_Model {
 	 * @author Chris Tranel
 	 **/
 	public function get_chart_display_types() {
-		log_message('debug', 'DEBUG.......................models/access_log_model/get_chart_display_types() ');
 		return $this->{$this->db_group_name}
 			//->where($this->tables['lookup_chart_types'] . '.active', 1)
 			->get($this->tables['lookup_chart_types']);
@@ -274,7 +271,6 @@ class Access_log_model extends Report_Model {
 	 * @author Chris Tranel
 	 **/
 	public function get_block_links($section_id = NULL) {
-		log_message('debug', 'DEBUG.......................models/access_log_model/get_block_links('.$section_id.') ');
 		$arr_return = array();
 		if(isset($section_id)) $this->{$this->db_group_name}->where('p.section_id', $section_id);
 		$result = $this->{$this->db_group_name}

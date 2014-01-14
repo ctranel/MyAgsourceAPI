@@ -441,7 +441,6 @@ class As_ion_auth extends Ion_auth {
 	 *  -----------------------------------------------------------------
 	 */
 	public function get_herds_by_group($group_in = false, $region_arr_in = false, $limit_in = NULL){
-		log_message('debug', 'DEBUG.......................libraries/as_ion_auth/get_herds_by_group('.$group_in.',  '.$limit_in.') ');
 		If (!isset($group_in) or empty($group_in)) {
 			// no group id -- fail this function.
 			return FALSE;
@@ -582,8 +581,7 @@ class As_ion_auth extends Ion_auth {
 	 * @author Chris Tranel
 	 **/
 	public function subscribed_section($section_id){
-		log_message('debug', 'DEBUG.......................libraries/as_ion_auth/subscribed_section('.$section_id.') ');
-		
+
 		return TRUE;
 		$tmp_array = $this->arr_user_sections;
 		if(isset($tmp_array) && is_array($tmp_array)){
@@ -603,7 +601,6 @@ class As_ion_auth extends Ion_auth {
 	 * @author Chris Tranel
 	 **/
 	public function get_promo_sections($user_id = FALSE){
-		log_message('debug', 'DEBUG.......................libraries/as_ion_auth/get_promo_sections('.$user_id.' ');
 		if (!$user_id){
 			$user_id = $this->session->userdata('user_id');
 		}

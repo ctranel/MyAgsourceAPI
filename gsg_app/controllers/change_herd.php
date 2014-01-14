@@ -141,7 +141,6 @@ class Change_herd extends CI_Controller {
 		// use the filled-in field if it is not blank. It overrides the pick list.
 		if ($typed_in_herd > 0) {
 			$selected_herd = $typed_in_herd;
-				log_message('debug','---- LOG MESSAGE ---- change_herd/select.  validating typed in herd:' .$typed_in_herd.':');
 			$tmp_obj = $this->as_ion_auth->get_herds_by_group($this->session->userdata('active_group_id'), $this->session->userdata('arr_regions'));
 			$valid_herd_array = array_flatten($tmp_obj->result_array());
 			unset($tmp_obj);
