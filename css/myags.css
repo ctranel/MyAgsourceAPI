@@ -3,6 +3,7 @@
 h1 {margin: 0; padding: 0 0 10px;}
 img, embed, object, video {border: none; max-width: 100%;}
 sup {font-size: .7em;}
+a {text-decoration: underline;}
 /*
 .page_header {background-color:#C8C488; color:#000; text-align:right; min-width:769px; width:100%;}
 .right_header {width:475px; height:127px; float:right;}
@@ -22,7 +23,7 @@ ul.primary-nav li.groupnav {display:none;}
 /* end agsource override */
 
 /* new styles */
-#container {margin:0 auto; display:table; border: solid 2px #E8E8E8;}
+.container {margin:0 auto; display:table; border: solid 2px #E8E8E8; padding:0;}
 #header {background-color:#CAC68A;}
 /* end new styles */
 
@@ -36,7 +37,7 @@ ul.primary-nav li.sectionnav, ul.primary-nav li.sectionnav ul, ul.primary-nav li
 ul.primary-nav li.sectionnav, ul.primary-nav li.groupnav {padding: 0 5px 0 0; width: 120px;}
 ul.primary-nav li.sectionnav ul {position:relative; cursor: pointer; visibility: hidden; margin: 5px -5px 0 0; height: 1px; overflow: visible;}
 ul.primary-nav li.sectionnav ul li {margin:0; padding: 5px; float: none; border-bottom: solid 1px #004147; border-left: solid 1px #004147; border-right: solid 1px #004147; background-color:#B0D9DB}
-ul.primary-nav li.sectionnav ul li a {text-decoration: none; font: normal .8em helvetica,arial,sans-serif; color:#004147; display:block; text-align: left;}
+ul.primary-nav li.sectionnav ul li a {text-decoration: none; font: normal .85em helvetica,arial,sans-serif; color:#004147; display:block; text-align: left;}
 ul.primary-nav li a {white-space:nowrap; color: #B0D9DB; font-size: 9pt; padding: 0; text-align: center; text-decoration: none; text-transform: uppercase;}
  *//* application navigation */
 ul.primary-nav {white-space: nowrap;}
@@ -45,7 +46,7 @@ ul.primary-nav li.sectionnav, ul.primary-nav li.groupnav {padding: 0 5px 0 0; wi
 ul.primary-nav li.groupnav {padding: 0 5px 0 0; width: 75px;}
 ul.primary-nav li.sectionnav ul, ul.primary-nav li.groupnav ul {position:relative; cursor: pointer; visibility: hidden; margin: 5px -5px 0 0; height: 1px; overflow: visible;}
 ul.primary-nav li.sectionnav ul li, ul.primary-nav li.groupnav ul li {margin:0; padding: 5px; float: none; border-bottom: solid 1px #004147; border-left: solid 1px #004147; border-right: solid 1px #004147; background-color:#B0D9DB}
-ul.primary-nav li.sectionnav ul li a, ul.primary-nav li.groupnav ul li a {text-decoration: none; font: normal .8em helvetica,arial,sans-serif; color:#004147; display:block; text-align: left;}
+ul.primary-nav li.sectionnav ul li a, ul.primary-nav li.groupnav ul li a {text-decoration: none; font: normal .85em helvetica,arial,sans-serif; color:#004147; display:block; text-align: left;}
 ul.primary-nav li a {white-space:nowrap; color: #B0D9DB; font-size: 9pt; padding: 0; text-align: center; text-decoration: none; text-transform: uppercase;}
 
 

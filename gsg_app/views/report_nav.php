@@ -1,7 +1,7 @@
 <div id="report-links">
 	<div id="pstring-links">
 	<?php if(!empty($arr_pstring) && count($arr_pstring) > 1): ?>
-		<a name="pstring-nav" class="label section-header" id="select-pstring">Select PString:</a> 
+		<a name="pstring-nav" class="section-header" id="select-pstring">Select PString:</a> 
 		<ul class="pstring-nav">
 			<?php $top = count($arr_pstring);
 			$first = TRUE;
@@ -19,7 +19,7 @@
 	</div>
 	<div id="block-links">
 	<?php if(isset($arr_pages) && is_array($arr_pages) && count($arr_pages) > 1): ?>
-		<a class="label section-header" id="select-block">Select Report Blocks:</a>
+		<a class="section-header" id="select-block">Select Report Blocks:</a>
 		<ul class="report-nav" id="current">
 		<?php
 		$first = TRUE;

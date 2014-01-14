@@ -114,13 +114,13 @@ abstract class parent_report extends CI_Controller {
 
 		
 		$this->section_id = $this->{$this->primary_model}->get_section_id();
-		/* Load the profile.php config file if it exists*/
+		/* Load the profile.php config file if it exists
 		if (ENVIRONMENT == 'development') {
 			$this->config->load('profiler', false, true);
 			if ($this->config->config['enable_profiler']) {
 				$this->output->enable_profiler(TRUE);
 			} 
-		}
+		}*/
 	}
 
 	protected function authorize(){
@@ -255,6 +255,7 @@ abstract class parent_report extends CI_Controller {
 		// render page
 		$this->carabiner->css('chart.css');
 		$this->carabiner->css('popup.css');
+		$this->carabiner->css('tabs.css');
 		$this->carabiner->css('report.css');
 		$this->carabiner->css('chart.css', 'print');
 		$this->carabiner->css('report.css', 'print');
