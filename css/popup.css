@@ -43,9 +43,12 @@
   display: none; }
 
 .mfp-content {
+  background: #D3D09E;
+  padding: 7px;
   position: relative;
   display: inline-block;
   vertical-align: middle;
+  max-width: 90% !important;
   margin: 0 auto;
   text-align: left;
   z-index: 1045; }
@@ -102,6 +105,8 @@
 
 .mfp-s-error .mfp-content {
   display: none; }
+
+button.mfp-close {background-color: #004147; color: #DBFFD4;}
 
 button.mfp-close, button.mfp-arrow {
   overflow: visible;
@@ -366,14 +371,3 @@ img.mfp-img {
   top: 0;
   right: 0;
   padding-top: 0; }
-  
-  
-/* Custom Definitions */
-.datafield-popup{
-  position: relative;
-  background: #FFF;
-  padding: 20px;
-  width: auto;
-  max-width: 500px;
-  margin: 20px auto;
-}

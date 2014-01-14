@@ -34,6 +34,8 @@ $(document).ready(function() {
 	});
 });
 
+
+
 (function($) {
 	  return $.fn.serializeObject = function() {
 	    var json, patterns, push_counters,

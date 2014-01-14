@@ -9,8 +9,9 @@
     <meta name="description" content="<?php if(isset($description)) echo $description; ?>">
     <meta name="keywords" content="<?php echo $this->config->item("cust_serv_company"); ?>, DHI Testing, DHI, DHIA, milk testing, soil testing, forage testing, manure testing, " />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+	<link rel="stylesheet" href='http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css'>
 <?php 	
-
+	    
 	    $this->carabiner->css('http://agsource.crinet.com/css/AgSource-Cooperative-Services.css', 'screen');
 		$this->carabiner->css('print.css', 'print');
 		$this->carabiner->css('myags.css', 'screen');
@@ -28,6 +29,7 @@
 	<script type="text/javascript">
 		head.js(
 			{jquery: "https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"},
+			{bootstrap: "http://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"},
 			{sectionhelper: "<?php echo $this->config->item('base_url_assets'); ?>js/as_section_helper.js"}
 			<?php
 				if(!empty($arr_headjs_line) && is_array($arr_headjs_line) !== FALSE):
@@ -43,7 +45,7 @@
 </head>
 <body>
 <?php $url = site_url(); ?>
-<div id="container">
+<div class="container">
 	<div id="inter-section-nav">
 		<ul>
 		<?php

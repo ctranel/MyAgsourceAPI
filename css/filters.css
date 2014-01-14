@@ -31,6 +31,9 @@ a.#set_filters {}
 	font-weight:bold;
 	cursor: pointer;
 }
+#filters .handle a, #filters .handle a:hover, #filters .handle a:active {
+	text-decoration:none; color:#fff;
+}
 #filters .handle a:before {
 	content: "▼";
 }
@@ -57,7 +60,9 @@ html legend{
     left: .5em;
     } */
 
-
+#filter-form legend {
+	border: none; width: auto; font-size: inherit; margin-bottom: 0; padding: 0 3px;
+}
 #filters p.filter-checkbox {padding:2px 0 2px 40px;}
 #filters span.filter-checkbox {white-space:nowrap;}
 

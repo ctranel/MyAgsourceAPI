@@ -12,10 +12,10 @@ ul.benchmark-nav li a, ul.report-card-nav li a, ul.pstring-nav li a {text-decora
 ul.report-card-nav {display:inline; margin: 0; list-style: none; border: none;}
 ul.report-card-nav li {display:inline; padding: 0px 5px; border-left: solid 1px #004147; margin: 0 0 0 -5px;}
 ul.report-card-nav li.first {border-left: none;}
-ul.report-card-nav li a {text-decoration: none; font: normal .8em helvetica,arial,sans-serif; color:#004147;}
+ul.report-card-nav li a {text-decoration: none; font: normal .85em helvetica,arial,sans-serif; color:#004147;}
 ul.report-card-nav {position:relative; display:none; margin: 5px -5px 0 0; height: 1px; overflow: visible;} 
 ul.report-card-nav li {display:inline; padding: 5px; border: solid 1px #004147; background-color:#B0D9DB; margin: 0 0 0 -5px;}
-ul.report-card-nav li a {text-decoration: none; font: normal .8em helvetica,arial,sans-serif; color:#004147;} */
+ul.report-card-nav li a {text-decoration: none; font: normal .85em helvetica,arial,sans-serif; color:#004147;} */
 
 .jqPlot {clear: left;}
 .chart-container {margin: 0 auto;}

@@ -1,7 +1,7 @@
 <div id="report-links">
 	<div id="pstring-links">
 	<?php if(!empty($arr_pstring) && count($arr_pstring) > 1): ?>
-		<a name="pstring-nav" class="label section-header" id="select-pstring">Select PString:</a> 
+		<a name="pstring-nav" class="section-header" id="select-pstring">Select PString:</a> 
 		<ul class="pstring-nav">
 	
 	
@@ -14,7 +14,7 @@
 	<?php endif; ?>
 	</div>
 	<div id="block-links">
-		<a class="label section-header" id="select-block">Select Report Block:</a><br>
+		<a class="section-header" id="select-block">Select Report Block:</a><br>
 		<ul class="report-nav" id="current">
 		<?php
 		$first = TRUE;
