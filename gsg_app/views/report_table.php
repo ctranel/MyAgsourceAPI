@@ -36,7 +36,8 @@
 							if(is_array($cr) && array_key_exists($field_name, $cr)) $value = $cr[$field_name];
 							elseif(is_object($cr) && property_exists($cr, $field_name)) $value = $cr->$field_name;
 							else $value = '';
-							if(in_array($field_name,$arr_numeric_fields)) $value = number_format($value, $arr_decimal_places[$field_name]);
+							if($field_name == 'control_num' || $field_name == 'list_order_num') $value = number_format($value,$arr_decimal_places[$field_name],'.','');
+							elseif(in_array($field_name,$arr_numeric_fields)) $value = number_format($value, $arr_decimal_places[$field_name]);
 							if(isset($arr_field_links[$field_name])){
 								$link = $arr_field_links[$field_name]['href'];
 								$params = '';
