@@ -223,7 +223,7 @@ $config['directory_trigger']	= 'd'; // experimental not currently in use
 			$config['log_threshold'] = 4;
 			break;
 		case 'testing':
-			$config['log_threshold'] = 2;
+			$config['log_threshold'] = 4;
 			break;
 		case 'production':
 			$config['log_threshold'] = 0;
@@ -247,7 +247,7 @@ $config['directory_trigger']	= 'd'; // experimental not currently in use
 			$config['log_path'] = 'C:\\MyAgSource\\logs\\';
 			break;
 		case 'testing':
-			$config['log_path'] = '';
+			$config['log_path'] = '/var/www/myagsource/logs/';
 			break;
 		case 'production':
 			$config['log_path'] = '';
