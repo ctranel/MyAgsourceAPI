@@ -290,6 +290,14 @@ function process_table(div_id, tbl_cnt_in){
 	}
 	if(typeof(section_data) == "object" && typeof post_render == 'function') post_render(section_data);
 	$('.table-wrapper').css('display', 'block');
+	//attach events to new data fields
+	attachDataFieldEvents();
+}
+
+function attachDataFieldEvents(){
+	$('.ajax-popup').magnificPopup({
+		type:'ajax'
+	});
 }
 
 function dump(arr,level) {

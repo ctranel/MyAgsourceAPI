@@ -7,7 +7,7 @@
 			<label>Lact #</label> <?php echo $curr_lact_num; ?>
 		</div>
 		<div class="col-sm-4">
-			<label>Test Day DIM</label> <?php echo $curr_lact_dim; ?>
+			<label>Test Day DIM</label> <?php echo $curr_305_dim; ?>
 		</div>
 	</div>
 	<div class="row">
@@ -18,7 +18,7 @@
 			<label>Curr Milk Lbs</label> <?php echo $curr_milk_lbs; ?>
 		</div>
 		<div class="col-sm-4">
-			<label>Proj 305 Milk Lbs</label> <?php echo $curr_td_proj_305_milk_lbs; ?>
+			<label>Proj 305 Milk Lbs</label> <?php echo $curr_305_milk_lbs; ?>
 		</div>
 	</div>
 	<div class="row">
@@ -29,7 +29,7 @@
 			<label>Curr % Last Milk</label> <?php echo $curr_pct_last_milk; ?>
 		</div>
 		<div class="col-sm-4">
-			<label>Proj 305 Fat Lbs</label> <?php echo $curr_td_proj_305_fat_lbs; ?>
+			<label>Proj 305 Fat Lbs</label> <?php echo $curr_305_fat_lbs; ?>
 		</div>
 	</div>
 	<div class="row">
@@ -40,29 +40,37 @@
 			<label>Curr SCC</label> <?php echo $curr_scc_cnt; ?>
 		</div>
 		<div class="col-sm-4">
-			<label>Proj 305 Pro Lbs</label> <?php echo $curr_td_proj_305_pro_lbs; ?>
+			<label>Proj 305 Pro Lbs</label> <?php echo $curr_305_pro_lbs; ?>
 		</div>
 	</div>
 </div>
-<a href="index.php?action=EVENTS&amp;bShow=ALL&amp;comp_num=1688&amp;token=686969169">Show All Events</a>
-<table id="EVENTS_EVENTS">
-	<thead>
-		<tr>
-			<th class="subcat-heading">Date</th>
-			<th class="subcat-heading">Event</th>
-			<th class="subcat-heading">Comment/Sire</th>
-		</tr>
-	</thead>
-	<tbody>
-		<tr class="odd">
-			<td>03/19/2012</td>
-			<td>Sold - Injury, Disease, Other</td>
-			<td></td>
-		</tr>
-		<tr class="even">
-			<td>03/05/2012</td>
-			<td>Cow Calved</td>
-			<td></td>
-		</tr>
-	</tbody>
-</table><!-- end #EVENTS_EVENTS -->
+<?php
+if(isset($arr_events) && is_array($arr_events)): ?>
+	<!-- <a href="index.php?action=EVENTS&amp;bShow=ALL&amp;comp_num=1688&amp;token=686969169">Show All Events</a> -->
+	<table>
+		<thead>
+			<tr>
+				<th class="subcat-heading">Date</th>
+				<th class="subcat-heading">Event</th>
+				<th class="subcat-heading">Comment/Sire</th>
+			</tr>
+		</thead>
+		<tbody>
+<?php
+		$cnt = 1;
+		foreach($arr_events as $e): 
+			$class = $cnt % 2 == 1 ? 'odd' : 'even'; ?>
+			<tr class="<?php echo $class; ?>">
+				<td><?php echo $e['event_date']; ?></td>
+				<td><?php echo $e['event_desc']; ?></td>
+				<td><?php echo $e['event_data']; ?></td>
+			</tr>
+<?php 	$cnt++;
+		endforeach; ?>
+		</tbody>
+	</table>
+<?php 
+else: ?>
+	<div>No events found for <?php echo $barn_name; ?></div>
+<?php 
+endif; ?>

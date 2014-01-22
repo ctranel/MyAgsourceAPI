@@ -1,5 +1,6 @@
 @CHARSET "UTF-8";
 sub {color: #003E3F; font-size: 80%; font-family: "Arial Narrow","Arial","Verdana",sans-serif;}
+.chart-container a, text, tspan {text-decoration: none;}
 
 /* report table */
 #main-report {border-collapse:collapse; clear:both; margin: 0 auto; max-width: 100%;}

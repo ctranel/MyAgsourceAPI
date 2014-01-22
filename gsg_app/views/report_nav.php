@@ -31,7 +31,6 @@
 					$li_class = FALSE; 
 				endif; ?>
 				<li<?php if($li_class) echo ' class="first"'; ?>><a href="<?php echo site_url($section_path . '/' . $e['url_segment']); ?>" id="<?php echo $e['url_segment']; ?>"<?php if($e['url_segment'] == $curr_page) echo ' class="current"'; ?>><?php echo $e['name']; ?></a></li>
-				<!--  <li <?php if($li_class) echo 'class="first"'; ?>><a href="#chart" id="<?php echo $e['url_segment']; ?>" onclick="return updateBlock(event, this, 'block-links', 'block', '<?php echo $e['url_segment']; ?>');"><?php echo $e['name']; ?></a></li> -->
 			<?php endforeach; ?>
 		</ul>
 	<?php endif; ?>

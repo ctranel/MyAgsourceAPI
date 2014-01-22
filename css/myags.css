@@ -1,6 +1,7 @@
 @CHARSET "UTF-8";
 /* override agsource styles */
 h1 {margin: 0; padding: 0 0 10px;}
+h3 {font-weight: bold;}
 img, embed, object, video {border: none; max-width: 100%;}
 sup {font-size: .7em;}
 a {text-decoration: underline;}
@@ -25,6 +26,21 @@ ul.primary-nav li.groupnav {display:none;}
 /* new styles */
 .container {margin:0 auto; display:table; border: solid 2px #E8E8E8; padding:0;}
 #header {background-color:#CAC68A;}
+h3.tight-to-table {margin: 20px 0 0; border: solid 1px black;}
+
+a.button {
+	background-color: #92C2C2;
+	background-image: url("http://agsource.crinet.com/css/../images/Common-Images/h3bg.gif");
+	background-repeat: repeat-x;
+	font-family: "Helvetica","Arial","Verdana",sans-serif;
+	font-weight: bold;
+	padding: 2px 5px;
+	margin: 5px;
+	display: inline-block;
+	border: solid 1px black;
+	text-decoration: none;
+}
+
 /* end new styles */
 
 /* general */

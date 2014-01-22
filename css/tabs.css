@@ -4,7 +4,7 @@
 
 /* TABS */
 ul.nav-tabs {background-color: #D3D09E; color: #000}
-ul.nav-tabs li a {background-color: #1B9E9F; color: #DBFFD4; border-right: solid 1px #D3D09E; border-top: solid 1px #D3D09E;}
+ul.nav-tabs li a {background-color: #1B9E9F; color: #DBFFD4; border-right: solid 1px #D3D09E; border-top: solid 1px #D3D09E; text-decoration: none;}
 ul.nav-tabs li a {margin-right:0;}
 ul.nav-tabs li a:hover {background-color: #1B9E9F; color: #004147; border-color: #D3D09E #D3D09E #D3D09E;}
 
