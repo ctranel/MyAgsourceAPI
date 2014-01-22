@@ -34,5 +34,4 @@ $(function() {
 	  });
 	  $('#cow-lookup-tabs a:first').tab("show");
 	});
-
 </script>

@@ -27,15 +27,6 @@ if($('#filter-form')){ //if there is a filter form (only on pages with one table
 	})
 }
 
-
-$(document).ready(function() {
-	$('.ajax-popup').magnificPopup({
-		type:'ajax'
-	});
-});
-
-
-
 (function($) {
 	  return $.fn.serializeObject = function() {
 	    var json, patterns, push_counters,
