@@ -6,16 +6,19 @@ class Cow_lookup extends CI_Controller {
 	
 	function __construct(){
 		parent::__construct();
-		$this->session->keep_flashdata('message');
-		$this->session->keep_flashdata('redirect_url');
 		if(!isset($this->as_ion_auth)) redirect('auth/login', 'refresh');
-
 		if((!$this->as_ion_auth->logged_in())){
 			$msg = $this->load->view('session_expired', array('url'=>$this->session->flashdata('redirect_url')), true);
 			echo $msg;
 			exit;
 		}
 		
+		$this->session->keep_flashdata('message');
+		
+		//make sure previous page remains as the redirect url 
+		$tmp = $this->session->flashdata('redirect_url');
+		$redirect_url = $tmp !== FALSE ? $tmp : $this->as_ion_auth->referrer;
+		$this->session->set_flashdata('redirect_url', $redirect_url);
 		/* Load the profile.php config file if it exists
 		if (ENVIRONMENT == 'development') {
 			$this->config->load('profiler', false, true);
