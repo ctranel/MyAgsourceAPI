@@ -13,24 +13,10 @@ if(isset($dam) && !empty($dam)):
 						<label>Name</label> <?php echo $dam['dam_name']; ?>
 					</div>
 					<div class="col-sm-3">
-						<label>VisID</label> <?php echo $dam['visible_id']; ?>
-					</div>
-					<div class="col-sm-3">
 						<label>Breed</label> <?php echo $dam['dam_breed_code']; ?>
 					</div>
-				</div>
-				<div class="row">
 					<div class="col-sm-3">
 						<label>ID</label> <?php echo $dam['dam_id']; ?>
-					</div>
-					<div class="col-sm-3">
-						<label>DOB</label> <?php echo $dam['birth_date']; ?>
-					</div>
-					<div class="col-sm-3">
-						<label>Avg ME Milk Dev</label> <?php echo $dam['me_avg_lbs_dev_milk']; ?>
-					</div>
-					<div class="col-sm-3">
-						<label>NM$</label> <?php echo $dam['net_merit_amt']; ?>
 					</div>
 				</div>
 			</div>

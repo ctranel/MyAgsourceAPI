@@ -38,10 +38,11 @@ class Events_model extends CI_Model {
 		}
 		
 		$arr_ret = $this->{$this->db_group_name}
-			->select("FORMAT(event_date, 'd') AS event_date, event_desc, event_data, srv_sire_naab")
+			->select("event_date AS ev_date, FORMAT(event_date, 'd') AS event_date, event_desc, event_data, srv_sire_naab")
 			->where('herd_code', $herd_code)
 			->where('serial_num', $serial_num)
-			->get('animal.dbo.vma_Cow_Lookup_Events')
+			->order_by('ev_date', 'desc')
+			->get('animal.dbo.vma_Cow_Lookup_Events e')
 			->result_array();
 		
 		if(is_array($arr_ret)){

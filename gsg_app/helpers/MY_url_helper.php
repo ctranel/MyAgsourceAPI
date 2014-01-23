@@ -57,7 +57,7 @@ if ( ! function_exists('anchor'))
 
 		if ($title == '')
 		{
-			$title = 'no data';
+			$title = 'n/a';
 		}
 
 		if ($attributes != '')
