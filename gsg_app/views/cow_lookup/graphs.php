@@ -1,11 +1,13 @@
 <?php	
 if(isset($lact_num)):
 	if($lact_num > 1):?>
-		<a class="button incr-lact-tests" data-target="#graphs" data-toggle="tab" href="<?php echo site_url('cow_lookup/graphs/' . $serial_num . '/' . ($lact_num - 1)); ?>">Previous Lactation</a>
+		<a class="button incr-lact-tests" data-target="#tests" data-toggle="tab" href="<?php echo site_url('cow_lookup/tests/' . $serial_num . '/' . ($lact_num - 1)); ?>">Previous Lactation</a>
 <?php 
-	endif; ?>
-	<a class="button incr-lact-tests" data-target="#graphs" data-toggle="tab" href="<?php echo site_url('cow_lookup/graphs/' . $serial_num . '/' . ($lact_num + 1)); ?>">Next Lactation</a>
-<?php	
+	endif;
+	if($lact_num < $curr_lact_num):?>
+		<a class="button incr-lact-tests" data-target="#tests" data-toggle="tab" href="<?php echo site_url('cow_lookup/tests/' . $serial_num . '/' . ($lact_num + 1)); ?>">Next Lactation</a>
+<?php
+	endif;
 endif; ?>
 <div class="chart-container odd">
 	<?php if(isset($before_chart)) echo $before_chart ?>

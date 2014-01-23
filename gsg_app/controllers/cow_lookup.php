@@ -2,6 +2,7 @@
 class Cow_lookup extends CI_Controller {
 	var $barn_name;
 	var $curr_lact_num;
+	var $curr_calving_date;
 	
 	function __construct(){
 		parent::__construct();
@@ -25,9 +26,12 @@ class Cow_lookup extends CI_Controller {
 	}
 	
     function index($serial_num){
-		$this->load->model('cow_lookup/events_model');
+		$this->_loadObjVars($serial_num);
+    	$this->load->model('cow_lookup/events_model');
     	$events_data = $this->events_model->getCowArray($this->session->userdata('herd_code'), $serial_num);
-    	$events_data['arr_events'] = $this->events_model->getEventsArray($this->session->userdata('herd_code'), $serial_num);
+    	$events_data['arr_events'] = $this->events_model->getEventsArray($this->session->userdata('herd_code'), $serial_num, $this->curr_calving_date, false);
+    	$events_data['serial_num'] = $serial_num;
+    	$events_data['show_all_events'] = false;
     	$data = array(
 			'serial_num'=>$serial_num
     		,'barn_name'=>$events_data['barn_name']
@@ -36,15 +40,14 @@ class Cow_lookup extends CI_Controller {
     	$this->load->view('cow_lookup/land', $data);
 	}
 	
-	function events($serial_num){
+	function events($serial_num, $show_all_events = 0){
+		$this->_loadObjVars($serial_num);
 		$this->load->model('cow_lookup/events_model');
-    	$events_data = $this->events_model->getCowArray($this->session->userdata('herd_code'), $serial_num);
-    	$data = array(
-			'serial_num'=>$serial_num
-    		,'barn_name'=>$events_data['barn_name']
-			,'arr_events' => $this->events_model->getEventsArray($this->session->userdata('herd_code'), $serial_num)
-    	);
-    	$this->load->view('cow_lookup/events', $data);
+    	$data = $this->events_model->getCowArray($this->session->userdata('herd_code'), $serial_num);
+    	$data['serial_num'] = $serial_num;
+     	$data['show_all_events'] = (bool)$show_all_events;
+   		$data['arr_events'] = $this->events_model->getEventsArray($this->session->userdata('herd_code'), $serial_num, $this->curr_calving_date, (bool)$show_all_events);
+       	$this->load->view('cow_lookup/events', $data);
 	}
 	
 	function id($serial_num){
@@ -56,8 +59,7 @@ class Cow_lookup extends CI_Controller {
 	function dam($serial_num){
 		$this->load->model('cow_lookup/dam_model');
 
-    	$data = $this->dam_model->getCowArray($this->session->userdata('herd_code'), $serial_num);
-
+    	$data['dam'] = $this->dam_model->getCowArray($this->session->userdata('herd_code'), $serial_num);
 		//build lactation tables
 		$this->load->model('cow_lookup/lactations_model');
 		$subdata['arr_lacts'] = $this->lactations_model->getLactationsArray($this->session->userdata('herd_code'), $serial_num);
@@ -90,6 +92,7 @@ class Cow_lookup extends CI_Controller {
 			,'barn_name' => $this->barn_name
 			,'serial_num' => $serial_num
 			,'lact_num' => $lact_num
+			,'curr_lact_num' => $this->curr_lact_num
 		);
 		$this->load->view('cow_lookup/tests', $data);
 	}
@@ -117,6 +120,7 @@ class Cow_lookup extends CI_Controller {
 			,'barn_name' => $this->barn_name
 			,'serial_num' => $serial_num
 			,'lact_num' => $lact_num
+			,'curr_lact_num' => $this->curr_lact_num
 		);
 		$this->load->view('cow_lookup/graphs', $data);
 	}
@@ -126,6 +130,7 @@ class Cow_lookup extends CI_Controller {
 		$events_data = $this->events_model->getCowArray($this->session->userdata('herd_code'), $serial_num);
 		$this->barn_name = $events_data['barn_name'];
 		$this->curr_lact_num = $events_data['curr_lact_num'];
+		$this->curr_calving_date = $events_data['curr_calving_date'];
 	} 
 	
 	function log_page(){

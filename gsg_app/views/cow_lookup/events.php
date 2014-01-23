@@ -44,9 +44,13 @@
 		</div>
 	</div>
 </div>
+<?php if($show_all_events):?>
+<a class="button incr-lact-tests" data-target="#events" data-toggle="tab" href="<?php echo site_url('cow_lookup/events/' . $serial_num); ?>">Show Current Lact Events</a>
+<?php else:?>
+<a class="button incr-lact-tests" data-target="#events" data-toggle="tab" href="<?php echo site_url('cow_lookup/events/' . $serial_num . '/1'); ?>">Show All Events</a>
 <?php
+endif;
 if(isset($arr_events) && is_array($arr_events)): ?>
-	<!-- <a href="index.php?action=EVENTS&amp;bShow=ALL&amp;comp_num=1688&amp;token=686969169">Show All Events</a> -->
 	<table>
 		<thead>
 			<tr>
@@ -74,3 +78,12 @@ else: ?>
 	<div>No events found for <?php echo $barn_name; ?></div>
 <?php 
 endif; ?>
+<script type="text/javascript">
+$(function() {
+	  $(".incr-lact-tests").bind("click", function(e) {    
+	    var contentID  = $(e.target).attr("data-target");
+	    var contentURL = $(e.target).attr("href");
+        $(contentID).load(contentURL, function(){ $("#cow-lookup-tabs").tab(); });
+	  });
+	});
+</script>
