@@ -4,11 +4,9 @@ head.ready(function() {
 			event.preventDefault();
 		}
 		else {
-			$("body").css("cursor", "progress");
 			var textValue = $(this).val();
 			$("#herd_code").attr("selectedIndex", "0");
 			var matches = $('#herd_code option[value^="' + $(this).val() + '"]').prop("selected",true);
-			$("*").css("cursor", "auto");
 		}
 	});
 }); 
