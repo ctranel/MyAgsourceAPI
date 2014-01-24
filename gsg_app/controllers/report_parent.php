@@ -3,24 +3,14 @@
 /* -----------------------------------------------------------------
  *	CLASS comments
  *  @file: report_parent.php
- *  @author: kmarshall
- *  @date: Nov 14, 2013
+ *  @author: ctranel
  *
- *  @description: First created by Chris Tranel based upon CI_controller.
+ *  @description: Parent abstract class that drives report page generation.  All database driven report pages 
+ *  	extend this class.
  *
  * -----------------------------------------------------------------
  */
 
-/* -----------------------------------------------------------------
- *  UPDATE comment
- *  @author: kmarshall
- *  @date: Nov 14, 2013
- *
- *  @description: Cleaned up file/class as a whole, modularized long sections of code into
- *  functions and the new Filters library, and finished filters coding.
- *  
- *  -----------------------------------------------------------------
- */
 
 
 abstract class parent_report extends CI_Controller {
@@ -343,6 +333,7 @@ abstract class parent_report extends CI_Controller {
 						'{popup_helper: "' . $this->config->item("base_url_assets") . 'js/jquery/popup.min.js"}',
 						'{graph_helper: "' . $this->config->item("base_url_assets") . 'js/charts/graph_helper.js"}',
 						'{report_helper: "' . $this->config->item("base_url_assets") . 'js/report_helper.js"}',
+						'{table_sort: "' . $this->config->item("base_url_assets") . 'js/jquery/stupidtable.min.js"}',
 					)
 				)
 			);

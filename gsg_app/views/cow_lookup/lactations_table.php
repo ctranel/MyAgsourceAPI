@@ -1,31 +1,31 @@
 <?php
 if(isset($arr_lacts) && is_array($arr_lacts)): ?>
-	<table>
+	<table class="simple-sort">
 		<thead>
 			<tr>
-				<th class="subcat-heading">Lact#</th>
-				<th class="subcat-heading">Age</th>
-				<th class="subcat-heading">Fresh Date</th>
-				<th class="subcat-heading">LTD DIM</th>
-				<th class="subcat-heading">LTD Milk</th>
-				<th class="subcat-heading">LTD Fat</th>
-				<th class="subcat-heading">LTD Pro</th>
-				<th class="subcat-heading">DIM 1st Bred</th>
-				<th class="subcat-heading">Days Open</th>
-				<th class="subcat-heading">Calv Intvl</th>
-				<th class="subcat-heading">Avg LSSCC</th>
-				<th class="subcat-heading">305 Milk</th>
-				<th class="subcat-heading">305 Fat</th>
-				<th class="subcat-heading">305 Pro</th>
-				<th class="subcat-heading">305 Milk ME</th>
-				<th class="subcat-heading">305 Fat ME</th>
-				<th class="subcat-heading">305 Pro ME</th>
-				<th class="subcat-heading">365 Milk</th>
-				<th class="subcat-heading">365 Fat</th>
-				<th class="subcat-heading">365 Pro</th>
-				<th class="subcat-heading">Grade Milk</th>
-				<th class="subcat-heading">Grade Fat</th>
-				<th class="subcat-heading">Grade Pro</th>
+				<th class="subcat-heading sort_asc" data-sort="int">Lact#</th>
+				<th class="subcat-heading" data-sort="string">Age</th>
+				<th class="subcat-heading" data-sort="date">Fresh Date</th>
+				<th class="subcat-heading" data-sort="int">LTD DIM</th>
+				<th class="subcat-heading" data-sort="int">LTD Milk</th>
+				<th class="subcat-heading" data-sort="int">LTD Fat</th>
+				<th class="subcat-heading" data-sort="int">LTD Pro</th>
+				<th class="subcat-heading" data-sort="int">DIM 1st Bred</th>
+				<th class="subcat-heading" data-sort="int">Days Open</th>
+				<th class="subcat-heading" data-sort="int">Calv Intvl</th>
+				<th class="subcat-heading" data-sort="int">Avg LSSCC</th>
+				<th class="subcat-heading" data-sort="int">305 Milk</th>
+				<th class="subcat-heading" data-sort="int">305 Fat</th>
+				<th class="subcat-heading" data-sort="int">305 Pro</th>
+				<th class="subcat-heading" data-sort="int">305 Milk ME</th>
+				<th class="subcat-heading" data-sort="int">305 Fat ME</th>
+				<th class="subcat-heading" data-sort="int">305 Pro ME</th>
+				<th class="subcat-heading" data-sort="int">365 Milk</th>
+				<th class="subcat-heading" data-sort="int">365 Fat</th>
+				<th class="subcat-heading" data-sort="int">365 Pro</th>
+				<th class="subcat-heading" data-sort="string">Grade Milk</th>
+				<th class="subcat-heading" data-sort="string">Grade Fat</th>
+				<th class="subcat-heading" data-sort="string">Grade Pro</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -66,4 +66,12 @@ if(isset($arr_lacts) && is_array($arr_lacts)): ?>
 else: ?>
 	<div>No lactations found for <?php echo $barn_name; ?></div>
 <?php 
-endif;
+endif; ?>
+
+<script type="text/javascript">
+	//add simple column sorting
+	var table = $(".simple-sort").stupidtable({
+  	  "date":function(a,b){return dateFunc(a,b);}
+	});
+	table.bind('aftertablesort', function (event, data) {addRowClasses();} );
+</script>

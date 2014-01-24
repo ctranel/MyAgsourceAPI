@@ -34,4 +34,43 @@ $(function() {
 	  });
 	  $('#cow-lookup-tabs a:first').tab("show");
 	});
+
+var date_from_string = function(str){
+	    var pattern = "^(\\d{1,2})\/(\\d{1,2})\/(\\d{4})$";
+	    var re = new RegExp(pattern);
+	    var DateParts = re.exec(str).slice(1);
+	
+	    var Year = DateParts[2];
+	    var Month = DateParts[0];
+	    var Day = DateParts[1];
+	    return new Date(Year, Month, Day);
+	}
+
+var dateFunc = function(a,b){
+	    // Get these into date objects for comparison.
+	    aDate = date_from_string(a);
+	    bDate = date_from_string(b);
+	
+	    return aDate - bDate;
+	}
+
+var addRowClasses = function(){
+		$(".simple-sort").each(function(){
+			var cnt = 1;
+			var cls = 'odd';
+			$(this).find ('tbody  tr').each(function(){
+				cls = 'even';
+				if(cnt % 2 == 1) cls = 'odd';
+				$(this).removeClass("odd even");
+				$(this).addClass(cls);
+				cnt++;
+			});
+		});
+	}
+
+var loadTab = function(e){
+	    var contentID  = $(e.target).attr("data-target");
+	    var contentURL = $(e.target).attr("href");
+	    $(contentID).load(contentURL, function(){ $("#cow-lookup-tabs").tab(); });
+	}
 </script>
