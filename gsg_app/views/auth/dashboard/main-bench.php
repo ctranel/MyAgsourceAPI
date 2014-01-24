@@ -66,8 +66,8 @@ if(isset($bench_data) && is_array($bench_data)): ?>
 	$arr_Metric[] = '<td>Service Rate</td>';
 	$arr_Metric[] = '<td>Preg Rate</td>';
 	$arr_Metric[] = '<td>Preg Loss Rate</td>';
-	$arr_Metric[] = '<td>% Died</td>';
-	$arr_Metric[] = '<td>% Died < 60 DIM</td>';
+	$arr_Metric[] = '<td>% Left</td>';
+	$arr_Metric[] = '<td>% Left < 60 DIM</td>';
 	
 	$arr_Prev[] = '<th class="subcat-heading">Prev Test</th>';
 	$arr_Prev[] = '<td>'.$bench_data['prev_daily_milk_production'].'</td>';
@@ -88,8 +88,8 @@ if(isset($bench_data) && is_array($bench_data)): ?>
 	$arr_Prev[] = '<td>'.$bench_data['prev_service_rate_pct'].'</td>';
 	$arr_Prev[] = '<td>'.$bench_data['prev_pregnancy_rate_pct'].'</td>';
 	$arr_Prev[] = '<td>'.$bench_data['prev_pregnancy_loss_pct'].'</td>';
-	$arr_Prev[] = '<td>'.$bench_data['prev_l0_exit_died_percent'].'</td>';
-	$arr_Prev[] = '<td>'.$bench_data['prev_l0_died_60_dim_pct'].'</td>';
+	$arr_Prev[] = '<td>'.$bench_data['prev_l0_left_herd_percent'].'</td>';
+	$arr_Prev[] = '<td>'.$bench_data['prev_l0_left_60_dim_pct'].'</td>';
 	
 	$arr_Trend[] = '<th class="subcat-heading">Trend</th>';
 	$s = get_trend_symbol($bench_data['prev_daily_milk_production'], $bench_data['curr_daily_milk_production'], TRUE);
@@ -128,9 +128,9 @@ if(isset($bench_data) && is_array($bench_data)): ?>
 	$arr_Trend[] = '<td class="'.$arr_cls[$s].'">'.$s.'</td>';
 	$s = get_trend_symbol($bench_data['prev_pregnancy_loss_pct'], $bench_data['curr_pregnancy_loss_pct'], FALSE);
 	$arr_Trend[] = '<td class="'.$arr_cls[$s].'">'.$s.'</td>';
-	$s = get_trend_symbol($bench_data['prev_l0_exit_died_percent'], $bench_data['curr_l0_exit_died_percent'], FALSE);
+	$s = get_trend_symbol($bench_data['prev_l0_left_herd_percent'], $bench_data['curr_l0_left_herd_percent'], FALSE);
 	$arr_Trend[] = '<td class="'.$arr_cls[$s].'">'.$s.'</td>';
-	$s = get_trend_symbol($bench_data['prev_l0_died_60_dim_pct'], $bench_data['curr_l0_died_60_dim_pct'], FALSE);
+	$s = get_trend_symbol($bench_data['prev_l0_left_60_dim_pct'], $bench_data['curr_l0_left_60_dim_pct'], FALSE);
 	$arr_Trend[] = '<td class="'.$arr_cls[$s].'">'.$s.'</td>';
 	
 	
@@ -153,8 +153,8 @@ if(isset($bench_data) && is_array($bench_data)): ?>
 	$arr_Curr[] = '<td>'.$bench_data['curr_service_rate_pct'].'</td>';
 	$arr_Curr[] = '<td>'.$bench_data['curr_pregnancy_rate_pct'].'</td>';
 	$arr_Curr[] = '<td>'.$bench_data['curr_pregnancy_loss_pct'].'</td>';
-	$arr_Curr[] = '<td>'.$bench_data['curr_l0_exit_died_percent'].'</td>';
-	$arr_Curr[] = '<td>'.$bench_data['curr_l0_died_60_dim_pct'].'</td>';
+	$arr_Curr[] = '<td>'.$bench_data['curr_l0_left_herd_percent'].'</td>';
+	$arr_Curr[] = '<td>'.$bench_data['curr_l0_left_60_dim_pct'].'</td>';
 	
 	$arr_80th[] = '<th class="subcat-heading">80th %tile</th>';
 	$arr_80th[] = '<td>'.$bench_data['bench_daily_milk_production'].'</td>';
@@ -175,8 +175,8 @@ if(isset($bench_data) && is_array($bench_data)): ?>
 	$arr_80th[] = '<td>'.$bench_data['bench_service_rate_pct'].'</td>';
 	$arr_80th[] = '<td>'.$bench_data['bench_pregnancy_rate_pct'].'</td>';
 	$arr_80th[] = '<td>'.$bench_data['bench_pregnancy_loss_pct'].'</td>';
-	$arr_80th[] = '<td>'.$bench_data['bench_l0_exit_died_percent'].'</td>';
-	$arr_80th[] = '<td>'.$bench_data['bench_l0_died_60_dim_pct'].'</td>';
+	$arr_80th[] = '<td>'.$bench_data['bench_l0_left_herd_percent'].'</td>';
+	$arr_80th[] = '<td>'.$bench_data['bench_l0_left_60_dim_pct'].'</td>';
 	
 	//	Add arrays in sorted order to arr_columns
 	
