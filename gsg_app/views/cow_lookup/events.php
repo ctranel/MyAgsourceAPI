@@ -51,12 +51,12 @@
 <?php
 endif;
 if(isset($arr_events) && is_array($arr_events)): ?>
-	<table>
+	<table class="simple-sort">
 		<thead>
 			<tr>
-				<th class="subcat-heading">Date</th>
-				<th class="subcat-heading">Event</th>
-				<th class="subcat-heading">Comment/Sire</th>
+				<th class="subcat-heading sort_desc" data-sort="date">Date</th>
+				<th class="subcat-heading" data-sort="string">Event</th>
+				<th class="subcat-heading" data-sort="string">Comment/Sire</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -79,11 +79,14 @@ else: ?>
 <?php 
 endif; ?>
 <script type="text/javascript">
+//links that reload tab content
 $(function() {
-	  $(".incr-lact-tests").bind("click", function(e) {    
-	    var contentID  = $(e.target).attr("data-target");
-	    var contentURL = $(e.target).attr("href");
-        $(contentID).load(contentURL, function(){ $("#cow-lookup-tabs").tab(); });
-	  });
+	  $(".incr-lact-tests").bind("click", function(e) {loadTab(e)} );
 	});
+
+//add simple column sorting
+var table = $(".simple-sort").stupidtable({
+    "date":function(a,b){return dateFunc(a,b);}
+});
+table.bind('aftertablesort', function (event, data) {addRowClasses();} );
 </script>

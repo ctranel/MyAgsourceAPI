@@ -16,22 +16,22 @@ if(isset($lact_num)):
 endif;
 
 if(isset($arr_tests) && is_array($arr_tests)): ?>
-	<table>
+	<table class="simple-sort">
 		<thead>
 			<tr>
-				<th class="subcat-heading">Test Date</th>
-				<th class="subcat-heading">DIM</th>
-				<th class="subcat-heading">Milk</th>
-				<th class="subcat-heading">Fat</th>
-				<th class="subcat-heading">Pro</th>
-				<th class="subcat-heading">FCM</th>
-				<th class="subcat-heading">ECM</th>
-				<th class="subcat-heading">MLM</th>
-				<th class="subcat-heading">SCC</th>
-				<th class="subcat-heading">LS SCC</th>
-				<th class="subcat-heading">% Last Milk</th>
-				<th class="subcat-heading">CAR</th>
-				<th class="subcat-heading">MUN</th>
+				<th class="subcat-heading sort_desc" data-sort="date">Test Date</th>
+				<th class="subcat-heading" data-sort="int">DIM</th>
+				<th class="subcat-heading" data-sort="int">Milk</th>
+				<th class="subcat-heading" data-sort="int">Fat</th>
+				<th class="subcat-heading" data-sort="int">Pro</th>
+				<th class="subcat-heading" data-sort="int">FCM</th>
+				<th class="subcat-heading" data-sort="int">ECM</th>
+				<th class="subcat-heading" data-sort="int">MLM</th>
+				<th class="subcat-heading" data-sort="int">SCC</th>
+				<th class="subcat-heading" data-sort="int">LS SCC</th>
+				<th class="subcat-heading" data-sort="int">% Last Milk</th>
+				<th class="subcat-heading" data-sort="int">CAR</th>
+				<th class="subcat-heading" data-sort="int">MUN</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -64,11 +64,14 @@ else: ?>
 <?php 
 endif; ?>
 <script type="text/javascript">
-$(function() {
-	  $(".incr-lact-tests").bind("click", function(e) {    
-	    var contentID  = $(e.target).attr("data-target");
-	    var contentURL = $(e.target).attr("href");
-        $(contentID).load(contentURL, function(){ $("#cow-lookup-tabs").tab(); });
-	  });
+	//links that reload tab content
+	$(function() {
+		  $(".incr-lact-tests").bind("click", function(e) {loadTab(e)} );
+		});
+
+	//add simple column sorting
+	var table = $(".simple-sort").stupidtable({
+		  "date":function(a,b){return dateFunc(a,b);}
 	});
+	table.bind('aftertablesort', function (event, data) {addRowClasses();} );
 </script>

@@ -1,17 +1,17 @@
 <?php
 if(isset($arr_offspring) && is_array($arr_offspring)): ?>
-	<table>
+	<table class="simple-sort">
 		<thead>
 			<tr>
-				<th class="subcat-heading">Calf#</th>
-				<th class="subcat-heading">DOB</th>
-				<th class="subcat-heading">Calf Name</th>
-				<th class="subcat-heading">Calf Vis ID</th>
-				<th class="subcat-heading">Sex</th>
-				<th class="subcat-heading">Twin</th>
-				<th class="subcat-heading">Calving Ease</th>
-				<th class="subcat-heading">Sire NAAB</th>
-				<th class="subcat-heading">Sire Name</th>
+				<th class="subcat-heading" data-sort="int">Calf#</th>
+				<th class="subcat-heading sort_asc" data-sort="date">DOB</th>
+				<th class="subcat-heading" data-sort="string">Calf Name</th>
+				<th class="subcat-heading" data-sort="int">Calf Vis ID</th>
+				<th class="subcat-heading" data-sort="string">Sex</th>
+				<th class="subcat-heading" data-sort="string">Twin</th>
+				<th class="subcat-heading" data-sort="int">Calving Ease</th>
+				<th class="subcat-heading" data-sort="string">Sire NAAB</th>
+				<th class="subcat-heading" data-sort="string">Sire Name</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -38,4 +38,12 @@ if(isset($arr_offspring) && is_array($arr_offspring)): ?>
 else: ?>
 	<div>No offspring found for <?php echo $barn_name; ?></div>
 <?php 
-endif;
+endif; ?>
+
+<script type="text/javascript">
+	//add simple column sorting
+	var table = $(".simple-sort").stupidtable({
+  	  "date":function(a,b){return dateFunc(a,b);}
+	});
+	table.bind('aftertablesort', function (event, data) {addRowClasses();} );
+</script>
