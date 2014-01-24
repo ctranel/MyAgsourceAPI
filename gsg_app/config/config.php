@@ -250,7 +250,7 @@ $config['directory_trigger']	= 'd'; // experimental not currently in use
 			$config['log_path'] = '/var/www/myagsource/logs/';
 			break;
 		case 'production':
-			$config['log_path'] = '';
+			$config['log_path'] = '/var/www/myagsource/logs/';
 			break;
 		default:
 			exit('The application environment is not set correctly - t_log_path.');
