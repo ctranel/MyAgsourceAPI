@@ -1,10 +1,9 @@
 <?php
 if (!empty($page_header)) echo $page_header;
 if (!empty($page_heading)) echo heading($page_heading); 
+if (!empty($herd_data)) echo $herd_data;
+if (!empty($report_nav)) echo $report_nav;
 ?>
-	<?php if (!empty($herd_data)): 
-		echo $herd_data;
-	endif;	?>
 	<p style = "clear:both"></p>
 	<?php if (!empty($table_heading)): 
 		?><h2 class="block"><?php echo $table_heading; ?></h2><?php

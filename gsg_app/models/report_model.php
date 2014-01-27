@@ -105,6 +105,9 @@ class Report_model extends CI_Model {
 	function get_section_id(){
 		return $this->section_id;
 	}
+	function get_current_pstring(){
+		return current($this->arr_pstring);
+	}
 	
 	function set_primary_table($table_name){
 		$this->primary_table_name = $table_name;

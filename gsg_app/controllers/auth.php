@@ -34,10 +34,21 @@ class Auth extends Ionauth {
 		}
 	}
 	
-	function index(){
-		
+	function index($pstring = NULL){
 		$this->load->model('herd_model');
 		$this->load->model('alert_model');
+		$arr_pstring = $this->herd_model->get_pstring_array($this->session->userdata('herd_code'));
+		if(isset($pstring)){
+			$this->session->set_userdata('pstring', $pstring);
+		}
+		else {
+			$pstring = $this->session->userdata('pstring');
+			if(!isset($this->pstring) || empty($this->pstring)){
+				$tmp = current($arr_pstring);
+				$pstring = isset($tmp) && isset($tmp['pstring']) ? $tmp['pstring'] . '' : '0';
+				$this->session->set_userdata('pstring', $pstring);
+			}
+		}
 		if(!isset($this->as_ion_auth) || !$this->as_ion_auth->logged_in()){
 			$this->session->keep_flashdata('redirect_url');
 			redirect(site_url('auth/login'));
@@ -58,21 +69,23 @@ class Auth extends Ionauth {
 		//header and footer
 		$this->page_header_data['section_nav'] = $this->load->view('auth/section_nav', NULL, TRUE);
 		//		$this->load->_ci_cached_vars = array();
-		//widgets (pull from DB?)
 		//get_herd_data
 		$herd_data = $this->herd_model->header_info($this->session->userdata('herd_code'));
 		
-
+		$nav_data = array(
+			'arr_pstring' => $arr_pstring
+			,'curr_pstring' => $pstring
+		);
 	
 		$this->data = array(
-			'page_header' => $this->load->view('page_header', $this->page_header_data, TRUE),
-			'page_heading' => 'My Account',
-			'herd_code' => $this->session->userdata('herd_code'),
-			'herd_data' => $this->load->view('herd_info', $herd_data, TRUE),
-			'table_heading' => 'Herd Overview',
-			'page_footer' => $this->load->view('page_footer', $this->footer_data, TRUE),
-			'bench_data' => $this->alert_model->get_benchmarks($this->session->userdata('herd_code'))
-//			'report_path' => $this->report_path
+			'page_header' => $this->load->view('page_header', $this->page_header_data, TRUE)
+			,'page_heading' => 'My Account'
+			,'herd_code' => $this->session->userdata('herd_code')
+			,'herd_data' => $this->load->view('herd_info', $herd_data, TRUE)
+			,'table_heading' => 'Herd Overview'
+			,'page_footer' => $this->load->view('page_footer', $this->footer_data, TRUE)
+			,'bench_data' => $this->alert_model->get_benchmarks($this->session->userdata('herd_code'), $pstring)
+			,'report_nav' => $this->load->view('auth/dashboard/report_nav', $nav_data, TRUE)
 		);
 		
 //		if((is_array($arr_nav_data['arr_pages']) && count($arr_nav_data['arr_pages']) > 1) || (is_array($arr_nav_data['arr_pstring']) && count($arr_nav_data['arr_pstring']) > 1)) $data['report_nav'] = $this->load->view($report_nav_path, $arr_nav_data, TRUE);

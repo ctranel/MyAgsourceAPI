@@ -12,8 +12,8 @@ class Alert_model extends CI_Model {
 		//$this->{$this->db_group_name} = $this->load->database($this->db_group_name, TRUE);
 	}
 	
-	public function get_benchmarks($herd_code){
-		$ret = $this->db->get_where('[herd_summary].[dbo].[vma_home_benchmarks]', array('herd_code' => $herd_code))->result_array();
+	public function get_benchmarks($herd_code, $pstring){
+		$ret = $this->db->get_where('[herd_summary].[dbo].[vma_home_benchmarks]', array('herd_code' => $herd_code, 'pstring' => $pstring))->result_array();
 		return $ret[0];
 	}
 }
