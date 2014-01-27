@@ -1,5 +1,5 @@
 head.ready(function() {
-	$("#herd_code_fill").bind("change", function(event) {
+	$("#herd_code_fill").bind("keyup", function(event) {
 	 	if (event.which == "9" || event.which == "13" || event.which == "16" || event.which == "18") {
 			event.preventDefault();
 		}
