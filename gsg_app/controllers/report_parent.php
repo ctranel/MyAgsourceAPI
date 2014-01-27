@@ -150,23 +150,17 @@ abstract class parent_report extends CI_Controller {
 	}
 
 	function display($arr_block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL, $json_filter_data = NULL){
+		$this->pstring = $this->session->userdata('pstring');
+		if(!isset($this->pstring) || empty($this->pstring)){
+			$tmp = $this->{$this->primary_model}->get_current_pstring();
+			$this->pstring = isset($tmp) && isset($tmp['pstring']) ? $tmp['pstring'] . '' : '0';
+			$this->session->set_userdata('pstring', $this->pstring);
+		}
 		
-		//Get Pstrings from DB
-		$this->arr_pstring = $this->herd_model->get_pstring_array($this->session->userdata('herd_code'));
 		//Get Tstrings from DB
 		$this->arr_tstring = $this->herd_model->get_tstring_array($this->session->userdata('herd_code'));
 		//get current element from array
 		$this->session->set_userdata('arr_tstring', $this->arr_tstring);
-		$tmp = current($this->{$this->primary_model}->arr_pstring);
-		// set $this->pstring to pstring in session data
-		$this->pstring = $this->session->userdata('pstring');
-
-		//If no Pstring, set to default of 0
-		if(!isset($this->pstring) || empty($this->pstring)){
-			$this->pstring = isset($this->{$this->primary_model}->arr_pstring) && is_array($tmp)?$tmp['pstring'] . '':'0';
-			$this->session->set_userdata('pstring', $this->pstring);
-		}
-		
 		//If no Tstring, set to default of 0
 		if(!isset($this->tstring) || empty($this->tstring)){
 			$this->tstring = array(0);
