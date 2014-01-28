@@ -87,6 +87,8 @@
 				break;
 			case 'dam_lact_num': ?>
 				<?php echo form_fieldset('Dam Lactation #', array('id' => 'dam_lact_num-fieldset')); ?>
+					<span class="filter-checkbox"><?php echo form_checkbox(array('name'=>'dam_lact_num[]', 'id'=>'dam_lact_num0'), '0', in_array('0', $filter_selected['dam_lact_num']) !== false); ?>
+					0&nbsp;&nbsp;</span>
 					<span class="filter-checkbox"><?php echo form_checkbox(array('name'=>'dam_lact_num[]', 'id'=>'dam_lact_num1'), '1', in_array('1', $filter_selected['dam_lact_num']) !== false); ?>
 					1&nbsp;&nbsp;</span>
 					<span class="filter-checkbox"><?php echo form_checkbox(array('name'=>'dam_lact_num[]', 'id'=>'dam_lact_num2'), '2', in_array('2', $filter_selected['dam_lact_num']) !== false); ?>
