@@ -291,6 +291,7 @@ class Herd_model extends CI_Model {
 		$pstring_db = $this->load->database('default', TRUE);
 		$arr_results = $pstring_db->select('pstring, publication_name')
 		->where('herd_code', $herd_code)
+		->where('pstring_active',1)
 		->order_by('pstring', 'asc')
 		->get('herd.dbo.pstring_definition')
 		->result_array();
