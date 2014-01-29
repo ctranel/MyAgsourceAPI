@@ -77,8 +77,8 @@
 	//HERD DB tables
 	$config['tables']['herds']    				= 'herd.dbo.herd_id';
 
-	//RPM DB tables
-	$config['tables']['vma_Dates_Last_7_Tests']			= 'rpm.dbo.vma_Dates_Last_7_Tests'; // Kevin - for dynamic test_date table headers
+	//vma DB views
+	$config['tables']['vma_Dates_Last_7_Tests']			= 'vma.dbo.vma_Dates_Last_7_Tests'; // Kevin - for dynamic test_date table headers
 		
 	/**
 	 * Meta sections to be included with profile.
