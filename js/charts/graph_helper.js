@@ -250,14 +250,9 @@ function process_chart(div_id){ //chart_data is defined globally at the top of t
 				options.series[count].data = tmpData[x];
 				count++;
 			}
-//document.write(JSON.stringify(options))
 			options.chart.renderTo = div_id;
-//alert(typeof before_render);
 			if(typeof pre_render == 'function') pre_render(options, section_data);
-//alert(JSON.stringify(options));
-//pausecomp(10);
 			chart[chart_index] = new Highcharts.Chart(options);
-//remove null series
 			while(chart[chart_index].series.length > count) chart[chart_index].series[count].remove(true);
 		}
 	}
@@ -265,16 +260,6 @@ function process_chart(div_id){ //chart_data is defined globally at the top of t
 	if(typeof(section_data) == "object" && typeof post_render == 'function') post_render(section_data);
 	$('.chart-container').css('display', 'block');
 }
-/*
-function pausecomp(millis)
-{
-	var date = new Date();
-	var curDate = null;
-	
-	do { curDate = new Date(); } 
-	while(curDate-date < millis);
-} */
-
 
 function process_table(div_id, tbl_cnt_in){
 	if(typeof(table_data[tbl_cnt_in]) != 'undefined'){
@@ -288,6 +273,7 @@ function process_table(div_id, tbl_cnt_in){
 			$('#' + div_id).html(table_data[tbl_cnt_in].html);
 		}
 	}
+
 	if(typeof(section_data) == "object" && typeof post_render == 'function') post_render(section_data);
 	$('.table-wrapper').css('display', 'block');
 	//attach events to new data fields
