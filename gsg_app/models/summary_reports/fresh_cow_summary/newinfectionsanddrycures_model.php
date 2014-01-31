@@ -13,7 +13,7 @@ class Newinfectionsanddrycures_model extends Report_model {
 	 * @param bool add average column
 	 * @param bool add sum column
 	 * @return array pivoted resultset
-	 * @author Chris Tranel
+	 * @author ctranel
 	 */
 	public function pivot($arr_dataset, $header_field, $header_field_width, $label_column_width, $bool_avg_column = FALSE, $bool_sum_column = FALSE, $bool_bench_column = FALSE){
 		$avg_l1_1st_new_infection_pct = $arr_dataset[0]['l1_1st_new_infection_pct'];
@@ -35,7 +35,7 @@ class Newinfectionsanddrycures_model extends Report_model {
 	 * @method prep_select_fields()
 	 * @param arr_fields: copy of fields array to be formatted into SQL
 	 * @return array of sql-prepped select fields
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	protected function prep_select_fields($arr_select_fields){
 		if (($key = array_search('test_date', $arr_select_fields)) !== FALSE) {

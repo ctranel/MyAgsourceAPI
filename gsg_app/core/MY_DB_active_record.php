@@ -4,7 +4,7 @@ require_once(BASEPATH.'database/DB_active_rec'.EXT);
 /**
 * Name:  DB Batch Insert
 *
-* Author: Chris Tranel
+* Author: ctranel
 *		  ctranel@agsource.com
 *
 * Location: http://www.agsource.com
@@ -28,7 +28,7 @@ class MY_DB_active_record extends CI_DB_active_record {
 	/**
 	 * Sets the ORDER BY value
 	 * 
-	 * CDT, 6/27/2012:  Added 3rd param to block escaping in cases where SQL functions are used in the order by clause
+	 * ctranel, 6/27/2012:  Added 3rd param to block escaping in cases where SQL functions are used in the order by clause
 	 *
 	 * @param	string
 	 * @param	string	direction: asc or desc

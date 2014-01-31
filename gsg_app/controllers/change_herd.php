@@ -137,7 +137,7 @@ class Change_herd extends CI_Controller {
 		}
 		//validate form input
 		$this->load->library('form_validation');
-		$this->form_validation->set_rules('herd_code', 'Herd', 'required|exact_length[8]');
+		$this->form_validation->set_rules('herd_code', 'Herd', 'required|max_length[8]');
 		//$this->form_validation->set_rules('herd_code_fill', 'Type Herd Code');
 
 		if ($this->form_validation->run() == TRUE) { //successful submission
@@ -149,7 +149,7 @@ class Change_herd extends CI_Controller {
 		else
 		{
 			$this->data['message'] = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
-			$tmp_obj = $this->as_ion_auth->get_herds_by_group($this->session->userdata('active_group_id'));
+			$tmp_obj = $this->as_ion_auth->get_viewable_herds($this->session->userdata('user_id'), $this->session->userdata('arr_regions'));
 			if(is_string($tmp_obj)){ //producers will return a string instead of the database object
 				$this->session->set_userdata('herd_code', $tmp_obj);
 				$this->session->set_userdata('arr_pstring', $this->herd_model->get_pstring_array($tmp_obj, FALSE));

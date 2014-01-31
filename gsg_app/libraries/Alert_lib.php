@@ -2,7 +2,7 @@
 /**
 * Name:  Laboratories Library File
 *
-* Author: Chris Tranel
+* Author: ctranel
 *		  ctranel@agsource.com
 *
 
@@ -27,7 +27,7 @@ class Alert_lib extends Reports{
 	/**
 	 * get_herd_info - retrieves herd data (for use in report headers)
 	 * @return array of herd data
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function get_herd_info($herd_code_in = FALSE){
 		if(!$herd_code_in) $herd_code_in = $this->ci->session->userdata('herd_code');

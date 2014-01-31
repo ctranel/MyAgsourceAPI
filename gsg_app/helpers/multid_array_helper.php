@@ -11,7 +11,7 @@
  * @param	boolean maintain empty rows
  * @param	boolean maintain key
  * @param	constant sort order
-	 * @author Chris Tranel
+	 * @author ctranel
  * @return	array
  */
 if ( ! function_exists('multid_array_sort')) {
@@ -59,7 +59,7 @@ if ( ! function_exists('multid_array_filter')) {
 	 * @param array input
 	 * @param string callback for filter
 	 * @return array
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	function multid_array_filter($input, $callback = null)
 	{
@@ -102,7 +102,7 @@ if ( ! function_exists('array_flatten')) {
 	 *
 	 * @param array array to flatten
 	 * @return flattened array
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	function array_flatten($arr_in){
 		$arr_return = array(); // initialize so that it can be passed by reference
@@ -220,7 +220,7 @@ if ( ! function_exists('array_depth')) {
 	 * Find maximum depth of an array
 	 * Usage: int ArrayDepth( array $array, [int $DepthCount] )
 	 * @return integer with max depth, if Array is a string or an empty array it will return 0
-	 * @author Chris Tranel
+	 * @author ctranel
 	 * 
 	 **/
 
@@ -245,7 +245,7 @@ if ( ! function_exists('array_extract_value_recursive')) {
 	 * @param $key string ("*" to extract all data into a )
 	 * @param $arr array
 	 * @return null|string|array
-	 * @author Chris Tranel
+	 * @author ctranel
 	 */
 	function array_extract_value_recursive($key_in, array $arr_in){
 		$new_val = array();
@@ -261,7 +261,7 @@ if ( ! function_exists('array_map_recursive')) {
 	 * @param callback function
 	 * @param $arr array
 	 * @return array of values after callback has been applied to each
-	 * @author Chris Tranel
+	 * @author ctranel
 	 */
 	function array_map_recursive($func, $arr) {
 	     $newArr = array();
@@ -280,7 +280,7 @@ if ( ! function_exists('array_merge_distinct')) {
 	 * @param $arr_1 array
 	 * @param $arr_2 array
 	 * @return array
-	 * @author Chris Tranel
+	 * @author ctranel
 	 */
  
 	function array_merge_distinct($arr_1, $arr_2, $sort_field = FALSE){
@@ -308,7 +308,7 @@ if ( ! function_exists('get_element_by_key')) {
 	 * @param key
 	 * @param array
 	 * @return mixed
-	 * @author Chris Tranel
+	 * @author ctranel
 	 */
  
 	function get_element_by_key($key, $array){
@@ -331,7 +331,7 @@ if ( ! function_exists('get_elements_by_key')) {
 	 * @param key
 	 * @param array
 	 * @return array
-	 * @author Chris Tranel
+	 * @author ctranel
 	 */
  
 	function get_elements_by_key($key, $array, &$ret_val = NULL){
@@ -355,7 +355,7 @@ if ( ! function_exists('set_element_by_key')) {
 	 * @param key
 	 * @param mixed value to be inserted
 	 * @return void
-	 * @author Chris Tranel
+	 * @author ctranel
 	 */
     function set_element_by_key(&$input, $key_in, $new_val_in, $arr_order = NULL){
     	if (!is_array($input)){
@@ -407,7 +407,7 @@ if ( ! function_exists('merge_arrays_on_value_key_match')) {
 	 * @param array
 	 * @param array
 	 * @return array
-	 * @author Chris Tranel
+	 * @author ctranel
 	 */
 
 	function merge_arrays_on_value_key_match(&$array1, &$array2){

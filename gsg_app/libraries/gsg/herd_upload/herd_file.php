@@ -2,7 +2,7 @@
 /**
 * Name:  Herd File
 *
-* Author: Chris Tranel
+* Author: ctranel
 *		  ctranel@agsource.com
 *
 * Created:  2.17.2011
@@ -52,7 +52,7 @@ class Herd_file{
 	/**
 	 * read_csv()
 	 *
-	 * @author Chris Tranel
+	 * @author ctranel
 	 * @param string csv filename
 	 * @return boolean
 	 **/
@@ -75,7 +75,7 @@ class Herd_file{
 	 * add_quartiles.
 	 *
 	 * @return Void - Sets the object's $arr_quartile_avg sets and $arr_quartile_data properties)
-	 * @author Chris Tranel
+	 * @author ctranel
 	 * @param array file data (by reference)
 	 * @param array key of field to be calculate
 	 * @param array key of field that stores quartile number
@@ -141,7 +141,7 @@ class Herd_file{
 	 * @param mixed key
 	 * @param int percentile
 	 * @return float value boundary for the given percentile
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function percentile($data, $key, $percentile){
 		$this->ci->load->helper('multid_array');
@@ -177,7 +177,7 @@ class Herd_file{
 	 * @param array animal data
 	 * @param mixed key
 	 * @return array value for each quartile boundary ('25'=>$q1 value)
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function quartiles($data, $key) {
 		$q1 = $this->percentile($data, $key, 25);
@@ -195,7 +195,7 @@ class Herd_file{
 	 * @param array herd data specific to GSG
 	 * @param char cow/heifer code
 	 * @return mixed number of rows or False
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function write_to_db($data, $herd_data, $gsg_herd_data, $cow_heifer_code){
 		if (is_array($herd_data)){
@@ -243,7 +243,7 @@ class Herd_file{
 	 * @param string due date month and date
 	 * @param string test date
 	 * @return string - date in mySQL format (inclding year)
-	 * @author Chris Tranel
+	 * @author ctranel
 	 * @access private
 	 **/
 	private function _set_due_date($date_in, $test_date){

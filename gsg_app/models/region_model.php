@@ -20,7 +20,7 @@ class Region_model extends CI_Model {
 	 * get_region_by_name
 	 *
 	 * @return array of objects
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function get_region_by_field($field, $value) {
 		if(is_array($value)) $this->db->where_in($field, $value);
@@ -33,7 +33,7 @@ class Region_model extends CI_Model {
 	 * get_regions
 	 *
 	 * @return array of region objects
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function get_regions($limit=NULL, $offset=NULL) {
 		if (isset($limit) && isset($offset))
@@ -44,7 +44,7 @@ class Region_model extends CI_Model {
 	 * create_region
 	 *
 	 * @return bool
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function create_region($data) {
 		if($this->is_duplicate($data['id'])) {
@@ -63,7 +63,7 @@ class Region_model extends CI_Model {
 	 * update_region
 	 *
 	 * @return bool
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function update_region($data) {
 		$has_data = is_array($data);
@@ -98,7 +98,7 @@ class Region_model extends CI_Model {
 			$arr_group_obj = $this->get_regions();
 		}
 		else{
-			$arr_group_obj = $this->get_region_by_field('id', $this->session->userdata('arr_regions'));
+			$arr_group_obj = $this->get_region_by_field('id', array_keys($this->session->userdata('arr_regions')));
 		}
 		if(is_array($arr_group_obj)) {
 			$ret_array[''] = "Select one";

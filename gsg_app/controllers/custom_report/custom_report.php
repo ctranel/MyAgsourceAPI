@@ -30,10 +30,6 @@ class Custom_report extends CI_Controller {
 		redirect(site_url('custom_report/create'), 'refresh');
 	}
 	function create(){
-/* if(isset($_POST['section_id'])){
-	var_dump($_POST);
-	die();
-} */
 		if(!isset($this->as_ion_auth) || !$this->as_ion_auth->logged_in()){
 			$this->session->keep_flashdata('redirect_url');
 			redirect(site_url('auth/login'));
@@ -163,7 +159,7 @@ class Custom_report extends CI_Controller {
 					//'value' => $this->form_validation->set_value('email', $obj_user->email),
 					//'class' => 'require'
 				);
-				$this->data['report_super_section_options'] = $this->as_ion_auth->set_form_array($this->ion_auth_model->get_subscribed_super_sections_array($obj_user->group_id, $user_id), 'id', 'name');//$this->access_log_model->get_section_select_data();
+				$this->data['report_super_section_options'] = $this->as_ion_auth->set_form_array($this->ion_auth_model->get_subscribed_super_sections_array($obj_user->arr_groups, $user_id), 'id', 'name');//$this->access_log_model->get_section_select_data();
 				$this->data['report_super_section'] = 'id="super_section_id"';
 				$this->data['report_super_section_selected'] = NULL;
 				$this->data['report_section_options'] = NULL;

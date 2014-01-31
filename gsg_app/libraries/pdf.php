@@ -427,7 +427,7 @@ class pdf extends TCPDF {
 		if ($this->numpages > $this->page) {
 			// this page has been already added
 			$this->setPage($this->page + 1);
-			//added conditional to this line, 3/2/11, Chris Tranel
+			//added conditional to this line, 3/2/11, ctranel
 			if($this->page == 1) $this->SetY($this->tMargin);
 			return;
 		}
@@ -448,7 +448,7 @@ class pdf extends TCPDF {
 		// mark this point
 		$this->setPageMark();
 		// print page header
-		//added conditional to this line, 3/2/11, Chris Tranel
+		//added conditional to this line, 3/2/11, ctranel
 		if ($this->numpages == 1) $this->setHeader();
 		// restore graphic settings
 		$this->setGraphicVars($gvars);
@@ -482,7 +482,7 @@ class pdf extends TCPDF {
 				//Automatic page break
 				$x = $this->x;
 				$this->AddPage($this->CurOrientation);
-				//added conditional to this line, 3/2/11, Chris Tranel
+				//added conditional to this line, 3/2/11, ctranel
 				if($this->numpages == 1) $this->y = $this->tMargin;
 				$oldpage = $this->page - 1;
 				if ($this->rtl) {
@@ -531,7 +531,7 @@ class pdf extends TCPDF {
 		} else {
 			$imgy = $this->GetY();
 		}
-		// modify cell height to be the height of the image cell -- Chris Tranel, 3/2/11
+		// modify cell height to be the height of the image cell -- ctranel, 3/2/11
 		$cell_height = round(($this->getCellHeightRatio() * $headerfont[2]) / $this->getScaleFactor(), 2);//$imgy - $this->GetY();
 		// set starting margin for text data cell
 		if ($this->getRTL()) {

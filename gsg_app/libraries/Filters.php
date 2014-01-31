@@ -2,7 +2,7 @@
 /**
 * Name:  Filters Library File
 *
-* Author: Chris Tranel
+* Author: ctranel
 *		  Compiled and Expanded by Kevin Marshall
 *
 

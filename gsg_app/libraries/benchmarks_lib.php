@@ -2,7 +2,7 @@
 /**
 * Name:  Benchmarks
 *
-* Author: Chris Tranel
+* Author: ctranel
 *  
 * Created:  1-11-2013
 *
@@ -86,7 +86,7 @@ class Benchmarks_lib
 	 * __construct
 	 *
 	 * @return void
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function __construct()
 	{
@@ -120,7 +120,7 @@ class Benchmarks_lib
 	 * gets metric options for benchmarks
 	 *
 	 * @return array of metric options
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function get_metric_options(){
 		return array(
@@ -137,7 +137,7 @@ class Benchmarks_lib
 	 * gets criteria options for benchmarks
 	 *
 	 * @return array of criteria options
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function get_criteria_options(){
 		return array(
@@ -153,7 +153,7 @@ class Benchmarks_lib
 	 * gets breakdown options for benchmarks
 	 *
 	 * @return array of breakdown options
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function get_breakdown_options(){
 		return array(
@@ -167,7 +167,7 @@ class Benchmarks_lib
 	 * gets text description of benchmarks being used
 	 *
 	 * @return string
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function get_bench_text(){
 		$sess_benchmarks = $this->ci->session->userdata('benchmarks');
@@ -182,7 +182,7 @@ class Benchmarks_lib
 	 * gets criteria options for benchmarks
 	 *
 	 * @return array of criteria options
-	 * @author Chris Tranel
+	 * @author ctranel
 	public function get_criteria_sort_order($criteria){
 		switch($criteria){
 			case 'p.avg_milk':
@@ -208,7 +208,7 @@ class Benchmarks_lib
 	 * @param string state
 
 	 * @return array of default settings
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function get_default_settings($herd_size = FALSE, $state = FALSE){
 		return array(
@@ -274,7 +274,7 @@ class Benchmarks_lib
 	 * @param string state
 
 	 * @return array of default settings
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function set_herd_defaults($herd_code){
 		$herd_info = $this->ci->herd_model->header_info($this->ci->session->userdata('herd_code'));
@@ -298,7 +298,7 @@ class Benchmarks_lib
 	 * @param array
 
 	 * @return void
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function set_criteria($db_table, $date_field, $metric = 'TOP10_PCT', $criteria = 'p.herd_rha', $arr_herd_size = NULL, array $arr_states = NULL){
 		if(isset($db_table)) $this->db_table = $db_table;
@@ -347,7 +347,7 @@ class Benchmarks_lib
 	 * builds sql based on object variables
 	 *
 	 * @return string
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function build_benchmark_query(&$report_model, $arr_fields_to_exclude = NULL, $arr_group_by = NULL){
 		$sql = '';
@@ -412,8 +412,7 @@ class Benchmarks_lib
 				LEFT JOIN herd_summary.dbo.herd_rha p ON i.herd_code = p.herd_code AND i.test_date = p.test_date";
 		$sql .= " GROUP BY i.herd_code, i.test_date
 			HAVING (SELECT MAX(test_date) FROM inventory WHERE herd_code = i.herd_code";
-//var_dump($this->herd_size_floor);
-//die();				
+
 		if(isset($this->herd_size_floor) && isset($this->herd_size_ceiling)) $sql .= " AND hi.milk_cow_cnt BETWEEN " . $this->herd_size_floor . " AND " . $this->herd_size_ceiling;
 		if(isset($this->arr_states) && is_array($this->arr_states) && !empty($this->arr_states)) " AND state_prov IN (" . implode(',', $this->arr_states) . ")";
 		

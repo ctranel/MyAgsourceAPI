@@ -16,33 +16,11 @@
 * Original Author name has been kept but that does not mean that the method has not been modified.
 *
 */
-/* -----------------------------------------------------------------
- *  UPDATE comment
- *  @author: carolmd
- *  @date: Nov 15, 2013
- *
- *  @description: Added any remaining tables that were referenced anywhere in Myagsource.
- *  
- *  -----------------------------------------------------------------
- */
-/* -----------------------------------------------------------------
- *  UPDATE comment
- *  @author: carolmd
- *  @date: Dec 9, 2013
- *
- *  @description: removed users_group table.
- *                The values that were stored there are now stored in the users table.
- *                Changes will be made to any references that used this table.
- *  
- *  @date: Jan 08, 2014
- *  
- *  @description: Changed default emails for support and customer service to myagsource.com .
- *  -----------------------------------------------------------------
- */
 	$config['use_mongodb'] = FALSE;
-	$config['collections']['users']          	= 'users';
-	$config['collections']['groups']         	= 'groups';
-	$config['collections']['login_attempts'] 	= 'login_attempts';
+	$config['collections']['users']          = 'users';
+	$config['collections']['groups']         = 'groups';
+	$config['collections']['login_attempts'] = 'login_attempts';
+
 	/**
 	 * Tables.
 	 **/
@@ -62,10 +40,9 @@
 	$config['tables']['users_sections']    		= 'users.dbo.users_sections';
 	$config['tables']['groups']  				= 'users.dbo.groups';
 	$config['tables']['users_dhi_supervisors']  = 'address.dbo.dhi_supervisor';
-	$config['tables']['regions']  				= 'users.dbo.regions';
-	$config['tables']['users_regions']  		= 'users.dbo.users_regions';
+	$config['tables']['regions']  				= 'address.dbo.association';//users.dbo.regions';
 	$config['tables']['users']   				= 'users.dbo.users';
-//	$config['tables']['users_groups']    		= 'users.dbo.users_groups';
+	$config['tables']['users_groups']    		= 'users.dbo.users_groups';
 	$config['tables']['meta']    				= 'users_meta'; 
 	$config['tables']['users_herds']    		= 'users.dbo.users_herds';
 	$config['tables']['login_attempts']  		= 'users.dbo.login_attempts';
@@ -78,32 +55,23 @@
 	$config['tables']['herds']    				= 'herd.dbo.herd_id';
 
 	//RPM DB tables
-	$config['tables']['vma_Dates_Last_7_Tests']			= 'rpm.dbo.vma_Dates_Last_7_Tests'; // Kevin - for dynamic test_date table headers
+	$config['tables']['vma_Dates_Last_7_Tests'] = 'rpm.dbo.vma_Dates_Last_7_Tests'; // Kevin - for dynamic test_date table headers
 		
 	/**
 	 * Meta sections to be included with profile.
 	 * Each should have a config setting for 'towrite' 'tables', 'join' and 'columns'
 	 **/
-	/* -----------------------------------------------------------------
-	 *  UPDATE comment
-	 *  @author: carolmd
-	 *  @date: Dec 10, 2013
-	 *
-	 *  @description: Removed users_herds.
-	 *  
-	 *  -----------------------------------------------------------------
-	 */
-// DELETE	$config['meta_sections']  			       = array( 'users_dhi_supervisors', 'users_regions', 'users_sections');//'meta', 
-	$config['meta_sections']  			       = array( 'users_regions', 'users_sections');//'meta', 
-	$config['herd_meta_sections']   		   = array('herds_sections');
+	$config['meta_sections']         = array('users_herds', 'users_sections');//'meta', 
+	$config['herd_meta_sections']         = array('herds_sections');
 
 	/**
 	 * Fields from meta table that must be present in order to write to the meta table
 	 * Note that these fields are not required on the user record
 	 **/
-	$config['towrite'] 	= array(
-		'users_regions'	=> array('region_id'),
-		'users'=> array('association_num'),
+	$config['towrite'] = array(
+		'users_herds'		=> array('herd_code'),
+		//'dhi_supervisor'=> array('supervisor_num','region_id'),
+		//'meta'		=> array(),
 		'users_sections'=> array('section_id', ''),
 		'herds_sections'=> array('section_id')
 	);
@@ -114,22 +82,26 @@
  | "meta sections" need to be user_id, "herd_meta_sections" need to be herd_code ("groups" are neither)
  */
 	$config['join'] = array(
-		'groups'				=> 'group_id',//from ion_auth
-		'users'					=> 'user_id', //from ion_auth
-		'users_regions'			=> 'user_id',
-		'users_dhi_supervisors'	=> 'affiliate_num', // correction for address.dbo.dhi_supervisors.
-		'users_sections'		=> 'user_id',
-		'herds_sections'		=> 'herd_code'
+		'groups'	=> 'group_id',//from ion_auth
+		'users'		=> 'user_id', //from ion_auth
+		'users_herds'		=> 'user_id',
+//		'users_dhi_supervisors'=> 'user_id',
+		//'meta'		=> 'user_id',
+		'users_sections'=> 'user_id',
+		'herds_sections'=> 'herd_code'
 	);
+
+
 	/**
 	 * Columns in your meta table,
 	 * id not required.
 	 **/
 	$config['columns'] = array(
-		'users_regions'		=> array('region_id'),
-		'dhi_supervisor'	=> array('supervisor_num', 'affiliate_num'),
-		'users_sections'	=> array('section_id', 'access_level'),
-		'herds_sections'	=> array('section_id', 'access_level')
+		'users_herds'		=> array('herd_code'),
+//		'dhi_supervisor'=> array('supervisor_num', 'region_id'),
+		//'meta'		=> array('first_name', 'last_name', 'company', 'phone'),
+		'users_sections'=> array('section_id', 'access_level'),
+		'herds_sections'=> array('section_id', 'access_level')
 	);
 	
 /*
@@ -170,7 +142,7 @@ $config['max_rounds']     = 9;
  */
 $config['default_herd']			="35999571";
 $config['site_title']           = "MyAgSource"; 		// Site Title, example.com
-$config['cust_serv_company']	= "AgSource Cooperative Services"; //custom CDT
+$config['cust_serv_company']	  = "AgSource Cooperative Services"; //custom CDT
 
 /* 
  * email and phone numbers vary by environment.
@@ -197,52 +169,21 @@ switch (ENVIRONMENT)
 		exit('The application environment is not set correctly - t_base_url.');
 }
 
-/* ----------------------------------------------------------------
- * GROUP ID SECTION
- * 
- * Note: : if new groups are added, they must be added here. 
- *                	    The config values are used in libraries/as_ion_auth  , so that would also need to be modified.
- *                      To add a new group id: 
- *                      	Insert row into group_id table. 
- *                      	Insert rows into group_tasks table.
- *                      	Add config entry here. 
- *                      	Add new function in libraries/as_ion_auth with name of  is_xxxx (xxx=group name) 
- *                      	Add logic wherever needed to implement the new group. (search for areas that use config['producer_group'] for clues)
- */
-/* -----------------------------------------------------------------
- *  UPDATE comment
- *  @author: carolmd
- *  @date: Dec 6, 2013
- *
- *  @description: Gordon revised this to use group_id instead of name. This simplifies using it for lookup later.
- *  
- *  -----------------------------------------------------------------
- */
-$config['default_group']        		= '2'; 			// Default group
-$config['producer_group']        		= '2'; 			// 
-$config['admin_group']          		= '1'; 			// Default administrators group
-$config['manager_group']         		= '3'; 
-$config['field_tech_group']         	= '5'; 
-$config['rss_group']         			= '8'; 
-$config['consultant_group']         	= '9'; 
-$config['association_group']         	= '10';
-$config['emrss_group']       		  	= '11';
-/* 
- * ----------------------------------------------------------------
- * USER LOGIN SECTION
- * --------------------------------------------------------------
- */
-$config['identity']             		= 'email'; 				// A database column which is used to login with
-$config['min_password_length']  		= 8; 					// Minimum Required Length of Password
-$config['max_password_length']  		= 20; 					// Maximum Allowed Length of Password
-$config['email_activation']     		= TRUE; 				// Email Activation for registration
-$config['manual_activation']    		= FALSE; 				// Manual Activation for registration
-$config['remember_users']       		= TRUE; 				// Allow users to be remembered and enable auto-login
-$config['user_expire']          		= (60 * 60 * 24 * 90); 	//90 Days				// How long to remember the user (seconds)
-$config['user_extend_on_login'] 		= TRUE; 				// Extend the users cookies everytime they auto-login
-$config['track_login_attempts'] 		= FALSE;				// Track the number of failed login attempts for each user or ip.
-$config['maximum_login_attempts']     	= 3; 				// The maximum number of failed login attempts.
-$config['forgot_password_expiration'] 	= 0; 				// The number of seconds after which a forgot password request will expire. If set to 0, forgot password requests will not expire.
+$config['default_group']        = 2; 			// Default group, use name
+$config['admin_group']          = 1; 				// Default administrators group, use name
+$config['manager_group']        = 3; //custom CDT
+
+$config['identity']             = 'email'; 				// A database column which is used to login with
+$config['min_password_length']  = 8; 					// Minimum Required Length of Password
+$config['max_password_length']  = 20; 					// Maximum Allowed Length of Password
+$config['email_activation']     = TRUE; 				// Email Activation for registration
+$config['manual_activation']    = FALSE; 				// Manual Activation for registration
+$config['remember_users']       = TRUE; 				// Allow users to be remembered and enable auto-login
+$config['user_expire']          = (60 * 60 * 24 * 90); 	//90 Days				// How long to remember the user (seconds)
+$config['user_extend_on_login'] = TRUE; 				// Extend the users cookies everytime they auto-login
+$config['track_login_attempts'] = FALSE;				// Track the number of failed login attempts for each user or ip.
+$config['maximum_login_attempts']     = 3; 				// The maximum number of failed login attempts.
+$config['forgot_password_expiration'] = 0; 				// The number of seconds after which a forgot password request will expire. If set to 0, forgot password requests will not expire.
 
 /*
  | -------------------------------------------------------------------------

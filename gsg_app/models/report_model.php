@@ -54,7 +54,6 @@ class Report_model extends CI_Model {
 		/*in the case of the access log model, the section id is set AFTER the parent (this file/class) is called so that the reference
 		 * back to the access log model does not cause problem.  That is the only other model that calls the get block links method.
 		 */
-		
 		$this->arr_pstring = $this->herd_model->get_pstring_array($this->session->userdata('herd_code'));
 		$this->tables  = $this->config->item('tables', 'ion_auth');
 
@@ -128,7 +127,7 @@ class Report_model extends CI_Model {
 	 * @method get_default_sort()
 	 * @param string block url segment
 	 * @return returns multi-dimensional array, arr_sort_by and arr_sort_order
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	function get_default_sort($block_url_segment){
 		$arr_ret = array();
@@ -154,7 +153,7 @@ class Report_model extends CI_Model {
 	 * @method get_group_by_fields()
 	 * @param int id of current block
 	 * @return array: ordered list of group by fields
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	function get_group_by_fields($block_id){
 		$arr_ret = array();
@@ -177,7 +176,7 @@ class Report_model extends CI_Model {
 	/**
 	 * @method get_table_header_data()
 	 * @return multi-dimensional array of header data ('arr_unsortable_columns', 'arr_field_sort', 'arr_header_data')
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	function get_table_header_data(){
 		$this->load->helper('table_header');
@@ -195,7 +194,7 @@ class Report_model extends CI_Model {
 	 * @param int id of current block
 	 * @abstract populates report-specific object variable arrays (from DB)
 	 * @return void
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function populate_field_meta_arrays($block_in){
 		$arr_numeric_types = array('bigint','decimal','int','money','smallmoney','numeric','smallint','tinyint','float','real');
@@ -284,7 +283,7 @@ class Report_model extends CI_Model {
 	 * @abstract returns block (i.e., table) header structure which provides a skeleton for the organization of fields in the arr_fields object variable
 	 * 				also 
 	 * @return array: ref = lookup array for ids, arr_fields = skeleton structure for db_fields
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	protected function get_select_field_structure($block_in){
 		$arr_fields = array();
@@ -318,7 +317,6 @@ class Report_model extends CI_Model {
 		}
 
 		//KLM - Added logic to convert header text to date text from herd_model function get_test_dates_7_short
-		
 		if(is_array($arr_groupings) && !empty($arr_groupings)){
 			$this->load->model('herd_model');
 			$arr_dates = $this->herd_model->get_test_dates_7_short($this->session->userdata('herd_code'));
@@ -354,7 +352,7 @@ class Report_model extends CI_Model {
 	 * @param string herd code
 	 * @abstract for now, this function removes the pstring column from the arr_fields object variable if the herd does not have pstrings, it could be used for other purposes as well.
 	 * @return void
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	protected function adjust_fields($herd_code){
 		//remove pstring column if the herd does not have pstrings
@@ -433,7 +431,7 @@ class Report_model extends CI_Model {
 	 * @param array sort by
 	 * @param array sort order
 	 * @return array results of search
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	function search($herd_code, $arr_filter_criteria, $arr_sort_by = array(''), $arr_sort_order = array(''), $limit = NULL) {
 		$this->load->helper('multid_array_helper');
@@ -500,7 +498,7 @@ class Report_model extends CI_Model {
 	 * @method prep_select_fields()
 	 * @param arr_fields: copy of fields array to be formatted into SQL
 	 * @return array of sql-prepped select fields
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	protected function prep_select_fields($arr_select_fields){
 		if (($key = array_search('test_date', $arr_select_fields)) !== FALSE) {
@@ -604,7 +602,7 @@ class Report_model extends CI_Model {
 	
 	/*  
 	 * @method prep_group_by()
-	 * @author Chris Tranel
+	 * @author ctranel
 	 */
 	protected function prep_group_by(){
 		$arr_len = is_array($this->arr_group_by_field)?count($this->arr_group_by_field):0;
@@ -620,7 +618,7 @@ class Report_model extends CI_Model {
 	 * @method prep_sort()
 	 * @param array fields to sort by
 	 * @param array sort order--corresponds to first parameter
-	 * @author Chris Tranel
+	 * @author ctranel
 	 */
 	protected function prep_sort($arr_sort_by, $arr_sort_order){
 		$arr_len = is_array($arr_sort_by)?count($arr_sort_by):0;
@@ -647,7 +645,7 @@ class Report_model extends CI_Model {
 	 * @param bool add average column
 	 * @param bool add sum column
 	 * @return array pivoted resultset
-	 * @author Chris Tranel
+	 * @author ctranel
 	 */
 	public function pivot($arr_dataset, $header_field, $header_field_width, $label_column_width, $bool_avg_column = FALSE, $bool_sum_column = FALSE, $bool_bench_column = FALSE){
 $bool_bench_column = FALSE;
@@ -774,7 +772,7 @@ $bool_bench_column = FALSE;
 	/**
 	 * get_recent_dates
 	 * @return date string
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function get_recent_dates($date_field = 'test_date', $num_dates = 1, $date_format = 'MMM-yy') {
 		if($date_format) $this->db->select("FORMAT(" . $date_field . ", '" . $date_format . "', 'en-US') AS " . $date_field, FALSE);
