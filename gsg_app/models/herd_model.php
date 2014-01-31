@@ -358,10 +358,11 @@ $this->load->helper('multid_array_helper');
 	 **/
 	public function get_tstring_array($herd_code) {
 		$tstring_db = $this->load->database('default', TRUE);
+		$tstring_db->distinct();
 		$arr_results = $tstring_db->select('tstring')
 		->where('herd_code', $herd_code)
 		->order_by('tstring', 'asc')
-		->get('rpm.dbo.string_summary')
+		->get('rpm.dbo.report_cow_id_1')
 		->result_array();
 
 		return $arr_results;
