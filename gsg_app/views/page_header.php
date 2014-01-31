@@ -10,8 +10,7 @@
     <meta name="keywords" content="<?php echo $this->config->item("cust_serv_company"); ?>, DHI Testing, DHI, DHIA, milk testing, soil testing, forage testing, manure testing, " />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 	<link rel="stylesheet" href='http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css'>
-<?php 	
-	    
+<?php
 	    $this->carabiner->css('http://agsource.crinet.com/css/AgSource-Cooperative-Services.css', 'screen');
 		$this->carabiner->css('print.css', 'print');
 		$this->carabiner->css('myags.css', 'screen');
@@ -122,7 +121,7 @@
 				</ul>
 			</li> <!-- close "Select Section" li -->
 			<?php $arr_groups = $this->session->userdata('arr_groups');
-			if(isset($arr_groups) && is_array($arr_groups) && count($arr_groups) > 1):?>
+			if(isset($arr_groups) && is_array($arr_groups) && count($arr_groups) > 1): ?>
 			<li class="groupnav"><a><?php echo $arr_groups[$this->session->userdata('active_group_id')]; ?></a><br />
 				<ul class="sub-menu">
 					<?php foreach($arr_groups as $k=>$v): ?>

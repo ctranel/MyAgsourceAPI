@@ -407,10 +407,6 @@ class Carabiner {
 	*/		
 	public function css($dev_file, $media = 'screen', $prod_file = '', $combine = TRUE, $minify = TRUE, $group = 'main')
 	{
-//echo $media . '<br>';
-//print_r($dev_file);
-//die();
-		
 		if( is_array($dev_file) ){
 			
 			if( is_array($dev_file[0]) ){
@@ -519,7 +515,6 @@ class Carabiner {
 	*/		
 	public function display($flag = 'both', $group_filter = NULL)
 	{	
-//die();
 		switch($flag){
 			
 			case 'JS':

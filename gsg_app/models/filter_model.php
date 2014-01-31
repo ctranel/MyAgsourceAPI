@@ -25,7 +25,7 @@ class Filter_model extends Report_Model {
 	 * translates filter criteria into sql format
 	 * @param $arr_filter_criteria
 	 * @return void
-	 * @author Chris Tranel
+	 * @author ctranel
 	 */
 	
 	 public function prep_where_criteria($arr_filter_criteria){
@@ -58,7 +58,7 @@ class Filter_model extends Report_Model {
 	/**
 	 * get_page_filters
 	 * @return array of filter data for given page
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function get_page_filters($section_id, $page_url_segment) {
 		$ret_array = array();

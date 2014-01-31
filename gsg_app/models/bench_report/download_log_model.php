@@ -55,7 +55,7 @@ class Download_log_model extends Report_model {
 	 * @method prep_select_fields() allows you to override basic defaults for fields included in results, including adding joins.
 	 * @param array fields to include
 	 * @return modified array of fields
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	function prep_select_fields($arr_fields) {
 		if(is_array($arr_fields)){
@@ -78,7 +78,7 @@ class Download_log_model extends Report_model {
 	 * get_keyed_page_array
 	 *
 	 * @return 1d array (id=>name)
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function get_keyed_page_array() {
 		$ret_array = array();

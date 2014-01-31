@@ -2,7 +2,7 @@
 /**
  * Name:  MY Ion Auth Model
  *
- * Author:  Chris Tranel (extends class by Ben Edmunds)
+ * Author:  ctranel (extends class by Ben Edmunds)
  * 		   ctranel@agsource.com
   *
  * Created:  06.29.2012
@@ -11,19 +11,6 @@
  *
  * Requirements: PHP5 or above
  *
- */
-/* -----------------------------------------------------------------
- *  UPDATE comment
- *  @author: carolmd
- *  @date: Nov 25, 2013
- *
- *  @description: Removed get_group_by_name. No longer needed anywhere, 
- *  				because default and active group fields are now group_id instead of name.
- *  
- *  @date: Jan 9, 2014
- *
- *  @description: removed some debugging code. 
- *  -----------------------------------------------------------------
  */
 require_once APPPATH . 'models/ion_auth_parent_model.php';
 
@@ -87,7 +74,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * @param array additional account data
 	 * @param array groups 
 	 * @return bool
-	 * @author Chris Tranel CDT
+	 * @author ctranel
 	 **/
 	public function register($username, $password, $email, $additional_data = false, $arr_groups = array())
 	{
@@ -119,7 +106,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * @param string password
 	 * @param boolean remember (store cookie)
 	 * @return bool
-	 * @author Chris Tranel CDT
+	 * @author ctranel
 	 **/
 	public function login($identity, $password, $remember=FALSE){
 		$this->ion_auth->set_hook('post_login_successful', 'set_session_meta', 'Ion_auth_model', '_set_session_meta');
@@ -131,23 +118,15 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 *
 	 * @abstract called on login success, writes session data specific to this section
 	 * @return bool
-	 * @author Chris Tranel CDT
+	 * @author ctranel
 	 **/
-	/* -----------------------------------------------------------------
-	 *  UPDATE comment
-	 *  @author: carolmd
-	 *  @date: Dec 9, 2013
-	 *
-	 *  @description: revised the arr_groups so it contains a single group_id.
-	 *  
-	 *  -----------------------------------------------------------------
-	 */
 	protected function _set_session_meta(){
-		$group_id = $this->get_users_group($this->session->userdata('user_id'));
-		$session_data['arr_groups'] = array($group_id);
+		$arr_groups = $this->get_users_group_array($this->session->userdata('user_id'));
+		$session_data['arr_groups'] = $arr_groups;
 		$arr_regions = $this->get_users_region_array($this->session->userdata('user_id'));
 		$session_data['arr_regions'] = $arr_regions;
-		$session_data['active_group_id'] = $group_id;
+		//@todogroups set active group to current element for now, should add default group to user record
+		$session_data['active_group_id'] = key($arr_groups);
 
 		// write select query for each meta section
 		if (!empty($this->meta_sections)){
@@ -160,17 +139,8 @@ class Ion_auth_model extends Ion_auth_parent_model
 				}
 			}
 		}
-/* -----------------------------------------------------------------
- *  UPDATE comment
- *  @author: carolmd
- *  @date: Dec 9, 2013
- *
- *  @description: changed to get herd meta data for everyone.
- *  
- *  -----------------------------------------------------------------
- */
-//		if (!empty($this->herd_meta_sections) && in_array('2', $arr_groups)){ //get herd data for producers
-		if (!empty($this->herd_meta_sections) ){ //get herd data
+
+		if (!empty($this->herd_meta_sections) && in_array('2', $arr_groups)){ //get herd data for producers
 			foreach($this->herd_meta_sections as $s){
 				if (!empty($this->columns[$s])) {
 					foreach ($this->columns[$s] as $field){
@@ -192,16 +162,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 				}
 			}
 		}
-		/* -----------------------------------------------------------------
-		 *  UPDATE comment
-		 *  @author: carolmd
-		 *  @date: Dec 9, 2013
-		 *
-		 *  @description: Revised to gather herd meta data for all users.
-		 *  
-		 *  -----------------------------------------------------------------
-		 */
-		if (!empty($this->herd_meta_sections)){
+		if (!empty($this->herd_meta_sections) && in_array('2', $arr_groups)){
 			foreach($this->herd_meta_sections as $s){
 				if (!empty($this->columns[$s])) {
 					foreach ($this->columns[$s] as $col){
@@ -225,17 +186,8 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * @param int limit
 	 * @param int offset
 	 * @return object Users
-	 * @author Chris Tranel CDT
+	 * @author ctranel
 	 **/
-	/* -----------------------------------------------------------------
-	 *  UPDATE comment
-	 *  @author: carolmd
-	 *  @date: Dec 9, 2013
-	 *
-	 *  @description: removed join criteria on users_groups.
-	 *  
-	 *  -----------------------------------------------------------------
-	 */
 	public function users($group=FALSE, $limit=NULL, $offset=NULL, $arr_joins = NULL)
 	{
 		if (!empty($this->meta_sections)){
@@ -262,36 +214,18 @@ class Ion_auth_model extends Ion_auth_parent_model
 				}
 			}
 		}
-		/* -----------------------------------------------------------------
-		 *  UPDATE comment
-		 *  @author: carolmd
-		 *  @date: Dec 9, 2013
-		 *
-		 *  @description: removed table users_groups , use users table instead.
-		 *  
-		 *  -----------------------------------------------------------------
-		 */
 		$this->db->join(
-		    $this->tables['groups'], 
-		    $this->tables['groups'].'.id = ' . $this->tables['users'].'.group_id', 
+		    $this->tables['users_groups'], 
+		    $this->tables['users_groups'].'.user_id = ' . $this->tables['users'].'.id', 
 		    'inner'
 		);
-
 		if(isset($arr_joins) && is_array($arr_joins)){
 			foreach($arr_joins as $j){
 				$this->db->join($j['table'], $j['condition'], $j['type']);
 			}
 		}
-		/* -----------------------------------------------------------------
-		 *  UPDATE comment
-		 *  @author: carolmd
-		 *  @date: Dec 9, 2013
-		 *
-		 *  @description: removed references to users_groups.
-		 *  
-		 *  -----------------------------------------------------------------
-		 */
-		//$this->db->select("CAST(REPLACE((SELECT group_id AS [data()] FROM " . $this->tables['users_groups'] . " AS groups2 WHERE " . $this->tables['users_groups'] . ".user_id = groups2.user_id ORDER BY group_id FOR xml path('')), ' ', ', ') AS VARCHAR(45)) AS arr_groups",FALSE);
+		
+		$this->db->select("CAST(REPLACE((SELECT group_id AS [data()] FROM " . $this->tables['users_groups'] . " AS groups2 WHERE " . $this->tables['users_groups'] . ".user_id = groups2.user_id ORDER BY group_id FOR xml path('')), ' ', ', ') AS VARCHAR(45)) AS arr_groups",FALSE);
 		//$this->db->select("(SELECT GROUP_CONCAT(group_id) FROM " . $this->tables['users_groups'] . " AS groups2 WHERE " . $this->tables['users_groups'] . ".user_id = groups2.user_id) AS groups",FALSE);
 		//$this->db->distinct();
 		
@@ -307,7 +241,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * @param int limit
 	 * @param int offset
 	 * @return object User
-	 * @author Chris Tranel CDT
+	 * @author ctranel
 	 **/
 	public function user($id = NULL){
 		$this->trigger_events('user');
@@ -328,7 +262,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 *
 	 * @param string group name
 	 * @return object
-	 * @author Chris Tranel CDT
+	 * @author ctranel
 	 **/
 	public function get_active_users($group_name = false)
 	{
@@ -358,43 +292,34 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 *
 	 * @param int/array region number
 	 * @return object
-	 * @author Chris Tranel CDT
+	 * @author ctranel
 	 **/
-	public function get_field_users_by_region($region_id)
+	public function get_field_users_by_region($region_num)
 	{
-		
-		if(!isset($region_id)) return FALSE;
-		if(!is_array($region_id)) $region_id = array($region_id);
-		$this->db->where($this->tables['users_regions'], $region_id);
+		if(!isset($region_num)) return FALSE;
+		if(!is_array($region_num)) $region_num = array($region_num);
+		$this->db->where($this->tables['users'] . '.association_num', $region_num);
 		$this->users();
 		return $this;
 	}
 	
 	/**
-	 * @method get_user_group
+	 * @method get_user_group_array
 	 *
 	 * @param int user id
-	 * @return group_id
-	 * @author Chris Tranel
+	 * @return array group_id=>group_name
+	 * @author ctranel
 	 **/
-	/* -----------------------------------------------------------------
-	 *  UPDATE comment
-	*  @author: carolmd
-	*  @date: Dec 9, 2013
-	*
-	*  @description: Changed this to find user's group_id from the users table.
-	*  				Returns int.
-	*  -----------------------------------------------------------------
-	*/
-	public function get_users_group($id=false) {
-		$this->db
-			->where('id',  $id)
-		    ->select('group_id');
-		$group_mdarray = $this->db
-		           ->get($this->tables['users'])
-		           ->result_array();
-		$group_id = $group_mdarray[0]["group_id"];
-		return $group_id;
+	public function get_users_group_array($id=false) {
+		$this->db->where($this->tables['groups'] . '.status', 1);
+		$arr_db_groups = parent::get_users_groups($id)->result_array();
+		$arr_return = array();
+		if(is_array($arr_db_groups) && !empty($arr_db_groups)){
+			foreach($arr_db_groups as $g){
+				$arr_return[$g['id']] = $g['name'];
+			}
+		}
+		return $arr_return;
 	}
 
 	/**
@@ -402,38 +327,51 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 *
 	 * @param int user id
 	 * @return array group_id=>group_name
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
-	/* -----------------------------------------------------------------
-	 *  UPDATE comment
-	 *  @author: carolmd
-	 *  @date: Dec 12, 2013
-	 *
-	 *  @description: Changed this function to get user's region_id (aka association_num) from the users table.
-	 *  
-	 *  -----------------------------------------------------------------
-	 */
 	public function get_users_region_array($id=false) {
 		//if no id was passed use the current users id
 		$id || $id = $this->session->userdata('user_id');
-		$this->db
-		->where('id',  $id)
-		->select('association_num');
-		$assoc_mdarray = $this->db
-		->get($this->tables['users'])
-		->result_array();
-		$assoc_id = $assoc_mdarray[0]["association_num"];
-		$assoc_arr = array($assoc_id);
-		return array($assoc_arr);
+		
+		$arr_db_regions = $this->db
+			->select('r.association_num, r.assoc_name')
+			->join($this->tables['regions'] . ' r', 'u.association_num = r.association_num')
+		    ->where('u.id', $id)
+			->where('u.status', 1)
+			->get($this->tables['users'] . ' u')
+			->result_array();
+
+		$arr_return = array();
+		if(is_array($arr_db_regions) && !empty($arr_db_regions)){
+			foreach($arr_db_regions as $r){
+				$arr_return[$r['association_num']] = $r['assoc_name'];
+			}
+		}
+		return $arr_return;
 	}
 	
-	
+	/**
+	 * @method get_group_by_name
+	 *
+	 * @param string group name
+	 * @return object
+	 * @author Ben Edmunds
+	 **/
+	public function get_group_by_name($name)
+	{
+		$this->db->where('name', $name);
+
+		return $this->db->get($this->tables['groups'])
+		->row();
+	}
+
+
 	/**
 	 * @method get_child_groups
 	 *
 	 * @param int group id
 	 * @return object
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function get_child_groups($group_id_in)
 	{
@@ -451,7 +389,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * @param array of groups
 	 * @param string user id
 	 * @return boolean
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function add_to_groups($groups_in, $user_id){
 		if(is_array($groups_in)){
@@ -468,7 +406,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * @param int user id
 	 * @param array user data
 	 * @return bool
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function update($id, array $data)
 	{
@@ -503,7 +441,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * @param int user id
 	 * @param array user data
 	 * @return bool
-	 * @author Chris Tranel (CDT)
+	 * @author ctranel
 	 **/
 	protected function _update_meta($id, array $data){
 		$has_data = is_array($data); 
@@ -614,7 +552,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 *
 	 * @param int user id
 	 * @return bool
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function delete_user($id)
 	{
@@ -645,7 +583,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * @method login_remembed_user
 	 *
 	 * @return bool
-	 * @author Chris Tranel
+	 * @author ctranel
 	 * 
 	 **/
 	public function login_remembered_user()
@@ -661,14 +599,13 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * @method get_child_regions()
 	 * @param int region id
 	 * @return array with region ids
-	 * @author Chris Tranel
-	 **/
+	 * @author ctranel
 	public function get_child_regions_array($region_in = FALSE) {
 		$region_id = $region_in ? $region_in : $this->session->userdata('arr_regions');
 		if(empty($region_id) === FALSE){
 			$reg_txt = implode(',', array_keys($region_id));
 			$return = $this->db->query( "WITH subregions(id, parent_region_id) AS (
-				SELECT id, parent_region_id
+				SELECT association_num, parent_region_id
 				FROM " . $this->tables['regions'] . "
 				WHERE id IN(" . $reg_txt . ")
 				UNION ALL
@@ -682,6 +619,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 		}
 		return false;
 	}
+	 **/
 	
 	
 	/**
@@ -690,7 +628,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * @param int $user_id
 	 * @param string $herd_code
 	 * @return array of section data for given user
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function get_subscribed_super_sections_array($group_id, $user_id, $herd_code = FALSE) {
 		if(is_array($group_id)) {
@@ -707,7 +645,6 @@ class Ion_auth_model extends Ion_auth_parent_model
 			if($group_id == 2){ //if this is a producer
 			//if(!$this->has_permission("View Non-owned Herds")){
 				if(isset($herd_code) && !empty($herd_code)){
-					//$tmp_arr_sections = $this->get_super_sections_by_herd($herd_code)->result_array();
 					$tmp_arr_sections = $this->get_super_sections_by_herd($herd_code);
 				}
 			}
@@ -742,8 +679,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * @param int $user_id
 	 * @param string $herd_code
 	 * @return array of section data for given user
-	 * @author Chris Tranel
-	 * 11/14/13: CMMD: remove result array.
+	 * @author ctranel
 	 **/
 	public function get_subscribed_sections_array($group_id, $user_id, $super_section_id, $herd_code = FALSE) {
 		if(is_array($group_id)) {
@@ -761,7 +697,6 @@ class Ion_auth_model extends Ion_auth_parent_model
 			if($group_id == 2){ //if this is a producer
 			//if(!$this->has_permission("View Non-owned Herds")){
 				if(isset($herd_code) && !empty($herd_code)){
-					//$tmp_arr_sections = $this->get_sections_by_herd($herd_code)->result_array();
 					$tmp_arr_sections = $this->get_sections_by_herd($herd_code);
 				}
 			}
@@ -783,13 +718,13 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * @param int $user_id
 	 * @param string $herd_code
 	 * @return array of section data for given user
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function get_unmanaged_super_sections_array($group_id, $user_id, $herd_code = FALSE) {
 		//$this->load->model('dm_model');
 		if(false){//$credentials = $this->dm_model->get_credentials()) {
 			$this->db->where($this->tables['super_sections'] . '.id', 6);
-			return $this->get_super_sections()->result_array();
+			return $this->get_super_sections();
 		}
 		else return array();
 	}
@@ -800,13 +735,13 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * @param int $user_id
 	 * @param string $herd_code
 	 * @return array of section data for given user
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function get_unmanaged_sections_array($group_id, $user_id, $herd_code = FALSE) {
 		//$this->load->model('dm_model');
 		if(false){//$credentials = $this->dm_model->get_credentials()) {
 			$this->db->where($this->tables['sections'] . '.id', 6);
-			return $this->get_sections()->result_array();
+			return $this->get_sections();
 		}
 		else return array();
 	}
@@ -815,14 +750,12 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * @method user_owns_herd by currently logged in user?
 	 * @param string herd_code
 	 * @return boolean
-	 * @author Chris Tranel
-	 * 11/14/13: CMMD: Fixed FROM clause.
+	 * @author ctranel
 	 **/
 	public function user_owns_herd($herd_code) {
 		$results = $this->db
 		->select('id')
-		//->from('users')
-		->from($this->tables['users'])
+		->from('users')
 		->join($this->tables['users_herds'], $this->tables['users'] . '.id = ' . $this->tables['users_herds'] . '.user_id')
 		->where($this->tables['users_herds'] . ".herd_code = '" . $herd_code . "'")
 		->where($this->tables['users'] . '.id = ' . $this->session->userdata('user_id'))
@@ -837,11 +770,10 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * @param int section_id
 	 * @param string herd_code
 	 * @return array of section data for given user
-	 * @author Chris Tranel
-	 * 11/14/13: CMMD remove result array -- already in an array.
+	 * @author ctranel
 	 **/
 	public function herd_is_subscribed($section_id, $herd_code) {
-		//return $this->get_sections()->result_array();
+		$this->db->where($this->tables['sections'] . '.id', $section_id);
 		return $this->get_sections();
 	}
 	
@@ -850,7 +782,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 *
 	 * @param array scope options to include
 	 * @return 1d array (id=>name)
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function get_keyed_section_array($arr_scope = NULL) {
 		$this->db
@@ -874,7 +806,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * @method get_blocks_by_section array
 	 * @param int section
 	 * @return array of block for given section
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function get_blocks_by_section($section, $display = NULL) {
 		$this->db
@@ -883,13 +815,13 @@ class Ion_auth_model extends Ion_auth_parent_model
 			->join($this->tables['lookup_display_types'], $this->tables['blocks'] . '.display_type_id = ' . $this->tables['lookup_display_types'] . '.id', 'left')
 			->where($this->tables['pages'] . '.section_id', $section);
 		if(isset($display)) $this->db->where($this->tables['lookup_display_types'] . '.name', $display);
-		return $this->get_blocks()->result_array();
+		return $this->get_blocks();
 	}
 
     /**
 	 * @method get_blocks
 	 * @return array of block data
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function get_blocks() {
 		$this->db
@@ -897,17 +829,20 @@ class Ion_auth_model extends Ion_auth_parent_model
 			->where($this->tables['blocks'] . '.active', 1)
 			->order_by('list_order', 'asc')
 			->from($this->tables['blocks']);
-		return $this->db->get();
+		return $this->db->get()->result_array();
 	}
 
 		/**
 	 * @method get_super_sections_by_scope array
 	 * @param string scope
 	 * @return array of section data for given user
-	 * 	 * 11/14/13: CMMD: return all active super_sections all the time.
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function get_super_sections_by_scope($scope) {
+		$this->db
+		->select($this->tables['super_sections'] . '.*')
+		->join($this->tables['lookup_scopes'], $this->tables['super_sections'] . '.scope_id = ' . $this->tables['lookup_scopes'] . '.id', 'left')
+		->where($this->tables['lookup_scopes'] . '.name', $scope);
 		return $this->get_super_sections();
 	}
 	
@@ -915,12 +850,26 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * @method get_sections_by_scope array
 	 * @param string scope
 	 * @return array of section data for given user
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function get_sections_by_scope($scope) {
-		$this->db->join($this->tables['lookup_scopes'], $this->tables['sections'] . '.scope_id = ' . $this->tables['lookup_scopes'] . '.id', 'left')
+		$this->db
+		->select($this->tables['sections'] . '.*')
+		->join($this->tables['lookup_scopes'], $this->tables['sections'] . '.scope_id = ' . $this->tables['lookup_scopes'] . '.id', 'left')
 		->where($this->tables['lookup_scopes'] . '.name', $scope);
 		return $this->get_sections();
+	}
+	
+	/**
+	 * @method get_sections_by_scope array
+	 * @param string scope
+	 * @return array of section data for given user
+	 * @author ctranel
+	 **/
+	public function get_child_sections_by_scope($scope, $parent_section_id) {
+		$this->db
+			->where($this->tables['sections'] . '.super_section_id', $parent_section_id);
+		return $this->get_sections_by_scope($scope);
 	}
 	
 	/**
@@ -964,8 +913,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 	/**
 	 * @method get_super_sections
 	 * @return array of section data
-	 * @author Chris Tranel
-	 * Revised 11/14/13: CMMD return array
+	 * @author ctranel
 	 **/
 	public function get_super_sections() {
 		$this->db
@@ -978,7 +926,7 @@ class Ion_auth_model extends Ion_auth_parent_model
     /**
 	 * @method get_sections
 	 * @return array of section data
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function get_sections() {
 		$this->db
@@ -992,7 +940,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * get_user_herd_settings
 	 *
 	 * @return array of user-herd settings
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function get_user_herd_settings(){
 		//REMOVE IF WE DECIDE TO STORE PREFERENCES
@@ -1019,10 +967,17 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * get_super_sections_by_user
 	 *
 	 * @return array of super_section data for given user
-	 * @author Chris Tranel
-	 * Revised: 11/14/13: CMMD: get all super sections all the time.
+	 * @author ctranel
 	 **/
 	public function get_super_sections_by_user($user_id){
+		$this->db
+		->select($this->tables['super_sections'] . '.id, ' . $this->tables['super_sections'] . '.name, ' . $this->tables['super_sections'] . '.path, ' . $this->tables['super_sections'] . '.list_order')
+		->distinct()
+		->join($this->tables['sections'], $this->tables['super_sections'] . '.id = ' . $this->tables['sections'] . '.super_section_id', 'left')
+		//->join($this->tables['users_sections'], $this->tables['users_sections'] . '.section_id = ' . $this->tables['sections'] . '.id', 'inner')
+		->where("(" . $this->tables['sections'] . '.user_id IS NULL OR ' . $this->tables['sections'] . '.user_id = ' . $user_id . ")");
+		//->where("(" . $this->tables['sections'] . '.user_id IS NULL OR ' . $this->tables['sections'] . '.user_id = ' . $user_id . ' OR ' . $this->tables['users_sections'] . '.user_id = ' . $user_id . ")");
+		//->where($this->tables['users_sections'] . '.user_id', $user_id);
 		return $this->get_super_sections();
 	}
 	
@@ -1030,11 +985,11 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * get_super_sections_by_herd
 	 *
 	 * @return array of super_section data for given herd
-	 * @author Chris Tranel
-	 * Revised: 11/14/13: CMMD: renamed function. 
-	 * 							Get all supersections all the time.
+	 * @author ctranel
 	 **/
 	public function get_super_sections_by_herd(){
+		$this->db
+		->where($this->tables['super_sections'] . '.scope_id', 2); // 2 = subscription
 		return $this->get_super_sections();
 	}
 
@@ -1042,7 +997,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * get_sections_by_user
 	 *
 	 * @return array of section data for given user
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function get_sections_by_user($user_id){
 		$this->db
@@ -1051,14 +1006,14 @@ class Ion_auth_model extends Ion_auth_parent_model
 		->where("(" . $this->tables['sections'] . '.user_id IS NULL OR ' . $this->tables['sections'] . '.user_id = ' . $user_id . ")");
 		//->where("(" . $this->tables['sections'] . '.user_id IS NULL OR ' . $this->tables['sections'] . '.user_id = ' . $user_id . ' OR ' . $this->tables['users_sections'] . '.user_id = ' . $user_id . ")")
 		//->where($this->tables['users_sections'] . '.user_id', $user_id);
-		 return $this->get_sections();
+		return $this->get_sections();
 	}
 	
 	/**
 	 * get_herd_sections
 	 *
 	 * @return array of section data for given herd
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function get_herd_sections(){
 		$this->db
@@ -1071,10 +1026,9 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 *
 	 * @param int section id FOR FUTURE USE
 	 * @return array tasks for which  the group of logged in user has permissions
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function get_task_permissions($section_id = ''){
-		
 		$this->load->helper('multid_array_helper');
 		$results = $this->db->select('name, description')
 		->join($this->tables['groups_tasks'] . ' gt', 't.id = gt.task_id', 'left')
@@ -1093,7 +1047,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * @param array of data to filter
 	 * @access protected
 	 * @return array of filtered data (filtered out if field is not present in table)
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	protected function _filter_data($table, $data)
 	{
@@ -1120,7 +1074,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * @method _get_group_lookup
 	 * @access protected
 	 * @return array of groups (id=>name)
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 		protected function _get_group_lookup(){
 		$arr_return = array();
@@ -1136,7 +1090,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 	/**
 	 * @method get_dhi_supervisors()
 	 * @return array of objects
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function get_dhi_supervisors() {
 		return $this->db->get($this->tables['users_dhi_supervisors']);
@@ -1146,20 +1100,11 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * @method get_dhi_supervisor_nums_by_region()
 	 * @param string region number
 	 * @return array of objects with field tech numbers
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
-	/* -----------------------------------------------------------------
-	 *  UPDATE comment
-	 *  @author: carolmd
-	 *  @date: Nov 25, 2013
-	 *
-	 *  @description: changed lookup from region_id to affiliate_num.
-	 *  
-	 *  -----------------------------------------------------------------
-	 */
 	public function get_dhi_supervisor_nums_by_region($arr_region_id = FALSE) {
 		$this->db->select('supervisor_num');
-		if($arr_region_id) $this->db->where_in('CONVERT(int, association_num)', $arr_region_id);
+		if($arr_region_id) $this->db->where_in('region_id', $arr_region_id);
 		$db_tmp_obj = $this->get_dhi_supervisors();
 		if(is_array($db_tmp_obj)) {
 			return $db_tmp_obj;
@@ -1172,7 +1117,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 *
 	 * @param int tech number
 	 * @return object
-	 * @author Chris Tranel CDT
+	 * @author ctranel
 	 **/
 	public function get_producer_users_by_tech($tech_num)
 	{
@@ -1190,7 +1135,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * @param int Region number
 	 * @param int child user id
 	 * @return object
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function is_child_field_user_by_region($region_id, $child_id)
 	{
@@ -1207,7 +1152,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * @param int tech number
 	 * @param int child user id
 	 * @return object
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function is_child_producer_user_by_tech($tech_num, $child_id)
 	{
@@ -1225,7 +1170,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 *
 	 * @param string herd code
 	 * @return array of section data for given herd
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	private function get_sections_by_herd($herd_code){
 		$this->db->select($this->tables['sections'] . '.id, ' . $this->tables['sections'] . '.name, ' . $this->tables['sections'] . '.path, ' . $this->tables['herds_sections'] . '.access_level')
@@ -1239,7 +1184,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * 
 	 * @param int/array region number
 	 * @return object
-	 * @author Chris Tranel CDT
+	 * @author ctranel
 	 **/
 	public function get_producer_users_by_region($region_id)
 	{
@@ -1260,7 +1205,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * @param int region number
 	 * @param int child user id
 	 * @return object
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function is_child_producer_user_by_region($region_id, $child_id)
 	{
@@ -1280,7 +1225,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * @param string consultant user id
 	 * @param string herd code
 	 * @return int/bool id of record matching params
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function get_consult_relationship_id($consultant_user_id, $herd_code){
 		$result = $this->db
@@ -1296,7 +1241,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * @param string consultant user id
 	 * @param string herd code
 	 * @return array/bool of fields of record matching params, false if none found
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function get_consult_relationship($consultant_user_id, $herd_code){
 		$result = $this->db->get_where($this->tables['consultants_herds'], array('user_id' => $consultant_user_id, 'herd_code' => $herd_code))->result_array();
@@ -1309,7 +1254,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 *
 	 * @param int relationship id
 	 * @return array/bool of fields of record matching params, false if none found
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function get_consult_relationship_by_id($id){
 		$result = $this->db->get_where($this->tables['consultants_herds'], array('id' => $id))->result_array();
@@ -1322,7 +1267,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 *
 	 * @param int consultant user id
 	 * @return array of herd records, keyed by consultant status
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function get_herds_by_consult($consultant_user_id){
 		$result = $this->db
@@ -1364,17 +1309,8 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 *
 	 * @param string herd code
 	 * @return array of consultant records, keyed by consultant status
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
-	/* -----------------------------------------------------------------
-	 *  UPDATE comment
-	 *  @author: carolmd
-	 *  @date: Nov 14, 2013
-	 *
-	 *  @description: fixed the JOIN stmt 
-	 *  
-	 *  -----------------------------------------------------------------
-	 */
 	public function get_consultants_by_herd($herd_code){
 		$result = $this->db
 		->select($this->tables['consultants_herds'] . '.*, ' . $this->tables['users'] . '.first_name, ' . $this->tables['users'] . '.last_name, ' . $this->tables['service_groups'] . '.account_name')
@@ -1395,7 +1331,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 		$result = $this->db
 		->select($this->tables['consultants_herds'] . '.*, ' . $this->tables['users'] . '.first_name, ' . $this->tables['users'] . '.last_name, ' . $this->tables['service_groups'] . '.account_name')
 		->from($this->tables['consultants_herds'])
-		->join($this->tables['users'], $this->tables['consultants_herds'] . '.user_id = ' . $this->tables['users'] . '.id')
+		->join('users', $this->tables['consultants_herds'] . '.user_id = ' . $this->tables['users'] . '.id')
 		->join($this->tables['users_service_groups'], $this->tables['users'] . '.id = ' . $this->tables['users_service_groups'] . '.user_id')
 		->join($this->tables['service_groups'], $this->tables['users_service_groups'] . '.sg_account_num = ' . $this->tables['service_groups'] . '.account_num')
 		->where("((" . $this->tables['consultants_herds'] . ".exp_date IS NOT NULL AND " . $this->tables['consultants_herds'] . ".exp_date <= GETDATE()) AND " . $this->tables['consultants_herds'] . ".request_status_id = 1)")
@@ -1417,7 +1353,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 *
 	 * @param array permission record ids to be modified
 	 * @return boolean
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function batch_consult_revoke($arr_modify_ids){
 		if(isset($arr_modify_ids) && is_array($arr_modify_ids)){
@@ -1434,7 +1370,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 *
 	 * @param array permission record ids to be modified
 	 * @return boolean
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function batch_grant_consult($arr_modify_ids){
 		if(isset($arr_modify_ids) && is_array($arr_modify_ids)){
@@ -1451,7 +1387,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 *
 	 * @param array permission record ids to be modified
 	 * @return boolean
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function batch_deny_consult($arr_modify_ids){
 		if(isset($arr_modify_ids) && is_array($arr_modify_ids)){
@@ -1468,7 +1404,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 *
 	 * @param array permission record ids to be modified
 	 * @return boolean
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function batch_remove_consult_expire($arr_modify_ids){
 		if(isset($arr_modify_ids) && is_array($arr_modify_ids)){
@@ -1485,7 +1421,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 *
 	 * @param int relationship id
 	 * @return string consultant request status
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function get_consult_status_text($id){
 		$result = $this->db
@@ -1502,7 +1438,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * @param array of data to be inserted into DB
 	 * @param int/NULL original id of relationship record
 	 * @return int/bool insert id if insert is successful, FALSE if not
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function set_consult_relationship($arr_relationship_data, $old_id = NULL){
 		$success = FALSE;
@@ -1521,7 +1457,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 *
 	 * @param int id of relationship record
 	 * @return array/bool array of section ids, FALSE if none found
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	function get_consult_rel_sections($rel_id){
 		$result = $this->db
@@ -1539,7 +1475,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * @param int id of relationship record for current update
 	 * @param int/NULL original id of relationship record
 	 * @return bool TRUE if insert is successful, FALSE if not
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function set_consult_sections($arr_section_id, $consult_relationship_id, $old_id = NULL){
 		if(isset($old_id) && !empty($old_id)) {
@@ -1562,7 +1498,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * @param string herd code
 	 * @param int section id
 	 * @return bool
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function consultant_has_access($consultant_user_id, $herd_code, $section_id){
 		$results = $this->db

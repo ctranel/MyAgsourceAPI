@@ -92,7 +92,7 @@ class Region extends CI_Controller {
 	 * create region
 	 *
 	 * @return bool
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function create_region()
 	{
@@ -117,8 +117,6 @@ class Region extends CI_Controller {
 		if($this->input->post('email') != '') $data['email'] = $this->input->post('email');
 		else $data['email'] = NULL;
 		//check to see if we are creating the region successfully
-//if($this->form_validation->run() === FALSE) die('not successful');
-//else die('validation successful');
 		if ($this->form_validation->run() !== FALSE && $this->region_model->create_region($data)) {
 			$this->session->set_flashdata('message', "The association/region has been created.");
 			redirect("region", 'refresh');
@@ -216,7 +214,7 @@ class Region extends CI_Controller {
 	 *
 	 * @param string - Region to be edited
 	 * @return bool
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	function edit_region($region_in = NULL) {
 		//validate form input

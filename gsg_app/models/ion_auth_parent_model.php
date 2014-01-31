@@ -799,17 +799,9 @@ class Ion_auth_parent_model extends CI_Model
 				$this->add_to_group($group, $id);
 			}
 		}
-/* -----------------------------------------------------------------
- *  UPDATE comment
- *  @author: carolmd
- *  @date: Dec 9, 2013
- *
- *  @description: config is now group_id. changed this query's where clause to match groups.id to config value.
- *  
- *  -----------------------------------------------------------------
- */
+
 		//add to default group if not already set
-		$default_group = $this->where('id', $this->config->item('default_group', 'ion_auth'))->group()->row();
+		$default_group = $this->where('name', $this->config->item('default_group', 'ion_auth'))->group()->row();
 		if ((isset($default_group->id) && !isset($groups)) || (empty($groups) && !in_array($default_group->id, $groups)))
 		{
 			$this->add_to_group($default_group->id, $id);
@@ -828,7 +820,6 @@ class Ion_auth_parent_model extends CI_Model
 	 **/
 	public function login($identity, $password, $remember=FALSE)
 	{
-		
 		$this->trigger_events('pre_login');
 
 		if (empty($identity) || empty($password))
@@ -839,7 +830,7 @@ class Ion_auth_parent_model extends CI_Model
 
 		$this->trigger_events('extra_where');
 
-		$query = $this->db->select($this->identity_column . ', username, email, id, password, active, last_login, group_id')
+		$query = $this->db->select($this->identity_column . ', username, email, id, password, active, last_login')
 		                  ->where($this->identity_column, $this->db->escape_str($identity))
 		                  ->limit(1)
 		                  ->get($this->tables['users']);
@@ -859,23 +850,13 @@ class Ion_auth_parent_model extends CI_Model
 
 					return FALSE;
 				}
-/* -----------------------------------------------------------------
- *  UPDATE comment
- *  @author: carolmd
- *  @date: Dec 10, 2013
- *
- *  @description: retrieve active group Id at login from users table.
- *  
- *  -----------------------------------------------------------------
- */
+
 				$session_data = array(
 				    'identity'             => $user->{$this->identity_column},
 				    'username'             => $user->username,
 				    'email'                => $user->email,
 				    'user_id'              => $user->id, //everyone likes to overwrite id so we'll use user_id
-				    'old_last_login'       => $user->last_login,
-				    'active_group_id'      => $user->group_id,
-				    'arr_groups'           =>array($user->group_id)
+				    'old_last_login'       => $user->last_login
 				);
 
 				$this->update_last_login($user->id);
@@ -1099,18 +1080,23 @@ class Ion_auth_parent_model extends CI_Model
 		//filter by group id(s) if passed
 		if (isset($groups))
 		{
-			/* -----------------------------------------------------------------
-			 *  UPDATE comment
-			 *  @author: carolmd
-			 *  @date: Dec 9, 2013
-			 *
-			 *  @description: revise to check a single group_id, because user can belong to only one group.
-			 *  
-			 *  -----------------------------------------------------------------
-			 */
+			//build an array if only one group was passed
+			if (is_numeric($groups))
+			{
+				$groups = Array($groups);
+			}
+
+			//join and then run a where_in against the group ids
 			if (isset($groups) && !empty($groups))
 			{
-				$this->db->where($this->tables['users'].'.group_id', $groups);
+				$this->db->distinct();
+				$this->db->join(
+				    $this->tables['users_groups'], 
+				    $this->tables['users_groups'].'.user_id = ' . $this->tables['users'].'.id', 
+				    'inner'
+				);
+
+				$this->db->where_in($this->tables['users_groups'].'.group_id', $groups);
 			}
 		}
 
@@ -1182,29 +1168,17 @@ class Ion_auth_parent_model extends CI_Model
 	 * @return array
 	 * @author Ben Edmunds
 	 **/
-	/* -----------------------------------------------------------------
-	 *  UPDATE comment
-	 *  @author: carolmd
-	 *  @date: Dec 9, 2013
-	 *
-	 *  @description: Revised to get the group_id from the users table.
-	 *                
-	 *  
-	 *  -----------------------------------------------------------------
-	 */
 	public function get_users_groups($id=FALSE)
 	{
 		$this->trigger_events('get_users_group');
 
 		//if no id was passed use the current users id
 		$id || $id = $this->session->userdata('user_id');
-		
-		$group_id = $this->db->select($this->tables['users'].'.group_id')
-						->select($this->tables['groups'].'.description')
-		                ->join($this->tables['groups'], $this->tables['users'].'.group_id=' .$this->tables['groups'].'.id' )
-						->where($this->tables['users'].'.id = ' . $id)
-		                ->get($this->tables['users']);
-		 return array($group_id);
+
+		return $this->db->select($this->tables['users_groups'].'.'.$this->join['groups'].' as id, '.$this->tables['groups'].'.name, '.$this->tables['groups'].'.description')
+		                ->where($this->tables['users_groups'].'.'.$this->join['users'], $id)
+		                ->join($this->tables['groups'], $this->tables['users_groups'].'.'.$this->join['groups'].'='.$this->tables['groups'].'.id')
+		                ->get($this->tables['users_groups']);
 	}
 
 	/**
@@ -1213,27 +1187,14 @@ class Ion_auth_parent_model extends CI_Model
 	 * @return bool
 	 * @author Ben Edmunds
 	 **/
-			/* -----------------------------------------------------------------
-			 *  UPDATE comment
-			 *  @author: carolmd
-			 *  @date: Dec 9, 2013
-			 *
-			 *  @description: revised to update the users table instead of inserting into the users_groups table.
-			 *  
-			 *  -----------------------------------------------------------------
-			 */
 	public function add_to_group($group_id, $user_id=false)
 	{
 		$this->trigger_events('add_to_group');
 
 		//if no id was passed use the current users id
 		$user_id || $user_id = $this->session->userdata('user_id');
-		$data = array(
-				'group_id' => $group_id
-		);
-		
-		$this->db->where('id', $id);
-		return $this->db->update($this->tables['users'], $data);
+
+		return $this->db->insert($this->tables['users_groups'], array( $this->join['groups'] => (int)$group_id, $this->join['users'] => (int)$user_id));
 	}
 
 	/**

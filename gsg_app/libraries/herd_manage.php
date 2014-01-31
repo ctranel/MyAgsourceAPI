@@ -2,7 +2,7 @@
 /**
 * Name:  Herd Manage - 
 *
-* Author: Chris Tranel
+* Author: ctranel
 *		  ctranel@agsource.com
 *
 * Location: na
@@ -90,54 +90,6 @@ class Herd_manage
 		}
 
 		return call_user_func_array( array($this->ci->herd_model, $method), $arguments);
-	}
-	
-	/**
-	 * @method get_herd_codes_by_tech_num()
-	 * @param string tech num
-	 * @return array of stdClass with all herds for given tech num
-	 * @access public
-	 *
-	 **/
-	public function get_herd_codes_by_tech_num($tech_num){
-		$this->ci->herd_model->get_herds_by_tech($tech_num);
-	}
-
-	/**
-	 * @method get_herds_by_region()
-	 * @param string region for which to get herds.  If nothing is passed, it will use the session value
-	 * @return array of stdClass with all herds for given region
-	 * @access public
-	 *
-	 **/
-	public function get_herds_by_region($region_in = false){
-		//$arr_groups = $this->ci->session->userdata('arr_groups');
-		$region_id = $region_in ? $region_in : $this->ci->session->userdata('arr_regions');
-		
-		$arr_manager_groups = array('1'=>'1', '3'=>'3', '4'=>'4', '8'=>'8');
-		
-		$bool_in_manager_group = in_array($this->ci->session->userdata('active_group_id'), $arr_manager_groups);
-		//following 2 lines to be used in place of previous line if all group permissions, not just the active, can be considered
-		//$arr_common_groups = array_intersect_key($arr_groups, $arr_manager_groups);
-		//$bool_in_manager_group = empty($arr_common_groups)?FALSE:TRUE;
-		if($bool_in_manager_group){ //mgr, DSR, admin, RSS
-			return $this->ci->herd_model->get_herds_by_region($region_id);
-		}
-		else if(array_key_exists('5', $arr_groups)){ //"Field Tech"
-			return $this->ci->herd_model->get_herds_by_tech_num($this->ci->session->userdata('supervisor_num'));
-		}
-		else return FALSE;
-	}
-	
-	
-	/**
-	 * @method get_herds()
-	 * @return array of stdClass objects with all herds
-	 * @access public
-	 *
-	 **/
-	public function get_herds($limit=NULL, $offset=NULL){
-		return $this->ci->herd_model->get_herds($limit, $offset);
 	}
 	
 	/**

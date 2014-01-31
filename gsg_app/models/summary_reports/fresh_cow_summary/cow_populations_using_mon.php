@@ -20,7 +20,7 @@ class Transitioncowindex extends Report_model {
 	 * @param bool add average column
 	 * @param bool add sum column
 	 * @return array pivoted resultset
-	 * @author Chris Tranel
+	 * @author ctranel
 	 */
 	public function pivot($arr_dataset, $header_field, $header_field_width, $label_column_width, $bool_avg_column = FALSE, $bool_sum_column = FALSE, $bool_bench_column = FALSE){
 var_dump($arr_dataset);

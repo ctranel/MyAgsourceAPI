@@ -2,7 +2,7 @@
 /**
 * Name:  Custom Report Library (for MyAgSource)
 *
-* Author: Chris Tranel
+* Author: ctranel
 *
 * Created:  06.28.2013
 *

@@ -1,17 +1,6 @@
 <?php
 class Herd_model extends CI_Model {
-/* -----------------------------------------------------------------
- *  UPDATE comment
- *  @author: carolmd
- *  @date: Nov 18, 2013
- *
- *  @description: Changed all load->database(...) to load 'default' instead of 'herd' or others.
- *                Changed the "from" clause to use the config tables.
- *                eg: changed this:		->from('users') 
- *                         to this: 	->from($this->tables['users'])
- *  
- *  -----------------------------------------------------------------
- */
+
 	protected $tables;
 	
 	public function __construct(){
@@ -50,42 +39,19 @@ class Herd_model extends CI_Model {
 
 
 	/**
-	 * @method get_herds_by_tech_num()
-	 * @param string tech num
-	 * @return array of stdClass with all herds for given tech num
-	 * @access public
-	 *
-	 **/
-	function get_herds_by_tech_num($tech_num){
-		$this->db->where('supervisor_num', $tech_num);
-		return $this->get_herds();
-	}
-
-	/**
 	 * get_herds_by_region
 	 *
 	 * @param string region number
 	 * @return array of object herd
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
-	/* -----------------------------------------------------------------
-	 *  UPDATE comment
-	 *  @author: carolmd
-	 *  @date: Dec 12, 2013
-	 *
-	 *  @description: Revised this to query the herd_id table, using the association_num to match $region_id
-	 *                instead of using the herds_region table.
-	 *  
-	 *  -----------------------------------------------------------------
-	 */
 	function get_herds_by_region($region_arr_in, $limit = NULL){
-		$this->load->helper('multid_array_helper');
-		// incoming array might be a multi-dimentional array. If so, need to flatten it into simple array before it can be used in the where clause.
-		$region_arr_in = array_flatten($region_arr_in);
-		If (!isset($region_arr_in) or empty($region_arr_in)) {
+		if (!isset($region_arr_in) or empty($region_arr_in)) {
 			// no region(s) were sent to this function -- fail this function.
 			return FALSE;
 		}	
+		// incoming array might be a multi-dimentional array. If so, need to flatten it into simple array before it can be used in the where clause.
+		$region_arr_in = array_keys($region_arr_in);
 		
 		if(!is_array($region_arr_in)) $region_arr_in = array($region_arr_in);
 		$this->db->where_in('association_num', $region_arr_in);
@@ -123,10 +89,10 @@ class Herd_model extends CI_Model {
 	public function get_herds_by_user($user_id, $limit = FALSE){
 		
 		if(!$user_id) $user_id = $this->session->userdata('user_id');
-		$this->db->join($this->tables['users_herds'] . ' u ', 'h.herd_code = u.herd_code')
-		->where('u.user_id', $user_id)
-		->where ('u.status',1)
-		->where(' (u.expire_date >'. now() . ' OR  u.expire_date IS NULL) ');
+		$this->db->join($this->tables['users_herds'] . ' uh', 'h.herd_code = uh.herd_code')
+		->where('uh.user_id', $user_id)
+		->where ('uh.status',1);
+//		->where(' (' . $this->tables['users_herds'] . '.expire_date >'. now() . ' OR  ' . $this->tables['users_herds'] . '.expire_date IS NULL) ');
 		return $this->get_herds($limit,NULL);
 		
 		
@@ -140,7 +106,7 @@ class Herd_model extends CI_Model {
 	 * @param int offset
 	 * @param string order_by
 	 * @return object herd
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function get_herds_by_criteria($criteria=NULL, $limit=NULL, $offset=NULL, $order_by=NULL)
 	{
@@ -154,7 +120,7 @@ class Herd_model extends CI_Model {
 	 * @param array field=>value combinations for update data
 	 * @param array field=>value combinations for criteria
 	 * @return mixed
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function update_herds_by_criteria($data, $criteria=NULL)
 	{
@@ -167,7 +133,7 @@ class Herd_model extends CI_Model {
 	 *
 	 * @param array field=>value combinations
 	 * @return mixed
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function insert_herd($data)
 	{
@@ -181,7 +147,7 @@ class Herd_model extends CI_Model {
 	 * @param string sort by field
 	 * @return array of stdClass objects with all herds
 	 * @access public
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	/* -----------------------------------------------------------------
 	 *  UPDATE comment
@@ -212,12 +178,96 @@ class Herd_model extends CI_Model {
 	 * @param string herd code
 	 * @return array of stdClass objects with all herds
 	 * @access public
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function get_herd($herd_code)
 	{
 		$this->db->where($this->tables['herds'] . '.herd_code', $herd_code);
 		return $this->get_herds(1,0);
+	}
+
+	/**
+	 * @method get_herd_codes()
+	 * @param int limit
+	 * @param int offset
+	 * @param string sort by field
+	 * @return array of herd codes (1d)
+	 * @access public
+	 * @author ctranel
+	 **/
+	public function get_herd_codes($limit=NULL, $offset=NULL)
+	{
+		$this->db
+		->select('h.[herd_code]')
+		->where("h.dhi_quit_date IS NULL");
+		
+		if(isset($order_by))$this->db->order_by($order_by);
+		if (isset($limit) && isset($offset)) $this->db->limit($limit, $offset);
+		elseif(isset($limit)) $this->db->limit($limit);
+		$results = $this->db->get($this->tables['herds'] . ' h');
+$this->load->helper('multid_array_helper');
+//var_dump(get_elements_by_key('herd_code', $results->result_array())); die;
+		return get_elements_by_key('herd_code', $results->result_array());
+	}
+
+	/**
+	 * get_herd_codes_by_region
+	 *
+	 * @param string region number
+	 * @return array of object herd
+	 * @author ctranel
+	 **/
+	function get_herd_codes_by_region($region_arr_in, $limit = NULL){
+		if (!isset($region_arr_in) or empty($region_arr_in)) {
+			// no region(s) were sent to this function -- fail this function.
+			return FALSE;
+		}	
+		// incoming array might be a multi-dimentional array. If so, need to flatten it into simple array before it can be used in the where clause.
+		$region_arr_in = array_keys($region_arr_in);
+		
+		if(!is_array($region_arr_in)) $region_arr_in = array($region_arr_in);
+		$this->db->where_in('association_num', $region_arr_in);
+		return $this->get_herd_codes($limit);
+	}
+
+	/**
+	 * @method get_herd_codes_by_consultant()
+	 * @param int consultant's user id
+	 * @return array of stdClass with all herds for given tech num
+	 * @access public
+	 *
+	 **/
+	function get_herd_codes_by_consultant($consultant_user_id = FALSE){
+		if(!$consultant_user_id) $consultant_user_id = $this->session->userdata('user_id');
+		$this->db->join('consultants_herds', 'herd.herd_code = consultants_herds.herd_code')
+		->where('consultants_herds.consultant_user_id', $consultant_user_id)
+		->where('(consultants_herds.exp_date > CURDATE() OR consultants_herds.exp_date IS NULL)')
+		->where('request_status_id', 1);
+		return $this->get_herd_codes();
+		
+		
+	}
+	/**
+	 * @method get_herd_codes_by_user
+	 *
+	 * @param int user id
+	 * @return simple array of herd codes
+	 *         empty array if no herds found.
+	 * @author Carol McCullough-Dieter
+	 * @description This function queries the users_herds table and the herd_id table,
+	 *           excluding herds that are expired for this user
+	 *           and also excluding herds that are not active.
+	 **/
+	public function get_herd_codes_by_user($user_id, $limit = FALSE){
+		
+		if(!$user_id) $user_id = $this->session->userdata('user_id');
+		$this->db->join($this->tables['users_herds'] . ' uh', 'h.herd_code = uh.herd_code')
+		->where('uh.user_id', $user_id)
+		->where ('uh.status',1);
+//		->where(' (' . $this->tables['users_herds'] . '.expire_date >'. now() . ' OR  ' . $this->tables['users_herds'] . '.expire_date IS NULL) ');
+		return $this->get_herd_codes($limit,NULL);
+		
+		
 	}
 
 	/**
@@ -229,11 +279,10 @@ class Herd_model extends CI_Model {
 	 **/
 	public function header_info($herd_code){
 		// results query
-		$q = $this->db->select("h.herd_code, h.farm_name, h.herd_owner, " . $this->tables['regions'] . ".region_name, supervisor_num, FORMAT(ct.test_date,'MM-dd-yyyy') AS test_date", FALSE)
+		$q = $this->db->select("h.herd_code, h.farm_name, h.herd_owner, r.assoc_name, supervisor_num, FORMAT(ct.test_date,'MM-dd-yyyy') AS test_date", FALSE)
 		->from($this->tables['herds'] . ' h')
 		->join('[herd].[dbo].[view_herd_id_curr_test] ct', 'h.herd_code = ' . 'ct.herd_code', 'left')
-		->join($this->tables['herds_regions'], 'h.herd_code = ' . $this->tables['herds_regions'] . '.herd_code', 'left')
-		->join($this->tables['regions'], $this->tables['herds_regions'] . '.region_id = ' . $this->tables['regions'] . '.id', 'left')
+		->join($this->tables['regions'] . ' r', 'ct.association_num = r.association_num', 'left')
 		->where('h.herd_code',$herd_code);
 		$ret = $q->get()->result_array();
 		if(!empty($ret) && is_array($ret)) return $ret[0];
@@ -256,7 +305,7 @@ class Herd_model extends CI_Model {
 		$q = $this->db
 		->select($field_name)
 		->from($this->tables['herds'])
-		->where($this->tables['herds'] . '.herd_code',$herd_code)
+		->where('herd_code',$herd_code)
 		->limit(1);
 		$ret = $q->get()->result_array();
 		if(!empty($ret) && is_array($ret)) return $ret[0][$field_name];
@@ -268,7 +317,7 @@ class Herd_model extends CI_Model {
 	 * @param string field to be populated
 	 * @return array
 	 * @access public
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function get_lookup_values($data_field)
 	{
@@ -285,7 +334,7 @@ class Herd_model extends CI_Model {
 	 * get_pstring_array
 	 * @param string herd code
 	 * @return 2d array (pstring & publication name)
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function get_pstring_array($herd_code, $include_all = TRUE) {
 		$pstring_db = $this->load->database('default', TRUE);
@@ -323,7 +372,7 @@ class Herd_model extends CI_Model {
 	 * herd_is_registered
 	 * @param string herd code
 	 * @return bool
-	 * @author Chris Tranel
+	 * @author ctranel
 	 * 11/14/13: CMMD: fixed from clause.
 	 * @todo is this used? (CMMD) I don't think we need it. If it IS used, fix the stmt so it does not use users_groups. If not, delete the function.
 	 *     
@@ -346,7 +395,7 @@ class Herd_model extends CI_Model {
 	 * get_herd_emails
 	 * @param string herd code
 	 * @return array of e-mail addresses
-	 * @author Chris Tranel
+	 * @author ctranel
 	 * 11/14/13: CMMD: Fixed from clause.
 	 * @todo CMMD is this used? If so, remove users_groups table. If not, delete function.
 	 **/

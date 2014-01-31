@@ -2,7 +2,7 @@
 /**
 * Name:  Chart File
 *
-* Author: Chris Tranel
+* Author: ctranel
 *		  ctranel@agsource.com
 *
 
@@ -30,7 +30,7 @@ class Chart{
 	 * @param array dataset
 	 * @param string name of xaxis field
 	 * @return array of data formatted into {axis_field, series_value} pairs (or false on error)
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	function formatDataSet($arr_dataset, $xaxis_field){
 		if(!isset($arr_dataset) || !is_array($arr_dataset) || !isset($xaxis_field) || empty($xaxis_field)){

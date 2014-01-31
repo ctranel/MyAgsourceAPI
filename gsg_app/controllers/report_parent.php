@@ -11,8 +11,6 @@
  * -----------------------------------------------------------------
  */
 
-
-
 abstract class parent_report extends CI_Controller {
 	protected $section_id;
 	protected $report_form_id;
@@ -45,51 +43,38 @@ abstract class parent_report extends CI_Controller {
 	protected $bool_has_summary;
 	
 	function __construct(){
-		
-		// construct CI_Controller
 		parent::__construct();
-		
- 		//$this->load->model('filter_model');
- 		
-		//Set up several class variables based upon uri - See http://ellislab.com/codeigniter%20/user-guide/libraries/uri.html
-
-		$this->section_path = $this->router->fetch_class(); //this should match the name of this file (minus ".php".  Also used as base for css and js file names and model directory name
-		//NOTE: fetch_class grabs the controller class regardless of rerouted URI
-
+		$class = $this->router->fetch_class(); //this should match the name of this file (minus ".php".  Also used as base for css and js file names and model directory name
+		$this->section_path = $class;
 		if($this->uri->segment(1) != $this->section_path){
-			//Likely called with all reports as the section is almost always superceded by the parent_section name
 			$this->section_path = $this->uri->segment(1) . '/' . $this->section_path;
-			//Example: Above results in section_path = summary_reports/herd_summary for herd_summary section
 		} 
 		$this->page = $this->router->fetch_method();
-		$this->block = $this->uri->segment(3);  //grabs block name in most cases: hs_prod in summary_reports/herd_summary/hs_prod
+//@todo: check this, should it be seg 5 or 3?
+		$this->block = $this->uri->segment(5);
 		$this->report_path = $this->section_path . '/' . $this->page;
-
-		//Get the herd_code from the session if it is 8 chars long, otherwise set to NULL
+		$this->primary_model = $this->block . '_model';
+		$this->report_form_id = 'report_criteria';//filter-form';
 		$this->herd_code = strlen($this->session->userdata('herd_code')) == 8?$this->session->userdata('herd_code'):NULL;
-
-		//Set 
 		$this->page_header_data['user_sections'] = $this->as_ion_auth->arr_user_super_sections;
-		if($this->authorize()) {  //If logged in, session not expired, etc
+
+		//load most specific model available.  Must load model before setting section_id
+		if(file_exists(APPPATH . 'models/' . $this->section_path . '/' . $this->primary_model . '.php')){
+			$this->load->model($this->section_path . '/' . $this->primary_model, '', FALSE, $this->section_path);
+		}
+		elseif(file_exists(APPPATH . 'models/' . $this->section_path . '/' . $class . '.php')){
+			$this->load->model($this->section_path . '/' . $class, '', FALSE, $this->section_path);
+			$this->primary_model = $class;
+		}
+		else{
+			$this->load->model('report_model', '', FALSE, $this->section_path);
+			$this->primary_model = 'report_model';
+		}
+
+		$this->section_id = $this->{$this->primary_model}->get_section_id();
+		if($this->authorize()) {
 			$this->load->library('reports');
 			$this->reports->herd_code = $this->herd_code;
-	
-			$class = $this->router->fetch_class();  			//get name of model for most animal reports
-					
-			//load model for parent_section/section/page reports (most summary reports)
-			if(file_exists(APPPATH . 'models/' . $this->section_path . '/' . $this->primary_model . '.php')){
-				$this->load->model($this->section_path . '/' . $this->primary_model, '', FALSE, $this->section_path);
-			}
-			//load model for parent/section reports (most animal reports)
-			elseif(file_exists(APPPATH . 'models/' . $this->section_path . '/' . $class . '.php')){
-				$this->load->model($this->section_path . '/' . $class, '', FALSE, $this->section_path);
-				$this->primary_model = $class;
-			}
-			//else default to catch-all report model class
-			else{
-				$this->load->model('report_model', '', FALSE, $this->section_path);
-				$this->primary_model = 'report_model';
-			}
 		}
 		else {  //redirect to login if not logged in or session is expired
 			if($this->session->flashdata('message')) $this->session->keep_flashdata('message');
@@ -97,13 +82,10 @@ abstract class parent_report extends CI_Controller {
 			redirect(site_url('auth/login'));
 		}
 		
-		if($this->session->userdata('herd_code') == ''){  		// send user to herd select screen if no herd_code selected
+		if($this->session->userdata('herd_code') == ''){ // || $this->session->userdata('herd_code') == '35990571'
 			$this->session->keep_flashdata('redirect_url');
 			redirect(site_url('change_herd/select'));			
 		}
-
-		
-		$this->section_id = $this->{$this->primary_model}->get_section_id();
 		/* Load the profile.php config file if it exists
 		if (ENVIRONMENT == 'development') {
 			$this->config->load('profiler', false, true);
@@ -141,8 +123,50 @@ abstract class parent_report extends CI_Controller {
 			}
   			exit;
 		}
-
-		return true;		
+		if($this->as_ion_auth->has_permission("View All Herds"))
+		$pass_unsubscribed_test = $this->as_ion_auth->has_permission("View Unsubscribed Herds") || $this->ion_auth_model->herd_is_subscribed($this->section_id, $this->herd_code);
+		$pass_view_nonowned_test = $this->as_ion_auth->has_permission("View All Herds");
+		if(!$pass_view_nonowned_test) $pass_view_nonowned_test = in_array($this->herd_code, $this->as_ion_auth->get_viewable_herd_codes($this->session->userdata('user_id'), $this->session->userdata('arr_regions')));//$this->as_ion_auth->has_permission("View Non-owned Herds") || $this->ion_auth_model->user_owns_herd($this->herd_code);
+//		if(!$pass_view_nonowned_test) $pass_view_nonowned_test = $this->as_ion_auth->has_permission("View Herds In Region") && in_array($this->herd_code, $this->herd_model->get_herd_codes_by_region($this->session->userdata('arr_region')));
+//		if(!$pass_view_nonowned_test) $pass_view_nonowned_test = $this->as_ion_auth->has_permission("View non-own w permission") && $this->ion_auth_model->consultant_has_access($this->session->userdata('user_id'), $this->herd_code, $this->section_id);
+		if($pass_unsubscribed_test && $pass_view_nonowned_test) return TRUE;
+		elseif(!$pass_unsubscribed_test && !$pass_view_nonowned_test) {
+			if($this->uri->segment(3) == 'ajax_report') {
+				echo 'Herd ' . $this->herd_code . ' is not subscribed to the ' . $this->product_name . ', nor do you have permission to view this report for herd ' . $this->herd_code . '.  Please contact ' . $this->config->item('cust_serv_company', 'ion_auth') . ' at ' . $this->config->item('cust_serv_email', 'ion_auth') . ' or ' . $this->config->item('cust_serv_phone', 'ion_auth') . ' if you have questions or concerns.';
+			}
+			else {
+				$this->session->set_flashdata('message', 'Herd ' . $this->herd_code . ' is not subscribed to the ' . $this->product_name . ', nor do you have permission to view this report for herd ' . $this->herd_code . '.  Please contact ' . $this->config->item('cust_serv_company', 'ion_auth') . ' at ' . $this->config->item('cust_serv_email', 'ion_auth') . ' or ' . $this->config->item('cust_serv_phone', 'ion_auth') . ' if you have questions or concerns.');
+ 				if($this->session->flashdata('message')) $this->session->keep_flashdata('message');
+				$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
+				redirect(site_url());
+      		}
+			exit;
+		}
+		elseif(!$pass_unsubscribed_test) {
+			if($this->uri->segment(3) == 'ajax_report') {
+				echo 'Herd ' . $this->herd_code . ' is not subscribed to the ' . $this->product_name . '.  Please contact ' . $this->config->item('cust_serv_company', 'ion_auth') . ' at ' . $this->config->item('cust_serv_email', 'ion_auth') . ' or ' . $this->config->item('cust_serv_phone', 'ion_auth') . ' if you have questions or concerns.';
+			}
+			else {
+				$this->session->set_flashdata('message', 'Herd ' . $this->herd_code . ' is not subscribed to the ' . $this->product_name . '.  Please contact ' . $this->config->item('cust_serv_company', 'ion_auth') . ' at ' . $this->config->item('cust_serv_email', 'ion_auth') . ' or ' . $this->config->item('cust_serv_phone', 'ion_auth') . ' if you have questions or concerns.');
+ 				if($this->session->flashdata('message')) $this->session->keep_flashdata('message');
+				$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
+				redirect(site_url());
+			}
+			exit;
+		}
+		elseif(!$pass_view_nonowned_test) {
+			if($this->uri->segment(3) == 'ajax_report') {
+				echo 'You do not have permission to view the ' . $this->product_name . ' for herd ' . $this->herd_code . '.  Please contact ' . $this->config->item('cust_serv_company', 'ion_auth') . ' at ' . $this->config->item('cust_serv_email', 'ion_auth') . ' or ' . $this->config->item('cust_serv_phone', 'ion_auth') . ' if you have questions or concerns.';
+			}
+			else {
+				$this->session->set_flashdata('message', 'You do not have permission to view the ' . $this->product_name . ' for herd ' . $this->herd_code . '.  Please contact ' . $this->config->item('cust_serv_company', 'ion_auth') . ' at ' . $this->config->item('cust_serv_email', 'ion_auth') . ' or ' . $this->config->item('cust_serv_phone', 'ion_auth') . ' if you have questions or concerns.');
+ 				if($this->session->flashdata('message')) $this->session->keep_flashdata('message');
+				$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
+				redirect(site_url());
+			}
+			exit;
+		}
+		return FALSE;
 	}
 	
 	function index(){
@@ -235,6 +259,44 @@ abstract class parent_report extends CI_Controller {
 			}
 			exit;
 		}
+		elseif ($display_format == 'pdf' && !is_null($arr_block_in)) {
+			$this->load->helper('table_header');
+			$data = array();
+			$herd_data = $this->herd_model->header_info($this->session->userdata('herd_code'));
+			$i = 0;
+			//foreach($arr_block_in as $block_in){
+			if(isset($arr_blocks['table']) && is_array($arr_blocks['table'])){
+				foreach($arr_blocks['table'] as $k=>$pb){
+					if(($arr_block_in !== NULL && in_array($k, $arr_block_in)) || $arr_block_in == NULL){
+					//SORT
+						if(isset($sort_by) && isset($sort_order)){
+							$this->arr_sort_by = array_values(explode('|', $sort_by));
+							$this->arr_sort_order = array_values(explode('|', $sort_order));
+						}
+						else {
+							$tmp = $this->{$this->primary_model}->get_default_sort($pb['url_segment']);
+							$this->arr_sort_by = $tmp['arr_sort_by'];
+							$this->arr_sort_order = $tmp['arr_sort_order'];
+							$sort_by = implode('|', $this->arr_sort_by);
+							$sort_order = implode('|', $this->arr_sort_order);
+						}
+
+						$this->{$this->primary_model}->populate_field_meta_arrays($pb['id']);
+						$block[$i]['data'] = $this->ajax_report(urlencode($this->page), urlencode($pb['url_segment']), $this->session->userdata('pstring'), 'array', urlencode($sort_by), $sort_order, 'pdf', NULL);
+						$tmp_pdf_width = $this->{$this->primary_model}->get_pdf_widths(); // was $model in place of $this->primary_model
+						$block[$i]['arr_pdf_widths'] = $tmp_pdf_width;
+						$arr_header_data = $this->{$this->primary_model}->get_fields(); // was $model
+						$block[$i]['header_structure'] = get_table_header_array($arr_header_data, $tmp_pdf_width);
+						$block[$i]['title'] = $pb['description'];
+						$i++;
+					}
+				}
+			}
+			//}
+			$this->access_log_model->write_entry($this->{$this->primary_model}->arr_blocks[$this->page]['page_id'], 'pdf', $this->reports->sort_text_brief($this->arr_sort_by, $this->arr_sort_order), $this->log_filter_text);
+			$this->reports->create_pdf($block, $this->product_name, NULL, $herd_data, 'P');
+			exit;
+		}
 
 		// render page
 		$this->carabiner->css('chart.css');
@@ -246,6 +308,7 @@ abstract class parent_report extends CI_Controller {
 		$this->carabiner->css($this->section_path . '.css', 'screen');
 		if($this->bool_has_summary) $this->carabiner->css('hide_filters.css', 'screen');
 		else $this->carabiner->css('filters.css', 'screen');
+		//$this->carabiner->css('tooltip.css', 'screen');
 		//get_herd_data
 		$herd_data = $this->herd_model->header_info($this->session->userdata('herd_code'));
 		
@@ -283,8 +346,6 @@ abstract class parent_report extends CI_Controller {
 							'odd_even' => $odd_even,
 							'block' => $k
 						);
-						
-						
 						$arr_chart[$display][] = $this->load->view($display, $arr_blk_data, TRUE);
 						//add js line to populate the block after the page loads
 						$tmp_container_div = $display == 'chart' ? 'graph-canvas' . $x : 'table-canvas' . $x;
@@ -296,8 +357,6 @@ abstract class parent_report extends CI_Controller {
 			}
 		}
 		//set up page header
-
-		
 		if(is_array($this->page_header_data)){
 			$arr_sec_nav_data = array(
 				'arr_pages' => $this->as_ion_auth->arr_user_sections,//$this->access_log_model->get_pages_by_criteria(array('section_id' => $this->section_id))->result_array(),
@@ -322,6 +381,8 @@ abstract class parent_report extends CI_Controller {
 					'arr_headjs_line'=>array(
 						//'{tooltips: "' . $this->config->item("base_url_assets") . 'js/jquery/jquery.qtip-1.0.0.min.js"}',
 						//'{tips_helper: "' . $this->config->item("base_url_assets") . 'js/rc_tooltip.js"}',
+						//'{highcharts: "' . $this->config->item("base_url_assets") . 'js/charts/highcharts.js"}',
+						//'{exporting: "' . $this->config->item("base_url_assets") . 'js/charts/exporting.js"}',
 						'{highcharts: "https://cdnjs.cloudflare.com/ajax/libs/highcharts/3.0.2/highcharts.js"}',
 						'{exporting: "https://cdnjs.cloudflare.com/ajax/libs/highcharts/3.0.2/modules/exporting.js"}',
 						'{popup_helper: "' . $this->config->item("base_url_assets") . 'js/jquery/popup.min.js"}',
@@ -342,6 +403,7 @@ abstract class parent_report extends CI_Controller {
 			'arr_pstring' => $this->{$this->primary_model}->arr_pstring,
 			'pstring_selected' => $this->arr_filter_criteria['pstring'][0],
 			'section_path' => $this->section_path,
+//			'benchmarks_id' => $this->arr_filter_criteria['benchmarks_id'],
 			'curr_pstring' => $this->pstring,
 			'curr_page' => $this->page,
 			'arr_pages' => $this->access_log_model->get_pages_by_criteria(array('section_id' => $this->section_id))->result_array()
@@ -363,6 +425,7 @@ abstract class parent_report extends CI_Controller {
 		if(isset($arr_filter_data)) $data['filters'] = $this->load->view($report_filter_path, $arr_filter_data, TRUE);
 		if((is_array($arr_nav_data['arr_pages']) && count($arr_nav_data['arr_pages']) > 1) || (is_array($arr_nav_data['arr_pstring']) && count($arr_nav_data['arr_pstring']) > 1)) $data['report_nav'] = $this->load->view($report_nav_path, $arr_nav_data, TRUE);
 		
+		//$this->access_log_model->write_entry($this->{$this->primary_model}->arr_blocks[$this->page]['page_id'], 'web');
 		$this->load->view('report', $data);
 	}
 	
@@ -372,17 +435,17 @@ abstract class parent_report extends CI_Controller {
 	 * @param string output: method of output (chart, table, etc)
 	 * @param boolean/string file_format: return the value of function (TRUE), or echo it (FALSE).  Defaults to FALSE
 	 * @param string cache_buster: text to make page appear as a different page so that new data is retrieved
+	 * @todo phasing out passing the pstring in the url, using the filter form instead (passed as $json_filter_data) --- the pstring parameter is no longer being used, but I have not removed it from the URLs that call ajax_report
 	 */
 	public function ajax_report($page, $block, $pstring, $output, $sort_by = 'null', $sort_order = 'null', $file_format = 'web', $test_date = FALSE, $report_count=0, $json_filter_data = NULL, $cache_buster = NULL) {//, $herd_size_code = FALSE, $all_breeds_code = FALSE
 		$page = urldecode($page);
 		$block = urldecode($block);
 		$sort_by = urldecode($sort_by);
 		
-		
 		if(isset($json_filter_data)){
-			include(APPPATH.'libraries/Filters.php');
-			//set arr_params to filter data from json
-			$arr_params = Filters::get_filter_array($json_filter_data);
+			$arr_params = (array)json_decode(urldecode($json_filter_data));
+			if(isset($arr_params['csrf_test_name']) && $arr_params['csrf_test_name'] != $this->security->get_csrf_hash()) die("I don't recognize your browser session, your session may have expired, or you may have cookies turned off.");
+			unset($arr_params['csrf_test_name']);
 			//ASSUMING ONLY ONE PSTRING WILL BE SELECTED FOR NOW
 			$pstring = (!isset($arr_params['pstring']) || empty($arr_params['pstring'][0]))?'0':$arr_params['pstring'][0];
 			$this->session->set_userdata('pstring', $pstring);
@@ -526,9 +589,9 @@ abstract class parent_report extends CI_Controller {
 		if(is_array($arr_axes['y'])){
 			$cnt = 0;
 			foreach($arr_axes['y'] as $a){
-						$label_format = 'function(){return this.value}';
-						if(isset($x_axis_date_field)) $tooltip_format = "function(){return '<b>' + this.series.name + ':</b><br>' + Highcharts.dateFormat('%B %e, %Y', this.x) + ' - ' + this.y + ' " . $um . "';}";
-						else $tooltip_format = "function(){return '<b>' + this.series.name + ':</b>' + this.y + ' " . $um . "';}";
+				$label_format = 'function(){return this.value}';
+				if(isset($x_axis_date_field)) $tooltip_format = "function(){return '<b>' + this.series.name + ':</b><br>' + Highcharts.dateFormat('%B %e, %Y', this.x) + ' - ' + this.y + ' " . $um . "';}";
+				else $tooltip_format = "function(){return '<b>' + this.series.name + ':</b>' + this.y + ' " . $um . "';}";
 				if($arr_this_block['chart_type'] != 'bar') $tmp_array['opposite'] = $a['opposite'];
 				if(isset($a['text'])) $tmp_array['title'] = array('text' => $a['text'], 'style'=>array('color'=>''));
 				if(isset($label_format) && $arr_this_block['chart_type'] != 'bar') $tmp_array['labels'] = array('formatter' => $label_format);
@@ -553,7 +616,6 @@ abstract class parent_report extends CI_Controller {
 			$this->graph['config']['tooltip']['formatter'] = $tooltip_format;
 		}
 		$this->graph['data'] = $this->{$this->primary_model}->get_graph_data($arr_fieldnames, $this->session->userdata('herd_code'), $this->max_rows, $x_axis_date_field, $this->graph['config']['xAxis']['categories']); // was $model in place of $this->primary_model
-				
 	}
 		
 	protected function load_table(&$arr_this_block, $report_count){
@@ -574,6 +636,13 @@ abstract class parent_report extends CI_Controller {
 		$tmp2 = $this->{$this->primary_model}->get_table_header_data();
 		$table_header_data = array_merge($tmp, $tmp2);
 
+/*		$sess_benchmarks = $this->session->userdata('benchmarks');
+		$criteria_options = $this->benchmarks_lib->get_criteria_options();
+		$bench_text = 'Benchmark herds determined by ' . $criteria_options[$sess_benchmarks['criteria']];
+		if(isset($sess_benchmarks['arr_herd_size'])) $bench_text .= ' for Herds between ' . $sess_benchmarks['arr_herd_size'][0] . ' and ' . $sess_benchmarks['arr_herd_size'][1] . ' animals.';
+		if(isset($sess_benchmarks['arr_states'])) $bench_text .= ' for Herds in ' . implode(',', $sess_benchmarks['arr_states']) . '.';
+*/
+	//	$bench_text = $this->benchmarks_lib->get_bench_text();
 		$this->report_data = array(
 			'table_header' => $this->load->view('table_header', $table_header_data, TRUE),
 			'table_id' => $arr_this_block['url_segment'],
@@ -592,7 +661,6 @@ abstract class parent_report extends CI_Controller {
 			$this->html = '<p class="message">No data found.</p>';
 		}
 		$this->display = 'table';
-	}	
-	
+	}
 }
 

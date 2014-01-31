@@ -2,7 +2,7 @@
 /**
 * Name:  Report Function Library File
 *
-* Author: Chris Tranel
+* Author: ctranel
 *		  ctranel@agsource.com
 *
 
@@ -30,7 +30,7 @@ class Reports{
 	/**
 	 * get_herd_info - retrieves herd data (for use in report headers)
 	 * @return array of herd data
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function get_herd_info($herd_code_in = FALSE){
 		$this->ci->load->model('herd_model');
@@ -40,7 +40,7 @@ class Reports{
 
 	/**
 	 * filters_to_text - sets public filter criteria variable.  Composes filter text property for use in the GSG Library file
-	 * @author Chris Tranel
+	 * @author ctranel
 	 * @return void
 	 * 
 	 **/
@@ -83,7 +83,7 @@ class Reports{
 	/**
 	 * sort_text - sets text description of sort fields and order.
 	 * @return string description of sort fields and order
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function sort_text($arr_sort_by, $arr_sort_order){
 		if(is_array($arr_sort_by) && !empty($arr_sort_by)){
@@ -104,7 +104,7 @@ class Reports{
 	/**
 	 * sort_text_brief - returns brief text description of sort fields and order.  Does not set object property
 	 * @return string description of sort fields and order
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	public function sort_text_brief($arr_sort_by, $arr_sort_order){
 		if(is_array($arr_sort_by) && !empty($arr_sort_by)){
@@ -129,7 +129,7 @@ class Reports{
 	 * @param array of herd data to be included in the PDF report header.
 	 * @param array of the table header structure.
 	 * @return void
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	function create_pdf($blocks, $product_name, $arr_filter_text = NULL, $herd_data = NULL, $orientation = 'L'){
 		$this->ci->load->library('pdf');
@@ -176,7 +176,7 @@ class Reports{
 	 * create_csv - creates PDF version of report.
 	 * @param array of data for report.
 	 * @return void
-	 * @author Chris Tranel
+	 * @author ctranel
 	 **/
 	function create_csv($data){
 		$delimiter = ",";

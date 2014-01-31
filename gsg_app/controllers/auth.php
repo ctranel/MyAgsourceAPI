@@ -1,13 +1,5 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
-/* -----------------------------------------------------------------
- *  UPDATE comment
- *  @author: carolmd
- *  @date: Nov 25, 2013
- *
- *  @description: Default group in ion_auth is now the id number , not the name. Changed code as needed.
- *  
- *  -----------------------------------------------------------------
- */
+
 require_once APPPATH . 'controllers/ionauth.php';
 
 class Auth extends Ionauth {
@@ -56,10 +48,10 @@ class Auth extends Ionauth {
 		
 		if(is_array($this->page_header_data)){
 			$this->page_header_data = array_merge($this->page_header_data,
-					array(
-							'title'=>'Dashboard - ' . $this->config->item("product_name"),
-							'description'=>'Dashboard for ' . $this->config->item("product_name"),
-					)
+				array(
+					'title'=>'Dashboard - ' . $this->config->item("product_name"),
+					'description'=>'Dashboard for ' . $this->config->item("product_name"),
+				)
 			);
 		}
 		$this->carabiner->css('report.css');
@@ -69,6 +61,7 @@ class Auth extends Ionauth {
 		//header and footer
 		$this->page_header_data['section_nav'] = $this->load->view('auth/section_nav', NULL, TRUE);
 		//		$this->load->_ci_cached_vars = array();
+		//widgets (pull from DB?)
 		//get_herd_data
 		$herd_data = $this->herd_model->header_info($this->session->userdata('herd_code'));
 		
@@ -252,20 +245,7 @@ class Auth extends Ionauth {
 	}
 
 	function manage_consult(){
-	/* -----------------------------------------------------------------
-	 *  UPDATE comment
-	*  @author: carolmd
-	*  @date: Dec 12, 2013
-	*
-	*  @description: disabled this function for now, so BETA can be deployed
-	*
-	*  -----------------------------------------------------------------
-	*/
-	$this->session->set_flashdata('message', "Manage Consultant temporarily disabled.");
-	redirect(site_url("auth"), 'refresh');
-	// *******************************************************************************
-	
-				if((!$this->as_ion_auth->logged_in())){
+		if((!$this->as_ion_auth->logged_in())){
        		$this->session->keep_flashdata('message');
 			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
        		redirect(site_url('auth/login'));
@@ -369,19 +349,6 @@ class Auth extends Ionauth {
 	}
 	
 	function consult_manage_herds(){
-		/* -----------------------------------------------------------------
-		 *  UPDATE comment
-		*  @author: carolmd
-		*  @date: Dec 12, 2013
-		*
-		*  @description: disabled this function for now, so BETA can be deployed
-		*
-		*  -----------------------------------------------------------------
-		*/
-		$this->session->set_flashdata('message', "Consultant Manage Herds temporarily disabled.");
-		redirect(site_url("auth"), 'refresh');
-				// *******************************************************************************
-		
 		if((!$this->as_ion_auth->logged_in())){
        		$this->session->keep_flashdata('message');
 			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
@@ -518,19 +485,6 @@ class Auth extends Ionauth {
 	
 	//Producers only, give consultant permission to view herd
 	function consult_access($cuid = NULL) {
-		/* -----------------------------------------------------------------
-		 *  UPDATE comment
-		*  @author: carolmd
-		*  @date: Dec 12, 2013
-		*
-		*  @description: disabled this function for now, so BETA can be deployed
-		*
-		*  -----------------------------------------------------------------
-		*/
-		$this->session->set_flashdata('message', "Consultant Access temporarily disabled.");
-		redirect(site_url("auth"), 'refresh');
-		// *******************************************************************************
-		
 		if((!$this->as_ion_auth->logged_in())){
        		$this->session->keep_flashdata('message');
 			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
@@ -599,12 +553,13 @@ class Auth extends Ionauth {
 //				$user_id = $this->input->post('user_id');
 				$user_id = $this->session->userdata('user_id');
 				$obj_user = $this->ion_auth_model->user($user_id)->row();
-				$obj_user->arr_groups = $this->ion_auth_model->get_users_group($obj_user->id);
+				$obj_user->arr_groups = array_keys($this->ion_auth_model->get_users_group_array($obj_user->id));
+				//note: active group id should always be 2
 				$tmp_array = $this->as_ion_auth->get_sections_array(2, $user_id, $obj_user->herd_code, NULL, array('subscription','public','unmanaged'));
 				$obj_user->section_id = $this->as_ion_auth->set_form_array($tmp_array, 'id', 'id'); // populate array of sections for which user is enrolled
 				$tmp_array = $this->input->post('section_id');
 				$arr_form_section_id = isset($tmp_array) && is_array($tmp_array) ? $tmp_array : $obj_user->section_id;
-				}
+			}
 
 			$this->data['sections_selected'] = $arr_form_section_id;
 			$this->data['section_id'] = 'id="section_id"';
@@ -687,19 +642,6 @@ class Auth extends Ionauth {
 
 		//Consultants only, request permission to view herd
 	function consult_request() {
-		/* -----------------------------------------------------------------
-		 *  UPDATE comment
-		*  @author: carolmd
-		*  @date: Dec 12, 2013
-		*
-		*  @description: disabled this function for now, so BETA can be deployed
-		*
-		*  -----------------------------------------------------------------
-		*/
-		$this->session->set_flashdata('message', "Request Herd temporarily disabled.");
-		redirect(site_url("auth"), 'refresh');
-				// *******************************************************************************
-		
 		if((!$this->as_ion_auth->logged_in())){
        		$this->session->keep_flashdata('message');
 			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
@@ -755,7 +697,7 @@ class Auth extends Ionauth {
 //			$user_id = $this->input->post('user_id');
 			$user_id = $this->session->userdata('user_id');
 			$obj_user = $this->ion_auth_model->user($user_id)->row();
-			$obj_user->arr_groups = $this->ion_auth_model->get_users_group($obj_user->id);
+			$obj_user->arr_groups = array_keys($this->ion_auth_model->get_users_group_array($obj_user->id));
 			
 			//note: active group id should always be 9
 			$tmp_array = $this->as_ion_auth->get_sections_array(9, $user_id, $obj_user->herd_code, NULL, array('subscription','public','unmanaged'));
@@ -764,6 +706,7 @@ class Auth extends Ionauth {
 			$tmp_array = $this->input->post('section_id');
 //			$arr_form_section_id = $this->form_validation->set_value('section_id');//, $obj_user->section_id);
 			$arr_form_section_id = isset($tmp_array) && is_array($tmp_array) ? $tmp_array : $obj_user->section_id;
+
 			$this->data['sections_selected'] = $arr_form_section_id;
 			$this->data['section_id'] = 'id="section_id"';
 			//note: active group id should always be 9
@@ -823,18 +766,6 @@ class Auth extends Ionauth {
 	}
 
 	function list_accounts(){
-	/* -----------------------------------------------------------------
-	 *  UPDATE comment
-	*  @author: carolmd
-	*  @date: Dec 12, 2013
-	*
-	*  @description: disabled this function for now, so BETA can be deployed
-	*
-	*  -----------------------------------------------------------------
-	*/
-	$this->session->set_flashdata('message', "List Accounts temporarily disabled.");
-	redirect(site_url("auth"), 'refresh');
-	// *******************************************************************************
 		if(!$this->as_ion_auth->has_permission("Manage Other Accounts")){
        		$this->session->set_flashdata('message',  $this->session->flashdata('message') . "You do not have permission to edit user accounts.");
        		redirect(site_url("auth/index"), 'refresh');
@@ -878,8 +809,16 @@ class Auth extends Ionauth {
 	//CDT overrides built-in function to allow us to redirect user to the original page they requested after login in
 	function login()
 	{
-		
 		$redirect_url = set_redirect_url('login');
+		// set redirect url
+		//$this->session->keep_flashdata('redirect_url');
+/*		$tmp = $this->session->flashdata('redirect_url');
+		$redirect_url = $tmp !== FALSE ? $tmp : $this->as_ion_auth->referrer;
+		//if(strpos($redirect_url, 'auth') !== FALSE) $redirect_url = 'auth/index';
+		if(strpos($redirect_url, 'login') || strpos($redirect_url, 'logout')) $redirect_url = '';
+		
+		$this->session->set_flashdata('redirect_url', $redirect_url);
+*/
 		$this->data['title'] = "Login";
 
 		//validate form input
@@ -892,10 +831,10 @@ class Auth extends Ionauth {
 			$remember = (bool) $this->input->post('remember');
 
 			if ($this->ion_auth->login($this->input->post('identity'), $this->input->post('password'), $remember))
-			{ 
+			{ //if the login is successful
+				//redirect them back to the home page
 				$this->access_log_model->write_entry(1); //1 is the page code for login for the user management section
 				$this->session->set_flashdata('message', $this->as_ion_auth->messages());
-				$redirect_url = $this->get_initial_redirect();
 				redirect(site_url($redirect_url));
 			}
 			else
@@ -995,19 +934,6 @@ class Auth extends Ionauth {
 	//deactivate the user
 	function deactivate($id = NULL)
 	{
-	/* -----------------------------------------------------------------
-	 *  UPDATE comment
-	*  @author: carolmd
-	*  @date: Dec 12, 2013
-	*
-	*  @description: disabled this function for now, so BETA can be deployed
-	*
-	*  -----------------------------------------------------------------
-	*/
-	$this->session->set_flashdata('message', "Deactivate User temporarily disabled.");
-	redirect(site_url("auth"), 'refresh');
-	// *******************************************************************************
-	
 		if(is_array($this->page_header_data)){
 			$this->page_header_data = array_merge($this->page_header_data,
 				array(
@@ -1027,19 +953,6 @@ class Auth extends Ionauth {
 //@todo : verify that producer are not allowed to add or modify groups
 	function create_user()
 	{
-		/* -----------------------------------------------------------------
-		 *  UPDATE comment
-		*  @author: carolmd
-		*  @date: Dec 12, 2013
-		*
-		*  @description: disabled this function for now, so BETA can be deployed
-		*
-		*  -----------------------------------------------------------------
-		*/
-		$this->session->set_flashdata('message', "Add Account temporarily disabled.");
-		redirect(site_url("auth"), 'refresh');
-				// *******************************************************************************
-		
 		$this->data['title'] = "Create Account";
 
 		//validate form input
@@ -1067,7 +980,7 @@ class Auth extends Ionauth {
 			if(!$this->as_ion_auth->group_assignable($arr_posted_group_id)){
 				$this->session->set_flashdata('message', 'You do not have permissions to create a user with the user group you selected.  Please try again, or contact ' . $this->config->item('cust_serv_company','ion_auth') . ' at ' . $this->config->item('cust_serv_email','ion_auth') . ' or ' . $this->config->item('cust_serv_phone','ion_auth') . '.');
 				redirect("auth/create_user", 'refresh');
-				die();
+				exit();
 			}
 			
 			//start with nothing
@@ -1117,7 +1030,7 @@ class Auth extends Ionauth {
 		}
 		else { //display the create user form
 				//get default group_id 
-			$default_group_id = $this->config->item('default_group', 'ion_auth');
+			$default_group_id = $this->ion_auth_model->get_group_by_name($this->config->item('default_group', 'ion_auth'))->id;
 			$arr_form_group_id = $this->form_validation->set_value('group_id[]', array($default_group_id));
 			$this->data['group_selected'] = $arr_form_group_id;
 
@@ -1125,10 +1038,9 @@ class Auth extends Ionauth {
 			$this->data['section_selected'] = $arr_form_section_id;
 			
 			$region_id_in = $this->form_validation->set_value('region_id[]');
-			$arr_form_region_id = !empty($region_id_in) ? $region_id_in : $this->session->userdata('arr_regions');
+			$arr_form_region_id = !empty($region_id_in) ? $region_id_in : array_keys($this->session->userdata('arr_regions'));
 			//set the flash data error message if there is one
 			$this->page_header_data['message'] = (validation_errors() ? validation_errors() : ($this->as_ion_auth->errors() ? $this->as_ion_auth->errors() : $this->session->flashdata('message')));
-//die($this->page_header_data['message']);
 			
 			$this->data['first_name'] = array('name' => 'first_name',
 				'id' => 'first_name',
@@ -1189,7 +1101,7 @@ class Auth extends Ionauth {
 						'id' => 'region_id',
 						'type' => 'hidden',
 						'class' => 'require',
-						'value' => $this->session->userdata('arr_regions')
+						'value' => array_keys($this->session->userdata('arr_regions'))
 					);
 				}
 
@@ -1254,7 +1166,6 @@ class Auth extends Ionauth {
 				);
 			}
 			$this->page_header_data['section_nav'] = $this->load->view('auth/section_nav', NULL, TRUE);
-//die($this->load->view('auth/section_nav', NULL, TRUE));
 			$this->data['page_header'] = $this->load->view('page_header', $this->page_header_data, TRUE);
 			$this->data['page_heading'] = 'Register User - ' . $this->config->item('product_name');
 			$footer_data = array(
@@ -1269,18 +1180,6 @@ class Auth extends Ionauth {
 
 	//create a new user
 	function edit_user($user_id = FALSE) {
-	/* -----------------------------------------------------------------
-	 *  UPDATE comment
-	 *  @author: carolmd
-	 *  @date: Dec 12, 2013
-	 *
-	 *  @description: disabled this function for now, so BETA can be deployed
-	 *  
-	 *  -----------------------------------------------------------------
-	 */
-		$this->session->set_flashdata('message', "Edit Account temporarily disabled.");
-		redirect(site_url("auth"), 'refresh');
-	// *******************************************************************************
 		if($user_id === FALSE) $user_id = $this->session->userdata('user_id');
 		//does the logged in user have permission to edit this user?
 		if (!$this->as_ion_auth->logged_in()) {
@@ -1326,7 +1225,7 @@ class Auth extends Ionauth {
 					if(!$this->as_ion_auth->group_assignable($arr_posted_group_id)){
 						$this->session->set_flashdata('message', 'You do not have permissions to edit a user with the user group you selected.  Please try again, or contact ' . $this->config->item('cust_serv_company','ion_auth') . ' at ' . $this->config->item('cust_serv_email','ion_auth') . ' or ' . $this->config->item('cust_serv_phone','ion_auth') . '.');
 						redirect(site_url("auth/edit_user/$user_id", 'refresh'));
-						die();
+						exit();
 					}
 					$region_id = $this->input->post('region_id[]');
 					$supervisor_num = $this->input->post('supervisor_num');
@@ -1337,7 +1236,7 @@ class Auth extends Ionauth {
 					if(!$this->as_ion_auth->group_assignable($arr_posted_group_id)){
 						$this->session->set_flashdata('message', 'You do not have permissions to edit a user with the user group you selected.  Please try again, or contact ' . $this->config->item('cust_serv_company','ion_auth') . ' at ' . $this->config->item('cust_serv_email','ion_auth') . ' or ' . $this->config->item('cust_serv_phone','ion_auth') . '.');
 						redirect(site_url("auth/edit_user/$user_id"), 'refresh');
-						die();
+						exit();
 					}
 				}
 				$obj_user = $this->ion_auth_model->user($user_id)->row();
@@ -1380,10 +1279,10 @@ class Auth extends Ionauth {
 			}
 			else { //display the edit user form
 				if(isset($obj_user) === FALSE) $obj_user = $this->ion_auth_model->user($user_id)->row();
-				$obj_user->arr_groups = $this->ion_auth_model->get_users_group($obj_user->id);
+				$obj_user->arr_groups = array_keys($this->ion_auth_model->get_users_group_array($obj_user->id));
 				//get default group_id
 				if(empty($obj_user->arr_groups)){ //if no group is set, set the default group
-					$default_group_id = $this->config->item('default_group', 'ion_auth');
+					$default_group_id = $this->ion_auth_model->get_group_by_name($this->config->item('default_group', 'ion_auth'))->id;
 					$obj_user->arr_groups = array($default_group_id);
 				}
 				$arr_form_group_id = $this->form_validation->set_value('group_id[]', $obj_user->arr_groups);
@@ -1392,10 +1291,11 @@ class Auth extends Ionauth {
 				$obj_user->section_id = $this->as_ion_auth->set_form_array($this->ion_auth_model->get_subscribed_sections_array($obj_user->arr_groups, $user_id, $this->as_ion_auth->super_section_id), 'id', 'id'); // populate array of sections for which user is enrolled
 				$arr_form_section_id = $this->form_validation->set_value('section_id[]', $obj_user->section_id);
 				$this->data['section_selected'] = $arr_form_section_id;
-				$arr_form_region_id = $this->form_validation->set_value('region_id[]', !empty($obj_user->region_id) ? $obj_user->region_id : $this->session->userdata('arr_regions'));
+
+				$arr_form_region_id = $this->form_validation->set_value('region_id[]', !empty($obj_user->region_id) ? $obj_user->region_id : array_keys($this->session->userdata('arr_regions')));
 				$this->data['region_selected'] = $arr_form_region_id;
 				$form_supervisor_num = $this->form_validation->set_value('supervisor_num', !empty($obj_user->supervisor_num) ? $obj_user->supervisor_num : $this->session->userdata('supervisor_num'));
-			
+
 				//set the flash data error message if there is one
 /****** MESSAGE NEEDS TO GO TO HEADER, NOT PAGE ****/
 				$this->data['message'] = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
@@ -1440,9 +1340,9 @@ class Auth extends Ionauth {
 					$this->data['section_options'] = $this->ion_auth_model->get_keyed_section_array(array('subscription'));
 					$this->data[] = $obj_user->section_id;
 				}
+
 				//if(in_array('3', $arr_form_group_id) || in_array('5', $arr_form_group_id) || in_array('6', $arr_form_group_id) || in_array('7', $arr_form_group_id) || in_array('8', $arr_form_group_id)){
 				//	if($this->as_ion_auth->is_admin){
-
 						$this->data['region_options'] = $this->as_ion_auth->get_region_dropdown_data();
 						$this->data['region_selected'] = $this->form_validation->set_value('region_id[]', $obj_user->region_id);
 						if(in_array('3', $arr_form_group_id) || in_array('5', $arr_form_group_id) || in_array('6', $arr_form_group_id) || in_array('7', $arr_form_group_id) || in_array('8', $arr_form_group_id)) $this->data['region_id'] = 'class = "require"';
@@ -1579,62 +1479,6 @@ class Auth extends Ionauth {
 		}
 		redirect(site_url($this->as_ion_auth->referrer));
 	}
-	/* -----------------------------------------------------------------
-	 *  Function get_initial_redirect
-	 *  @author: carolmd
-	 *  @date: Dec 6, 2013
-	 *
-	 *  @description: Determine if this user should go directly to the home page or to the change_herd/select page.
-	 *                If user is a producer, always go to the home page. 
-	 *                If user is admin, rss, or emrss : go to change_herd page.
-	 *                Otherwise, if the user can view >1 herd, go to the change_herd page.
-	 *  			  Also sets the initial herd code in the userdata.
-	 *  -----------------------------------------------------------------
-	 */
-	function get_initial_redirect() {
-		// set the user_data with a valid herd code.
-		$tmp_obj = $this->as_ion_auth->get_herds_by_group($this->session->userdata('active_group_id'),$this->session->userdata('arr_regions'), 2);
-		$herd_array = $tmp_obj->result_array();
-		if (count($herd_array) > 0) { 	
-			// set initial herd code in user_data
-			$this->session->set_userdata('herd_code', $herd_array[0]["herd_code"]);
-		}
-		else {
-
-			// found no herds for this user.
-			$this->session->set_flashdata('message', 'A list of herds could not be generated for your account.  If you believe this is an error, please contact ' 
-										. $this->config->item('cust_serv_company', 'ion_auth') . ' at ' . $this->config->item('cust_serv_email', 'ion_auth') . ' or ' . $this->config->item('cust_serv_phone', 'ion_auth') . '.');
-			//$this->session->set_flashdata('redirect_url',$this->session->flashdata('redirect_url'));
-			$this->session->set_userdata('herd_code', $this->config->item('default_herd','ion_auth'));
-			return('');
-			break;
-		}
-		
-		if ($this->as_ion_auth->is_admin()) {
-			return('change_herd/select');
-			break;
-		} 
-		if ($this->as_ion_auth->is_producer()) {
-			return(''); //blank goes to home page.
-			break;
-		}
-		if ($this->as_ion_auth->is_rss()) {
-			return('change_herd/select');
-			break;
-		}
-		if ($this->as_ion_auth->is_emrss()) {
-			return('change_herd/select');
-			break;
-		}
-		// all other groups: go to change herd IF user has >1 herd. Otherwise, go to home page.
-		if (count($herd_array) > 1) {
-			return('change_herd/select');
-			break;
-		}
-		// If you fall through to here, go to the home page.
-		return('');
-	}
-	
 	
 	// used with dashboard graph
 	function graph_snapshot($report, $type = NULL) {
