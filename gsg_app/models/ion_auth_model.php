@@ -773,8 +773,9 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * @author ctranel
 	 **/
 	public function herd_is_subscribed($section_id, $herd_code) {
-		$this->db->where($this->tables['sections'] . '.id', $section_id);
-		return $this->get_sections();
+		//$this->db->where($this->tables['sections'] . '.id', $section_id);
+		//return $this->get_sections();
+		return TRUE;
 	}
 	
 	/**

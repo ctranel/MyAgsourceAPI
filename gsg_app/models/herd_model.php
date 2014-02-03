@@ -205,8 +205,7 @@ class Herd_model extends CI_Model {
 		if (isset($limit) && isset($offset)) $this->db->limit($limit, $offset);
 		elseif(isset($limit)) $this->db->limit($limit);
 		$results = $this->db->get($this->tables['herds'] . ' h');
-$this->load->helper('multid_array_helper');
-//var_dump(get_elements_by_key('herd_code', $results->result_array())); die;
+		$this->load->helper('multid_array_helper');
 		return get_elements_by_key('herd_code', $results->result_array());
 	}
 

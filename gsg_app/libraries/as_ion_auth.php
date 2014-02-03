@@ -254,7 +254,7 @@ class As_ion_auth extends Ion_auth {
 	 **/
 	public function get_viewable_herds($user_id, $region_num = false, $limit_in = NULL){
 		if($this->has_permission('View All Herds')){
-			return $this->herd_model->get_herds(null, null, $limit_in);
+			return $this->herd_model->get_herds();
 		}
 		if($this->has_permission('View Herds In Region')){
 			return $this->herd_model->get_herds_by_region($region_num, $limit_in);
