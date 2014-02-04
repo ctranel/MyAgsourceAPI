@@ -149,22 +149,23 @@ class Change_herd extends CI_Controller {
 		else
 		{
 			$this->data['message'] = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
-			$tmp_obj = $this->as_ion_auth->get_viewable_herds($this->session->userdata('user_id'), $this->session->userdata('arr_regions'));
-			if(is_string($tmp_obj)){ //producers will return a string instead of the database object
-				$this->session->set_userdata('herd_code', $tmp_obj);
-				$this->session->set_userdata('arr_pstring', $this->herd_model->get_pstring_array($tmp_obj, FALSE));
-				redirect(site_url($redirect_url));
-			}
-			elseif(is_object($tmp_obj)){
-				$tmp_obj = $tmp_obj->result_array();
+			$tmp_arr = $this->as_ion_auth->get_viewable_herds($this->session->userdata('user_id'), $this->session->userdata('arr_regions'));
+			if(is_array($tmp_arr)){
+				if(count($tmp_arr) == 1){ //producers will return a string instead of the database object
+					$this->session->set_userdata('herd_code', $tmp_arr);
+					$this->session->set_userdata('arr_pstring', $this->herd_model->get_pstring_array($tmp_arr['herd_code'], FALSE));
+					redirect(site_url($redirect_url));
+					exit();
+				}
 				$this->load->library('herd_manage');
-				$this->data['arr_herd_data'] = $this->herd_manage->set_herd_dropdown_array($tmp_obj);
-				unset($tmp_obj);
+				$this->data['arr_herd_data'] = $this->herd_manage->set_herd_dropdown_array($tmp_arr);
+				unset($tmp_arr);
 			}
 			else{
 				$this->session->set_flashdata('message', 'A list of herds could not be generated for your account.  If you believe this is an error, please contact ' . $this->config->item('cust_serv_company', 'ion_auth') . ' at ' . $this->config->item('cust_serv_email', 'ion_auth') . ' or ' . $this->config->item('cust_serv_phone', 'ion_auth') . '.');
 				//$this->session->set_flashdata('redirect_url',$this->session->flashdata('redirect_url'));
 				redirect(site_url($redirect_url));
+				exit();
 			}
 
 			$this->data['herd_code_fill'] = array('name' => 'herd_code_fill',

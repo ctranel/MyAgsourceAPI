@@ -47,7 +47,6 @@ class Herd_model extends CI_Model {
 	 **/
 	function get_herds_by_region($region_arr_in, $limit = NULL){
 		if (!isset($region_arr_in) or empty($region_arr_in)) {
-			// no region(s) were sent to this function -- fail this function.
 			return FALSE;
 		}	
 		// incoming array might be a multi-dimentional array. If so, need to flatten it into simple array before it can be used in the where clause.
@@ -63,6 +62,7 @@ class Herd_model extends CI_Model {
 	 * @param int consultant's user id
 	 * @return array of stdClass with all herds for given tech num
 	 * @access public
+	 * @author ctranel
 	 *
 	 **/
 	function get_herds_by_consultant($consultant_user_id = FALSE){
@@ -169,14 +169,14 @@ class Herd_model extends CI_Model {
 		if(isset($order_by))$this->db->order_by($order_by);
 		if (isset($limit) && isset($offset)) $this->db->limit($limit, $offset);
 		elseif(isset($limit)) $this->db->limit($limit);
-		$results = $this->db->get($this->tables['herds'] . ' h');
+		$results = $this->db->get($this->tables['herds'] . ' h')->result_array();
 		return $results;
 	}
 
 	/**
 	 * @method get_herd()
 	 * @param string herd code
-	 * @return array of stdClass objects with all herds
+	 * @return 1D array of herd data
 	 * @access public
 	 * @author ctranel
 	 **/

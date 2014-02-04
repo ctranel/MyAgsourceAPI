@@ -1264,7 +1264,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 	}
 
 	/**
-	 * @method get_herds_by_consult page
+	 * @method get_herds_by_consult
 	 *
 	 * @param int consultant user id
 	 * @return array of herd records, keyed by consultant status
