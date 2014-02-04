@@ -190,7 +190,6 @@ class As_ion_auth extends Ion_auth {
 	 * @return array of child user objects
 	 * @access public
 	 *
-	 **/
 	public function get_editable_users(){
 		//$obj_user = $this->ion_auth_model->user($this->session->userdata('user_id'))->row();
 		//$obj_user->arr_groups = array_keys($this->ion_auth_model->get_users_group_array($obj_user->id));
@@ -205,42 +204,11 @@ class As_ion_auth extends Ion_auth {
 			return array_merge_distinct($arr_tmp1, $arr_tmp2);
 		}
 		if($this->has_permission('Edit Producers In Region')){
-			return $this->ion_auth_model->get_producer_users_by_tech($obj_user->supervisor_num)->result_array();
+			return $this->ion_auth_model->get_producer_users_by_region($obj_user->supervisor_num)->result_array();
 		}
 		else { // Genex groups or producers
 			return array();
 		}
-	}
-
-	/**
-	 * @method get_users_herds()
-	 * @return mixed array of herds or boolean
-	 * @access public
-	 *
-	public function get_users_herds(){
-		if($this->as_ion_auth->is_admin){
-			return $this->herd_model->get_herds(null, null)->result_array();
-		}
-		else{
-			$arr_herds = array();
-			if($this->as_ion_auth->has_permission("View Region Herds")){
-				$arr_herds['region'] = $this->herd_model->get_herds_by_region($this->session->userdata('arr_regions'))->result_array();
-			}
-			if($this->as_ion_auth->has_permission("View Non-owned Herds")){
-				$arr_herds['user'] = $this->herd_model->get_herds_by_rep($this->session->userdata('user_id'))->result_array();
-			}
-			else {
-				return $this->session->userdata('herd_code');
-			}
-			if(!empty($arr_herds)){
-				$arr_combined = array();
-				foreach($arr_herds as $v => $h){
-					$arr_combined = array_merge_distinct($arr_combined, $h, 'farm_name');
-				}
-				return $arr_combined;
-			}
-		}
-		return FALSE;
 	}
 	 **/
 
@@ -253,19 +221,23 @@ class As_ion_auth extends Ion_auth {
 	 *
 	 **/
 	public function get_viewable_herds($user_id, $region_num = false, $limit_in = NULL){
+		$arr_return_reg = array();
+		$arr_return_user = array();
+		$arr_return_permission = array();
+		
 		if($this->has_permission('View All Herds')){
 			return $this->herd_model->get_herds();
 		}
 		if($this->has_permission('View Herds In Region')){
-			return $this->herd_model->get_herds_by_region($region_num, $limit_in);
+			$arr_return_reg = $this->herd_model->get_herds_by_region($region_num, $limit_in);
 		}
 		if($this->has_permission('View Assigned Herds')){
-			return $this->herd_model->get_herds_by_user($user_id, $limit_in);
+			$arr_return_user = $this->herd_model->get_herds_by_user($user_id, $limit_in);
 		}
 		if($this->has_permission('View non-own w permission')){
-			return $this->herd_model->get_herds_by_consultant($limit_in);
+			$arr_return_permission = $this->herd_model->get_herds_by_consultant($limit_in);
 		}
-		return array();
+		return array_merge($arr_return_reg, $arr_return_user, $arr_return_permission);
 	}
 
 	/**
@@ -277,19 +249,23 @@ class As_ion_auth extends Ion_auth {
 	 *
 	 **/
 	public function get_viewable_herd_codes($user_id, $region_num = false, $limit_in = NULL){
+		$arr_return_reg = array();
+		$arr_return_user = array();
+		$arr_return_permission = array();
+		
 		if($this->has_permission('View All Herds')){
 			return $this->herd_model->get_herd_codes(null, null, $limit_in);
 		}
 		if($this->has_permission('View Herds In Region')){
-			return $this->herd_model->get_herd_codes_by_region($region_num, $limit_in);
+			$arr_return_reg = $this->herd_model->get_herd_codes_by_region($region_num, $limit_in);
 		}
 		if($this->has_permission('View Assigned Herds')){
-			return $this->herd_model->get_herd_codes_by_user($user_id, $limit_in);
+			$arr_return_user = $this->herd_model->get_herd_codes_by_user($user_id, $limit_in);
 		}
 		if($this->has_permission('View non-own w permission')){
-			return $this->herd_model->get_herd_codes_by_consultant($limit_in);
+			$arr_return_permission = $this->herd_model->get_herd_codes_by_consultant($limit_in);
 		}
-		return array();
+		return array_merge($arr_return_reg, $arr_return_user, $arr_return_permission);
 	}
 
 	/**
