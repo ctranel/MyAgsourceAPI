@@ -89,7 +89,8 @@ class As_ion_auth extends Ion_auth {
 		if($this->uri->segment(1) != $section_path){
 			$this->super_section_id = $this->ion_auth_model->get_super_section_id_by_path($this->uri->segment(1));
 		} 
-		//reliably set the referrer
+//die($this->uri->uri_string());
+		//reliably set the referrer, used when determining whether to set the redirect variable on pages like select herd
 		$this->referrer = $this->session->userdata('referrer');
 		$tmp_uri= $this->uri->uri_string();
 		if($this->session->userdata('referrer') != $tmp_uri && strpos($tmp_uri, 'ajax') === FALSE) $this->session->set_userdata('referrer', $tmp_uri);
@@ -104,9 +105,14 @@ class As_ion_auth extends Ion_auth {
 			$this->arr_user_super_sections = $this->get_super_sections_array($this->session->userdata('active_group_id'), $this->session->userdata('user_id'), $this->session->userdata('herd_code'), $arr_scope);
 			$this->arr_user_sections = $this->get_sections_array($this->session->userdata('active_group_id'), $this->session->userdata('user_id'), $this->session->userdata('herd_code'), $this->super_section_id, $arr_scope);
 		}
-		if(!isset($tmp) || empty($tmp) !== FALSE) {
+		else {
 			$this->session->set_userdata('herd_code', $this->config->item('default_herd', 'ion_auth'));
 			$this->session->set_userdata('arr_pstring', $this->herd_model->get_pstring_array($this->config->item('default_herd', 'ion_auth'), FALSE));
+			//$this->session->set_userdata('active_group_id', 2);
+			$arr_scope = array('subscription','public','unmanaged');
+			//the first parameter is group id--use producer (2) if no one is logged in, second param is user id. 
+			$this->arr_user_super_sections = $this->get_super_sections_array(2, $this->session->userdata('user_id'), $this->session->userdata('herd_code'), $arr_scope);
+			$this->arr_user_sections = $this->get_sections_array(2, $this->session->userdata('user_id'), $this->session->userdata('herd_code'), $this->super_section_id, $arr_scope);
 		}
 	}
 	

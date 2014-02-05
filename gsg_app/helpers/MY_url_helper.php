@@ -16,7 +16,7 @@ if ( ! function_exists('set_redirect_url'))
 		$ci->session->keep_flashdata('redirect_url');
 		$tmp = $ci->session->flashdata('redirect_url');
 		$redirect_url = $tmp !== FALSE ? str_replace('/csv', '', str_replace('/pdf', '', $tmp)) : $ci->as_ion_auth->referrer;
-		if($redirect_url == $curr_control_path || $redirect_url == 'auth/login' || $redirect_url == 'change_herd/select' || $redirect_url == 'auth/logout' || $redirect_url == 'benchmarks') $redirect_url = '';
+		if($redirect_url == $curr_control_path || $redirect_url == 'auth/login' || strpos($redirect_url, 'chnage_herd') !== FALSE || $redirect_url == 'auth/logout' || $redirect_url == 'benchmarks' || strpos($redirect_url, 'cow_page') !== FALSE || strpos($redirect_url, 'custom_reports/select') !== FALSE || strpos($redirect_url, 'custom_reports/insert') !== FALSE) $redirect_url = '';
 		$ci->session->set_flashdata('redirect_url', $redirect_url);
 		return $redirect_url;
 	}
