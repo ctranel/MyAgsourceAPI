@@ -76,11 +76,11 @@ abstract class parent_report extends CI_Controller {
 			$this->load->library('reports');
 			$this->reports->herd_code = $this->herd_code;
 		}
-		else {  //redirect to login if not logged in or session is expired
-			if($this->session->flashdata('message')) $this->session->keep_flashdata('message');
-			if($this->uri->segment(3) != 'ajax_report') $this->session->set_flashdata('redirect_url', $this->uri->uri_string());
-			redirect(site_url('auth/login'));
-		}
+//		else {  //redirect to login if not logged in or session is expired
+//			if($this->session->flashdata('message')) $this->session->keep_flashdata('message');
+//			if($this->uri->segment(3) != 'ajax_report') $this->session->set_flashdata('redirect_url', $this->uri->uri_string());
+//			redirect(site_url('auth/login'));
+//		}
 		
 		if($this->session->userdata('herd_code') == ''){ // || $this->session->userdata('herd_code') == '35990571'
 			$this->session->keep_flashdata('redirect_url');
@@ -97,13 +97,13 @@ abstract class parent_report extends CI_Controller {
 
 	protected function authorize(){
 		if(!isset($this->as_ion_auth)){
-	       	if($this->uri->segment(3) == 'ajax_report'){
+	       	if($this->uri->segment(3) == 'ajax_report' && $this->session->userdata('herd_code') != $this->config->item('default_herd', 'ion_auth')){
 				echo "Your session has expired, please log in and try again.";
 			}
 			else return FALSE;
 		}
 		if(!$this->as_ion_auth->logged_in()) {
-	       	if($this->uri->segment(3) == 'ajax_report'){
+	       	if($this->uri->segment(3) == 'ajax_report' && $this->session->userdata('herd_code') != $this->config->item('default_herd', 'ion_auth')){
 				echo "Your session has expired, please log in and try again.";
 			}
 			else {
@@ -124,13 +124,11 @@ abstract class parent_report extends CI_Controller {
   			exit;
 		}
 		//if section scope is public, pass unsubscribed test
-		//@todo: build display_hierarchy/report_organization, etc interface with get_scope function
+		//@todo: build display_hierarchy/report_organization, etc interface with get_scope function (with classes for super_sections, sections, etc)
 		$pass_unsubscribed_test = true; //$this->as_ion_auth->get_scope('sections', $this->section_id) == 'pubic';
 		$pass_unsubscribed_test = $this->as_ion_auth->has_permission("View Unsubscribed Herds") || $this->ion_auth_model->herd_is_subscribed($this->section_id, $this->herd_code);
 		$pass_view_nonowned_test = $this->as_ion_auth->has_permission("View All Herds");
 		if(!$pass_view_nonowned_test) $pass_view_nonowned_test = in_array($this->herd_code, $this->as_ion_auth->get_viewable_herd_codes($this->session->userdata('user_id'), $this->session->userdata('arr_regions')));//$this->as_ion_auth->has_permission("View Non-owned Herds") || $this->ion_auth_model->user_owns_herd($this->herd_code);
-//		if(!$pass_view_nonowned_test) $pass_view_nonowned_test = $this->as_ion_auth->has_permission("View Herds In Region") && in_array($this->herd_code, $this->herd_model->get_herd_codes_by_region($this->session->userdata('arr_region')));
-//		if(!$pass_view_nonowned_test) $pass_view_nonowned_test = $this->as_ion_auth->has_permission("View non-own w permission") && $this->ion_auth_model->consultant_has_access($this->session->userdata('user_id'), $this->herd_code, $this->section_id);
 		if($pass_unsubscribed_test && $pass_view_nonowned_test) return TRUE;
 		elseif(!$pass_unsubscribed_test && !$pass_view_nonowned_test) {
 			if($this->uri->segment(3) == 'ajax_report') {
@@ -140,7 +138,7 @@ abstract class parent_report extends CI_Controller {
 				$this->session->set_flashdata('message', 'Herd ' . $this->herd_code . ' is not subscribed to the ' . $this->product_name . ', nor do you have permission to view this report for herd ' . $this->herd_code . '.  Please contact ' . $this->config->item('cust_serv_company', 'ion_auth') . ' at ' . $this->config->item('cust_serv_email', 'ion_auth') . ' or ' . $this->config->item('cust_serv_phone', 'ion_auth') . ' if you have questions or concerns.');
  				if($this->session->flashdata('message')) $this->session->keep_flashdata('message');
 				$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
-				redirect(site_url());
+				redirect(site_url('change_herd/select'));
       		}
 			exit;
 		}
@@ -164,7 +162,7 @@ abstract class parent_report extends CI_Controller {
 				$this->session->set_flashdata('message', 'You do not have permission to view the ' . $this->product_name . ' for herd ' . $this->herd_code . '.  Please contact ' . $this->config->item('cust_serv_company', 'ion_auth') . ' at ' . $this->config->item('cust_serv_email', 'ion_auth') . ' or ' . $this->config->item('cust_serv_phone', 'ion_auth') . ' if you have questions or concerns.');
  				if($this->session->flashdata('message')) $this->session->keep_flashdata('message');
 				$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
-				redirect(site_url());
+				redirect(site_url('change_herd/select'));
 			}
 			exit;
 		}
@@ -198,6 +196,7 @@ abstract class parent_report extends CI_Controller {
 
 		$arr_blocks = $this->{$this->primary_model}->arr_blocks[$this->page]['display'];
 		//Determine if any report blocks have is_summary flag - will determine if tstring needs to be loaded and filters shown
+		$this->load->helper('multid_array_helper');
 		$this->bool_has_summary = array_search(1, get_elements_by_key('is_summary', $arr_blocks)) === FALSE ? FALSE : TRUE;
 		//Check for valid herd_code
 		if(empty($this->herd_code) || strlen($this->herd_code) != 8){

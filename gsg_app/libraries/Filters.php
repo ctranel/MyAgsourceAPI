@@ -92,6 +92,7 @@ class Filters{
 						foreach($this->arr_params[$k] as $k1=>$v1){
 							$this->arr_params[$k][$k1] = explode('|', $v1);
 						}
+						$this->ci->load->helper('multid_array_helper');
 						$this->arr_params[$k] = array_flatten($this->arr_params[$k]);
 						$this->criteria[$k] = $this->arr_params[$k];
 					}
