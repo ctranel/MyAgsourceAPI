@@ -152,12 +152,14 @@
 					type: 'spline',
 					color: chart[3].series[0].color,
 					marker: {enabled:false},
+					name: '1st Lact Trend',
 					data: (function() {return fitData(chart[3].series[0].data).data})()
 			});
 			chart[3].addSeries({
 				type: 'spline',
 				color: chart[3].series[1].color,
 				marker: {enabled:false},
+				name: '2+ Lact Trend',
 				data: (function() {return fitData(chart[3].series[1].data).data})()
 			});
 		}
