@@ -1026,7 +1026,7 @@ $bool_bench_column = FALSE;
 		$row_count = 0;
 		$arr_series = array();
 		foreach ($data as $d){
-		$arr_d = explode('-', $d['test_date']);
+			$arr_d = explode('-', $d['test_date']);
 			unset($d['test_date']);
 			$this_date = mktime(0, 0, 0, $arr_d[1], $arr_d[2],$arr_d[0]) * 1000;
 			$field_count = 1;
@@ -1034,11 +1034,11 @@ $bool_bench_column = FALSE;
 			$arr_series[$series_count][$row_count] = array($this_date);
 			foreach ($d as $f){
 				$tmp_data = is_numeric($f) ? (float)$f : $f;
-				if($field_count <= ($num_boxplot_series * 4)){//boxplot work-around using candlestick chart requires 4 datapoints
+				if($field_count <= ($num_boxplot_series * 5)){//boxplot work-around using boxplot chart requires 5 datapoints
 					$arr_series[$series_count][$row_count][] = $tmp_data;
-					if($field_count%4 == 0 && $field_count > 1){
+					if($field_count%5 == 0 && $field_count > 1){
 						$series_count++;
-						if(($field_count + 1) <= ($num_boxplot_series * 4)) $arr_series[$series_count][$row_count] = array($this_date + ($series_space * $series_count)); //adjust date so that multiple boxplots are not on top of each other
+						if(($field_count + 1) <= ($num_boxplot_series * 5)) $arr_series[$series_count][$row_count] = array($this_date + ($series_space * $series_count)); //adjust date so that multiple boxplots are not on top of each other
 					}
 				}
 				else { //assumes that non-box series correspond to box series

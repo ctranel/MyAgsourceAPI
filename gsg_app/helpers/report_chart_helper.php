@@ -140,7 +140,7 @@ function get_boxplot_options(){
 			)
 		),
 		'plotOptions' => array(
-			'candlestick' => array(
+			'boxplot' => array(
 				'pointWidth' => 17,
 				'shadow' => false,
 				'borderWidth' => 0,
@@ -150,7 +150,7 @@ function get_boxplot_options(){
 		'tooltip' => array(
 			'formatter' => 'function(){
 								var p = this.point; 
-								if(this.series.options.type != "candlestick"){
+								if(this.series.options.type != "boxplot"){
 									return "<b>"+ Highcharts.dateFormat("%B %Y", this.x) +"</b><br/>"+this.series.name +": "+ this.y;
 								}
 								else {
