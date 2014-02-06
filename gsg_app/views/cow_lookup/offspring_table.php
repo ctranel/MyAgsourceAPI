@@ -1,6 +1,6 @@
 <?php
 if(isset($arr_offspring) && is_array($arr_offspring)): ?>
-	<table class="simple-sort">
+	<table class="simple-sort tbl">
 		<thead>
 			<tr>
 				<th class="subcat-heading" data-sort="int">Calf#</th>
@@ -8,7 +8,7 @@ if(isset($arr_offspring) && is_array($arr_offspring)): ?>
 				<th class="subcat-heading" data-sort="string">Calf Name</th>
 				<th class="subcat-heading" data-sort="int">Calf Vis ID</th>
 				<th class="subcat-heading" data-sort="string">Sex</th>
-				<th class="subcat-heading" data-sort="string">Twin</th>
+				<th class="subcat-heading" data-sort="string">Twin/ET</th>
 				<th class="subcat-heading" data-sort="int">Calving Ease</th>
 				<th class="subcat-heading" data-sort="string">Sire NAAB</th>
 				<th class="subcat-heading" data-sort="string">Sire Name</th>

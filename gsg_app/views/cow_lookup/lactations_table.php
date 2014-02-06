@@ -1,6 +1,6 @@
 <?php
 if(isset($arr_lacts) && is_array($arr_lacts)): ?>
-	<table class="simple-sort">
+	<table class="simple-sort tbl">
 		<thead>
 			<tr>
 				<th class="subcat-heading sort_asc" data-sort="int">Lact#</th>

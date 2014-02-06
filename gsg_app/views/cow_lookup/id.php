@@ -9,7 +9,7 @@
 		<label>Visible ID</label> <?php echo $visible_id; ?>
 	</div>
 	<div class="col-sm-3">
-		<label>Reg #</label> <?php echo $country_code . $cow_id; ?>
+		<label>Reg #</label> <?php echo $cow_id; ?>
 	</div>
 </div>
 <div class="row">
@@ -23,7 +23,7 @@
 		<label>DOB</label> <?php echo $birth_date; ?>
 	</div>
 	<div class="col-sm-3">
-		<label>Twin Code</label> <?php echo $twin_code; ?>
+		<label>Twin/ET</label> <?php echo $twin_code; ?>
 	</div>
 </div>
 <div class="row">
@@ -61,7 +61,7 @@
 			</div>
 			<div class="row">
 				<div class="col-sm-6">
-					<label>Reg #</label> <?php echo $dam_country_code . $dam_id; ?>
+					<label>Reg #</label> <?php echo $dam_id; ?>
 				</div>
 				<div class="col-sm-6">
 					<label>Breed</label> <?php echo $dam_breed_code; ?>
@@ -126,7 +126,7 @@
 			</div>
 			<div class="row">
 				<div class="col-sm-6">
-					<label>Reg #</label> <?php echo $mgr_dam_country_code . $mgr_dam_id; ?>
+					<label>Reg #</label> <?php echo $mgr_dam_id; ?>
 				</div>
 				<div class="col-sm-6">
 					<label>Breed</label> <?php echo $mgr_dam_breed_code; ?>

@@ -12,7 +12,6 @@ ul.nav-tabs li a:hover {background-color: #1B9E9F; color: #004147; border-color:
 .tab-content {background-color: #fff; padding: 10px; border-left: solid 1px #DDDDDD; border-right: solid 1px #DDDDDD; border-bottom: solid 1px #DDDDDD;}
 .tab-content table {width: 100%}
 .tab-content .gen-info {margin: 8px 0 15px;}
-.tab-content table {border: 1px solid black;}
 .tab-content .gen-info .row .col-md-4 {white-space: nowrap}
 
 .tab-content .box {border: solid 1px #D3D09E; margin: 8px 0 0 0;}

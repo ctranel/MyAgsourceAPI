@@ -42,11 +42,9 @@ class Change_herd extends CI_Controller {
  * @return	void
  */
 	function request(){
-		$this->session->keep_flashdata('redirect_url');
-		$tmp = $this->session->flashdata('redirect_url');
-		$redirect_url = $tmp !== FALSE ? $tmp : $this->as_ion_auth->referrer;
-		if($redirect_url == 'change_herd/request') $redirect_url = '';
-		$this->session->set_flashdata('redirect_url', $redirect_url);
+		$tmp_uri = $this->uri->uri_string();
+		$redirect_url = set_redirect_url($tmp_uri);
+		if(empty($redirect_url) && $this->as_ion_auth->referrer !== $tmp_uri) $redirect_url = $tmp_uri;
 		if($this->as_ion_auth->has_permission("Select Herd") && !$this->as_ion_auth->has_permission("Request Herd")){
 			$this->session->set_flashdata('redirect_url', $redirect_url);
 			redirect(site_url('change_herd/select'));
@@ -122,16 +120,14 @@ class Change_herd extends CI_Controller {
  * @return	void
  */
 	function select(){
-		$this->session->keep_flashdata('redirect_url');
-		$tmp = $this->session->flashdata('redirect_url');
-		$redirect_url = $tmp !== FALSE?$tmp:$this->as_ion_auth->referrer;
-		if($redirect_url == 'change_herd/select') $redirect_url = '';
-		$this->session->set_flashdata('redirect_url', $redirect_url);
+		$tmp_uri = $this->uri->uri_string();
+		$redirect_url = set_redirect_url($tmp_uri);
+		if(empty($redirect_url) && $this->as_ion_auth->referrer !== $tmp_uri) $redirect_url = $tmp_uri;
 		if(!$this->as_ion_auth->has_permission("Select Herd") && $this->as_ion_auth->has_permission("Request Herd")){
 			$this->session->set_flashdata('redirect_url', $redirect_url);
 			redirect(site_url('change_herd/request'));
 		}
-		elseif(!$this->as_ion_auth->has_permission("Select Herd")){
+		if(!$this->as_ion_auth->has_permission("Select Herd")){
 			$this->session->set_flashdata('message', 'You do not have permissions to select herds.');
 			redirect(site_url($redirect_url));
 		}
@@ -151,9 +147,9 @@ class Change_herd extends CI_Controller {
 			$this->data['message'] = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
 			$tmp_arr = $this->as_ion_auth->get_viewable_herds($this->session->userdata('user_id'), $this->session->userdata('arr_regions'));
 			if(is_array($tmp_arr)){
-				if(count($tmp_arr) == 1){ //producers will return a string instead of the database object
-					$this->session->set_userdata('herd_code', $tmp_arr);
-					$this->session->set_userdata('arr_pstring', $this->herd_model->get_pstring_array($tmp_arr['herd_code'], FALSE));
+				if(count($tmp_arr) == 1){
+					$this->session->set_userdata('herd_code', $tmp_arr[0]['herd_code']);
+					$this->session->set_userdata('arr_pstring', $this->herd_model->get_pstring_array($tmp_arr[0]['herd_code'], FALSE));
 					redirect(site_url($redirect_url));
 					exit();
 				}

@@ -221,9 +221,12 @@ FUNCTION MOVED?
 	 * @author Chris Tranel
 	 **/
 	private function get_pages() {
+		//need to check/adjust user_id to allow showing of default herd when no users are logged in
+		$uid = $this->session->userdata('user_id');
+		if(!isset($uid) || empty($uid)) $uid = 0;
 		return $this->{$this->db_group_name}
 			->where($this->tables['pages'] . '.active', 1)
-			->where("(" . $this->tables['pages'] . ".user_id IS NULL OR " . $this->tables['pages'] . ".user_id = " . $this->session->userdata('user_id') . ")")
+			->where("(" . $this->tables['pages'] . ".user_id IS NULL OR " . $this->tables['pages'] . ".user_id = " . $uid . ")")
 			->order_by($this->tables['pages'] . '.list_order')
 			->get($this->tables['pages']);
 	}

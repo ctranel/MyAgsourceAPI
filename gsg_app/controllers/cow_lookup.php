@@ -6,8 +6,7 @@ class Cow_lookup extends CI_Controller {
 	
 	function __construct(){
 		parent::__construct();
-		if(!isset($this->as_ion_auth)) redirect('auth/login', 'refresh');
-		if((!$this->as_ion_auth->logged_in())){
+		if((!isset($this->as_ion_auth) || !$this->as_ion_auth->logged_in()) && $this->session->userdata('herd_code') != $this->config->item('default_herd', 'ion_auth')){
 			$msg = $this->load->view('session_expired', array('url'=>$this->session->flashdata('redirect_url')), true);
 			echo $msg;
 			exit;
@@ -16,9 +15,9 @@ class Cow_lookup extends CI_Controller {
 		$this->session->keep_flashdata('message');
 		
 		//make sure previous page remains as the redirect url 
-		$tmp = $this->session->flashdata('redirect_url');
-		$redirect_url = $tmp !== FALSE ? $tmp : $this->as_ion_auth->referrer;
-		$this->session->set_flashdata('redirect_url', $redirect_url);
+//		$tmp = $this->session->flashdata('redirect_url');
+//		$redirect_url = $tmp !== FALSE ? $tmp : $this->as_ion_auth->referrer;
+		set_redirect_url($this->uri->uri_string());
 		/* Load the profile.php config file if it exists
 		if (ENVIRONMENT == 'development') {
 			$this->config->load('profiler', false, true);
@@ -28,17 +27,18 @@ class Cow_lookup extends CI_Controller {
 		} */
 	}
 	
-    function index($serial_num){
+    function index($serial_num, $tab = 'events'){
 		$this->_loadObjVars($serial_num);
     	$this->load->model('cow_lookup/events_model');
     	$events_data = $this->events_model->getCowArray($this->session->userdata('herd_code'), $serial_num);
-    	$events_data['arr_events'] = $this->events_model->getEventsArray($this->session->userdata('herd_code'), $serial_num, $this->curr_calving_date, false);
     	$events_data['serial_num'] = $serial_num;
     	$events_data['show_all_events'] = false;
+    	$events_data['arr_events'] = $this->events_model->getEventsArray($this->session->userdata('herd_code'), $serial_num, $this->curr_calving_date, false);
     	$data = array(
 			'serial_num'=>$serial_num
     		,'barn_name'=>$events_data['barn_name']
 			,'events_content' => $this->load->view('cow_lookup/events', $events_data, true)
+    		,'tab' => $tab
     	);
     	$this->load->view('cow_lookup/land', $data);
 	}
@@ -65,11 +65,14 @@ class Cow_lookup extends CI_Controller {
     	$data['dam'] = $this->dam_model->getCowArray($this->session->userdata('herd_code'), $serial_num);
 		//build lactation tables
 		$this->load->model('cow_lookup/lactations_model');
-		$subdata['arr_lacts'] = $this->lactations_model->getLactationsArray($this->session->userdata('herd_code'), $serial_num);
-		$tab['lact_table'] = $this->load->view('cow_lookup/lactations_table', $subdata, true);
-		$subdata['arr_offspring'] = $this->lactations_model->getOffspringArray($this->session->userdata('herd_code'), $serial_num);
-		$tab['offspring_table'] = $this->load->view('cow_lookup/offspring_table', $subdata, true);
-		unset($subdata);
+		$tab = array();
+		if(isset($data['dam']['dam_serial_num']) && !empty($data['dam']['dam_serial_num'])){
+			$subdata['arr_lacts'] = $this->lactations_model->getLactationsArray($this->session->userdata('herd_code'), $data['dam']['dam_serial_num']);
+			$tab['lact_table'] = $this->load->view('cow_lookup/lactations_table', $subdata, true);
+			$subdata['arr_offspring'] = $this->lactations_model->getOffspringArray($this->session->userdata('herd_code'), $data['dam']['dam_serial_num']);
+			$tab['offspring_table'] = $this->load->view('cow_lookup/offspring_table', $subdata, true);
+			unset($subdata);
+		}
 		$data['lact_tables'] = $this->load->view('cow_lookup/lactations', $tab, true);
 		unset($tab);
 		

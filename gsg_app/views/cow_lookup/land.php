@@ -4,8 +4,8 @@
 	<ul id="cow-lookup-tabs" class="nav nav-tabs">
 		<li><a data-target="#events" data-toggle="tab" href="<?php echo site_url('/cow_lookup/events/' . $serial_num); ?>">Events</a></li>
 		<li><a data-target="#id" data-toggle="tab" href="<?php echo site_url('/cow_lookup/id/' . $serial_num); ?>">ID</a></li>
-		<li><a data-target="#dam" data-toggle="tab" href="<?php echo site_url('/cow_lookup/dam/' . $serial_num); ?>">Dam</a></li>
-		<li><a data-target="#sire" data-toggle="tab" href="<?php echo site_url('/cow_lookup/sire/' . $serial_num); ?>">Sire</a></li>
+		<li><a id="dam-tab" data-target="#dam" data-toggle="tab" href="<?php echo site_url('/cow_lookup/dam/' . $serial_num); ?>">Dam</a></li>
+		<li><a id="sire-tab" data-target="#sire" data-toggle="tab" href="<?php echo site_url('/cow_lookup/sire/' . $serial_num); ?>">Sire</a></li>
 		<li><a data-target="#tests" data-toggle="tab" href="<?php echo site_url('/cow_lookup/tests/' . $serial_num); ?>">Tests</a></li>
 		<li><a data-target="#lactations" data-toggle="tab" href="<?php echo site_url('/cow_lookup/lactations/' . $serial_num); ?>">Lactations</a></li>
 		<li><a data-target="#graphs" data-toggle="tab" href="<?php echo site_url('/cow_lookup/graphs/' . $serial_num); ?>">Graphs</a></li>
@@ -27,7 +27,7 @@ $(function() {
 	  $("#cow-lookup-tabs").bind("click", function(e) {    
 	    var contentID  = $(e.target).attr("data-target");
 	    var contentURL = $(e.target).attr("href");
-	    if (typeof(contentURL) != 'undefined' && $(contentID).html().length < 20) //@todo: add condition to prevent multiple loads of the same data
+	    if (typeof(contentURL) != 'undefined' && $(contentID).html().length < 20)
 	      $(contentID).load(contentURL, function(){ $("#cow-lookup-tabs").tab(); });
 	    else
 	      $(contentID).tab('show');
@@ -73,4 +73,15 @@ var loadTab = function(e){
 	    var contentURL = $(e.target).attr("href");
 	    $(contentID).load(contentURL, function(){ $("#cow-lookup-tabs").tab(); });
 	}
+
+<?php
+if($tab == 'sire'): ?>
+	$('#sire-tab').trigger('click');
+<?php
+endif; 
+if($tab == 'dam'): ?>
+	$('#dam-tab').trigger('click');
+<?php
+endif; 
+?>
 </script>

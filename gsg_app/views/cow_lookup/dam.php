@@ -108,6 +108,6 @@ endif;
 if(isset($lact_tables) && !empty($lact_tables)):
 	echo $lact_tables; 
 else: ?>
-	<div>No lactation data found for <?php echo $barn_name; ?></div>
+	<div>No lactation data found.</div>
 <?php 
 endif; ?>
