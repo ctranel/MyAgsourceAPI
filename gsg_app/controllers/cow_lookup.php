@@ -31,9 +31,9 @@ class Cow_lookup extends CI_Controller {
 		$this->_loadObjVars($serial_num);
     	$this->load->model('cow_lookup/events_model');
     	$events_data = $this->events_model->getCowArray($this->session->userdata('herd_code'), $serial_num);
-    	$events_data['arr_events'] = $this->events_model->getEventsArray($this->session->userdata('herd_code'), $serial_num, $this->curr_calving_date, false);
     	$events_data['serial_num'] = $serial_num;
     	$events_data['show_all_events'] = false;
+    	$events_data['arr_events'] = $this->events_model->getEventsArray($this->session->userdata('herd_code'), $serial_num, $this->curr_calving_date, false);
     	$data = array(
 			'serial_num'=>$serial_num
     		,'barn_name'=>$events_data['barn_name']
@@ -64,11 +64,14 @@ class Cow_lookup extends CI_Controller {
     	$data['dam'] = $this->dam_model->getCowArray($this->session->userdata('herd_code'), $serial_num);
 		//build lactation tables
 		$this->load->model('cow_lookup/lactations_model');
-		$subdata['arr_lacts'] = $this->lactations_model->getLactationsArray($this->session->userdata('herd_code'), $serial_num);
-		$tab['lact_table'] = $this->load->view('cow_lookup/lactations_table', $subdata, true);
-		$subdata['arr_offspring'] = $this->lactations_model->getOffspringArray($this->session->userdata('herd_code'), $serial_num);
-		$tab['offspring_table'] = $this->load->view('cow_lookup/offspring_table', $subdata, true);
-		unset($subdata);
+		$tab = array();
+		if(isset($data['dam']['dam_serial_num']) && !empty($data['dam']['dam_serial_num'])){
+			$subdata['arr_lacts'] = $this->lactations_model->getLactationsArray($this->session->userdata('herd_code'), $data['dam']['dam_serial_num']);
+			$tab['lact_table'] = $this->load->view('cow_lookup/lactations_table', $subdata, true);
+			$subdata['arr_offspring'] = $this->lactations_model->getOffspringArray($this->session->userdata('herd_code'), $data['dam']['dam_serial_num']);
+			$tab['offspring_table'] = $this->load->view('cow_lookup/offspring_table', $subdata, true);
+			unset($subdata);
+		}
 		$data['lact_tables'] = $this->load->view('cow_lookup/lactations', $tab, true);
 		unset($tab);
 		

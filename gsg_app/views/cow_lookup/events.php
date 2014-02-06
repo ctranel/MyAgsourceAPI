@@ -7,7 +7,7 @@
 			<label>Lact #</label> <?php echo $curr_lact_num; ?>
 		</div>
 		<div class="col-sm-4">
-			<label>Test Day DIM</label> <?php echo $curr_305_dim; ?>
+			<label>Test Day DIM</label> <?php echo $curr_ltd_dim; ?>
 		</div>
 	</div>
 	<div class="row">
@@ -51,7 +51,7 @@
 <?php
 endif;
 if(isset($arr_events) && is_array($arr_events)): ?>
-	<table class="simple-sort">
+	<table class="simple-sort tbl">
 		<thead>
 			<tr>
 				<th class="subcat-heading sort_desc" data-sort="date">Date</th>

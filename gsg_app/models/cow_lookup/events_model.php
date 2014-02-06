@@ -18,7 +18,7 @@ class Events_model extends CI_Model {
 	}
 	
 	public function getCowArray($herd_code, $serial_num){
-		$arr_ret = $this->{$this->db_group_name}->select ("i.barn_name, i.visible_id, i.net_merit_\$amt AS net_merit_amt, i.tstring, p2.curr_lact_num, p1.curr_milk_lbs, p1.curr_pct_last_milk, p1.curr_scc_cnt, p2.curr_305_dim, p2.curr_305_milk_lbs, p2.curr_305_fat_lbs, p2.curr_305_pro_lbs, FORMAT(p2.curr_calving_date, 'd') AS curr_calving_date")
+		$arr_ret = $this->{$this->db_group_name}->select ("i.barn_name, i.visible_id, i.net_merit_\$amt AS net_merit_amt, i.tstring, p2.curr_lact_num, p1.curr_milk_lbs, p1.curr_pct_last_milk, p1.curr_scc_cnt, p2.curr_ltd_dim, p2.curr_305_milk_lbs, p2.curr_305_fat_lbs, p2.curr_305_pro_lbs, FORMAT(p2.curr_calving_date, 'd') AS curr_calving_date")
 			->where ('i.herd_code', $herd_code)
 			->where ('i.serial_num', $serial_num)
 			->join ('rpm.dbo.report_cow_prod_1 p1', 'i.herd_code = p1.herd_code AND i.serial_num = p1.serial_num')
@@ -42,7 +42,8 @@ class Events_model extends CI_Model {
 			->where('herd_code', $herd_code)
 			->where('serial_num', $serial_num)
 			->order_by('ev_date', 'desc')
-			->get('animal.dbo.vma_Cow_Lookup_Events e')
+			->order_by('seq_num', 'desc')
+			->get('vma.dbo.vma_Cow_Lookup_Events e')
 			->result_array();
 		
 		if(is_array($arr_ret)){

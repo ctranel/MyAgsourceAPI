@@ -27,7 +27,7 @@ class Graphs_model extends CI_Model {
 			->order_by('test_date', 'ASC');
 
 		$arr_ret = $this->{$this->db_group_name}
-			->get('animal.dbo.vma_Cow_Lookup_Tests')
+			->get('vma.dbo.vma_Cow_Lookup_Tests')
 			->result_array();
 		if(is_array($arr_ret)){
 			return $arr_ret;

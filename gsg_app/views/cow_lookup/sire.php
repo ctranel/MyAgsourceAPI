@@ -12,10 +12,10 @@
 			</div>
 			<div class="row">
 				<div class="col-sm-6">
-					<label>Country</label> <?php echo $sire_country_code; ?>
+					<label>ID</label> <?php echo $sire_id; ?>
 				</div>
 				<div class="col-sm-6">
-					<label>ID</label> <?php echo $sire_id; ?>
+					<label>Reg Name</label> <?php echo $sire_registered_name; ?>
 				</div>
 			</div>
 			<div class="row">
@@ -23,7 +23,7 @@
 					<label>Breed</label> <?php echo $sire_breed_code; ?>
 				</div>
 				<div class="col-sm-6">
-					<label>Reg Name</label> <?php echo $sire_registered_name; ?>
+					&nbsp;
 				</div>
 			</div>
 		</div>

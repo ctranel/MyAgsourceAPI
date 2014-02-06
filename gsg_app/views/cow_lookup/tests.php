@@ -16,7 +16,7 @@ if(isset($lact_num)):
 endif;
 
 if(isset($arr_tests) && is_array($arr_tests)): ?>
-	<table class="simple-sort">
+	<table class="simple-sort tbl">
 		<thead>
 			<tr>
 				<th class="subcat-heading sort_desc" data-sort="date">Test Date</th>
@@ -24,6 +24,7 @@ if(isset($arr_tests) && is_array($arr_tests)): ?>
 				<th class="subcat-heading" data-sort="int">Milk</th>
 				<th class="subcat-heading" data-sort="int">Fat</th>
 				<th class="subcat-heading" data-sort="int">Pro</th>
+				<th class="subcat-heading" data-sort="int">SNF</th>
 				<th class="subcat-heading" data-sort="int">FCM</th>
 				<th class="subcat-heading" data-sort="int">ECM</th>
 				<th class="subcat-heading" data-sort="int">MLM</th>
@@ -45,6 +46,7 @@ if(isset($arr_tests) && is_array($arr_tests)): ?>
 				<td><?php echo $t['td_milk_lbs']; ?></td>
 				<td><?php echo $t['fat_pct']; ?></td>
 				<td><?php echo $t['pro_pct']; ?></td>
+				<td><?php echo $t['snf_pct']; ?></td>
 				<td><?php echo $t['fcm_lbs']; ?></td>
 				<td><?php echo $t['ecm_lbs']; ?></td>
 				<td><?php echo $t['mlm_lbs']; ?></td>
