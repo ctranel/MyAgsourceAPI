@@ -221,8 +221,6 @@ class Report_model extends CI_Model {
 				$header_data['arr_order'][$fd['name']] = $fd['list_order'];
 				$arr_field_child[$fd['block_header_group_id']][$fd['name']] = $fn; //used to create arr_fields nested array
 				$this->arr_field_sort[$fn] = $fd['default_sort_order'];
-				$tmp_params = $this->get_field_link_params($fd['bsf_id']);
-				$tmp_params = !empty($tmp_params) ? $tmp_params : NULL;
 				$this->arr_field_links[$fn] = array(
 					'href' => $fd['a_href']
 					,'rel' => $fd['a_rel']
@@ -410,6 +408,7 @@ class Report_model extends CI_Model {
 		->from('users.dbo.select_field_link_params l')
 		->join('users.dbo.db_fields f', 'l.param_value_field_id = f.id', 'LEFT')
 		->where(array('l.blocks_select_fields_id'=>$bsf_id))
+		->order_by('l.list_order', 'ASC')
 		->get()
 		->result_array();
 		
