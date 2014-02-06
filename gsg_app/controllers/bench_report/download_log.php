@@ -16,7 +16,7 @@ class Download_log extends parent_report {
 		if($this->authorize()) { //authorize function is in report parent class
 			if(!$this->as_ion_auth->is_admin){
 				$this->session->set_flashdata('message', 'You must be an administrator to access ' . $this->product_name);
-				redirect(site_url('auth/index'));
+				redirect(site_url());
 			}
 			$this->load->model('bench_report/download_log_model');
 			$this->load->library('reports');
@@ -27,7 +27,7 @@ class Download_log extends parent_report {
 		}
 		else {
 			if($this->session->flashdata('message')) $this->session->keep_flashdata('message');
-			redirect('auth/index', 'refresh');
+			redirect(site_url(), 'refresh');
 		}
 		/* Load the profile.php config file if it exists
 		$this->config->load('profiler', false, true);

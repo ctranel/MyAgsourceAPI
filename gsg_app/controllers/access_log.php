@@ -56,7 +56,7 @@ class Access_log extends parent_report {
 			
 			if($this->session->flashdata('message')) $this->session->keep_flashdata('message');
 			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
-			redirect(site_url('auth/index'), 'refresh');
+			redirect(site_url(), 'refresh');
 		}
 		/* Load the profile.php config file if it exists
 		$this->config->load('profiler', false, true);

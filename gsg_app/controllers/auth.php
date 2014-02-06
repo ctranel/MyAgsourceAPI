@@ -28,7 +28,7 @@ class Auth extends Ionauth {
 	
 	function index($pstring = NULL){
 			$this->session->keep_flashdata('redirect_url');
-			redirect(site_url('land'));
+			redirect(site_url('land/index/' . $pstring));
 	}
 
 	function section_info(){
@@ -571,7 +571,7 @@ class Auth extends Ionauth {
 	function list_accounts(){
 		if(!$this->as_ion_auth->has_permission("Manage Other Accounts")){
        		$this->session->set_flashdata('message',  $this->session->flashdata('message') . "You do not have permission to edit user accounts.");
-       		redirect(site_url("auth/index"), 'refresh');
+       		redirect(site_url(), 'refresh');
 		}
 		//set the flash data error message if there is one
 		$this->data['message'] = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
