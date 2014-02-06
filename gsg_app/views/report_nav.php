@@ -21,7 +21,7 @@ if(isset($arr_pstring) && !empty($arr_pstring) && count($arr_pstring) > 1): ?>
 endif;
 if(isset($arr_pages) && is_array($arr_pages) && count($arr_pages) > 1): ?>
 	<div id="block-links">
-		<a class="section-header" id="select-block">Select Report Blocks:</a>
+		<a class="section-header" id="select-block">Select Report Page:</a>
 		<ul class="report-nav" id="current">
 		<?php
 		$first = TRUE;
