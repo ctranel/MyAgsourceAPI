@@ -83,7 +83,7 @@ ul.report-nav, ul.pstring-nav {margin: 0; list-style: none; border: none; paddin
 ul.report-nav, ul.pstring-nav {display:inline; margin: 0; list-style: none; border: none;}
 ul.report-nav li, ul.pstring-nav li {display:inline; padding: 0px 5px; border-left: solid 1px #004147; margin: 0 0 0 -5px;}
 ul.report-nav li.first, ul.pstring-nav li.first {border-left: none;}
-ul.report-nav li a, ul.pstring-nav li a {text-decoration: none; font: normal .85em helvetica,arial,sans-serif; color:#004147;}
+ul.report-nav li a, ul.pstring-nav li a {text-decoration: none; font: normal .85em helvetica,arial,sans-serif; color:#004147; white-space: nowrap;}
 ul.report-nav li a:hover, ul.pstring-nav li a:hover {text-decoration: underline;}
 ul.report-nav li a.sel, ul.pstring-nav li a.sel {font-weight: bold;  text-decoration: underline;}
 
