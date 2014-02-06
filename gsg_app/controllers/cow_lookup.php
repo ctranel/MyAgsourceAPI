@@ -27,7 +27,7 @@ class Cow_lookup extends CI_Controller {
 		} */
 	}
 	
-    function index($serial_num){
+    function index($serial_num, $tab = 'events'){
 		$this->_loadObjVars($serial_num);
     	$this->load->model('cow_lookup/events_model');
     	$events_data = $this->events_model->getCowArray($this->session->userdata('herd_code'), $serial_num);
@@ -38,6 +38,7 @@ class Cow_lookup extends CI_Controller {
 			'serial_num'=>$serial_num
     		,'barn_name'=>$events_data['barn_name']
 			,'events_content' => $this->load->view('cow_lookup/events', $events_data, true)
+    		,'tab' => $tab
     	);
     	$this->load->view('cow_lookup/land', $data);
 	}
