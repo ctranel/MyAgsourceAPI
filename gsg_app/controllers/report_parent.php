@@ -309,7 +309,7 @@ abstract class parent_report extends CI_Controller {
 		$this->carabiner->css($this->section_path . '.css', 'screen');
 		if($this->bool_has_summary) $this->carabiner->css('hide_filters.css', 'screen');
 		else $this->carabiner->css('filters.css', 'screen');
-		//$this->carabiner->css('tooltip.css', 'screen');
+
 		//get_herd_data
 		$herd_data = $this->herd_model->header_info($this->session->userdata('herd_code'));
 		
@@ -401,17 +401,24 @@ abstract class parent_report extends CI_Controller {
 		}
 		unset($this->{$this->primary_model}->arr_messages); //clear message var once it is displayed
 		$arr_nav_data = array(
-			'arr_pstring' => $this->{$this->primary_model}->arr_pstring,
-			'pstring_selected' => $this->arr_filter_criteria['pstring'][0],
+			//if I do not add this empty array, the array in the view somehow populated (should only be populated if code in bool_has_summary block below is executed)
+			'arr_pstring' => array(),
 			'section_path' => $this->section_path,
 //			'benchmarks_id' => $this->arr_filter_criteria['benchmarks_id'],
-			'curr_pstring' => $this->pstring,
 			'curr_page' => $this->page,
 			'arr_pages' => $this->access_log_model->get_pages_by_criteria(array('section_id' => $this->section_id))->result_array()
 		);
+		if($this->bool_has_summary){
+			$arr_nav_data['arr_pstring'] = $this->{$this->primary_model}->arr_pstring;
+			$arr_nav_data['pstring_selected'] = $this->arr_filter_criteria['pstring'][0];
+			$arr_nav_data['curr_pstring'] = $this->pstring;
+		}
 		$this->page_footer_data = array();
 		$report_nav_path = 'report_nav';
 		if(file_exists(APPPATH . 'views/' . $this->section_path . '/report_nav.php')) $report_nav_path =  $this->section_path . '/' . $report_nav_path;
+		if(count($arr_nav_data['arr_pages']) < 2) {
+			$this->carabiner->css('hide_report_nav.css', 'screen');
+		}
 		$report_filter_path = 'filters';
 		if(file_exists(APPPATH . 'views/' . $this->section_path . '/filters.php')) $report_filter_path =  $this->section_path . '/' . $report_filter_path;
 		$data = array(
@@ -424,7 +431,9 @@ abstract class parent_report extends CI_Controller {
 			'report_path' => $this->report_path
 		);
 		if(isset($arr_filter_data)) $data['filters'] = $this->load->view($report_filter_path, $arr_filter_data, TRUE);
-		if((is_array($arr_nav_data['arr_pages']) && count($arr_nav_data['arr_pages']) > 1) || (is_array($arr_nav_data['arr_pstring']) && count($arr_nav_data['arr_pstring']) > 1)) $data['report_nav'] = $this->load->view($report_nav_path, $arr_nav_data, TRUE);
+		if((is_array($arr_nav_data['arr_pages']) && count($arr_nav_data['arr_pages']) > 1) || (isset($arr_nav_data['arr_pstring']) && is_array($arr_nav_data['arr_pstring']) && count($arr_nav_data['arr_pstring']) > 1)){
+			$data['report_nav'] = $this->load->view($report_nav_path, $arr_nav_data, TRUE);
+		}
 		
 		//$this->access_log_model->write_entry($this->{$this->primary_model}->arr_blocks[$this->page]['page_id'], 'web');
 		$this->load->view('report', $data);

@@ -1,6 +1,7 @@
 <div id="report-links">
+<?php
+if(isset($arr_pstring) && !empty($arr_pstring) && count($arr_pstring) > 1): ?>
 	<div id="pstring-links">
-	<?php if(!empty($arr_pstring) && count($arr_pstring) > 1): ?>
 		<a name="pstring-nav" class="section-header" id="select-pstring">Select PString:</a> 
 		<ul class="pstring-nav">
 			<?php $top = count($arr_pstring);
@@ -15,10 +16,11 @@
 			<li<?php if($li_class) echo ' class="first" style="font-weight: bold"'; ?>><a href="#chart" class="pstring-link<?php if($arr_pstring[$c]['pstring'] == $curr_pstring) echo ' current'; ?>" id="<?php echo $arr_pstring[$c]['pstring']; ?>" onclick="$('.pstring-filter-item > input').prop('checked', false); $('input:checkbox[value=<?php echo $arr_pstring[$c]['pstring']; ?>]').prop('checked', true); return updatePage(this);"><?php echo $arr_pstring[$c]['publication_name']; // . ' - ' . $arr_pstring[$c]['publication_name']; ?></a></li>
 			<?php endfor; ?>
 		</ul>
-	<?php endif; ?>
 	</div>
+<?php 
+endif;
+if(isset($arr_pages) && is_array($arr_pages) && count($arr_pages) > 1): ?>
 	<div id="block-links">
-	<?php if(isset($arr_pages) && is_array($arr_pages) && count($arr_pages) > 1): ?>
 		<a class="section-header" id="select-block">Select Report Blocks:</a>
 		<ul class="report-nav" id="current">
 		<?php
@@ -33,6 +35,7 @@
 				<li<?php if($li_class) echo ' class="first"'; ?>><a href="<?php echo site_url($section_path . '/' . $e['url_segment']); ?>" id="<?php echo $e['url_segment']; ?>"<?php if($e['url_segment'] == $curr_page) echo ' class="current"'; ?>><?php echo $e['name']; ?></a></li>
 			<?php endforeach; ?>
 		</ul>
-	<?php endif; ?>
 	</div>
+<?php
+endif; ?>
 </div>
