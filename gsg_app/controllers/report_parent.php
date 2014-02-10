@@ -40,7 +40,7 @@ abstract class parent_report extends CI_Controller {
 	protected $sum_row;
 	protected $avg_row;
 	protected $pivot_db_field;
-	protected $bool_has_summary;
+	protected $bool_is_summary;
 	
 	function __construct(){
 		parent::__construct();
@@ -197,7 +197,7 @@ abstract class parent_report extends CI_Controller {
 		$arr_blocks = $this->{$this->primary_model}->arr_blocks[$this->page]['display'];
 		//Determine if any report blocks have is_summary flag - will determine if tstring needs to be loaded and filters shown
 		$this->load->helper('multid_array_helper');
-		$this->bool_has_summary = array_search(1, get_elements_by_key('is_summary', $arr_blocks)) === FALSE ? FALSE : TRUE;
+		$this->bool_is_summary = array_search(1, get_elements_by_key('is_summary', $arr_blocks)) === FALSE ? FALSE : TRUE;
 		//Check for valid herd_code
 		if(empty($this->herd_code) || strlen($this->herd_code) != 8){
 			$this->session->set_flashdata('message', 'Please select a valid herd.');
@@ -223,7 +223,7 @@ abstract class parent_report extends CI_Controller {
 		$this->load->library('filters',$filter_lib_data);
 		$this->load->library('form_validation');
 
-		$arr_filter_data = $this->filters->set_filters($this->bool_has_summary);
+		$arr_filter_data = $this->filters->set_filters($this->bool_is_summary);
 		
 		$this->arr_filter_criteria = $arr_filter_data['filter_selected'];
 
@@ -307,7 +307,7 @@ abstract class parent_report extends CI_Controller {
 		$this->carabiner->css('chart.css', 'print');
 		$this->carabiner->css('report.css', 'print');
 		$this->carabiner->css($this->section_path . '.css', 'screen');
-		if($this->bool_has_summary) $this->carabiner->css('hide_filters.css', 'screen');
+		if($this->bool_is_summary) $this->carabiner->css('hide_filters.css', 'screen');
 		else $this->carabiner->css('filters.css', 'screen');
 
 		//get_herd_data
@@ -401,14 +401,14 @@ abstract class parent_report extends CI_Controller {
 		}
 		unset($this->{$this->primary_model}->arr_messages); //clear message var once it is displayed
 		$arr_nav_data = array(
-			//if I do not add this empty array, the array in the view somehow populated (should only be populated if code in bool_has_summary block below is executed)
+			//if I do not add this empty array, the array in the view somehow populated (should only be populated if code in bool_is_summary block below is executed)
 			'arr_pstring' => array(),
 			'section_path' => $this->section_path,
 //			'benchmarks_id' => $this->arr_filter_criteria['benchmarks_id'],
 			'curr_page' => $this->page,
 			'arr_pages' => $this->access_log_model->get_pages_by_criteria(array('section_id' => $this->section_id))->result_array()
 		);
-		if($this->bool_has_summary){
+		if($this->bool_is_summary){
 			$arr_nav_data['arr_pstring'] = $this->{$this->primary_model}->arr_pstring;
 			$arr_nav_data['pstring_selected'] = $this->arr_filter_criteria['pstring'][0];
 			$arr_nav_data['curr_pstring'] = $this->pstring;
@@ -475,7 +475,7 @@ abstract class parent_report extends CI_Controller {
 			//load required libraries
 			$this->load->library('filters',$filter_lib_data);
 
-			$arr_filter_data = $this->filters->set_filters($this->bool_has_summary);
+			$arr_filter_data = $this->filters->set_filters($this->bool_is_summary);
 
 			$this->arr_filter_criteria = $arr_filter_data['filter_selected'];
 			
@@ -625,14 +625,14 @@ abstract class parent_report extends CI_Controller {
 			}
 			$this->graph['config']['tooltip']['formatter'] = $tooltip_format;
 		}
-		$this->graph['data'] = $this->{$this->primary_model}->get_graph_data($arr_fieldnames, $this->session->userdata('herd_code'), $this->max_rows, $x_axis_date_field, $this->graph['config']['xAxis']['categories']); // was $model in place of $this->primary_model
+		$this->graph['data'] = $this->{$this->primary_model}->get_graph_data($arr_fieldnames, $this->session->userdata('herd_code'), $this->max_rows, $x_axis_date_field, $arr_this_block['url_segment'], $this->graph['config']['xAxis']['categories']); // was $model in place of $this->primary_model
 	}
 		
 	protected function load_table(&$arr_this_block, $report_count){
 		$title = $arr_this_block['description'];
 		$subtitle = 'Herd ' + $this->session->userdata('herd_code');
 		$this->{$this->primary_model}->populate_field_meta_arrays($arr_this_block['id']);// was $model in place of $this->primary_model
-		$results = $this->{$this->primary_model}->search($this->session->userdata('herd_code'), $this->arr_filter_criteria, $this->arr_sort_by, $this->arr_sort_order, $this->max_rows);// was $model in place of $this->primary_model
+		$results = $this->{$this->primary_model}->search($this->session->userdata('herd_code'), $arr_this_block['url_segment'], $this->arr_filter_criteria, $this->arr_sort_by, $this->arr_sort_order, $this->max_rows);// was $model in place of $this->primary_model
 		if(!empty($this->pivot_db_field)) $results = $this->{$this->primary_model}->pivot($results, $this->pivot_db_field, 10, 10, $this->avg_row, $this->sum_row, $this->bench_row);// was $model in place of $this->primary_model
 		
 		$tmp = array(
