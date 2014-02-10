@@ -432,7 +432,7 @@ class Report_model extends CI_Model {
 	 * @return array results of search
 	 * @author ctranel
 	 **/
-	function search($herd_code, $arr_filter_criteria, $arr_sort_by = array(''), $arr_sort_order = array(''), $limit = NULL) {
+	function search($herd_code, $block_url, $arr_filter_criteria, $arr_sort_by = array(''), $arr_sort_order = array(''), $limit = NULL) {
 		$this->load->helper('multid_array_helper');
 		$this->herd_code = $herd_code;
 		$this->{$this->db_group_name}->start_cache();
@@ -442,7 +442,18 @@ class Report_model extends CI_Model {
 				$this->{$this->db_group_name}->join($j['table'], $j['join_text']);
 			}
 		}		
-		if(is_array($arr_filter_criteria) && !empty($arr_filter_criteria)) $this->prep_where_criteria($arr_filter_criteria);
+		if(is_array($arr_filter_criteria) && !empty($arr_filter_criteria)) $this->prep_where_criteria($arr_filter_criteria, $block_url);
+
+		// ----  BEGIN debugging code - for testing only --------DEBUG_SEARCH_TAG
+				$c = 0;
+				$arr_temp = steamroller($arr_filter_criteria);
+				log_message('debug','---- LOG ARRAY ---- Array Name: $arr_filter_criteria');
+				foreach($arr_temp as $k=>$v) {
+					log_message('debug','---- LOG ARRAY ---- Item '.$c.' -- key: '.$k.' value: '.$v);
+					$c++;
+				}
+		// ----  END debugging code - for testing only------------------------------------
+		
 		if(is_array($this->arr_fields)){
 			$arr_select_fields = array_flatten($this->arr_fields);
 			$arr_select_fields = $this->prep_select_fields($arr_select_fields);
@@ -547,7 +558,8 @@ class Report_model extends CI_Model {
 	 * @return void
 	 */
 	
-	protected function prep_where_criteria($arr_filter_criteria){
+	protected function prep_where_criteria($arr_filter_criteria, $block_url){
+
 		//incorporate built-in report filters if set
 		if(is_array($this->arr_where_field) && !empty($this->arr_where_field)){
 			$tmp_cnt = count($this->arr_where_field);
@@ -567,12 +579,16 @@ class Report_model extends CI_Model {
 			if(strpos($k, '.') === FALSE && strpos($k, 'dbfrom') === FALSE && strpos($k, 'dbto') === FALSE) {
 				$k = isset($this->arr_field_table[$k]) && !empty($this->arr_field_table[$k])?$this->arr_field_table[$k] . '.' . $k: $this->primary_table_name . '.' . $k;
 			}
-			
+
+			if($block_url == 'peak_milk_trends' && substr($k,-7)=='pstring' && $v==0){
+				continue;
+			}
+					
 			if(empty($v) === FALSE || $v === '0'){
 				if(is_array($v)){
 					if(strpos($k, 'pstring') !== FALSE){
-						$bool_has_summary = array_search(1, get_elements_by_key('is_summary', $this->arr_blocks)) === FALSE ? FALSE : TRUE;
-						if(!$bool_has_summary) {
+						$bool_is_summary = array_search(1, get_elements_by_key('is_summary', $this->arr_blocks)) === FALSE ? FALSE : TRUE;
+						if(!$bool_is_summary) {
 							$v = array_filter($v);
 							if(empty($v)) continue;
 						}
@@ -921,14 +937,14 @@ $bool_bench_column = FALSE;
 	 * @access public
 	 *
 	 **/
-	function get_graph_data($arr_fieldname, $herd_code, $num_dates, $date_field, $arr_categories = NULL){
+	function get_graph_data($arr_fieldname, $herd_code, $num_dates, $date_field, $block_url, $arr_categories = NULL){
 		if(isset($date_field) && isset($num_dates)){
 			$from_date = $this->get_start_date($date_field, $num_dates, 'MM-dd-yyyy');
 			$arr_to_date = $this->get_recent_dates($date_field, 1, 'MM-dd-yyyy');
-			$data = $this->search($herd_code, array('herd_code'=>$herd_code, 'pstring'=>$this->session->userdata('pstring'), $date_field . '_dbfrom' => $from_date, $date_field . '_dbto' => $arr_to_date[0]), array($date_field . ''), array('ASC'), $num_dates);
+			$data = $this->search($herd_code, $block_url, array('herd_code'=>$herd_code, 'pstring'=>$this->session->userdata('pstring'), $date_field . '_dbfrom' => $from_date, $date_field . '_dbto' => $arr_to_date[0]), array($date_field . ''), array('ASC'), $num_dates);
 		}
 		else{
-			$data = $this->search($herd_code, array('herd_code'=>$herd_code, 'pstring'=>$this->session->userdata('pstring')), array($date_field), array('ASC'), $num_dates);
+			$data = $this->search($herd_code, $block_url, array('herd_code'=>$herd_code, 'pstring'=>$this->session->userdata('pstring')), array($date_field), array('ASC'), $num_dates);
 		}
 		if(isset($arr_categories) && is_array($arr_categories)) $return_val = $this->set_row_to_series($data, $arr_fieldname, $arr_categories);
 		else $return_val = $this->set_longitudinal_data($data, $date_field);
