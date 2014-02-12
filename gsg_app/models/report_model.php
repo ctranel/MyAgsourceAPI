@@ -443,17 +443,6 @@ class Report_model extends CI_Model {
 			}
 		}		
 		if(is_array($arr_filter_criteria) && !empty($arr_filter_criteria)) $this->prep_where_criteria($arr_filter_criteria, $block_url);
-
-		// ----  BEGIN debugging code - for testing only --------DEBUG_SEARCH_TAG
-				$c = 0;
-				$arr_temp = steamroller($arr_filter_criteria);
-				log_message('debug','---- LOG ARRAY ---- Array Name: $arr_filter_criteria');
-				foreach($arr_temp as $k=>$v) {
-					log_message('debug','---- LOG ARRAY ---- Item '.$c.' -- key: '.$k.' value: '.$v);
-					$c++;
-				}
-		// ----  END debugging code - for testing only------------------------------------
-		
 		if(is_array($this->arr_fields)){
 			$arr_select_fields = array_flatten($this->arr_fields);
 			$arr_select_fields = $this->prep_select_fields($arr_select_fields);
