@@ -105,7 +105,6 @@ function get_bar_options(){
 		'chart' => array(
 			'defaultSeriesType' => 'bar'
 		),
-		'legend' => array('enabled'=>FALSE),
 		'xAxis' => array('type'=>'linear', 'categories'=>array()),
 	);
 }
@@ -140,7 +139,6 @@ function get_line_options(){
 				'type'=>'linear',
 			)
 		),
-		'legend' => array('enabled' => TRUE),
 	);
 }
 
@@ -160,7 +158,6 @@ function get_scatter_options(){
 							'type'=>'linear',
 					)
 			),
-			'legend' => array('enabled' => TRUE),
 	);
 }
 

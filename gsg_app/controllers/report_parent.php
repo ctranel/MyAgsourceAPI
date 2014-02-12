@@ -550,7 +550,7 @@ abstract class parent_report extends CI_Controller {
 			
 		foreach($arr_fields as $k=>$f){
 			//these 2 arrays need to have the same numeric index so that the yaxis# can be correctly assigned to series
-			$this->graph['config']['series'][$c]['name'] = $k;
+			$return_val[$c]['name'] = $k;
 			if(isset($this->{$this->primary_model}->arr_unit_of_measure[$f]) && !empty($this->{$this->primary_model}->arr_unit_of_measure[$f])) $um = $this->{$this->primary_model}->arr_unit_of_measure[$f]; 
 			if(isset($arr_axis_index[$f]) && !empty($arr_axis_index[$f])) $return_val[$c]['yAxis'] = $arr_axis_index[$f];
 			if(isset($arr_chart_type[$f]) && !empty($arr_chart_type[$f])) $return_val[$c]['type'] = $arr_chart_type[$f];
