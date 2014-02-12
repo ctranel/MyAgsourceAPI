@@ -45,6 +45,15 @@ var global_options = {
 		}
 	},
 	plotOptions: {
+		boxplot: {
+			grouping: false,
+			whiskerWidth: 0,
+            //pointWidth: 10,
+            //lineWidth: 2,
+            pointWidth: 8,
+            lineWidth: 8,
+            medianColor: null
+		},
 		area: {
 			marker: { 
 				enabled: false
@@ -62,7 +71,6 @@ var global_options = {
             shadow: false
 		},
         bar: {
-			pointWidth: 20,
             dataLabels: {
                enabled: true,
                align: 'right',

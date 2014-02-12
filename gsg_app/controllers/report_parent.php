@@ -50,28 +50,30 @@ abstract class parent_report extends CI_Controller {
 			$this->section_path = $this->uri->segment(1) . '/' . $this->section_path;
 		} 
 		$this->page = $this->router->fetch_method();
-//@todo: check this, should it be seg 5 or 3?
-		$this->block = $this->uri->segment(5);
+		//@todo: check this, should it be seg 5 or 3?
+		//$this->block = $this->uri->segment(3);
 		$this->report_path = $this->section_path . '/' . $this->page;
-		$this->primary_model = $this->block . '_model';
+//echo $class . "<br>\n" . $this->page . "<br>\n" . $this->section_path . "<br>\n";
+		$this->primary_model = $this->page . '_model';
 		$this->report_form_id = 'report_criteria';//filter-form';
 		$this->herd_code = strlen($this->session->userdata('herd_code')) == 8?$this->session->userdata('herd_code'):NULL;
 		$this->page_header_data['user_sections'] = $this->as_ion_auth->arr_user_super_sections;
 
 		//load most specific model available.  Must load model before setting section_id
-		if(file_exists(APPPATH . 'models/' . $this->section_path . '/' . $this->primary_model . '.php')){
+		if(file_exists(APPPATH . 'models' . FS_SEP . $this->section_path . FS_SEP . $this->primary_model . '_model.php')){
 			$this->load->model($this->section_path . '/' . $this->primary_model, '', FALSE, $this->section_path);
 		}
-		elseif(file_exists(APPPATH . 'models/' . $this->section_path . '/' . $class . '.php')){
-			$this->load->model($this->section_path . '/' . $class, '', FALSE, $this->section_path);
-			$this->primary_model = $class;
+		elseif(file_exists(APPPATH . 'models' . FS_SEP . $this->section_path . FS_SEP . $class . '_model.php')){
+			$this->load->model($this->section_path . '/' . $class . '_model', '', FALSE, $this->section_path);
+			$this->primary_model = $class . '_model';
 		}
 		else{
 			$this->load->model('report_model', '', FALSE, $this->section_path);
 			$this->primary_model = 'report_model';
 		}
-
+		
 		$this->section_id = $this->{$this->primary_model}->get_section_id();
+
 		if($this->authorize()) {
 			$this->load->library('reports');
 			$this->reports->herd_code = $this->herd_code;
@@ -86,13 +88,13 @@ abstract class parent_report extends CI_Controller {
 			$this->session->keep_flashdata('redirect_url');
 			redirect(site_url('change_herd/select'));			
 		}
-		/* Load the profile.php config file if it exists
+		/* Load the profile.php config file if it exists*/
 		if (ENVIRONMENT == 'development') {
 			$this->config->load('profiler', false, true);
 			if ($this->config->config['enable_profiler']) {
 				$this->output->enable_profiler(TRUE);
 			} 
-		}*/
+		}
 	}
 
 	protected function authorize(){
@@ -284,7 +286,7 @@ abstract class parent_report extends CI_Controller {
 
 						$this->{$this->primary_model}->populate_field_meta_arrays($pb['id']);
 						$block[$i]['data'] = $this->ajax_report(urlencode($this->page), urlencode($pb['url_segment']), $this->session->userdata('pstring'), 'array', urlencode($sort_by), $sort_order, 'pdf', NULL);
-						$tmp_pdf_width = $this->{$this->primary_model}->get_pdf_widths(); // was $model in place of $this->primary_model
+						$tmp_pdf_width = $this->{$this->primary_model}->get_pdf_widths(); 
 						$block[$i]['arr_pdf_widths'] = $tmp_pdf_width;
 						$arr_header_data = $this->{$this->primary_model}->get_fields(); // was $model
 						$block[$i]['header_structure'] = get_table_header_array($arr_header_data, $tmp_pdf_width);
@@ -380,11 +382,8 @@ abstract class parent_report extends CI_Controller {
 						'</script>'
 					),
 					'arr_headjs_line'=>array(
-						//'{tooltips: "' . $this->config->item("base_url_assets") . 'js/jquery/jquery.qtip-1.0.0.min.js"}',
-						//'{tips_helper: "' . $this->config->item("base_url_assets") . 'js/rc_tooltip.js"}',
-						//'{highcharts: "' . $this->config->item("base_url_assets") . 'js/charts/highcharts.js"}',
-						//'{exporting: "' . $this->config->item("base_url_assets") . 'js/charts/exporting.js"}',
 						'{highcharts: "https://cdnjs.cloudflare.com/ajax/libs/highcharts/3.0.2/highcharts.js"}',
+						'{highcharts_more: "https://cdnjs.cloudflare.com/ajax/libs/highcharts/3.0.2/highcharts-more.js"}',
 						'{exporting: "https://cdnjs.cloudflare.com/ajax/libs/highcharts/3.0.2/modules/exporting.js"}',
 						'{popup_helper: "' . $this->config->item("base_url_assets") . 'js/jquery/popup.min.js"}',
 						'{graph_helper: "' . $this->config->item("base_url_assets") . 'js/charts/graph_helper.js"}',
@@ -415,12 +414,12 @@ abstract class parent_report extends CI_Controller {
 		}
 		$this->page_footer_data = array();
 		$report_nav_path = 'report_nav';
-		if(file_exists(APPPATH . 'views/' . $this->section_path . '/report_nav.php')) $report_nav_path =  $this->section_path . '/' . $report_nav_path;
+		if(file_exists(APPPATH . 'views' . FS_SEP . $this->section_path . FS_SEP . 'report_nav.php')) $report_nav_path =  $this->section_path . '/' . $report_nav_path;
 		if(count($arr_nav_data['arr_pages']) < 2) {
 			$this->carabiner->css('hide_report_nav.css', 'screen');
 		}
 		$report_filter_path = 'filters';
-		if(file_exists(APPPATH . 'views/' . $this->section_path . '/filters.php')) $report_filter_path =  $this->section_path . '/' . $report_filter_path;
+		if(file_exists(APPPATH . 'views' . FS_SEP . $this->section_path . FS_SEP . 'filters.php')) $report_filter_path =  $this->section_path . '/' . $report_filter_path;
 		$data = array(
 			'page_header' => $this->load->view('page_header', $this->page_header_data, TRUE),
 			'herd_code' => $this->session->userdata('herd_code'),
@@ -533,7 +532,7 @@ abstract class parent_report extends CI_Controller {
 	
 	protected function load_block($block, $report_count, $file_format){
 		$arr_this_block = get_element_by_key($block, $this->{$this->primary_model}->arr_blocks);
-		$this->max_rows = isset($arr_this_block['max_rows']) ? $arr_this_block['max_rows'] : NULL;
+		$this->max_rows = $arr_this_block['max_rows'];
 		$this->cnt_row = $arr_this_block['cnt_row'];
 		$this->sum_row = $arr_this_block['sum_row'];
 		$this->avg_row = $arr_this_block['avg_row'];
@@ -543,9 +542,37 @@ abstract class parent_report extends CI_Controller {
 		elseif($this->display == 'chart'){$this->load_chart($arr_this_block, $report_count);}
 	}
 	
+	protected function derive_series($arr_fields){
+		$return_val = array();
+		$c = 0;
+		$arr_chart_type = $this->{$this->primary_model}->get_chart_type_array();
+		$arr_axis_index = $this->{$this->primary_model}->get_axis_index_array();
+			
+		foreach($arr_fields as $k=>$f){
+			//these 2 arrays need to have the same numeric index so that the yaxis# can be correctly assigned to series
+			$this->graph['config']['series'][$c]['name'] = $k;
+			if(isset($this->{$this->primary_model}->arr_unit_of_measure[$f]) && !empty($this->{$this->primary_model}->arr_unit_of_measure[$f])) $um = $this->{$this->primary_model}->arr_unit_of_measure[$f]; 
+			if(isset($arr_axis_index[$f]) && !empty($arr_axis_index[$f])) $return_val[$c]['yAxis'] = $arr_axis_index[$f];
+			if(isset($arr_chart_type[$f]) && !empty($arr_chart_type[$f])) $return_val[$c]['type'] = $arr_chart_type[$f];
+			$c++;
+		}
+		return $return_val;
+	}
+	
+	protected function derive_field_array($arr_fields){
+		$return_val = array();
+		$c = 0;
+			
+		foreach($arr_fields as $k=>$f){
+			$return_val[$c] = $f;
+			$c++;
+		}
+		return $return_val;
+	}
+	
 	protected function load_chart(&$arr_this_block, $report_count){
 		$um = '';//unit of measure
-		$arr_axes = $this->{$this->primary_model}->get_chart_axes($arr_this_block['id']); // was $model in place of $this->primary_model
+		$arr_axes = $this->{$this->primary_model}->get_chart_axes($arr_this_block['id']); 
 		$x_axis_date_field = NULL;
 		$this->graph['config'] = get_chart_options($arr_this_block['chart_type']);
 		$this->graph['config']['subtitle']['text'] = "Herd " . $this->session->userdata('herd_code');
@@ -555,19 +582,8 @@ abstract class parent_report extends CI_Controller {
 		$this->{$this->primary_model}->set_chart_fields($arr_this_block['id']);
 		$arr_fields = $this->{$this->primary_model}->get_fields();
 		if(is_array($arr_fields) && !empty($arr_fields)){
-			$c = 0;
-			$arr_chart_type = $this->{$this->primary_model}->get_chart_type_array();
-			$arr_axis_index = $this->{$this->primary_model}->get_axis_index_array();
-			
-			foreach($arr_fields as $k=>$f){
-				//these 2 arrays need to have the same numeric index so that the yaxis# can be correctly assigned to series
-				$this->graph['config']['series'][$c]['name'] = $k;
-				$arr_fieldnames[$c] = $f;
-				if(isset($this->{$this->primary_model}->arr_unit_of_measure[$f]) && !empty($this->{$this->primary_model}->arr_unit_of_measure[$f])) $um = $this->{$this->primary_model}->arr_unit_of_measure[$f]; // was $model in place of $this->primary_model
-				if(isset($arr_axis_index[$f]) && !empty($arr_axis_index[$f])) $this->graph['config']['series'][$c]['yAxis'] = $arr_axis_index[$f];
-				if(isset($arr_chart_type[$f]) && !empty($arr_chart_type[$f])) $this->graph['config']['series'][$c]['type'] = $arr_chart_type[$f];
-				$c++;
-			}
+			$this->graph['config']['series'] = $this->derive_series($arr_fields);
+			$arr_fieldnames = $this->derive_field_array($arr_fields);
 		}		
 		if(is_array($arr_axes['x'])){
 			foreach($arr_axes['x'] as $a){
@@ -593,15 +609,33 @@ abstract class parent_report extends CI_Controller {
 				if(count($arr_axes['x']) > 1) $this->graph['config']['xAxis'][] = $tmp_array;
 				else $this->graph['config']['xAxis'] = $tmp_array;
 				unset($tmp_array);
-				if(isset($a['db_field_name']) && !empty($a['db_field_name'])) $this->{$this->primary_model}->add_field(array('Date' => $a['db_field_name'])); // was $model in place of $this->primary_model
+				if(isset($a['db_field_name']) && !empty($a['db_field_name'])) $this->{$this->primary_model}->add_field(array('Date' => $a['db_field_name'])); 
 			}
 		}
 		if(is_array($arr_axes['y'])){
 			$cnt = 0;
 			foreach($arr_axes['y'] as $a){
 				$label_format = 'function(){return this.value}';
-				if(isset($x_axis_date_field)) $tooltip_format = "function(){return '<b>' + this.series.name + ':</b><br>' + Highcharts.dateFormat('%B %e, %Y', this.x) + ' - ' + this.y + ' " . $um . "';}";
-				else $tooltip_format = "function(){return '<b>' + this.series.name + ':</b>' + this.y + ' " . $um . "';}";
+				if(isset($x_axis_date_field)){
+					if($arr_this_block['chart_type'] == 'boxplot'){
+						$tooltip_format = 'function(){
+							var p = this.point;
+							if(this.series.options.type == "boxplot" || typeof(this.series.options.type) == "undefined"){
+								return "<b>" + Highcharts.dateFormat("%B %Y", this.x) +"</b><br/>" + this.series.name +"<br/>75th Percentile: "+ p.q1 + "<br/>50th Percentile: "+ p.median + "<br/>25th Percentile: "+ p.q3;
+							}
+							else {
+								return false;
+								//return "<b>"+ Highcharts.dateFormat("%B %Y", this.x) +"</b><br/>"+this.series.name +": "+ this.y;
+							}
+						}';
+					}
+					else{
+						$tooltip_format = "function(){return '<b>' + this.series.name + ':</b><br>' + Highcharts.dateFormat('%B %e, %Y', this.x) + ' - ' + this.y + ' " . $um . "';}";
+					}
+				}
+				else {
+					$tooltip_format = "function(){return '<b>' + this.series.name + ':</b>' + this.y + ' " . $um . "';}";
+				}
 				if($arr_this_block['chart_type'] != 'bar') $tmp_array['opposite'] = $a['opposite'];
 				if(isset($a['text'])) $tmp_array['title'] = array('text' => $a['text'], 'style'=>array('color'=>''));
 				if(isset($label_format) && $arr_this_block['chart_type'] != 'bar') $tmp_array['labels'] = array('formatter' => $label_format);
@@ -625,15 +659,15 @@ abstract class parent_report extends CI_Controller {
 			}
 			$this->graph['config']['tooltip']['formatter'] = $tooltip_format;
 		}
-		$this->graph['data'] = $this->{$this->primary_model}->get_graph_data($arr_fieldnames, $this->session->userdata('herd_code'), $this->max_rows, $x_axis_date_field, $arr_this_block['url_segment'], $this->graph['config']['xAxis']['categories']); // was $model in place of $this->primary_model
+		$this->graph['data'] = $this->{$this->primary_model}->get_graph_data($arr_fieldnames, $this->session->userdata('herd_code'), $this->max_rows, $x_axis_date_field, $arr_this_block['url_segment'], $this->graph['config']['xAxis']['categories']);
 	}
 		
 	protected function load_table(&$arr_this_block, $report_count){
 		$title = $arr_this_block['description'];
 		$subtitle = 'Herd ' + $this->session->userdata('herd_code');
 		$this->{$this->primary_model}->populate_field_meta_arrays($arr_this_block['id']);// was $model in place of $this->primary_model
-		$results = $this->{$this->primary_model}->search($this->session->userdata('herd_code'), $arr_this_block['url_segment'], $this->arr_filter_criteria, $this->arr_sort_by, $this->arr_sort_order, $this->max_rows);// was $model in place of $this->primary_model
-		if(!empty($this->pivot_db_field)) $results = $this->{$this->primary_model}->pivot($results, $this->pivot_db_field, 10, 10, $this->avg_row, $this->sum_row, $this->bench_row);// was $model in place of $this->primary_model
+		$results = $this->{$this->primary_model}->search($this->session->userdata('herd_code'), $arr_this_block['url_segment'], $this->arr_filter_criteria, $this->arr_sort_by, $this->arr_sort_order, $this->max_rows);
+		if(!empty($this->pivot_db_field)) $results = $this->{$this->primary_model}->pivot($results, $this->pivot_db_field, 10, 10, $this->avg_row, $this->sum_row, $this->bench_row);
 		
 		$tmp = array(
 			'form_id' => $this->report_form_id,
@@ -656,7 +690,7 @@ abstract class parent_report extends CI_Controller {
 		$this->report_data = array(
 			'table_header' => $this->load->view('table_header', $table_header_data, TRUE),
 			'table_id' => $arr_this_block['url_segment'],
-			'fields' => $this->{$this->primary_model}->get_fieldlist_array(),// was $model in place of $this->primary_model
+			'fields' => $this->{$this->primary_model}->get_fieldlist_array(),
 			'report_data' => $results,
 			'table_heading' => $title,
 			'table_sub_heading' => $subtitle,
