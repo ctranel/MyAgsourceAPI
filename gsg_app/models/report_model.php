@@ -548,7 +548,7 @@ class Report_model extends CI_Model {
 	 */
 	
 	protected function prep_where_criteria($arr_filter_criteria){
-		//incorporate built-in report filters if set
+		//incorporate built-in report filters if set in a child report model--may not be needed with database-driven reports
 		if(is_array($this->arr_where_field) && !empty($this->arr_where_field)){
 			$tmp_cnt = count($this->arr_where_field);
 			for($x = 0; $x < $tmp_cnt; $x++){
@@ -917,11 +917,28 @@ $bool_bench_column = FALSE;
 	 * @param string herd code
 	 * @param int number of tests to include on report
 	 * @param string date field used on graph (test_date)
+	 * @param array of categories
 	 * @return array of data for the chart
 	 * @access public
 	 *
 	 **/
 	function get_graph_data($arr_fieldname, $herd_code, $num_dates, $date_field, $arr_categories = NULL){
+		$data = $this->get_graph_dataset($herd_code, $num_dates, $date_field);
+		if(isset($arr_categories) && is_array($arr_categories)) $return_val = $this->set_row_to_series($data, $arr_fieldname, $arr_categories);
+		else $return_val = $this->set_longitudinal_data($data, $date_field);
+		return $return_val;
+	}
+	
+	/**
+	 * @method get_graph_dataset()
+	 * @param string herd code
+	 * @param int number of tests to include on report
+	 * @param string date field used on graph (test_date)
+	 * @return array of database results
+	 * @access public
+	 *
+	 **/
+	function get_graph_dataset($herd_code, $num_dates, $date_field){
 		if(isset($date_field) && isset($num_dates)){
 			$from_date = $this->get_start_date($date_field, $num_dates, 'MM-dd-yyyy');
 			$arr_to_date = $this->get_recent_dates($date_field, 1, 'MM-dd-yyyy');
@@ -930,9 +947,7 @@ $bool_bench_column = FALSE;
 		else{
 			$data = $this->search($herd_code, array('herd_code'=>$herd_code, 'pstring'=>$this->session->userdata('pstring')), array($date_field), array('ASC'), $num_dates);
 		}
-		if(isset($arr_categories) && is_array($arr_categories)) $return_val = $this->set_row_to_series($data, $arr_fieldname, $arr_categories);
-		else $return_val = $this->set_longitudinal_data($data, $date_field);
-		return $return_val;
+		return $data;
 	}
 	
 	/**
@@ -1021,33 +1036,83 @@ $bool_bench_column = FALSE;
 	 * @access protected
 	 *
 	 **/
-	protected function set_boxplot_data($data, $num_boxplot_series = 1, $series_space = 400000000){
+	protected function set_boxplot_data($data, $date_field = 'test_date', $num_boxplot_series = 1, $adjustment = 200000000){
 		$row_count = 0;
 		$arr_series = array();
-		foreach ($data as $d){
-			$arr_d = explode('-', $d['test_date']);
-			unset($d['test_date']);
-			$this_date = mktime(0, 0, 0, $arr_d[1], $arr_d[2],$arr_d[0]) * 1000;
+		foreach ($data as $d){ //foreach row
+			//set a variable so we can pair date with each data point
+			if(!isset($d[$date_field])) continue;
+			$arr_d = explode('-', $d[$date_field]);
+			unset($d[$date_field]); //remove date so we can loop through the remaining data points
+			//the date is formated in the database search ('m-d-y'), so we need to accommodate that in the mktime function
+			$this_date = mktime(0, 0, 0, $arr_d[0], $arr_d[1],'20' . $arr_d[2]) * 1000;
+			$num_series = count($d)/3;
 			$field_count = 1;
 			$series_count = 0;
-			$arr_series[$series_count][$row_count] = array($this_date);
-			foreach ($d as $f){
+			$offset = $this->_get_series_offset($num_series, $series_count, $adjustment);
+			$arr_series[$series_count][$row_count] = array($this_date + $offset);
+			$arr_series[$series_count + 1][$row_count] = array($this_date + $offset);
+			foreach ($d as $f){ //for each field in row
 				$tmp_data = is_numeric($f) ? (float)$f : $f;
-				if($field_count <= ($num_boxplot_series * 5)){//boxplot work-around using boxplot chart requires 5 datapoints
+				if($field_count <= ($num_boxplot_series * 3)){// using boxplot chart requires 4 datapoints
+					$modulus = $field_count%3;
 					$arr_series[$series_count][$row_count][] = $tmp_data;
-					if($field_count%5 == 0 && $field_count > 1){
-						$series_count++;
-						if(($field_count + 1) <= ($num_boxplot_series * 5)) $arr_series[$series_count][$row_count] = array($this_date + ($series_space * $series_count)); //adjust date so that multiple boxplots are not on top of each other
+					//boxplots require 5 datapoints, need to replicate each end of the box (i.e., blend whiskers into box)
+					if($modulus === 1 || $modulus === 0){
+						$arr_series[$series_count][$row_count][] = $tmp_data;
+					}
+					if($modulus === 2){ //for median, add a datapoint in the trendline series
+						$arr_series[$series_count + 1][$row_count][] = $tmp_data;
+					}
+					if($modulus == 0 && $field_count > 1){
+						$series_count += 2;
+						if(($field_count + 1) <= ($num_boxplot_series * 3)){
+							$offset = $this->_get_series_offset($num_series, $series_count, $adjustment);
+							$arr_series[$series_count][$row_count] = array(($this_date + $offset)); //adjust date so that multiple boxplots are not on top of each other
+							$arr_series[$series_count +1][$row_count] = array(($this_date + $offset)); //adjust date so that multiple boxplots are not on top of each other
+						}
 					}
 				}
-				else { //assumes that non-box series correspond to box series
-					$arr_series[$series_count][$row_count] = array(($this_date + ($series_space * ($series_count - $num_boxplot_series))), $tmp_data);
-					$series_count++;
+/*				else { //assumes that non-box series correspond to box series
+					$offset = $this->_get_series_offset($num_series, $series_count, $adjustment);
+					$arr_series[$series_count][$row_count] = array(($this_date + $offset), $tmp_data);
+					$arr_series[$series_count + 1][$row_count] = array(($this_date + $offset), $tmp_data);
+					$series_count += 2;
 				}
-				$field_count++;
+*/				$field_count++;
 			}
 			$row_count++;
 		}
 		return $arr_series;
+	}
+	
+	/**
+	 * @method _get_series_offset()
+	 * @param int number of series' in the dataset for which the offset is being calculated
+	 * @param int numeric position of series for which offset is currently being calculated
+	 * @param int standardized unit on which adjustment calculation is based
+	 * @return int amount to offset date in series
+	 * @access protected
+	 *
+	 **/
+		protected function _get_series_offset($num_series, $series_count, $adjustment){
+		$offset = 0;;
+		if($num_series == 2){
+			if($series_count == 0) {
+				$offset -= $adjustment;
+			}
+			if($series_count == 2) {
+				$offset += $adjustment;
+			}
+		}
+		if($num_series == 3){
+			if($series_count == 0) {
+				$offset -= ($adjustment * 2);
+			}
+			if($series_count == 4) {
+				$offset += ($adjustment * 2);
+			}
+		}
+		return $offset;
 	}
 }
