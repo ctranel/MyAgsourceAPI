@@ -129,6 +129,28 @@
 					and <?php echo form_input(array('name'=>'scc_cnt_1_dbto', 'value'=>$filter_selected['scc_cnt_1_dbto'], 'size'=>'5', 'maxlength'=>'5', 'id'=>'scc_cnt_1_dbto')); ?>
 				<?php echo form_fieldset_close();
 				break;
+			case 'test_result':
+				echo form_fieldset('Test Result', array('id' => 'test_result-fieldset')); ?>
+					<span class="filter-checkbox"><?php echo form_checkbox(array('name'=>'test_result[]', 'id'=>'test_resultstrong'), 'strong positive', in_array('strong positive', $filter_selected['test_result']) !== false); ?>
+					Strong Positive&nbsp;&nbsp;</span>
+					<span class="filter-checkbox"><?php echo form_checkbox(array('name'=>'test_result[]', 'id'=>'test_resultpositive'), 'positive', in_array('positive', $filter_selected['test_result']) !== false); ?>
+					Positive&nbsp;&nbsp;</span>
+					<span class="filter-checkbox"><?php echo form_checkbox(array('name'=>'test_result[]', 'id'=>'test_resultsuspect'), 'suspect', in_array('suspect', $filter_selected['test_result']) !== false); ?>
+					Suspect&nbsp;&nbsp;</span>
+					<span class="filter-checkbox"><?php echo form_checkbox(array('name'=>'test_result[]', 'id'=>'test_resultnegative'), 'negative', in_array('negative', $filter_selected['test_result']) !== false); ?>
+					Negative&nbsp;&nbsp;</span>
+				<?php echo form_fieldset_close();
+				break;
+			case 'final_result':
+				echo form_fieldset('Final Result', array('id' => 'final_result-fieldset')); ?>
+					<span class="filter-checkbox"><?php echo form_checkbox(array('name'=>'final_result[]', 'id'=>'final_resultpositive'), 'POS', in_array('POS', $filter_selected['final_result']) !== false); ?>
+					Positive&nbsp;&nbsp;</span>
+					<span class="filter-checkbox"><?php echo form_checkbox(array('name'=>'final_result[]', 'id'=>'final_resultnegative'), 'NEG', in_array('NEG', $filter_selected['final_result']) !== false); ?>
+					Negative&nbsp;&nbsp;</span>
+					<span class="filter-checkbox"><?php echo form_checkbox(array('name'=>'final_result[]', 'id'=>'final_resultrecheck'), 'RECHECK', in_array('RECHECK', $filter_selected['final_result']) !== false); ?>
+					Recheck&nbsp;&nbsp;</span>
+					<?php echo form_fieldset_close();
+				break;
 		endswitch; 
 	endforeach;
 endif; ?>
