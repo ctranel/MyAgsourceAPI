@@ -278,28 +278,29 @@ class As_ion_auth extends Ion_auth {
 	 * @method get_group_dropdown_data()
 	 * @return array (key=>value) array of groups for populating options lists
 	 * @access public
+	 * 
+	 * @todo: groups are hard-coded, find a good way to pull them dynamically (use group table's parent_group field?)
 	 *
 	 **/
 	public function get_group_dropdown_data(){
+		$arr_groups = array();
 		$ret_array = array();
-		if($this->is_admin){
-			$arr_group_obj = $this->ion_auth_model->groups()->result();
-		}
-		elseif($this->is_manager){
-			$arr_group_obj = $this->ion_auth_model->get_child_groups($this->session->userdata('active_group_id'));
+		if($this->has_permission('Add All Users')){
+			$arr_groups = $this->ion_auth_model->groups()->result_array();
 		}
 		else{
-			$arr_group_obj = (object) $this->session->userdata('arr_groups');
+			if($this->has_permission('Add Users In Region')){
+				$arr_groups = $this->ion_auth_model->get_child_groups(3);
+			}
+			$arr_groups[] = array('id'=>'2', 'name'=>'Producers');
+			$arr_groups[] = array('id'=>'9', 'name'=>'Consultants');
 		}
-		if(is_array($arr_group_obj)) {
+		if(is_array($arr_groups)) {
 			$ret_array[''] = "Select one";
-			foreach($arr_group_obj as $g){
-				$ret_array[$g->id] = $g->name;
+			foreach($arr_groups as $g){
+				$ret_array[$g['id']] = $g['name'];
 			}
 			return $ret_array;
-		}
-		elseif(is_object($arr_group_obj)) {
-			return $arr_group_obj;
 		}
 		else {
 			return false;
@@ -741,6 +742,6 @@ class As_ion_auth extends Ion_auth {
 die($message);
 		return FALSE;
 	}
-
 	//WHEN LOOKING UP HERDS FOR CONSULTANTS, ENSURE THAT IT IS NOT EXPIRED, AND THAT IT HAS BEEN APPROVED
+
 }

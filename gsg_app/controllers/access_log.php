@@ -212,7 +212,7 @@ class Access_log extends parent_report {
 					array(
 						'title' => $this->product_name,
 						'description' => $this->product_name,
-						'messages' => $this->access_log_model->arr_messages,
+						'message' => $this->access_log_model->arr_messages,
 						'page_heading' => $this->product_name,
 						'section_nav' => $this->load->view('auth/section_nav', NULL, TRUE),
 						'arr_headjs_line'=>array(

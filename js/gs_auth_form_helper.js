@@ -14,9 +14,9 @@ function toggle_fields() {
 	var obj_group = document.getElementById('group_id');
 	var arr_group_id = $('#group_id').val();
 	
-	document.getElementById('region').style.display = "none";
-	document.getElementById('tech').style.display = "none";
-	document.getElementById('herd').style.display = "none";
+	if(document.getElementById('region')) document.getElementById('region').style.display = "none";
+	if(document.getElementById('tech')) document.getElementById('tech').style.display = "none";
+	if(document.getElementById('herd')) document.getElementById('herd').style.display = "none";
 	$('#region').removeClass('required');
 	$('#tech').removeClass('required');
 	$('#herd').removeClass('required');
