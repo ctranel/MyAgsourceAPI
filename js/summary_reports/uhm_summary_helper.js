@@ -6,7 +6,7 @@
 			 colors: ['#D18FBA', '#D5EAFF', '#BFBFFF']
 			});
 		}
-		if(section_data['block'] == 'weighted_average_scc_-_la'){
+		if(section_data['block'] == 'infection_by_lactation_gr' || section_data['block'] == 'weighted_average_scc_-_la'){
 			Highcharts.setOptions({
 				legend: {enabled: false}
 			});

@@ -11,7 +11,7 @@
  * @param	boolean maintain empty rows
  * @param	boolean maintain key
  * @param	constant sort order
-	 * @author ctranel
+ * @author ctranel
  * @return	array
  */
 if ( ! function_exists('multid_array_sort')) {
@@ -137,17 +137,17 @@ function array_flatten_wkeys($array, $preserve_keys = 1, &$newArray = Array()) {
 }
 
 function rollcount(array &$count, &$depth, $separator) {
-	$key_prefix = $count[$depth];
+	$codex = $count[$depth];
 	for ($i=$depth-1;$i>-1;$i--) {
-		$key_prefix = $count[$i].$separator.$key_prefix;
+		$codex = $count[$i].$separator.$codex;
 	}
-	return $key_prefix.":";
+	return str_pad($codex,12,' ',STR_PAD_LEFT);
 }
 
 function steamroll(array &$arr_out, array &$arr_in, array &$count, &$depth, $separator) {
 
 	foreach($arr_in as $k => $v) {
-		$key = rollcount($count, $depth, $separator).$k;
+		$key = rollcount($count, $depth, $separator).'  '.str_pad($k,20);
 		if (is_array($v) && empty($v)) {
 			$arr_out[$key] = "Array(empty)";
 		}
