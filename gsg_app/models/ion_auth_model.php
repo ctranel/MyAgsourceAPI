@@ -83,7 +83,6 @@ class Ion_auth_model extends Ion_auth_parent_model
 		if($tran_status){
 			$id = $tran_status; //register returns id if it is successful
 			$this->_update_meta($id, $additional_data);
-			//$this->add_to_groups($arr_groups, $id);
 			$tran_status = $this->db->trans_status();
 		}
 		if(!$tran_status){
@@ -93,10 +92,10 @@ class Ion_auth_model extends Ion_auth_parent_model
 				$this->set_error('register_unsuccessful');
 				return FALSE;
 		}
-
+		
 		$this->set_message('register_successful');
 		$this->db->trans_commit();
-		return is_int($id) ? $id : FALSE;
+		return is_numeric($id) ? $id : FALSE;
 	}
 
 	/**
@@ -356,14 +355,13 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * @param string group name
 	 * @return object
 	 * @author Ben Edmunds
-	 **/
 	public function get_group_by_name($name)
 	{
 		$this->db->where('name', $name);
-
 		return $this->db->get($this->tables['groups'])
 		->row();
 	}
+	 **/
 
 
 	/**
@@ -1052,6 +1050,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 **/
 	protected function _filter_data($table, $data)
 	{
+		$this->load->helper('multid_array');
 		$filtered_data = array();
 		$columns = $this->db
 			->select('column_name')
@@ -1059,10 +1058,8 @@ class Ion_auth_model extends Ion_auth_parent_model
 			->get('users.information_schema.columns')
 			->result_array();
 		$columns = array_flatten($columns); 
-		if (is_array($data))
-		{
-			foreach ($columns as $column)
-			{
+		if (is_array($data)) {
+			foreach ($columns as $column) {
 				if (array_key_exists($column, $data))
 					$filtered_data[$column] = $data[$column];
 			}

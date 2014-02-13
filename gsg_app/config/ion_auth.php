@@ -166,7 +166,8 @@ switch (ENVIRONMENT)
 		exit('The application environment is not set correctly - t_base_url.');
 }
 
-$config['default_group']        = 2; 			// Default group, use name
+$config['default_group']        = 'Producer'; 			// Default group, use name
+$config['default_group_id']     = 2;
 $config['admin_group']          = 1; 				// Default administrators group, use name
 $config['manager_group']        = 3; //custom CDT
 

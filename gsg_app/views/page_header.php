@@ -136,6 +136,7 @@
 	<!--left side of page-->
 	<div id="main-content">
 	<?php if (!empty($page_heading)) echo heading($page_heading);
+
 	if(isset($error)):
 		if (is_array($error) &&!empty($error)):
 			foreach($error as $e) {?>
@@ -144,13 +145,13 @@
 		else: ?>
 			<div id="errors"><?php echo $error;?></div>
 <?php 	endif;
-	elseif(isset($messages)):
-		if (is_array($messages) && !empty($messages)):
-			foreach($messages as $m) {?>
+	elseif(isset($message)):
+		if (is_array($message) && !empty($message)):
+			foreach($message as $m) {?>
 				<div id="infoMessage"><?php echo $m;?></div>
 			<?php }
-		elseif(is_array($messages) == FALSE): ?>
-			<div id="infoMessage"><?php echo $messages;?></div>
+		elseif(is_array($message) == FALSE): ?>
+			<div id="infoMessage"><?php echo $message;?></div>
 <?php 	endif;
 	elseif($this->session->flashdata('message') != ''): ?>
 			<div id="infoMessage"><?php echo $this->session->flashdata('message');?></div>

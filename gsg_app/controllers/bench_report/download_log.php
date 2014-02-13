@@ -152,7 +152,7 @@ class Download_log extends parent_report {
 					array(
 						'title'=>$this->config->item('product_name'),
 						'description'=>$this->config->item('product_name'),
-						'messages' => $this->download_log_model->arr_messages,
+						'message' => $this->download_log_model->arr_messages,
 						'page_heading' => $this->product_name,
 						'section_nav' => $this->load->view('bench_report/section_nav', NULL, TRUE),
 						'arr_headjs_line'=>array(

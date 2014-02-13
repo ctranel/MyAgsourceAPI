@@ -283,7 +283,7 @@ class Ion_auth
 		$this->ion_auth_model->trigger_events('pre_account_creation');
 
 		$email_activation = $this->config->item('email_activation', 'ion_auth');
-
+		
 		if (!$email_activation)
 		{
 			$id = $this->ion_auth_model->register($username, $password, $email, $additional_data, $group_name);
@@ -340,7 +340,7 @@ class Ion_auth
 
 				$this->email->clear();
 				$this->email->from($this->config->item('admin_email', 'ion_auth'), $this->config->item('site_title', 'ion_auth'));
-				$this->email->to($email);
+				$this->email->to($this->config->item('cust_serv_email','ion_auth'));//ctranel temp change.  was: $this->email->to($email);
 				$this->email->subject($this->config->item('site_title', 'ion_auth') . ' - Account Activation');
 				$this->email->message($message);
 

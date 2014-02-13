@@ -370,7 +370,7 @@ abstract class parent_report extends CI_Controller {
 				array(
 					'title'=>$this->product_name . ' - ' . $this->config->item('site_title'),
 					'description'=>$this->product_name . ' - ' . $this->config->item('site_title'),
-					'messages' => $this->{$this->primary_model}->arr_messages,
+					'message' => $this->{$this->primary_model}->arr_messages,
 					'section_nav' => $this->load->view('section_nav', $arr_sec_nav_data, TRUE),
 					'page_heading' => $this->product_name . " for Herd " . $this->herd_code,
 					'arr_head_line' => array(
