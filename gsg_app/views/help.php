@@ -2,7 +2,7 @@
 
 	echo $page_header;
 
-	$filepath = APPPATH.'helpdocs/'.$product_name.'.html';
+	$filepath = APPPATH.'helpdocs'.FS_SEP.$product_name.'.html';
 
 	if (is_file($filepath)) {
 		ob_start();
