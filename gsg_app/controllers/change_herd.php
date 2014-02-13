@@ -103,7 +103,7 @@ class Change_herd extends CI_Controller {
 			}
 			$arr_redirect_url = explode('/', $redirect_url);
 
-			if(file_exists($arr_redirect_url[0] . FS_SEP . 'section_nav')) $this->page_header_data['section_nav'] = $this->load->view($arr_redirect_url[0] . '/section_nav', NULL, TRUE);
+			if(file_exists($arr_redirect_url[0] . '/section_nav')) $this->page_header_data['section_nav'] = $this->load->view($arr_redirect_url[0] . '/section_nav', NULL, TRUE);
 			$this->data['page_header'] = $this->load->view('page_header', $this->page_header_data, TRUE);
 			$this->data['page_heading'] = 'Request Herd - ' . $this->config->item('product_name');
 			$this->data['page_footer'] = $this->load->view('page_footer', NULL, TRUE);
@@ -188,7 +188,7 @@ class Change_herd extends CI_Controller {
 			);
 			$this->data['message'] = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
 			$arr_redirect_url = explode('/', $redirect_url);
-			if(file_exists($arr_redirect_url[0] . FS_SEP . 'section_nav')) $this->page_header_data['section_nav'] = $this->load->view($arr_redirect_url[0] . '/section_nav', NULL, TRUE);
+			if(file_exists($arr_redirect_url[0] . '/section_nav')) $this->page_header_data['section_nav'] = $this->load->view($arr_redirect_url[0] . '/section_nav', NULL, TRUE);
 			$this->data['page_header'] = $this->load->view('page_header', $this->page_header_data, TRUE);
 			$this->data['page_heading'] = 'Select Herd - ' . $this->config->item('product_name');
 			$this->data['page_footer'] = $this->load->view('page_footer', $this->page_footer_data, TRUE);

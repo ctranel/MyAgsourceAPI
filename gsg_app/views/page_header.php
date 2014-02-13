@@ -1,8 +1,6 @@
 <!doctype html>
-<html lang="en">
 <head>
 	<title><?php if(isset($title)) echo $title; ?></title>
-	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">    
     <meta http-equiv="pragma" content="no-cache">
     <meta http-equiv="cache-control" content="no-cache">
     <meta http-equiv="content-type" content="text/html;charset=UTF-8">
@@ -10,7 +8,7 @@
     <meta name="googlebot" content="NOARCHIVE">
     <meta name="description" content="<?php if(isset($description)) echo $description; ?>">
     <meta name="keywords" content="<?php echo $this->config->item("cust_serv_company"); ?>, DHI Testing, DHI, DHIA, milk testing, soil testing, forage testing, manure testing, " />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 	<link rel="stylesheet" href='http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css'>
 <?php
 	    $this->carabiner->css('http://agsource.crinet.com/css/AgSource-Cooperative-Services.css', 'screen');
@@ -26,9 +24,10 @@
 		endforeach;
 	endif; ?>
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/headjs/0.99/head.min.js"></script>
+	<!-- <script src="<?php echo $this->config->item('base_url_assets') ?>js/head.js"></script> -->
 	<script type="text/javascript">
 		head.js(
-			{jquery: "https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"},
+			{jquery: "https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"},
 			{bootstrap: "http://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"},
 			{sectionhelper: "<?php echo $this->config->item('base_url_assets'); ?>js/as_section_helper.js"}
 			<?php

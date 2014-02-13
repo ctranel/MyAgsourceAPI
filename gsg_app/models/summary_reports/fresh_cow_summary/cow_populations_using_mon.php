@@ -23,6 +23,7 @@ class Transitioncowindex extends Report_model {
 	 * @author ctranel
 	 */
 	public function pivot($arr_dataset, $header_field, $header_field_width, $label_column_width, $bool_avg_column = FALSE, $bool_sum_column = FALSE, $bool_bench_column = FALSE){
+var_dump($arr_dataset);
 		$tmp_total = 0;
 		$new_dataset = parent::pivot($arr_dataset, $header_field, $header_field_width, $label_column_width, $bool_avg_column, $bool_sum_column, $bool_bench_column);
 		//update total field in new dataset
