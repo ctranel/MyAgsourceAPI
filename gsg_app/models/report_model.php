@@ -443,6 +443,7 @@ class Report_model extends CI_Model {
 			}
 		}		
 		if(is_array($arr_filter_criteria) && !empty($arr_filter_criteria)) $this->prep_where_criteria($arr_filter_criteria, $block_url);
+		
 		if(is_array($this->arr_fields)){
 			$arr_select_fields = array_flatten($this->arr_fields);
 			$arr_select_fields = $this->prep_select_fields($arr_select_fields);
