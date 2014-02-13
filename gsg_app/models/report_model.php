@@ -572,7 +572,12 @@ class Report_model extends CI_Model {
 			if($block_url == 'peak_milk_trends' && substr($k,-7)=='pstring' && $v==0){
 				continue;
 			}
-					
+			if($block_url == 'dim_at_1st_breeding' && substr($k,-7)=='pstring' && $v==0){
+				continue;
+			}
+				
+						
+			
 			if(empty($v) === FALSE || $v === '0'){
 				if(is_array($v)){
 					if(strpos($k, 'pstring') !== FALSE){
