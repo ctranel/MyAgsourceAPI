@@ -773,9 +773,10 @@ class Auth extends Ionauth {
 		$this->form_validation->set_rules('email', 'Email Address', 'trim|required|valid_email');
 		$this->form_validation->set_rules('supervisor_num', 'Field Technician Number', 'exact_length[6]');
 		$this->form_validation->set_rules('region_id', 'Association Number (if a member of an association)', 'exact_length[3]');
-		$this->form_validation->set_rules('phone1', 'First Part of Phone', 'exact_length[3]');
-		$this->form_validation->set_rules('phone2', 'Second Part of Phone', 'exact_length[3]');
-		$this->form_validation->set_rules('phone3', 'Third Part of Phone', 'exact_length[4]');
+		$this->form_validation->set_rules('phone1', 'First Part of Phone', 'exact_length[3]|required');
+		$this->form_validation->set_rules('phone2', 'Second Part of Phone', 'exact_length[3]|required');
+		$this->form_validation->set_rules('phone3', 'Third Part of Phone', 'exact_length[4]|required');
+		$this->form_validation->set_rules('best_time', 'Best Time to Call', 'max_length[10]|required');
 		$this->form_validation->set_rules('password', 'Password', 'trim|required|min_length[' . $this->config->item('min_password_length', 'ion_auth') . ']|max_length[' . $this->config->item('max_password_length', 'ion_auth') . ']|matches[password_confirm]');
 		$this->form_validation->set_rules('password_confirm', 'Password Confirmation', 'trim|required');
 		$this->form_validation->set_rules('group_id[]', 'Name of User Group');
@@ -829,6 +830,7 @@ class Auth extends Ionauth {
 				'supervisor_num' => $supervisor_num,
 				'region_id' => $region_id,
 				'phone' => $this->input->post('phone1') . '-' . $this->input->post('phone2') . '-' . $this->input->post('phone3'),
+				'best_time' => $this->input->post('best_time'),
 				'group_id' => $arr_posted_group_id,
 				'section_id' => $this->input->post('section_id')
 			);
@@ -966,8 +968,8 @@ class Auth extends Ionauth {
 				'id' => 'best_time',
 				'class' => 'require',
 				'type' => 'text',
-				'size' => '5',
-				'maxlength' => '5',
+				'size' => '10',
+				'maxlength' => '10',
 				'value' => $this->form_validation->set_value('best_time')
 			);
 			$this->data['password'] = array('name' => 'password',
@@ -1019,9 +1021,10 @@ class Auth extends Ionauth {
 			$this->form_validation->set_rules('email', 'Email Address', 'trim|required|valid_email');
 			$this->form_validation->set_rules('supervisor_num', 'Field Technician Number', 'exact_length[6]');
 			$this->form_validation->set_rules('region_id[]', 'Association/Region Number');
-			$this->form_validation->set_rules('phone1', 'First Part of Phone', 'exact_length[3]');
-			$this->form_validation->set_rules('phone2', 'Second Part of Phone', 'exact_length[3]');
-			$this->form_validation->set_rules('phone3', 'Third Part of Phone', 'exact_length[4]');
+			$this->form_validation->set_rules('phone1', 'First Part of Phone', 'exact_length[3]|required');
+			$this->form_validation->set_rules('phone2', 'Second Part of Phone', 'exact_length[3]|required');
+			$this->form_validation->set_rules('phone3', 'Third Part of Phone', 'exact_length[4]|required');
+			$this->form_validation->set_rules('best_time', 'Best Time to Call', 'max_length[10]|required');
 			$this->form_validation->set_rules('password', 'Password', 'trim|min_length[' . $this->config->item('min_password_length', 'ion_auth') . ']|max_length[' . $this->config->item('max_password_length', 'ion_auth') . ']|matches[password_confirm]');
 			$this->form_validation->set_rules('password_confirm', 'Password Confirmation', 'trim');
 			$this->form_validation->set_rules('group_id[]', 'Name of Account Group');
@@ -1085,6 +1088,7 @@ class Auth extends Ionauth {
 					'last_name' => $this->input->post('last_name'),
 //					'company' => $this->input->post('company') ? $this->input->post('company') : NULL,
 					'phone' => $this->input->post('phone1') . '-' . $this->input->post('phone2') . '-' . $this->input->post('phone3'),
+					'best_time' => $this->input->post('best_time'),
 					'group_id' => $arr_posted_group_id,
 					'supervisor_num' => $supervisor_num,
 					'region_id' => $region_id,
@@ -1258,8 +1262,8 @@ class Auth extends Ionauth {
 					'id' => 'best_time',
 					'class' => 'require',
 					'type' => 'text',
-					'size' => '5',
-					'maxlength' => '5',
+					'size' => '10',
+					'maxlength' => '10',
 					'value' => $this->form_validation->set_value('best_time', $obj_user->best_time)
 				);
 				$this->data['user_id'] = array('name' => 'user_id',
