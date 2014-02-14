@@ -12,9 +12,6 @@
       <?php echo form_input($last_name);?>
       </p>
       
-      <p><?php echo form_label('Email', 'email', NULL, $email) ?>
-      <?php echo form_input($email);?>
-      </p>
       <?php //if($this->as_ion_auth->is_admin || $this->as_ion_auth->is_manager): ?>
       	<p><?php echo form_label('User Group', 'group_id', NULL, $group_id) ?>
       	<?php echo form_dropdown('group_id[]', $group_options, $group_selected, $group_id)?>
@@ -64,6 +61,10 @@
       
       <p><?php echo form_label('Best Time to Call', 'best_time', NULL, $best_time) ?>
       <?php echo form_input($best_time);?>
+      </p>
+      
+      <p><?php echo form_label('Email', 'email', NULL, $email) ?>
+      <?php echo form_input($email);?>
       </p>
       
       <p><?php echo form_label('Password (at least 8 characters)', 'password', NULL, $password) ?>
