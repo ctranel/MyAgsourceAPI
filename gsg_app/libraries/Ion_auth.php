@@ -327,6 +327,11 @@ class Ion_auth
 				'id'         => $user->id,
 				'email'      => $email,
 				'activation' => $activation_code,
+// ctranel addition
+				'herd_code'	 => $additional_data['herd_code'],
+				'phone'		 => $additional_data['phone'],
+				'best_time'	 => $additional_data['best_time'],
+// end ctranel addition
 			);
 			if(!$this->config->item('use_ci_email', 'ion_auth'))
 			{

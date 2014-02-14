@@ -62,6 +62,10 @@
       <?php echo form_input($phone1);?>-<?php echo form_input($phone2);?>-<?php echo form_input($phone3);?>
       </p>
       
+      <p><?php echo form_label('Best Time to Call', 'best_time', NULL, $best_time) ?>
+      <?php echo form_input($best_time);?>
+      </p>
+      
       <p><?php echo form_label('Password (at least 8 characters)', 'password', NULL, $password) ?>
       <?php echo form_input($password);?>
       </p>
