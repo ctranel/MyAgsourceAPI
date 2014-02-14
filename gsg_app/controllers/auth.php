@@ -726,6 +726,23 @@ class Auth extends Ionauth {
 		parent::forgot_password();
 	}
 
+	//reset password - final step for forgotten password
+	public function reset_password($code = NULL){
+		if(is_array($this->page_header_data)){
+			$this->page_header_data = array_merge($this->page_header_data,
+				array(
+					'title'=>'Reset Password - ' . $this->config->item('product_name'),
+					'description'=>'Reset Password - ' . $this->config->item('product_name')
+				)
+			);
+		}
+		$this->page_header_data['section_nav'] = $this->load->view('auth/section_nav', NULL, TRUE);
+		$this->data['page_header'] = $this->load->view('page_header', $this->page_header_data, TRUE);
+		$this->data['page_heading'] = 'Forgotten Password - ' . $this->config->item('product_name');
+		$this->data['page_footer'] = $this->load->view('page_footer', null, TRUE);
+		parent::reset_password();
+	}
+	
 	//deactivate the user
 	function deactivate($id = NULL)
 	{
@@ -923,6 +940,7 @@ class Auth extends Ionauth {
 			}
 			$this->data['phone1'] = array('name' => 'phone1',
 				'id' => 'phone1',
+				'class' => 'require',
 				'type' => 'text',
 				'size' => '3',
 				'maxlength' => '3',
@@ -930,6 +948,7 @@ class Auth extends Ionauth {
 			);
 			$this->data['phone2'] = array('name' => 'phone2',
 				'id' => 'phone2',
+				'class' => 'require',
 				'type' => 'text',
 				'size' => '3',
 				'maxlength' => '3',
@@ -937,10 +956,19 @@ class Auth extends Ionauth {
 			);
 			$this->data['phone3'] = array('name' => 'phone3',
 				'id' => 'phone3',
+				'class' => 'require',
 				'type' => 'text',
 				'size' => '4',
 				'maxlength' => '4',
 				'value' => $this->form_validation->set_value('phone3'),
+			);
+			$this->data['best_time'] = array('name' => 'best_time',
+				'id' => 'best_time',
+				'class' => 'require',
+				'type' => 'text',
+				'size' => '5',
+				'maxlength' => '5',
+				'value' => $this->form_validation->set_value('best_time')
 			);
 			$this->data['password'] = array('name' => 'password',
 				'id' => 'password',
@@ -1204,6 +1232,7 @@ class Auth extends Ionauth {
 				}
 				$this->data['phone1'] = array('name' => 'phone1',
 					'id' => 'phone1',
+					'class' => 'require',
 					'type' => 'text',
 					'size' => '3',
 					'maxlength' => '3',
@@ -1211,6 +1240,7 @@ class Auth extends Ionauth {
 				);
 				$this->data['phone2'] = array('name' => 'phone2',
 					'id' => 'phone2',
+					'class' => 'require',
 					'type' => 'text',
 					'size' => '3',
 					'maxlength' => '3',
@@ -1218,10 +1248,19 @@ class Auth extends Ionauth {
 				);
 				$this->data['phone3'] = array('name' => 'phone3',
 					'id' => 'phone3',
+					'class' => 'require',
 					'type' => 'text',
 					'size' => '4',
 					'maxlength' => '4',
 					'value' => $this->form_validation->set_value('phone3', $phone3)
+				);
+				$this->data['best_time'] = array('name' => 'best_time',
+					'id' => 'best_time',
+					'class' => 'require',
+					'type' => 'text',
+					'size' => '5',
+					'maxlength' => '5',
+					'value' => $this->form_validation->set_value('best_time', $obj_user->best_time)
 				);
 				$this->data['user_id'] = array('name' => 'user_id',
 					'id' => 'user_id',
