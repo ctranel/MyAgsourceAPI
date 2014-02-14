@@ -407,7 +407,7 @@ abstract class parent_report extends CI_Controller {
 			'curr_page' => $this->page,
 			'arr_pages' => $this->access_log_model->get_pages_by_criteria(array('section_id' => $this->section_id))->result_array()
 		);
-		if($this->bool_is_summary){
+		if($this->bool_is_summary && (substr($this->page,0,3)!= 'mun')){
 			$arr_nav_data['arr_pstring'] = $this->{$this->primary_model}->arr_pstring;
 			$arr_nav_data['pstring_selected'] = $this->arr_filter_criteria['pstring'][0];
 			$arr_nav_data['curr_pstring'] = $this->pstring;
