@@ -150,11 +150,11 @@
 			foreach($message as $m) {?>
 				<div id="infoMessage"><?php echo $m;?></div>
 			<?php }
-		elseif(is_array($message) == FALSE): ?>
+		elseif(!is_array($message)): ?>
 			<div id="infoMessage"><?php echo $message;?></div>
 <?php 	endif;
 	elseif($this->session->flashdata('message') != ''): ?>
 			<div id="infoMessage"><?php echo $this->session->flashdata('message');?></div>
 <?php
 	endif;
- ?>	
+	
