@@ -56,7 +56,7 @@ class Access_log extends parent_report {
 			
 			if($this->session->flashdata('message')) $this->session->keep_flashdata('message');
 			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
-			redirect(site_url('auth/index'), 'refresh');
+			redirect(site_url(), 'refresh');
 		}
 		/* Load the profile.php config file if it exists
 		$this->config->load('profiler', false, true);
@@ -212,7 +212,7 @@ class Access_log extends parent_report {
 					array(
 						'title' => $this->product_name,
 						'description' => $this->product_name,
-						'messages' => $this->access_log_model->arr_messages,
+						'message' => $this->access_log_model->arr_messages,
 						'page_heading' => $this->product_name,
 						'section_nav' => $this->load->view('auth/section_nav', NULL, TRUE),
 						'arr_headjs_line'=>array(

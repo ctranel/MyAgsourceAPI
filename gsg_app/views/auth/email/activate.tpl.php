@@ -6,5 +6,8 @@
 	<p>Your <?php echo $this->config->item("product_name"); ?> account has been created.  Before you login, please <?php echo anchor('auth/activate/'. $id .'/'. $activation, 'click this link');?> to verify this e-mail address and activate your account.  If that link does not work, please cut and paste the following URL into your browser: <?php echo $this->config->item('base_url') . $this->config->item('index_page') . 'auth/activate/'. $id .'/'. $activation; ?></p>
 	<p><?php echo $this->config->item("product_name"); ?> gives you access to a number of <?php echo $this->config->item("cust_serv_company","ion_auth"); ?> products with one convenient login.</p>
 	<p>If you have any questions or concerns, please contact us at <?php echo $this->config->item("cust_serv_email"); ?> or <?php echo $this->config->item("cust_serv_phone","ion_auth"); ?>.</p>
+	<p>Herd: <?php echo $herd_code; ?></p>
+	<p>Phone: <?php echo $phone; ?></p>
+	<p>Best time to call: <?php echo $best_time; ?></p>
 </body>
 </html>

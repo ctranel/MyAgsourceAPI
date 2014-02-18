@@ -221,8 +221,6 @@ class Report_model extends CI_Model {
 				$header_data['arr_order'][$fd['name']] = $fd['list_order'];
 				$arr_field_child[$fd['block_header_group_id']][$fd['name']] = $fn; //used to create arr_fields nested array
 				$this->arr_field_sort[$fn] = $fd['default_sort_order'];
-				$tmp_params = $this->get_field_link_params($fd['bsf_id']);
-				$tmp_params = !empty($tmp_params) ? $tmp_params : NULL;
 				$this->arr_field_links[$fn] = array(
 					'href' => $fd['a_href']
 					,'rel' => $fd['a_rel']
@@ -410,6 +408,7 @@ class Report_model extends CI_Model {
 		->from('users.dbo.select_field_link_params l')
 		->join('users.dbo.db_fields f', 'l.param_value_field_id = f.id', 'LEFT')
 		->where(array('l.blocks_select_fields_id'=>$bsf_id))
+		->order_by('l.list_order', 'ASC')
 		->get()
 		->result_array();
 		
@@ -433,7 +432,7 @@ class Report_model extends CI_Model {
 	 * @return array results of search
 	 * @author ctranel
 	 **/
-	function search($herd_code, $arr_filter_criteria, $arr_sort_by = array(''), $arr_sort_order = array(''), $limit = NULL) {
+	function search($herd_code, $block_url, $arr_filter_criteria, $arr_sort_by = array(''), $arr_sort_order = array(''), $limit = NULL) {
 		$this->load->helper('multid_array_helper');
 		$this->herd_code = $herd_code;
 		$this->{$this->db_group_name}->start_cache();
@@ -443,7 +442,8 @@ class Report_model extends CI_Model {
 				$this->{$this->db_group_name}->join($j['table'], $j['join_text']);
 			}
 		}		
-		if(is_array($arr_filter_criteria) && !empty($arr_filter_criteria)) $this->prep_where_criteria($arr_filter_criteria);
+		if(is_array($arr_filter_criteria) && !empty($arr_filter_criteria)) $this->prep_where_criteria($arr_filter_criteria, $block_url);
+		
 		if(is_array($this->arr_fields)){
 			$arr_select_fields = array_flatten($this->arr_fields);
 			$arr_select_fields = $this->prep_select_fields($arr_select_fields);
@@ -548,7 +548,7 @@ class Report_model extends CI_Model {
 	 * @return void
 	 */
 	
-	protected function prep_where_criteria($arr_filter_criteria){
+	protected function prep_where_criteria($arr_filter_criteria, $block_url){
 		//incorporate built-in report filters if set
 		if(is_array($this->arr_where_field) && !empty($this->arr_where_field)){
 			$tmp_cnt = count($this->arr_where_field);
@@ -568,12 +568,21 @@ class Report_model extends CI_Model {
 			if(strpos($k, '.') === FALSE && strpos($k, 'dbfrom') === FALSE && strpos($k, 'dbto') === FALSE) {
 				$k = isset($this->arr_field_table[$k]) && !empty($this->arr_field_table[$k])?$this->arr_field_table[$k] . '.' . $k: $this->primary_table_name . '.' . $k;
 			}
+
+			if($block_url == 'peak_milk_trends' && substr($k,-7)=='pstring' && $v==0){
+				continue;
+			}
+			if($block_url == 'dim_at_1st_breeding' && substr($k,-7)=='pstring' && $v==0){
+				continue;
+			}
+				
+						
 			
 			if(empty($v) === FALSE || $v === '0'){
 				if(is_array($v)){
 					if(strpos($k, 'pstring') !== FALSE){
-						$bool_has_summary = array_search(1, get_elements_by_key('is_summary', $this->arr_blocks)) === FALSE ? FALSE : TRUE;
-						if(!$bool_has_summary) {
+						$bool_is_summary = array_search(1, get_elements_by_key('is_summary', $this->arr_blocks)) === FALSE ? FALSE : TRUE;
+						if(!$bool_is_summary) {
 							$v = array_filter($v);
 							if(empty($v)) continue;
 						}
@@ -918,22 +927,38 @@ $bool_bench_column = FALSE;
 	 * @param string herd code
 	 * @param int number of tests to include on report
 	 * @param string date field used on graph (test_date)
+	 * @param string url segment of block
+	 * @param array of categories
 	 * @return array of data for the chart
 	 * @access public
 	 *
 	 **/
-	function get_graph_data($arr_fieldname, $herd_code, $num_dates, $date_field, $arr_categories = NULL){
-		if(isset($date_field) && isset($num_dates)){
-			$from_date = $this->get_start_date($date_field, $num_dates, 'MM-dd-yyyy');
-			$arr_to_date = $this->get_recent_dates($date_field, 1, 'MM-dd-yyyy');
-			$data = $this->search($herd_code, array('herd_code'=>$herd_code, 'pstring'=>$this->session->userdata('pstring'), $date_field . '_dbfrom' => $from_date, $date_field . '_dbto' => $arr_to_date[0]), array($date_field . ''), array('ASC'), $num_dates);
-		}
-		else{
-			$data = $this->search($herd_code, array('herd_code'=>$herd_code, 'pstring'=>$this->session->userdata('pstring')), array($date_field), array('ASC'), $num_dates);
-		}
+	function get_graph_data($arr_fieldname, $herd_code, $num_dates, $date_field, $block_url, $arr_categories = NULL){
+		$data = $this->get_graph_dataset($herd_code, $num_dates, $date_field, $block_url);
 		if(isset($arr_categories) && is_array($arr_categories)) $return_val = $this->set_row_to_series($data, $arr_fieldname, $arr_categories);
 		else $return_val = $this->set_longitudinal_data($data, $date_field);
 		return $return_val;
+	}
+	
+	/**
+	 * @method get_graph_dataset()
+	 * @param string herd code
+	 * @param int number of tests to include on report
+	 * @param string date field used on graph (test_date)
+	 * @return array of database results
+	 * @access public
+	 *
+	 **/
+	function get_graph_dataset($herd_code, $num_dates, $date_field, $block_url){
+		if(isset($date_field) && isset($num_dates)){
+			$from_date = $this->get_start_date($date_field, $num_dates, 'MM-dd-yyyy');
+			$arr_to_date = $this->get_recent_dates($date_field, 1, 'MM-dd-yyyy');
+			$data = $this->search($herd_code, $block_url, array('herd_code'=>$herd_code, 'pstring'=>$this->session->userdata('pstring'), $date_field . '_dbfrom' => $from_date, $date_field . '_dbto' => $arr_to_date[0]), array($date_field . ''), array('ASC'), $num_dates);
+		}
+		else{
+			$data = $this->search($herd_code, $block_url, array('herd_code'=>$herd_code, 'pstring'=>$this->session->userdata('pstring')), array($date_field), array('ASC'), $num_dates);
+		}
+		return $data;
 	}
 	
 	/**
@@ -1022,33 +1047,83 @@ $bool_bench_column = FALSE;
 	 * @access protected
 	 *
 	 **/
-	protected function set_boxplot_data($data, $num_boxplot_series = 1, $series_space = 400000000){
+	protected function set_boxplot_data($data, $date_field = 'test_date', $num_boxplot_series = 1, $adjustment = 200000000){
 		$row_count = 0;
 		$arr_series = array();
-		foreach ($data as $d){
-		$arr_d = explode('-', $d['test_date']);
-			unset($d['test_date']);
-			$this_date = mktime(0, 0, 0, $arr_d[1], $arr_d[2],$arr_d[0]) * 1000;
+		foreach ($data as $d){ //foreach row
+			//set a variable so we can pair date with each data point
+			if(!isset($d[$date_field])) continue;
+			$arr_d = explode('-', $d[$date_field]);
+			unset($d[$date_field]); //remove date so we can loop through the remaining data points
+			//the date is formated in the database search ('m-d-y'), so we need to accommodate that in the mktime function
+			$this_date = mktime(0, 0, 0, $arr_d[0], $arr_d[1],'20' . $arr_d[2]) * 1000;
+			$num_series = count($d)/3;
 			$field_count = 1;
 			$series_count = 0;
-			$arr_series[$series_count][$row_count] = array($this_date);
-			foreach ($d as $f){
+			$offset = $this->_get_series_offset($num_series, $series_count, $adjustment);
+			$arr_series[$series_count][$row_count] = array($this_date + $offset);
+			$arr_series[$series_count + 1][$row_count] = array($this_date + $offset);
+			foreach ($d as $f){ //for each field in row
 				$tmp_data = is_numeric($f) ? (float)$f : $f;
-				if($field_count <= ($num_boxplot_series * 4)){//boxplot work-around using candlestick chart requires 4 datapoints
+				if($field_count <= ($num_boxplot_series * 3)){// using boxplot chart requires 4 datapoints
+					$modulus = $field_count%3;
 					$arr_series[$series_count][$row_count][] = $tmp_data;
-					if($field_count%4 == 0 && $field_count > 1){
-						$series_count++;
-						if(($field_count + 1) <= ($num_boxplot_series * 4)) $arr_series[$series_count][$row_count] = array($this_date + ($series_space * $series_count)); //adjust date so that multiple boxplots are not on top of each other
+					//boxplots require 5 datapoints, need to replicate each end of the box (i.e., blend whiskers into box)
+					if($modulus === 1 || $modulus === 0){
+						$arr_series[$series_count][$row_count][] = $tmp_data;
+					}
+					if($modulus === 2){ //for median, add a datapoint in the trendline series
+						$arr_series[$series_count + 1][$row_count][] = $tmp_data;
+					}
+					if($modulus == 0 && $field_count > 1){
+						$series_count += 2;
+						if(($field_count + 1) <= ($num_boxplot_series * 3)){
+							$offset = $this->_get_series_offset($num_series, $series_count, $adjustment);
+							$arr_series[$series_count][$row_count] = array(($this_date + $offset)); //adjust date so that multiple boxplots are not on top of each other
+							$arr_series[$series_count +1][$row_count] = array(($this_date + $offset)); //adjust date so that multiple boxplots are not on top of each other
+						}
 					}
 				}
-				else { //assumes that non-box series correspond to box series
-					$arr_series[$series_count][$row_count] = array(($this_date + ($series_space * ($series_count - $num_boxplot_series))), $tmp_data);
-					$series_count++;
+/*				else { //assumes that non-box series correspond to box series
+					$offset = $this->_get_series_offset($num_series, $series_count, $adjustment);
+					$arr_series[$series_count][$row_count] = array(($this_date + $offset), $tmp_data);
+					$arr_series[$series_count + 1][$row_count] = array(($this_date + $offset), $tmp_data);
+					$series_count += 2;
 				}
-				$field_count++;
+*/				$field_count++;
 			}
 			$row_count++;
 		}
 		return $arr_series;
+	}
+	
+	/**
+	 * @method _get_series_offset()
+	 * @param int number of series' in the dataset for which the offset is being calculated
+	 * @param int numeric position of series for which offset is currently being calculated
+	 * @param int standardized unit on which adjustment calculation is based
+	 * @return int amount to offset date in series
+	 * @access protected
+	 *
+	 **/
+		protected function _get_series_offset($num_series, $series_count, $adjustment){
+		$offset = 0;;
+		if($num_series == 2){
+			if($series_count == 0) {
+				$offset -= $adjustment;
+			}
+			if($series_count == 2) {
+				$offset += $adjustment;
+			}
+		}
+		if($num_series == 3){
+			if($series_count == 0) {
+				$offset -= ($adjustment * 2);
+			}
+			if($series_count == 4) {
+				$offset += ($adjustment * 2);
+			}
+		}
+		return $offset;
 	}
 }

@@ -1,9 +1,8 @@
 	// this function allows you to change chart options immediately before chart is rendered
 	function pre_render(options_in, section_data){
 		//if there is a second yAxis, change the color
-//alert(JSON.stringify(section_data));
 		if(typeof options_in.yAxis != 'undefined') {
-			if(section_data.block != 'rc_long_milk' && section_data.block != 'rc_long_health' && section_data.block != 'rc_long_genetics'){
+			if(section_data.block.substring(0, 7) !== 'rc_long'){
 				var tmpdata = Array();
 				tmpdata[0] = options_in.series[0].data
 				tmpdata[1] = '';
@@ -16,7 +15,11 @@
 				    {type:"bar",name:"Percentile",data:tmpdata[0]},
 				    {type:"scatter",marker:{radius:0,data:tmpdata[1]}}
 				];
+				Highcharts.setOptions({
+					legend: {enabled: false}
+				});
 			}
+
 			options_in.tooltip.formatter = function(){return this.y + ["th","st","nd","rd"][!(this.y%10>3||Math.floor(this.y%100/10)==1)*this.y%10] + ' Percentile';};
 			options_in.plotOptions = {}
 			options_in.plotOptions.bar = {
@@ -54,12 +57,7 @@
 			    {color:'rgba(100,204,100,.1)',from:80,to:100}
 			];
 		}
-//alert(JSON.stringify(options_in));
 		$('.chart-container').each(function(){
 			$(this).addClass('chart-only').removeClass('chart-odd').removeClass('chart-even').removeClass('chart-last-odd');
 		})
-	}
-	
-	//this function is called in the graph_helper.js file after the JSON data file has loaded.  It can make report specific updates after the data has been loaded (see commented code for example)
-	function post_render(app_data){
 	}

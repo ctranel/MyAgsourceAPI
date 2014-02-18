@@ -166,7 +166,8 @@ switch (ENVIRONMENT)
 		exit('The application environment is not set correctly - t_base_url.');
 }
 
-$config['default_group']        = 2; 			// Default group, use name
+$config['default_group']        = 'Producer'; 			// Default group, use name
+$config['default_group_id']     = 2;
 $config['admin_group']          = 1; 				// Default administrators group, use name
 $config['manager_group']        = 3; //custom CDT
 
@@ -207,6 +208,7 @@ $config['email_forgot_password_complete'] = 'new_password.tpl.php'; //Forgot Pas
 $config['consult_granted']   = 'consult_granted.tpl.php';	//grant consultant access to herd
 $config['consult_denied']   = 'consult_denied.tpl.php';		//deny consultant access to herd
 $config['consult_request']   = 'consult_request.tpl.php';	//consultants' request to access herd
+$config['user_herd_data']   = 'user_herd_data.tpl.php';	//internal email with user and herd data of registrants
 
 /*
  | -------------------------------------------------------------------------

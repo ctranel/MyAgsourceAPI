@@ -22,7 +22,7 @@ class Region extends CI_Controller {
 
 		if(!$this->as_ion_auth->has_permission("Manage Staff")){
        		$this->session->set_flashdata('message',  $this->session->flashdata('message') . "You do not have permission to edit the requested association/region.");
-       		redirect("auth/index", 'refresh');
+       		redirect(site_url(), 'refresh');
 		}
 
        	$this->load->library('form_validation');

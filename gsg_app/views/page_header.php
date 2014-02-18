@@ -1,6 +1,8 @@
 <!doctype html>
+<html lang="en">
 <head>
 	<title><?php if(isset($title)) echo $title; ?></title>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">    
     <meta http-equiv="pragma" content="no-cache">
     <meta http-equiv="cache-control" content="no-cache">
     <meta http-equiv="content-type" content="text/html;charset=UTF-8">
@@ -8,7 +10,7 @@
     <meta name="googlebot" content="NOARCHIVE">
     <meta name="description" content="<?php if(isset($description)) echo $description; ?>">
     <meta name="keywords" content="<?php echo $this->config->item("cust_serv_company"); ?>, DHI Testing, DHI, DHIA, milk testing, soil testing, forage testing, manure testing, " />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 	<link rel="stylesheet" href='http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css'>
 <?php
 	    $this->carabiner->css('http://agsource.crinet.com/css/AgSource-Cooperative-Services.css', 'screen');
@@ -24,10 +26,9 @@
 		endforeach;
 	endif; ?>
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/headjs/0.99/head.min.js"></script>
-	<!-- <script src="<?php echo $this->config->item('base_url_assets') ?>js/head.js"></script> -->
 	<script type="text/javascript">
 		head.js(
-			{jquery: "https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"},
+			{jquery: "https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"},
 			{bootstrap: "http://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"},
 			{sectionhelper: "<?php echo $this->config->item('base_url_assets'); ?>js/as_section_helper.js"}
 			<?php
@@ -135,6 +136,7 @@
 	<!--left side of page-->
 	<div id="main-content">
 	<?php if (!empty($page_heading)) echo heading($page_heading);
+
 	if(isset($error)):
 		if (is_array($error) &&!empty($error)):
 			foreach($error as $e) {?>
@@ -143,13 +145,13 @@
 		else: ?>
 			<div id="errors"><?php echo $error;?></div>
 <?php 	endif;
-	elseif(isset($messages)):
-		if (is_array($messages) && !empty($messages)):
-			foreach($messages as $m) {?>
+	elseif(isset($message)):
+		if (is_array($message) && !empty($message)):
+			foreach($message as $m) {?>
 				<div id="infoMessage"><?php echo $m;?></div>
 			<?php }
-		elseif(is_array($messages) == FALSE): ?>
-			<div id="infoMessage"><?php echo $messages;?></div>
+		elseif(is_array($message) == FALSE): ?>
+			<div id="infoMessage"><?php echo $message;?></div>
 <?php 	endif;
 	elseif($this->session->flashdata('message') != ''): ?>
 			<div id="infoMessage"><?php echo $this->session->flashdata('message');?></div>

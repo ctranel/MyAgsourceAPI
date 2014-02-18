@@ -12,7 +12,7 @@
 				else :
 					$li_class = FALSE; 
 				endif; ?>
-			<li<?php if($li_class) echo ' class="first" style="font-weight: bold"'; ?>><a href="<?php echo site_url('auth/index/' . $arr_pstring[$c]['pstring']); ?>" class="pstring-link<?php if($arr_pstring[$c]['pstring'] == $curr_pstring) echo ' current'; ?>" id="<?php echo $arr_pstring[$c]['pstring']; ?>"><?php echo $arr_pstring[$c]['publication_name']; // . ' - ' . $arr_pstring[$c]['publication_name']; ?></a></li>
+			<li<?php if($li_class) echo ' class="first" style="font-weight: bold"'; ?>><a href="<?php echo site_url('land/index/' . $arr_pstring[$c]['pstring']); ?>" class="pstring-link<?php if($arr_pstring[$c]['pstring'] == $curr_pstring) echo ' current'; ?>" id="<?php echo $arr_pstring[$c]['pstring']; ?>"><?php echo $arr_pstring[$c]['publication_name']; // . ' - ' . $arr_pstring[$c]['publication_name']; ?></a></li>
 			<?php endfor; ?>
 		</ul>
 	</div>

@@ -123,6 +123,44 @@ class As_ion_auth extends Ion_auth {
 
 	//overridden functions below
 	/**
+	 * @method register
+	 *
+	 * @return boolean/void
+	 * @author ctranel
+	 **/
+	public function register($username, $password, $email, $additional_data = array(), $group_name = array()) {
+		$id = parent::register($username, $password, $email, $additional_data, $group_name);
+		$herd_code = $additional_data['herd_code'];
+		
+		$this->load->model('tech_model');
+		
+		if($id && isset($herd_code) && !empty($herd_code)){
+			$data = array(
+				'email'     => $email,
+				'herd_code'	=> $herd_code,
+				'phone'		=> $additional_data['phone'],
+				'best_time'	=> $additional_data['best_time'],
+				'arr_herd'	=> $this->herd_model->get_herd($herd_code),
+				'arr_tech'	=> $this->tech_model->get_tech_by_herd($herd_code),
+			);
+			if(!$this->config->item('use_ci_email', 'ion_auth')) {
+				return $data;
+			}
+			else {
+				$message = $this->load->view($this->config->item('email_templates', 'ion_auth').$this->config->item('user_herd_data', 'ion_auth'), $data, true);
+				$this->email->clear();
+				$this->email->from($this->config->item('admin_email', 'ion_auth'), $this->config->item('site_title', 'ion_auth'));
+				$this->email->to($this->config->item('cust_serv_email','ion_auth'));
+				$this->email->subject($this->config->item('site_title', 'ion_auth') . ' - Account Activation Info');
+				$this->email->message($message);
+				$this->email->send();
+			}
+		}
+		return $id;
+	}
+	
+	
+	/**
 	 * @method logout
 	 *
 	 * @return boolean/void
@@ -278,28 +316,29 @@ class As_ion_auth extends Ion_auth {
 	 * @method get_group_dropdown_data()
 	 * @return array (key=>value) array of groups for populating options lists
 	 * @access public
+	 * 
+	 * @todo: groups are hard-coded, find a good way to pull them dynamically (use group table's parent_group field?)
 	 *
 	 **/
 	public function get_group_dropdown_data(){
+		$arr_groups = array();
 		$ret_array = array();
-		if($this->is_admin){
-			$arr_group_obj = $this->ion_auth_model->groups()->result();
-		}
-		elseif($this->is_manager){
-			$arr_group_obj = $this->ion_auth_model->get_child_groups($this->session->userdata('active_group_id'));
+		if($this->has_permission('Add All Users')){
+			$arr_groups = $this->ion_auth_model->groups()->result_array();
 		}
 		else{
-			$arr_group_obj = (object) $this->session->userdata('arr_groups');
+			if($this->has_permission('Add Users In Region')){
+				$arr_groups = $this->ion_auth_model->get_child_groups(3);
+			}
+			$arr_groups[] = array('id'=>'2', 'name'=>'Producers');
+			$arr_groups[] = array('id'=>'9', 'name'=>'Consultants');
 		}
-		if(is_array($arr_group_obj)) {
+		if(is_array($arr_groups)) {
 			$ret_array[''] = "Select one";
-			foreach($arr_group_obj as $g){
-				$ret_array[$g->id] = $g->name;
+			foreach($arr_groups as $g){
+				$ret_array[$g['id']] = $g['name'];
 			}
 			return $ret_array;
-		}
-		elseif(is_object($arr_group_obj)) {
-			return $arr_group_obj;
 		}
 		else {
 			return false;
@@ -741,6 +780,6 @@ class As_ion_auth extends Ion_auth {
 die($message);
 		return FALSE;
 	}
-
 	//WHEN LOOKING UP HERDS FOR CONSULTANTS, ENSURE THAT IT IS NOT EXPIRED, AND THAT IT HAS BEEN APPROVED
+
 }

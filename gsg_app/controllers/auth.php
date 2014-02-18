@@ -28,7 +28,7 @@ class Auth extends Ionauth {
 	
 	function index($pstring = NULL){
 			$this->session->keep_flashdata('redirect_url');
-			redirect(site_url('land'));
+			redirect(site_url('land/index/' . $pstring));
 	}
 
 	function section_info(){
@@ -571,7 +571,7 @@ class Auth extends Ionauth {
 	function list_accounts(){
 		if(!$this->as_ion_auth->has_permission("Manage Other Accounts")){
        		$this->session->set_flashdata('message',  $this->session->flashdata('message') . "You do not have permission to edit user accounts.");
-       		redirect(site_url("auth/index"), 'refresh');
+       		redirect(site_url(), 'refresh');
 		}
 		//set the flash data error message if there is one
 		$this->data['message'] = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
@@ -726,6 +726,23 @@ class Auth extends Ionauth {
 		parent::forgot_password();
 	}
 
+	//reset password - final step for forgotten password
+	public function reset_password($code = NULL){
+		if(is_array($this->page_header_data)){
+			$this->page_header_data = array_merge($this->page_header_data,
+				array(
+					'title'=>'Reset Password - ' . $this->config->item('product_name'),
+					'description'=>'Reset Password - ' . $this->config->item('product_name')
+				)
+			);
+		}
+		$this->page_header_data['section_nav'] = $this->load->view('auth/section_nav', NULL, TRUE);
+		$this->data['page_header'] = $this->load->view('page_header', $this->page_header_data, TRUE);
+		$this->data['page_heading'] = 'Forgotten Password - ' . $this->config->item('product_name');
+		$this->data['page_footer'] = $this->load->view('page_footer', null, TRUE);
+		parent::reset_password();
+	}
+	
 	//deactivate the user
 	function deactivate($id = NULL)
 	{
@@ -744,8 +761,7 @@ class Auth extends Ionauth {
 		parent::deactivate($id);
 	}
 
-	//create a new user
-//@todo : verify that producer are not allowed to add or modify groups
+
 	function create_user()
 	{
 		$this->data['title'] = "Create Account";
@@ -756,9 +772,10 @@ class Auth extends Ionauth {
 		$this->form_validation->set_rules('email', 'Email Address', 'trim|required|valid_email');
 		$this->form_validation->set_rules('supervisor_num', 'Field Technician Number', 'exact_length[6]');
 		$this->form_validation->set_rules('region_id', 'Association Number (if a member of an association)', 'exact_length[3]');
-		$this->form_validation->set_rules('phone1', 'First Part of Phone', 'exact_length[3]');
-		$this->form_validation->set_rules('phone2', 'Second Part of Phone', 'exact_length[3]');
-		$this->form_validation->set_rules('phone3', 'Third Part of Phone', 'exact_length[4]');
+		$this->form_validation->set_rules('phone1', 'First Part of Phone', 'exact_length[3]|required');
+		$this->form_validation->set_rules('phone2', 'Second Part of Phone', 'exact_length[3]|required');
+		$this->form_validation->set_rules('phone3', 'Third Part of Phone', 'exact_length[4]|required');
+		$this->form_validation->set_rules('best_time', 'Best Time to Call', 'max_length[10]|required');
 		$this->form_validation->set_rules('password', 'Password', 'trim|required|min_length[' . $this->config->item('min_password_length', 'ion_auth') . ']|max_length[' . $this->config->item('max_password_length', 'ion_auth') . ']|matches[password_confirm]');
 		$this->form_validation->set_rules('password_confirm', 'Password Confirmation', 'trim|required');
 		$this->form_validation->set_rules('group_id[]', 'Name of User Group');
@@ -789,7 +806,7 @@ class Auth extends Ionauth {
 				$region_id = $this->input->post('region_id[]'); //field techs and managers
 				$supervisor_num = $this->input->post('supervisor_num'); //field tech only
 			}
-			elseif(in_array(3, $arr_posted_group_id)){
+			elseif(in_array(3, $arr_posted_group_id) || in_array(10, $arr_posted_group_id)){
 				$region_id = $this->input->post('region_id[]'); //field techs and managers
 			}
 			if(in_array(2, $arr_posted_group_id)){ //producers
@@ -797,10 +814,10 @@ class Auth extends Ionauth {
 				$herd_release_code = $this->input->post('herd_release_code');
 				$this->load->model('herd_model');
 				$error = $this->herd_model->herd_authorization_error($herd_code, $herd_release_code);
-//				if($error){
-//					$this->as_ion_auth->set_error($error);
-//					$is_validated = false;
-//				}
+				if($error){
+					$this->as_ion_auth->set_error($error);
+					$is_validated = false;
+				}
 			}
 			$username = substr(strtolower($this->input->post('first_name')) . ' ' . strtolower($this->input->post('last_name')),0,15);
 			$email = $this->input->post('email');
@@ -812,7 +829,8 @@ class Auth extends Ionauth {
 				'supervisor_num' => $supervisor_num,
 				'region_id' => $region_id,
 				'phone' => $this->input->post('phone1') . '-' . $this->input->post('phone2') . '-' . $this->input->post('phone3'),
-//				'group_id' => $arr_posted_group_id,
+				'best_time' => $this->input->post('best_time'),
+				'group_id' => $arr_posted_group_id,
 				'section_id' => $this->input->post('section_id')
 			);
 			if($additional_data['phone'] == '--') $additional_data['phone'] = '';
@@ -820,23 +838,28 @@ class Auth extends Ionauth {
 		if ($is_validated === TRUE && $this->as_ion_auth->register($username, $password, $email, $additional_data, $arr_posted_group_id)) { //check to see if we are creating the user
 			//redirect them back to the admin page
 			//$this->as_ion_auth->activate();
-			$this->session->set_flashdata('message', "Your account has been created.  Please check your e-mail for instructions on activating your account.");
+			$this->session->set_flashdata('message', "Your account has been created.  A member of the AgSource Customer Service team will contact you to activate your account.");
 			redirect(site_url("auth/login"), 'refresh');
 		}
 		else { //display the create user form
-				//get default group_id 
-			$default_group_id = $this->ion_auth_model->get_group_by_name($this->config->item('default_group', 'ion_auth'))->id;
-			$arr_form_group_id = $this->form_validation->set_value('group_id[]', array($default_group_id));
+			$arr_form_group_id = $this->form_validation->set_value('group_id[]', array($this->config->item('default_group_id', 'ion_auth')));
 			$this->data['group_selected'] = $arr_form_group_id;
-
+			$this->data['group_id'] = 'id="group_id" class = "require"';// multiple size="4"';
+			$this->data['group_options'] = $this->as_ion_auth->get_group_dropdown_data();
+				
 			$arr_form_section_id = $this->form_validation->set_value('section_id[]', array());
 			$this->data['section_selected'] = $arr_form_section_id;
 			
 			$region_id_in = $this->form_validation->set_value('region_id[]');
-			$arr_form_region_id = !empty($region_id_in) ? $region_id_in : array_keys($this->session->userdata('arr_regions'));
+			if(!$this->as_ion_auth->logged_in()){
+				$arr_form_region_id = array();
+			}
+			else{
+				$arr_form_region_id = !empty($region_id_in) ? $region_id_in : array_keys($this->session->userdata('arr_regions'));
+			}
 			//set the flash data error message if there is one
 			$this->page_header_data['message'] = (validation_errors() ? validation_errors() : ($this->as_ion_auth->errors() ? $this->as_ion_auth->errors() : $this->session->flashdata('message')));
-			
+				
 			$this->data['first_name'] = array('name' => 'first_name',
 				'id' => 'first_name',
 				'type' => 'text',
@@ -900,9 +923,6 @@ class Auth extends Ionauth {
 					);
 				}
 
-				$this->data['group_id'] = 'id="group_id" class = "require" multiple size="4"';
-				$this->data['group_options'] = $this->as_ion_auth->get_group_dropdown_data();
-				$this->data['group_selected'] = $arr_form_group_id;
 				$this->data['supervisor_num_options'] = !empty($arr_form_region_id)?$this->as_ion_auth->get_dhi_supervisor_dropdown_data(array_keys($arr_form_region_id)):array();
 				$this->data['supervisor_num_selected'] = $this->form_validation->set_value('supervisor_num');
 				if(!empty($this->data['supervisor_num_options'])){
@@ -921,6 +941,7 @@ class Auth extends Ionauth {
 			}
 			$this->data['phone1'] = array('name' => 'phone1',
 				'id' => 'phone1',
+				'class' => 'require',
 				'type' => 'text',
 				'size' => '3',
 				'maxlength' => '3',
@@ -928,6 +949,7 @@ class Auth extends Ionauth {
 			);
 			$this->data['phone2'] = array('name' => 'phone2',
 				'id' => 'phone2',
+				'class' => 'require',
 				'type' => 'text',
 				'size' => '3',
 				'maxlength' => '3',
@@ -935,10 +957,19 @@ class Auth extends Ionauth {
 			);
 			$this->data['phone3'] = array('name' => 'phone3',
 				'id' => 'phone3',
+				'class' => 'require',
 				'type' => 'text',
 				'size' => '4',
 				'maxlength' => '4',
 				'value' => $this->form_validation->set_value('phone3'),
+			);
+			$this->data['best_time'] = array('name' => 'best_time',
+				'id' => 'best_time',
+				'class' => 'require',
+				'type' => 'text',
+				'size' => '10',
+				'maxlength' => '10',
+				'value' => $this->form_validation->set_value('best_time')
 			);
 			$this->data['password'] = array('name' => 'password',
 				'id' => 'password',
@@ -989,9 +1020,10 @@ class Auth extends Ionauth {
 			$this->form_validation->set_rules('email', 'Email Address', 'trim|required|valid_email');
 			$this->form_validation->set_rules('supervisor_num', 'Field Technician Number', 'exact_length[6]');
 			$this->form_validation->set_rules('region_id[]', 'Association/Region Number');
-			$this->form_validation->set_rules('phone1', 'First Part of Phone', 'exact_length[3]');
-			$this->form_validation->set_rules('phone2', 'Second Part of Phone', 'exact_length[3]');
-			$this->form_validation->set_rules('phone3', 'Third Part of Phone', 'exact_length[4]');
+			$this->form_validation->set_rules('phone1', 'First Part of Phone', 'exact_length[3]|required');
+			$this->form_validation->set_rules('phone2', 'Second Part of Phone', 'exact_length[3]|required');
+			$this->form_validation->set_rules('phone3', 'Third Part of Phone', 'exact_length[4]|required');
+			$this->form_validation->set_rules('best_time', 'Best Time to Call', 'max_length[10]|required');
 			$this->form_validation->set_rules('password', 'Password', 'trim|min_length[' . $this->config->item('min_password_length', 'ion_auth') . ']|max_length[' . $this->config->item('max_password_length', 'ion_auth') . ']|matches[password_confirm]');
 			$this->form_validation->set_rules('password_confirm', 'Password Confirmation', 'trim');
 			$this->form_validation->set_rules('group_id[]', 'Name of Account Group');
@@ -1055,6 +1087,7 @@ class Auth extends Ionauth {
 					'last_name' => $this->input->post('last_name'),
 //					'company' => $this->input->post('company') ? $this->input->post('company') : NULL,
 					'phone' => $this->input->post('phone1') . '-' . $this->input->post('phone2') . '-' . $this->input->post('phone3'),
+					'best_time' => $this->input->post('best_time'),
 					'group_id' => $arr_posted_group_id,
 					'supervisor_num' => $supervisor_num,
 					'region_id' => $region_id,
@@ -1077,8 +1110,7 @@ class Auth extends Ionauth {
 				$obj_user->arr_groups = array_keys($this->ion_auth_model->get_users_group_array($obj_user->id));
 				//get default group_id
 				if(empty($obj_user->arr_groups)){ //if no group is set, set the default group
-					$default_group_id = $this->ion_auth_model->get_group_by_name($this->config->item('default_group', 'ion_auth'))->id;
-					$obj_user->arr_groups = array($default_group_id);
+					$obj_user->arr_groups = array($this->config->item('default_group_id', 'ion_auth'));
 				}
 				$arr_form_group_id = $this->form_validation->set_value('group_id[]', $obj_user->arr_groups);
 				$this->data['group_selected'] = $arr_form_group_id;
@@ -1091,8 +1123,6 @@ class Auth extends Ionauth {
 				$this->data['region_selected'] = $arr_form_region_id;
 				$form_supervisor_num = $this->form_validation->set_value('supervisor_num', !empty($obj_user->supervisor_num) ? $obj_user->supervisor_num : $this->session->userdata('supervisor_num'));
 
-				//set the flash data error message if there is one
-/****** MESSAGE NEEDS TO GO TO HEADER, NOT PAGE ****/
 				$this->data['message'] = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
 				$this->data['first_name'] = array('name' => 'first_name',
 					'id' => 'first_name',
@@ -1205,6 +1235,7 @@ class Auth extends Ionauth {
 				}
 				$this->data['phone1'] = array('name' => 'phone1',
 					'id' => 'phone1',
+					'class' => 'require',
 					'type' => 'text',
 					'size' => '3',
 					'maxlength' => '3',
@@ -1212,6 +1243,7 @@ class Auth extends Ionauth {
 				);
 				$this->data['phone2'] = array('name' => 'phone2',
 					'id' => 'phone2',
+					'class' => 'require',
 					'type' => 'text',
 					'size' => '3',
 					'maxlength' => '3',
@@ -1219,10 +1251,19 @@ class Auth extends Ionauth {
 				);
 				$this->data['phone3'] = array('name' => 'phone3',
 					'id' => 'phone3',
+					'class' => 'require',
 					'type' => 'text',
 					'size' => '4',
 					'maxlength' => '4',
 					'value' => $this->form_validation->set_value('phone3', $phone3)
+				);
+				$this->data['best_time'] = array('name' => 'best_time',
+					'id' => 'best_time',
+					'class' => 'require',
+					'type' => 'text',
+					'size' => '10',
+					'maxlength' => '10',
+					'value' => $this->form_validation->set_value('best_time', $obj_user->best_time)
 				);
 				$this->data['user_id'] = array('name' => 'user_id',
 					'id' => 'user_id',

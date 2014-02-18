@@ -11,7 +11,7 @@
  * @param	boolean maintain empty rows
  * @param	boolean maintain key
  * @param	constant sort order
-	 * @author ctranel
+ * @author ctranel
  * @return	array
  */
 if ( ! function_exists('multid_array_sort')) {
@@ -137,28 +137,28 @@ function array_flatten_wkeys($array, $preserve_keys = 1, &$newArray = Array()) {
 }
 
 function rollcount(array &$count, &$depth, $separator) {
-	$out = $count[$depth];
-	for ($i=0;$i<$depth;$i++) {
-		$out = $count[$i].$separator.$out;
+	$codex = $count[$depth];
+	for ($i=$depth-1;$i>-1;$i--) {
+		$codex = $count[$i].$separator.$codex;
 	}
-	return $out.":";
+	return str_pad($codex,12,' ',STR_PAD_LEFT);
 }
 
-function steamroll(array &$output, array &$arr, array &$count, &$depth, $separator) {
+function steamroll(array &$arr_out, array &$arr_in, array &$count, &$depth, $separator) {
 
-	foreach($arr as $k => $v) {
-		$key = rollcount($count, $depth, $separator).$k;
+	foreach($arr_in as $k => $v) {
+		$key = rollcount($count, $depth, $separator).'  '.str_pad($k,20);
 		if (is_array($v) && empty($v)) {
-			$output[$key] = "Array(empty)";
+			$arr_out[$key] = "Array(empty)";
 		}
 		elseif (is_array($v)) {
-			$output[$key] = "Array";
+			$arr_out[$key] = "Array";
 			$depth++;
 			$count[$depth]=0;
-			steamroll($output, $v, $count, $depth, $separator);
+			steamroll($arr_out, $v, $count, $depth, $separator);
 		}
 		else {
-			$output[$key] = $v;
+			$arr_out[$key] = $v;
 		}
 		$count[$depth]++;
 	}
@@ -173,10 +173,10 @@ function steamroll(array &$output, array &$arr, array &$count, &$depth, $separat
 
 function steamroller(array $arr_in, $node_separator = ".") {
 	
-	$new_count = array(0=>0);
-	$arr_out = array();
-	$depth = 0;	
-	steamroll($arr_out, $arr_in, $new_count, $depth, $node_separator);	
+	$count = array(0=>0); //Array of node counters
+	$arr_out = array(); // The array to be returned
+	$depth = 0;	//designates the active node
+	steamroll($arr_out, $arr_in, $count, $depth, $node_separator);	
 	
 	return $arr_out;
 }
