@@ -67,9 +67,11 @@ class Cow_lookup extends CI_Controller {
 		$this->load->model('cow_lookup/lactations_model');
 		$tab = array();
 		if(isset($data['dam']['dam_serial_num']) && !empty($data['dam']['dam_serial_num'])){
-			$subdata['arr_lacts'] = $this->lactations_model->getLactationsArray($this->session->userdata('herd_code'), $data['dam']['dam_serial_num']);
+			//$subdata['arr_lacts'] = $this->lactations_model->getLactationsArray($this->session->userdata('herd_code'), $data['dam']['dam_serial_num']);
+			$subdata['arr_lacts'] = $this->lactations_model->getDamLactationsArray($this->session->userdata('herd_code'), $serial_num);
 			$tab['lact_table'] = $this->load->view('cow_lookup/lactations_table', $subdata, true);
-			$subdata['arr_offspring'] = $this->lactations_model->getOffspringArray($this->session->userdata('herd_code'), $data['dam']['dam_serial_num']);
+			//$subdata['arr_offspring'] = $this->lactations_model->getOffspringArray($this->session->userdata('herd_code'), $data['dam']['dam_serial_num']);
+			$subdata['arr_offspring'] = $this->lactations_model->getDamOffspringArray($this->session->userdata('herd_code'), $serial_num);
 			$tab['offspring_table'] = $this->load->view('cow_lookup/offspring_table', $subdata, true);
 			unset($subdata);
 		}
