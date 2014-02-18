@@ -16,7 +16,7 @@
 
 	echo form_open("auth/change_password");?>
 
-      <p>Old Password:<br />
+      <p>Old Password (at least 8 characters):<br />
       <?php echo form_input($old_password);?>
       </p>
       
