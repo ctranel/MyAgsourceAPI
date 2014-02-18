@@ -13,7 +13,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 	<link rel="stylesheet" href='http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css'>
 <?php
-	    $this->carabiner->css('http://agsource.crinet.com/css/AgSource-Cooperative-Services.css', 'screen');
+	    $this->carabiner->css('corporate.css', 'screen');
 		$this->carabiner->css('print.css', 'print');
 		$this->carabiner->css('myags.css', 'screen');
 		$this->carabiner->css('myags.css', 'print');
