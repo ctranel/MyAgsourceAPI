@@ -49,3 +49,11 @@ $lang['update_successful'] 		 	         = 'Account Information Successfully Upda
 $lang['update_unsuccessful'] 		 	     = 'Unable to Update Account Information';
 $lang['delete_successful'] 		 	         = 'User Deleted';
 $lang['delete_unsuccessful'] 		 	     = 'Unable to Delete User';
+
+//herd code
+$lang['account_creation_invalid_herd_release_code']	= 'Invalid Herd Release Code';
+$lang['account_creation_invalid_herd_code'] 		= 'Invalid Herd Code';
+
+//consultant
+$lang['consultant_status_email_successful']			= 'Request sent successfully';
+$lang['consultant_status_email_unsuccessful'] 		= 'Unable to send request';
