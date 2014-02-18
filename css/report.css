@@ -50,6 +50,7 @@ th span.hide-column {cursor: pointer;}
 .downloads-container {position: relative; right: 2px; top:30px;}
 /* IE workaround */
 .ie .downloads-container {right: 30px; top:6px;}
+.eq-ie9 .table-wrapper, .eq-ie8 .table-wrapper {padding-top: 24px;}
 /* IE workaround */
 a.download-links {font-family: "Lucida Grande","Lucida Sans Unicode",Verdana,Arial,Helvetica,sans-serif; text-decoration: none; cursor: pointer; padding: 0pt 5px; display:block;}
 a.download-links:hover {color:#F1F8F8; background-color:#004147;}
