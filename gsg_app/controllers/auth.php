@@ -740,7 +740,7 @@ class Auth extends Ionauth {
 		$this->data['page_header'] = $this->load->view('page_header', $this->page_header_data, TRUE);
 		$this->data['page_heading'] = 'Forgotten Password - ' . $this->config->item('product_name');
 		$this->data['page_footer'] = $this->load->view('page_footer', null, TRUE);
-		parent::reset_password();
+		parent::reset_password($code);
 	}
 	
 	//deactivate the user
