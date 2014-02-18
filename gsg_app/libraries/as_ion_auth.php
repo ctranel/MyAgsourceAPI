@@ -123,6 +123,44 @@ class As_ion_auth extends Ion_auth {
 
 	//overridden functions below
 	/**
+	 * @method register
+	 *
+	 * @return boolean/void
+	 * @author ctranel
+	 **/
+	public function register($username, $password, $email, $additional_data = array(), $group_name = array()) {
+		$id = parent::register($username, $password, $email, $additional_data, $group_name);
+		$herd_code = $additional_data['herd_code'];
+		
+		$this->load->model('tech_model');
+		
+		if($id && isset($herd_code) && !empty($herd_code)){
+			$data = array(
+				'email'     => $email,
+				'herd_code'	=> $herd_code,
+				'phone'		=> $additional_data['phone'],
+				'best_time'	=> $additional_data['best_time'],
+				'arr_herd'	=> $this->herd_model->get_herd($herd_code),
+				'arr_tech'	=> $this->tech_model->get_tech_by_herd($herd_code),
+			);
+			if(!$this->config->item('use_ci_email', 'ion_auth')) {
+				return $data;
+			}
+			else {
+				$message = $this->load->view($this->config->item('email_templates', 'ion_auth').$this->config->item('user_herd_data', 'ion_auth'), $data, true);
+				$this->email->clear();
+				$this->email->from($this->config->item('admin_email', 'ion_auth'), $this->config->item('site_title', 'ion_auth'));
+				$this->email->to($this->config->item('cust_serv_email','ion_auth'));
+				$this->email->subject($this->config->item('site_title', 'ion_auth') . ' - Account Activation Info');
+				$this->email->message($message);
+				$this->email->send();
+			}
+		}
+		return $id;
+	}
+	
+	
+	/**
 	 * @method logout
 	 *
 	 * @return boolean/void

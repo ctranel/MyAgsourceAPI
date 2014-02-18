@@ -761,8 +761,7 @@ class Auth extends Ionauth {
 		parent::deactivate($id);
 	}
 
-	//create a new user
-//@todo : verify that producer are not allowed to add or modify groups
+
 	function create_user()
 	{
 		$this->data['title'] = "Create Account";

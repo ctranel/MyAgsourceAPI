@@ -149,15 +149,6 @@ class Herd_model extends CI_Model {
 	 * @access public
 	 * @author ctranel
 	 **/
-	/* -----------------------------------------------------------------
-	 *  UPDATE comment
-	 *  @author: carolmd
-	 *  @date: Dec 12, 2013
-	 *
-	 *  @description: Revised to NOT use herds_regions table. 
-	 *  
-	 *  -----------------------------------------------------------------
-	 */
 	public function get_herds($limit=NULL, $offset=NULL, $order_by='herd_owner')
 	{
 		$this->db
@@ -182,8 +173,10 @@ class Herd_model extends CI_Model {
 	 **/
 	public function get_herd($herd_code)
 	{
-		$this->db->where($this->tables['herds'] . '.herd_code', $herd_code);
-		return $this->get_herds(1,0);
+		$this->db->where('h.herd_code', $herd_code);
+		$arr_return = $this->get_herds(1,0);
+		if(isset($arr_return[0])) return $arr_return[0];
+		else return FALSE;
 	}
 
 	/**
@@ -243,9 +236,8 @@ class Herd_model extends CI_Model {
 		->where('(consultants_herds.exp_date > CURDATE() OR consultants_herds.exp_date IS NULL)')
 		->where('request_status_id', 1);
 		return $this->get_herd_codes();
-		
-		
 	}
+
 	/**
 	 * @method get_herd_codes_by_user
 	 *
