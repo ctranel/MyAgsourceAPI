@@ -9,7 +9,7 @@
 		<label>Visible ID</label> <?php echo $visible_id; ?>
 	</div>
 	<div class="col-sm-3">
-		<label>Reg #</label> <?php echo $cow_id; ?>
+		<label>ID</label> <?php echo $cow_id; ?>
 	</div>
 </div>
 <div class="row">
@@ -40,7 +40,7 @@
 			</div>
 			<div class="row">
 				<div class="col-sm-6">
-					<label>Reg #</label> <?php echo $sire_id; ?>
+					<label>ID</label> <?php echo $sire_id; ?>
 				</div>
 				<div class="col-sm-6">
 					<label>Breed</label> <?php echo $sire_breed_code; ?>
@@ -61,7 +61,7 @@
 			</div>
 			<div class="row">
 				<div class="col-sm-6">
-					<label>Reg #</label> <?php echo $dam_id; ?>
+					<label>ID</label> <?php echo $dam_id; ?>
 				</div>
 				<div class="col-sm-6">
 					<label>Breed</label> <?php echo $dam_breed_code; ?>
@@ -84,7 +84,7 @@
 			</div>
 			<div class="row">
 				<div class="col-sm-6">
-					<label>Reg #</label> <?php echo $mgr_sire_id; ?>
+					<label>ID</label> <?php echo $mgr_sire_id; ?>
 				</div>
 				<div class="col-sm-6">
 					<label>Breed</label> <?php echo $mgr_sire_breed_code; ?>
@@ -105,7 +105,7 @@
 			</div>
 			<div class="row">
 				<div class="col-sm-6">
-					<label>Reg #</label> <?php echo $mgrtgr_sire_id; ?>
+					<label>ID</label> <?php echo $mgrtgr_sire_id; ?>
 				</div>
 				<div class="col-sm-6">
 					<label>Breed</label> <?php echo $mgrtgr_sire_breed_code; ?>
@@ -126,7 +126,7 @@
 			</div>
 			<div class="row">
 				<div class="col-sm-6">
-					<label>Reg #</label> <?php echo $mgr_dam_id; ?>
+					<label>ID</label> <?php echo $mgr_dam_id; ?>
 				</div>
 				<div class="col-sm-6">
 					<label>Breed</label> <?php echo $mgr_dam_breed_code; ?>
