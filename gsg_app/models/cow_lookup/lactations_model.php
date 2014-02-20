@@ -37,7 +37,7 @@ class Lactations_model extends CI_Model {
 		->select("calf_control_num, calving_date, calf_name, calf_visible_id, sex_desc, twin_code, calving_ease_code, calf_sire_naab, calf_sire_name")
 		->where('herd_code', $herd_code)
 		->where('serial_num', $serial_num)
-		->order_by('calving_date', 'asc')
+		->order_by('CONVERT(datetime, calving_date, 101)')
 		->get('vma.dbo.vma_Cow_Lookup_Calving')
 		->result_array();
 		
