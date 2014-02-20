@@ -324,7 +324,7 @@ class Report_model extends CI_Model {
 				$c = 0;
 				foreach($arr_dates[0] as $key => $value){
 					if ($key == $ag['text']) {
-						if ($value = '0-0') {
+						if ($value == '0-0') {
 							$value='No Test (-'.$c.')';
 						}
 						$ag['text'] = $value;
