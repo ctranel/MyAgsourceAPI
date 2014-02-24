@@ -266,7 +266,9 @@ function process_chart(div_id){ //chart_data is defined globally at the top of t
 	}
 
 	if(typeof(section_data) == "object" && typeof post_render == 'function') post_render(section_data);
-	$('.chart-container').css('display', 'block');
+
+	$('#waiting-icon' + chart_index).hide();
+	$('#chart-container' + chart_index).show();
 }
 
 function process_table(div_id, tbl_cnt_in){
@@ -283,7 +285,9 @@ function process_table(div_id, tbl_cnt_in){
 	}
 
 	if(typeof(section_data) == "object" && typeof post_render == 'function') post_render(section_data);
-	$('.table-wrapper').css('display', 'block');
+//alert(div_id + ', ' + tbl_cnt_in);
+	$('#waiting-icon' + tbl_cnt_in).hide();
+	$('#table-wrapper' + tbl_cnt_in).show();//css('display', 'block');
 	//attach events to new data fields
 	attachDataFieldEvents();
 }

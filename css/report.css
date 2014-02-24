@@ -1,5 +1,7 @@
 @CHARSET "UTF-8";
 sub {color: #003E3F; font-size: 80%; font-family: "Arial Narrow","Arial","Verdana",sans-serif;}
+
+.chart-container {text-align: center;}
 .chart-container a, text, tspan {text-decoration: none;}
 
 /* report table */
@@ -42,8 +44,8 @@ th span.hide-column {cursor: pointer;}
 .hide-column {display:none; font-size:50%; color:#a22;}
 #main-report td {font-size:.8em; text-align: center; border:solid 1px #000; font-weight:normal;}
 
-.table-wrapper {display:none; margin: 0 auto 0; text-align: center; clear:both;} /* border:solid 1px #999; padding:10px;  */
-.table-wrappers td {text-align: left;}
+.table-wrapper {margin: 0 auto 0; text-align: center; clear:both;} /* border:solid 1px #999; padding:10px;  */
+.table-wrapper .waiting-icon {position: relative; top: 30px; margin-top: 50px;}
 .table-section {display:inline-block; margin: 0 auto;}
 .table-container {display:inline-block;}
 .open-download-menu {float: right; cursor: pointer;}
@@ -51,7 +53,7 @@ th span.hide-column {cursor: pointer;}
 /* IE workaround */
 .ie .downloads-container {right: 30px; top:6px;}
 .eq-ie9 .table-wrapper, .eq-ie8 .table-wrapper {padding-top: 24px;}
-/* IE workaround */
+/* end IE workaround */
 a.download-links {font-family: "Lucida Grande","Lucida Sans Unicode",Verdana,Arial,Helvetica,sans-serif; text-decoration: none; cursor: pointer; padding: 0pt 5px; display:block;}
 a.download-links:hover {color:#F1F8F8; background-color:#004147;}
 .download-link-wrapper {cursor: pointer; background: none repeat scroll 0% 0% transparent; color: rgb(48, 48, 48); font-size: 11px; white-space: nowrap;}
