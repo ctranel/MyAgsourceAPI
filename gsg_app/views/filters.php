@@ -124,7 +124,7 @@
 				<?php echo form_fieldset_close();
 				break;
 			case 'scc_cnt_1':
-				echo form_fieldset('SCC Count Range', array('id' => 'scc_cnt_1-fieldset')); ?>
+				echo form_fieldset('Current SCC Range', array('id' => 'scc_cnt_1-fieldset')); ?>
 					Between <?php echo form_input(array('name'=>'scc_cnt_1_dbfrom', 'value'=>$filter_selected['scc_cnt_1_dbfrom'], 'size'=>'5', 'maxlength'=>'5', 'id'=>'scc_cnt_1_dbfrom')); ?>
 					and <?php echo form_input(array('name'=>'scc_cnt_1_dbto', 'value'=>$filter_selected['scc_cnt_1_dbto'], 'size'=>'5', 'maxlength'=>'5', 'id'=>'scc_cnt_1_dbto')); ?>
 				<?php echo form_fieldset_close();
