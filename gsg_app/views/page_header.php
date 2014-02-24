@@ -46,8 +46,8 @@
 <body>
 <?php $url = site_url(); ?>
 <div class="container">
-	<div id="inter-section-nav">
-		<ul>
+	<nav class="navbar navbar-inverse" role="navigation">
+		<ul class="nav navbar-nav">
 		<?php
 			if(isset($user_sections) && is_array($user_sections)):
 				$first = TRUE;
@@ -77,7 +77,7 @@
 			<?php endif;
 			//END AGSOURCE DM ?>
 		</ul>
-	</div>
+	</nav>
 	<div id="header">
 		<ul id="session-nav">
 			<li><?php echo anchor('http://agsource.crinet.com', 'AgSource Site'); ?></li>
@@ -106,33 +106,33 @@
 		<?php echo anchor('', '<div class="header-link">&nbsp;</div>'); ?>
 	</div> <!-- header -->
 	<!--top navigation-->
-	<ul class="primary-nav dropdown">
-		<?php if(isset($section_nav) && !empty($section_nav)):
-			echo $section_nav;
-		endif;
-		if(($this->as_ion_auth->logged_in())): ?>
-			<li class="sectionnav"><a name="section-nav">Select Report</a><br />
-				<ul class="sub-menu">
-					<?php $arr_tmp = $user_sections;
-					if(isset($arr_tmp) && is_array($arr_tmp)):
-						foreach($arr_tmp as $a): ?>
-							<li><?php echo anchor($url . $a['path'], $a['name']);?></li>
-						<?php endforeach;
-					endif; ?>
-				</ul>
-			</li> <!-- close "Select Section" li -->
-			<?php $arr_groups = $this->session->userdata('arr_groups');
-			if(isset($arr_groups) && is_array($arr_groups) && count($arr_groups) > 1): ?>
-			<li class="groupnav"><a><?php echo $arr_groups[$this->session->userdata('active_group_id')]; ?></a><br />
-				<ul class="sub-menu">
-					<?php foreach($arr_groups as $k=>$v): ?>
-						<li><?php echo anchor($url . 'auth/set_role/'. $k, $v);?></li>
-					<?php endforeach; ?>
-				</ul>
-			</li> <!-- close "Select Section" li -->
+		<ul class="primary-nav navbar dropdown">
+			<?php if(isset($section_nav) && !empty($section_nav)):
+				echo $section_nav;
+			endif;
+			if(($this->as_ion_auth->logged_in())): ?>
+				<li class="sectionnav"><a class="dropdown-toggle" data-toggle="dropdown" name="section-nav">Select Report</a><br />
+					<ul class="dropdown-menu" role="menu">
+						<?php $arr_tmp = $user_sections;
+						if(isset($arr_tmp) && is_array($arr_tmp)):
+							foreach($arr_tmp as $a): ?>
+								<li role="presentation"><?php echo anchor($url . $a['path'], $a['name']);?></li>
+							<?php endforeach;
+						endif; ?>
+					</ul>
+				</li> <!-- close "Select Section" li -->
+				<?php $arr_groups = $this->session->userdata('arr_groups');
+				if(isset($arr_groups) && is_array($arr_groups) && count($arr_groups) > 1): ?>
+				<li class="groupnav"><a class="dropdown-toggle" data-toggle="dropdown"><?php echo $arr_groups[$this->session->userdata('active_group_id')]; ?></a><br />
+					<ul class="dropdown-menu" role="menu">
+						<?php foreach($arr_groups as $k=>$v): ?>
+							<li role="presentation"><?php echo anchor($url . 'auth/set_role/'. $k, $v);?></li>
+						<?php endforeach; ?>
+					</ul>
+				</li> <!-- close "Select Section" li -->
+				<?php endif; ?>
 			<?php endif; ?>
-		<?php endif; ?>
-	</ul>
+		</ul>
 	<!--left side of page-->
 	<div id="main-content">
 	<?php if (!empty($page_heading)) echo heading($page_heading);

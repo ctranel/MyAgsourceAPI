@@ -363,7 +363,8 @@ abstract class parent_report extends CI_Controller {
 		if(is_array($this->page_header_data)){
 			$arr_sec_nav_data = array(
 				'arr_pages' => $this->as_ion_auth->arr_user_sections,//$this->access_log_model->get_pages_by_criteria(array('section_id' => $this->section_id))->result_array(),
-				'section_id' => $this->section_id
+				'section_id' => $this->section_id,
+				'section_path' => $this->section_path,
 			);
 			
 			$this->page_header_data = array_merge($this->page_header_data,

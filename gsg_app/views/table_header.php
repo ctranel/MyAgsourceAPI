@@ -26,7 +26,7 @@ foreach($structure as $row): ?>
 				$after_text = $sort_order=='ASC'?"▲":"▼";
 			endif;
  			//$extra = array('rel'=>$th['text'], 'id'=>$th['field_name'] . '_tip');
-			?>class = "<?php echo $class?>">
+			?> class = "<?php echo $class?>">
 			<?php
 			if (is_array($arr_unsortable_columns) && !in_array($th['field_name'], $arr_unsortable_columns)):
 //				if($form_id == 'filter-form'){ //reports that reload pages

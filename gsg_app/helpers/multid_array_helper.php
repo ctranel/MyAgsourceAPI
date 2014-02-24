@@ -401,7 +401,7 @@ if ( ! function_exists('set_element_by_key')) {
 
 if ( ! function_exists('merge_arrays_on_value_key_match')) {
 	/**
-	 * @abstract Returns an array in which values of param2 are inserted into param1 where the key of param2 
+	 * @description Returns an array in which values of param2 are inserted into param1 where the key of param2 
 	 * 		matches the value of param1 (replacing the value of param1).  If there are no matches, no replacements are made.
 	 *
 	 * @param array
