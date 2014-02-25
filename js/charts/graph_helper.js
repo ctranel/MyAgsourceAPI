@@ -216,7 +216,6 @@ function process_chart(div_id){ //chart_data is defined globally at the top of t
 		if(typeof chart_data[chart_index].section_data !== 'undefined') section_data = chart_data[chart_index].section_data;
 		if(typeof chart_data[chart_index].data === 'undefined' || chart_data[chart_index].data == false){
 			$('#' + div_id).html('<p class-"chart-error">Sorry, there is no data available for this report.  Please try again, or contact AgSource at 1-800-236-0097 for assistance.</p>');
-			//return false;
 		}
 		else if(typeof(section_data.redirect) !== 'undefined'){
 			if(section_data.redirect == 'login') window.location.href = window.location.protocol + window.location.host + window.location.path;
@@ -270,9 +269,8 @@ function process_table(div_id, tbl_cnt_in){
 	}
 
 	if(typeof(section_data) == "object" && typeof post_render == 'function') post_render(section_data);
-//alert(div_id + ', ' + tbl_cnt_in);
 	$('#waiting-icon' + tbl_cnt_in).hide();
-	$('#table-wrapper' + tbl_cnt_in).find('table').show();//css('display', 'block');
+	$('#table-wrapper' + tbl_cnt_in).find('table').show();
 	//attach events to new data fields
 	attachDataFieldEvents();
 }

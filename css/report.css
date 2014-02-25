@@ -5,6 +5,8 @@ sub {color: #003E3F; font-size: 80%; font-family: "Arial Narrow","Arial","Verdan
 .jqPlot {clear: left;}
 .chart-container {margin: 30px auto 0; text-align: center;}
 .chart-container a, text, tspan {text-decoration: none;}
+.chart {background:transparent url('i/AgSource_watermark.gif') no-repeat center 70px; text-align: center;}
+.highcharts-container {border: solid 1px #c0c0c0; margin: 0 auto;}
 
 /* report table */
 #main-report {border-collapse:collapse; clear:both; margin: 0 auto; max-width: 100%;}
@@ -101,6 +103,3 @@ ul.report-nav li a.sel, ul.pstring-nav li a.sel {font-weight: bold;  text-decora
 #main-report td.sum-label {white-space: normal; font-weight: bold;}
 th.cat-heading, th.cat-heading a {white-space:normal;}
 tr#herd-avg td {border-top: solid 2px black;}
-
-#graph-canvas, .chart {background:transparent url('i/AgSource_watermark.gif') no-repeat center 70px; text-align: center;}
-.highcharts-container {border: solid 1px #c0c0c0;}
