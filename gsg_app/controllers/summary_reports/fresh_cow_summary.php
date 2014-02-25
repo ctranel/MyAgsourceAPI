@@ -27,7 +27,10 @@ class Fresh_cow_summary extends parent_report {
 	 }
 	 
 	 protected function derive_series($arr_fields){
-	 	$return_val = array();
+	 	if($this->graph['config']['chart']['type'] !== 'boxplot'){
+	 		return parent::derive_series($arr_fields);
+	 	}
+		$return_val = array();
 	 	$c = 0;
 	 	$arr_chart_type = $this->{$this->primary_model}->get_chart_type_array();
 	 	$arr_axis_index = $this->{$this->primary_model}->get_axis_index_array();
