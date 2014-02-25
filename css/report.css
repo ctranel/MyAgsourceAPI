@@ -1,13 +1,43 @@
 @CHARSET "UTF-8";
 sub {color: #003E3F; font-size: 80%; font-family: "Arial Narrow","Arial","Verdana",sans-serif;}
 
-.chart-container {text-align: center;}
+/* charts only */
+.jqPlot {clear: left;}
+.chart-container {margin: 30px auto 0; text-align: center;}
 .chart-container a, text, tspan {text-decoration: none;}
 
 /* report table */
 #main-report {border-collapse:collapse; clear:both; margin: 0 auto; max-width: 100%;}
 .tbl {border-collapse:collapse; clear:both; border: solid 1px #000; margin: 0 auto} /* the table created for fixed headers */
 .tbl td {padding:1px 6px; text-align:right; white-space:nowrap;}
+
+.table-wrapper {margin: 0 auto 0; text-align: center; clear:both;} /* border:solid 1px #999; padding:10px;  */
+.table-wrapper .waiting-icon {margin: 50px auto 0; clear:both;}
+.table-section {display:inline-block;}
+.table-container {display:inline-block; min-width: 200px;}
+.open-download-menu {float: right; cursor: pointer;}
+.downloads-container {position: relative; right: 2px; top:30px;}
+/* IE workaround */
+.ie .downloads-container {right: 30px; top:6px;}
+.eq-ie9 .table-wrapper, .eq-ie8 .table-wrapper {padding-top: 24px;}
+/* end IE workaround */
+a.download-links {font-family: "Lucida Grande","Lucida Sans Unicode",Verdana,Arial,Helvetica,sans-serif; text-decoration: none; cursor: pointer; padding: 0pt 5px; display:block;}
+a.download-links:hover {color:#F1F8F8; background-color:#004147;}
+.download-link-wrapper {cursor: pointer; background: none repeat scroll 0% 0% transparent; color: rgb(48, 48, 48); font-size: 11px; white-space: nowrap;}
+.download-links-container {
+	box-shadow: 3px 3px 10px rgb(136, 136, 136); 
+	border: 1px solid rgb(160, 160, 160); 
+	background: none repeat scroll 0% 0% rgb(255, 255, 255); 
+	position: absolute;
+	right:0;
+	top:28px; 
+	list-style: none outside none;
+    padding: 0;
+    margin: 0 0 0 0;
+    display:none;
+}
+
+.hide-column {display:none; font-size:50%; color:#a22;}
 
 /* table headings */
 h2.block {
@@ -41,35 +71,6 @@ th span.hide-column {cursor: pointer;}
 
 /* end table headings */
 
-.hide-column {display:none; font-size:50%; color:#a22;}
-#main-report td {font-size:.8em; text-align: center; border:solid 1px #000; font-weight:normal;}
-
-.table-wrapper {margin: 0 auto 0; text-align: center; clear:both;} /* border:solid 1px #999; padding:10px;  */
-.table-wrapper .waiting-icon {position: relative; top: 30px; margin-top: 50px;}
-.table-section {display:inline-block; margin: 0 auto;}
-.table-container {display:inline-block;}
-.open-download-menu {float: right; cursor: pointer;}
-.downloads-container {position: relative; right: 2px; top:30px;}
-/* IE workaround */
-.ie .downloads-container {right: 30px; top:6px;}
-.eq-ie9 .table-wrapper, .eq-ie8 .table-wrapper {padding-top: 24px;}
-/* end IE workaround */
-a.download-links {font-family: "Lucida Grande","Lucida Sans Unicode",Verdana,Arial,Helvetica,sans-serif; text-decoration: none; cursor: pointer; padding: 0pt 5px; display:block;}
-a.download-links:hover {color:#F1F8F8; background-color:#004147;}
-.download-link-wrapper {cursor: pointer; background: none repeat scroll 0% 0% transparent; color: rgb(48, 48, 48); font-size: 11px; white-space: nowrap;}
-.download-links-container {
-	box-shadow: 3px 3px 10px rgb(136, 136, 136); 
-	border: 1px solid rgb(160, 160, 160); 
-	background: none repeat scroll 0% 0% rgb(255, 255, 255); 
-	position: absolute;
-	right:0;
-	top:28px; 
-	list-style: none outside none;
-    padding: 0;
-    margin: 0 0 0 0;
-    display:none;
-}
-
 
 /* header herd info */
 #herd-info {max-width:50%;}
@@ -101,19 +102,5 @@ ul.report-nav li a.sel, ul.pstring-nav li a.sel {font-weight: bold;  text-decora
 th.cat-heading, th.cat-heading a {white-space:normal;}
 tr#herd-avg td {border-top: solid 2px black;}
 
-
-/* charts only */
-.jqPlot {clear: left;}
-.chart-container {margin: 0 auto 15px;}
-
 #graph-canvas, .chart {background:transparent url('i/AgSource_watermark.gif') no-repeat center 70px; text-align: center;}
 .highcharts-container {border: solid 1px #c0c0c0;}
-/* .gt-1024 .chart-container {width: 480px;}
-.gt-1024 .highcharts-container {width: 480px; margin: 0 auto;}
-.gt-1024 .chart-odd {float: left; clear: both;}
-.gt-1024 .chart-even {float: right;}
-.gt-1024 .chart-last-odd {display: block; margin: 0 auto;}
-.gt-1024 .chart-only {display: block; width: 100%; clear: both;} */
-
-
-

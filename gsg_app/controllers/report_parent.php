@@ -196,7 +196,7 @@ abstract class parent_report extends CI_Controller {
 		//Create block info as array in arr_block_in if not an array
 		if(isset($arr_block_in) && !empty($arr_block_in) && !is_array($arr_block_in)) $arr_block_in = array($arr_block_in);
 
-		$arr_blocks = $this->{$this->primary_model}->arr_blocks[$this->page]['display'];
+		$arr_blocks = $this->{$this->primary_model}->arr_blocks[$this->page]['blocks'];
 		//Determine if any report blocks have is_summary flag - will determine if tstring needs to be loaded and filters shown
 		$this->load->helper('multid_array_helper');
 		$this->bool_is_summary = array_search(1, get_elements_by_key('is_summary', $arr_blocks)) === FALSE ? FALSE : TRUE;
@@ -206,20 +206,21 @@ abstract class parent_report extends CI_Controller {
 			redirect(site_url($this->report_path));
 		}
 
-//FILTERS
-
+		//FILTERS
 		include(APPPATH.'libraries/Filters.php');
 		//set arr_params to filter data from json
 		$arr_params = Filters::get_filter_array($json_filter_data);
 
 		//prep data for filter library
-		$filter_lib_data = array(	'page'=>$this->page,
-									'params'=>$arr_params,
-									'section'=>$this->section_id,
-									'criteria'=>$this->arr_filter_criteria,
-									'primary_model'=>$this->{$this->primary_model},
-									'log_filter_text'=>$this->log_filter_text,
-									'report_path'=>$this->report_path);
+		$filter_lib_data = array(
+			'page'=>$this->page,
+			'params'=>$arr_params,
+			'section'=>$this->section_id,
+			'criteria'=>$this->arr_filter_criteria,
+			'primary_model'=>$this->{$this->primary_model},
+			'log_filter_text'=>$this->log_filter_text,
+			'report_path'=>$this->report_path
+		);
 		
 		//load required libraries
 		$this->load->library('filters',$filter_lib_data);
@@ -231,10 +232,12 @@ abstract class parent_report extends CI_Controller {
 
 		if ($display_format == 'csv'){
 			$data = array();
-			if(isset($arr_blocks['table']) && is_array($arr_blocks['table'])){
-				foreach($arr_blocks['table'] as $k=>$pb){
-					if(($arr_block_in !== NULL && in_array($k, $arr_block_in)) || $arr_block_in == NULL){
-				//SORT
+			if(isset($arr_blocks) && is_array($arr_blocks)){
+				foreach($arr_blocks as $pb){
+					if($pb['display_type'] == 'table'){
+						continue;
+					}
+					if(($arr_block_in !== NULL && in_array($pb['url_segment'], $arr_block_in)) || $arr_block_in == NULL){
 						if(isset($sort_by) && isset($sort_order)){
 							$this->arr_sort_by = array_values(explode('|', $sort_by));
 							$this->arr_sort_order = array_values(explode('|', $sort_order));
@@ -267,10 +270,13 @@ abstract class parent_report extends CI_Controller {
 			$data = array();
 			$herd_data = $this->herd_model->header_info($this->session->userdata('herd_code'));
 			$i = 0;
-			//foreach($arr_block_in as $block_in){
-			if(isset($arr_blocks['table']) && is_array($arr_blocks['table'])){
-				foreach($arr_blocks['table'] as $k=>$pb){
-					if(($arr_block_in !== NULL && in_array($k, $arr_block_in)) || $arr_block_in == NULL){
+
+			if(isset($arr_blocks) && is_array($arr_blocks)){
+				foreach($arr_blocks as $pb){
+					if($pb['display_type'] == 'table'){
+						continue;
+					}
+					if(($arr_block_in !== NULL && in_array($pb['url_segment'], $arr_block_in)) || $arr_block_in == NULL){
 					//SORT
 						if(isset($sort_by) && isset($sort_order)){
 							$this->arr_sort_by = array_values(explode('|', $sort_by));
@@ -295,7 +301,6 @@ abstract class parent_report extends CI_Controller {
 					}
 				}
 			}
-			//}
 			$this->access_log_model->write_entry($this->{$this->primary_model}->arr_blocks[$this->page]['page_id'], 'pdf', $this->reports->sort_text_brief($this->arr_sort_by, $this->arr_sort_order), $this->log_filter_text);
 			$this->reports->create_pdf($block, $this->product_name, NULL, $herd_data, 'P');
 			exit;
@@ -317,45 +322,45 @@ abstract class parent_report extends CI_Controller {
 		
 		//set js lines and load views for each block to be displayed on page
 		$tmp_js = '';
-		$arr_chart = NULL;
+		$arr_view_blocks = NULL;
 		if(isset($arr_blocks) && !empty($arr_blocks)){
-			foreach($arr_blocks as $display=>$arr_v){
-				$x = 0;
-				$cnt = count($arr_blocks[$display]);
-				foreach($arr_v as $k=>$pb){ 
-					//load view for placeholder for block display
-					//SORT
-					if(isset($sort_by) && isset($sort_order)){
-						$this->arr_sort_by = array_values(explode('|', $sort_by));
-						$this->arr_sort_order = array_values(explode('|', $sort_order));
-					}
-					else {
-						$tmp = $this->{$this->primary_model}->get_default_sort($pb['url_segment']);
-						$this->arr_sort_by = $tmp['arr_sort_by'];
-						$this->arr_sort_order = $tmp['arr_sort_order'];
-						$sort_by = implode('|', $this->arr_sort_by);
-						$sort_order = implode('|', $this->arr_sort_order);
-					}
-					if($arr_block_in == NULL || in_array($k, $arr_block_in)){
-						$this->{$this->primary_model}->populate_field_meta_arrays($pb['id']);
-						if($cnt == 1) $odd_even = 'chart-only';
-						elseif($x % 2 == 1) $odd_even = 'chart-even';
-						elseif($x == ($cnt - 1)) $odd_even = 'chart-last-odd';
-						else $odd_even = 'chart-odd';
-						$arr_blk_data = array(
-							$display . '_num' => $x, 
-							'link_url' => site_url($this->section_path . '/' . $this->page . '/' . $k . '/' . $sort_by . '/' . $sort_order), 
-							'form_id' => $this->report_form_id,
-							'odd_even' => $odd_even,
-							'block' => $k
-						);
-						$arr_chart[$display][] = $this->load->view($display, $arr_blk_data, TRUE);
-						//add js line to populate the block after the page loads
-						$tmp_container_div = $display == 'chart' ? 'graph-canvas' . $x : 'table-canvas' . $x;
-						$tmp_js .= "updateBlock(\"$tmp_container_div\", \"$k\", \"$x\", \"null\", \"null\", \"$display\")\n";//, \"" . $this->{$this->primary_model}->arr_blocks[$this->page]['display'][$display][$block]['description'] . "\", \"" . $bench_text . "\");\n";
-						$tmp_block = $k;
-						$x++;
-					}
+			$x = 0;
+			$cnt = count($arr_blocks);
+			foreach($arr_blocks as $c => $pb){
+				$display = $pb['display_type'];
+				//load view for placeholder for block display
+				if(isset($sort_by) && isset($sort_order)){
+					$this->arr_sort_by = array_values(explode('|', $sort_by));
+					$this->arr_sort_order = array_values(explode('|', $sort_order));
+				}
+				else {
+					$tmp = $this->{$this->primary_model}->get_default_sort($pb['url_segment']);
+					$this->arr_sort_by = $tmp['arr_sort_by'];
+					$this->arr_sort_order = $tmp['arr_sort_order'];
+					$sort_by = implode('|', $this->arr_sort_by);
+					$sort_order = implode('|', $this->arr_sort_order);
+				}
+				if($arr_block_in == NULL || in_array($pb['url_segment'], $arr_block_in)){
+					$this->{$this->primary_model}->populate_field_meta_arrays($pb['id']);
+					if($cnt == 1) $odd_even = 'chart-only';
+					elseif($x % 2 == 1) $odd_even = 'chart-even';
+					elseif($x == ($cnt - 1)) $odd_even = 'chart-last-odd';
+					else $odd_even = 'chart-odd';
+					if($display == 'table') $cnt = 0;
+
+					$arr_blk_data = array(
+						'block_num' => $x, 
+						'link_url' => site_url($this->section_path . '/' . $this->page . '/' . $pb['url_segment'] . '/' . $sort_by . '/' . $sort_order), 
+						'form_id' => $this->report_form_id,
+						'odd_even' => $odd_even,
+						'block' => $pb['url_segment'],
+					);
+					$arr_view_blocks[] = $this->load->view($display, $arr_blk_data, TRUE);
+					//add js line to populate the block after the page loads
+					$tmp_container_div = $display == 'chart' ? 'graph-canvas' . $x : 'table-canvas' . $x;
+					$tmp_js .= "updateBlock(\"$tmp_container_div\", \"" . $pb['url_segment'] . "\", \"$x\", \"null\", \"null\", \"$display\")\n";//, \"" . $this->{$this->primary_model}->arr_blocks[$this->page]['display'][$display][$block]['description'] . "\", \"" . $bench_text . "\");\n";
+					$tmp_block = $pb['url_segment'];
+					$x++;
 				}
 			}
 		}
@@ -426,7 +431,7 @@ abstract class parent_report extends CI_Controller {
 			'herd_code' => $this->session->userdata('herd_code'),
 			'herd_data' => $this->load->view('herd_info', $herd_data, TRUE),
 			'page_footer' => $this->load->view('page_footer', $this->page_footer_data, TRUE),
-			'charts' => $arr_chart,
+			'blocks' => $arr_view_blocks,
 			'print_all' => $this->print_all,
 			'report_path' => $this->report_path
 		);

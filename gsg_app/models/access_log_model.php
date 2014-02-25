@@ -9,7 +9,7 @@ class Access_log_model extends Report_Model {
 		 * back to the access log model does not cause problem.  That is the only other model that call the get block links method.
 		 */ 
 		$this->section_id = '3';
-		$this->arr_blocks = $this->get_block_links($this->section_id);
+		//$this->arr_blocks = $this->get_block_links($this->section_id);
 		$this->primary_table_name = $this->tables['access_log'];
 		$this->arr_joins = array(
 			'section_id'=>array('table' => $this->tables['pages'], 'join_text' => $this->tables['access_log'] . '.page_id = ' . $this->tables['pages'] . '.id')
@@ -329,7 +329,7 @@ FUNCTION MOVED?
 		$arr_return = array();
 		if(isset($section_id)) $this->{$this->db_group_name}->where('p.section_id', $section_id);
 		$result = $this->{$this->db_group_name}
-		->select("p.id AS page_id, b.id, p.section_id, b.url_segment, b.name, ct.name AS chart_type, b.description, p.url_segment AS page, p.name AS page_name, CASE WHEN dt.name LIKE '%chart' THEN 'chart' ELSE dt.name END AS display,s.path AS section_path, b.max_rows, b.cnt_row, b.sum_row, b.avg_row, b.bench_row, pf.db_field_name AS pivot_db_field, b.is_summary")
+		->select("p.id AS page_id, b.id, p.section_id, b.url_segment, b.name, ct.name AS chart_type, b.description, p.url_segment AS page, p.name AS page_name, CASE WHEN dt.name LIKE '%chart' THEN 'chart' ELSE dt.name END AS display_type,s.path AS section_path, b.max_rows, b.cnt_row, b.sum_row, b.avg_row, b.bench_row, pf.db_field_name AS pivot_db_field, b.is_summary")
 		->join($this->tables['pages'] . ' AS p', 'p.section_id = s.id', 'left')
 		->join($this->tables['pages_blocks'] . ' AS pb', 'p.id = pb.page_id', 'left')
 		->join($this->tables['blocks'] . ' AS b', 'pb.block_id = b.id', 'left')
@@ -347,13 +347,14 @@ FUNCTION MOVED?
 				$arr_return[$r['page']]['page_id'] = $r['page_id'];
 				$arr_return[$r['page']]['name'] = $r['page_name'];
 				if(empty($r['url_segment']) === FALSE){
-					$arr_return[$r['page']]['display'][$r['display']][$r['url_segment']] = array(
+					$arr_return[$r['page']]['blocks'][$r['url_segment']] = array(
 						'id'=>$r['id'],
 						'section_id'=>$r['section_id'],
 						'name'=>$r['name'],
 						'description'=>$r['description'],
 						'url_segment'=>$r['url_segment'],
 						'section_path'=>$r['section_path'],
+						'display_type'=>$r['display_type'],
 						'chart_type'=>$r['chart_type'],
 						'max_rows'=>$r['max_rows'],
 						'cnt_row'=>$r['cnt_row'],
@@ -365,7 +366,7 @@ FUNCTION MOVED?
 					);
 				} 
 				else	{
-					$arr_return[$r['page']]['display'][$r['display']][] = array(
+					$arr_return[$r['page']]['blocks'][$r['url_segment']] = array(
 						'id'=>$r['id'],
 						'section_id'=>$r['section_id'],
 						'name'=>$r['name'],
@@ -376,7 +377,7 @@ FUNCTION MOVED?
 					);
 				}
  			}
-			return $arr_return;
+ 			return $arr_return;
 		}
 		else return FALSE;
 	}
