@@ -106,7 +106,7 @@ abstract class parent_report extends CI_Controller {
 				echo "Your session has expired, please log in and try again.";
 			}
 			else {
-	       		$this->session->set_flashdata('message',  $this->session->flashdata('message') . " Please log in.");
+	       		$this->session->set_flashdata('message', "Please log in.");
 				return FALSE;
 			}
 		}
