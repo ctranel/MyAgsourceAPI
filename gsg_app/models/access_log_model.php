@@ -340,7 +340,7 @@ FUNCTION MOVED?
 		->where('b.url_segment IS NOT NULL')
 		->order_by('s.list_order', 'asc')
 		->order_by('p.list_order', 'asc')
-		->order_by('b.list_order', 'asc')
+		->order_by('pb.list_order', 'asc')
 		->get($this->tables['sections'] . ' AS s')->result_array();
 		if(is_array($result) && !empty($result)){
 			foreach($result as $r){
