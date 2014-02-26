@@ -7,7 +7,14 @@ class HTTP_Error extends CI_Controller {
 	}
 	
 	function index() {
-		$this->load->view('http_error');
+		
+		$this->page_header_data = array('title'=>'Page Not Found');
+		
+		$this->data['page_header'] = $this->load->view('page_header', $this->page_header_data, TRUE);
+		$this->data['page_footer'] = $this->load->view('page_footer', NULL, TRUE);
+		
+		
+		$this->load->view('http_error', $this->data);
 	}
 	
 }
