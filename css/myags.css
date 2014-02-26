@@ -29,8 +29,6 @@ h3.tight-to-table {margin: 20px 0 0; border: solid 1px black;}
 
 a.button {
 	background-color: #92C2C2;
-	background-image: url("http://agsource.crinet.com/images/Common-Images/h3bg.gif");
-	background-repeat: repeat-x;
 	font-family: "Helvetica","Arial","Verdana",sans-serif;
 	font-weight: bold;
 	padding: 2px 5px;
@@ -44,7 +42,7 @@ a.button {
 
 /* general */
 a, .footer a:link, a:hover, a:active, a:visited {color: #004147;}
-.important-message {font-size: 1.3em; color:#004147; background-color:inherit; font-weight:bold;}
+.important-message {font-size: 1.3em; color:#F60E27; background-color:inherit; font-weight:bold;}
 /* end general */
 
 /* application navigation */
