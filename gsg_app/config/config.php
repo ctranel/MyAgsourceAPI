@@ -47,16 +47,16 @@
 |
 | Typically this will be your index.php file, unless you've renamed it to
 | something else. If you are using mod_rewrite to remove the page set this
-| variable so that it is blank.
+| variable so that it is blank. "index.php/"
 |
 */
 	switch (ENVIRONMENT)
 	{
 		case 'development':
-			$config['index_page'] = "index.php/";
+			$config['index_page'] = "";
 		break;
 		case 'testing':
-			$config['index_page'] = "";
+			$config['index_page'] = "index.php/";
 		break;
 		case 'production':
 			$config['index_page'] = "index.php/";
