@@ -6,11 +6,11 @@
     <?php echo form_open("region/edit_region/");?>
      <div id="association">
       	<?php if($this->as_ion_auth->is_admin): ?>
-      		<p id="region"><?php echo form_label('Association/Region Number', 'region_id', NULL, $region_id) ?>
-      		<?php echo form_dropdown('region_id', $region_options, $region_selected, $region_id)?>
+      		<p id="region"><?php echo form_label('Association/Region Number', 'association_num', NULL, $association_num) ?>
+      		<?php echo form_dropdown('association_num', $association_options, $association_selected, $association_num)?>
       		</p>
       	<?php elseif($this->as_ion_auth->is_manager): ?>
-      		<?php echo form_input($region_id);?>
+      		<?php echo form_input($association_num);?>
       	<?php endif; ?>
     </div>
  

@@ -5,8 +5,8 @@
 	
     <?php echo form_open("region/create_region");?>
      	<div id="association">
-      		<p id="region"><?php echo form_label('Association/Region Number', 'region_id', NULL, $region_id) ?>
-				<?php echo form_input($region_id);?>
+      		<p id="region"><?php echo form_label('Association/Region Number', 'association_num', NULL, $association_num) ?>
+				<?php echo form_input($association_num);?>
 			</p>
 	    </div>
       

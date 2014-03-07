@@ -50,10 +50,7 @@ abstract class parent_report extends CI_Controller {
 			$this->section_path = $this->uri->segment(1) . '/' . $this->section_path;
 		} 
 		$this->page = $this->router->fetch_method();
-		//@todo: check this, should it be seg 5 or 3?
-		//$this->block = $this->uri->segment(3);
 		$this->report_path = $this->section_path . '/' . $this->page;
-//echo $class . "<br>\n" . $this->page . "<br>\n" . $this->section_path . "<br>\n";
 		$this->primary_model = $this->page . '_model';
 		$this->report_form_id = 'report_criteria';//filter-form';
 		$this->herd_code = strlen($this->session->userdata('herd_code')) == 8?$this->session->userdata('herd_code'):NULL;

@@ -89,7 +89,7 @@ class As_ion_auth extends Ion_auth {
 		if($this->uri->segment(1) != $section_path){
 			$this->super_section_id = $this->ion_auth_model->get_super_section_id_by_path($this->uri->segment(1));
 		} 
-//die($this->uri->uri_string());
+
 		//reliably set the referrer, used when determining whether to set the redirect variable on pages like select herd
 		$this->referrer = $this->session->userdata('referrer');
 		$tmp_uri= $this->uri->uri_string();
@@ -212,17 +212,17 @@ class As_ion_auth extends Ion_auth {
 	 * @access public
 	 *
 	 **/
-	public function is_editable_user($user_id){
-		//$obj_user = $this->ion_auth_model->user($this->session->userdata('user_id'))->row();
+	public function is_editable_user($user_id, $logged_user_id){
+		$obj_user = $this->ion_auth_model->user($user_id)->row();
 		//$obj_user->arr_groups = array_keys($this->ion_auth_model->get_users_group_array($obj_user->id));
-		if($this->has_permission('Edit All Users')){
+		if($this->has_permission('Edit All Users') || $user_id == $logged_user_id){
 			return TRUE;
 		}
 		if($this->has_permission('Edit Users In Region')){
-			return ($this->ion_auth_model->is_child_producer_user_by_region($obj_user->region_id, $user_id) || $this->ion_auth_model->is_child_field_user_by_region($obj_user->region_id, $user_id));
+			return ($this->ion_auth_model->is_child_user_by_association($obj_user->assoc_acct_num, $user_id));
 		}
 		if($this->has_permission('Edit Producers In Region')){
-			return $this->ion_auth_model->is_child_producer_user_by_tech($obj_user->supervisor_num, $user_id);
+			return $this->ion_auth_model->is_child_user_by_group_and_association(2, $obj_user->assoc_acct_num, $user_id);
 		}
 		else {
 			return false;
@@ -234,27 +234,25 @@ class As_ion_auth extends Ion_auth {
 	 * @return array of child user objects
 	 * @access public
 	 *
+	 **/
 	public function get_editable_users(){
-		//$obj_user = $this->ion_auth_model->user($this->session->userdata('user_id'))->row();
+		$obj_user = $this->ion_auth_model->user($this->session->userdata('user_id'))->row();
 		//$obj_user->arr_groups = array_keys($this->ion_auth_model->get_users_group_array($obj_user->id));
 		
 		if($this->has_permission('Edit All Users')){
 			return $this->ion_auth_model->users()->result_array();
 		}
 		if($this->has_permission('Edit Users In Region')){
-			$arr_tmp1 = $this->ion_auth_model->get_producer_users_by_region($obj_user->region_id)->result_array();
-			$arr_tmp2 = $this->ion_auth_model->get_field_users_by_region($obj_user->region_id)->result_array();
-			//call function from multid_array_helper.php
-			return array_merge_distinct($arr_tmp1, $arr_tmp2);
+			$arr_tmp2 = $this->ion_auth_model->get_users_by_association($obj_user->assoc_acct_num)->result_array();
+			return $arr_tmp2;
 		}
 		if($this->has_permission('Edit Producers In Region')){
-			return $this->ion_auth_model->get_producer_users_by_region($obj_user->supervisor_num)->result_array();
+			return $this->ion_auth_model->get_users_by_group_and_association(2, $obj_user->assoc_acct_num)->result_array();
 		}
 		else { // Genex groups or producers
 			return array();
 		}
 	}
-	 **/
 
 	/**
 	 * @method get_viewable_herds()
@@ -301,7 +299,9 @@ class As_ion_auth extends Ion_auth {
 			return $this->herd_model->get_herd_codes(null, null, $limit_in);
 		}
 		if($this->has_permission('View Herds In Region')){
-			$arr_return_reg = $this->herd_model->get_herd_codes_by_region($region_num, $limit_in);
+			$tmp = $this->herd_model->get_herd_codes_by_region($region_num, $limit_in);
+			if(isset($tmp) && is_array($tmp)) $arr_return_reg = $tmp;
+			unset($tmp);
 		}
 		if($this->has_permission('View Assigned Herds')){
 			$arr_return_user = $this->herd_model->get_herd_codes_by_user($user_id, $limit_in);
@@ -314,23 +314,26 @@ class As_ion_auth extends Ion_auth {
 
 	/**
 	 * @method get_group_dropdown_data()
+	 * @param int active group id
 	 * @return array (key=>value) array of groups for populating options lists
 	 * @access public
 	 * 
-	 * @todo: groups are hard-coded, find a good way to pull them dynamically (use group table's parent_group field?)
 	 *
 	 **/
-	public function get_group_dropdown_data(){
+	public function get_group_dropdown_data($active_group_id){
 		$arr_groups = array();
 		$ret_array = array();
 		if($this->has_permission('Add All Users')){
 			$arr_groups = $this->ion_auth_model->groups()->result_array();
 		}
-		else{
+		elseif($this->logged_in()){
 			if($this->has_permission('Add Users In Region')){
-				$arr_groups = $this->ion_auth_model->get_child_groups(3);
+				$arr_groups = $this->ion_auth_model->get_editable_groups($active_group_id);
 			}
-			$arr_groups[] = array('id'=>'2', 'name'=>'Producers');
+		}
+		if(empty($arr_groups)){
+			$arr_groups[] = array('id'=>'2', 'name'=>'Producers (direct member)');
+			$arr_groups[] = array('id'=>'13', 'name'=>'Producers (association member)');
 			$arr_groups[] = array('id'=>'9', 'name'=>'Consultants');
 		}
 		if(is_array($arr_groups)) {
@@ -346,28 +349,29 @@ class As_ion_auth extends Ion_auth {
 	}
 
 	/**
-	 * @method get_region_dropdown_data()
+	 * @method get_assoc_dropdown_data()
+	 * @param array of association numbers to which the user currently has access (array_keys($this->session->userdata('arr_regions')) in CI)
 	 * @return array 1d (key=>value) array of herds for populating options lists
 	 * @access public
 	 *
 	 **/
-	public function get_region_dropdown_data(){
+	public function get_assoc_dropdown_data($arr_users_regions){
 		$ret_array = array();
-		if($this->is_admin){
-			$arr_group_obj = $this->region_model->get_regions();
+		if($this->has_permission("Edit All Users") || $this->has_permission("Add All Users")){
+			$arr_assn_obj = $this->region_model->get_regions();
 		}
 		else{
-			$arr_group_obj = $this->region_model->get_region_by_field('id', array_keys($this->session->userdata('arr_regions')));
+			$arr_assn_obj = $this->region_model->get_region_by_field('assoc_acct_num', $arr_users_regions);
 		}
-		if(is_array($arr_group_obj)) {
+		if(is_array($arr_assn_obj)) {
 			$ret_array[''] = "Select";
-			foreach($arr_group_obj as $g){
-				$ret_array[$g->id] = $g->region_name;
+			foreach($arr_assn_obj as $g){
+				$ret_array[$g->account_num] = $g->assoc_name;
 			}
 			return $ret_array;
 		}
-		elseif(is_object($arr_group_obj)) {
-			return $arr_group_obj;
+		elseif(is_object($arr_assn_obj)) {
+			return $arr_assn_obj;
 		}
 		else {
 			return false;
@@ -376,17 +380,16 @@ class As_ion_auth extends Ion_auth {
 
 	/**
 	 * @method get_dhi_supervisor_dropdown_data()
-	 * @param region number
+	 * @param array of tech objects
 	 * @return array 1d (key=>value) array of herds for populating options lists
 	 * @access public
 	 *
 	 **/
-	public function get_dhi_supervisor_dropdown_data($arr_region_id = FALSE){
-		$arr_tech_obj = $this->ion_auth_model->get_dhi_supervisor_nums_by_region($arr_region_id);
+	public function get_dhi_supervisor_dropdown_data($arr_tech_obj){
 		if(is_array($arr_tech_obj)) {
 			$ret_array[''] = "Select one";
 			foreach($arr_tech_obj as $g){
-				$ret_array[$g->supervisor_num] = $g->supervisor_num;
+				$ret_array[$g->account_num] = $g->name;
 			}
 			return $ret_array;
 		}
@@ -406,7 +409,7 @@ class As_ion_auth extends Ion_auth {
 	 *
 	 **/
 	public function has_permission($task_name){
-		$tmp_array = $this->arr_task_permissions;//$this->session->userdata('arr_task_permissions');
+		$tmp_array = $this->arr_task_permissions;
 		if(is_array($tmp_array) !== FALSE) return in_array($task_name, $tmp_array);
 		else return FALSE;
 	}
@@ -622,49 +625,30 @@ class As_ion_auth extends Ion_auth {
 	public function group_assignable($arr_form_group_id){
 		$session_group_id = $this->session->userdata('active_group_id');
 		if($this->logged_in() === FALSE){
-			$arr_tmp = array_intersect($arr_form_group_id, array('2', '9')); //if select groups include only 2 and 9 (producer and consultant)
+			$arr_tmp = array_intersect($arr_form_group_id, array('2', '9', '13')); //if select groups include only 2 and 9 (producer and consultant)
 			if(count($arr_tmp) == count($arr_form_group_id)) return TRUE;
+			return false;
 		}
-		elseif($this->is_admin) return TRUE;
-		elseif(in_array($session_group_id, $arr_form_group_id) && count($arr_form_group_id) == 1) return TRUE;
-		elseif(!in_array($session_group_id, $arr_form_group_id) && count($arr_form_group_id) == 1 && $this->has_permission("Manage Other Accounts") === FALSE) {
+		if($this->is_admin){
+			return TRUE;
+		}
+		if(in_array($session_group_id, $arr_form_group_id) && count($arr_form_group_id) == 1){
+			return TRUE;
+		}
+		if(!in_array($session_group_id, $arr_form_group_id) && count($arr_form_group_id) == 1
+			&& $this->has_permission("Edit All Users") === FALSE && $this->has_permission("Edit Users In Region") === FALSE
+			&& $this->has_permission("Add All Users") === FALSE && $this->has_permission("Add Users In Region") === FALSE
+		) {
 			return FALSE;
 		}
-		elseif((!in_array($session_group_id, $arr_form_group_id) || count($arr_form_group_id) > 1) && $this->has_permission("Manage Other Accounts") === TRUE) {
-			switch ($session_group_id) {
-				case 1:
-					return TRUE;
-					break;
-				case 3:
-					$arr_tmp = array_intersect($arr_form_group_id, array('2', '3', '5', '8', '9'));
-					if(count($arr_tmp) == count($arr_form_group_id)) return TRUE;
-//					if($arr_form_group_id == 2 || $arr_form_group_id == 3 || $arr_form_group_id == 5 || $arr_form_group_id == 8 || $arr_form_group_id == 9)
-					break;
-				case 4:
-					$arr_tmp = array_intersect($arr_form_group_id, array('2', '4', '9'));
-					if(count($arr_tmp) == count($arr_form_group_id)) return TRUE;
-//					if($arr_form_group_id == 2 || $arr_form_group_id == 4 || $arr_form_group_id == 9) return TRUE;
-					break;
-				case 5:
-					$arr_tmp = array_intersect($arr_form_group_id, array('2', '5', '9'));
-					if(count($arr_tmp) == count($arr_form_group_id)) return TRUE;
-//					if($arr_form_group_id == 2 || $arr_form_group_id == 5 || $arr_form_group_id == 9) return TRUE;
-					break;
-				case 6:
-					$arr_tmp = array_intersect($arr_form_group_id, array('6', '7'));
-					if(count($arr_tmp) == count($arr_form_group_id)) return TRUE;
-//					if($arr_form_group_id == 6 || $arr_form_group_id == 7) return TRUE;
-					break;
-				case 8:
-					$arr_tmp = array_intersect($arr_form_group_id, array('2', '8', '9'));
-					if(count($arr_tmp) == count($arr_form_group_id)) return TRUE;
-//					if($arr_form_group_id == 2 || $arr_form_group_id == 8 || $arr_form_group_id == 9) return TRUE;
-					break;
-				default:
-					return FALSE;
-					break;
-			}
-		}
+
+		$tmp = $this->ion_auth_model->get_editable_groups($session_group_id);
+		//get_editable_groups returns a multidimensional array, need to extract ids
+		$arr_child_groups = get_elements_by_key('id', $tmp);
+		unset($tmp);
+		unset($arr_form_group_id[$session_group_id]);
+		$arr_tmp = array_intersect($arr_form_group_id, $arr_child_groups);
+		if(count($arr_tmp) == count($arr_form_group_id)) return TRUE;
 		return FALSE;
 	}
 

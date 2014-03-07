@@ -126,10 +126,12 @@ class Change_herd extends CI_Controller {
 		if(!$this->as_ion_auth->has_permission("Select Herd") && $this->as_ion_auth->has_permission("Request Herd")){
 			$this->session->set_flashdata('redirect_url', $redirect_url);
 			redirect(site_url('change_herd/request'));
+			exit();
 		}
 		if(!$this->as_ion_auth->has_permission("Select Herd")){
 			$this->session->set_flashdata('message', 'You do not have permissions to select herds.');
 			redirect(site_url($redirect_url));
+			exit();
 		}
 		//validate form input
 		$this->load->library('form_validation');
@@ -141,6 +143,7 @@ class Change_herd extends CI_Controller {
 			$this->session->set_userdata('arr_pstring', $this->herd_model->get_pstring_array($this->input->post('herd_code'), FALSE));
 			$this->access_log_model->write_entry(2); //2 is the page code for herd change
 			redirect(site_url($redirect_url));
+			exit();
 		}
 		else
 		{

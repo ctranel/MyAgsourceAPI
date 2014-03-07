@@ -40,56 +40,11 @@ class Region_model extends CI_Model {
 		$this->db->limit($limit, $offset);
 		return $this->db->get($this->tables['regions'])->result();
 	}
-	/**
-	 * create_region
-	 *
-	 * @return bool
-	 * @author ctranel
-	 **/
-	public function create_region($data) {
-		if($this->is_duplicate($data['id'])) {
-			$this->error = "The region number entered already exists.  Please edit that record or enter a different region number.";
-			return FALSE;
-		}
-		$this->db->insert($this->ion_auth_model->tables['regions'], $data);
-		if($this->db->affected_rows() <= 0){
-			$this->error = "Could not add record";
-			return FALSE;
-		}
-		return TRUE;
-	}
-
-	/**
-	 * update_region
-	 *
-	 * @return bool
-	 * @author ctranel
-	 **/
-	public function update_region($data) {
-		$has_data = is_array($data);
-
-		if (array_key_exists('id', $data)) {
-			if($this->db->update($this->ion_auth_model->tables['regions'], $data, array('id' => $data['id']))) return TRUE;
-		}
-
-		return FALSE;
-	}
-
-	/**
-	 * Checks for duplicate record
-	 *
-	 * @return bool
-	 * @author Mathew
-	 **/
-	public function is_duplicate($region_id = '') {
-		if (empty($region_id)) return TRUE;
-		return $this->db->where('id', $region_id)->count_all_results($this->ion_auth_model->tables['regions']) > 0;
-	}
 
 	/**
 	 * Returns array to be passed to form helper
 	 *
-	 * @return array
+	 * @return array association_num => assoc_name
 	 * @author Mathew
 	 **/
 	public function get_dropdown_data(){
@@ -98,12 +53,12 @@ class Region_model extends CI_Model {
 			$arr_group_obj = $this->get_regions();
 		}
 		else{
-			$arr_group_obj = $this->get_region_by_field('id', array_keys($this->session->userdata('arr_regions')));
+			$arr_group_obj = $this->get_region_by_field('association_num', array_keys($this->session->userdata('arr_regions')));
 		}
 		if(is_array($arr_group_obj)) {
 			$ret_array[''] = "Select one";
 			foreach($arr_group_obj as $g){
-				$ret_array[$g->id] = $g->region_name;
+				$ret_array[$g->association_num] = $g->assoc_name;
 			}
 			return $ret_array;
 		}
