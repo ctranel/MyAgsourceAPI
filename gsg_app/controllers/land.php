@@ -10,7 +10,7 @@ class Land extends parent_report {
 	function index($pstring = NULL){
 		$this->load->model('herd_model');
 		$this->load->model('alert_model');
-		$arr_pstring = $this->herd_model->get_pstring_array($this->session->userdata('herd_code'));
+		$arr_pstring = $this->session->userdata('arr_pstring');
 		if(isset($pstring)){
 			$this->session->set_userdata('pstring', $pstring);
 		}

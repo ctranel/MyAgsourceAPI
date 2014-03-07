@@ -67,12 +67,12 @@ class Tech_model extends CI_Model {
 	 * @param array field=>value combinations for criteria
 	 * @return mixed
 	 * @author ctranel
-	 **/
 	public function update_techs_by_criteria($data, $criteria=NULL)
 	{
 		$this->db->where($criteria);
-		return $this->db->update($this->tables['users_dhi_supervisors'], $data);
+		return $this->db->update($this->tables['dhi_supervisors'], $data);
 	}
+	 **/
 
 	/**
 	 * insert_tech
@@ -98,7 +98,7 @@ class Tech_model extends CI_Model {
 	public function get_techs($limit=NULL, $offset=NULL, $order_by='t.last_name')
 	{
 		$this->db
-		->select("t.[association_num], t.[supervisor_num],t.[first_name],t.[last_name],t.[voice_mail_num], CONCAT(hp.area_code, '-', hp.phone_num) AS home_phone, CONCAT(hp.area_code, '-', hp.phone_num) AS cell_phone")
+		->select("t.[supervisor_acct_num], t.[association_num], t.[supervisor_num],t.[first_name],t.[last_name],t.[voice_mail_num], CONCAT(hp.area_code, '-', hp.phone_num) AS home_phone, CONCAT(hp.area_code, '-', hp.phone_num) AS cell_phone")
 		->where('t.status_code', 'A')
 		->join('address.dbo.phone hp', 't.account_num = hp.account_num AND hp.phone_type_code = 1', 'left')
 		->join('address.dbo.phone cp', 't.account_num = cp.account_num AND cp.phone_type_code = 4', 'left');
@@ -106,7 +106,7 @@ class Tech_model extends CI_Model {
 		if(isset($order_by))$this->db->order_by($order_by);
 		if (isset($limit) && isset($offset)) $this->db->limit($limit, $offset);
 		elseif(isset($limit)) $this->db->limit($limit);
-		$results = $this->db->get($this->tables['users_dhi_supervisors'] . ' t')->result_array();
+		$results = $this->db->get($this->tables['dhi_supervisors'] . ' t')->result_array();
 		return $results;
 	}
 
@@ -119,7 +119,7 @@ class Tech_model extends CI_Model {
 	 **/
 	public function get_tech($account_num)
 	{
-		$this->db->where($this->tables['users_dhi_supervisors'] . '.account_num', $account_num);
+		$this->db->where($this->tables['dhi_supervisors'] . '.account_num', $account_num);
 		return $this->get_techs(1,0);
 	}
 
@@ -137,7 +137,7 @@ class Tech_model extends CI_Model {
 		if(strlen($account_num) != 8) return NULL;
 		$q = $this->db
 		->select($field_name)
-		->from($this->tables['users_dhi_supervisors'])
+		->from($this->tables['dhi_supervisors'])
 		->where('account_num',$account_num)
 		->limit(1);
 		$ret = $q->get()->result_array();

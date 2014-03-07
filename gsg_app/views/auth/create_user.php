@@ -12,38 +12,35 @@
       <?php echo form_input($last_name);?>
       </p>
       
-      <?php //if($this->as_ion_auth->is_admin || $this->as_ion_auth->is_manager): ?>
-      	<p><?php echo form_label('User Group', 'group_id', NULL, $group_id) ?>
+     <?php if(isset($group_id)): ?>
+     	<p><?php echo form_label('User Group', 'group_id', NULL, $group_id) ?>
       	<?php echo form_dropdown('group_id[]', $group_options, $group_selected, $group_id)?>
       	</p>
-	  <?php // else: ?>
-	  	
-      <?php //endif; ?>
-
-     <?php if($this->as_ion_auth->is_admin || $this->as_ion_auth->is_manager): ?>
+     <?php endif;
+     if(isset($assoc_acct_num) || isset($supervisor_acct_num)): ?>
      	<div id="association">
-	      	<p id="region"><?php if($this->as_ion_auth->is_admin): ?>
-	      		<?php echo form_label('Association/Region', 'region_id', NULL, $region_id) ?>
-      			<?php echo form_dropdown('region_id', $region_options, $region_selected, $region_id)?>
-	      		
-	      	<?php else: ?>
-	      		<?php echo form_input($region_id);?>
-	      	<?php endif; ?></p>
-	      
-	      	<p id="tech"><?php if(($this->as_ion_auth->is_admin || $this->as_ion_auth->is_manager) && !empty($supervisor_num_options)): ?>
-	      		<?php echo form_label('DHI Supervisor', 'supervisor_num', NULL, $supervisor_num) ?>
-      			<?php echo form_dropdown('supervisor_num', $supervisor_num_options, $supervisor_num_selected, $supervisor_num)?>
-	      		
-	      	<?php elseif($this->as_ion_auth->is_admin || $this->as_ion_auth->is_manager): ?>
-	      		<?php echo form_label('DHI Supervisor', 'supervisor_num', NULL, $supervisor_num) ?>
-	      		<?php echo form_input($supervisor_num);?>
-	      	<?php else: ?>
-	      		<?php echo form_input($supervisor_num);?>
-	      	<?php endif; ?></p>
-      
+	      	<?php
+	      	if(isset($assoc_acct_num)): 
+	      		if(isset($assoc_acct_options)): ?>
+	      	<p id="region"><?php
+	      			echo form_label('Association/Region', 'assoc_acct_num', NULL, $assoc_acct_num);
+      				echo form_dropdown('assoc_acct_num[]', $assoc_acct_options, $assoc_acct_selected, $assoc_acct_num);
+	      	?></p>
+	      	<?php
+	      		else: 
+	      			echo form_input($assoc_acct_num);
+	      		endif;
+	      	endif;
+	      	 
+	      	if(isset($supervisor_acct_num)):?>
+		      	<p id="tech"><?php 
+	     			echo form_label('Link to DHI Supervisor', 'supervisor_acct_num', NULL, $supervisor_acct_num);
+	     			echo form_dropdown('supervisor_acct_num', $supervisor_acct_num_options, $supervisor_acct_num_selected, $supervisor_acct_num);
+			    ?></p>
+			<?php endif; ?>
 	    </div>
      <?php endif; ?>
-
+      
 
 		<div id="herd">
 	      <p><?php echo form_label('Herd Code', 'herd_code', NULL, $herd_code) ?>

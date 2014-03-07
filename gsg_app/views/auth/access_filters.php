@@ -71,8 +71,8 @@
 			case 'herd_code': ?>
 				<p><?php echo form_label('Herd Code (any part)', 'herd_code'); echo form_input($herd_code) ?></p>
 				<?php break;
-			case 'user_region_id': ?>
-				<p><?php echo form_label('User&#39;s Region', 'user_region_id'); //echo form_input($user_region_id) ?><?php echo form_dropdown('user_region_id', $region_options, $region_selected, $user_region_id)?>
+			case 'user_association_num': ?>
+				<p><?php echo form_label('User&#39;s Association/Region', 'user_association_num'); //echo form_input($user_association_num) ?><?php echo form_dropdown('user_association_num', $association_options, $association_selected, $user_association_num)?>
 				</p>
 				<?php break;
 			case 'user_tech_num': ?>

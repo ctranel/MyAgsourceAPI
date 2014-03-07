@@ -238,22 +238,6 @@ if ( ! function_exists('array_depth')) {
 	}
 }
 
-if ( ! function_exists('array_extract_value_recursive')) {
-	/**
-	 * Get all values from specific key (or '*' for all keys) in a multidimensional array and return them in a numerically indexed 1-D array
-	 *
-	 * @param $key string ("*" to extract all data into a )
-	 * @param $arr array
-	 * @return null|string|array
-	 * @author ctranel
-	 */
-	function array_extract_value_recursive($key_in, array $arr_in){
-		$new_val = array();
-	    array_walk_recursive($arr_in, create_function('$val, $key, $obj', 'if($key == key($obj) || key($obj) == "*") array_push($obj[key($obj)], $val);'), array($key_in => &$new_val));
-	    return $new_val;
-	}
-}
-
 if ( ! function_exists('array_map_recursive')) {
 	/**
 	 * Get all values from specific key (or '*' for all keys) in a multidimensional array and return them in a numerically indexed 1-D array
@@ -274,7 +258,7 @@ if ( ! function_exists('array_map_recursive')) {
 
 if ( ! function_exists('array_merge_distinct')) {
 	/**
-	 * @abstract merges 2 arrays and removes duplicates
+	 * @description merges 2 arrays and removes duplicates
 	 *
 	 * @param callback function
 	 * @param $arr_1 array
@@ -303,7 +287,7 @@ if ( ! function_exists('array_merge_distinct')) {
 
 if ( ! function_exists('get_element_by_key')) {
 	/**
-	 * @abstract Returns first match of $key in mulitdimensional array
+	 * @description Returns first match of $key in mulitdimensional array
 	 *
 	 * @param key
 	 * @param array
@@ -326,7 +310,7 @@ if ( ! function_exists('get_element_by_key')) {
 
 if ( ! function_exists('get_elements_by_key')) {
 	/**
-	 * @abstract Recursively returns all matches of $key in mulitdimensional $array, returns array with all values for that key
+	 * @description Recursively returns all matches of $key in mulitdimensional $array, returns array with all values for that key
 	 *
 	 * @param key
 	 * @param array
@@ -336,7 +320,7 @@ if ( ! function_exists('get_elements_by_key')) {
  
 	function get_elements_by_key($key, $array, &$ret_val = NULL){
 		foreach($array as $k => $v){
-			if($k == $key){
+			if($k === $key){
 				$ret_val[] = $v;
 			} 
 			if(is_array($v)) {
@@ -347,9 +331,25 @@ if ( ! function_exists('get_elements_by_key')) {
 	}	
 }
 
+if ( ! function_exists('array_extract_value_recursive')) {
+	/**
+	 * Get all values from specific key (or '*' for all keys) in a multidimensional array and return them in a numerically indexed 1-D array
+	 *
+	 * @param $key string ("*" to extract all data into a )
+	 * @param $arr array
+	 * @return null|string|array
+	 * @author ctranel
+	 */
+	function array_extract_value_recursive($key_in, array $arr_in){
+		$new_val = array();
+	    array_walk_recursive($arr_in, create_function('$val, $key, $obj', 'if($key == key($obj) || key($obj) == "*") array_push($obj[key($obj)], $val);'), array($key_in => &$new_val));
+	    return $new_val;
+	}
+}
+
 if ( ! function_exists('set_element_by_key')) {
 	/**
-	 * @abstract Sets value for first match of $key in mulitdimensional array
+	 * @description Sets value for first match of $key in mulitdimensional array
 	 *
 	 * @param array into which value will be inserted
 	 * @param key

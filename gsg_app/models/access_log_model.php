@@ -35,7 +35,7 @@ class Access_log_model extends Report_Model {
 			'User'=>'user_id',
 			'Group'=>'group_id',
 			'Herd'=>'herd_code',
-			'User Region'=>'user_region_id',
+			'User Region'=>'user_association_num',
 			'User Tech Num'=>'user_tech_num',
 			'Sort'=>'sort_text',
 			'Filter'=>'filter_text'
@@ -48,7 +48,7 @@ class Access_log_model extends Report_Model {
 			'user_id' => $this->primary_table_name,
 			'group_id' => $this->primary_table_name,
 			'herd_code' => $this->primary_table_name,
-			'user_region_id' => $this->primary_table_name,
+			'user_association_num' => $this->primary_table_name,
 			'user_tech_num' => $this->primary_table_name,
 			'sort_text' => $this->primary_table_name,
 			'filter_text' => $this->primary_table_name
@@ -61,7 +61,7 @@ class Access_log_model extends Report_Model {
 			'user_id' => 'ASC',
 			'group_id' => 'DESC',
 			'herd_code' => 'ASC',
-			'user_region_id' => 'ASC',
+			'user_association_num' => 'ASC',
 			'user_tech_num' => 'ASC',
 			'sort_text' => 'ASC',
 			'filter_text' => 'ASC'
@@ -74,7 +74,7 @@ class Access_log_model extends Report_Model {
 			'user_id' => '30',
 			'group_id' => '12',
 			'herd_code' => '14',
-			'user_region_id' => '12',
+			'user_association_num' => '12',
 			'user_tech_num' => '16',
 //			'herd_subscription_level' => '14',
 			'sort_text' => '45',
@@ -100,9 +100,9 @@ class Access_log_model extends Report_Model {
 				$arr_fields[$key] = "CONCAT(" . $this->tables['users'] . ".first_name, ' ', " . $this->tables['users'] . ".last_name) AS user_id";
 				$this->{$this->db_group_name}->join($this->tables['users'], $this->tables['access_log'] . '.user_id = ' . $this->tables['users'] . '.id');
 			}
-			if (($key = array_search('user_region_id', $arr_fields)) !== FALSE) {
-				$arr_fields[$key] = $this->tables['regions'] . ".region_name AS user_region_id";
-				$this->{$this->db_group_name}->join($this->tables['regions'], $this->tables['access_log'] . '.user_region_id = ' . $this->tables['regions'] . '.id');
+			if (($key = array_search('user_association_num', $arr_fields)) !== FALSE) {
+				$arr_fields[$key] = $this->tables['regions'] . ".association_num AS user_association_num";
+				$this->{$this->db_group_name}->join($this->tables['regions'], $this->tables['access_log'] . '.user_association_num = ' . $this->tables['regions'] . '.association_num');
 			}
 			if (($key = array_search('group_id', $arr_fields)) !== FALSE) {
 				$arr_fields[$key] = 'groups.name AS group_id';
@@ -400,8 +400,8 @@ FUNCTION MOVED?
 			'user_id'=>$this->session->userdata('user_id'),
 			'group_id'=>$this->session->userdata('active_group_id'),
 			'herd_code'=>$this->session->userdata('herd_code'),
-			'user_tech_num'=>$this->session->userdata('supervisor_num'),
-			'user_region_id'=>implode(',', array_keys($this->session->userdata('arr_regions'))),
+			'user_supervisor_acct_num'=>$this->session->userdata('supervisor_acct_num'),
+			'user_association_acct_num'=>implode(',', array_keys($this->session->userdata('arr_regions'))),
 			'access_time'=> date('Y-m-d H:i:s')
 		);
 		if ($sort) $tmp_array['sort_text'] = $sort;

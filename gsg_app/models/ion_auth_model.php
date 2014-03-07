@@ -201,18 +201,19 @@ class Ion_auth_model extends Ion_auth_parent_model
 				}
 			}
 		}
-		if (!empty($this->herd_meta_sections)){
+ 		if (!empty($this->herd_meta_sections)){
 			foreach($this->herd_meta_sections as $s){
 				if($s != 'herds_sections'){ //creates multiple records for herds with multiple sections.
 					if (!empty($this->columns[$s])) {
 						foreach ($this->columns[$s] as $field){
-							$this->db->select($this->tables[$s].'.'. $field);
+							$this->db->select($this->tables[$s].'.'. $field . '');
 						}
 					}
 					$this->db->join($this->tables[$s], $this->tables['users_herds'].'.herd_code = '.$this->tables[$s].'.'.$this->join[$s], 'left');
 				}
 			}
 		}
+
 		$this->db->join(
 		    $this->tables['users_groups'], 
 		    $this->tables['users_groups'].'.user_id = ' . $this->tables['users'].'.id', 
@@ -225,8 +226,6 @@ class Ion_auth_model extends Ion_auth_parent_model
 		}
 		
 		$this->db->select("CAST(REPLACE((SELECT group_id AS [data()] FROM " . $this->tables['users_groups'] . " AS groups2 WHERE " . $this->tables['users_groups'] . ".user_id = groups2.user_id ORDER BY group_id FOR xml path('')), ' ', ', ') AS VARCHAR(45)) AS arr_groups",FALSE);
-		//$this->db->select("(SELECT GROUP_CONCAT(group_id) FROM " . $this->tables['users_groups'] . " AS groups2 WHERE " . $this->tables['users_groups'] . ".user_id = groups2.user_id) AS groups",FALSE);
-		//$this->db->distinct();
 		
 		if($limit) $this->db->limit($limit, $offset);
 		$this->db->distinct();
@@ -287,17 +286,18 @@ class Ion_auth_model extends Ion_auth_parent_model
 	}
 
 	/**
-	 * @method get_field_users_by_region
+	 * @method get_users_by_association
 	 *
 	 * @param int/array region number
 	 * @return object
 	 * @author ctranel
 	 **/
-	public function get_field_users_by_region($region_num)
+	public function get_users_by_association($assoc_acct_num)
 	{
-		if(!isset($region_num)) return FALSE;
-		if(!is_array($region_num)) $region_num = array($region_num);
-		$this->db->where($this->tables['users'] . '.association_num', $region_num);
+		if(!isset($assoc_acct_num)) return FALSE;
+		if(!is_array($assoc_acct_num)) $assoc_acct_num = array($assoc_acct_num);
+		$this->db->join($this->tables['users_associations'] . ' ua', $this->tables['users'] . '.id = ua.user_id');
+		$this->db->where_in('ua.assoc_acct_num', $assoc_acct_num);
 		$this->users();
 		return $this;
 	}
@@ -333,51 +333,50 @@ class Ion_auth_model extends Ion_auth_parent_model
 		$id || $id = $this->session->userdata('user_id');
 		
 		$arr_db_regions = $this->db
-			->select('r.association_num, r.assoc_name')
-			->join($this->tables['regions'] . ' r', 'u.association_num = r.association_num')
-		    ->where('u.id', $id)
+			->select('r.account_num, r.assoc_name')
+			->join($this->tables['regions'] . ' r', 'ua.assoc_acct_num = r.account_num')
+			->join($this->tables['users'] . ' u', 'ua.user_id = u.id')
+			->where('ua.user_id', $id)
 			->where('u.status', 1)
-			->get($this->tables['users'] . ' u')
+			->get($this->tables['users_associations'] . ' ua')
 			->result_array();
 
 		$arr_return = array();
 		if(is_array($arr_db_regions) && !empty($arr_db_regions)){
 			foreach($arr_db_regions as $r){
-				$arr_return[$r['association_num']] = $r['assoc_name'];
+				$arr_return[$r['account_num']] = $r['assoc_name'];
 			}
 		}
 		return $arr_return;
 	}
 	
 	/**
-	 * @method get_group_by_name
-	 *
-	 * @param string group name
-	 * @return object
-	 * @author Ben Edmunds
-	public function get_group_by_name($name)
-	{
-		$this->db->where('name', $name);
-		return $this->db->get($this->tables['groups'])
-		->row();
-	}
-	 **/
-
-
-	/**
-	 * @method get_child_groups
+	 * @method get_editable_groups
 	 *
 	 * @param int group id
 	 * @return object
 	 * @author ctranel
 	 **/
-	public function get_child_groups($group_id_in)
+	public function get_editable_groups($group_id_in)
 	{
-		$this->db->where('parent_group', '' . $group_id_in);
-		$this->db->or_where('name', 'Producers');
-
-		return $this->db->get($this->tables['groups'])
-		->result();
+		$sql = "WITH cteAnchor AS
+			(
+				SELECT id, name, parent_group
+				FROM users.dbo.groups
+				WHERE parent_group = " . $group_id_in . " OR id = " . $group_id_in . "
+			),
+			cteRecursive AS
+			(
+				SELECT id, name, parent_group
+				FROM cteAnchor
+				UNION all
+				SELECT t.id, t.name, t.parent_group
+				FROM users.dbo.groups t
+				join cteRecursive r ON r.id = t.parent_group
+			)
+			SELECT DISTINCT id, name FROM cteRecursive ORDER BY name;";
+		
+		return $this->db->query($sql)->result_array();
 	}
 
 
@@ -406,25 +405,30 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * @return bool
 	 * @author ctranel
 	 **/
-	public function update($id, array $data)
+	public function update($id, $data, $session_group_id)
 	{
 		$this->db->trans_begin();
 		$tran_status = parent::update($id, $data);
 		if($tran_status){
 			$this->_update_meta($id, $data);
-			$current_groups = array_extract_value_recursive('id', $this->get_users_groups($id)->result_array());
-			$arr_groups_to_delete = is_array($data['group_id']) ? array_diff($current_groups, $data['group_id']) : FALSE;
-			$arr_groups_to_add = is_array($data['group_id']) ? array_diff($data['group_id'], $current_groups) : FALSE;
-			if(is_array($arr_groups_to_delete) && !empty($arr_groups_to_delete)) $this->remove_from_group($arr_groups_to_delete, $id);
-			if(is_array($arr_groups_to_add) && !empty($arr_groups_to_add)) $this->add_to_groups($arr_groups_to_add, $id);
+			//get_editable_groups returns a multidimensional array, need to extract ids
+			$possible_groups = array_extract_value_recursive('id', $this->get_editable_groups($session_group_id));
+			
+			$arr_groups_to_delete = is_array($data['group_id']) ? array_diff($possible_groups, $data['group_id']) : FALSE;
+			$arr_groups_to_add = is_array($data['group_id']) ? array_diff($data['group_id'], $possible_groups) : FALSE;
+			if(is_array($arr_groups_to_delete) && !empty($arr_groups_to_delete)){
+				$this->remove_from_group($arr_groups_to_delete, $id);
+			}
+			if(is_array($arr_groups_to_add) && !empty($arr_groups_to_add)){
+				$this->add_to_groups($arr_groups_to_add, $id);
+			}
 			$tran_status = $this->db->trans_status();
 		}
 		if(!$tran_status){
-				$this->db->trans_rollback();
-	
-				$this->trigger_events(array('post_update_user', 'post_update_user_unsuccessful'));
-				$this->set_error('update_unsuccessful');
-				return FALSE;
+			$this->db->trans_rollback();
+			$this->trigger_events(array('post_update_user', 'post_update_user_unsuccessful'));
+			$this->set_error('update_unsuccessful');
+			return FALSE;
 		}
 		$this->set_message('update_successful');
 		$this->db->trans_commit();
@@ -435,115 +439,119 @@ class Ion_auth_model extends Ion_auth_parent_model
 	/**
 	 * @method _update_meta
 	 * 
-	 * @abstract helper function for "update"
+	 * @description helper function for "update"
 	 * @param int user id
 	 * @param array user data
 	 * @return bool
 	 * @author ctranel
 	 **/
-	protected function _update_meta($id, array $data){
-		$has_data = is_array($data); 
-		if (!empty($this->meta_sections)){
-			foreach($this->meta_sections as $s){
-				$skip_section[$s] = FALSE;
-				if (!empty($this->columns[$s])) {
-					$meta_fields = array();
-					$arr_meta_fields = array();
-					foreach ($this->columns[$s] as $field) {
-						if ($has_data && isset($data[$field]) && (in_array($field, $this->towrite[$s]) !== FALSE && $data[$field] != '')) {
-							if(is_array($data[$field])) $arr_meta_fields[$field] = $data[$field];
-							else $meta_fields[$field] = $data[$field];
-						}
-						elseif(in_array($field, $this->towrite[$s]) !== FALSE && (isset($data[$field]) === FALSE || $data[$field] == '')) {
-							$skip_section[$s] = TRUE;
-						}
-						//unset($data[$field]);
-					}
-					if(!$skip_section[$s]){
-					//update the meta data
-						if(count($arr_meta_fields) > 0){
-							//@todo rather than deleting and re-inserting, only delete/add/update changes 
-							//delete from $this->tables[$s]
-							$this->db->delete($this->tables[$s], array($this->join[$s] => $id));
-							foreach($arr_meta_fields as $field_name => $arr){
-								foreach($arr as $value){
-									$this->db->set($this->join[$s], $id);
-									$this->db->set($field_name, $value);
-									foreach($meta_fields as $k => $v){
-										$this->db->set($k, $v);
-									}
-									$this->db->insert($this->tables[$s]);
-								}
-							}
-						}
-						else {
-							if (count($meta_fields) > 0) {
-								$cnt = $this->db->where($this->join[$s], $id)
-									->from($this->tables[$s])
-									->count_all_results();
-								
-								if($cnt == 0){
-									$this->db->set($meta_fields);
-									$this->db->set(array($this->join[$s] => $id));
-									$this->db->insert($this->tables[$s]);
-								}
-								else{
-									$this->db->where($this->join[$s], $id);
-									$this->db->set($meta_fields);
-									$this->db->update($this->tables[$s]);
-								}
-							}
-						}
-					}
-					unset($arr_meta_fields);
-					unset($meta_fields);
-				}
-			}
+	protected function _update_meta($id, $data){
+		if(!isset($id) || !isset($data) || !is_array($data)){
+			return false;
+		} 
+ 		$this->_update_section_meta($this->meta_sections, $id, $data);
+ 		$this->_update_section_meta($this->herd_meta_sections, $id, $data);
+	}
+	
+	
+	/**
+	 * @method _update_section_meta
+	 *
+	 * @description helper function for "update"
+	 * @param array sections
+	 * @param int user id
+	 * @param array data
+	 * @return bool
+	 * @author ctranel
+	 **/
+	protected function _update_section_meta($sections, $id, $data){
+		if (!isset($sections) || !is_array($sections)){
+			return false;
 		}
-
-		if (!empty($this->herd_meta_sections)){
-			foreach($this->herd_meta_sections as $s){
-				if (!empty($this->columns[$s])) {
-					$meta_fields = array();
-					$arr_meta_fields = array();
-					foreach ($this->columns[$s] as $field) {
-						if ($has_data && isset($data[$field]) && (in_array($data[$field], $this->towrite[$s]) === false || $data[$field] != '')) {
-							if(is_array($data[$field])) $arr_meta_fields[$field] = $data[$field];
-							else $meta_fields[$field] = $data[$field];
-						}
-						unset($data[$field]);
+		foreach($sections as $s){
+			$skip_section[$s] = FALSE;
+			if (!empty($this->columns[$s])) {
+				$meta_fields = array();
+				$arr_meta_fields = array();
+				foreach ($this->columns[$s] as $field) {
+					if (isset($data[$field]) && (in_array($field, $this->towrite[$s]) !== FALSE && $data[$field] != '')) {
+						if(is_array($data[$field])) $arr_meta_fields[$field] = $data[$field];
+						else $meta_fields[$field] = $data[$field];
 					}
-
-					//update the meta data
-					if(count($arr_meta_fields) > 0){
-						//delete from $this->tables[$s]
-						$this->db->delete($this->tables[$s], array($this->join[$s] => $id));
-						foreach($arr_meta_fields as $field_name => $arr){
-							foreach($arr as $value){
-								$this->db->set($this->join[$s], $id);
-								$this->db->set($field_name, $value);
-								foreach($meta_fields as $k => $v){
-									$this->db->set($k, $v);
-								}
-								$this->db->insert($this->tables[$s]);
-							}
-						}
+					elseif(in_array($field, $this->towrite[$s]) !== FALSE && (isset($data[$field]) === FALSE || $data[$field] == '')) {
+						$skip_section[$s] = TRUE;
 					}
-					else {
-						if (count($meta_fields) > 0) {
-							// 'user_id' = $id
-							$this->db->where($this->join[$s], $id);
-							$this->db->set($meta_fields);
-							$this->db->update($this->tables[$s]);
-						}
-					}
-					unset($arr_meta_fields);
-					unset($meta_fields);
+				}
+				if(!$skip_section[$s]){
+					$this->_write_meta_data($s, $id, $meta_fields, $arr_meta_fields);
 				}
 			}
 		}
 	}
 	
+	/**
+	 * @method _update_herd_meta
+	 *
+	 * @description helper function for "update"
+	 * @param int user id
+	 * @param array user data
+	 * @return bool
+	 * @author ctranel
+	 * @todo create function that combines this with _update_user_meta (pass meta_sections, columns and toWrite can remain object-based)
+	protected function _update_herd_meta($sections, $id, $data){
+		if (!isset($sections) || is_array($sections)){
+			return false;
+		}
+		foreach($sections as $s){
+			if (!empty($this->columns[$s])) {
+				$meta_fields = array();
+				$arr_meta_fields = array();
+				foreach ($this->columns[$s] as $field) {
+					if (isset($data[$field]) && (in_array($data[$field], $this->towrite[$s]) === false || $data[$field] != '')) {
+						if(is_array($data[$field])) $arr_meta_fields[$field] = $data[$field];
+						else $meta_fields[$field] = $data[$field];
+					}
+					unset($data[$field]);
+				}
+				$this->_write_meta_data($s, $id, $meta_fields, $arr_meta_fields);
+			}
+		}
+	}
+	 **/
+	
+	protected function _write_meta_data($table, $id, $meta_fields, $arr_meta_fields){
+		if(count($arr_meta_fields) > 0){
+			//@todo rather than deleting and re-inserting, only delete/add/update changes 
+			//delete from $this->tables[$table]
+
+			$this->db->delete($this->tables[$table], array($this->join[$table] => $id));
+			foreach($arr_meta_fields as $field_name => $arr){
+				foreach($arr as $value){
+					$this->db->set($this->join[$table], $id);
+					$this->db->set($field_name, $value);
+					foreach($meta_fields as $k => $v){
+						$this->db->set($k, $v);
+					}
+					$this->db->insert($this->tables[$table]);
+				}
+			}
+		}
+		if (count($meta_fields) > 0) {
+			$cnt = $this->db->where($this->join[$table], $id)
+				->from($this->tables[$table])
+				->count_all_results();
+			if($cnt == 0){
+				$this->db->set($meta_fields);
+				$this->db->set(array($this->join[$table] => $id));
+				$this->db->insert($this->tables[$table]);
+			}
+			else{
+				$this->db->where($this->join[$table], $id);
+				$this->db->set($meta_fields);
+				$this->db->update($this->tables[$table]);
+			}
+		}
+	}
 	
 	/**
 	 * @method delete_user
@@ -593,33 +601,6 @@ class Ion_auth_model extends Ion_auth_parent_model
 		else return FALSE;
 	}
 
-	/**
-	 * @method get_child_regions()
-	 * @param int region id
-	 * @return array with region ids
-	 * @author ctranel
-	public function get_child_regions_array($region_in = FALSE) {
-		$region_id = $region_in ? $region_in : $this->session->userdata('arr_regions');
-		if(empty($region_id) === FALSE){
-			$reg_txt = implode(',', array_keys($region_id));
-			$return = $this->db->query( "WITH subregions(id, parent_region_id) AS (
-				SELECT association_num, parent_region_id
-				FROM " . $this->tables['regions'] . "
-				WHERE id IN(" . $reg_txt . ")
-				UNION ALL
-				SELECT c.id, c.parent_region_id
-				FROM " . $this->tables['regions'] . " c
-				INNER JOIN subregions p ON c.parent_region_id = p.id
-			  )
-			  SELECT id FROM subregions")->result_array();
-			  
-			return is_array($return) ? array_flatten($return) : false;
-		}
-		return false;
-	}
-	 **/
-	
-	
 	/**
 	 * @method get_subscribed_super_sections_array
 	 * @param int $group_id for active session
@@ -973,10 +954,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 		->select($this->tables['super_sections'] . '.id, ' . $this->tables['super_sections'] . '.name, ' . $this->tables['super_sections'] . '.path, ' . $this->tables['super_sections'] . '.list_order')
 		->distinct()
 		->join($this->tables['sections'], $this->tables['super_sections'] . '.id = ' . $this->tables['sections'] . '.super_section_id', 'left')
-		//->join($this->tables['users_sections'], $this->tables['users_sections'] . '.section_id = ' . $this->tables['sections'] . '.id', 'inner')
 		->where("(" . $this->tables['sections'] . '.user_id IS NULL OR ' . $this->tables['sections'] . '.user_id = ' . $user_id . ")");
-		//->where("(" . $this->tables['sections'] . '.user_id IS NULL OR ' . $this->tables['sections'] . '.user_id = ' . $user_id . ' OR ' . $this->tables['users_sections'] . '.user_id = ' . $user_id . ")");
-		//->where($this->tables['users_sections'] . '.user_id', $user_id);
 		return $this->get_super_sections();
 	}
 	
@@ -1001,10 +979,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 	public function get_sections_by_user($user_id){
 		$this->db
 		->select($this->tables['sections'] . '.id, ' . $this->tables['sections'] . '.name, ' . $this->tables['sections'] . '.path')
-		//->join($this->tables['users_sections'], $this->tables['users_sections'] . '.section_id = ' . $this->tables['sections'] . '.id', 'left')
 		->where("(" . $this->tables['sections'] . '.user_id IS NULL OR ' . $this->tables['sections'] . '.user_id = ' . $user_id . ")");
-		//->where("(" . $this->tables['sections'] . '.user_id IS NULL OR ' . $this->tables['sections'] . '.user_id = ' . $user_id . ' OR ' . $this->tables['users_sections'] . '.user_id = ' . $user_id . ")")
-		//->where($this->tables['users_sections'] . '.user_id', $user_id);
 		return $this->get_sections();
 	}
 	
@@ -1091,19 +1066,32 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * @author ctranel
 	 **/
 	public function get_dhi_supervisors() {
-		return $this->db->get($this->tables['users_dhi_supervisors']);
+		return $this->db->get($this->tables['dhi_supervisors']);
 	}
 
 	/**
-	 * @method get_dhi_supervisor_nums_by_region()
-	 * @param string region number
+	 * @method get_dhi_supervisor_acct_nums_by_association()
+	 * @param string/array association account number
 	 * @return array of objects with field tech numbers
 	 * @author ctranel
 	 **/
-	public function get_dhi_supervisor_nums_by_region($arr_region_id = FALSE) {
-		$this->db->select('supervisor_num');
-		if($arr_region_id) $this->db->where_in('region_id', $arr_region_id);
-		$db_tmp_obj = $this->get_dhi_supervisors();
+	public function get_dhi_supervisor_acct_nums_by_association($arr_assoc_acct_num = FALSE) {
+		if(is_array($arr_assoc_acct_num)){
+			$arr_assoc_acct_num = array_filter($arr_assoc_acct_num);
+		}
+		if(!isset($arr_assoc_acct_num) || empty($arr_assoc_acct_num)){
+			return false;
+		}
+		if(!is_array($arr_assoc_acct_num)){
+			$arr_assoc_acct_num = array($arr_assoc_acct_num);
+		}
+		$this->db->select($this->tables['dhi_supervisors'] . ".account_num, CONCAT(first_name, ' ', last_name) AS name");
+		if($arr_assoc_acct_num){
+			$this->db
+			->join($this->tables['regions'] . ' a', $this->tables['dhi_supervisors'] . '.affiliate_num = a.affiliate_num AND ' . $this->tables['dhi_supervisors'] . '.association_num = a.association_num')
+			->where_in('a.account_num', $arr_assoc_acct_num);
+		}
+		$db_tmp_obj = $this->get_dhi_supervisors()->result();
 		if(is_array($db_tmp_obj)) {
 			return $db_tmp_obj;
 		}
@@ -1111,55 +1099,18 @@ class Ion_auth_model extends Ion_auth_parent_model
 	}
 	
 	/**
-	 * @method get_producer_users_by_tech
+	 * @method is_child_user_by_association
 	 *
-	 * @param int tech number
-	 * @return object
-	 * @author ctranel
-	 **/
-	public function get_producer_users_by_tech($tech_num)
-	{
-		if(!isset($tech_num)) return FALSE;
-		if(!is_array($tech_num)) $tech_num = array($tech_num);
-		$this->db->join($this->tables['users_herds'], $this->tables['users_herds'] . '.herd_code = ' . $this->tables['users_herds'] . '.herd_code', 'left')
-			->where('supervisor_num', $tech_num);
-		$this->users();
-		return $this;
-	}
-
-	/**
-	 * @method is_child_field_users_by_region
-	 *
-	 * @param int Region number
+	 * @param string/array association account number
 	 * @param int child user id
 	 * @return object
 	 * @author ctranel
 	 **/
-	public function is_child_field_user_by_region($region_id, $child_id)
+	public function is_child_user_by_association($assoc_acct_num, $child_id)
 	{
-		$this->db->select('user_id')
-			->from($this->tables['users_dhi_supervisors'])
-			->where('region_id', $region_id)
-			->where('user_id', $child_id);
-		return ($this->db->get()->num_rows() > 0);
-	}
-
-	/**
-	 * @method is_child_producer_user_by_tech
-	 *
-	 * @param int tech number
-	 * @param int child user id
-	 * @return object
-	 * @author ctranel
-	 **/
-	public function is_child_producer_user_by_tech($tech_num, $child_id)
-	{
-		$this->db->select('user_id')
-			->from($tables['herds'])
-			->join($this->tables['users_herds'], $this->tables['users_herds'] . '.herd_code = ' . $this->tables['herds'] . '.herd_code', 'left')
-			->where('supervisor_num', $tech_num)
-			->where('user_id', $child_id);
-		return ($this->db->get()->num_rows() > 0);
+		$this->db->where('ua.user_id', $child_id);
+		$ret = $this->get_users_by_association($assoc_acct_num)->result_array();
+		return (count($ret) > 0);
 	}
 
 //PRODUCER FUNCTIONS
@@ -1178,42 +1129,34 @@ class Ion_auth_model extends Ion_auth_parent_model
 	}
 
 	/**
-	 * @method get_field_users_by_region
+	 * @method get_users_by_group_and_association
 	 * 
-	 * @param int/array region number
+	 * @param string/array association account number
 	 * @return object
 	 * @author ctranel
 	 **/
-	public function get_producer_users_by_region($region_id)
+	public function get_users_by_group_and_association($group_id, $assoc_acct_num)
 	{
-		if(!isset($region_id)) return FALSE;
-		if(!is_array($region_id)) $region_id = array($region_id);
-		$arr_joins = array(
-			0=>array('table'=>$this->tables['users_herds'], 'condition'=>$this->tables['users_herds'] . '.herd_code = ' . $this->tables['users_herds'] . '.herd_code', 'type'=>'left'),
-			1=>array('table'=>$this->tables['herds_regions'], 'condition'=>$this->tables['herds'] . '.herd_code = ' . $this->tables['herds_regions'] . '.herd_code', 'type'=>'left')
-		);	
-		$this->db->where($this->tables['herds_regions'] . '.region_id', $region_id);
-		$this->users(FALSE, NULL, NULL, $arr_joins);
-		return $this;
+		if(!isset($assoc_acct_num)) return FALSE;
+		if(!is_array($assoc_acct_num)) $assoc_acct_num = array($assoc_acct_num);
+		$this->db->join($this->tables['users_groups'] . ' ug', $this->tables['users'] . '.id = ug.user_id AND ug.group_id = ' . $group_id);
+		
+		return $this->get_users_by_association($assoc_acct_num);
 	}
 
 	/**
-	 * @method is_child_producer_user_by_region
+	 * @method is_child_user_by_group_and_association
 	 *
-	 * @param int region number
+	 * @param string/array association account number
 	 * @param int child user id
 	 * @return object
 	 * @author ctranel
 	 **/
-	public function is_child_producer_user_by_region($region_id, $child_id)
+	public function is_child_user_by_group_and_association($group_id, $assoc_acct_num, $child_id)
 	{
-		$this->db->select('user_id')
-			->from($this->tables['herds'])
-			->join($this->tables['users_herds'], $this->tables['users_herds'] . '.herd_code = ' . $this->tables['users_herds'] . '.herd_code', 'left')
-			->join($this->tables['herds_regions'], $this->tables['herds'] . '.herd_code = ' . $this->tables['herds_regions'] . '.herd_code', 'left')
-			->where($this->tables['herds_regions'] . '.region_id', $region_id)
-			->where('user_id', $child_id);
-		return ($this->db->get()->num_rows() > 0);
+		$this->db->where('ua.user_id', $child_id);
+		$ret = $this->get_users_by_group_and_association($group_id, $assoc_acct_num)->result_array();
+		return (count($ret) > 0);
 	}
 
 //SERVICE GROUP FUNCTIONS

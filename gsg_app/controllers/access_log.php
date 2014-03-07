@@ -4,17 +4,6 @@ class Access_log extends parent_report {
 	protected $arr_filters;
 	protected $arr_keyed_pages;
 	protected $arr_keyed_sections;
-	/* -----------------------------------------------------------------
-	 *  UPDATE comment
-	 *  @author: carolmd
-	 *  @date: Dec 12, 2013
-	 *
-	 *  @description: commented out the next line because was getting an error: 
-	 *  Fatal error: Cannot redeclare Access_log::$arr_keyed_pages in C:\Program Files (x86)\Zend\Apache2\htdocs\MyAgSource\gsg_app\controllers\access_log.php on line 7
-	 *  
-	 *  -----------------------------------------------------------------
-	 */
-	//protected $arr_keyed_pages; //[section_id][id]=name
 
 	function __construct(){
 
@@ -47,7 +36,7 @@ class Access_log extends parent_report {
 			$this->load->library('reports');
 			$this->reports->herd_code = $this->herd_code;
 			$this->arr_pages = $this->access_log_model->arr_pages;
-			$this->arr_filters = array('access_time', 'sections', 'pages', 'format', 'groups', 'user_region_id', 'user_tech_num', 'herd_code');
+			$this->arr_filters = array('access_time', 'sections', 'pages', 'format', 'groups', 'user_association_num', 'user_tech_num', 'herd_code');
 //			$this->arr_keyed_pages = $this->access_log_model->get_keyed_page_array();
 			$this->arr_keyed_sections = $this->ion_auth_model->get_keyed_section_array();
 			$this->arr_keyed_pages = $this->access_log_model->get_keyed_page_array();
@@ -101,7 +90,7 @@ class Access_log extends parent_report {
 		$arr_sort_order = array_values(explode('|', trim(urldecode($sort_order))));
 
 		//validate form input for filters
-		$this->form_validation->set_rules('user_region_id', 'Association Number (if a member of an association)', 'exact_length[3]');
+		$this->form_validation->set_rules('user_association_num', 'Association Number (if a member of an association)', 'exact_length[3]');
 		$this->form_validation->set_rules('user_tech_num', 'Field Technician Number', 'trim|max_length[6]');
 		$this->form_validation->set_rules('herd_code', 'Herd Code', 'trim|max_length[8]');
 		$this->form_validation->set_rules('group_id', 'User Group ID');
@@ -119,7 +108,7 @@ class Access_log extends parent_report {
 			$arr_filter_criteria['format'] = is_array($this->input->post('format', TRUE))?$this->input->post('format', TRUE):array();
 			$arr_filter_criteria['group_id'] = is_array($this->input->post('group_id', TRUE))?$this->input->post('group_id', TRUE):array();
 			$arr_filter_criteria['herd_code'] = $this->input->post('herd_code');
-			$arr_filter_criteria['user_region_id'] = $this->input->post('user_region_id');
+			$arr_filter_criteria['user_association_num'] = $this->input->post('user_association_num');
 			$arr_filter_criteria['user_tech_num'] = $this->input->post('user_tech_num');
 			$arr_filter_criteria['access_time_dbfrom'] = $this->input->post('access_time_dbfrom');
 			$arr_filter_criteria['access_time_dbto'] = $this->input->post('access_time_dbto');
@@ -233,9 +222,9 @@ class Access_log extends parent_report {
 				'sort_order' => $arr_sort_order,
 				'arr_filters' => $this->arr_filters,
 				'report_path' => $this->report_path,
-				'user_region_id' => '',
-				'region_options' => $this->as_ion_auth->get_region_dropdown_data(),
-				'region_selected' => $this->form_validation->set_value('user_region_id'),
+				'user_association_num' => '',
+				'association_options' => $this->as_ion_auth->get_assoc_dropdown_data(array_keys($this->session->userdata('arr_regions'))),
+				'association_selected' => $this->form_validation->set_value('user_association_num'),
 				'user_tech_num' => array('name' => 'user_tech_num',
 					'id' => 'user_tech_num',
 					'type' => 'text',
@@ -251,7 +240,7 @@ class Access_log extends parent_report {
 					'value' => $this->form_validation->set_value('herd_code')
 				),
 				'group_id' => '',
-				'group_options' => $this->as_ion_auth->get_group_dropdown_data(),
+				'group_options' => $this->as_ion_auth->get_group_dropdown_data($this->session->userdata('active_group_id')),
 				'group_selected' => $arr_filter_criteria['group_id'],
 				'section_id' => '',
 				'section_options' => $this->arr_keyed_sections,

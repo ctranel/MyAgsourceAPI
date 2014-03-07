@@ -11,7 +11,7 @@ class Download_log extends parent_report {
 		$this->product_name = 'Benchmark Download Log';
 		$this->report_path = 'bench_report/download_log';
 		$this->herd_code = strlen($this->session->userdata('herd_code')) == 8?$this->session->userdata('herd_code'):NULL;
-		$this->arr_filters = array('access_time', 'pages', 'user_region_id');
+		$this->arr_filters = array('access_time', 'pages', 'user_association_num');
 
 		if($this->authorize()) { //authorize function is in report parent class
 			if(!$this->as_ion_auth->is_admin){
@@ -57,7 +57,7 @@ class Download_log extends parent_report {
 
 		//validate form input for filters
 		$this->load->library('form_validation');
-		$this->form_validation->set_rules('user_region_id', 'Association Number (if a member of an association)', 'exact_length[3]');
+		$this->form_validation->set_rules('user_association_num', 'Association Number (if a member of an association)', 'exact_length[3]');
 		$this->form_validation->set_rules('access_time_dbfrom', 'Access Date From', 'trim');
 		$this->form_validation->set_rules('access_time_dbfrom', 'Access Date To', 'trim');
 		$this->form_validation->set_rules('page_id', 'Event');
@@ -65,7 +65,7 @@ class Download_log extends parent_report {
 		//handle filters
 		if ($this->form_validation->run() == TRUE) { //successful submission
 			$arr_filter_criteria['page_id'] = is_array($this->input->post('page_id', TRUE))?$this->input->post('page_id', TRUE):array();
-			$arr_filter_criteria['user_region_id'] =is_array($this->input->post('user_region_id', TRUE))?$this->input->post('user_region_id', TRUE):array();
+			$arr_filter_criteria['user_association_num'] =is_array($this->input->post('user_association_num', TRUE))?$this->input->post('user_association_num', TRUE):array();
 			$arr_filter_criteria['access_time_dbfrom'] = $this->input->post('access_time_dbfrom');
 			$arr_filter_criteria['access_time_dbto'] = $this->input->post('access_time_dbto');
 		}
@@ -173,9 +173,9 @@ class Download_log extends parent_report {
 				'sort_order'=>$arr_sort_order,
 				'arr_filters'=>$this->arr_filters,
 				'report_path'=>$this->report_path,
-//				'user_region_id' => '',
-//				'region_options' => $this->as_ion_auth->get_region_dropdown_data(),
-//				'region_selected' => $this->form_validation->set_value('user_region_id'),
+//				'user_association_num' => '',
+//				'association_options' => $this->as_ion_auth->get_assoc_dropdown_data(array_keys($this->session->userdata('arr_regions'))),
+//				'association_selected' => $this->form_validation->set_value('user_association_num'),
 				'page_id' => '',
 				'page_options' => $this->arr_keyed_pages,
 				'page_selected' => $arr_filter_criteria['page_id'],

@@ -1,11 +1,10 @@
 <?php 
-	 $class = 'first';
-	 if($this->as_ion_auth->has_permission("Manage Staff") && FALSE): ?>
-		<li class="<?php echo $class; ?>"><?php echo anchor('region','Manage Assoc/Regions', 'class="teal_banner"') ?></li>
-<?php	$class = '';
-	endif; ?>
-	<?php if($this->as_ion_auth->has_permission("Manage Other Accounts")): ?>
+	$class = 'first';
+	if($this->as_ion_auth->has_permission("Add All Users") || $this->as_ion_auth->has_permission("Add Users In Region")): ?>
 		<li class="<?php echo $class; ?>"><?php echo anchor('auth/create_user','Add Account', 'class="teal_banner"') ?></li>
+<?php	$class = '';
+	endif; 
+	if($this->as_ion_auth->has_permission("Edit All Users") || $this->as_ion_auth->has_permission("Edit Users In Region")): ?>
 		<li><?php echo anchor('auth/list_accounts','List Accounts', 'class="teal_banner"') ?></li>
 <?php	$class = '';
 	endif; ?>

@@ -27,19 +27,24 @@
 	$config['tables']['lookup_display_types']	= 'users.dbo.lookup_display_types';
 	$config['tables']['lookup_chart_types'] 	= 'users.dbo.lookup_chart_types';
 	$config['tables']['lookup_scopes'] 			= 'users.dbo.lookup_scopes';
+
 	$config['tables']['consultants_herds']    	= 'users.dbo.service_groups_herds';
 	$config['tables']['users_service_groups']   = 'users.dbo.users_service_groups';
 	$config['tables']['service_groups']    		= 'address.dbo.service_group';
+
 	$config['tables']['super_sections']    		= 'users.dbo.super_sections';
 	$config['tables']['sections']    			= 'users.dbo.sections';
 	$config['tables']['pages']  				= 'users.dbo.pages';
 	$config['tables']['pages_blocks']  			= 'users.dbo.pages_blocks';
 	$config['tables']['blocks']  				= 'users.dbo.blocks';
 	$config['tables']['access_log']  			= 'users.dbo.access_log';
+
 	$config['tables']['users_sections']    		= 'users.dbo.users_sections';
 	$config['tables']['groups']  				= 'users.dbo.groups';
-	$config['tables']['users_dhi_supervisors']  = 'address.dbo.dhi_supervisor';
+	$config['tables']['dhi_supervisors']  		= 'address.dbo.dhi_supervisor';
+	$config['tables']['users_dhi_supervisors']  = 'users.dbo.users_dhi_supervisors';//address.dbo.dhi_supervisor';
 	$config['tables']['regions']  				= 'address.dbo.association';//users.dbo.regions';
+	$config['tables']['users_associations']  	= 'users.dbo.users_associations';
 	$config['tables']['users']   				= 'users.dbo.users';
 	$config['tables']['users_groups']    		= 'users.dbo.users_groups';
 	$config['tables']['meta']    				= 'users_meta'; 
@@ -47,11 +52,11 @@
 	$config['tables']['login_attempts']  		= 'users.dbo.login_attempts';
 	$config['tables']['tasks']  				= 'users.dbo.tasks';
 	$config['tables']['groups_tasks']  			= 'users.dbo.groups_tasks';
-	$config['tables']['herds_sections']    		= 'users.dbo.herds_sections';
-	$config['tables']['herds_regions']    		= 'users.dbo.herds_regions';
 	
 	//HERD DB tables
 	$config['tables']['herds']    				= 'herd.dbo.herd_id';
+	$config['tables']['herds_sections']    		= 'users.dbo.herds_sections';
+	$config['tables']['herds_regions']    = 'users.dbo.herds_regions';
 
 	//vma DB views
 	$config['tables']['vma_Dates_Last_7_Tests']			= 'vma.dbo.vma_Dates_Last_7_Tests'; // Kevin - for dynamic test_date table headers
@@ -60,16 +65,17 @@
 	 * Meta sections to be included with profile.
 	 * Each should have a config setting for 'towrite' 'tables', 'join' and 'columns'
 	 **/
-	$config['meta_sections']         = array('users_herds', 'users_sections');//'meta', 
+	$config['meta_sections']         = array('users_dhi_supervisors', 'users_associations', 'users_herds', 'users_sections');////'meta', 
 	$config['herd_meta_sections']         = array('herds_sections');
-
+	
 	/**
 	 * Fields from meta table that must be present in order to write to the meta table
 	 * Note that these fields are not required on the user record
 	 **/
 	$config['towrite'] = array(
 		'users_herds'		=> array('herd_code'),
-		//'dhi_supervisor'=> array('supervisor_num','region_id'),
+		'users_associations'	=> array('assoc_acct_num'),
+		'users_dhi_supervisors'=> array('supervisor_acct_num'),
 		//'meta'		=> array(),
 	 	'users_sections'=> array('section_id', ''),
 		'herds_sections'=> array('section_id')
@@ -84,7 +90,8 @@
 		'groups'	=> 'group_id',//from ion_auth
 		'users'		=> 'user_id', //from ion_auth
 		'users_herds'		=> 'user_id',
-//		'users_dhi_supervisors'=> 'user_id',
+		'users_associations'	=> 'user_id',
+		'users_dhi_supervisors'=> 'user_id',
 		//'meta'		=> 'user_id',
 		'users_sections'=> 'user_id',
 		'herds_sections'=> 'herd_code'
@@ -95,7 +102,8 @@
 	 **/
 	$config['columns'] = array(
 		'users_herds'		=> array('herd_code'),
-//		'dhi_supervisor'=> array('supervisor_num', 'region_id'),
+		'users_associations'	=> array('assoc_acct_num'),
+		'users_dhi_supervisors'=> array('supervisor_acct_num'),
 		//'meta'		=> array('first_name', 'last_name', 'company', 'phone'),
 		'users_sections'=> array('section_id', 'access_level'),
 		'herds_sections'=> array('section_id', 'access_level')
