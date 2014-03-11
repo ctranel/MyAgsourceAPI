@@ -6,7 +6,12 @@ class Change_herd extends CI_Controller {
 
 		if((!$this->as_ion_auth->logged_in())){
 			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
-			$this->session->set_flashdata('message',  $this->session->flashdata('message') . "Please log in.");
+			if(strpos($this->session->flashdata('message'), 'Please log in.') === FALSE){
+				$this->session->set_flashdata('message',  $this->session->flashdata('message') . 'Please log in.');
+			}
+			else{
+				$this->session->keep_flashdata('message');
+			}
 			redirect(site_url('auth/login'));
 		}
 		$this->page_header_data['user_sections'] = $this->as_ion_auth->arr_user_super_sections;
