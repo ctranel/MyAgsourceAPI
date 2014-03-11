@@ -30,8 +30,8 @@
     <?php echo form_close();?>
 
     <p>Forgot your password?  <?php echo anchor('auth/forgot_password', 'Click here'); ?></p>
-    
     <p>Not currently enrolled?  <?php echo anchor('auth/create_user', 'Register now.'); ?></p>
-
+    <p>Want to see more?  <?php echo anchor('demo', 'View Demo Herd.'); ?></p>
+    
 </div>
 <?php if(isset($page_footer) !== false) echo $page_footer;

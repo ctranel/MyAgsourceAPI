@@ -105,11 +105,11 @@ class As_ion_auth extends Ion_auth {
 			$this->arr_user_super_sections = $this->get_super_sections_array($this->session->userdata('active_group_id'), $this->session->userdata('user_id'), $this->session->userdata('herd_code'), $arr_scope);
 			$this->arr_user_sections = $this->get_sections_array($this->session->userdata('active_group_id'), $this->session->userdata('user_id'), $this->session->userdata('herd_code'), $this->super_section_id, $arr_scope);
 		}
-		else {
-			$this->session->set_userdata('herd_code', $this->config->item('default_herd', 'ion_auth'));
+		elseif($this->session->userdata('herd_code') == $this->config->item('default_herd', 'ion_auth')) {
+/*			$this->session->set_userdata('herd_code', $this->config->item('default_herd', 'ion_auth'));
 			$this->session->set_userdata('arr_pstring', $this->herd_model->get_pstring_array($this->config->item('default_herd', 'ion_auth'), FALSE));
 			//$this->session->set_userdata('active_group_id', 2);
-			$arr_scope = array('subscription','public','unmanaged');
+*/			$arr_scope = array('subscription','public','unmanaged');
 			//the first parameter is group id--use producer (2) if no one is logged in, second param is user id. 
 			$this->arr_user_super_sections = $this->get_super_sections_array(2, $this->session->userdata('user_id'), $this->session->userdata('herd_code'), $arr_scope);
 			$this->arr_user_sections = $this->get_sections_array(2, $this->session->userdata('user_id'), $this->session->userdata('herd_code'), $this->super_section_id, $arr_scope);

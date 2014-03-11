@@ -101,8 +101,8 @@ abstract class parent_report extends CI_Controller {
 			}
 			else return FALSE;
 		}
-		if(!$this->as_ion_auth->logged_in()) {
-	       	if($this->uri->segment(3) == 'ajax_report' && $this->session->userdata('herd_code') != $this->config->item('default_herd', 'ion_auth')){
+		if(!$this->as_ion_auth->logged_in() && $this->session->userdata('herd_code') != $this->config->item('default_herd', 'ion_auth')) {
+	       	if($this->uri->segment(3) == 'ajax_report'){
 				echo "Your session has expired, please log in and try again.";
 			}
 			else {
@@ -126,7 +126,7 @@ abstract class parent_report extends CI_Controller {
 		//@todo: build display_hierarchy/report_organization, etc interface with get_scope function (with classes for super_sections, sections, etc)
 		$pass_unsubscribed_test = true; //$this->as_ion_auth->get_scope('sections', $this->section_id) == 'pubic';
 		$pass_unsubscribed_test = $this->as_ion_auth->has_permission("View Unsubscribed Herds") || $this->ion_auth_model->herd_is_subscribed($this->section_id, $this->herd_code);
-		$pass_view_nonowned_test = $this->as_ion_auth->has_permission("View All Herds");
+		$pass_view_nonowned_test = $this->as_ion_auth->has_permission("View All Herds") || $this->session->userdata('herd_code') == $this->config->item('default_herd', 'ion_auth');
 		if(!$pass_view_nonowned_test) $pass_view_nonowned_test = in_array($this->herd_code, $this->as_ion_auth->get_viewable_herd_codes($this->session->userdata('user_id'), $this->session->userdata('arr_regions')));//$this->as_ion_auth->has_permission("View Non-owned Herds") || $this->ion_auth_model->user_owns_herd($this->herd_code);
 		if($pass_unsubscribed_test && $pass_view_nonowned_test) return TRUE;
 		elseif(!$pass_unsubscribed_test && !$pass_view_nonowned_test) {
