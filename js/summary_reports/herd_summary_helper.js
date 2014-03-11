@@ -148,19 +148,19 @@
 	//this function is called in the graph_helper.js file after the JSON data file has loaded.  It can make report specific updates after the data has been loaded (see commented code for example)
 	function post_render(app_data){
 		if(typeof(chart) != 'undefined' && app_data['block'] == 'peak_milk_trends'){
-			chart[3].addSeries({
+			chart[app_data['graph_order']].addSeries({
 					type: 'spline',
-					color: chart[3].series[0].color,
+					color: chart[app_data['graph_order']].series[0].color,
 					marker: {enabled:false},
 					name: '1st Lact Trend',
-					data: (function() {return fitData(chart[3].series[0].data).data})()
+					data: (function() {return fitData(chart[app_data['graph_order']].series[0].data).data})()
 			});
-			chart[3].addSeries({
+			chart[app_data['graph_order']].addSeries({
 				type: 'spline',
-				color: chart[3].series[1].color,
+				color: chart[app_data['graph_order']].series[1].color,
 				marker: {enabled:false},
 				name: '2+ Lact Trend',
-				data: (function() {return fitData(chart[3].series[1].data).data})()
+				data: (function() {return fitData(chart[app_data['graph_order']].series[1].data).data})()
 			});
 		}
 	}
