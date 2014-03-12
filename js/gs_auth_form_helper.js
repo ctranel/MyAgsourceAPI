@@ -58,7 +58,6 @@ function populate_techs(ev){
 	$.getJSON("ajax_techs/" + $(this).val(), null, function(data) {
 		$('#tech').find('option').remove();
 		$.each(data, function(index, item){
-	console.log(index + ' - ' + item);
 			$('#tech').find('select').append(
 				$("<option></option>")
 					.text(item)
