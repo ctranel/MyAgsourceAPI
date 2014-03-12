@@ -31,14 +31,17 @@
 	     			echo form_dropdown('supervisor_acct_num', $supervisor_acct_num_options, $supervisor_acct_num_selected, $supervisor_acct_num);
 			    ?></p>
 			<?php endif; ?>
-	    </div>
- 		<div id="herd">
-	      <p><?php echo form_label('Herd Code', 'herd_code', NULL, $herd_code); ?>
-	      <?php echo form_input($herd_code); ?>
-	      </p>
-	    </div>
+	    </div><?php
+	    if(isset($herd_code)): ?>
+	 		<div id="herd">
+		      <p><?php echo form_label('Herd Code', 'herd_code', NULL, $herd_code); ?>
+		      <?php echo form_input($herd_code); ?>
+		      </p>
+		    </div>
+<?php
+		endif;
+	endif; ?>
 
-     <?php endif; ?>
 
 
       <p><?php echo form_label('Phone', 'phone1', NULL, $phone1); ?>
