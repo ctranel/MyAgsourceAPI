@@ -405,7 +405,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * @return bool
 	 * @author ctranel
 	 **/
-	public function update($id, $data, $session_group_id)
+	public function update($id, $data, $session_group_id, $session_arr_groups)
 	{
 		$this->db->trans_begin();
 		$tran_status = parent::update($id, $data);
@@ -414,8 +414,10 @@ class Ion_auth_model extends Ion_auth_parent_model
 			//get_editable_groups returns a multidimensional array, need to extract ids
 			$possible_groups = array_extract_value_recursive('id', $this->get_editable_groups($session_group_id));
 			
-			$arr_groups_to_delete = is_array($data['group_id']) ? array_diff($possible_groups, $data['group_id']) : FALSE;
-			$arr_groups_to_add = is_array($data['group_id']) ? array_diff($data['group_id'], $possible_groups) : FALSE;
+			$arr_groups_to_delete = is_array($data['group_id']) ? array_diff($session_arr_groups, $data['group_id']) : FALSE;
+			$arr_tmp = is_array($data['group_id']) ? array_intersect($data['group_id'], $possible_groups) : FALSE;
+			$arr_groups_to_add = is_array($data['group_id']) ? array_diff($arr_tmp, $session_arr_groups) : FALSE;
+
 			if(is_array($arr_groups_to_delete) && !empty($arr_groups_to_delete)){
 				$this->remove_from_group($arr_groups_to_delete, $id);
 			}
