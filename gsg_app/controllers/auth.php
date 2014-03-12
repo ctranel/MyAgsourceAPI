@@ -800,11 +800,11 @@ class Auth extends Ionauth {
 			$herd_release_code = NULL;
 
 			//Set variables that depend on group(s) selected
-			if($this->as_ion_auth->has_permission("Edit All Users") || $this->as_ion_auth->has_permission("Edit Users In Region")){
+			if($this->as_ion_auth->has_permission("Add All Users") || $this->as_ion_auth->has_permission("Add Users In Region")){
 				$arr_posted_group_id = $this->input->post('group_id');
 				if(!$this->as_ion_auth->group_assignable($arr_posted_group_id)){
-					$this->session->set_flashdata('message', 'You do not have permissions to edit a user with the user group you selected.  Please try again, or contact ' . $this->config->item('cust_serv_company','ion_auth') . ' at ' . $this->config->item('cust_serv_email','ion_auth') . ' or ' . $this->config->item('cust_serv_phone','ion_auth') . '.');
-					redirect(site_url("auth/edit_user/$user_id"), 'refresh');
+					$this->session->set_flashdata('message', 'You do not have permissions to add a user with the user group you selected.  Please try again, or contact ' . $this->config->item('cust_serv_company','ion_auth') . ' at ' . $this->config->item('cust_serv_email','ion_auth') . ' or ' . $this->config->item('cust_serv_phone','ion_auth') . '.');
+					redirect(site_url("auth/create_user/$user_id"), 'refresh');
 					exit();
 				}
 				$assoc_acct_num = $this->input->post('assoc_acct_num');
@@ -1074,7 +1074,8 @@ class Auth extends Ionauth {
 			$password = $this->input->post('password');
 			if(!empty($password)) $data['password'] = $password;
 		}
-		if ($is_validated === TRUE && $this->ion_auth_model->update($user_id, $data, $this->session->userdata('active_group_id'))) { //check to see if we are creating the user
+		$arr_curr_group_ids = array_keys($this->session->userdata('arr_groups'));
+		if ($is_validated === TRUE && $this->ion_auth_model->update($user_id, $data, $this->session->userdata('active_group_id'), $arr_curr_group_ids)) { //check to see if we are creating the user
 			$this->session->set_flashdata('message', "Account Edited");
 			redirect(site_url("auth"), 'refresh');
 		}
