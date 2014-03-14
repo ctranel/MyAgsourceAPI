@@ -577,7 +577,7 @@ class Auth extends Ionauth {
 		$this->data['message'] = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
 		//list the users
 		$this->data['users'] = $this->as_ion_auth->get_editable_users();
-		$this->data['arr_group_lookup'] = $this->ion_auth_model->arr_group_lookup;
+		$this->data['arr_group_lookup'] = $this->ion_auth_model->get_group_lookup();
 		
 		$this->carabiner->css('report.css', 'screen');
 		$this->carabiner->css('datatables/table_ui.css', 'screen');

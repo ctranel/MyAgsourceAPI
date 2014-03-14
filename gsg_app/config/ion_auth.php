@@ -44,7 +44,7 @@
 	$config['tables']['dhi_supervisors']  		= 'address.dbo.dhi_supervisor';
 	$config['tables']['users_dhi_supervisors']  = 'users.dbo.users_dhi_supervisors';//address.dbo.dhi_supervisor';
 	$config['tables']['regions']  				= 'address.dbo.association';//users.dbo.regions';
-	$config['tables']['users_associations']  	= 'users.dbo.users_associations';
+	//$config['tables']['users_associations']  	= 'users.dbo.users_associations';
 	$config['tables']['users']   				= 'users.dbo.users';
 	$config['tables']['users_groups']    		= 'users.dbo.users_groups';
 	$config['tables']['meta']    				= 'users_meta'; 
@@ -65,7 +65,7 @@
 	 * Meta sections to be included with profile.
 	 * Each should have a config setting for 'towrite' 'tables', 'join' and 'columns'
 	 **/
-	$config['meta_sections']         = array('users_dhi_supervisors', 'users_associations', 'users_herds', 'users_sections');////'meta', 
+	$config['meta_sections']         = array('users_dhi_supervisors', 'users_herds', 'users_sections');////'meta', 'users_associations', 
 	$config['herd_meta_sections']         = array('herds_sections');
 	
 	/**
@@ -74,7 +74,7 @@
 	 **/
 	$config['towrite'] = array(
 		'users_herds'		=> array('herd_code'),
-		'users_associations'	=> array('assoc_acct_num'),
+		//'users_associations'	=> array('assoc_acct_num'),//associations can be derived from supervisor data
 		'users_dhi_supervisors'=> array('supervisor_acct_num'),
 		//'meta'		=> array(),
 	 	'users_sections'=> array('section_id', ''),
@@ -90,7 +90,7 @@
 		'groups'	=> 'group_id',//from ion_auth
 		'users'		=> 'user_id', //from ion_auth
 		'users_herds'		=> 'user_id',
-		'users_associations'	=> 'user_id',
+		//'users_associations'	=> 'user_id',//associations can be derived from supervisor data
 		'users_dhi_supervisors'=> 'user_id',
 		//'meta'		=> 'user_id',
 		'users_sections'=> 'user_id',
@@ -101,8 +101,8 @@
 	 * id not required.
 	 **/
 	$config['columns'] = array(
-		'users_herds'		=> array('herd_code'),
-		'users_associations'	=> array('assoc_acct_num'),
+		//'users_herds'		=> array('herd_code'),
+		//'users_associations'	=> array('assoc_acct_num'), //associations can be derived from supervisor data
 		'users_dhi_supervisors'=> array('supervisor_acct_num'),
 		//'meta'		=> array('first_name', 'last_name', 'company', 'phone'),
 		'users_sections'=> array('section_id', 'access_level'),
@@ -145,7 +145,7 @@ $config['max_rounds']     = 9;
  | The controller should check this function and act
  | appropriately. If this variable set to 0, there is no maximum.
  */
-$config['default_herd']			="35999923";
+$config['default_herd']			="35999909";
 $config['site_title']           = "MyAgSource"; 		// Site Title, example.com
 $config['cust_serv_company']	= "AgSource Cooperative Services"; //custom CDT
 
