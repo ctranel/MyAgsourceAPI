@@ -46,13 +46,6 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 **/
 	public $towrite = array();
 
-	/**
-	 * key = group_id
-	 * value = group_name
-	 * @var array
-	 **/
-	public $arr_group_lookup = array();
-
 	public function __construct()
 	{
 		parent::__construct();
@@ -62,7 +55,6 @@ class Ion_auth_model extends Ion_auth_parent_model
 		$this->columns = $this->config->item('columns', 'ion_auth');
 		$this->join = $this->config->item('join', 'ion_auth');
 		$this->towrite = $this->config->item('towrite', 'ion_auth');
-		$this->arr_group_lookup = $this->_get_group_lookup();
 	}
 
 	/**
@@ -225,7 +217,8 @@ class Ion_auth_model extends Ion_auth_parent_model
 			}
 		}
 		
-		$this->db->select("CAST(REPLACE((SELECT group_id AS [data()] FROM " . $this->tables['users_groups'] . " AS groups2 WHERE " . $this->tables['users_groups'] . ".user_id = groups2.user_id ORDER BY group_id FOR xml path('')), ' ', ', ') AS VARCHAR(45)) AS arr_groups",FALSE);
+		$this->db->select("CAST(REPLACE((SELECT group_id AS [data()] FROM " . $this->tables['users_groups'] . " AS g2 WHERE " . $this->tables['users_groups'] . ".user_id = g2.user_id ORDER BY group_id FOR xml path('')), ' ', ', ') AS VARCHAR(45)) AS arr_groups",FALSE);
+		$this->db->select("CAST(REPLACE((SELECT herd_code AS [data()] FROM " . $this->tables['users_herds'] . " AS h2 WHERE " . $this->tables['users_herds'] . ".user_id = h2.user_id ORDER BY herd_code FOR xml path('')), ' ', ', ') AS VARCHAR(180)) AS herd_code",FALSE);
 		
 		if($limit) $this->db->limit($limit, $offset);
 		$this->db->distinct();
@@ -296,8 +289,10 @@ class Ion_auth_model extends Ion_auth_parent_model
 	{
 		if(!isset($assoc_acct_num)) return FALSE;
 		if(!is_array($assoc_acct_num)) $assoc_acct_num = array($assoc_acct_num);
-		$this->db->join($this->tables['users_associations'] . ' ua', $this->tables['users'] . '.id = ua.user_id');
-		$this->db->where_in('ua.assoc_acct_num', $assoc_acct_num);
+		$this->db->join($this->tables['users_dhi_supervisors'] . ' us', 'u.id = us.user_id')
+		->join($this->tables['dhi_supervisors'] . ' s', 'us.supervisor_acct_num = s.account_num')
+		->join($this->tables['regions'] . ' r', 's.affiliate_num = r.affiliate_num AND s.association_num = r.association_num')
+		->where_in('r.account_num', $assoc_acct_num);
 		$this->users();
 		return $this;
 	}
@@ -334,11 +329,12 @@ class Ion_auth_model extends Ion_auth_parent_model
 		
 		$arr_db_regions = $this->db
 			->select('r.account_num, r.assoc_name')
-			->join($this->tables['regions'] . ' r', 'ua.assoc_acct_num = r.account_num')
-			->join($this->tables['users'] . ' u', 'ua.user_id = u.id')
-			->where('ua.user_id', $id)
+			->join($this->tables['users_dhi_supervisors'] . ' us', 'u.id = us.user_id')
+			->join($this->tables['dhi_supervisors'] . ' s', 'us.supervisor_acct_num = s.account_num')
+			->join($this->tables['regions'] . ' r', 's.affiliate_num = r.affiliate_num AND s.association_num = r.association_num')
+			->where('u.id', $id)
 			->where('u.status', 1)
-			->get($this->tables['users_associations'] . ' ua')
+			->get($this->tables['users'] . ' u')
 			->result_array();
 
 		$arr_return = array();
@@ -351,6 +347,20 @@ class Ion_auth_model extends Ion_auth_parent_model
 	}
 	
 	/**
+	 * get_active_groups
+	 *
+	 * @return object
+	 * @author Chris Tranel
+	 **/
+	public function get_active_groups()
+	{
+		$this->_ion_where[] = array($this->tables['groups'] . '.status' => 1);
+		$this->_ion_order_by = $this->tables['groups'] . '.list_order';
+		$this->_ion_order = 'asc';
+		return parent::groups();
+	}
+	
+	/**
 	 * @method get_editable_groups
 	 *
 	 * @param int group id
@@ -359,22 +369,24 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 **/
 	public function get_editable_groups($group_id_in)
 	{
-		$sql = "WITH cteAnchor AS
-			(
-				SELECT id, name, parent_group
-				FROM users.dbo.groups
-				WHERE parent_group = " . $group_id_in . " OR id = " . $group_id_in . "
-			),
-			cteRecursive AS
-			(
-				SELECT id, name, parent_group
-				FROM cteAnchor
-				UNION all
-				SELECT t.id, t.name, t.parent_group
-				FROM users.dbo.groups t
-				join cteRecursive r ON r.id = t.parent_group
-			)
-			SELECT DISTINCT id, name FROM cteRecursive ORDER BY name;";
+		$sql = "WITH cteAnchor AS (
+	SELECT g.id, g.name, gp.parent_group_id as parent_group, g.status, g.list_order
+	FROM users.dbo.groups g 
+	INNER JOIN users.dbo.group_parents gp ON g.id = gp.group_id 
+	WHERE gp.parent_group_id = " . $group_id_in . " OR g.id = " . $group_id_in . "
+
+	UNION all 
+	
+	SELECT t.id, t.name, t.parent_group, t.status, t.list_order
+	FROM (
+		SELECT g.id, g.name, gp.parent_group_id as parent_group, g.status, g.list_order
+		FROM users.dbo.groups g 
+		INNER JOIN users.dbo.group_parents gp ON g.id = gp.group_id
+	) t
+	INNER JOIN cteAnchor r ON r.id = t.parent_group 
+	WHERE t.status = 1 
+) 
+SELECT DISTINCT id, name, list_order FROM cteAnchor ORDER BY list_order;";
 		
 		return $this->db->query($sql)->result_array();
 	}
@@ -1046,15 +1058,14 @@ class Ion_auth_model extends Ion_auth_parent_model
 	}
 	
 	/**
-	 * @method _get_group_lookup
-	 * @access protected
+	 * @method get_group_lookup
+	 * @access public
 	 * @return array of groups (id=>name)
 	 * @author ctranel
 	 **/
-		protected function _get_group_lookup(){
+	public function get_group_lookup(){
 		$arr_return = array();
-		$this->db->where('status', TRUE);
-		$tmp = $this->groups()->result_array();
+		$tmp = $this->get_active_groups()->result_array();
 		foreach($tmp as $g){
 			$arr_return[$g['id']] = $g['name'];
 		}

@@ -324,7 +324,7 @@ class As_ion_auth extends Ion_auth {
 		$arr_groups = array();
 		$ret_array = array();
 		if($this->has_permission('Add All Users')){
-			$arr_groups = $this->ion_auth_model->groups()->result_array();
+			$arr_groups = $this->ion_auth_model->get_active_groups()->result_array();
 		}
 		elseif($this->logged_in()){
 			if($this->has_permission('Add Users In Region')){
@@ -332,9 +332,8 @@ class As_ion_auth extends Ion_auth {
 			}
 		}
 		if(empty($arr_groups)){
-			$arr_groups[] = array('id'=>'2', 'name'=>'Producers (direct member)');
-			$arr_groups[] = array('id'=>'13', 'name'=>'Producers (association member)');
-			$arr_groups[] = array('id'=>'9', 'name'=>'Consultants');
+			$arr_groups[] = array('id'=>'13', 'name'=>'Producer');
+			$arr_groups[] = array('id'=>'9', 'name'=>'Consultant');
 		}
 		if(is_array($arr_groups)) {
 			$ret_array[''] = "Select one";
