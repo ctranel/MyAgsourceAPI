@@ -56,7 +56,7 @@
 	//HERD DB tables
 	$config['tables']['herds']    				= 'herd.dbo.herd_id';
 	$config['tables']['herds_sections']    		= 'users.dbo.herds_sections';
-	$config['tables']['herds_regions']    = 'users.dbo.herds_regions';
+	$config['tables']['herds_regions']    		= 'users.dbo.herds_regions';
 
 	//vma DB views
 	$config['tables']['vma_Dates_Last_7_Tests']			= 'vma.dbo.vma_Dates_Last_7_Tests'; // Kevin - for dynamic test_date table headers
@@ -101,7 +101,7 @@
 	 * id not required.
 	 **/
 	$config['columns'] = array(
-		//'users_herds'		=> array('herd_code'),
+		'users_herds'		=> array('herd_code'),
 		//'users_associations'	=> array('assoc_acct_num'), //associations can be derived from supervisor data
 		'users_dhi_supervisors'=> array('supervisor_acct_num'),
 		//'meta'		=> array('first_name', 'last_name', 'company', 'phone'),
