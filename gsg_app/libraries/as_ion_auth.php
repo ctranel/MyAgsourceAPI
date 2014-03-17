@@ -129,7 +129,7 @@ class As_ion_auth extends Ion_auth {
 	 * @author ctranel
 	 **/
 	public function register($username, $password, $email, $additional_data = array(), $group_name = array()) {
-		$id = parent::register($username, $password, $email, $additional_data, $group_name);
+		$id = parent::register($username, $password, $this->config->item('cust_serv_email','ion_auth'), $additional_data, $group_name); //to sendn email to registrant, change 3rd param to $email
 		$herd_code = $additional_data['herd_code'];
 		
 		$this->load->model('tech_model');

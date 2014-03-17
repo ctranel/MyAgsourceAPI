@@ -884,12 +884,12 @@ class Auth extends Ionauth {
 				$this->data['assoc_acct_num'] = 'class = "require"';
 			}
 			elseif($this->as_ion_auth->has_permission("Add Users In Region")){
-					$this->data['assoc_acct_num'] = array('name' => 'assoc_acct_num[]',
-						'id' => 'assoc_acct_num',
-						'type' => 'hidden',
-						'class' => 'require',
-						'value' => $this->session->userdata('assoc_acct_num'),
-					);
+				$this->data['assoc_acct_num'] = array('name' => 'assoc_acct_num[]',
+					'id' => 'assoc_acct_num',
+					'type' => 'hidden',
+					'class' => 'require',
+					'value' => $this->session->userdata('assoc_acct_num'),
+				);
 			}
 			
 			if($this->as_ion_auth->has_permission("Add All Users") || $this->as_ion_auth->has_permission("Add Users In Region")){

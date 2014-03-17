@@ -18,6 +18,6 @@
 	<p>Name: <?php echo $arr_tech['first_name'] . ' ' . $arr_tech['last_name']; ?></p>
 	<p>Home Phone: <?php echo $arr_tech['home_phone']; ?></p>
 	<p>Cell Phone: <?php echo $arr_tech['cell_phone']; ?></p>
-	<p>Voice Mail #: <?php echo $arr_tech['voice_mail_num']; ?></p>
+	<p>Association: <?php echo $arr_tech['association_num']; ?></p>
 	</body>
 </html>
