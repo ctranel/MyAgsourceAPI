@@ -332,7 +332,7 @@ class As_ion_auth extends Ion_auth {
 			}
 		}
 		if(empty($arr_groups)){
-			$arr_groups[] = array('id'=>'13', 'name'=>'Producer');
+			$arr_groups[] = array('id'=>'2', 'name'=>'Producer');
 			$arr_groups[] = array('id'=>'9', 'name'=>'Consultant');
 		}
 		if(is_array($arr_groups)) {
