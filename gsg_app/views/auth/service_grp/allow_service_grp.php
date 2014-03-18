@@ -4,8 +4,8 @@
 	<p>Please fill in the data.</p>
     <?php echo form_open("auth/consult_access");?>
 	<p>
-		<label for="consultant_user_id">Consultant</label>
-      	<?php echo form_input($consultant_user_id);?> SEARCH FOR CONSULTANT
+		<label for="sg_user_id">Consultant</label>
+      	<?php echo form_input($sg_user_id);?> SEARCH FOR CONSULTANT
 	</p>
       <p>
       	<?php echo form_fieldset('Data to Share', array('id' => 'data_shared')); ?>

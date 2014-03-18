@@ -277,7 +277,7 @@ class As_ion_auth extends Ion_auth {
 			$arr_return_user = $this->herd_model->get_herds_by_user($user_id, $limit_in);
 		}
 		if($this->has_permission('View non-own w permission')){
-			$arr_return_permission = $this->herd_model->get_herds_by_consultant($limit_in);
+			$arr_return_permission = $this->herd_model->get_herds_by_consultant($user_id, $limit_in);
 		}
 		return array_merge($arr_return_reg, $arr_return_user, $arr_return_permission);
 	}
@@ -662,7 +662,7 @@ class As_ion_auth extends Ion_auth {
 	 *
 	 **/
 	public function allow_consult($arr_relationship_data, $arr_section_id) {
-		$old_relationship_id = $this->ion_auth_model->get_consult_relationship_id($arr_relationship_data['consultant_user_id'], $arr_relationship_data['herd_code']);
+		$old_relationship_id = $this->ion_auth_model->get_consult_relationship_id($arr_relationship_data['sg_user_id'], $arr_relationship_data['herd_code']);
 		//insert into consulants_herds
 		$relationship_id = $this->ion_auth_model->set_consult_relationship($arr_relationship_data, $old_relationship_id);
 		//insert each section into consulants_herds_sections
@@ -672,7 +672,7 @@ class As_ion_auth extends Ion_auth {
 				$this->set_message('consultant_status_update_successful');
 				//send e-mail
 				$arr_herd_info = $this->herd_model->header_info($this->session->userdata('herd_code'));
-				$consultant_info = $this->ion_auth_model->user($arr_relationship_data['consultant_user_id'])->result_array();
+				$consultant_info = $this->ion_auth_model->user($arr_relationship_data['sg_user_id'])->result_array();
 				$consultant_info = $consultant_info[0];
 
 				if($arr_relationship_data['request_status_id'] == 1) $message = $this->load->view($this->config->item('email_templates', 'ion_auth').$this->config->item('consult_granted', 'ion_auth'), $arr_herd_info, true);
@@ -700,7 +700,7 @@ class As_ion_auth extends Ion_auth {
 	}
 
 	/**
-	 * @method consult_request()
+	 * @method service_grp_request()
 	 * @abstract write consultant-herd relationship record
 	 * @param string herd code
 	 * @param int consultant's user id
@@ -710,8 +710,8 @@ class As_ion_auth extends Ion_auth {
 	 * @access public
 	 *
 	 **/
-	public function consult_request($arr_relationship_data, $arr_section_id) {
-		$old_relationship_id = $this->ion_auth_model->get_consult_relationship_id($arr_relationship_data['consultant_user_id'], $arr_relationship_data['herd_code']);
+	public function service_grp_request($arr_relationship_data, $arr_section_id) {
+		$old_relationship_id = $this->ion_auth_model->get_consult_relationship_id($arr_relationship_data['sg_user_id'], $arr_relationship_data['herd_code']);
 		//insert into consulants_herds
 		$relationship_id = $this->ion_auth_model->set_consult_relationship($arr_relationship_data, $old_relationship_id);
 		//insert each section into consulants_herds_sections
@@ -740,9 +740,9 @@ class As_ion_auth extends Ion_auth {
 	 **/
 	function send_consultant_request($arr_relationship_data, $relationship_id){
 		//send e-mail
-		$consultant_info = $this->ion_auth_model->user($arr_relationship_data['consultant_user_id'])->result_array();
+		$consultant_info = $this->ion_auth_model->user($arr_relationship_data['sg_user_id'])->result_array();
 		$consultant_info[0]['relationship_id'] = $relationship_id;
-		$message = $this->load->view($this->config->item('email_templates', 'ion_auth').$this->config->item('consult_request', 'ion_auth'), $consultant_info[0], TRUE);
+		$message = $this->load->view($this->config->item('email_templates', 'ion_auth').$this->config->item('service_grp_request', 'ion_auth'), $consultant_info[0], TRUE);
 		$arr_herd_emails = $this->herd_model->get_herd_emails($arr_relationship_data['herd_code']);
 		$arr_herd_emails = array_flatten($arr_herd_emails);
 

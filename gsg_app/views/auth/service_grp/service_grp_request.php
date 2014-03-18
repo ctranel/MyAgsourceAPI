@@ -2,7 +2,7 @@
 <div class='mainInfo'>
 	<?php if(isset($page_heading) !== FALSE) echo heading($page_heading); ?>
 	<p>Please fill in the data.</p>
-    <?php echo form_open("auth/consult_request");?>
+    <?php echo form_open("auth/service_grp_request");?>
       <p>
       	<label for="herd_code">Herd Code</label>
       	<?php echo form_input($herd_code);?>

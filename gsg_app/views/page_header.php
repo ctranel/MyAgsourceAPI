@@ -85,7 +85,7 @@
 				<li><?php echo anchor('auth/logout', 'Log Out'); ?></li>
 				<?php if($this->as_ion_auth->has_permission("View non-own w permission")): ?>
 					<li><?php echo anchor('auth/consult_manage_herds', 'Manage Herd Access'); ?></li>
-					<li><?php echo anchor('auth/consult_request', 'Request Herd Access'); ?></li>
+					<li><?php echo anchor('auth/service_grp_request', 'Request Herd Access'); ?></li>
 				<?php endif; ?>
 				<?php if($this->session->userdata('active_group_id') == 2): ?>
 					<li><?php echo anchor('auth/manage_consult', 'Manage Consultant Access'); ?></li>

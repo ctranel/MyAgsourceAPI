@@ -29,6 +29,7 @@
 	$config['tables']['lookup_scopes'] 			= 'users.dbo.lookup_scopes';
 
 	$config['tables']['consultants_herds']    	= 'users.dbo.service_groups_herds';
+	$config['tables']['serv_grps_herds_sections'] = 'users.dbo.service_groups_herds_sections';
 	$config['tables']['users_service_groups']   = 'users.dbo.users_service_groups';
 	$config['tables']['service_groups']    		= 'address.dbo.service_group';
 
@@ -213,9 +214,9 @@ $config['email_templates'] = 'auth/email/';		//Folder where email templates are 
 $config['email_activate'] = 'activate.tpl.php';	//Activate Account Email Template
 $config['email_forgot_password'] = 'forgot_password.tpl.php'; //Forgot Password Email Template
 $config['email_forgot_password_complete'] = 'new_password.tpl.php'; //Forgot Password Complete Email Template
-$config['consult_granted']   = 'consult_granted.tpl.php';	//grant consultant access to herd
-$config['consult_denied']   = 'consult_denied.tpl.php';		//deny consultant access to herd
-$config['consult_request']   = 'consult_request.tpl.php';	//consultants' request to access herd
+$config['consult_granted']   = 'service_grp_granted.tpl.php';	//grant consultant access to herd
+$config['consult_denied']   = 'service_grp_denied.tpl.php';		//deny consultant access to herd
+$config['service_grp_request']   = 'service_grp_request.tpl.php';	//consultants' request to access herd
 $config['user_herd_data']   = 'user_herd_data.tpl.php';	//internal email with user and herd data of registrants
 
 /*

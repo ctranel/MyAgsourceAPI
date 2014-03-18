@@ -65,11 +65,11 @@ class Herd_model extends CI_Model {
 	 * @author ctranel
 	 *
 	 **/
-	function get_herds_by_consultant($consultant_user_id = FALSE){
-		if(!$consultant_user_id) $consultant_user_id = $this->session->userdata('user_id');
-		$this->db->join('consultants_herds', 'herd.herd_code = consultants_herds.herd_code')
-		->where('consultants_herds.consultant_user_id', $consultant_user_id)
-		->where('(consultants_herds.exp_date > CURDATE() OR consultants_herds.exp_date IS NULL)')
+	function get_herds_by_consultant($sg_user_id = FALSE){
+		if(!$sg_user_id) $sg_user_id = $this->session->userdata('user_id');
+		$this->db->join($this->tables['consultants_herds'] . ' ch', 'h.herd_code = ch.herd_code')
+		->where('ch.sg_user_id', $sg_user_id)
+		->where('(ch.exp_date > GETDATE() OR ch.exp_date IS NULL)')
 		->where('request_status_id', 1);
 		return $this->get_herds();
 		
@@ -229,11 +229,11 @@ class Herd_model extends CI_Model {
 	 * @access public
 	 *
 	 **/
-	function get_herd_codes_by_consultant($consultant_user_id = FALSE){
-		if(!$consultant_user_id) $consultant_user_id = $this->session->userdata('user_id');
-		$this->db->join('consultants_herds', 'herd.herd_code = consultants_herds.herd_code')
-		->where('consultants_herds.consultant_user_id', $consultant_user_id)
-		->where('(consultants_herds.exp_date > CURDATE() OR consultants_herds.exp_date IS NULL)')
+	function get_herd_codes_by_consultant($sg_user_id = FALSE){
+		if(!$sg_user_id) $sg_user_id = $this->session->userdata('user_id');
+		$this->db->join($this->tables['consultants_herds'] . ' ch', 'h.herd_code = ch.herd_code')
+		->where('ch.sg_user_id', $sg_user_id)
+		->where('(ch.exp_date > GETDATE() OR ch.exp_date IS NULL)')
 		->where('request_status_id', 1);
 		return $this->get_herd_codes();
 	}
@@ -365,18 +365,16 @@ class Herd_model extends CI_Model {
 	 * @param string herd code
 	 * @return bool
 	 * @author ctranel
-	 * 11/14/13: CMMD: fixed from clause.
-	 * @todo is this used? (CMMD) I don't think we need it. If it IS used, fix the stmt so it does not use users_groups. If not, delete the function.
 	 *     
 	 **/
 	public function herd_is_registered($herd_code){
 		$arr_results = $this->db->select('herd_code')
-		->from($this->tables['users'])
-		->join('users_herd_meta', 'users.id = users_herd_meta.user_id')
-		->join('users_groups', 'users.id = users_groups.user_id')
-		->where('users_herd_meta.herd_code', $herd_code)
-		->where('users.active', 1)
-		->where('users_groups.group_id', 2)
+		->from($this->tables['users'] . ' u')
+		->join($this->tables['users_herds'] . ' uh', 'u.id = uh.user_id')
+		->join($this->tables['users_groups'] . ' ug', 'u.id = ug.user_id')
+		->where('uh.herd_code', $herd_code)
+		->where('u.active', 1)
+		->where('ug.group_id', 2)
 		->get()
 		->result_array();
 		if(is_array($arr_results) && !empty($arr_results)) return TRUE;
@@ -388,17 +386,15 @@ class Herd_model extends CI_Model {
 	 * @param string herd code
 	 * @return array of e-mail addresses
 	 * @author ctranel
-	 * 11/14/13: CMMD: Fixed from clause.
-	 * @todo CMMD is this used? If so, remove users_groups table. If not, delete function.
 	 **/
 	public function get_herd_emails($herd_code){
 		$arr_results = $this->db->select('email')
-		->from($this->tables['users'])
-		->join('users_herd_meta', 'users.id = users_herd_meta.user_id')
-		->join('users_groups', 'users.id = users_groups.user_id')
-		->where('users_herd_meta.herd_code', $herd_code)
-		->where('users.active', 1)
-		->where('users_groups.group_id', 2)
+		->from($this->tables['users'] . ' u')
+		->join($this->tables['users_herds'] . ' uh', 'u.id = uh.user_id')
+		->join($this->tables['users_groups'] . ' ug', 'u.id = ug.user_id')
+		->where('uh.herd_code', $herd_code)
+		->where('u.active', 1)
+		->where('ug.group_id', 2)
 		->get()
 		->result_array();
 		if(is_array($arr_results) && !empty($arr_results)) return $arr_results;

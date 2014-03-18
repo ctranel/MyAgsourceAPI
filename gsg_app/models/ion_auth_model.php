@@ -1181,10 +1181,10 @@ SELECT DISTINCT id, name, list_order FROM cteAnchor ORDER BY list_order;";
 	 * @return int/bool id of record matching params
 	 * @author ctranel
 	 **/
-	public function get_consult_relationship_id($consultant_user_id, $herd_code){
+	public function get_consult_relationship_id($sg_user_id, $herd_code){
 		$result = $this->db
 		->select('id')
-		->get_where($this->tables['consultants_herds'], array('user_id' => $consultant_user_id, 'herd_code' => $herd_code))->result();
+		->get_where($this->tables['consultants_herds'], array('sg_user_id' => $sg_user_id, 'herd_code' => $herd_code))->result();
 		if(!empty($result)) return $result[0]->id;
 		else return FALSE;
 	}
@@ -1197,8 +1197,8 @@ SELECT DISTINCT id, name, list_order FROM cteAnchor ORDER BY list_order;";
 	 * @return array/bool of fields of record matching params, false if none found
 	 * @author ctranel
 	 **/
-	public function get_consult_relationship($consultant_user_id, $herd_code){
-		$result = $this->db->get_where($this->tables['consultants_herds'], array('user_id' => $consultant_user_id, 'herd_code' => $herd_code))->result_array();
+	public function get_consult_relationship($sg_user_id, $herd_code){
+		$result = $this->db->get_where($this->tables['consultants_herds'], array('sg_user_id' => $sg_user_id, 'herd_code' => $herd_code))->result_array();
 		if(!empty($result)) return $result[0];
 		else return FALSE;
 	}
@@ -1223,13 +1223,13 @@ SELECT DISTINCT id, name, list_order FROM cteAnchor ORDER BY list_order;";
 	 * @return array of herd records, keyed by consultant status
 	 * @author ctranel
 	 **/
-	public function get_herds_by_consult($consultant_user_id){
+	public function get_herds_by_consult($sg_user_id){
 		$result = $this->db
-		->select($this->tables['consultants_herds'] . '.*, ' . $this->tables['herds'] . '.herd_owner')
-		->from($this->tables['consultants_herds'])
-		->join($tables['herds'], $this->tables['consultants_herds'] . '.herd_code = herd.herd_code')
-		->where('(' . $this->tables['consultants_herds'] . '.exp_date IS NULL OR ' . $this->tables['consultants_herds'] . '.exp_date > GETDATE())')
-		->where('user_id', $consultant_user_id)
+		->select('ch.*, h.herd_owner')
+		->from($this->tables['consultants_herds'] . ' ch')
+		->join($this->tables['herds'] . ' h', 'ch.herd_code = h.herd_code')
+		->where('(ch.exp_date IS NULL OR ch.exp_date > GETDATE())')
+		->where('sg_user_id', $sg_user_id)
 		->get()
 		->result_array();
 		if(!empty($result)){
@@ -1240,11 +1240,11 @@ SELECT DISTINCT id, name, list_order FROM cteAnchor ORDER BY list_order;";
 			}
 		}
 		$result = $this->db
-		->select($this->tables['consultants_herds'] . '.*, ' . $this->tables['herds'] . '.herd_owner')
-		->from($this->tables['consultants_herds'])
-		->join($tables['herds'], $this->tables['consultants_herds'] . '.herd_code = ' . $this->tables['herds'] . '.herd_code')
-		->where("((" . $this->tables['consultants_herds'] . ".exp_date IS NOT NULL AND " . $this->tables['consultants_herds'] . ".exp_date <= GETDATE()) AND " . $this->tables['consultants_herds'] . ".request_status_id = 1)")
-		->where('user_id', $consultant_user_id)
+		->select('ch.*, h.herd_owner')
+		->from($this->tables['consultants_herds'] . ' ch')
+		->join($this->tables['herds'] . ' h', 'ch.herd_code = h.herd_code')
+		->where("((ch.exp_date IS NOT NULL AND ch.exp_date <= GETDATE()) AND ch.request_status_id = 1)")
+		->where('sg_user_id', $sg_user_id)
 		->get()
 		->result_array();
 		if(!empty($result)){
@@ -1267,12 +1267,12 @@ SELECT DISTINCT id, name, list_order FROM cteAnchor ORDER BY list_order;";
 	 **/
 	public function get_consultants_by_herd($herd_code){
 		$result = $this->db
-		->select($this->tables['consultants_herds'] . '.*, ' . $this->tables['users'] . '.first_name, ' . $this->tables['users'] . '.last_name, ' . $this->tables['service_groups'] . '.account_name')
-		->from($this->tables['consultants_herds'])
-		->join($this->tables['users'], $this->tables['consultants_herds'] . '.user_id = ' . $this->tables['users'] . '.id')
-		->join($this->tables['users_service_groups'], $this->tables['users'] . '.id = ' . $this->tables['users_service_groups'] . '.user_id')
-		->join($this->tables['service_groups'], $this->tables['users_service_groups'] . '.sg_account_num = ' . $this->tables['service_groups'] . '.account_num')
-		->where('(' . $this->tables['consultants_herds'] . '.exp_date IS NULL OR ' . $this->tables['consultants_herds'] . '.exp_date > GETDATE())')
+		->select('ch.*, u.first_name, u.last_name, c.account_name')
+		->from($this->tables['consultants_herds'] . ' ch')
+		->join($this->tables['users'] . ' u', 'ch.user_id = ' . $this->tables['users'] . '.id')
+		->join($this->tables['users_service_groups'] . 'uc', 'u.id = uc.user_id')
+		->join($this->tables['service_groups'] . 'c', 'uc.sg_account_num = c.account_num')
+		->where('(ch.exp_date IS NULL OR ch.exp_date > GETDATE())')
 		->where('herd_code', $herd_code)
 		->get()
 		->result_array();
@@ -1283,12 +1283,12 @@ SELECT DISTINCT id, name, list_order FROM cteAnchor ORDER BY list_order;";
 			}
 		}
 		$result = $this->db
-		->select($this->tables['consultants_herds'] . '.*, ' . $this->tables['users'] . '.first_name, ' . $this->tables['users'] . '.last_name, ' . $this->tables['service_groups'] . '.account_name')
-		->from($this->tables['consultants_herds'])
-		->join('users', $this->tables['consultants_herds'] . '.user_id = ' . $this->tables['users'] . '.id')
-		->join($this->tables['users_service_groups'], $this->tables['users'] . '.id = ' . $this->tables['users_service_groups'] . '.user_id')
-		->join($this->tables['service_groups'], $this->tables['users_service_groups'] . '.sg_account_num = ' . $this->tables['service_groups'] . '.account_num')
-		->where("((" . $this->tables['consultants_herds'] . ".exp_date IS NOT NULL AND " . $this->tables['consultants_herds'] . ".exp_date <= GETDATE()) AND " . $this->tables['consultants_herds'] . ".request_status_id = 1)")
+		->select('ch.*, u.first_name, u.last_name, c.account_name')
+		->from($this->tables['consultants_herds'] . ' ch')
+		->join($this->tables['users'] . ' u', 'ch.user_id = u.id')
+		->join($this->tables['users_service_groups'] . ' uc', 'u.id = uc.user_id')
+		->join($this->tables['service_groups'] . 'c', 'uc.sg_account_num = c.account_num')
+		->where("((ch.exp_date IS NOT NULL AND ch.exp_date <= GETDATE()) AND ch.request_status_id = 1)")
 		->where('herd_code', $herd_code)
 		->get()
 		->result_array();
@@ -1398,10 +1398,14 @@ SELECT DISTINCT id, name, list_order FROM cteAnchor ORDER BY list_order;";
 		$success = FALSE;
 		if(isset($old_id) && !empty($old_id)) {
 			$this->db->where('id', $old_id);
-			if($this->db->update($this->tables['consultants_herds'], $arr_relationship_data)) $success = $old_id;
+			if($this->db->update($this->tables['consultants_herds'], $arr_relationship_data)){
+				$success = $old_id;
+			}
 		}
 		else {
-			if($this->db->insert($this->tables['consultants_herds'], $arr_relationship_data)) $success = $this->db->insert_id();
+			if($this->db->insert($this->tables['consultants_herds'], $arr_relationship_data)){
+				$success = $this->db->insert_id();
+			}
 		}
 		return $success;
 	}
@@ -1416,7 +1420,7 @@ SELECT DISTINCT id, name, list_order FROM cteAnchor ORDER BY list_order;";
 	function get_consult_rel_sections($rel_id){
 		$result = $this->db
 		->select('section_id')
-		->get_where($this->tables['consultants_herds_sections'], array('service_groups_herds_id'=>$rel_id))
+		->get_where($this->tables['serv_grps_herds_sections'], array('service_groups_herds_id'=>$rel_id))
 		->result_array();
 		if(!empty($result)) return array_flatten($result);
 		else return FALSE;
@@ -1433,11 +1437,11 @@ SELECT DISTINCT id, name, list_order FROM cteAnchor ORDER BY list_order;";
 	 **/
 	public function set_consult_sections($arr_section_id, $consult_relationship_id, $old_id = NULL){
 		if(isset($old_id) && !empty($old_id)) {
-			$this->db->delete($this->tables['consultants_herds_sections'], array('service_groups_herds_id' => $old_id));
+			$this->db->delete($this->tables['serv_grps_herds_sections'], array('service_groups_herds_id' => $old_id));
 		}
 		if(is_array($arr_section_id) && !empty($arr_section_id)){
 			foreach($arr_section_id as $a){
-				$success = $this->db->insert($this->tables['consultants_herds_sections'], array('service_groups_herds_id' => $consult_relationship_id, 'section_id' => $a));
+				$success = $this->db->insert($this->tables['serv_grps_herds_sections'], array('service_groups_herds_id' => $consult_relationship_id, 'section_id' => $a));
 				if(!$success) return FALSE;
 			}
 			return TRUE;
@@ -1454,16 +1458,16 @@ SELECT DISTINCT id, name, list_order FROM cteAnchor ORDER BY list_order;";
 	 * @return bool
 	 * @author ctranel
 	 **/
-	public function consultant_has_access($consultant_user_id, $herd_code, $section_id){
+	public function consultant_has_access($sg_user_id, $herd_code, $section_id){
 		$results = $this->db
-		->select('id')
-		->from($this->tables['consultants_herds'])
-		->join($this->tables['consultants_herds_sections'], $this->tables['consultants_herds'] . '.id = ' . $this->tables['consultants_herds_sections'] . '.service_groups_herds_id')
-		->where($this->tables['consultants_herds'] . '.user_id = ' . $consultant_user_id)
-		->where($this->tables['consultants_herds'] . '.herd_code = ' . $herd_code)
-		->where('(' . $this->tables['consultants_herds'] . '.exp_date IS NULL OR ' . $this->tables['consultants_herds'] . '.exp_date > GETDATE())')
-		->where($this->tables['consultants_herds'] . '.request_status_id', 1)
-		->where($this->tables['consultants_herds_sections'] . '.section_id = ' . $section_id)
+		->select('sg_user_id')
+		->from($this->tables['consultants_herds'] . ' ch')
+		->join($this->tables['serv_grps_herds_sections'] . ' chs', 'ch.id = chs.service_groups_herds_id')
+		->where('ch.sg_user_id = ' . $sg_user_id)
+		->where('ch.herd_code = ' . $herd_code)
+		->where('(ch.exp_date IS NULL OR ch.exp_date > GETDATE())')
+		->where('ch.request_status_id', 1)
+		->where('chs.section_id = ' . $section_id)
 		->count_all_results();
 
 		if($results > 0) return TRUE;

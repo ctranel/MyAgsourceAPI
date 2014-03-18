@@ -4,6 +4,6 @@
 	<td><?php echo $herd_owner; ?></td>
 	<td><?php echo $exp_date; ?></td>
 	<?php if($is_editable): ?>
-		<td><?php echo anchor('auth/consult_access/' . $consultant_user_id, 'edit'); ?></td>
+		<td><?php echo anchor('auth/consult_access/' . $sg_user_id, 'edit'); ?></td>
 	<?php endif; ?>
 </tr>

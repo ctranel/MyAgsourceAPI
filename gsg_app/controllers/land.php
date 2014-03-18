@@ -175,7 +175,7 @@ class Land extends parent_report {
 			if(isset($consultants_by_status['open']) && is_array($consultants_by_status['open'])){
 				$section_data['content'] = $this->_set_consult_section($consultants_by_status['open'], 'open', 'Open Requests', array('Grant Access', 'Deny Access'));
 				$this->data['widget']['info'][] = array(
-					'content' => $this->load->view('auth/dashboard/open_consult_requests', $section_data, TRUE),
+					'content' => $this->load->view('auth/dashboard/open_service_grp_requests', $section_data, TRUE),
 					'title' => 'Open Consultant Requests'
 				);
 			}
