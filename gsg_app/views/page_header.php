@@ -9,7 +9,7 @@
     <meta name="robots" content="NO FOLLOW,NO INDEX">
     <meta name="googlebot" content="NOARCHIVE">
     <meta name="description" content="<?php if(isset($description)) echo $description; ?>">
-    <meta name="keywords" content="<?php echo $this->config->item("cust_serv_company"); ?>, DHI Testing, DHI, DHIA, milk testing, soil testing, forage testing, manure testing, " />
+    <meta name="keywords" content="<?php echo $this->config->item('cust_serv_company'); ?>, DHI Testing, DHI, DHIA, milk testing, soil testing, forage testing, manure testing, " />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 	<link rel="stylesheet" href='http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css'>
 <?php
@@ -28,7 +28,7 @@
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/headjs/0.99/head.min.js"></script>
 	<script type="text/javascript">
 		head.js(
-			{jquery: "https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"},
+			{jquery: "https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"},
 			{bootstrap: "http://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"},
 			{sectionhelper: "<?php echo $this->config->item('base_url_assets'); ?>js/as_section_helper.js"}
 			<?php
@@ -80,16 +80,18 @@
 	</nav>
 	<div id="header">
 		<ul id="session-nav">
-			<li><?php echo anchor('http://agsource.crinet.com', 'AgSource Site'); ?></li>
+			<!-- <li><?php echo anchor('http://agsource.crinet.com', 'AgSource Site'); ?></li> -->
 			<?php if(($this->as_ion_auth->logged_in())): ?>
 				<li><?php echo anchor('auth/logout', 'Log Out'); ?></li>
+				<li><?php echo anchor('', 'Home/Account'); ?></li>
+				<li><?php echo anchor('help', 'Help'); ?></li>
 				<?php if($this->as_ion_auth->has_permission("View non-own w permission")): ?>
-					<li><?php echo anchor('auth/consult_manage_herds', 'Manage Herd Access'); ?></li>
+					<li><?php echo anchor('auth/service_grp_manage_herds', 'Manage Herd Access'); ?></li>
 					<li><?php echo anchor('auth/service_grp_request', 'Request Herd Access'); ?></li>
 				<?php endif; ?>
 				<?php if($this->session->userdata('active_group_id') == 2): ?>
-					<li><?php echo anchor('auth/manage_consult', 'Manage Consultant Access'); ?></li>
-					<!-- <li><?php echo anchor('auth/consult_access', 'Grant Herd Access'); ?></li> -->
+					<li><?php echo anchor('auth/manage_service_grp', 'Manage Consultant Access'); ?></li>
+					<!-- <li><?php echo anchor('auth/service_grp_access', 'Grant Herd Access'); ?></li> -->
 				<?php endif; ?>
 				<?php if($this->as_ion_auth->has_permission("Select Herd")): ?>
 					<li><?php echo anchor('change_herd/select', 'Change Herd'); ?></li>
@@ -97,8 +99,7 @@
 				<?php if($this->as_ion_auth->has_permission("Request Herd")): ?>
 					<li><?php echo anchor('change_herd/request', 'Request Herd'); ?></li>
 				<?php endif; ?>
-				<li><?php echo anchor('', 'My Account'); ?></li>
-			<?php else:?>
+				<?php else:?>
 				<li><?php echo anchor('auth/login', 'Log In');?></li>
 				<li><?php echo anchor('auth/create_user', 'Register');?></li>
 			<?php endif; ?>
@@ -145,7 +146,8 @@
 		else: ?>
 			<div id="errors"><?php echo $error;?></div>
 <?php 	endif;
-	elseif(isset($message)):
+	endif;
+	if(isset($message)):
 		if (is_array($message) && !empty($message)):
 			foreach($message as $m) {?>
 				<div id="infoMessage"><?php echo $m;?></div>

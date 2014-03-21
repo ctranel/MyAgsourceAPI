@@ -383,6 +383,7 @@ class Herd_model extends CI_Model {
 
 	/**
 	 * get_herd_emails
+	 * @description retrieves email address of all users association with the passed herd
 	 * @param string herd code
 	 * @return array of e-mail addresses
 	 * @author ctranel

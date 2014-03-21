@@ -34,7 +34,7 @@ class Custom_report extends CI_Controller {
 			$this->session->keep_flashdata('redirect_url');
 			redirect(site_url('auth/login'));
 		}
-		$this->data['message'] = $this->session->flashdata('message');
+		$this->page_header_data['message'] = $this->session->flashdata('message');
 
 		if(!isset($user_id) || $user_id === FALSE) $user_id = $this->session->userdata('user_id');
 		//does the logged in user have permission to edit this user?

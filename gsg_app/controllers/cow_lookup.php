@@ -6,7 +6,7 @@ class Cow_lookup extends CI_Controller {
 	
 	function __construct(){
 		parent::__construct();
-		if((!isset($this->as_ion_auth) || !$this->as_ion_auth->logged_in()) && $this->session->userdata('herd_code') != $this->config->item('default_herd', 'ion_auth')){
+		if((!isset($this->as_ion_auth) || !$this->as_ion_auth->logged_in()) && $this->session->userdata('herd_code') != $this->config->item('default_herd')){
 			$msg = $this->load->view('session_expired', array('url'=>$this->session->flashdata('redirect_url')), true);
 			echo $msg;
 			exit;

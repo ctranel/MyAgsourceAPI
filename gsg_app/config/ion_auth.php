@@ -131,6 +131,26 @@
  | Becareful how high you set max_rounds, I would do your own testing on how long it takes
  | to encrypt with x rounds.
  */
+	/*
+	 * email and phone numbers vary by environment.
+	*/
+
+// admin_email and site_title are also set in config.php
+switch (ENVIRONMENT)
+{
+	case 'development':
+		$config['admin_email']          = "ghartmann@agsource.com"; 	// Admin Email, admin@example.com
+		break;
+	case 'testing':
+		$config['admin_email']          = "ghartmann@agsource.com"; 	// Admin Email, admin@example.com
+		break;
+	case 'production':
+		$config['admin_email']          = "support@myagsource.com"; 	// Admin Email, admin@example.com
+		break;
+}
+$config['site_title']     = "MyAgSource";
+
+
 $config['hash_method']    = 'sha1';	// IMPORTANT: Make sure this is set to either sha1 or bcrypt
 $config['default_rounds'] = 8;		// This does not apply if random_rounds is set to true
 $config['random_rounds']  = FALSE;
@@ -146,35 +166,6 @@ $config['max_rounds']     = 9;
  | The controller should check this function and act
  | appropriately. If this variable set to 0, there is no maximum.
  */
-$config['default_herd']			="35999909";
-$config['site_title']           = "MyAgSource"; 		// Site Title, example.com
-$config['cust_serv_company']	= "AgSource Cooperative Services"; //custom CDT
-
-/* 
- * email and phone numbers vary by environment.
- */
-
-switch (ENVIRONMENT)
-{
-	case 'development':
-		$config['admin_email']          = "ghartmann@agsource.com"; 	// Admin Email, admin@example.com
-		$config['cust_serv_email']		= "ghartmann@agsource.com"; //custom CDT
-		$config['cust_serv_phone']		= "1-800-236-0097"; //custom CDT
-		break;
-	case 'testing':
-		$config['admin_email']          = "ghartmann@agsource.com"; 	// Admin Email, admin@example.com
-		$config['cust_serv_email']		= "ghartmann@agsource.com"; //custom CDT
-		$config['cust_serv_phone']		= "1-800-236-0097"; //custom CDT
-		break;
-	case 'production':
-		$config['admin_email']          = "support@myagsource.com"; 	// Admin Email, admin@example.com
-		$config['cust_serv_email']		= "cust_service@myagsource.com"; //custom CDT
-		$config['cust_serv_phone']		= "1-800-236-0097"; //custom CDT		
-		break;
-	default:
-		exit('The application environment is not set correctly - t_base_url.');
-}
-
 $config['default_group']        = 'Producer'; 			// Default group, use name
 $config['default_group_id']     = 2;
 $config['admin_group']          = 1; 				// Default administrators group, use name
@@ -201,8 +192,9 @@ $config['forgot_password_expiration'] = 0; 				// The number of seconds after wh
  | 	  array  = Manually set your email config settings
  */
 $config['use_ci_email'] = TRUE; // Send Email using the builtin CI email class, if false it will return the code and the identity
+$config['email_type']	= 'html';
 $config['email_config'] = array(
-	'mailtype' => 'html',
+	'mailtype' => $config['email_type'],
 );
 
 /*
