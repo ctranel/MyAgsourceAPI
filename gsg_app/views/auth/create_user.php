@@ -52,7 +52,13 @@
 	      </p>
 	    </div>
       
-      <p><?php echo form_label('Phone', 'phone1', NULL, $phone1) ?>
+	  <div id="sg">
+	      <p><?php echo form_label('Service Group Acct Num', 'sg_acct_num', NULL, $sg_acct_num) ?>
+	      <?php echo form_input($sg_acct_num);?>
+	      </p>
+      </div>
+	      
+	  <p><?php echo form_label('Phone', 'phone1', NULL, $phone1) ?>
       <?php echo form_input($phone1);?>-<?php echo form_input($phone2);?>-<?php echo form_input($phone3);?>
       </p>
       

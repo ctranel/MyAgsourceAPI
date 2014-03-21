@@ -66,7 +66,7 @@
 	 * Meta sections to be included with profile.
 	 * Each should have a config setting for 'towrite' 'tables', 'join' and 'columns'
 	 **/
-	$config['meta_sections']         = array('users_dhi_supervisors', 'users_herds', 'users_sections');////'meta', 'users_associations', 
+	$config['meta_sections']         = array('users_service_groups','users_dhi_supervisors', 'users_herds', 'users_sections');////'meta', 'users_associations', 
 	$config['herd_meta_sections']         = array('herds_sections');
 	
 	/**
@@ -77,6 +77,7 @@
 		'users_herds'		=> array('herd_code'),
 		//'users_associations'	=> array('assoc_acct_num'),//associations can be derived from supervisor data
 		'users_dhi_supervisors'=> array('supervisor_acct_num'),
+		'users_service_groups'=> array('sg_acct_num'),
 		//'meta'		=> array(),
 	 	'users_sections'=> array('section_id', ''),
 		'herds_sections'=> array('section_id')
@@ -93,6 +94,7 @@
 		'users_herds'		=> 'user_id',
 		//'users_associations'	=> 'user_id',//associations can be derived from supervisor data
 		'users_dhi_supervisors'=> 'user_id',
+		'users_service_groups'=> 'user_id',
 		//'meta'		=> 'user_id',
 		'users_sections'=> 'user_id',
 		'herds_sections'=> 'herd_code'
@@ -105,6 +107,7 @@
 		//'users_herds'		=> array('herd_code'),
 		//'users_associations'	=> array('assoc_acct_num'), //associations can be derived from supervisor data
 		'users_dhi_supervisors'=> array('supervisor_acct_num'),
+		'users_service_groups'=> array('sg_acct_num'),
 		//'meta'		=> array('first_name', 'last_name', 'company', 'phone'),
 		'users_sections'=> array('section_id', 'access_level'),
 		'herds_sections'=> array('section_id', 'access_level')

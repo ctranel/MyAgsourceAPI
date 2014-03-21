@@ -822,8 +822,9 @@ class Auth extends Ionauth {
 		$this->form_validation->set_rules('first_name', 'First Name', 'trim|required');
 		$this->form_validation->set_rules('last_name', 'Last Name', 'trim|required');
 		$this->form_validation->set_rules('email', 'Email Address', 'trim|required|valid_email');
-		$this->form_validation->set_rules('supervisor_acct_num', 'Field Technician Number', 'exact_length[8]');
-		$this->form_validation->set_rules('assoc_acct_num[]', 'Association Account Number', 'exact_length[8]');
+		$this->form_validation->set_rules('supervisor_acct_num', 'Field Technician Account Number', 'max_length[8]');
+		$this->form_validation->set_rules('sg_acct_num', 'Service Group Account Number', 'max_length[8]');
+		$this->form_validation->set_rules('assoc_acct_num[]', 'Association Account Number', 'max_length[8]');
 		$this->form_validation->set_rules('phone1', 'First Part of Phone', 'exact_length[3]|required');
 		$this->form_validation->set_rules('phone2', 'Second Part of Phone', 'exact_length[3]|required');
 		$this->form_validation->set_rules('phone3', 'Third Part of Phone', 'exact_length[4]|required');
@@ -848,6 +849,7 @@ class Auth extends Ionauth {
 			//start with nothing
 			$assoc_acct_num = NULL;
 			$supervisor_acct_num = NULL;
+			$sg_acct_num = NULL;
 			$herd_code = NULL;
 			$herd_release_code = NULL;
 
@@ -861,6 +863,12 @@ class Auth extends Ionauth {
 				}
 				$assoc_acct_num = $this->input->post('assoc_acct_num');
 				$supervisor_acct_num = $this->input->post('supervisor_acct_num');
+				if(empty($assoc_acct_num)){
+					$assoc_acct_num = NULL;
+				}
+				if(empty($supervisor_acct_num)){
+					$supervisor_acct_num = NULL;
+				}
 			}
 			if(in_array(2, $arr_posted_group_id) || in_array(13, $arr_posted_group_id)){ //producers
 				$herd_code = $this->input->post('herd_code') ? $this->input->post('herd_code') : NULL;
@@ -872,6 +880,13 @@ class Auth extends Ionauth {
 					$is_validated = false;
 				}
 			}
+			if(in_array(9, $arr_posted_group_id)){ //service groups
+				$sg_acct_num = $this->input->post('sg_acct_num');
+				if(empty($sg_acct_num)){
+					$sg_acct_num = NULL;
+				}
+			}
+			
 			$username = substr(strtolower($this->input->post('first_name')) . ' ' . strtolower($this->input->post('last_name')),0,15);
 			$email = $this->input->post('email');
 			$password = $this->input->post('password');
@@ -879,6 +894,7 @@ class Auth extends Ionauth {
 				'herd_code' => $herd_code,
 				'last_name' => $this->input->post('last_name'),
 				'supervisor_acct_num' => $supervisor_acct_num,
+				'sg_acct_num' => $sg_acct_num,
 				'assoc_acct_num' => $assoc_acct_num,
 				'phone' => $this->input->post('phone1') . '-' . $this->input->post('phone2') . '-' . $this->input->post('phone3'),
 				'best_time' => $this->input->post('best_time'),
@@ -978,6 +994,15 @@ class Auth extends Ionauth {
 			);
 			if(in_array('2', $arr_form_group_id)) $this->data['herd_release_code']['class'] = 'require';
 
+			$this->data['sg_acct_num'] = array('name' => 'sg_acct_num',
+				'id' => 'sg_acct_num',
+				'type' => 'text',
+				'size' => '8',
+				'maxlength' => '8',
+				'class' => 'require',
+				'value' => $this->form_validation->set_value('sg_acct_num'),
+			);
+			
 			$this->data['phone1'] = array('name' => 'phone1',
 				'id' => 'phone1',
 				'class' => 'require',
