@@ -84,7 +84,7 @@ class Change_herd extends CI_Controller {
 			redirect(site_url($redirect_url));
 		}
 		else {  //the user is not logging in so display the login page
-			$this->data['message'] = compose_error(validation_errors(), $this->session->flashdata('message'));
+			$this->page_header_data['message'] = compose_error(validation_errors(), $this->session->flashdata('message'));
 			$this->data['herd_code'] = array('name' => 'herd_code',
 				'id' => 'herd_code',
 				'type' => 'text',
@@ -152,7 +152,7 @@ class Change_herd extends CI_Controller {
 		}
 		else
 		{
-			$this->data['message'] = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
+			$this->page_header_data['message'] = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
 			$tmp_arr = $this->as_ion_auth->get_viewable_herds($this->session->userdata('user_id'), $this->session->userdata('arr_regions'));
 			if(is_array($tmp_arr)){
 				if(count($tmp_arr) == 1){
@@ -166,7 +166,7 @@ class Change_herd extends CI_Controller {
 				unset($tmp_arr);
 			}
 			else{
-				$this->session->set_flashdata('message', 'A list of herds could not be generated for your account.  If you believe this is an error, please contact ' . $this->config->item('cust_serv_company', 'ion_auth') . ' at ' . $this->config->item('cust_serv_email', 'ion_auth') . ' or ' . $this->config->item('cust_serv_phone', 'ion_auth') . '.');
+				$this->session->set_flashdata('message', 'A list of herds could not be generated for your account.  If you believe this is an error, please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . '.');
 				//$this->session->set_flashdata('redirect_url',$this->session->flashdata('redirect_url'));
 				redirect(site_url($redirect_url));
 				exit();
@@ -194,7 +194,7 @@ class Change_herd extends CI_Controller {
 			}
 			$this->page_footer_data = array(
 			);
-			$this->data['message'] = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
+			$this->page_header_data['message'] = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
 			$arr_redirect_url = explode('/', $redirect_url);
 			if(file_exists($arr_redirect_url[0] . FS_SEP . 'section_nav')) $this->page_header_data['section_nav'] = $this->load->view($arr_redirect_url[0] . '/section_nav', NULL, TRUE);
 			$this->data['page_header'] = $this->load->view('page_header', $this->page_header_data, TRUE);

@@ -38,7 +38,37 @@
 |
 |	
 */
-	$config['product_name']           = "MyAgSource"; 		// Site Title, example.com
+	// admin_email and site_title are also set in ion_auth.php
+	$config['product_name']         = "MyAgSource";
+	$config['default_herd']			= "35999909";
+	$config['site_title']           = "MyAgSource";
+	$config['cust_serv_company']	= "AgSource Cooperative Services";
+	
+	/*
+	 * email and phone numbers vary by environment.
+	*/
+	
+	switch (ENVIRONMENT)
+	{
+		case 'development':
+			$config['admin_email']          = "ghartmann@agsource.com"; 	// Admin Email, admin@example.com
+			$config['cust_serv_email']		= "ghartmann@agsource.com"; //custom CDT
+			$config['cust_serv_phone']		= "1-800-236-0097"; //custom CDT
+			break;
+		case 'testing':
+			$config['admin_email']          = "ghartmann@agsource.com"; 	// Admin Email, admin@example.com
+			$config['cust_serv_email']		= "ghartmann@agsource.com"; //custom CDT
+			$config['cust_serv_phone']		= "1-800-236-0097"; //custom CDT
+			break;
+		case 'production':
+			$config['admin_email']          = "support@myagsource.com"; 	// Admin Email, admin@example.com
+			$config['cust_serv_email']		= "cust_service@myagsource.com"; //custom CDT
+			$config['cust_serv_phone']		= "1-800-236-0097"; //custom CDT
+			break;
+		default:
+			exit('The application environment is not set correctly - t_base_url.');
+	}
+	
 	
 /*
 |--------------------------------------------------------------------------

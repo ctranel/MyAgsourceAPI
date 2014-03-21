@@ -1,4 +1,4 @@
-		<?php echo form_open('auth/consult_manage_herds', $attributes); ?>
+		<?php echo form_open('auth/service_grp_manage_herds', $attributes); ?>
 			<table>
 				<tr>
 					<th>&nbsp;</th>

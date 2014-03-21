@@ -29,6 +29,7 @@
 	$config['tables']['lookup_scopes'] 			= 'users.dbo.lookup_scopes';
 
 	$config['tables']['consultants_herds']    	= 'users.dbo.service_groups_herds';
+	$config['tables']['serv_grps_herds_sections'] = 'users.dbo.service_groups_herds_sections';
 	$config['tables']['users_service_groups']   = 'users.dbo.users_service_groups';
 	$config['tables']['service_groups']    		= 'address.dbo.service_group';
 
@@ -65,7 +66,7 @@
 	 * Meta sections to be included with profile.
 	 * Each should have a config setting for 'towrite' 'tables', 'join' and 'columns'
 	 **/
-	$config['meta_sections']         = array('users_dhi_supervisors', 'users_herds', 'users_sections');////'meta', 'users_associations', 
+	$config['meta_sections']         = array('users_service_groups','users_dhi_supervisors', 'users_herds', 'users_sections');////'meta', 'users_associations', 
 	$config['herd_meta_sections']         = array('herds_sections');
 	
 	/**
@@ -76,6 +77,7 @@
 		'users_herds'		=> array('herd_code'),
 		//'users_associations'	=> array('assoc_acct_num'),//associations can be derived from supervisor data
 		'users_dhi_supervisors'=> array('supervisor_acct_num'),
+		'users_service_groups'=> array('sg_acct_num'),
 		//'meta'		=> array(),
 	 	'users_sections'=> array('section_id', ''),
 		'herds_sections'=> array('section_id')
@@ -92,6 +94,7 @@
 		'users_herds'		=> 'user_id',
 		//'users_associations'	=> 'user_id',//associations can be derived from supervisor data
 		'users_dhi_supervisors'=> 'user_id',
+		'users_service_groups'=> 'user_id',
 		//'meta'		=> 'user_id',
 		'users_sections'=> 'user_id',
 		'herds_sections'=> 'herd_code'
@@ -104,6 +107,7 @@
 		'users_herds'		=> array('herd_code'),
 		//'users_associations'	=> array('assoc_acct_num'), //associations can be derived from supervisor data
 		'users_dhi_supervisors'=> array('supervisor_acct_num'),
+		'users_service_groups'=> array('sg_acct_num'),
 		//'meta'		=> array('first_name', 'last_name', 'company', 'phone'),
 		'users_sections'=> array('section_id', 'access_level'),
 		'herds_sections'=> array('section_id', 'access_level')
@@ -130,6 +134,26 @@
  | Becareful how high you set max_rounds, I would do your own testing on how long it takes
  | to encrypt with x rounds.
  */
+	/*
+	 * email and phone numbers vary by environment.
+	*/
+
+// admin_email and site_title are also set in config.php
+switch (ENVIRONMENT)
+{
+	case 'development':
+		$config['admin_email']          = "ghartmann@agsource.com"; 	// Admin Email, admin@example.com
+		break;
+	case 'testing':
+		$config['admin_email']          = "ghartmann@agsource.com"; 	// Admin Email, admin@example.com
+		break;
+	case 'production':
+		$config['admin_email']          = "support@myagsource.com"; 	// Admin Email, admin@example.com
+		break;
+}
+$config['site_title']     = "MyAgSource";
+
+
 $config['hash_method']    = 'sha1';	// IMPORTANT: Make sure this is set to either sha1 or bcrypt
 $config['default_rounds'] = 8;		// This does not apply if random_rounds is set to true
 $config['random_rounds']  = FALSE;
@@ -145,35 +169,6 @@ $config['max_rounds']     = 9;
  | The controller should check this function and act
  | appropriately. If this variable set to 0, there is no maximum.
  */
-$config['default_herd']			="35999909";
-$config['site_title']           = "MyAgSource"; 		// Site Title, example.com
-$config['cust_serv_company']	= "AgSource Cooperative Services"; //custom CDT
-
-/* 
- * email and phone numbers vary by environment.
- */
-
-switch (ENVIRONMENT)
-{
-	case 'development':
-		$config['admin_email']          = "ghartmann@agsource.com"; 	// Admin Email, admin@example.com
-		$config['cust_serv_email']		= "ghartmann@agsource.com"; //custom CDT
-		$config['cust_serv_phone']		= "1-800-236-0097"; //custom CDT
-		break;
-	case 'testing':
-		$config['admin_email']          = "ghartmann@agsource.com"; 	// Admin Email, admin@example.com
-		$config['cust_serv_email']		= "ghartmann@agsource.com"; //custom CDT
-		$config['cust_serv_phone']		= "1-800-236-0097"; //custom CDT
-		break;
-	case 'production':
-		$config['admin_email']          = "support@myagsource.com"; 	// Admin Email, admin@example.com
-		$config['cust_serv_email']		= "cust_service@myagsource.com"; //custom CDT
-		$config['cust_serv_phone']		= "1-800-236-0097"; //custom CDT		
-		break;
-	default:
-		exit('The application environment is not set correctly - t_base_url.');
-}
-
 $config['default_group']        = 'Producer'; 			// Default group, use name
 $config['default_group_id']     = 2;
 $config['admin_group']          = 1; 				// Default administrators group, use name
@@ -200,8 +195,9 @@ $config['forgot_password_expiration'] = 0; 				// The number of seconds after wh
  | 	  array  = Manually set your email config settings
  */
 $config['use_ci_email'] = TRUE; // Send Email using the builtin CI email class, if false it will return the code and the identity
+$config['email_type']	= 'html';
 $config['email_config'] = array(
-	'mailtype' => 'html',
+	'mailtype' => $config['email_type'],
 );
 
 /*
@@ -213,9 +209,9 @@ $config['email_templates'] = 'auth/email/';		//Folder where email templates are 
 $config['email_activate'] = 'activate.tpl.php';	//Activate Account Email Template
 $config['email_forgot_password'] = 'forgot_password.tpl.php'; //Forgot Password Email Template
 $config['email_forgot_password_complete'] = 'new_password.tpl.php'; //Forgot Password Complete Email Template
-$config['consult_granted']   = 'consult_granted.tpl.php';	//grant consultant access to herd
-$config['consult_denied']   = 'consult_denied.tpl.php';		//deny consultant access to herd
-$config['consult_request']   = 'consult_request.tpl.php';	//consultants' request to access herd
+$config['consult_granted']   = 'service_grp_granted.tpl.php';	//grant consultant access to herd
+$config['consult_denied']   = 'service_grp_denied.tpl.php';		//deny consultant access to herd
+$config['service_grp_request']   = 'service_grp_request.tpl.php';	//consultants' request to access herd
 $config['user_herd_data']   = 'user_herd_data.tpl.php';	//internal email with user and herd data of registrants
 
 /*

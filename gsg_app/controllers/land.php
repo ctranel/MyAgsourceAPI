@@ -77,7 +77,7 @@ class Land extends parent_report {
 			$this->session->keep_flashdata('redirect_url');
 			redirect(site_url('change_herd/select'));
 		}
-		$this->data['message'] = $this->session->flashdata('message');
+		$this->page_header_data['message'] = $this->session->flashdata('message');
 
 		//set variables for sample report card
 //		$this->load->model('report_card_model');
@@ -175,7 +175,7 @@ class Land extends parent_report {
 			if(isset($consultants_by_status['open']) && is_array($consultants_by_status['open'])){
 				$section_data['content'] = $this->_set_consult_section($consultants_by_status['open'], 'open', 'Open Requests', array('Grant Access', 'Deny Access'));
 				$this->data['widget']['info'][] = array(
-					'content' => $this->load->view('auth/dashboard/open_consult_requests', $section_data, TRUE),
+					'content' => $this->load->view('auth/dashboard/open_service_grp_requests', $section_data, TRUE),
 					'title' => 'Open Consultant Requests'
 				);
 			}
@@ -196,7 +196,7 @@ class Land extends parent_report {
 		);
 		$this->data['widget']['agsource'][] = array(
 			'content' => $this->load->view('auth/dashboard/youtube', NULL, TRUE),
-			'title' => $this->config->item("cust_serv_company","ion_auth") . ' Video'
+			'title' => $this->config->item("cust_serv_company") . ' Video'
 		);
 		$full_width['inner_html'] = $this->load->view('chart', NULL, TRUE);
 		$this->data['widget']['full_width'][] = array(

@@ -75,7 +75,7 @@
 				echo form_fieldset_close();
 			endif; ?>
 
-	      <!-- <p><?php echo form_checkbox('terms', 'Y', set_checkbox('terms','Y'))?> By checking this box, I am confirming that I understand that the account associated with the herd number entered above will be billed according to (<?php echo anchor('gsg/animal_report/billing', $this->config->item("cust_serv_company","ion_auth") . ' billing procedures')?>) for the requested reports.</p>
+	      <!-- <p><?php echo form_checkbox('terms', 'Y', set_checkbox('terms','Y'))?> By checking this box, I am confirming that I understand that the account associated with the herd number entered above will be billed according to (<?php echo anchor('gsg/animal_report/billing', $this->config->item('cust_serv_company') . ' billing procedures')?>) for the requested reports.</p>
 	      <p>
 	      	<input type=checkbox name="reset_password"> <?php echo form_label('Reset Password', 'reset_password') ?>
 	      </p> -->
