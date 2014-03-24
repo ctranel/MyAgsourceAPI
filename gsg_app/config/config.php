@@ -53,17 +53,17 @@
 		case 'development':
 			$config['admin_email']          = "ghartmann@agsource.com"; 	// Admin Email, admin@example.com
 			$config['cust_serv_email']		= "ghartmann@agsource.com"; //custom CDT
-			$config['cust_serv_phone']		= "1-800-236-0097"; //custom CDT
+			$config['cust_serv_phone']		= "1-800-236-4995"; //custom CDT
 			break;
 		case 'testing':
 			$config['admin_email']          = "ghartmann@agsource.com"; 	// Admin Email, admin@example.com
 			$config['cust_serv_email']		= "ghartmann@agsource.com"; //custom CDT
-			$config['cust_serv_phone']		= "1-800-236-0097"; //custom CDT
+			$config['cust_serv_phone']		= "1-800-236-4995"; //custom CDT
 			break;
 		case 'production':
 			$config['admin_email']          = "support@myagsource.com"; 	// Admin Email, admin@example.com
 			$config['cust_serv_email']		= "cust_service@myagsource.com"; //custom CDT
-			$config['cust_serv_phone']		= "1-800-236-0097"; //custom CDT
+			$config['cust_serv_phone']		= "1-800-236-4995"; //custom CDT
 			break;
 		default:
 			exit('The application environment is not set correctly - t_base_url.');
