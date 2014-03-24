@@ -1250,7 +1250,7 @@ SELECT DISTINCT id, name, list_order FROM cteAnchor ORDER BY list_order;";
 		->from($this->tables['consultants_herds'] . ' ch')
 		->join($this->tables['herds'] . ' h', 'ch.herd_code = h.herd_code')
 		->join('users.dbo.lookup_sg_request_status lus', 'ch.request_status_id = lus.id')
-		->where("((ch.exp_date IS NOT NULL AND ch.exp_date <= GETDATE()) AND lus.name = 'grant')")
+		->where("((ch.exp_date IS NOT NULL AND ch.exp_date <= GETDATE()) AND lus.name IN('open', 'grant'))")
 		->where('sg_user_id', $sg_user_id)
 		->get()
 		->result_array();
@@ -1297,7 +1297,7 @@ SELECT DISTINCT id, name, list_order FROM cteAnchor ORDER BY list_order;";
 		->join($this->tables['users_service_groups'] . ' uc', 'u.id = uc.user_id')
 		->join($this->tables['service_groups'] . ' c', 'uc.sg_acct_num = c.account_num')
 		->join('users.dbo.lookup_sg_request_status lus', 'ch.request_status_id = lus.id', 'left')
-		->where("((ch.exp_date IS NOT NULL AND ch.exp_date <= GETDATE()) AND lus.name = 'open')")
+		->where("((ch.exp_date IS NOT NULL AND ch.exp_date <= GETDATE()) AND lus.name IN('open', 'grant'))")
 		->where('herd_code', $herd_code)
 		->get()
 		->result_array();

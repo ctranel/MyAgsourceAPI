@@ -750,6 +750,7 @@ class As_ion_auth extends Ion_auth {
 			'first_name' => $consultant_info[0]['first_name'],
 			'last_name' => $consultant_info[0]['last_name'],
 			'herd_code' => $arr_relationship_data['herd_code'],
+			'sg_acct_num' => $arr_relationship_data['sg_acct_num'],
 		);
 		$message = $this->load->view($this->config->item('email_templates', 'ion_auth').$this->config->item('service_grp_request', 'ion_auth'), $email_data, TRUE);
 		$arr_herd_emails = $this->herd_model->get_herd_emails($arr_relationship_data['herd_code']);
