@@ -654,8 +654,29 @@ class As_ion_auth extends Ion_auth {
 	}
 
 	/**
+	 * @method service_grp_exists()
+	 * @description does service group account number exist?
+	 * @param string service group account number
+	 * @return boolean
+	 * @access public
+	 *
+	 **/
+	public function service_grp_exists($sg_acct_num){
+		if(empty($sg_acct_num)){
+			$this->set_error('service_group_required');
+			return FALSE;
+		}
+		$tmp = $this->ion_auth_model->get_service_group_account($sg_acct_num);
+		if(isset($tmp)){
+			return TRUE;
+		}
+		$this->set_error('service_group_not_found');
+		return FALSE;
+	}
+	
+	/**
 	 * @method allow_service_grp()
-	 * @abstract write consultant-herd relationship record
+	 * @description write consultant-herd relationship record
 	 * @param string consultant user id
 	 * @param string herd code
 	 * @param array sections for which consultant should be give permissions
@@ -744,13 +765,14 @@ class As_ion_auth extends Ion_auth {
 		//send e-mail
 		$consultant_info = $this->ion_auth_model->user($arr_relationship_data['sg_user_id'])->result_array();
 		$consultant_info[0]['relationship_id'] = $relationship_id;
+var_dump($consultant_info[0]);
 		$email_data = array(
 			'id' => $consultant_info[0]['id'],
 			'company' => '',//$consultant_info[0]['company'],
 			'first_name' => $consultant_info[0]['first_name'],
 			'last_name' => $consultant_info[0]['last_name'],
 			'herd_code' => $arr_relationship_data['herd_code'],
-			'sg_acct_num' => $arr_relationship_data['sg_acct_num'],
+			'sg_acct_num' => $consultant_info[0]['sg_acct_num'],
 		);
 		$message = $this->load->view($this->config->item('email_templates', 'ion_auth').$this->config->item('service_grp_request', 'ion_auth'), $email_data, TRUE);
 		$arr_herd_emails = $this->herd_model->get_herd_emails($arr_relationship_data['herd_code']);

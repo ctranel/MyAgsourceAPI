@@ -8,6 +8,7 @@
 	<p>If you have any questions or concerns, please contact us at <?php echo $this->config->item("cust_serv_email"); ?> or <?php echo $this->config->item("cust_serv_phone"); ?>.</p>
 	<p>Name: <?php echo $first_name . ' ' . $last_name; ?></p>
 	<p>Herd: <?php echo $herd_code; ?></p>
+	<p>SG Acct: <?php echo $sg_acct_num; ?></p>
 	<p>Phone: <?php echo $phone; ?></p>
 	<p>Best time to call: <?php echo $best_time; ?></p>
 </body>

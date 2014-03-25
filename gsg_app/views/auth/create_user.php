@@ -27,13 +27,13 @@
       				echo form_dropdown('assoc_acct_num[]', $assoc_acct_options, $assoc_acct_selected, $assoc_acct_num);
 	      	?></p>
 	      	<?php
-	      		else: 
+	      		else:
 	      			echo form_input($assoc_acct_num);
 	      		endif;
 	      	endif;
 	      	 
 	      	if(isset($supervisor_acct_num)):?>
-		      	<p id="tech"><?php 
+		      	<p id="tech"><?php
 	     			echo form_label('Link to DHI Supervisor', 'supervisor_acct_num', NULL, $supervisor_acct_num);
 	     			echo form_dropdown('supervisor_acct_num', $supervisor_acct_num_options, $supervisor_acct_num_selected, $supervisor_acct_num);
 			    ?></p>
@@ -49,12 +49,14 @@
 	      
 	      <p><?php echo form_label('Herd Release Code', 'herd_release_code', NULL, $herd_release_code) ?>
 	      <?php echo form_input($herd_release_code);?>
+	      <?php echo anchor($base_url_assets . 'img/find_release_code.png', 'Find release code', 'class="image-link"'); ?>
 	      </p>
 	    </div>
       
 	  <div id="sg">
 	      <p><?php echo form_label('Service Group Acct Num', 'sg_acct_num', NULL, $sg_acct_num) ?>
 	      <?php echo form_input($sg_acct_num);?>
+	      Account numbers are 8 character long and start with &quot;SG&quot;.  If you don't have a Service Group account, please call <?php echo $cs_phone; ?>.
 	      </p>
       </div>
 	      

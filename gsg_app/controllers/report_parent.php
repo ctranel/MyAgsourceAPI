@@ -388,7 +388,7 @@ abstract class parent_report extends CI_Controller {
 						'{highcharts: "https://cdnjs.cloudflare.com/ajax/libs/highcharts/3.0.2/highcharts.js"}',
 						'{highcharts_more: "https://cdnjs.cloudflare.com/ajax/libs/highcharts/3.0.2/highcharts-more.js"}',
 						'{exporting: "https://cdnjs.cloudflare.com/ajax/libs/highcharts/3.0.2/modules/exporting.js"}',
-						'{popup_helper: "' . $this->config->item("base_url_assets") . 'js/jquery/popup.min.js"}',
+						'{popup: "' . $this->config->item("base_url_assets") . 'js/jquery/popup.min.js"}',
 						'{graph_helper: "' . $this->config->item("base_url_assets") . 'js/charts/graph_helper.js"}',
 						'{report_helper: "' . $this->config->item("base_url_assets") . 'js/report_helper.js"}',
 						'{table_sort: "' . $this->config->item("base_url_assets") . 'js/jquery/stupidtable.min.js"}',

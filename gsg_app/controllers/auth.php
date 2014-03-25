@@ -495,10 +495,11 @@ class Auth extends Ionauth {
 		$is_validated = $this->form_validation->run();
 		if ($is_validated === TRUE) {
 			$herd_code = $this->input->post('herd_code');
+			/* herd does not have to be registered for MyAgSource at this point
 			if(!$this->herd_model->herd_is_registered($herd_code)){
 				$this->session->set_flashdata('message', 'Herd ' . $herd_code . ' is not registered for ' . $this->config->item('product_name') . '.  In order to access their data, they must be registered for ' . $this->config->item('product_name') . '.');
 				redirect(site_url('auth/service_grp_request'));
-			}
+			} */
 			$herd_release_code = $this->input->post('herd_release_code');
 			$this->load->model('herd_model');
 			$error = $this->herd_model->herd_authorization_error($herd_code, $herd_release_code);
@@ -882,8 +883,8 @@ class Auth extends Ionauth {
 			}
 			if(in_array(9, $arr_posted_group_id)){ //service groups
 				$sg_acct_num = $this->input->post('sg_acct_num');
-				if(empty($sg_acct_num)){
-					$sg_acct_num = NULL;
+				if(!$this->as_ion_auth->service_grp_exists($sg_acct_num)){
+					$is_validated = false;
 				}
 			}
 			
@@ -1051,10 +1052,14 @@ class Auth extends Ionauth {
 				$this->page_header_data = array_merge($this->page_header_data,
 					array(
 						'title'=>'Register User - ' . $this->config->item('product_name'),
-						'description'=>'Register user for ' . $this->config->item('product_name')
+						'description'=>'Register user for ' . $this->config->item('product_name'),
+						'arr_headjs_line'=>array(
+							'{popup: "' . $this->config->item("base_url_assets") . 'js/jquery/popup.min.js"}',
+						)
 					)
 				);
 			}
+			$this->carabiner->css('popup.css');
 			$this->page_header_data['section_nav'] = $this->load->view('auth/section_nav', NULL, TRUE);
 			$this->data['page_header'] = $this->load->view('page_header', $this->page_header_data, TRUE);
 			$this->data['page_heading'] = 'Register User - ' . $this->config->item('product_name');
@@ -1064,6 +1069,8 @@ class Auth extends Ionauth {
 				)
 			);
 			$this->data['page_footer'] = $this->load->view('page_footer', $footer_data, TRUE);
+			$this->data['cs_phone'] = $this->config->item('cust_serv_phone');
+			$this->data['base_url_assets'] = $this->config->item("base_url_assets");
 			$this->load->view('auth/create_user', $this->data);
 		}
 	}

@@ -1266,6 +1266,25 @@ SELECT DISTINCT id, name, list_order FROM cteAnchor ORDER BY list_order;";
 	}
 
 	/**
+	 * @method get_service_group_account
+	 *
+	 * @param string service group account number
+	 * @return array of consultant records, keyed by consultant status
+	 * @author ctranel
+	 **/
+	public function get_service_group_account($service_grp){
+		$result = $this->db
+			->select('account_num, account_name')
+			->where('account_num', $service_grp)
+			->get($this->tables['service_groups'])
+			->result_array();
+		if(count($result) > 0){
+			return $result[0];
+		}
+		return null;
+	}
+	
+	/**
 	 * @method get_consultants_by_herd
 	 *
 	 * @param string herd code

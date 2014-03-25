@@ -328,11 +328,12 @@ class Ion_auth
 				'email'      => $email,
 				'activation' => $activation_code,
 // ctranel addition
-				'first_name' => $additional_data['first_name'],
-				'last_name'  => $additional_data['last_name'],
-				'herd_code'	 => $additional_data['herd_code'],
-				'phone'		 => $additional_data['phone'],
-				'best_time'	 => $additional_data['best_time'],
+				'first_name' 	=> $additional_data['first_name'],
+				'last_name'  	=> $additional_data['last_name'],
+				'herd_code'		=> $additional_data['herd_code'],
+				'phone'			=> $additional_data['phone'],
+				'best_time'	 	=> $additional_data['best_time'],
+				'sg_acct_num'	=> $additional_data['sg_acct_num'],
 // end ctranel addition
 			);
 			if(!$this->config->item('use_ci_email', 'ion_auth'))
