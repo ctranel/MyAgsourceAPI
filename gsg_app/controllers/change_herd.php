@@ -80,7 +80,7 @@ class Change_herd extends CI_Controller {
 		if ($this->form_validation->run() == TRUE) { //if validation is successful
 			$this->session->set_userdata('herd_code', $this->input->post('herd_code'));
 			$this->session->set_userdata('arr_pstring', $this->herd_model->get_pstring_array($this->input->post('herd_code'), FALSE));
-			$this->access_log_model->write_entry(2); //2 is the page code for herd change
+			$this->_record_access(2); //2 is the page code for herd change
 			redirect(site_url($redirect_url));
 		}
 		else {  //the user is not logging in so display the login page
@@ -146,7 +146,7 @@ class Change_herd extends CI_Controller {
 		if ($this->form_validation->run() == TRUE) { //successful submission
 			$this->session->set_userdata('herd_code', $this->input->post('herd_code'));
 			$this->session->set_userdata('arr_pstring', $this->herd_model->get_pstring_array($this->input->post('herd_code'), FALSE));
-			$this->access_log_model->write_entry(2); //2 is the page code for herd change
+			$this->_record_access(2); //2 is the page code for herd change
 			redirect(site_url($redirect_url));
 			exit();
 		}
@@ -205,4 +205,14 @@ class Change_herd extends CI_Controller {
 		} // end ELSE -- form validation failed.
 	}
 
+	protected function _record_access($event_id){
+		$this->access_log_model->write_entry(
+				$event_id,
+				$this->session->userdata('herd_code'),
+				$recent_test_date,
+				$herd_enroll_status,
+				$this->session->userdata('user_id'),
+				$this->session->userdata('active_group_id')
+		);
+	}
 }

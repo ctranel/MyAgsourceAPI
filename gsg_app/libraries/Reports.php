@@ -39,48 +39,6 @@ class Reports{
 	}
 
 	/**
-	 * filters_to_text - sets public filter criteria variable.  Composes filter text property for use in the GSG Library file
-	 * @author ctranel
-	 * @return void
-	 * 
-	 **/
-	function filters_to_text($arr_filters, $arr_pstring){
-		if(is_array($arr_filters) && !empty($arr_filters)){
-			foreach($arr_filters as $k=>$v){
-				if($k == 'block'); //don't show block filter info because it is specified in heading
-				elseif($k == 'pstring') {
-					if(is_array($v)) {
-						$pstring_text = '';
-						if(!empty($v)) {
-							foreach($v as $e){
-								$pstring_text .= $arr_pstring[$e]['publication_name'] . ', ';
-							}
-							$pstring_text = substr($pstring_text, 0, -2);
-						}
-					}
-					else $pstring_text = $arr_pstring[$v]['publication_name'];
-					$this->arr_filter_text[] = 'PString: ' . $pstring_text;
-				}
-				elseif(is_array($v) && !empty($v)){
-					if(($tmp_key = array_search('NULL', $v)) !== FALSE) unset($v[$tmp_key]);
-					else $this->arr_filter_text[] = ucwords(str_replace('_', ' ', $k)) . ': ' . implode(', ', $v);
-				}
-				else{
-					if(substr($k, -5) == "_dbto" && !empty($v)){ //ranges
-						$db_field = substr($k, 0, -5);
-						$this->arr_filter_text[] = ucwords(str_replace('_', ' ', $db_field)) . ': Between ' . $arr_filters[$db_field . '_dbfrom'] . ' and ' . $arr_filters[$db_field . '_dbto'];
-					}
-					elseif(substr($k, -7) != "_dbfrom" && $k != 'herd_code' && !empty($v)){ //default--it skips the opposite end of the range as _dbto
-						$this->arr_filter_text[] = ucwords(str_replace('_', ' ', $k)) . ': ' . $v;
-					}
-				}
-			}
-			return $this->arr_filter_text;
-		}
-		else return FALSE;
-	}
-	
-	/**
 	 * sort_text - sets text description of sort fields and order.
 	 * @return string description of sort fields and order
 	 * @author ctranel

@@ -11,9 +11,4 @@ class Land extends CI_Controller {
 	function land(){
 		redirect(site_url('lab/johnes'));
 	}
-	
-	function log_page(){
-		echo $this->access_log_model->write_entry(); //19 is the page code for DM Login
-		exit;
-	}
 }

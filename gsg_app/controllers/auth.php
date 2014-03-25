@@ -71,28 +71,28 @@ class Auth extends Ionauth {
 				switch ($action) {
 					case 'Remove Access':
 						if($this->ion_auth_model->batch_herd_revoke($arr_modify_id)) {
-							$this->access_log_model->write_entry(41);
+							$this->_record_access(41);
 							$this->page_header_data['message'] = 'Consultant access adjusted successfully.';
 						}
 						else $this->page_header_data['message'] = 'Consultant access adjustment failed.  Please try again.';
 					break;
 					case 'Grant Access':
 						if($this->ion_auth_model->batch_grant_consult($arr_modify_id)) {
-							$this->access_log_model->write_entry(34);
+							$this->_record_access(34);
 							$this->page_header_data['message'] = 'Consultant access adjusted successfully.';
 						}
 						else $this->page_header_data['message'] = 'Consultant access adjustment failed.  Please try again.';
 					break;
 					case 'Deny Access':
 						if($this->ion_auth_model->batch_deny_consult($arr_modify_id)) {
-							$this->access_log_model->write_entry(42);
+							$this->_record_access(42);
 							$this->page_header_data['message'] = 'Consultant access adjusted successfully.';
 						}
 						else $this->page_header_data['message'] = 'Consultant access adjustment failed.  Please try again.';
 					break;
 					case 'Remove Expiration Date':
 						if($this->ion_auth_model->batch_remove_consult_expire($arr_modify_id)) {
-							$this->access_log_model->write_entry(43);
+							$this->_record_access(43);
 							$this->page_header_data['message'] = 'Consultant access adjusted successfully.';
 						}
 						else $this->page_header_data['message'] = 'Consultant access adjustment failed.  Please try again.';
@@ -178,7 +178,7 @@ class Auth extends Ionauth {
 				switch ($action) {
 					case 'Remove Access':
 						if($this->ion_auth_model->batch_consult_revoke($arr_modify_id)){
-							$this->access_log_model->write_entry(41);
+							$this->_record_access(41);
 							$this->page_header_data['message'] = 'Consultant access adjusted successfully.';
 						}
 						else $this->page_header_data['message'] = 'Consultant access adjustment failed.  Please try again.';
@@ -189,7 +189,7 @@ class Auth extends Ionauth {
 							if($this->ion_auth_model->get_consult_status_text($id) != 'consult revoked') unset($arr_modify_id[$k]);
 						}
 						if(!empty($arr_modify_id) && $this->ion_auth_model->batch_grant_consult($arr_modify_id)) {
-							$this->access_log_model->write_entry(34);
+							$this->_record_access(34);
 							$this->page_header_data['message'] = 'Consultant access adjusted successfully.';
 						}
 						else $this->page_header_data['message'] = 'Consultant access adjustment failed.  Please try again.';
@@ -198,7 +198,7 @@ class Auth extends Ionauth {
 						foreach($arr_modify_id as $k=>$id){
 							$arr_relationship_data = $this->ion_auth_model->get_consult_relationship_by_id($id);
 							if ($this->as_ion_auth->send_consultant_request($arr_relationship_data, $id, $this->config->item('cust_serv_email'))) {
-								$this->access_log_model->write_entry(35);
+								$this->_record_access(35);
 								$this->page_header_data['message'] = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
 							}
 							else { //if the request was un-successful
@@ -353,7 +353,7 @@ class Auth extends Ionauth {
 			if ($this->as_ion_auth->allow_service_grp($arr_relationship_data, $arr_post_section_id)) { //if permission is granted successfully
 				//redirect them back to the home page
 				$msg = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
-				$this->access_log_model->write_entry(34);
+				$this->_record_access(34);
 				$this->session->set_flashdata('message', $msg);
 				redirect(site_url($redirect_url)); //to access management page?
 			}
@@ -525,7 +525,7 @@ class Auth extends Ionauth {
 */			$arr_post_section_id = array();
 			
 			if ($is_validated === TRUE && $this->as_ion_auth->service_grp_request($arr_relationship_data, $arr_post_section_id, $this->config->item('cust_serv_email'))) {
-				$this->access_log_model->write_entry(35);
+				$this->_record_access(35);
 				$msg = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
 				$this->session->set_flashdata('message', $msg);
 				redirect(site_url($redirect_url)); //  to manage access page
@@ -682,7 +682,7 @@ class Auth extends Ionauth {
 		
 			if ($this->ion_auth->login($this->input->post('identity'), $this->input->post('password'), $remember))
 			{ //if the login is successful
-				$this->access_log_model->write_entry(1); //1 is the page code for login for the user management section
+				$this->_record_access(1); //1 is the page code for login for the user management section
 				$this->session->set_flashdata('message', $this->as_ion_auth->messages());
 				redirect(site_url(change_herd/select));
 			}
@@ -1404,5 +1404,14 @@ class Auth extends Ionauth {
 	        var_dump($graph);
 	    	//$this->load->view('default', $graph);
 */	}
-
+	protected function _record_access($event_id){
+		$this->access_log_model->write_entry(
+			$event_id,
+			$this->session->userdata('herd_code'),
+			$recent_test_date,
+			$herd_enroll_status,
+			$this->session->userdata('user_id'),
+			$this->session->userdata('active_group_id')
+		);
+	}
 }

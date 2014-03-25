@@ -116,54 +116,6 @@ class Access_log_model extends Report_Model {
 		return $arr_fields;
 	}
 
-	/** function prep_where_criteria -- overrode parent function to set where criteria to end of the date given (on form, the user enters only the date).
-	 * DATES NOW ACCOUNTED FOR IN PARENT??
-	 * translates filter criteria into sql format
-	 * @param $arr_filter_criteria
-	 * @return void
-	
-	protected function prep_where_criteria($arr_filter_criteria){
-		foreach($arr_filter_criteria as $k => $v){
-			if(empty($v) === FALSE){
-				if(is_array($v)){
-					if(($tmp_key = array_search('NULL', $v)) !== FALSE){
-						unset($v[$tmp_key]);
-						$text = implode(',', $v);
-						if(!empty($v)) $this->{$this->db_group_name}->where("($k IS NULL OR $k IN ( $text ))");
-						else $this->{$this->db_group_name}->where("$k IS NULL");
-					}
-					else $this->{$this->db_group_name}->where_in($k, $v);
-				}
-				else { //is not an array
-					if(substr($k, -5) == "_dbto"){ //ranges
-						$db_field = substr($k, 0, -5);
-						//overrode this line only--if we add time to user form, this function can be removed.
-						$this->{$this->db_group_name}->where("$db_field BETWEEN '" . date_to_mysqldatetime($arr_filter_criteria[$db_field . '_dbfrom']) . "' AND '" . date_to_mysqldatetime($arr_filter_criteria[$db_field . '_dbto'] . ' 23:59:59') . "'");
-					}
-					elseif(substr($k, -7) != "_dbfrom"){ //default--it skips the opposite end of the range as _dbto
-						$this->{$this->db_group_name}->where($k, $v);
-					}
-				} 
-			}
-		}
-	}
-	 */
-	
-	/**
-	 * @method get_section_select_data()
-	 * @access public
-	 *
-	function get_section_select_data(){
-		$arr_ret = array();
-		$arr_section = $this->db->get_sections_by_user($this->session->userdata('user_id'))->result_array();
-		if(is_array($arr_section)){
-			foreach($arr_section as $s){
-				$arr_ret[$s['id']] = $s['name'];
-			}
-		}
-	}	 **/
-
-
 	/**
 	 * get_page_filters
 FUNCTION MOVED?
@@ -385,25 +337,32 @@ FUNCTION MOVED?
 	/**
 	 * write_entry
 	 *
-	 * @param int page id
+	 * @param int event id
+	 * @param string herd code
+	 * @param string most recent test date for herd
+	 * @param int herd enrollment status (id represents none, paid or trial)
+	 * @param int user_id
+	 * @param int group_id
 	 * @param string format (web, pdf or csv) defaults to web
 	 * @param string sort order (NULL, ASC or DESC) defaults to NULL
 	 * @param string filter text, defaults to NULL
 	 * @return boolean
 	 * @author Chris Tranel
 	 **/
-	function write_entry($page_id, $format='web', $sort=NULL, $filters=NULL){
+	function write_entry($event_id, $herd_code, $recent_test_date, $herd_enroll_status_id, $user_id, $group_id, $format='web', $report_page_id = NULL, $sort=NULL, $filters=NULL){
 		if($this->as_ion_auth->is_admin()) return 1; //do not record admin action
 		$tmp_array = array(
-			'page_id'=>$page_id,
-			'format'=>$format,
-			'user_id'=>$this->session->userdata('user_id'),
-			'group_id'=>$this->session->userdata('active_group_id'),
-			'herd_code'=>$this->session->userdata('herd_code'),
-			'user_supervisor_acct_num'=>$this->session->userdata('supervisor_acct_num'),
-			'user_association_acct_num'=>implode(',', array_keys($this->session->userdata('arr_regions'))),
-			'access_time'=> date('Y-m-d H:i:s')
+			'event_id' => $event_id,
+			'herd_code' => $herd_code,
+			'recent_test_date' => $recent_test_date,
+			'herd_enroll_status_id' => $herd_enroll_status_id,
+			'user_id' => $user_id,
+			'group_id' => $group_id,
+			'format' => $format,
+			'report_page_id' => $report_page_id,
+			'access_time' => date('Y-m-d H:i:s')
 		);
+		if ($report_page_id) $tmp_array['report_page_id'] = $report_page_id;
 		if ($sort) $tmp_array['sort_text'] = $sort;
 		if ($filters) $tmp_array['filter_text'] = $filters;
 		return $this->{$this->db_group_name}->insert($this->tables['access_log'], $tmp_array);

@@ -14,17 +14,7 @@ class Cow_lookup extends CI_Controller {
 		
 		$this->session->keep_flashdata('message');
 		
-		//make sure previous page remains as the redirect url 
-//		$tmp = $this->session->flashdata('redirect_url');
-//		$redirect_url = $tmp !== FALSE ? $tmp : $this->as_ion_auth->referrer;
 		set_redirect_url($this->uri->uri_string());
-		/* Load the profile.php config file if it exists
-		if (ENVIRONMENT == 'development') {
-			$this->config->load('profiler', false, true);
-			if ($this->config->config['enable_profiler']) {
-				$this->output->enable_profiler(TRUE);
-			} 
-		} */
 	}
 	
     function index($serial_num, $tab = 'events'){
@@ -40,6 +30,7 @@ class Cow_lookup extends CI_Controller {
 			,'events_content' => $this->load->view('cow_lookup/events', $events_data, true)
     		,'tab' => $tab
     	);
+    	$this->_record_access(93);
     	$this->load->view('cow_lookup/land', $data);
 	}
 	
@@ -139,8 +130,17 @@ class Cow_lookup extends CI_Controller {
 		$this->curr_calving_date = $events_data['curr_calving_date'];
 	} 
 	
-	function log_page(){
-		echo $this->access_log_model->write_entry(); //19 is the page code for DM Login
-		exit;
+	protected function _record_access($event_id){
+		$herd_enroll_status = NULL;
+		$recent_test_date = NULL;
+		$this->access_log_model->write_entry(
+				$event_id,
+				$this->session->userdata('herd_code'),
+				$recent_test_date,
+				$herd_enroll_status,
+				$this->session->userdata('user_id'),
+				$this->session->userdata('active_group_id')
+		);
 	}
+	
 }

@@ -29,7 +29,8 @@ abstract class parent_report extends CI_Controller {
 	protected $display;
 	protected $html;
 	protected $graph;
-	protected $page;
+	protected $page; //url segment of current page
+	protected $objPage; //object of current page
 	protected $block;
 	protected $report_count;
 	protected $print_all = FALSE;
@@ -192,8 +193,10 @@ abstract class parent_report extends CI_Controller {
 				
 		//Create block info as array in arr_block_in if not an array
 		if(isset($arr_block_in) && !empty($arr_block_in) && !is_array($arr_block_in)) $arr_block_in = array($arr_block_in);
+		$this->objPage = $this->{$this->primary_model}->arr_blocks[$this->page];
+		$arr_blocks = $this->objPage['blocks'];
 
-		$arr_blocks = $this->{$this->primary_model}->arr_blocks[$this->page]['blocks'];
+
 		//Determine if any report blocks have is_summary flag - will determine if tstring needs to be loaded and filters shown
 		$this->load->helper('multid_array_helper');
 		$this->bool_is_summary = array_search(1, get_elements_by_key('is_summary', $arr_blocks)) === FALSE ? FALSE : TRUE;
@@ -255,7 +258,7 @@ abstract class parent_report extends CI_Controller {
 			}
 			if(is_array($data) && !empty($data)){
 				$this->reports->create_csv($data);
-				$this->access_log_model->write_entry($this->{$this->primary_model}->arr_blocks[$this->page]['page_id'], 'csv');
+				$this->_record_access(90, $this->objPage['page_id'], 'csv');
 			}
 			else {
 				$this->{$this->primary_model}->arr_messages[] = 'There is no data to export into an Excel file.';
@@ -298,7 +301,7 @@ abstract class parent_report extends CI_Controller {
 					}
 				}
 			}
-			$this->access_log_model->write_entry($this->{$this->primary_model}->arr_blocks[$this->page]['page_id'], 'pdf', $this->reports->sort_text_brief($this->arr_sort_by, $this->arr_sort_order), $this->log_filter_text);
+			$this->_record_access(90, $this->objPage['page_id'], 'pdf');
 			$this->reports->create_pdf($block, $this->product_name, NULL, $herd_data, 'P');
 			exit;
 		}
@@ -437,7 +440,7 @@ abstract class parent_report extends CI_Controller {
 			$data['report_nav'] = $this->load->view($report_nav_path, $arr_nav_data, TRUE);
 		}
 		
-		//$this->access_log_model->write_entry($this->{$this->primary_model}->arr_blocks[$this->page]['page_id'], 'web');
+		$this->_record_access(90, $this->objPage['page_id'], 'web');
 		$this->load->view('report', $data);
 	}
 	
@@ -708,6 +711,23 @@ abstract class parent_report extends CI_Controller {
 			$this->html = '<p class="message">No data found.</p>';
 		}
 		$this->display = 'table';
+	}
+	
+	protected function _record_access($event_id, $page_id, $format){
+		$herd_enroll_status = NULL;
+		$recent_test_date = NULL;
+		$this->access_log_model->write_entry(
+			$event_id,
+			$this->session->userdata('herd_code'),
+			$recent_test_date,
+			$herd_enroll_status,
+			$this->session->userdata('user_id'),
+			$this->session->userdata('active_group_id'),
+			$format,
+			$page_id,
+			$this->reports->sort_text_brief($this->arr_sort_by, $this->arr_sort_order),
+			$this->filters->get_filter_text()
+		);
 	}
 }
 

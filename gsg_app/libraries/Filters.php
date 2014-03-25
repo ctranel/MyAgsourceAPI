@@ -51,6 +51,11 @@ class Filters{
 		return $arr_params;
 	}
 
+	public function get_filter_text(){
+		return $this->log_filter_text;
+	}
+		
+	
 	public function set_filters($is_summary = TRUE){
 		//get filters from DB for the current page
 		$arr_page_filters = $this->ci->filter_model->get_page_filters($this->sect_id, $this->page);
@@ -119,8 +124,8 @@ class Filters{
 			}
 		}
 		if(validation_errors()) $this->primary_model->arr_messages[] = validation_errors();
-		$arr_filter_text = $this->ci->reports->filters_to_text($this->criteria, $this->primary_model->arr_pstring);
-		$this->log_filter_text = is_array($arr_filter_text) && !empty($arr_filter_text)?implode('; ', $arr_filter_text):'';
+		$this->set_filter_text();
+
 		//create array of all filter data		
 		$filter_data = array(
 				'arr_filters'=>isset($arr_filters_list) && is_array($arr_filters_list)?$arr_filters_list:array(),
@@ -130,4 +135,46 @@ class Filters{
 		return $filter_data;
 	}
 	
+	/**
+	 * filters_to_text
+	 * @description sets arr_filter_text variable.  Composes filter text property for use in the GSG Library file
+	 * @author ctranel
+	 * @return void
+	 * 
+	 **/
+	protected function set_filter_text(){
+		if(is_array($this->criteria) && !empty($this->criteria)){
+			return FALSE;
+		}
+		foreach($this->criteria as $k=>$v){
+			if($k == 'block'); //don't show block filter info because it is specified in heading
+			elseif($k == 'pstring') {
+				if(is_array($v)) {
+					$pstring_text = '';
+					if(!empty($v)) {
+						foreach($v as $e){
+							$pstring_text .= $this->primary_model->arr_pstring[$e]['publication_name'] . ', ';
+						}
+						$pstring_text = substr($pstring_text, 0, -2);
+					}
+				}
+				else $pstring_text = $this->primary_model->arr_pstring[$v]['publication_name'];
+				$arr_filter_text[] = 'PString: ' . $pstring_text;
+			}
+			elseif(is_array($v) && !empty($v)){
+				if(($tmp_key = array_search('NULL', $v)) !== FALSE) unset($v[$tmp_key]);
+				else $arr_filter_text[] = ucwords(str_replace('_', ' ', $k)) . ': ' . implode(', ', $v);
+			}
+			else{
+				if(substr($k, -5) == "_dbto" && !empty($v)){ //ranges
+					$db_field = substr($k, 0, -5);
+					$arr_filter_text[] = ucwords(str_replace('_', ' ', $db_field)) . ': Between ' . $arr_filters[$db_field . '_dbfrom'] . ' and ' . $arr_filters[$db_field . '_dbto'];
+				}
+				elseif(substr($k, -7) != "_dbfrom" && $k != 'herd_code' && !empty($v)){ //default--it skips the opposite end of the range as _dbto
+					$arr_filter_text[] = ucwords(str_replace('_', ' ', $k)) . ': ' . $v;
+				}
+			}
+		}
+		$this->arr_filter_text = is_array($arr_filter_text) && !empty($arr_filter_text)?implode('; ', $arr_filter_text):'';
+	}
 }
