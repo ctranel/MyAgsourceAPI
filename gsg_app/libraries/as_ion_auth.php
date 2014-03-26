@@ -78,10 +78,8 @@ class As_ion_auth extends Ion_auth {
 			//$this->arr_task_permissions = $this->ion_auth_model->get_task_permissions('3');
 		//}
 		parent::__construct();
-		$this->load->library('herd_manage');
 		$this->load->model('access_log_model');
 		$this->load->model('region_model');
-		$this->load->model('herd_model');
 		$this->load->helper('url');
 
 		//set supersection if there is one
@@ -106,10 +104,7 @@ class As_ion_auth extends Ion_auth {
 			$this->arr_user_sections = $this->get_sections_array($this->session->userdata('active_group_id'), $this->session->userdata('user_id'), $this->session->userdata('herd_code'), array($this->super_section_id), $arr_scope);
 		}
 		elseif($this->session->userdata('herd_code') == $this->config->item('default_herd')) {
-/*			$this->session->set_userdata('herd_code', $this->config->item('default_herd'));
-			$this->session->set_userdata('arr_pstring', $this->herd_model->get_pstring_array($this->config->item('default_herd'), FALSE));
-			//$this->session->set_userdata('active_group_id', 2);
-*/			$arr_scope = array('subscription','public','unmanaged');
+			$arr_scope = array('subscription','public','unmanaged');
 			//the first parameter is group id--use producer (2) if no one is logged in, second param is user id. 
 			$this->arr_user_super_sections = $this->get_super_sections_array(2, $this->session->userdata('user_id'), $this->session->userdata('herd_code'), $arr_scope);
 			$this->arr_user_sections = $this->get_sections_array(2, $this->session->userdata('user_id'), $this->session->userdata('herd_code'), array($this->super_section_id), $arr_scope);
@@ -172,6 +167,8 @@ class As_ion_auth extends Ion_auth {
 		$this->session->unset_userdata('active_group_id');
 		$this->session->unset_userdata('herd_code');
 		$this->session->unset_userdata('arr_pstring');
+		$this->session->unset_userdata('herd_code');
+		$this->session->unset_userdata('herd_code');
 		$this->session->unset_userdata('first_name');
 		$this->session->unset_userdata('last_name');
 //		$this->session->unset_userdata('company');

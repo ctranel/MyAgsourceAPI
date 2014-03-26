@@ -358,7 +358,7 @@ abstract class parent_report extends CI_Controller {
 					$arr_view_blocks[] = $this->load->view($display, $arr_blk_data, TRUE);
 					//add js line to populate the block after the page loads
 					$tmp_container_div = $display == 'chart' ? 'graph-canvas' . $x : 'table-canvas' . $x;
-					$tmp_js .= "updateBlock(\"$tmp_container_div\", \"" . $pb['url_segment'] . "\", \"$x\", \"null\", \"null\", \"$display\")\n";//, \"" . $this->{$this->primary_model}->arr_blocks[$this->page]['display'][$display][$block]['description'] . "\", \"" . $bench_text . "\");\n";
+					$tmp_js .= "updateBlock(\"$tmp_container_div\", \"" . $pb['url_segment'] . "\", \"$x\", \"null\", \"null\", \"$display\",\"false\")\n";//, \"" . $this->{$this->primary_model}->arr_blocks[$this->page]['display'][$display][$block]['description'] . "\", \"" . $bench_text . "\");\n";
 					$tmp_block = $pb['url_segment'];
 					$x++;
 				}
@@ -452,11 +452,13 @@ abstract class parent_report extends CI_Controller {
 	 * @param string cache_buster: text to make page appear as a different page so that new data is retrieved
 	 * @todo phasing out passing the pstring in the url, using the filter form instead (passed as $json_filter_data) --- the pstring parameter is no longer being used, but I have not removed it from the URLs that call ajax_report
 	 */
-	public function ajax_report($page, $block, $pstring, $output, $sort_by = 'null', $sort_order = 'null', $file_format = 'web', $test_date = FALSE, $report_count=0, $json_filter_data = NULL, $cache_buster = NULL) {//, $herd_size_code = FALSE, $all_breeds_code = FALSE
+	public function ajax_report($page, $block, $pstring, $output, $sort_by = 'null', $sort_order = 'null', $file_format = 'web', $test_date = FALSE, $report_count=0, $json_filter_data = NULL, $first=FALSE, $cache_buster = NULL) {//, $herd_size_code = FALSE, $all_breeds_code = FALSE
+		$first = ($first === 'true');
 		$page = urldecode($page);
 		$block = urldecode($block);
 		$sort_by = urldecode($sort_by);
-		
+		$this->objPage = $this->{$this->primary_model}->arr_blocks[$page];
+				
 		if(isset($json_filter_data)){
 			$arr_params = (array)json_decode(urldecode($json_filter_data));
 			if(isset($arr_params['csrf_test_name']) && $arr_params['csrf_test_name'] != $this->security->get_csrf_hash()) die("I don't recognize your browser session, your session may have expired, or you may have cookies turned off.");
@@ -508,8 +510,16 @@ abstract class parent_report extends CI_Controller {
 				break;
 		}
 		//common functionality
-		if($file_format == 'csv') return $this->report_data['report_data'];
+		if($file_format == 'csv'){
+			if($first){
+				$this->_record_access(90, $this->objPage['page_id'], 'csv');
+			}
+			return $this->report_data['report_data'];
+		}
 		elseif($file_format == 'pdf'){
+			if($first){
+				$this->_record_access(90, $this->objPage['page_id'], 'pdf');
+			}
 			if($this->display == 'html') return $this->html;
 			else {
 				return $this->report_data['report_data'];
@@ -517,6 +527,10 @@ abstract class parent_report extends CI_Controller {
 		}
 		if($this->display == 'table'){
 			$this->graph['html'] = $this->html;
+		}
+
+		if($first){
+			$this->_record_access(90, $this->objPage['page_id'], 'web');
 		}
 		$this->graph['section_data'] = $this->get_section_data($block, $this->pstring, $sort_by, $sort_order, $report_count);
 		$return_val = prep_output($this->display, $this->graph, $report_count, $file_format);
@@ -714,19 +728,24 @@ abstract class parent_report extends CI_Controller {
 	}
 	
 	protected function _record_access($event_id, $page_id, $format){
-		$herd_enroll_status = NULL;
-		$recent_test_date = NULL;
+		$herd_code = $this->session->userdata('herd_code');
+		$herd_enroll_status_id = empty($herd_code) ? NULL : $this->session->userdata('herd_enroll_status_id');
+		$recent_test = $this->session->userdata('recent_test_date');
+		$recent_test = empty($recent_test) ? NULL : $recent_test;
+		
+		$filter_text = isset($this->filters) ? $this->filters->get_filter_text() : NULL;
+
 		$this->access_log_model->write_entry(
 			$event_id,
-			$this->session->userdata('herd_code'),
-			$recent_test_date,
-			$herd_enroll_status,
+			$herd_code,
+			$recent_test,
+			$herd_enroll_status_id,
 			$this->session->userdata('user_id'),
 			$this->session->userdata('active_group_id'),
 			$format,
 			$page_id,
 			$this->reports->sort_text_brief($this->arr_sort_by, $this->arr_sort_order),
-			$this->filters->get_filter_text()
+			$filter_text
 		);
 	}
 }

@@ -34,12 +34,6 @@ class Uhm_summary extends parent_report {
 	 	parent::display($block_in, $display_format);
 	 }
 	 
-	 /*
-	 * ajax_report: Called via AJAX to populate graphs
-	 * to add flexibility (any graph/table can be called from any page),
-	 * all block generation code has been moved to the report parent ajax_report function
-	 */
-	 
 	 protected function get_section_data($block, $pstring, $sort_by, $sort_order, $report_count){
 	 	$arr_return = array(
 	 			'block' => $block,

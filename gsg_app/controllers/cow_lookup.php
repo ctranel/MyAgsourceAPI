@@ -131,16 +131,18 @@ class Cow_lookup extends CI_Controller {
 	} 
 	
 	protected function _record_access($event_id){
-		$herd_enroll_status = NULL;
-		$recent_test_date = NULL;
+		$herd_code = $this->session->userdata('herd_code');
+		$herd_enroll_status_id = empty($herd_code) ? NULL : $this->session->userdata('herd_enroll_status_id');
+		$recent_test = $this->session->userdata('recent_test_date');
+		$recent_test = empty($recent_test) ? NULL : $recent_test;
+		
 		$this->access_log_model->write_entry(
-				$event_id,
-				$this->session->userdata('herd_code'),
-				$recent_test_date,
-				$herd_enroll_status,
-				$this->session->userdata('user_id'),
-				$this->session->userdata('active_group_id')
+			$event_id,
+			$herd_code,
+			$recent_test,
+			$herd_enroll_status_id,
+			$this->session->userdata('user_id'),
+			$this->session->userdata('active_group_id')
 		);
 	}
-	
 }

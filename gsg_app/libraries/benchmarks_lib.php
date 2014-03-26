@@ -92,7 +92,6 @@ class Benchmarks_lib
 	{
 		$this->ci =& get_instance();
 		//$this->load->config('ion_auth', TRUE);
-//		$this->ci->load->model('herd_model');
 		$this->arr_states_in_region = array(
 			'NE' => array('NY','PA','OH','VT','ME','CT','NH','MA','NJ','RI'),
 			'SE' => array('FL','VA','GA','MD','KY','NC','TN','SC','LA','MS','WV','AL','AK','DE'),

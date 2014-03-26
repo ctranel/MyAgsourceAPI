@@ -8,7 +8,6 @@ class Land extends parent_report {
 	}
 	
 	function index($pstring = NULL){
-		$this->load->model('herd_model');
 		$this->load->model('alert_model');
 		$arr_pstring = $this->session->userdata('arr_pstring');
 		if(isset($pstring)){
@@ -59,7 +58,7 @@ class Land extends parent_report {
 		
 //		if((is_array($arr_nav_data['arr_pages']) && count($arr_nav_data['arr_pages']) > 1) || (is_array($arr_nav_data['arr_pstring']) && count($arr_nav_data['arr_pstring']) > 1)) $data['report_nav'] = $this->load->view($report_nav_path, $arr_nav_data, TRUE);
 		
-		//$this->access_log_model->write_entry($this->{$this->primary_model}->arr_blocks[$this->page]['page_id'], 'web');
+		$this->_record_access(94, NULL, 'web');
 		$this->load->view('auth/dashboard/main-bench', $this->data);
 		//$this->load->view('report', $data);
 	}
@@ -110,16 +109,6 @@ class Land extends parent_report {
 				)
 			);
 		}
-		$this->footer_data = Array(
-/*			'arr_foot_line'=>array(
-				'<script type="text/javascript"> //for chart
-					head.ready("card_helper", function(){//load_chart("' . $ajax_url . '", false);
-						load_chart("' . site_url("/report_card/ajax_graph/production/" . $pstring . "/chart/" . $benchmarks_id . "/" . $all_breeds_code) . '", "snapshot-chart");
-						load_chart("' . site_url("/report_card/ajax_graph/inventory/" . $pstring . "/chart/" . $benchmarks_id . "/" . $all_breeds_code) . '");
-					});
-				</script>'
-			)
-*/		);
 
 		//header and footer
 		$this->page_header_data['section_nav'] = $this->load->view('auth/section_nav', NULL, TRUE);
@@ -128,7 +117,6 @@ class Land extends parent_report {
 //		$this->load->_ci_cached_vars = array();
 		//widgets (pull from DB?)
 		//get_herd_data
-		$this->load->model('herd_model');
 		$herd_data = $this->herd_model->header_info($this->session->userdata('herd_code'));
 		$this->data['widget']['sections'][] = array(
 			'content' => $this->load->view('auth/dashboard/herd_data', $herd_data, TRUE),

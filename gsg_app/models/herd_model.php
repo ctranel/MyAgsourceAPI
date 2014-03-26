@@ -429,6 +429,48 @@ class Herd_model extends CI_Model {
 		else return FALSE;
 	}
 	
+	/**
+	 * get_recent_test
+	 * @param string herd code
+	 * @return date string most recent test date
+	 * @author ctranel
+	 **/
+	public function get_recent_test($herd_code){
+		$result = $this->db
+			->select('MAX(test_date) AS test_date')
+			->where('herd_code', $herd_code)
+			->get('[herd].[dbo].[herd_test_turnaround]')
+			->result_array();
+		if(is_array($result)){
+			return $result[0]['test_date'];
+		}
+		return FALSE;
+	}
 	
-	
+	/**
+	 * get_herd_output
+	 * @param string herd code
+	 * @param string or array of report codes
+	 * @return array of herd output data arrays
+	 * @author ctranel
+	 **/
+	public function get_herd_output($herd_code, $report_code = NULL){
+		if(isset($report_code)){
+			if(!is_array($report_code)){
+				$report_code = array($report_code);
+			}
+			$this->db->where_in('report_code', $report_code);
+		}
+		$result = $this->db
+			->select('report_code, bill_account_num')
+			->where('herd_code', $herd_code)
+			->where('end_date IS NULL')
+			->where('activity_code', 'A')
+			->get('[herd].[dbo].[herd_output]')
+			->result_array();
+		if(is_array($result)){
+			return $result;
+		}
+		return FALSE;
+	}
 }

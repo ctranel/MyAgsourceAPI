@@ -14,10 +14,4 @@ class Test_Day extends parent_report {
 		$this->product_name = 'Test Day Results';
 		parent::display($block_in, $display_format, isset($sort_by) ? urldecode($sort_by) : NULL, isset($sort_order) ? urldecode($sort_order) : NULL, isset($json_filter_data) ? urldecode($json_filter_data) : NULL);
 	}
-
-	/*
-	 * ajax_report: Called via AJAX to populate graphs
-	 * to add flexibility (any graph/table can be called from any page),
-	 * all block generation code has been moved to the report parent ajax_report function
-	 */
 }

@@ -27,9 +27,4 @@ class Fresh_Cow_List extends parent_report {
 	 	$this->product_name = 'Fresh Cow List Special';
 		parent::display($block_in, $display_format);
 	 }
-	 /*
-	 * ajax_report: Called via AJAX to populate graphs
-	 * to add flexibility (any graph/table can be called from any page),
-	 * all block generation code has been moved to the report parent ajax_report function
-	 */
 }

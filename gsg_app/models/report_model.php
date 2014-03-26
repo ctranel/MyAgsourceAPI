@@ -54,6 +54,7 @@ class Report_model extends CI_Model {
 		/*in the case of the access log model, the section id is set AFTER the parent (this file/class) is called so that the reference
 		 * back to the access log model does not cause problem.  That is the only other model that calls the get block links method.
 		 */
+		$this->load->model('herd_model');
 		$this->arr_pstring = $this->herd_model->get_pstring_array($this->session->userdata('herd_code'));
 		$this->tables  = $this->config->item('tables', 'ion_auth');
 
@@ -316,7 +317,6 @@ class Report_model extends CI_Model {
 
 		//KLM - Added logic to convert header text to date text from herd_model function get_test_dates_7_short
 		if(is_array($arr_groupings) && !empty($arr_groupings)){
-			$this->load->model('herd_model');
 			$arr_dates = $this->herd_model->get_test_dates_7_short($this->session->userdata('herd_code'));
 			foreach($arr_groupings as &$ag){
 				$arr_ref[$ag['id']] = (string)$ag['text'];

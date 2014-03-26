@@ -33,7 +33,6 @@ class Reports{
 	 * @author ctranel
 	 **/
 	public function get_herd_info($herd_code_in = FALSE){
-		$this->ci->load->model('herd_model');
 		if(!$herd_code_in) $herd_code_in = $this->herd_code;
 		return $this->ci->herd_model->header_info($herd_code_in);
 	}

@@ -143,9 +143,11 @@ class Filters{
 	 * 
 	 **/
 	protected function set_filter_text(){
-		if(is_array($this->criteria) && !empty($this->criteria)){
+		if(!is_array($this->criteria) || empty($this->criteria)){
 			return FALSE;
 		}
+
+		$arr_filter_text = array();
 		foreach($this->criteria as $k=>$v){
 			if($k == 'block'); //don't show block filter info because it is specified in heading
 			elseif($k == 'pstring') {
@@ -175,6 +177,6 @@ class Filters{
 				}
 			}
 		}
-		$this->arr_filter_text = is_array($arr_filter_text) && !empty($arr_filter_text)?implode('; ', $arr_filter_text):'';
+		$this->log_filter_text = is_array($arr_filter_text) && !empty($arr_filter_text)?implode('; ', $arr_filter_text):'';
 	}
 }

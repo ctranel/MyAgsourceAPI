@@ -29,7 +29,7 @@ foreach($structure as $row): ?>
 			<?php
 			if (is_array($arr_unsortable_columns) && !in_array($th['field_name'], $arr_unsortable_columns)):
 				$submit_url = '#';
-				$extra = Array('onclick'=>"return load_table(null, 'table-canvas" . $report_count . "', $report_count, '". $th['field_name'] . "', '$link_sort_order', '$block');");
+				$extra = Array('onclick'=>"return updateBlock('table-canvas" . $report_count . "', '$block', $report_count, '". $th['field_name'] . "', '$link_sort_order', 'table', true);");
 
 				echo anchor($submit_url, $th['text'], $extra);
 				echo $after_text;

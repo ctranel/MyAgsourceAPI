@@ -115,7 +115,7 @@ function updatePage(el){
 	var sort_field;
 	var sort_order;
 	var display;
-	
+	var first = true;
 	$('.chart').each(function(){
 		div_id = $(this).attr('id');
 		block_name = $(this).attr('data-block');
@@ -123,7 +123,8 @@ function updatePage(el){
 		sort_field = null;
 		sort_order = null;
 		display = 'chart'
-		updateBlock(div_id, block_name, block_index, sort_field, sort_order, display);
+		updateBlock(div_id, block_name, block_index, sort_field, sort_order, display, first);
+		first = false;
 	})
 	$('.table-container').each(function(){
 		div_id = $(this).attr('id');
@@ -132,16 +133,16 @@ function updatePage(el){
 		sort_field = null;
 		sort_order = null;
 		display = 'table'
-		updateBlock(div_id, block_name, block_index, sort_field, sort_order, display);
+		updateBlock(div_id, block_name, block_index, sort_field, sort_order, display, first);
+		first = false
 	})
 	
 	$('.pstring-link').css('fontWeight', 'normal');
 	el.style.fontWeight = 'bold';
 }
 
-function updateBlock(container_div_id, block_in, block_index, sort_field, sort_order, display){//}, title, benchmark_text){
+function updateBlock(container_div_id, block_in, block_index, sort_field, sort_order, display, first){//}, title, benchmark_text){
 //load and process ajax data - base_url and page are defined globally in the controller
-	block = block_in;
 	var params = '';
 	var cache_bust = Math.floor(Math.random()*1000);
 	var pstring = $('.pstring-filter-item > input:checked').val();
@@ -153,46 +154,34 @@ function updateBlock(container_div_id, block_in, block_index, sort_field, sort_o
 	if(typeof(sort_order) == 'undefined') sort_order = null;
 	switch(display){
 		case "table": 
-			load_table(base_url + '/ajax_report/' + encodeURIComponent(page) + '/' + encodeURIComponent(block) + '/' + pstring + '/' + display + '/' + encodeURIComponent(sort_field) + '/' + sort_order + '/web/null/' + block_index + '/' + params + '/' + cache_bust, container_div_id, block_index, sort_field, sort_order, block, params);
+			load_table(base_url + '/ajax_report/' + encodeURIComponent(page) + '/' + encodeURIComponent(block_in) + '/' + pstring + '/' + display + '/' + encodeURIComponent(sort_field) + '/' + sort_order + '/web/null/' + block_index + '/' + params + '/' + first + '/' + cache_bust, container_div_id, block_index, params);
 			break;
 		case "chart":
-			load_chart(base_url + '/ajax_report/' + encodeURIComponent(page) + '/' + encodeURIComponent(block) + '/' + pstring + '/' + display + '/' + encodeURIComponent(sort_field) + '/' + sort_order + '/web/null/' + block_index + '/' + params + '/' + cache_bust, container_div_id, params);
+			load_chart(base_url + '/ajax_report/' + encodeURIComponent(page) + '/' + encodeURIComponent(block_in) + '/' + pstring + '/' + display + '/' + encodeURIComponent(sort_field) + '/' + sort_order + '/web/null/' + block_index + '/' + params + '/' + first + '/' + cache_bust, container_div_id, block_index, params);
 			break;
 	}
 	return false;
 }
 
-function load_table(server_path, div_id, tbl_cnt_in, sort_field, sort_order, block_in, params){
-	block = block_in;
-	if(typeof(sort_field) == 'undefined') sort_field = null;
-	if(typeof(sort_order) == 'undefined') sort_order = null;
+function load_table(server_path, div_id, block_index, params){
 	if(typeof(params) == 'undefined' && $("#filter-form")){
 		params = encodeURIComponent(JSON.stringify($("#filter-form").serializeObject()));
 	}
 	if(!server_path) {
-		var pstring = $('input:checkbox[name=pstring]:checked').val();
-		if(typeof(pstring) == 'undefined') pstring = 0;
-		if(typeof(block) != 'undefined' && typeof(pstring) != 'undefined'){
-			var cache_bust = Math.floor(Math.random()*1000);
-			server_path = base_url + '/ajax_report/' + encodeURIComponent(page) + '/' + encodeURIComponent(block) + '/' + pstring + '/table/' + encodeURIComponent(sort_field) + '/' + sort_order + '/web/null/' + tbl_cnt_in + '/' + params + '/' + cache_bust;
-		}
-		else {
-			alert("No data found.");
-			return false;
-		}
+		alert("No data found.");
+		return false;
 	}
 	if(typeof(div_id) === 'undefined' || !div_id) div_id = 'table-canvas0';
-	$('#table-wrapper' + tbl_cnt_in).find('table').hide();
-	$('#waiting-icon' + tbl_cnt_in).show();
+	$('#table-wrapper' + block_index).find('table').hide();
+	$('#waiting-icon' + block_index).show();
 	
 	//load javascript file (with a cache-busting parameter) rather than calling with AJAX for consistency with charts
-	head.js(server_path, function() { process_table(div_id, tbl_cnt_in); });
+	head.js(server_path, function() { process_table(div_id, block_index); });
 	//cancel link when called from anchor tag
 	return false;
 }
 
-function load_chart(server_path, div_id, params){
-	chart_index = div_id.charAt( div_id.length-1 );
+function load_chart(server_path, div_id, block_index, params){
 	if(typeof(params) == 'undefined' && $("#filter-form")){
 		params = encodeURIComponent(JSON.stringify($("#filter-form").serializeObject()));
 	}
@@ -203,18 +192,18 @@ function load_chart(server_path, div_id, params){
 	if(typeof(div_id) == 'undefined' || !div_id) div_id = 'graph-canvas0';
 	
 	//load javascript file rather than calling with AJAX so that functions can be imported.  This javascript file will call the process_data function
-	$('#chart-container' + chart_index).hide();
-	$('#waiting-icon' + chart_index).show();
+	$('#chart-container' + block_index).hide();
+	$('#waiting-icon' + block_index).show();
 	head.js(server_path, function() { process_chart(div_id); });
 }
 
 function process_chart(div_id){ //chart_data is defined globally at the top of this page
-	chart_index = div_id.charAt( div_id.length-1 );
-	if(typeof(chart_data[chart_index]) != 'undefined'){
+	block_index = div_id.charAt( div_id.length-1 );
+	if(typeof(chart_data[block_index]) != 'undefined'){
 		// set up the temporary array that holds the data
 		var tmpData = {};
-		if(typeof chart_data[chart_index].section_data !== 'undefined') section_data = chart_data[chart_index].section_data;
-		if(typeof chart_data[chart_index].data === 'undefined' || chart_data[chart_index].data == false){
+		if(typeof chart_data[block_index].section_data !== 'undefined') section_data = chart_data[block_index].section_data;
+		if(typeof chart_data[block_index].data === 'undefined' || chart_data[block_index].data == false){
 			$('#' + div_id).html('<p class-"chart-error">Sorry, there is no data available for this report.  Please try again, or contact AgSource at 1-800-236-0097 for assistance.</p>');
 		}
 		else if(typeof(section_data.redirect) !== 'undefined'){
@@ -224,11 +213,11 @@ function process_chart(div_id){ //chart_data is defined globally at the top of t
 			$('#' + div_id).html('<p class-"chart-error">' + section_data.error + '</p>');
 		}
 		else{
-			tmpData = chart_data[chart_index].data;
+			tmpData = chart_data[block_index].data;
 			var count = 0;
 			//convert the options array to 
-			if(typeof chart_data[chart_index].config !== 'undefined'){
-				var options = chart_data[chart_index].config;
+			if(typeof chart_data[block_index].config !== 'undefined'){
+				var options = chart_data[block_index].config;
 				// combine with base options, but don't overwrite those from 
 				if(typeof(base_options) != 'undefined'){
 					var i;
@@ -244,33 +233,34 @@ function process_chart(div_id){ //chart_data is defined globally at the top of t
 			}
 			options.chart.renderTo = div_id;
 			if(typeof pre_render == 'function') pre_render(options, section_data);
-			chart[chart_index] = new Highcharts.Chart(options);
-			while(chart[chart_index].series.length > count) chart[chart_index].series[count].remove(true);
+			chart[block_index] = new Highcharts.Chart(options);
+			while(chart[block_index].series.length > count) chart[block_index].series[count].remove(true);
 		}
 	}
 
 	if(typeof(section_data) == "object" && typeof post_render == 'function') post_render(section_data);
 
-	$('#waiting-icon' + chart_index).hide();
-	$('#chart-container' + chart_index).show();
+	$('#waiting-icon' + block_index).hide();
+	$('#chart-container' + block_index).show();
 }
 
-function process_table(div_id, tbl_cnt_in){
-	if(typeof(table_data[tbl_cnt_in]) != 'undefined'){
+function process_table(div_id){
+	block_index = div_id.charAt( div_id.length-1 );
+	if(typeof(table_data[block_index]) != 'undefined'){
 		var tmpData = {};
-		if(typeof table_data[tbl_cnt_in].section_data !== 'undefined') section_data = table_data[tbl_cnt_in].section_data;
-		if(typeof table_data[tbl_cnt_in].html === 'undefined' || table_data[tbl_cnt_in].html == false){
+		if(typeof table_data[block_index].section_data !== 'undefined') section_data = table_data[block_index].section_data;
+		if(typeof table_data[block_index].html === 'undefined' || table_data[block_index].html == false){
 			$('#' + div_id).html('<p class-"chart-error">Sorry, there is no data available for the ' + table_data[chart_index].config.title.text + ' report.  Please try again, or contact AgSource at 1-800-236-0097 for assistance.</p>');
 			exit;
 		}
 		else{
-			$('#' + div_id).html(table_data[tbl_cnt_in].html);
+			$('#' + div_id).html(table_data[block_index].html);
 		}
 	}
 
 	if(typeof(section_data) == "object" && typeof post_render == 'function') post_render(section_data);
-	$('#waiting-icon' + tbl_cnt_in).hide();
-	$('#table-wrapper' + tbl_cnt_in).find('table').show();
+	$('#waiting-icon' + block_index).hide();
+	$('#table-wrapper' + block_index).find('table').show();
 	//attach events to new data fields
 	attachDataFieldEvents();
 }

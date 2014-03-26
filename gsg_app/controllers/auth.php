@@ -501,7 +501,6 @@ class Auth extends Ionauth {
 				redirect(site_url('auth/service_grp_request'));
 			} */
 			$herd_release_code = $this->input->post('herd_release_code');
-			$this->load->model('herd_model');
 			$error = $this->herd_model->herd_authorization_error($herd_code, $herd_release_code);
 			if($error){
 				$this->as_ion_auth->set_error($error);
@@ -677,6 +676,9 @@ class Auth extends Ionauth {
 			$remember = (bool) $this->input->post('remember');
 			//Clear out herd code in case user was browsing demo herd before logging in.
 			$this->session->unset_userdata('herd_code');
+			$this->session->unset_userdata('arr_pstring');
+			$this->session->unset_userdata('recent_test_date');
+			$this->session->unset_userdata('herd_enroll_status_id');
 			$this->session->sess_destroy();
 			$this->session->sess_create();
 		
@@ -874,7 +876,6 @@ class Auth extends Ionauth {
 			if(in_array(2, $arr_posted_group_id) || in_array(13, $arr_posted_group_id)){ //producers
 				$herd_code = $this->input->post('herd_code') ? $this->input->post('herd_code') : NULL;
 				$herd_release_code = $this->input->post('herd_release_code');
-				$this->load->model('herd_model');
 				$error = $this->herd_model->herd_authorization_error($herd_code, $herd_release_code);
 				if($error){
 					$this->as_ion_auth->set_error($error);
@@ -1131,7 +1132,6 @@ class Auth extends Ionauth {
 			/*if($this->input->post('herd_code') && $this->input->post('herd_code') != $obj_user->herd_code){
 				$herd_code = $this->input->post('herd_code') ? $this->input->post('herd_code') : NULL;
 				$herd_release_code = $this->input->post('herd_release_code');
-				$this->load->model('herd_model');
 				$error = $this->herd_model->herd_authorization_error($herd_code, $herd_release_code);
 				if($error){
 					$this->as_ion_auth->set_error($error);
@@ -1405,11 +1405,16 @@ class Auth extends Ionauth {
 	    	//$this->load->view('default', $graph);
 */	}
 	protected function _record_access($event_id){
+		$herd_code = $this->session->userdata('herd_code');
+		$herd_enroll_status_id = empty($herd_code) ? NULL : $this->session->userdata('herd_enroll_status_id');
+		$recent_test = $this->session->userdata('recent_test_date');
+		$recent_test = empty($recent_test) ? NULL : $recent_test;
+		
 		$this->access_log_model->write_entry(
 			$event_id,
-			$this->session->userdata('herd_code'),
-			$recent_test_date,
-			$herd_enroll_status,
+			$herd_code,
+			$recent_test,
+			$herd_enroll_status_id,
 			$this->session->userdata('user_id'),
 			$this->session->userdata('active_group_id')
 		);

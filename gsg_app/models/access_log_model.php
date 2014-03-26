@@ -350,7 +350,7 @@ FUNCTION MOVED?
 	 * @author Chris Tranel
 	 **/
 	function write_entry($event_id, $herd_code, $recent_test_date, $herd_enroll_status_id, $user_id, $group_id, $format='web', $report_page_id = NULL, $sort=NULL, $filters=NULL){
-		if($this->as_ion_auth->is_admin()) return 1; //do not record admin action
+		//if($this->as_ion_auth->is_admin()) return 1; //do not record admin action
 		$tmp_array = array(
 			'event_id' => $event_id,
 			'herd_code' => $herd_code,

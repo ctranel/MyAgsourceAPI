@@ -1,5 +1,7 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 class Change_herd extends CI_Controller {
+	//protected $herd; //herd object
+	
 	function __construct(){
 		parent::__construct();
 		if(!isset($this->as_ion_auth)) redirect('auth/login', 'refresh');
@@ -59,8 +61,6 @@ class Change_herd extends CI_Controller {
 			redirect(site_url($redirect_url));
 		}
 
-		$this->load->model('herd_model');
-
 		//validate form input
 		$this->load->library('form_validation');
 		$this->form_validation->set_rules('herd_code', 'Herd', 'required|exact_length[8]');
@@ -78,8 +78,8 @@ class Change_herd extends CI_Controller {
 		}
 
 		if ($this->form_validation->run() == TRUE) { //if validation is successful
-			$this->session->set_userdata('herd_code', $this->input->post('herd_code'));
-			$this->session->set_userdata('arr_pstring', $this->herd_model->get_pstring_array($this->input->post('herd_code'), FALSE));
+			$this->load->library('herd', array('herd_code' => $this->input->post('herd_code')));
+			$this->set_herd_session_data();
 			$this->_record_access(2); //2 is the page code for herd change
 			redirect(site_url($redirect_url));
 		}
@@ -144,8 +144,8 @@ class Change_herd extends CI_Controller {
 		//$this->form_validation->set_rules('herd_code_fill', 'Type Herd Code');
 
 		if ($this->form_validation->run() == TRUE) { //successful submission
-			$this->session->set_userdata('herd_code', $this->input->post('herd_code'));
-			$this->session->set_userdata('arr_pstring', $this->herd_model->get_pstring_array($this->input->post('herd_code'), FALSE));
+			$this->load->library('herd', array('herd_code' => $this->input->post('herd_code')));
+			$this->set_herd_session_data();
 			$this->_record_access(2); //2 is the page code for herd change
 			redirect(site_url($redirect_url));
 			exit();
@@ -156,13 +156,13 @@ class Change_herd extends CI_Controller {
 			$tmp_arr = $this->as_ion_auth->get_viewable_herds($this->session->userdata('user_id'), $this->session->userdata('arr_regions'));
 			if(is_array($tmp_arr)){
 				if(count($tmp_arr) == 1){
-					$this->session->set_userdata('herd_code', $tmp_arr[0]['herd_code']);
-					$this->session->set_userdata('arr_pstring', $this->herd_model->get_pstring_array($tmp_arr[0]['herd_code'], FALSE));
+					$this->load->library('herd', array('herd_code' => $tmp_arr[0]['herd_code']));
+					$this->set_herd_session_data();
 					redirect(site_url($redirect_url));
 					exit();
 				}
-				$this->load->library('herd_manage');
-				$this->data['arr_herd_data'] = $this->herd_manage->set_herd_dropdown_array($tmp_arr);
+				$this->load->library('herds');
+				$this->data['arr_herd_data'] = $this->herds->set_herd_dropdown_array($tmp_arr);
 				unset($tmp_arr);
 			}
 			else{
@@ -204,15 +204,28 @@ class Change_herd extends CI_Controller {
 			$this->load->view('herd_selection', $this->data);
 		} // end ELSE -- form validation failed.
 	}
+	
+	protected function set_herd_session_data(){
+//die(var_dump($this->config->item('product_report_code')));
+		$this->session->set_userdata('herd_code', $this->herd->getHerdCode());
+		$this->session->set_userdata('arr_pstring', $this->herd_model->get_pstring_array($this->herd->getHerdCode(), FALSE));
+		$this->session->set_userdata('herd_enroll_status_id', $this->herd->getHerdEnrollStatus($this->herd_model, $this->config->item('product_report_code')));
+		$this->session->set_userdata('recent_test_date', $this->herd->getRecentTest($this->herd_model));
+	}
 
 	protected function _record_access($event_id){
+		$herd_code = $this->session->userdata('herd_code');
+		$herd_enroll_status_id = empty($herd_code) ? NULL : $this->session->userdata('herd_enroll_status_id');
+		$recent_test = $this->session->userdata('recent_test_date');
+		$recent_test = empty($recent_test) ? NULL : $recent_test;
+		
 		$this->access_log_model->write_entry(
-				$event_id,
-				$this->session->userdata('herd_code'),
-				$recent_test_date,
-				$herd_enroll_status,
-				$this->session->userdata('user_id'),
-				$this->session->userdata('active_group_id')
+			$event_id,
+			$herd_code,
+			$recent_test,
+			$herd_enroll_status_id,
+			$this->session->userdata('user_id'),
+			$this->session->userdata('active_group_id')
 		);
 	}
 }
