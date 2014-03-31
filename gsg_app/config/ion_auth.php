@@ -56,7 +56,7 @@
 	
 	//HERD DB tables
 	$config['tables']['herds']    				= 'herd.dbo.herd_id';
-	$config['tables']['herds_sections']    		= 'users.dbo.herds_sections';
+//	$config['tables']['herds_sections']    		= 'users.dbo.herds_sections';
 	$config['tables']['herds_regions']    = 'users.dbo.herds_regions';
 
 	//vma DB views
@@ -67,7 +67,7 @@
 	 * Each should have a config setting for 'towrite' 'tables', 'join' and 'columns'
 	 **/
 	$config['meta_sections']         = array('users_service_groups','users_dhi_supervisors', 'users_herds', 'users_sections');////'meta', 'users_associations', 
-	$config['herd_meta_sections']         = array('herds_sections');
+//	$config['herd_meta_sections']         = array('herds_sections');
 	
 	/**
 	 * Fields from meta table that must be present in order to write to the meta table
@@ -80,7 +80,7 @@
 		'users_service_groups'=> array('sg_acct_num'),
 		//'meta'		=> array(),
 	 	'users_sections'=> array('section_id', ''),
-		'herds_sections'=> array('section_id')
+//		'herds_sections'=> array('section_id')
 	);
 
 /*
@@ -97,7 +97,7 @@
 		'users_service_groups'=> 'user_id',
 		//'meta'		=> 'user_id',
 		'users_sections'=> 'user_id',
-		'herds_sections'=> 'herd_code'
+//		'herds_sections'=> 'herd_code'
 	);
 	/**
 	 * Columns in your meta table,
@@ -110,7 +110,7 @@
 		'users_service_groups'=> array('sg_acct_num'),
 		//'meta'		=> array('first_name', 'last_name', 'company', 'phone'),
 		'users_sections'=> array('section_id', 'access_level'),
-		'herds_sections'=> array('section_id', 'access_level')
+//		'herds_sections'=> array('section_id', 'access_level')
 	);
 	
 /*

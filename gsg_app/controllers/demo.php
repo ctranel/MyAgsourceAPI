@@ -23,11 +23,6 @@ class Demo extends CI_Controller {
 		
 		$this->session->set_userdata('herd_code', $this->config->item('default_herd'));
 		$this->session->set_userdata('arr_pstring', $this->herd_model->get_pstring_array($this->config->item('default_herd'), FALSE));
-		//$this->session->set_userdata('active_group_id', 2);
-		//$arr_scope = array('subscription','public','unmanaged');
-		//the first parameter is group id--use producer (2) if no one is logged in, second param is user id. 
-		//$this->arr_user_super_sections = $this->as_ion_auth->get_super_sections_array(2, $this->session->userdata('user_id'), $this->session->userdata('herd_code'), $arr_scope);
-		//$this->arr_user_sections = $this->as_ion_auth->get_sections_array(2, $this->session->userdata('user_id'), $this->session->userdata('herd_code'), $super_section_id, $arr_scope);
 		redirect(site_url());
 	}
 }
