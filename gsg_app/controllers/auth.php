@@ -311,7 +311,6 @@ class Auth extends Ionauth {
 		$this->data['title'] = "Grant Consultant Access to Herd";
 
 		//validate form input
-		$this->form_validation->set_rules('sg_user_id', 'Consultant User Id', 'trim|required');
 		$this->form_validation->set_rules('section_id', 'Sections', '');
 		$this->form_validation->set_rules('exp_date', 'Expiration Date', 'trim');
 		$this->form_validation->set_rules('request_status_id', 'Request Status', '');
@@ -322,7 +321,6 @@ class Auth extends Ionauth {
 		if ($this->form_validation->run() == TRUE) {
 			$arr_relationship_data = array(
 				'herd_code' => $this->session->userdata('herd_code'),
-				'sg_user_id' => (int)$this->input->post('sg_user_id'),
 				'write_data' => (int)$this->input->post('write_data'),
 				'active_date' => date('Y-m-d'),
 				'active_user_id' => $this->session->userdata('user_id'),
@@ -333,17 +331,7 @@ class Auth extends Ionauth {
 			}
 			$tmp = human_to_mysql($this->input->post('exp_date'));
 			if(isset($tmp) && !empty($tmp)) $arr_relationship_data['exp_date'] = $tmp;
-			//if($this->input->post('request_denied') == 1) $arr_relationship_data['request_denied'] = 1;
-			$arr_consultant = $this->ion_auth_model->user($this->input->post('sg_user_id'))->row_array();
-			$arr_consult_groups = explode(',', $arr_consultant['arr_groups']);
-			if(!is_array($arr_consult_groups)){
-				$arr_consult_groups = array($arr_consult_groups);
-			}
-			if(!in_array('9', $arr_consult_groups)){
-				$this->session->set_flashdata('message', 'The user you are attempting to add as a consultant is not a consultant.  Please try again or contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone'));
-				redirect(site_url('auth/service_grp_access'));
-			}
-			
+
 			//convert submitted section id values to int
 			$arr_post_section_id = $this->input->post('section_id');
 			if(isset($arr_post_section_id) && is_array($arr_post_section_id)){
@@ -367,50 +355,15 @@ class Auth extends Ionauth {
 			//set the flash data error message if there is one
 			$this->page_header_data['message'] = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
 			//check of an existing record for this relationship
-			if(!isset($cuid)) $cuid = $this->input->post('sg_user_id');
 			if(isset($cuid) && !empty($cuid)) $arr_relationship = $this->ion_auth_model->get_consult_relationship($cuid, $this->session->userdata('herd_code'));
 			else $arr_relationship = FALSE;
 
-			// get sections for user
-/*			if($arr_relationship['service_grp_request']){
-				$arr_form_section_id = $this->ion_auth_model->get_consult_rel_sections($arr_relationship['id']);
-			}
-			else{
-				$user_id = $this->session->userdata('user_id');
-				$obj_user = $this->ion_auth_model->user($user_id)->row();
-				$obj_user->arr_groups = array_keys($this->ion_auth_model->get_users_group_array($obj_user->id));
-				//note: active group id should always be 2
-				$tmp_array = $this->as_ion_auth->get_sections_array(2, $user_id, $obj_user->herd_code, NULL, array('subscription','public','unmanaged'));
-				$obj_user->section_id = $this->as_ion_auth->set_form_array($tmp_array, 'id', 'id'); // populate array of sections for which user is enrolled
-				$tmp_array = $this->input->post('section_id');
-				$arr_form_section_id = isset($tmp_array) && is_array($tmp_array) ? $tmp_array : $obj_user->section_id;
-			}
-
-			$this->data['sections_selected'] = $arr_form_section_id;
-			$this->data['section_id'] = 'id="section_id"';
-			//note: active group id should always be 2
-			$tmp_array = $this->as_ion_auth->get_sections_array($this->session->userdata('active_group_id'), $this->session->userdata('user_id'), $this->session->userdata('herd_code'), NULL, array('subscription', 'public', 'unmanaged'));
-			$this->data['section_options'] = $this->as_ion_auth->set_form_array($tmp_array, 'id', 'name');
-			unset($tmp_array);
-*/
-			$this->data['sg_user_id'] = array(
-				'name' => 'sg_user_id',
-				'id' => 'sg_user_id',
-				'type' => 'text',
-				'value' => $this->form_validation->set_value('sg_user_id', $arr_relationship ? $arr_relationship['sg_user_id'] : $cuid),
-			);
 			$this->data['exp_date'] = array(
 				'name' => 'exp_date',
 				'id' => 'exp_date',
 				'type' => 'text',
 				'value' => $this->form_validation->set_value('exp_date', $arr_relationship ? mysql_to_human($arr_relationship['exp_date']) : ''),
 			);
-/*			$this->data['request_status_id'] = array(
-				'name' => 'request_status_id',
-				'id' => 'request_status_id',
-				'type' => 'hidden',
-				'value' => $this->form_validation->set_value('request_status_id', $this->data['request_status_id']),
-			); */
 			if($arr_relationship['request_status_id'] !== 3){
 				$this->data['request_denied'] = array(
 					'name' => 'request_status_id',

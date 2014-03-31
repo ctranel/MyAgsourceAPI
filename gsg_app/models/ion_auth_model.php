@@ -1136,8 +1136,7 @@ SELECT DISTINCT id, name, list_order FROM cteAnchor ORDER BY list_order;";
 	 * @author ctranel
 	 **/
 	private function get_sections_by_herd($herd_code){
-		$this->db->select($this->tables['sections'] . '.id, ' . $this->tables['sections'] . '.name, ' . $this->tables['sections'] . '.path')
-		->where('herd_code', $herd_code);
+		$this->db->select($this->tables['sections'] . '.id, ' . $this->tables['sections'] . '.name, ' . $this->tables['sections'] . '.path');
 		return $this->get_sections();
 	}
 
