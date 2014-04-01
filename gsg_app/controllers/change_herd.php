@@ -4,10 +4,12 @@ class Change_herd extends CI_Controller {
 	
 	function __construct(){
 		parent::__construct();
-		if(!isset($this->as_ion_auth)) redirect('auth/login', 'refresh');
-
+		if(!isset($this->as_ion_auth)){
+			redirect('auth/login', 'refresh');
+		}
 		if((!$this->as_ion_auth->logged_in())){
-			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
+			$redirect_url = set_redirect_url($this->uri->uri_string(), $this->session->flashdata('redirect_url'), $this->as_ion_auth->referrer);
+			$this->session->set_flashdata('redirect_url', $redirect_url);
 			if(strpos($this->session->flashdata('message'), 'Please log in.') === FALSE){
 				$this->session->set_flashdata('message',  $this->session->flashdata('message') . 'Please log in.');
 			}
@@ -50,10 +52,10 @@ class Change_herd extends CI_Controller {
  */
 	function request(){
 		$tmp_uri = $this->uri->uri_string();
-		$redirect_url = set_redirect_url($tmp_uri);
+		$redirect_url = set_redirect_url($tmp_uri, $this->session->flashdata('redirect_url'), $this->as_ion_auth->referrer);
+		$this->session->set_flashdata('redirect_url', $redirect_url);
 		if(empty($redirect_url) && $this->as_ion_auth->referrer !== $tmp_uri) $redirect_url = $tmp_uri;
 		if($this->as_ion_auth->has_permission("Select Herd") && !$this->as_ion_auth->has_permission("Request Herd")){
-			$this->session->set_flashdata('redirect_url', $redirect_url);
 			redirect(site_url('change_herd/select'));
 		}
 		if(!$this->as_ion_auth->has_permission("Request Herd")){
@@ -71,7 +73,6 @@ class Change_herd extends CI_Controller {
 			$herd_release_code = $this->input->post('herd_release_code');
 			$error = $this->herd_model->herd_authorization_error($herd_code, $herd_release_code);
 			if($error){
-				$this->session->set_flashdata('redirect_url', $redirect_url);
 				$this->session->set_flashdata('message', 'Invalid data submitted: ' . $error);
 				redirect(site_url('change_herd/request'));
 			}
@@ -126,10 +127,10 @@ class Change_herd extends CI_Controller {
  */
 	function select(){
 		$tmp_uri = $this->uri->uri_string();
-		$redirect_url = set_redirect_url($tmp_uri);
+		$redirect_url = set_redirect_url($tmp_uri, $this->session->flashdata('redirect_url'), $this->as_ion_auth->referrer);
+		$this->session->set_flashdata('redirect_url', $redirect_url);
 		if(empty($redirect_url) && $this->as_ion_auth->referrer !== $tmp_uri) $redirect_url = $tmp_uri;
 		if(!$this->as_ion_auth->has_permission("Select Herd") && $this->as_ion_auth->has_permission("Request Herd")){
-			$this->session->set_flashdata('redirect_url', $redirect_url);
 			redirect(site_url('change_herd/request'));
 			exit();
 		}
@@ -167,7 +168,6 @@ class Change_herd extends CI_Controller {
 			}
 			else{
 				$this->session->set_flashdata('message', 'A list of herds could not be generated for your account.  If you believe this is an error, please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . '.');
-				//$this->session->set_flashdata('redirect_url',$this->session->flashdata('redirect_url'));
 				redirect(site_url($redirect_url));
 				exit();
 			}

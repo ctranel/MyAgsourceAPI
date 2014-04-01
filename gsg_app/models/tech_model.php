@@ -28,7 +28,7 @@ class Tech_model extends CI_Model {
 		return $this->get_techs($limit);
 	}
 
-*
+/**
 	 *  get_techs_by_criteria
 	 *
 	 * @param array criteria (field=>value pairs)
@@ -44,7 +44,7 @@ class Tech_model extends CI_Model {
 		return $this->get_techs($limit, $offset, $order_by);
 	}
 
-*
+/**
 	 *  get_tech_by_herd
 	 *
 	 * @param string herd_code

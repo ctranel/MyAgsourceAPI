@@ -6,18 +6,15 @@ class Auth extends Ionauth {
 	function __construct()
 	{
 		parent::__construct();
-//		if(isset($this->as_ion_auth)){
-//			$this->as_ion_auth->is_admin = $this->as_ion_auth->is_admin();
-//			$this->as_ion_auth->is_manager = $this->as_ion_auth->is_manager();
-//		}
-
+		$redirect_url = set_redirect_url($this->uri->uri_string(), $this->session->flashdata('redirect_url'), $this->as_ion_auth->referrer);
+		$this->session->set_flashdata('redirect_url', $redirect_url);
 		$this->page_header_data['user_sections'] = $this->as_ion_auth->arr_user_super_sections;
 		
 		//load necessary files
 		$this->load->library('form_validation');
 		$this->load->helper('cookie');
 
-			/* Load the profile.php config file if it exists*/
+		/* Load the profile.php config file if it exists*/
 		if (ENVIRONMENT == 'development') {
 			$this->config->load('profiler', false, true);
 			if ($this->config->config['enable_profiler']) {
@@ -57,7 +54,7 @@ class Auth extends Ionauth {
        		redirect(site_url('auth/login'));
 		}
 		if($this->session->userdata('active_group_id') != 2) {
-			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
+			$this->session->keep_flashdata('redirect_url');
 			$this->session->set_flashdata('message', 'Only producers can manage consultant access to their herd data.');
 			redirect('auth');
 		}
@@ -164,7 +161,7 @@ class Auth extends Ionauth {
        		redirect(site_url('auth/login'));
 		}
 		if($this->as_ion_auth->has_permission('View non-own w permission') !== TRUE) {
-			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
+			$this->session->keep_flashdata('redirect_url');
 			$this->session->set_flashdata('message', 'You do not have permission to view non-owned herds.');
 			redirect('auth');
 		}
@@ -303,7 +300,7 @@ class Auth extends Ionauth {
        		redirect(site_url('auth/login'));
 		}
 		if($this->session->userdata('active_group_id') != 2) {
-			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
+			$this->session->keep_flashdata('redirect_url');
 			$this->session->set_flashdata('message', 'Only producers can manage access to their herd data.');
 			redirect('auth');
 		}
@@ -311,7 +308,6 @@ class Auth extends Ionauth {
 		$this->data['title'] = "Grant Consultant Access to Herd";
 
 		//validate form input
-		$this->form_validation->set_rules('sg_user_id', 'Consultant User Id', 'trim|required');
 		$this->form_validation->set_rules('section_id', 'Sections', '');
 		$this->form_validation->set_rules('exp_date', 'Expiration Date', 'trim');
 		$this->form_validation->set_rules('request_status_id', 'Request Status', '');
@@ -322,7 +318,6 @@ class Auth extends Ionauth {
 		if ($this->form_validation->run() == TRUE) {
 			$arr_relationship_data = array(
 				'herd_code' => $this->session->userdata('herd_code'),
-				'sg_user_id' => (int)$this->input->post('sg_user_id'),
 				'write_data' => (int)$this->input->post('write_data'),
 				'active_date' => date('Y-m-d'),
 				'active_user_id' => $this->session->userdata('user_id'),
@@ -333,17 +328,7 @@ class Auth extends Ionauth {
 			}
 			$tmp = human_to_mysql($this->input->post('exp_date'));
 			if(isset($tmp) && !empty($tmp)) $arr_relationship_data['exp_date'] = $tmp;
-			//if($this->input->post('request_denied') == 1) $arr_relationship_data['request_denied'] = 1;
-			$arr_consultant = $this->ion_auth_model->user($this->input->post('sg_user_id'))->row_array();
-			$arr_consult_groups = explode(',', $arr_consultant['arr_groups']);
-			if(!is_array($arr_consult_groups)){
-				$arr_consult_groups = array($arr_consult_groups);
-			}
-			if(!in_array('9', $arr_consult_groups)){
-				$this->session->set_flashdata('message', 'The user you are attempting to add as a consultant is not a consultant.  Please try again or contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone'));
-				redirect(site_url('auth/service_grp_access'));
-			}
-			
+
 			//convert submitted section id values to int
 			$arr_post_section_id = $this->input->post('section_id');
 			if(isset($arr_post_section_id) && is_array($arr_post_section_id)){
@@ -367,7 +352,6 @@ class Auth extends Ionauth {
 			//set the flash data error message if there is one
 			$this->page_header_data['message'] = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
 			//check of an existing record for this relationship
-			if(!isset($cuid)) $cuid = $this->input->post('sg_user_id');
 			if(isset($cuid) && !empty($cuid)) $arr_relationship = $this->ion_auth_model->get_consult_relationship($cuid, $this->session->userdata('herd_code'));
 			else $arr_relationship = FALSE;
 
@@ -393,24 +377,12 @@ class Auth extends Ionauth {
 			$this->data['section_options'] = $this->as_ion_auth->set_form_array($tmp_array, 'id', 'name');
 			unset($tmp_array);
 */
-			$this->data['sg_user_id'] = array(
-				'name' => 'sg_user_id',
-				'id' => 'sg_user_id',
-				'type' => 'text',
-				'value' => $this->form_validation->set_value('sg_user_id', $arr_relationship ? $arr_relationship['sg_user_id'] : $cuid),
-			);
 			$this->data['exp_date'] = array(
 				'name' => 'exp_date',
 				'id' => 'exp_date',
 				'type' => 'text',
 				'value' => $this->form_validation->set_value('exp_date', $arr_relationship ? mysql_to_human($arr_relationship['exp_date']) : ''),
 			);
-/*			$this->data['request_status_id'] = array(
-				'name' => 'request_status_id',
-				'id' => 'request_status_id',
-				'type' => 'hidden',
-				'value' => $this->form_validation->set_value('request_status_id', $this->data['request_status_id']),
-			); */
 			if($arr_relationship['request_status_id'] !== 3){
 				$this->data['request_denied'] = array(
 					'name' => 'request_status_id',
@@ -476,7 +448,7 @@ class Auth extends Ionauth {
        		redirect(site_url('auth/login'));
 		}
 		if(!$this->as_ion_auth->has_permission('View non-own w permission')) {
-			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
+			$this->session->keep_flashdata('redirect_url');
 			$this->session->set_flashdata('message', 'You do not have permission to request the data of a herd you do not own.');
 			redirect('auth');
 		}
@@ -677,16 +649,18 @@ class Auth extends Ionauth {
 			//Clear out herd code in case user was browsing demo herd before logging in.
 			$this->session->unset_userdata('herd_code');
 			$this->session->unset_userdata('arr_pstring');
-			$this->session->unset_userdata('recent_test_date');
-			$this->session->unset_userdata('herd_enroll_status_id');
-			$this->session->sess_destroy();
-			$this->session->sess_create();
+			$this->session->unset_userdata('pstring');
+			$this->session->unset_userdata('arr_tstring');
+			$this->session->unset_userdata('tstring');
+			//$this->session->sess_destroy();
+			//$this->session->sess_create();
 		
 			if ($this->ion_auth->login($this->input->post('identity'), $this->input->post('password'), $remember))
 			{ //if the login is successful
 				$this->_record_access(1); //1 is the page code for login for the user management section
 				$this->session->set_flashdata('message', $this->as_ion_auth->messages());
-				redirect(site_url(change_herd/select));
+				$this->session->set_flashdata('redirect_url', $redirect_url);
+				redirect(site_url('change_herd/select'));
 			}
 			else
 			{ //if the login was un-successful
@@ -1332,7 +1306,8 @@ class Auth extends Ionauth {
 	}
 	
 	function set_role($group_id){
-		$redirect_url = set_redirect_url('login');
+		$redirect_url = set_redirect_url($this->uri->uri_string(), $this->session->flashdata('redirect_url'), $this->as_ion_auth->referrer);
+		$this->session->set_flashdata('redirect_url', $redirect_url);
 		if(array_key_exists($group_id, $this->session->userdata('arr_groups'))){
 			$this->session->set_userdata('active_group_id', $group_id);
 		}

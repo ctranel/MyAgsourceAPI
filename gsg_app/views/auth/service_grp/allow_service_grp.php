@@ -1,21 +1,10 @@
 <?php if(isset($page_header) !== false) echo $page_header; ?>
 <div class='mainInfo'>
 	<?php if(isset($page_heading) !== false) echo heading($page_heading); ?>
-	<p>Please fill in the data.</p>
     <?php echo form_open("auth/service_grp_access");?>
-	<p>
-		<label for="sg_user_id">Consultant</label>
-      	<?php echo form_input($sg_user_id);?> SEARCH FOR CONSULTANT
-	</p>
-    <?php if(isset($write_data) || isset($section_options) || (isset($request_granted) && isset($request_denied))): ?>
+
+    <?php if(isset($write_data) || isset($section_options)): ?>
       	<?php echo form_fieldset('Data to Share', array('id' => 'data_shared')); 
-      		if(isset($request_granted) && isset($request_denied)): ?>
-	      		<p>
-	      			<label for="request_status_id">Request Status</label>
-					<?php echo form_radio($request_granted); ?> Grant&nbsp;&nbsp;&nbsp;
-					<?php echo form_radio($request_denied); ?> Deny
-				</p>
-			<?php endif;
 			if(isset($write_data)): ?>
 	      		<p><?php echo form_checkbox($write_data); ?> <label for=write_data> Allow Consultant to Enter Event Data</label></p>
 			<?php endif;
@@ -34,7 +23,14 @@
 			endif;
 		echo form_fieldset_close();
 		?>
-      <?php endif; ?>
+      <?php endif;
+      if(isset($request_granted) && isset($request_denied)): ?>
+      	<p>
+      		<label for="request_status_id">Request Status</label>
+			<?php echo form_radio($request_granted); ?> Grant&nbsp;&nbsp;&nbsp;
+			<?php echo form_radio($request_denied); ?> Deny
+		</p>
+	  <?php endif; ?>
       <p>
       	<label for="exp_date">Expiration Date</label>
       	<?php echo form_input($exp_date);?>
