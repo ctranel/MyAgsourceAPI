@@ -6,18 +6,15 @@ class Auth extends Ionauth {
 	function __construct()
 	{
 		parent::__construct();
-//		if(isset($this->as_ion_auth)){
-//			$this->as_ion_auth->is_admin = $this->as_ion_auth->is_admin();
-//			$this->as_ion_auth->is_manager = $this->as_ion_auth->is_manager();
-//		}
-
+		$redirect_url = set_redirect_url($this->uri->uri_string(), $this->session->flashdata('redirect_url'), $this->as_ion_auth->referrer);
+		$this->session->set_flashdata('redirect_url', $redirect_url);
 		$this->page_header_data['user_sections'] = $this->as_ion_auth->arr_user_super_sections;
 		
 		//load necessary files
 		$this->load->library('form_validation');
 		$this->load->helper('cookie');
 
-			/* Load the profile.php config file if it exists*/
+		/* Load the profile.php config file if it exists*/
 		if (ENVIRONMENT == 'development') {
 			$this->config->load('profiler', false, true);
 			if ($this->config->config['enable_profiler']) {
@@ -57,7 +54,7 @@ class Auth extends Ionauth {
        		redirect(site_url('auth/login'));
 		}
 		if($this->session->userdata('active_group_id') != 2) {
-			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
+			$this->session->keep_flashdata('redirect_url');
 			$this->session->set_flashdata('message', 'Only producers can manage consultant access to their herd data.');
 			redirect('auth');
 		}
@@ -164,7 +161,7 @@ class Auth extends Ionauth {
        		redirect(site_url('auth/login'));
 		}
 		if($this->as_ion_auth->has_permission('View non-own w permission') !== TRUE) {
-			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
+			$this->session->keep_flashdata('redirect_url');
 			$this->session->set_flashdata('message', 'You do not have permission to view non-owned herds.');
 			redirect('auth');
 		}
@@ -303,7 +300,7 @@ class Auth extends Ionauth {
        		redirect(site_url('auth/login'));
 		}
 		if($this->session->userdata('active_group_id') != 2) {
-			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
+			$this->session->keep_flashdata('redirect_url');
 			$this->session->set_flashdata('message', 'Only producers can manage access to their herd data.');
 			redirect('auth');
 		}
@@ -429,7 +426,7 @@ class Auth extends Ionauth {
        		redirect(site_url('auth/login'));
 		}
 		if(!$this->as_ion_auth->has_permission('View non-own w permission')) {
-			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
+			$this->session->keep_flashdata('redirect_url');
 			$this->session->set_flashdata('message', 'You do not have permission to request the data of a herd you do not own.');
 			redirect('auth');
 		}
@@ -616,7 +613,8 @@ class Auth extends Ionauth {
 	//CDT overrides built-in function to allow us to redirect user to the original page they requested after login in
 	function login()
 	{
-		$redirect_url = set_redirect_url('login');
+		$redirect_url = set_redirect_url($this->uri->uri_string(), $this->session->flashdata('redirect_url'), $this->as_ion_auth->referrer);
+		$this->session->set_flashdata('redirect_url', $redirect_url);
 		$this->data['title'] = "Login";
 
 		//validate form input
@@ -629,18 +627,22 @@ class Auth extends Ionauth {
 			$remember = (bool) $this->input->post('remember');
 			//Clear out herd code in case user was browsing demo herd before logging in.
 			$this->session->unset_userdata('herd_code');
-			$this->session->sess_destroy();
-			$this->session->sess_create();
+			$this->session->unset_userdata('arr_pstring');
+			$this->session->unset_userdata('pstring');
+			$this->session->unset_userdata('arr_tstring');
+			$this->session->unset_userdata('tstring');
+			//$this->session->sess_destroy();
+			//$this->session->sess_create();
 		
 			if ($this->ion_auth->login($this->input->post('identity'), $this->input->post('password'), $remember))
 			{ //if the login is successful
 				$this->access_log_model->write_entry(1); //1 is the page code for login for the user management section
 				$this->session->set_flashdata('message', $this->as_ion_auth->messages());
-				redirect(site_url(change_herd/select));
+				$this->session->set_flashdata('redirect_url', $redirect_url);
+				redirect(site_url('change_herd/select'));
 			}
 			else
 			{ //if the login was un-successful
-				$this->session->set_flashdata('redirect_url', $redirect_url);
 				$this->session->set_flashdata('message', $this->as_ion_auth->errors());
 				redirect(site_url('auth/login')); //use redirects instead of loading views for compatibility with MY_Controller libraries
 			}
@@ -1278,7 +1280,8 @@ class Auth extends Ionauth {
 	}
 	
 	function set_role($group_id){
-		$redirect_url = set_redirect_url('login');
+		$redirect_url = set_redirect_url($this->uri->uri_string(), $this->session->flashdata('redirect_url'), $this->as_ion_auth->referrer);
+		$this->session->set_flashdata('redirect_url', $redirect_url);
 		if(array_key_exists($group_id, $this->session->userdata('arr_groups'))){
 			$this->session->set_userdata('active_group_id', $group_id);
 		}

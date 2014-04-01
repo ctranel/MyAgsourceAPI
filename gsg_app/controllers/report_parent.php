@@ -115,7 +115,8 @@ abstract class parent_report extends CI_Controller {
 				echo 'Please select a herd and try again.';
 			}
 			else {
-      			$this->session->set_flashdata('message',  $this->session->flashdata('message') . "Please select a herd and try again.");
+die('huh');
+				$this->session->set_flashdata('message',  $this->session->flashdata('message') . "Please select a herd and try again.");
 				if($this->session->flashdata('message')) $this->session->keep_flashdata('message');
 				$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
 				redirect(site_url('change_herd/select'));
