@@ -205,6 +205,20 @@ class Change_herd extends CI_Controller {
 		} // end ELSE -- form validation failed.
 	}
 	
+	public function ajax_herd_enrolled($herd_code){
+		header('Content-type: application/json');
+		$group = $this->session->userdata('active_group_id');
+		if($this->as_ion_auth->has_permission('View non-own w permission') === FALSE) {
+			//return a 0 for non-service groups
+			echo json_encode(0);
+			exit;
+		}
+		$this->load->library('herd', array('herd_code' => $herd_code));
+		$enroll_status = $this->herd->getHerdEnrollStatus($this->herd_model, $this->config->item('product_report_code'));
+		echo json_encode($enroll_status);
+		exit;
+	}
+	
 	protected function set_herd_session_data(){
 //die(var_dump($this->config->item('product_report_code')));
 		$this->session->set_userdata('herd_code', $this->herd->getHerdCode());
