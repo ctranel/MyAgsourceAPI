@@ -635,7 +635,8 @@ class Auth extends Ionauth {
 	//CDT overrides built-in function to allow us to redirect user to the original page they requested after login in
 	function login()
 	{
-		$redirect_url = set_redirect_url('login');
+		$redirect_url = set_redirect_url($this->uri->uri_string(), $this->session->flashdata('redirect_url'), $this->as_ion_auth->referrer);
+		$this->session->set_flashdata('redirect_url', $redirect_url);
 		$this->data['title'] = "Login";
 
 		//validate form input
