@@ -59,5 +59,6 @@ $lang['consultant_status_email_successful']			= 'Request sent successfully';
 $lang['consultant_status_email_unsuccessful'] 		= 'Unable to send request';
 $lang['consultant_status_update_successful'] 		= 'Consultant record updated';
 $lang['consultant_status_update_unsuccessful'] 		= 'Consultant record update failed';
+$lang['consultant_request_recorded']				= 'Your herd access request was recorded';
 $lang['service_group_required'] 					= 'Service group account is required';
 $lang['service_group_not_found'] 					= 'The service group account entered was not found';
