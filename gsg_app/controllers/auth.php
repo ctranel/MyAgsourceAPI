@@ -317,6 +317,7 @@ class Auth extends Ionauth {
 
 		if ($this->form_validation->run() == TRUE) {
 			$arr_relationship_data = array(
+				'sg_user_id' => (int)$this->input->post('sg_user_id'),
 				'herd_code' => $this->session->userdata('herd_code'),
 				'write_data' => (int)$this->input->post('write_data'),
 				'active_date' => date('Y-m-d'),
@@ -377,6 +378,12 @@ class Auth extends Ionauth {
 			$this->data['section_options'] = $this->as_ion_auth->set_form_array($tmp_array, 'id', 'name');
 			unset($tmp_array);
 */
+			$this->data['sg_user_id'] = array(
+					'name' => 'sg_user_id',
+					'id' => 'sg_user_id',
+					'type' => 'hidden',
+					'value' => $arr_relationship['sg_user_id'],
+			);
 			$this->data['exp_date'] = array(
 				'name' => 'exp_date',
 				'id' => 'exp_date',

@@ -5,11 +5,11 @@
 //if($('#access_time_dbto').val() == '') $('#access_time_dbto').datetimeEntry('setDatetime', '+1M');
 
 $('#access_time_dbfrom').datepick({
-		dateFormat: 'mm-dd-yyyy'
+		dateFormat: 'mm/dd/yyyy'
 });
 
 $('#access_time_dbto').datepick({
-	dateFormat: 'mm-dd-yyyy'
+	dateFormat: 'mm/dd/yyyy'
 });
 
 $('.section-checkbox').bind('click', function(event) {

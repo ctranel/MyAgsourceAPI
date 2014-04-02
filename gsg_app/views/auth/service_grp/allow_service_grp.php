@@ -1,9 +1,12 @@
 <?php if(isset($page_header) !== false) echo $page_header; ?>
 <div class='mainInfo'>
 	<?php if(isset($page_heading) !== false) echo heading($page_heading); ?>
-    <?php echo form_open("auth/service_grp_access");?>
-
-    <?php if(isset($write_data) || isset($section_options)): ?>
+    <?php echo form_open("auth/service_grp_access");
+    if(isset($sg_user_id)):
+    	echo form_input($sg_user_id);
+    endif;
+        
+    if(isset($write_data) || isset($section_options)): ?>
       	<?php echo form_fieldset('Data to Share', array('id' => 'data_shared')); 
 			if(isset($write_data)): ?>
 	      		<p><?php echo form_checkbox($write_data); ?> <label for=write_data> Allow Consultant to Enter Event Data</label></p>
