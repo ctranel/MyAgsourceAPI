@@ -1,4 +1,24 @@
 @CHARSET "UTF-8";
+/*
+med orange: #EF5C29
+dk orange: #A03B22
+
+dk tan: #C8C488
+med tan: #D3D09E
+
+lt lt teal #f0f9f4
+lt teal #B0D9DB
+med teal #92C2C2
+
+dkk green #004147
+
+lt gray #E8E8E8
+med grad: #666
+
+bright red; #F60E27
+
+*/
+
 /* override agsource styles */
 h1 {margin: 5px 0 0 0; padding: 0 0 10px;}
 h3 {font-weight: bold;}
