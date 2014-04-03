@@ -481,6 +481,11 @@ class Auth extends Ionauth {
 			} */
 			$herd_release_code = $this->input->post('herd_release_code');
 			$error = $this->herd_model->herd_authorization_error($herd_code, $herd_release_code);
+			
+//var_dump($this->ion_auth_model->get_consult_relationship_id($this->session->userdata('user_id'), $herd_code)); die;
+			if($this->ion_auth_model->get_consult_relationship_id($this->session->userdata('user_id'), $herd_code) !== FALSE){
+				$error = 'relationship_exists';
+			}
 			if($error){
 				$this->as_ion_auth->set_error($error);
 				$is_validated = false;

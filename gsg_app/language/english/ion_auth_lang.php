@@ -62,3 +62,4 @@ $lang['consultant_status_update_unsuccessful'] 		= 'Consultant record update fai
 $lang['consultant_request_recorded']				= 'Your herd access request was recorded';
 $lang['service_group_required'] 					= 'Service group account is required';
 $lang['service_group_not_found'] 					= 'The service group account entered was not found';
+$lang['relationship_exists'] 						= 'You already have a relationship with this herd.  Please enter another herd or go to the &quot;Manage Herd Access&quot; page to modify your current access to this herd.';
