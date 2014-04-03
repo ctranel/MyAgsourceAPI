@@ -740,7 +740,6 @@ class As_ion_auth extends Ion_auth {
 			if($success){
 				$this->set_message('consultant_request_recorded');
 				$this->send_consultant_request($arr_relationship_data, $relationship_id, $cust_serv_email);
-
 				return TRUE; // Even if e-mail is not sent, consultant info was recorded
 			}
 		}
@@ -762,7 +761,6 @@ class As_ion_auth extends Ion_auth {
 		//send e-mail
 		$consultant_info = $this->ion_auth_model->user($arr_relationship_data['sg_user_id'])->result_array();
 		$consultant_info[0]['relationship_id'] = $relationship_id;
-var_dump($consultant_info[0]);
 		$email_data = array(
 			'id' => $consultant_info[0]['id'],
 			'company' => '',//$consultant_info[0]['company'],
@@ -785,7 +783,7 @@ var_dump($consultant_info[0]);
 			$this->email->clear();
 			$this->email->from($this->config->item('admin_email'), $this->config->item('site_title'));
 			$this->email->to($arr_herd_emails);
-			$this->email->cc($this->session->userdata('email'));
+			//$this->email->cc($this->session->userdata('email'));
 			$this->email->subject($this->config->item('site_title') . ' - Consultant Access');
 			$this->email->message($message);
 
@@ -795,7 +793,7 @@ var_dump($consultant_info[0]);
 			}
 		}
 		$this->set_error('consultant_status_email_unsuccessful');
-die($message);
+//die($message);
 		return FALSE;
 	}
 	//WHEN LOOKING UP HERDS FOR CONSULTANTS, ENSURE THAT IT IS NOT EXPIRED, AND THAT IT HAS BEEN APPROVED
