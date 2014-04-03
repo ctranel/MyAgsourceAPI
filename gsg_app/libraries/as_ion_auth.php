@@ -796,6 +796,4 @@ class As_ion_auth extends Ion_auth {
 //die($message);
 		return FALSE;
 	}
-	//WHEN LOOKING UP HERDS FOR CONSULTANTS, ENSURE THAT IT IS NOT EXPIRED, AND THAT IT HAS BEEN APPROVED
-
 }

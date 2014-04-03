@@ -210,17 +210,18 @@ class Change_herd extends CI_Controller {
 		$group = $this->session->userdata('active_group_id');
 		if($this->as_ion_auth->has_permission('View non-own w permission') === FALSE) {
 			//return a 0 for non-service groups
-			echo json_encode(0);
+			echo json_encode(array('enroll_status' => 0, 'new_test' => false));
 			exit;
 		}
 		$this->load->library('herd', array('herd_code' => $herd_code));
 		$enroll_status = $this->herd->getHerdEnrollStatus($this->herd_model, $this->config->item('product_report_code'));
-		echo json_encode($enroll_status);
+		$recent_test = $this->herd->getRecentTest($this->herd_model);
+		//has the current user accessed requested herd during this test period? access_log->is first load of test(user, herd)
+		echo json_encode(array('enroll_status' => $enroll_status, 'new_test' => true));
 		exit;
 	}
 	
 	protected function set_herd_session_data(){
-//die(var_dump($this->config->item('product_report_code')));
 		$this->session->set_userdata('herd_code', $this->herd->getHerdCode());
 		$this->session->set_userdata('arr_pstring', $this->herd_model->get_pstring_array($this->herd->getHerdCode(), FALSE));
 		$this->session->set_userdata('herd_enroll_status_id', $this->herd->getHerdEnrollStatus($this->herd_model, $this->config->item('product_report_code')));

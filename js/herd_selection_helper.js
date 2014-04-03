@@ -18,11 +18,13 @@ head.ready(function() {
 			async: false,
 			dataType: 'json',
 			success: function(data) {
-				if(data === 1){ //not on MyAgSource
-					ret_val = confirm("Herd "  + herd_code + " is not enrolled on MyAgSource.  If you choose to continue, you will be billed once for each test period in which you access a report for this herd while the herd is not billed for MyAgSource.  Do you want to continue?");
-				}
-				else if(data === 2){//on trial
-					ret_val = confirm("Herd "  + herd_code + " is in an unpaid trial period on MyAgSource.  If you choose to continue, you will be billed once for each test period in which you access a report for this herd while the herd is not billed for MyAgSource.  Do you want to continue?");
+				if(data['new_test'] === true){ 
+					if(data['enroll_status'] === 1){ //not on MyAgSource
+						ret_val = confirm("Herd "  + herd_code + " is not enrolled on MyAgSource, and you have not yet accessed this herd's information since their most recent test.  If you choose to continue, you will be billed for this access.  Do you want to continue?");
+					}
+					else if(data['enroll_status'] === 2){//on trial
+						ret_val = confirm("Herd "  + herd_code + " is in an unpaid trial period on MyAgSource, and you have not yet accessed this herd's information since their most recent test.  If you choose to continue, you will be billed for this access.  Do you want to continue?");
+					}
 				}
 			}
 		});
