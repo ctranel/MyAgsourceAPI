@@ -320,7 +320,6 @@ abstract class parent_report extends CI_Controller {
 		else{
 			$this->carabiner->css('hide_filters.css', 'screen');
 		}
-		$this->filters->displayFilters();
 		//get_herd_data
 		$herd_data = $this->herd_model->header_info($this->session->userdata('herd_code'));
 		
