@@ -730,13 +730,15 @@ abstract class parent_report extends CI_Controller {
 	}
 	
 	protected function _record_access($event_id, $page_id, $format){
+		if($this->session->userdata('user_id') === FALSE){
+			return FALSE;
+		}
 		$herd_code = $this->session->userdata('herd_code');
 		$herd_enroll_status_id = empty($herd_code) ? NULL : $this->session->userdata('herd_enroll_status_id');
 		$recent_test = $this->session->userdata('recent_test_date');
 		$recent_test = empty($recent_test) ? NULL : $recent_test;
 		
 		$filter_text = isset($this->filters) ? $this->filters->get_filter_text() : NULL;
-
 		$this->access_log_model->write_entry(
 			$event_id,
 			$herd_code,

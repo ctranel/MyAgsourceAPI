@@ -1392,6 +1392,9 @@ class Auth extends Ionauth {
 	    	//$this->load->view('default', $graph);
 */	}
 	protected function _record_access($event_id){
+		if($this->session->userdata('user_id') === FALSE){
+			return FALSE;
+		}
 		$herd_code = $this->session->userdata('herd_code');
 		$herd_enroll_status_id = empty($herd_code) ? NULL : $this->session->userdata('herd_enroll_status_id');
 		$recent_test = $this->session->userdata('recent_test_date');
