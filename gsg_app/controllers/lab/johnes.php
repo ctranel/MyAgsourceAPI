@@ -10,14 +10,8 @@ class Johnes extends parent_report {
 		} */
 	}
 
-	function index($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL, $json_filter_data = NULL){
+	function index($block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL, $json_filter_data = NULL){
 		$this->product_name = 'Johnes Test Results';
 		parent::display($block_in, $display_format, isset($sort_by) ? urldecode($sort_by) : NULL, isset($sort_order) ? urldecode($sort_order) : NULL, isset($json_filter_data) ? urldecode($json_filter_data) : NULL);
 	}
-
-	/*
-	 * ajax_report: Called via AJAX to populate graphs
-	 * to add flexibility (any graph/table can be called from any page),
-	 * all block generation code has been moved to the report parent ajax_report function
-	 */
 }

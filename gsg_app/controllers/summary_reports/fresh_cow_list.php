@@ -12,24 +12,19 @@ class Fresh_Cow_List extends parent_report {
 		} */
 	}
 
-	 function index($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL){
+	 function index($block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
 	 	redirect(site_url('summary_reports/fresh_cow_list/fcl_cows'));
 	 }
-	function fcl_cows($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL){
-	 	$this->product_name = 'Fresh Cow List TCI Cows';
+	function fcl_cows($block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
+		$this->product_name = 'Fresh Cow List TCI Cows';
 		parent::display($block_in, $display_format);
 	 }
-	function fcl_heifers($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL){
+	function fcl_heifers($block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
 	 	$this->product_name = 'Fresh Cow List Fresh Heifers';
 		parent::display($block_in, $display_format);
 	 }
-	function fcl_spec($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL){
+	function fcl_spec($block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
 	 	$this->product_name = 'Fresh Cow List Special';
 		parent::display($block_in, $display_format);
 	 }
-	 /*
-	 * ajax_report: Called via AJAX to populate graphs
-	 * to add flexibility (any graph/table can be called from any page),
-	 * all block generation code has been moved to the report parent ajax_report function
-	 */
 }

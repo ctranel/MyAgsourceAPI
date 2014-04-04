@@ -20,9 +20,9 @@
 	//	window.location = $(this).find("a:first").attr('href');
 	//})
 
-	$("ul.dropdown li").mouseover(menu_open);
-    $("ul.dropdown ul:first").mouseover(cancel_timer);
-    $("ul.dropdown li ul:first").mouseout(menu_timer);
+//	$("ul.dropdown li").mouseover(menu_open);
+//    $("ul.dropdown ul:first").mouseover(cancel_timer);
+//    $("ul.dropdown li ul:first").mouseout(menu_timer);
 	//document.onclick = menu_close;
     
     $("ul.dropdown li:has(ul)").find("a:first").append(" ▼");
@@ -106,30 +106,3 @@
 	});
 
 // END TEMPORARY CODE FOR RECORDING CLICKS OFF TO AGSOURCE DM
-
-	if(!window.form_reset){
-		function form_reset(){
-			oForm = document.getElementById("filter-form");
-			var frm_elements = oForm.elements;
-			for (i = 0; i < frm_elements.length; i++) {  
-			    field_type = frm_elements[i].type.toLowerCase();  
-		
-			    switch (field_type) {  
-				    case "text":  
-				    	frm_elements[i].value = "";  
-				        break;  
-				    //case "radio":  
-				    case "checkbox":  
-				        if (frm_elements[i].checked)  
-				        {  
-				        	frm_elements[i].checked = false;  
-				        }  
-				        break;  
-				    default:  
-				        break;  
-			    }  
-			}
-			oForm.submit();
-		}
-	}
-

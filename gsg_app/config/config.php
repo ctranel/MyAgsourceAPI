@@ -22,11 +22,11 @@
 			$config['base_url_assets']	= "http://feweb.verona.crinet/myagsource/";
 		break;
 		case 'production':
-			$config['base_url']	= "http://173.229.1.156/myagsource/";
-			$config['base_url_assets']	= "http://173.229.1.156/myagsource/";
+			$config['base_url']	= "http://myagsource.com/myagsource/";
+			$config['base_url_assets']	= "http://myagsource.com/myagsource/";
 		break;
 		default:
-			exit('The application environment is not set correctly - t_base_url.');
+			exit('The application environment is not set correctly. - base_url');
 	}
 
 /*
@@ -38,7 +38,38 @@
 |
 |	
 */
-	$config['product_name']           = "MyAgSource"; 		// Site Title, example.com
+	// admin_email and site_title are also set in ion_auth.php
+	$config['product_name']         = "MyAgSource";
+	$config['product_report_code']  = "AMYA-500";
+	$config['default_herd']			= "35999909";
+	$config['site_title']           = "MyAgSource";
+	$config['cust_serv_company']	= "AgSource Cooperative Services";
+	
+	/*
+	 * email and phone numbers vary by environment.
+	*/
+	
+	switch (ENVIRONMENT)
+	{
+		case 'development':
+			$config['admin_email']          = "ghartmann@agsource.com"; 	// Admin Email, admin@example.com
+			$config['cust_serv_email']		= "ghartmann@agsource.com"; //custom CDT
+			$config['cust_serv_phone']		= "1-800-236-4995"; //custom CDT
+			break;
+		case 'testing':
+			$config['admin_email']          = "ghartmann@agsource.com"; 	// Admin Email, admin@example.com
+			$config['cust_serv_email']		= "ghartmann@agsource.com"; //custom CDT
+			$config['cust_serv_phone']		= "1-800-236-4995"; //custom CDT
+			break;
+		case 'production':
+			$config['admin_email']          = "support@myagsource.com"; 	// Admin Email, admin@example.com
+			$config['cust_serv_email']		= "cust_service@myagsource.com"; //custom CDT
+			$config['cust_serv_phone']		= "1-800-236-4995"; //custom CDT
+			break;
+		default:
+			exit('The application environment is not set correctly - t_base_url.');
+	}
+	
 	
 /*
 |--------------------------------------------------------------------------
@@ -47,7 +78,7 @@
 |
 | Typically this will be your index.php file, unless you've renamed it to
 | something else. If you are using mod_rewrite to remove the page set this
-| variable so that it is blank.
+| variable so that it is blank. "index.php/"
 |
 */
 	switch (ENVIRONMENT)
@@ -56,13 +87,13 @@
 			$config['index_page'] = "index.php/";
 		break;
 		case 'testing':
-			$config['index_page'] = "index.php/";
+			$config['index_page'] = "";
 		break;
 		case 'production':
-			$config['index_page'] = "index.php/";
+			$config['index_page'] = "";
 		break;
 		default:
-			exit('The application environment is not set correctly - t_index_page.');
+			exit('The application environment is not set correctly - index_page.');
 	}
 
 /*
@@ -229,7 +260,7 @@ $config['directory_trigger']	= 'd'; // experimental not currently in use
 			$config['log_threshold'] = 0;
 			break;
 		default:
-			exit('The application environment is not set correctly - t_log_threshold.');
+			exit('The application environment is not set correctly - log_threshold.');
 	}
 
 /*
@@ -253,7 +284,7 @@ $config['directory_trigger']	= 'd'; // experimental not currently in use
 			$config['log_path'] = '/var/www/myagsource/logs/';
 			break;
 		default:
-			exit('The application environment is not set correctly - t_log_path.');
+			exit('The application environment is not set correctly - log_path.');
 	}
 
 /*
@@ -386,10 +417,10 @@ $config['csrf_expire'] = 7200;
 			$config['compress_output'] = FALSE;
 		break;
 		case 'production':
-			$config['compress_output'] = FALSE;
+			$config['compress_output'] = TRUE;
 		break;
 		default:
-			exit('The application environment is not set correctly - t_compress_output.');
+			exit('The application environment is not set correctly - compress_output.');
 	}
 
 /*

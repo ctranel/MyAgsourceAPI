@@ -28,7 +28,7 @@ class Tech_model extends CI_Model {
 		return $this->get_techs($limit);
 	}
 
-	 /**
+/**
 	 *  get_techs_by_criteria
 	 *
 	 * @param array criteria (field=>value pairs)
@@ -44,7 +44,7 @@ class Tech_model extends CI_Model {
 		return $this->get_techs($limit, $offset, $order_by);
 	}
 
-	 /**
+/**
 	 *  get_tech_by_herd
 	 *
 	 * @param string herd_code
@@ -98,7 +98,7 @@ class Tech_model extends CI_Model {
 	public function get_techs($limit=NULL, $offset=NULL, $order_by='t.last_name')
 	{
 		$this->db
-		->select("t.[supervisor_acct_num], t.[association_num], t.[supervisor_num],t.[first_name],t.[last_name],t.[voice_mail_num], CONCAT(hp.area_code, '-', hp.phone_num) AS home_phone, CONCAT(hp.area_code, '-', hp.phone_num) AS cell_phone")
+		->select("t.[account_num], t.[association_num], t.[supervisor_num],t.[first_name],t.[last_name],t.[voice_mail_num], CONCAT(hp.area_code, '-', hp.phone_num) AS home_phone, CONCAT(hp.area_code, '-', hp.phone_num) AS cell_phone")
 		->where('t.status_code', 'A')
 		->join('address.dbo.phone hp', 't.account_num = hp.account_num AND hp.phone_type_code = 1', 'left')
 		->join('address.dbo.phone cp', 't.account_num = cp.account_num AND cp.phone_type_code = 4', 'left');

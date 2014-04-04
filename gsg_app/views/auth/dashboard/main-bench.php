@@ -3,8 +3,12 @@ if (!empty($page_header)) echo $page_header;
 if (!empty($page_heading)) echo heading($page_heading); 
 if (!empty($herd_data)) echo $herd_data;
 if (!empty($report_nav)) echo $report_nav;
-?>
-	<p style = "clear:both"></p>
+
+if(isset($herd_code) && $herd_code == $this->config->item('default_herd')): ?>
+	<p class="important-message">This is sample herd data, please <?php echo anchor('auth/login', 'login'); ?> or <?php echo anchor('auth/create_user', 'register'); ?> to see your herd's data.</p>
+<?php
+endif; ?>
+<p style = "clear:both"></p>
 	<?php if (!empty($table_heading)): 
 		?><h2 class="block"><?php echo $table_heading; ?></h2><?php
 	endif;	?>	

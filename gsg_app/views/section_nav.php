@@ -1,6 +1,9 @@
 <?php 	$class = 'first';
 		if(!isset($section_id)) $section_id = '';
-		foreach($arr_pages as $p): ?>
+		foreach($arr_pages as $p): 
+			if($section_path == $p['path']):
+				$class .= ' current';
+			endif; ?>
 			<li class = "<?php echo $class; ?>"><?php echo anchor($p['path'], $p['name'], 'class="section-nav"'); ?></li>
 <?php 		$class = '';
 		endforeach;

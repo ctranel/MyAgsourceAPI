@@ -54,6 +54,7 @@ class Report_model extends CI_Model {
 		/*in the case of the access log model, the section id is set AFTER the parent (this file/class) is called so that the reference
 		 * back to the access log model does not cause problem.  That is the only other model that calls the get block links method.
 		 */
+		$this->load->model('herd_model');
 		$this->arr_pstring = $this->herd_model->get_pstring_array($this->session->userdata('herd_code'));
 		$this->tables  = $this->config->item('tables', 'ion_auth');
 
@@ -316,16 +317,20 @@ class Report_model extends CI_Model {
 
 		//KLM - Added logic to convert header text to date text from herd_model function get_test_dates_7_short
 		if(is_array($arr_groupings) && !empty($arr_groupings)){
-			$this->load->model('herd_model');
 			$arr_dates = $this->herd_model->get_test_dates_7_short($this->session->userdata('herd_code'));
 			foreach($arr_groupings as &$ag){
 				$arr_ref[$ag['id']] = (string)$ag['text'];
 				$arr_order[(string)$ag['text']] = $ag['list_order'];
+				$c = 0;
 				foreach($arr_dates[0] as $key => $value){
 					if ($key == $ag['text']) {
+						if ($value == '0-0') {
+							$value='No Test (-'.$c.')';
+						}
 						$ag['text'] = $value;
 						break;
 					}
+					$c++;
 				}
 			}
 			unset($ag);
@@ -572,7 +577,12 @@ class Report_model extends CI_Model {
 			if($block_url == 'peak_milk_trends' && substr($k,-7)=='pstring' && $v==0){
 				continue;
 			}
-					
+			if($block_url == 'dim_at_1st_breeding' && substr($k,-7)=='pstring' && $v==0){
+				continue;
+			}
+				
+						
+			
 			if(empty($v) === FALSE || $v === '0'){
 				if(is_array($v)){
 					if(strpos($k, 'pstring') !== FALSE){

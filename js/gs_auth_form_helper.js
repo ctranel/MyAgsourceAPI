@@ -1,6 +1,10 @@
 if(document.getElementById('group_id')) AddEvent(document.getElementById('group_id'), 'change', function(){toggle_fields();});
 toggle_fields();
 
+$('.image-link').magnificPopup({
+	type: 'image'
+});
+
 function AddEvent(html_element, event_name, event_function) {
 	if (html_element.attachEvent) // Internet Explorer
 		html_element.attachEvent("on" + event_name, function() {
@@ -19,9 +23,11 @@ function toggle_fields() {
 	if(document.getElementById('region')) document.getElementById('region').style.display = "none";
 	if(document.getElementById('tech')) document.getElementById('tech').style.display = "none";
 	if(document.getElementById('herd')) document.getElementById('herd').style.display = "none";
+	if(document.getElementById('sg')) document.getElementById('sg').style.display = "none";
 	$('#region').removeClass('required');
 	$('#tech').removeClass('required');
 	$('#herd').removeClass('required');
+	$('#sg').removeClass('required');
 	
 	//add optional sections back in as appropriate
 	if (($.inArray('2', arr_group_id) >= 0 || $.inArray('13', arr_group_id) >= 0) && document.getElementById('herd') != null) {
@@ -32,6 +38,10 @@ function toggle_fields() {
 		document.getElementById('association').style.display = "block";
 		document.getElementById('region').style.display = "block";
 		$('#region').addClass('required');
+	}
+	if ($.inArray('9', arr_group_id) >= 0 && document.getElementById('sg') != null) {
+		document.getElementById('sg').style.display = "block";
+		$('#sg').addClass('required');
 	}
 	if (($.inArray('5', arr_group_id) >= 0 || $.inArray('12', arr_group_id) >= 0 || $.inArray('8', arr_group_id) >= 0) && document.getElementById('region') != null && document.getElementById('tech') != null && document.getElementById('association') != null) {
 		document.getElementById('association').style.display = "block";

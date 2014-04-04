@@ -1,5 +1,5 @@
 $('#exp_date').datepick({
-		dateFormat: 'mm-dd-yyyy'
+		dateFormat: 'mm/dd/yyyy'
 });
 
 $('.section-checkbox').bind('click', function(event) {

@@ -9,7 +9,12 @@ class Dm extends CI_Controller {
 		}
 				
 		if((!$this->as_ion_auth->logged_in())){ //redirect when live
-       		$this->session->set_flashdata('message',  $this->session->flashdata('message') . "Please log in.");
+					if(strpos($this->session->flashdata('message'), 'Please log in.') === FALSE){
+				$this->session->set_flashdata('message',  $this->session->flashdata('message') . 'Please log in.');
+			}
+			else{
+				$this->session->keep_flashdata('message');
+			}
 			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
        		redirect(site_url('auth/login'));
 		}
@@ -24,10 +29,5 @@ class Dm extends CI_Controller {
 	
 	function index(){
 		redirect(site_url());
-	}
-	
-	function log_page(){
-		echo $this->access_log_model->write_entry(19); //19 is the page code for DM Login
-		exit;
 	}
 }

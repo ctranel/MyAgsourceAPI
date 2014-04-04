@@ -1,6 +1,6 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /**
-* Name:  Herd Manage - 
+* Name:  Herd 
 *
 * Author: ctranel
 *		  ctranel@agsource.com
@@ -15,57 +15,8 @@
 *
 */
 
-class Herd_manage
+class Herds
 {
-	/**
-	 * CodeIgniter global
-	 *
-	 * @var string
-	 **/
-	protected $ci;
-
-	/**
-	 * herd identifier
-	 *
-	 * @var string
-	 **/
-	protected $herd_code;
-
-	/**
-	 * code used to authorize release of herd information
-	 *
-	 * @var string
-	 **/
-	protected $herd_release_code;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 **/
-	protected $supervisor_num;
-
-	/**
-	 * 
-	 *
-	 * @var string
-	 **/
-	protected $association_num;
-
-	/**
-	 * enum (cow, heifer, all)
-	 *
-	 * @var string
-	 **/
-	protected $access_level;
-
-	/**
-	 * 
-	 *
-	 * @var array
-	 **/
-	public $test_date;
-
 	/**
 	 * __construct
 	 *
@@ -73,8 +24,6 @@ class Herd_manage
 	 * @author Chris
 	 **/
 	public function __construct() {
-		$this->ci =& get_instance();
-		$this->ci->load->model('herd_model');
 	}
 
 	/**
@@ -82,7 +31,6 @@ class Herd_manage
 	 *
 	 * Acts as a simple way to call model methods without loads of stupid alias'
 	 *
-	 **/
 	public function __call($method, $arguments) {
 		if (!method_exists( $this->ci->herd_model, $method) )
 		{
@@ -91,6 +39,7 @@ class Herd_manage
 
 		return call_user_func_array( array($this->ci->herd_model, $method), $arguments);
 	}
+	 **/
 	
 	/**
 	 * @method set_herd_dropdown_array()
@@ -99,10 +48,9 @@ class Herd_manage
 	 * @access public
 	 *
 	 **/
-	public function set_herd_dropdown_array($tmp_array){
+	public static function set_herd_dropdown_array($tmp_array){
 		$new_array = array('Select One');
 		array_walk($tmp_array, create_function ('$value, $key, $obj', '$obj["arr_in"][$value["herd_code"]] = $value["herd_owner"] . " - " . $value["farm_name"] . " - " . $value["herd_code"];'), array('arr_in' => &$new_array));
 		return $new_array;
 	}
-	
 }

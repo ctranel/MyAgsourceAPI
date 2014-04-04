@@ -150,7 +150,7 @@ class Access_log extends parent_report {
 			if(is_array($results) && !empty($results)){
 				$this->load->library('Reports');
 				$this->reports->create_csv($results);
-				$this->access_log_model->write_entry(5, 'csv', $this->reports->sort_text_brief($arr_sort_by, $arr_sort_order), $log_filter_text);
+				$this->_record_access(5, NULL, 'csv', $this->reports->sort_text_brief($arr_sort_by, $arr_sort_order), $log_filter_text);
 				exit;
 			}
 			else {
@@ -166,7 +166,7 @@ class Access_log extends parent_report {
 			$header_structure = get_table_header_array($arr_data_fields, $arr_pdf_widths);
 
 			$this->reports->create_pdf(array($results), $this->product_name, $arr_filter_text, $arr_pdf_widths, NULL, $header_structure);
-			$this->access_log_model->write_entry(5, 'pdf', $this->reports->sort_text_brief($arr_sort_by, $arr_sort_order), $log_filter_text);
+			$this->_record_access(5, NULL, 'pdf', $this->reports->sort_text_brief($arr_sort_by, $arr_sort_order), $log_filter_text);
 			exit;
 		}
 //		else{
@@ -281,7 +281,7 @@ class Access_log extends parent_report {
 				'page_footer' => $this->load->view('page_footer', $footer_data, TRUE),
 			);
 			$this->load->view('report', $data);
-			$this->access_log_model->write_entry(5, 'web', $this->reports->sort_text_brief($arr_sort_by, $arr_sort_order), $log_filter_text); //10 is the page code for Benchmark Activity view
+			$this->_record_access(5, NULL, 'web', $this->reports->sort_text_brief($arr_sort_by, $arr_sort_order), $log_filter_text);
 //		}
 	}
 }

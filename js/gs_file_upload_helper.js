@@ -1,1 +1,3 @@
-$(function() { $('#test_date').datepick();});
+$(function() { $('#test_date').datepick({
+	dateFormat: 'mm/dd/yyyy'
+});});

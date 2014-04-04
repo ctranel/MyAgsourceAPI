@@ -52,7 +52,7 @@ function get_stacked_area_options(){
 function get_stacked_column_options(){
 	return array(
 		'chart' => array(
-			'defaultSeriesType' => 'column'
+			'type' => 'column'
 		),
 		'xAxis' => array(
 			'type'=>'datetime',
@@ -77,7 +77,7 @@ function get_stacked_column_options(){
 function get_column_options(){
 	return array(
 		'chart' => array(
-			'defaultSeriesType' => 'column'
+			'type' => 'column'
 		),
 		'xAxis' => array(
 			'type'=>'datetime',
@@ -103,7 +103,7 @@ function get_column_options(){
 function get_bar_options(){
 	return array(
 		'chart' => array(
-			'defaultSeriesType' => 'bar'
+			'type' => 'bar'
 		),
 		'xAxis' => array('type'=>'linear', 'categories'=>array()),
 	);
@@ -128,6 +128,9 @@ function get_boxplot_options(){
 
 function get_line_options(){
 	return array(
+		'chart' => array(
+			'type'=>'line'
+		),
 		'xAxis' => array(
 			'type'=>'datetime',
 			'categories' => NULL, //clear out previously declared categories
@@ -145,7 +148,7 @@ function get_line_options(){
 function get_scatter_options(){
 	return array(
 			'chart' => array(
-				'defaultSeriesType' => 'scatter'
+				'type' => 'scatter'
 			),
 			'xAxis' => array(
 					'type'=>'datetime',

@@ -6,18 +6,15 @@ class Auth extends Ionauth {
 	function __construct()
 	{
 		parent::__construct();
-//		if(isset($this->as_ion_auth)){
-//			$this->as_ion_auth->is_admin = $this->as_ion_auth->is_admin();
-//			$this->as_ion_auth->is_manager = $this->as_ion_auth->is_manager();
-//		}
-
+		$redirect_url = set_redirect_url($this->uri->uri_string(), $this->session->flashdata('redirect_url'), $this->as_ion_auth->referrer);
+		$this->session->set_flashdata('redirect_url', $redirect_url);
 		$this->page_header_data['user_sections'] = $this->as_ion_auth->arr_user_super_sections;
 		
 		//load necessary files
 		$this->load->library('form_validation');
 		$this->load->helper('cookie');
 
-			/* Load the profile.php config file if it exists*/
+		/* Load the profile.php config file if it exists*/
 		if (ENVIRONMENT == 'development') {
 			$this->config->load('profiler', false, true);
 			if ($this->config->config['enable_profiler']) {
@@ -46,15 +43,18 @@ class Auth extends Ionauth {
 		}
 		redirect(site_url('auth'));
 	}
-
-	function manage_consult(){
+	
+	/*
+	 * @description manage_service_grp is the page producers use to manage service group access
+	 */
+	function manage_service_grp(){
 		if((!$this->as_ion_auth->logged_in())){
        		$this->session->keep_flashdata('message');
 			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
        		redirect(site_url('auth/login'));
 		}
 		if($this->session->userdata('active_group_id') != 2) {
-			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
+			$this->session->keep_flashdata('redirect_url');
 			$this->session->set_flashdata('message', 'Only producers can manage consultant access to their herd data.');
 			redirect('auth');
 		}
@@ -67,70 +67,70 @@ class Auth extends Ionauth {
 			if(isset($arr_modify_id) && is_array($arr_modify_id)){
 				switch ($action) {
 					case 'Remove Access':
-						if($this->ion_auth_model->batch_consult_revoke($arr_modify_id)) {
-							$this->access_log_model->write_entry(41);
-							$this->data['message'] = 'Consultant access adjusted successfully.';
+						if($this->ion_auth_model->batch_herd_revoke($arr_modify_id)) {
+							$this->_record_access(41);
+							$this->page_header_data['message'] = 'Consultant access adjusted successfully.';
 						}
-						else $this->data['message'] = 'Consultant access adjustment failed.  Please try again.';
+						else $this->page_header_data['message'] = 'Consultant access adjustment failed.  Please try again.';
 					break;
 					case 'Grant Access':
 						if($this->ion_auth_model->batch_grant_consult($arr_modify_id)) {
-							$this->access_log_model->write_entry(34);
-							$this->data['message'] = 'Consultant access adjusted successfully.';
+							$this->_record_access(34);
+							$this->page_header_data['message'] = 'Consultant access adjusted successfully.';
 						}
-						else $this->data['message'] = 'Consultant access adjustment failed.  Please try again.';
+						else $this->page_header_data['message'] = 'Consultant access adjustment failed.  Please try again.';
 					break;
 					case 'Deny Access':
 						if($this->ion_auth_model->batch_deny_consult($arr_modify_id)) {
-							$this->access_log_model->write_entry(42);
-							$this->data['message'] = 'Consultant access adjusted successfully.';
+							$this->_record_access(42);
+							$this->page_header_data['message'] = 'Consultant access adjusted successfully.';
 						}
-						else $this->data['message'] = 'Consultant access adjustment failed.  Please try again.';
+						else $this->page_header_data['message'] = 'Consultant access adjustment failed.  Please try again.';
 					break;
 					case 'Remove Expiration Date':
 						if($this->ion_auth_model->batch_remove_consult_expire($arr_modify_id)) {
-							$this->access_log_model->write_entry(43);
-							$this->data['message'] = 'Consultant access adjusted successfully.';
+							$this->_record_access(43);
+							$this->page_header_data['message'] = 'Consultant access adjusted successfully.';
 						}
-						else $this->data['message'] = 'Consultant access adjustment failed.  Please try again.';
+						else $this->page_header_data['message'] = 'Consultant access adjustment failed.  Please try again.';
 					break;
 					default:
-						$this->data['message'] = 'Consultant access adjustment failed.  Please try again.';
+						$this->page_header_data['message'] = 'Consultant access adjustment failed.  Please try again.';
 					break;
 				}
 			}
 		}
-		$this->data['message'] = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
+		$this->page_header_data['message'] = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
 		$consultants_by_status = $this->ion_auth_model->get_consultants_by_herd($this->session->userdata('herd_code'));
 		if(isset($consultants_by_status['open']) && is_array($consultants_by_status['open'])){
 			$section_data['content'] = $this->_set_consult_section($consultants_by_status['open'], 'open', array('Grant Access', 'Deny Access'));
 			$section_data['title'] = 'Open Requests';
-			$this->data['arr_sections']['open'] = $this->load->view('auth/consult/consultant_section_container', $section_data, TRUE);
+			$this->data['arr_sections']['open'] = $this->load->view('auth/service_grp/service_grp_section_container', $section_data, TRUE);
 		}
 		if(isset($consultants_by_status['deny']) && is_array($consultants_by_status['deny'])){
 			$section_data['content'] = $this->_set_consult_section($consultants_by_status['deny'], 'deny', array('Grant Access'));
 			$section_data['title'] = 'Denied Requests';
-			$this->data['arr_sections']['deny'] = $this->load->view('auth/consult/consultant_section_container', $section_data, TRUE);
+			$this->data['arr_sections']['deny'] = $this->load->view('auth/service_grp/service_grp_section_container', $section_data, TRUE);
 		}
 		if(isset($consultants_by_status['grant']) && is_array($consultants_by_status['grant'])) {
 			$section_data['content'] = $this->_set_consult_section($consultants_by_status['grant'], 'grant', array('Remove Access'));
 			$section_data['title'] = 'Granted Requests';
-			$this->data['arr_sections']['grant'] = $this->load->view('auth/consult/consultant_section_container', $section_data, TRUE);
+			$this->data['arr_sections']['grant'] = $this->load->view('auth/service_grp/service_grp_section_container', $section_data, TRUE);
 		}
 		if(isset($consultants_by_status['expired']) && is_array($consultants_by_status['expired'])) {
 			$section_data['content'] = $this->_set_consult_section($consultants_by_status['expired'], 'expired', array('Remove Expiration Date'));
 			$section_data['title'] = 'Expired Requests';
-			$this->data['arr_sections']['expired'] = $this->load->view('auth/consult/consultant_section_container', $section_data, TRUE);
+			$this->data['arr_sections']['expired'] = $this->load->view('auth/service_grp/service_grp_section_container', $section_data, TRUE);
 		}
-		if(isset($consultants_by_status['consult_revoked']) && is_array($consultants_by_status['consult_revoked'])){
-			$section_data['content'] = $this->_set_consult_section($consultants_by_status['consult_revoked'], 'consult_revoked', NULL);
+		if(isset($consultants_by_status['consult revoked']) && is_array($consultants_by_status['consult revoked'])){
+			$section_data['content'] = $this->_set_consult_section($consultants_by_status['consult revoked'], 'consult revoked', NULL);
 			$section_data['title'] = 'Consultant Revoked Access';
-			$this->data['arr_sections']['consult_revoked'] = $this->load->view('auth/consult/consultant_section_container', $section_data, TRUE);
+			$this->data['arr_sections']['consult_revoked'] = $this->load->view('auth/service_grp/service_grp_section_container', $section_data, TRUE);
 		}
-		if(isset($consultants_by_status['herd_revoked']) && is_array($consultants_by_status['herd_revoked'])){
-			$section_data['content'] = $this->_set_consult_section($consultants_by_status['herd_revoked'], 'herd_revoked', array('Grant Access'));
+		if(isset($consultants_by_status['herd revoked']) && is_array($consultants_by_status['herd revoked'])){
+			$section_data['content'] = $this->_set_consult_section($consultants_by_status['herd revoked'], 'herd revoked', array('Grant Access'));
 			$section_data['title'] = 'Herd Revoked Access';
-			$this->data['arr_sections']['herd_revoked'] = $this->load->view('auth/consult/consultant_section_container', $section_data, TRUE);
+			$this->data['arr_sections']['herd_revoked'] = $this->load->view('auth/service_grp/service_grp_section_container', $section_data, TRUE);
 		}
 		$this->carabiner->css('accordion.css', 'screen');
 		$this->data['title'] = "Manage Consultants";
@@ -148,18 +148,21 @@ class Auth extends Ionauth {
 		$footer_data = array();
 		$this->data['page_footer'] = $this->load->view('page_footer', $footer_data, TRUE);
 		
-		$this->load->view('auth/consult/manage_consult', $this->data);
+		$this->load->view('auth/service_grp/manage_service_grp', $this->data);
 	}
 	
-	function consult_manage_herds(){
+	/*
+	 * @description manage_service_grp is the page service groups use to manage herd access
+	 */
+	function service_grp_manage_herds(){
 		if((!$this->as_ion_auth->logged_in())){
        		$this->session->keep_flashdata('message');
 			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
        		redirect(site_url('auth/login'));
 		}
-		if($this->session->userdata('active_group_id') != 9) {
-			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
-			$this->session->set_flashdata('message', 'Only consultants can manage their access to herd data.');
+		if($this->as_ion_auth->has_permission('View non-own w permission') !== TRUE) {
+			$this->session->keep_flashdata('redirect_url');
+			$this->session->set_flashdata('message', 'You do not have permission to view non-owned herds.');
 			redirect('auth');
 		}
 
@@ -172,73 +175,76 @@ class Auth extends Ionauth {
 				switch ($action) {
 					case 'Remove Access':
 						if($this->ion_auth_model->batch_consult_revoke($arr_modify_id)){
-							$this->access_log_model->write_entry(41);
-							$this->data['message'] = 'Consultant access adjusted successfully.';
+							$this->_record_access(41);
+							$this->page_header_data['message'] = 'Consultant access adjusted successfully.';
 						}
-						else $this->data['message'] = 'Consultant access adjustment failed.  Please try again.';
+						else $this->page_header_data['message'] = 'Consultant access adjustment failed.  Please try again.';
 					break;
 					case 'Restore Access':
 						//if consultant had revoked access, they can restore it (call grant_access)
 						foreach($arr_modify_id as $k=>$id){
-							if($this->ion_auth_model->get_consult_status_text($id) != 'consult_revoked') unset($arr_modify_id[$k]);
+							if($this->ion_auth_model->get_consult_status_text($id) != 'consult revoked') unset($arr_modify_id[$k]);
 						}
 						if(!empty($arr_modify_id) && $this->ion_auth_model->batch_grant_consult($arr_modify_id)) {
-							$this->access_log_model->write_entry(34);
-							$this->data['message'] = 'Consultant access adjusted successfully.';
+							$this->_record_access(34);
+							$this->page_header_data['message'] = 'Consultant access adjusted successfully.';
 						}
-						else $this->data['message'] = 'Consultant access adjustment failed.  Please try again.';
+						else $this->page_header_data['message'] = 'Consultant access adjustment failed.  Please try again.';
 					break;
 					case 'Resend Request Email':
 						foreach($arr_modify_id as $k=>$id){
 							$arr_relationship_data = $this->ion_auth_model->get_consult_relationship_by_id($id);
-							if ($this->as_ion_auth->send_consultant_request($arr_relationship_data, $id)) {
-								$this->access_log_model->write_entry(35);
-								$this->data['message'] = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
+							if ($this->as_ion_auth->send_consultant_request($arr_relationship_data, $id, $this->config->item('cust_serv_email'))) {
+								$this->_record_access(35);
+								$this->page_header_data['message'] = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
 							}
 							else { //if the request was un-successful
 								//redirect them back to the login page
-								$this->data['message'] = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
+								$this->page_header_data['message'] = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
 							}
 						}
 					break;
 					default:
-						$this->data['message'] = 'Consultant access adjustment failed.  Please try again.';
+						$this->page_header_data['message'] = 'Consultant access adjustment failed.  Please try again.';
 					break;
 				}
 			}
 		}
-		$this->data['message'] = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
+		if(!isset($this->page_header_data['message'])){
+			$this->page_header_data['message'] = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
+		}
 
 		$herds_by_status = $this->ion_auth_model->get_herds_by_consult($this->session->userdata('user_id'));
 		if(isset($herds_by_status['open']) && is_array($herds_by_status['open'])){
+
 			$section_data['content'] = $this->_set_consult_herd_section($herds_by_status['open'], 'open', array('Resend Request Email'));
 			$section_data['title'] = 'Open Requests';
-			$this->data['arr_sections']['open'] = $this->load->view('auth/consult/herd_section_container', $section_data, TRUE);
+			$this->data['arr_sections']['open'] = $this->load->view('auth/service_grp/herd_section_container', $section_data, TRUE);
 		}
 		if(isset($herds_by_status['deny']) && is_array($herds_by_status['deny'])){
 			$section_data['content'] = $this->_set_consult_herd_section($herds_by_status['deny'], 'deny', NULL);
 			$section_data['title'] = 'Denied Requests';
-			$this->data['arr_sections']['deny'] = $this->load->view('auth/consult/herd_section_container', $section_data, TRUE);
+			$this->data['arr_sections']['deny'] = $this->load->view('auth/service_grp/herd_section_container', $section_data, TRUE);
 		}
 		if(isset($herds_by_status['grant']) && is_array($herds_by_status['grant'])) {
 			$section_data['content'] = $this->_set_consult_herd_section($herds_by_status['grant'], 'grant', array('Remove Access'));
 			$section_data['title'] = 'Granted Requests';
-			$this->data['arr_sections']['grant'] = $this->load->view('auth/consult/herd_section_container', $section_data, TRUE);
+			$this->data['arr_sections']['grant'] = $this->load->view('auth/service_grp/herd_section_container', $section_data, TRUE);
 		}
 		if(isset($herds_by_status['expired']) && is_array($herds_by_status['expired'])) {
 			$section_data['content'] = $this->_set_consult_herd_section($herds_by_status['expired'], 'expired', array('Resend Request Email'));
 			$section_data['title'] = 'Expired Requests';
-			$this->data['arr_sections']['expired'] = $this->load->view('auth/consult/herd_section_container', $section_data, TRUE);
+			$this->data['arr_sections']['expired'] = $this->load->view('auth/service_grp/herd_section_container', $section_data, TRUE);
 		}
-		if(isset($herds_by_status['consult_revoked']) && is_array($herds_by_status['consult_revoked'])){
-			$section_data['content'] = $this->_set_consult_herd_section($herds_by_status['consult_revoked'], 'consult_revoked', array('Restore Access'));
+		if(isset($herds_by_status['consult revoked']) && is_array($herds_by_status['consult revoked'])){
+			$section_data['content'] = $this->_set_consult_herd_section($herds_by_status['consult revoked'], 'consult revoked', array('Restore Access'));
 			$section_data['title'] = 'Consultant Revoked Access';
-			$this->data['arr_sections']['consult_revoked'] = $this->load->view('auth/consult/herd_section_container', $section_data, TRUE);
+			$this->data['arr_sections']['consult_revoked'] = $this->load->view('auth/service_grp/herd_section_container', $section_data, TRUE);
 		}
-		if(isset($herds_by_status['herd_revoked']) && is_array($herds_by_status['herd_revoked'])){
-			$section_data['content'] = $this->_set_consult_herd_section($herds_by_status['herd_revoked'], 'herd_revoked', NULL);
+		if(isset($herds_by_status['herd revoked']) && is_array($herds_by_status['herd revoked'])){
+			$section_data['content'] = $this->_set_consult_herd_section($herds_by_status['herd revoked'], 'herd revoked', NULL);
 			$section_data['title'] = 'Herd Revoked Access';
-			$this->data['arr_sections']['herd_revoked'] = $this->load->view('auth/consult/herd_section_container', $section_data, TRUE);
+			$this->data['arr_sections']['herd_revoked'] = $this->load->view('auth/service_grp/herd_section_container', $section_data, TRUE);
 		}
 		$this->carabiner->css('accordion.css', 'screen');
 		$this->data['title'] = "Manage Herd Access";
@@ -255,7 +261,7 @@ class Auth extends Ionauth {
 		$this->data['page_heading'] = "Manage Herd Access";
 		$footer_data = array();
 		$this->data['page_footer'] = $this->load->view('page_footer', $footer_data, TRUE);
-		$this->load->view('auth/consult/manage_consult', $this->data);
+		$this->load->view('auth/service_grp/manage_service_grp', $this->data);
 	}
 	
 	function _set_consult_section($data, $key, $arr_submit_options){
@@ -266,9 +272,9 @@ class Auth extends Ionauth {
 			);
 			foreach($data as $h) {
 				$h['is_editable'] = TRUE;
-				$this->section_data['arr_records'][] = $this->load->view('auth/consult/consultant_line', $h, TRUE);
+				$this->section_data['arr_records'][] = $this->load->view('auth/service_grp/service_grp_line', $h, TRUE);
 			}
-			return $this->load->view('auth/consult/consultant_section', $this->section_data, TRUE);
+			return $this->load->view('auth/service_grp/service_grp_section', $this->section_data, TRUE);
 		}
 	}
 
@@ -280,21 +286,21 @@ class Auth extends Ionauth {
 			);
 			foreach($data as $h) {
 				$h['is_editable'] = FALSE;
-				$this->section_data['arr_records'][] = $this->load->view('auth/consult/herd_line', $h, TRUE);
+				$this->section_data['arr_records'][] = $this->load->view('auth/service_grp/herd_line', $h, TRUE);
 			}
-			return $this->load->view('auth/consult/herd_section', $this->section_data, TRUE);
+			return $this->load->view('auth/service_grp/herd_section', $this->section_data, TRUE);
 		}
 	}
 	
 	//Producers only, give consultant permission to view herd
-	function consult_access($cuid = NULL) {
+	function service_grp_access($cuid = NULL) {
 		if((!$this->as_ion_auth->logged_in())){
        		$this->session->keep_flashdata('message');
 			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
        		redirect(site_url('auth/login'));
 		}
 		if($this->session->userdata('active_group_id') != 2) {
-			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
+			$this->session->keep_flashdata('redirect_url');
 			$this->session->set_flashdata('message', 'Only producers can manage access to their herd data.');
 			redirect('auth');
 		}
@@ -302,58 +308,59 @@ class Auth extends Ionauth {
 		$this->data['title'] = "Grant Consultant Access to Herd";
 
 		//validate form input
-		$this->form_validation->set_rules('consultant_user_id', 'Consultant User Id', 'trim|required');
-		$this->form_validation->set_rules('section_id', 'Sections', 'required');
+		$this->form_validation->set_rules('section_id', 'Sections', '');
 		$this->form_validation->set_rules('exp_date', 'Expiration Date', 'trim');
 		$this->form_validation->set_rules('request_status_id', 'Request Status', '');
 		$this->form_validation->set_rules('write_data', 'Enter Event Data', '');
-		//$this->form_validation->set_rules('consult_request', '', '');
+		//$this->form_validation->set_rules('request_status_id', '', '');
 		$this->form_validation->set_rules('disclaimer', 'Confirmation of Understanding', 'required');
 
 		if ($this->form_validation->run() == TRUE) {
 			$arr_relationship_data = array(
+				'sg_user_id' => (int)$this->input->post('sg_user_id'),
 				'herd_code' => $this->session->userdata('herd_code'),
-				'consultant_user_id' => $this->input->post('consultant_user_id'),
-				'request_status_id' => $this->input->post('request_status_id'),
-				//'consult_request' => $this->input->post('consult_request'),
-				'write_data' => $this->input->post('write_data')
+				'write_data' => (int)$this->input->post('write_data'),
+				'active_date' => date('Y-m-d'),
+				'active_user_id' => $this->session->userdata('user_id'),
 			);
+			$post_request_status_id = $this->input->post('request_status_id');
+			if(isset($post_request_status_id) && !empty($post_request_status_id)){
+				$arr_relationship_data['request_status_id'] = (int)$post_request_status_id;
+			}
 			$tmp = human_to_mysql($this->input->post('exp_date'));
 			if(isset($tmp) && !empty($tmp)) $arr_relationship_data['exp_date'] = $tmp;
-			//if($this->input->post('request_denied') == 1) $arr_relationship_data['request_denied'] = 1;
-			$arr_consultant = $this->ion_auth_model->user($this->input->post('consultant_user_id'))->row_array();
-			$arr_consult_groups = explode(',', $arr_consultant['groups']);
-			if(!in_array('9', $arr_consult_groups)){
-				$this->session->set_flashdata('message', 'The user you are attempting to add as a consultant is not a consultant.  Please try again or contact ' . $this->config->item('cust_serv_company','ion_auth') . ' at ' . $this->config->item('cust_serv_email','ion_auth') . ' or ' . $this->config->item('cust_serv_phone','ion_auth'));
-				redirect(site_url('auth/consult_access'));
+
+			//convert submitted section id values to int
+			$arr_post_section_id = $this->input->post('section_id');
+			if(isset($arr_post_section_id) && is_array($arr_post_section_id)){
+				array_walk($arr_post_section_id, function (&$value) { $value = (int)$value; });
 			}
-			if ($this->as_ion_auth->allow_consult($arr_relationship_data, $this->input->post('section_id'))) { //if permission is granted successfully
+			
+			if ($this->as_ion_auth->allow_service_grp($arr_relationship_data, $arr_post_section_id)) { //if permission is granted successfully
 				//redirect them back to the home page
 				$msg = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
-				$this->access_log_model->write_entry(34);
+				$this->_record_access(34);
 				$this->session->set_flashdata('message', $msg);
 				redirect(site_url($redirect_url)); //to access management page?
 			}
 			else { //if the request was un-successful
 				$msg = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
 				$this->session->set_flashdata('message', $msg);
-				redirect(site_url('auth/consult_access'));
+				redirect(site_url('auth/service_grp_access'));
 			}
 		}
 		else {
 			//set the flash data error message if there is one
-			$this->data['message'] = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
+			$this->page_header_data['message'] = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
 			//check of an existing record for this relationship
-			if(!isset($cuid)) $cuid = $this->input->post('consultant_user_id');
 			if(isset($cuid) && !empty($cuid)) $arr_relationship = $this->ion_auth_model->get_consult_relationship($cuid, $this->session->userdata('herd_code'));
 			else $arr_relationship = FALSE;
 
 			// get sections for user
-			if($arr_relationship['consult_request']){
+/*			if($arr_relationship['service_grp_request']){
 				$arr_form_section_id = $this->ion_auth_model->get_consult_rel_sections($arr_relationship['id']);
 			}
 			else{
-//				$user_id = $this->input->post('user_id');
 				$user_id = $this->session->userdata('user_id');
 				$obj_user = $this->ion_auth_model->user($user_id)->row();
 				$obj_user->arr_groups = array_keys($this->ion_auth_model->get_users_group_array($obj_user->id));
@@ -370,11 +377,12 @@ class Auth extends Ionauth {
 			$tmp_array = $this->as_ion_auth->get_sections_array($this->session->userdata('active_group_id'), $this->session->userdata('user_id'), $this->session->userdata('herd_code'), NULL, array('subscription', 'public', 'unmanaged'));
 			$this->data['section_options'] = $this->as_ion_auth->set_form_array($tmp_array, 'id', 'name');
 			unset($tmp_array);
-			$this->data['consultant_user_id'] = array(
-				'name' => 'consultant_user_id',
-				'id' => 'consultant_user_id',
-				'type' => 'text',
-				'value' => $this->form_validation->set_value('consultant_user_id', $arr_relationship ? $arr_relationship['consultant_user_id'] : $cuid),
+*/
+			$this->data['sg_user_id'] = array(
+					'name' => 'sg_user_id',
+					'id' => 'sg_user_id',
+					'type' => 'hidden',
+					'value' => $arr_relationship['sg_user_id'],
 			);
 			$this->data['exp_date'] = array(
 				'name' => 'exp_date',
@@ -382,33 +390,29 @@ class Auth extends Ionauth {
 				'type' => 'text',
 				'value' => $this->form_validation->set_value('exp_date', $arr_relationship ? mysql_to_human($arr_relationship['exp_date']) : ''),
 			);
-/*			$this->data['consult_request'] = array(
-				'name' => 'consult_request',
-				'id' => 'consult_request',
-				'type' => 'hidden',
-				'value' => $this->form_validation->set_value('consult_request', $this->data['consult_request']),
-			); */
-			$this->data['request_denied'] = array(
-				'name' => 'request_status_id',
-				'id' => 'request_denied',
-				'type' => 'radio',
-				'value' => 2,
-				'checked' => set_radio('request_status_id', 'deny', $arr_relationship && $arr_relationship['request_status_id'] == 2 ? TRUE : FALSE)
-			);
-			$this->data['request_granted'] = array(
-				'name' => 'request_status_id',
-				'id' => 'request_granted',
-				'type' => 'radio',
-				'value' => 1,
-				'checked' => set_radio('request_status_id', 'grant', $arr_relationship && $arr_relationship['request_status_id'] != 2 ? TRUE : FALSE)
-			);
-			$this->data['write_data'] = array(
+			if($arr_relationship['request_status_id'] !== 3){
+				$this->data['request_denied'] = array(
+					'name' => 'request_status_id',
+					'id' => 'request_denied',
+					'type' => 'radio',
+					'value' => 2,
+					'checked' => set_radio('request_status_id', 'deny', $arr_relationship && $arr_relationship == 2 ? TRUE : FALSE)
+				);
+				$this->data['request_granted'] = array(
+					'name' => 'request_status_id',
+					'id' => 'request_granted',
+					'type' => 'radio',
+					'value' => 1,
+					'checked' => set_radio('request_status_id', 'grant', $arr_relationship && $arr_relationship['request_status_id'] != 2 ? TRUE : FALSE)
+				);
+			}
+/*			$this->data['write_data'] = array(
 				'name' => 'write_data',
 				'id' => 'write_data',
 				'type' => 'checkbox',
 				'value' => '1',
 				'checked' => set_checkbox('write_data', 1, $arr_relationship && $arr_relationship['write_data'] == '1' ? TRUE : FALSE)
-			);
+			); */
 			$this->data['disclaimer'] = array(
 				'name' => 'disclaimer',
 				'id' => 'disclaimer',
@@ -439,20 +443,20 @@ class Auth extends Ionauth {
 			);
 			$this->data['page_footer'] = $this->load->view('page_footer', $footer_data, TRUE);
 
-			$this->load->view('auth/consult/allow_consult', $this->data);
+			$this->load->view('auth/service_grp/allow_service_grp', $this->data);
 		}
 	}
 
-		//Consultants only, request permission to view herd
-	function consult_request() {
+	//Consultants only, request permission to view herd
+	function service_grp_request() {
 		if((!$this->as_ion_auth->logged_in())){
        		$this->session->keep_flashdata('message');
 			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
        		redirect(site_url('auth/login'));
 		}
-		if($this->session->userdata('active_group_id') != 9) {
-			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
-			$this->session->set_flashdata('message', 'Only consultant can request permission to view a herd\'s data.');
+		if(!$this->as_ion_auth->has_permission('View non-own w permission')) {
+			$this->session->keep_flashdata('redirect_url');
+			$this->session->set_flashdata('message', 'You do not have permission to request the data of a herd you do not own.');
 			redirect('auth');
 		}
 
@@ -460,27 +464,50 @@ class Auth extends Ionauth {
 
 		//validate form input
 		$this->form_validation->set_rules('herd_code', 'Herd Code', 'trim|required|exact_length[8]');
-		$this->form_validation->set_rules('section_id', 'Sections', 'required');
+		$this->form_validation->set_rules('herd_release_code', 'Release Code', 'trim|required|exact_length[10]');
+		$this->form_validation->set_rules('section_id', 'Sections', '');
 		$this->form_validation->set_rules('exp_date', 'Expiration Date', 'trim');
 		$this->form_validation->set_rules('write_data', 'Enter Event Data', '');
-//		$this->form_validation->set_rules('consult_request', '', '');
+//		$this->form_validation->set_rules('request_status_id', '', '');
 		$this->form_validation->set_rules('disclaimer', 'Confirmation of Understanding', 'required');
 
-		if ($this->form_validation->run() == TRUE) {
-			if(!$this->herd_model->herd_is_registered($this->input->post('herd_code'))){
-				$this->session->set_flashdata('message', 'Herd ' . $this->input->post('herd_code') . ' is not registered for ' . $this->config->item('product_name') . '.  In order to access their data, they must be registered for ' . $this->config->item('product_name') . '.');
-				redirect(site_url('auth/consult_request'));
+		$is_validated = $this->form_validation->run();
+		if ($is_validated === TRUE) {
+			$herd_code = $this->input->post('herd_code');
+			/* herd does not have to be registered for MyAgSource at this point
+			if(!$this->herd_model->herd_is_registered($herd_code)){
+				$this->session->set_flashdata('message', 'Herd ' . $herd_code . ' is not registered for ' . $this->config->item('product_name') . '.  In order to access their data, they must be registered for ' . $this->config->item('product_name') . '.');
+				redirect(site_url('auth/service_grp_request'));
+			} */
+			$herd_release_code = $this->input->post('herd_release_code');
+			$error = $this->herd_model->herd_authorization_error($herd_code, $herd_release_code);
+			
+			if($this->ion_auth_model->get_consult_relationship_id($this->session->userdata('user_id'), $herd_code) !== FALSE){
+				$error = 'relationship_exists';
+			}
+			if($error){
+				$this->as_ion_auth->set_error($error);
+				$is_validated = false;
 			}
 			$arr_relationship_data = array(
-				'herd_code' => $this->input->post('herd_code'),
-				'consultant_user_id' => $this->session->userdata('user_id'),
-				'consult_request' => 1,
-				'write_data' => $this->input->post('write_data')
+				'herd_code' => $herd_code,
+				'sg_user_id' => $this->session->userdata('user_id'),
+				'service_grp_request' => 1, //bit - did a service group request
+				'write_data' => (int)$this->input->post('write_data'),
+				'request_status_id' => 7, //7 is the id for open request
+				'active_date' => date('Y-m-d'),
+				'active_user_id' => $this->session->userdata('user_id'),
 			);
 			$tmp = human_to_mysql($this->input->post('exp_date'));
 			if(isset($tmp) && !empty($tmp)) $arr_relationship_data['exp_date'] = $tmp;
-			if ($this->as_ion_auth->consult_request($arr_relationship_data, $this->input->post('section_id'))) {
-				$this->access_log_model->write_entry(35);
+
+			//convert submitted section id values to int
+/*			$arr_post_section_id = $this->input->post('section_id');
+			array_walk($arr_post_section_id, function (&$value) { $value = (int)$value; });
+*/			$arr_post_section_id = array();
+			
+			if ($is_validated === TRUE && $this->as_ion_auth->service_grp_request($arr_relationship_data, $arr_post_section_id, $this->config->item('cust_serv_email'))) {
+				$this->_record_access(35);
 				$msg = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
 				$this->session->set_flashdata('message', $msg);
 				redirect(site_url($redirect_url)); //  to manage access page
@@ -489,38 +516,46 @@ class Auth extends Ionauth {
 				//redirect them back to the login page
 				$msg = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
 				$this->session->set_flashdata('message', $msg);
-				redirect(site_url('auth/consult_request'));
+				redirect(site_url('auth/service_grp_request'));
 			}
 		}
 		else {
 			//set the flash data error message if there is one
-			$this->data['message'] = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
-
+			$this->page_header_data['message'] = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
 			// get sections for user
 //			$user_id = $this->input->post('user_id');
 			$user_id = $this->session->userdata('user_id');
 			$obj_user = $this->ion_auth_model->user($user_id)->row();
 			$obj_user->arr_groups = array_keys($this->ion_auth_model->get_users_group_array($obj_user->id));
-			
-			//note: active group id should always be 9
-			$tmp_array = $this->as_ion_auth->get_sections_array(9, $user_id, $obj_user->herd_code, NULL, array('subscription','public','unmanaged'));
+/*			
+			$tmp_array = $this->as_ion_auth->get_sections_array($this->session->userdata('active_group_id'), $user_id, $obj_user->herd_code, NULL, array('subscription','public','unmanaged'));
 			$obj_user->section_id = $this->as_ion_auth->set_form_array($tmp_array, 'id', 'id'); // populate array of sections for which user is enrolled
 
 			$tmp_array = $this->input->post('section_id');
-//			$arr_form_section_id = $this->form_validation->set_value('section_id');//, $obj_user->section_id);
 			$arr_form_section_id = isset($tmp_array) && is_array($tmp_array) ? $tmp_array : $obj_user->section_id;
 
 			$this->data['sections_selected'] = $arr_form_section_id;
 			$this->data['section_id'] = 'id="section_id"';
-			//note: active group id should always be 9
-			$tmp_array = $this->as_ion_auth->get_sections_array(9, $user_id, FALSE, NULL, array('subscription','public','unmanaged'));
+				
+			$arr_super_sections = $this->as_ion_auth->get_super_sections_array($this->session->userdata('active_group_id'), $this->session->userdata('user_id'), $this->session->userdata('herd_code'), array('subscription','public','unmanaged'));
+			$arr_super_section_id = array_extract_value_recursive('id', $arr_super_sections);
+			$tmp_array = $this->as_ion_auth->get_sections_array($this->session->userdata('active_group_id'), $user_id, FALSE, $arr_super_section_id, array('subscription','public','unmanaged'));
 			$this->data['section_options'] = $this->as_ion_auth->set_form_array($tmp_array, 'id', 'name');
-
+*/
 			$this->data['herd_code'] = array(
 				'name' => 'herd_code',
 				'id' => 'herd_code',
 				'type' => 'text',
 				'value' => $this->form_validation->set_value('herd_code'),
+				'class' => 'required',
+			);
+			$this->data['herd_release_code'] = array('name' => 'herd_release_code',
+				'id' => 'herd_release_code',
+				'type' => 'text',
+				'size' => '10',
+				'maxlength' => '10',
+				'value' => $this->form_validation->set_value('herd_release_code'),
+				'class' => 'required',
 			);
 			$this->data['exp_date'] = array(
 				'name' => 'exp_date',
@@ -528,13 +563,14 @@ class Auth extends Ionauth {
 				'type' => 'text',
 				'value' => $this->form_validation->set_value('exp_date'),
 			);
-			$this->data['write_data'] = array(
+/*			$this->data['write_data'] = array(
 				'name' => 'write_data',
 				'id' => 'write_data',
 				'type' => 'checkbox',
 				'value' => '1',
 				'checked' => set_checkbox('write_data', 1, FALSE)
 			);
+*/
 			$this->data['disclaimer'] = array(
 				'name' => 'disclaimer',
 				'id' => 'disclaimer',
@@ -563,8 +599,7 @@ class Auth extends Ionauth {
 			$footer_data = array(
 			);
 			$this->data['page_footer'] = $this->load->view('page_footer', $footer_data, TRUE);
-
-			$this->load->view('auth/consult/consult_request', $this->data);
+			$this->load->view('auth/service_grp/service_grp_request', $this->data);
 		}
 	}
 
@@ -574,7 +609,7 @@ class Auth extends Ionauth {
        		redirect(site_url(), 'refresh');
 		}
 		//set the flash data error message if there is one
-		$this->data['message'] = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
+		$this->page_header_data['message'] = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
 		//list the users
 		$this->data['users'] = $this->as_ion_auth->get_editable_users();
 		$this->data['arr_group_lookup'] = $this->ion_auth_model->get_group_lookup();
@@ -611,7 +646,8 @@ class Auth extends Ionauth {
 	//CDT overrides built-in function to allow us to redirect user to the original page they requested after login in
 	function login()
 	{
-		$redirect_url = set_redirect_url('login');
+		$redirect_url = set_redirect_url($this->uri->uri_string(), $this->session->flashdata('redirect_url'), $this->as_ion_auth->referrer);
+		$this->session->set_flashdata('redirect_url', $redirect_url);
 		$this->data['title'] = "Login";
 
 		//validate form input
@@ -624,14 +660,19 @@ class Auth extends Ionauth {
 			$remember = (bool) $this->input->post('remember');
 			//Clear out herd code in case user was browsing demo herd before logging in.
 			$this->session->unset_userdata('herd_code');
-			$this->session->sess_destroy();
-			$this->session->sess_create();
+			$this->session->unset_userdata('arr_pstring');
+			$this->session->unset_userdata('pstring');
+			$this->session->unset_userdata('arr_tstring');
+			$this->session->unset_userdata('tstring');
+			//$this->session->sess_destroy();
+			//$this->session->sess_create();
 		
 			if ($this->ion_auth->login($this->input->post('identity'), $this->input->post('password'), $remember))
 			{ //if the login is successful
-				$this->access_log_model->write_entry(1); //1 is the page code for login for the user management section
+				$this->_record_access(1); //1 is the page code for login for the user management section
 				$this->session->set_flashdata('message', $this->as_ion_auth->messages());
-				redirect(site_url(change_herd/select));
+				$this->session->set_flashdata('redirect_url', $redirect_url);
+				redirect(site_url('change_herd/select'));
 			}
 			else
 			{ //if the login was un-successful
@@ -643,7 +684,7 @@ class Auth extends Ionauth {
 		else
 		{  //the user is not logging in so display the login page
 			//set the flash data error message if there is one
-			$this->data['message'] = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
+			$this->page_header_data['message'] = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
 
 			$this->data['identity'] = array('name' => 'identity',
 				'id' => 'identity',
@@ -770,8 +811,9 @@ class Auth extends Ionauth {
 		$this->form_validation->set_rules('first_name', 'First Name', 'trim|required');
 		$this->form_validation->set_rules('last_name', 'Last Name', 'trim|required');
 		$this->form_validation->set_rules('email', 'Email Address', 'trim|required|valid_email');
-		$this->form_validation->set_rules('supervisor_acct_num', 'Field Technician Number', 'exact_length[8]');
-		$this->form_validation->set_rules('assoc_acct_num[]', 'Association Account Number', 'exact_length[8]');
+		$this->form_validation->set_rules('supervisor_acct_num', 'Field Technician Account Number', 'max_length[8]');
+		$this->form_validation->set_rules('sg_acct_num', 'Service Group Account Number', 'max_length[8]');
+		$this->form_validation->set_rules('assoc_acct_num[]', 'Association Account Number', 'max_length[8]');
 		$this->form_validation->set_rules('phone1', 'First Part of Phone', 'exact_length[3]|required');
 		$this->form_validation->set_rules('phone2', 'Second Part of Phone', 'exact_length[3]|required');
 		$this->form_validation->set_rules('phone3', 'Third Part of Phone', 'exact_length[4]|required');
@@ -788,7 +830,7 @@ class Auth extends Ionauth {
 		if ($is_validated === TRUE) {
 			$arr_posted_group_id = $this->form_validation->set_value('group_id[]');
 			if(!$this->as_ion_auth->group_assignable($arr_posted_group_id)){
-				$this->session->set_flashdata('message', 'You do not have permissions to create a user with the user group you selected.  Please try again, or contact ' . $this->config->item('cust_serv_company','ion_auth') . ' at ' . $this->config->item('cust_serv_email','ion_auth') . ' or ' . $this->config->item('cust_serv_phone','ion_auth') . '.');
+				$this->session->set_flashdata('message', 'You do not have permissions to create a user with the user group you selected.  Please try again, or contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . '.');
 				redirect("auth/create_user", 'refresh');
 				exit();
 			}
@@ -796,6 +838,7 @@ class Auth extends Ionauth {
 			//start with nothing
 			$assoc_acct_num = NULL;
 			$supervisor_acct_num = NULL;
+			$sg_acct_num = NULL;
 			$herd_code = NULL;
 			$herd_release_code = NULL;
 
@@ -803,23 +846,35 @@ class Auth extends Ionauth {
 			if($this->as_ion_auth->has_permission("Add All Users") || $this->as_ion_auth->has_permission("Add Users In Region")){
 				$arr_posted_group_id = $this->input->post('group_id');
 				if(!$this->as_ion_auth->group_assignable($arr_posted_group_id)){
-					$this->session->set_flashdata('message', 'You do not have permissions to add a user with the user group you selected.  Please try again, or contact ' . $this->config->item('cust_serv_company','ion_auth') . ' at ' . $this->config->item('cust_serv_email','ion_auth') . ' or ' . $this->config->item('cust_serv_phone','ion_auth') . '.');
+					$this->session->set_flashdata('message', 'You do not have permissions to add a user with the user group you selected.  Please try again, or contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . '.');
 					redirect(site_url("auth/create_user/$user_id"), 'refresh');
 					exit();
 				}
 				$assoc_acct_num = $this->input->post('assoc_acct_num');
 				$supervisor_acct_num = $this->input->post('supervisor_acct_num');
+				if(empty($assoc_acct_num)){
+					$assoc_acct_num = NULL;
+				}
+				if(empty($supervisor_acct_num)){
+					$supervisor_acct_num = NULL;
+				}
 			}
 			if(in_array(2, $arr_posted_group_id) || in_array(13, $arr_posted_group_id)){ //producers
 				$herd_code = $this->input->post('herd_code') ? $this->input->post('herd_code') : NULL;
 				$herd_release_code = $this->input->post('herd_release_code');
-				$this->load->model('herd_model');
 				$error = $this->herd_model->herd_authorization_error($herd_code, $herd_release_code);
 				if($error){
 					$this->as_ion_auth->set_error($error);
 					$is_validated = false;
 				}
 			}
+			if(in_array(9, $arr_posted_group_id)){ //service groups
+				$sg_acct_num = $this->input->post('sg_acct_num');
+				if(!$this->as_ion_auth->service_grp_exists($sg_acct_num)){
+					$is_validated = false;
+				}
+			}
+			
 			$username = substr(strtolower($this->input->post('first_name')) . ' ' . strtolower($this->input->post('last_name')),0,15);
 			$email = $this->input->post('email');
 			$password = $this->input->post('password');
@@ -827,6 +882,7 @@ class Auth extends Ionauth {
 				'herd_code' => $herd_code,
 				'last_name' => $this->input->post('last_name'),
 				'supervisor_acct_num' => $supervisor_acct_num,
+				'sg_acct_num' => $sg_acct_num,
 				'assoc_acct_num' => $assoc_acct_num,
 				'phone' => $this->input->post('phone1') . '-' . $this->input->post('phone2') . '-' . $this->input->post('phone3'),
 				'best_time' => $this->input->post('best_time'),
@@ -884,12 +940,12 @@ class Auth extends Ionauth {
 				$this->data['assoc_acct_num'] = 'class = "require"';
 			}
 			elseif($this->as_ion_auth->has_permission("Add Users In Region")){
-					$this->data['assoc_acct_num'] = array('name' => 'assoc_acct_num[]',
-						'id' => 'assoc_acct_num',
-						'type' => 'hidden',
-						'class' => 'require',
-						'value' => $this->session->userdata('assoc_acct_num'),
-					);
+				$this->data['assoc_acct_num'] = array('name' => 'assoc_acct_num[]',
+					'id' => 'assoc_acct_num',
+					'type' => 'hidden',
+					'class' => 'require',
+					'value' => $this->session->userdata('assoc_acct_num'),
+				);
 			}
 			
 			if($this->as_ion_auth->has_permission("Add All Users") || $this->as_ion_auth->has_permission("Add Users In Region")){
@@ -926,6 +982,15 @@ class Auth extends Ionauth {
 			);
 			if(in_array('2', $arr_form_group_id)) $this->data['herd_release_code']['class'] = 'require';
 
+			$this->data['sg_acct_num'] = array('name' => 'sg_acct_num',
+				'id' => 'sg_acct_num',
+				'type' => 'text',
+				'size' => '8',
+				'maxlength' => '8',
+				'class' => 'require',
+				'value' => $this->form_validation->set_value('sg_acct_num'),
+			);
+			
 			$this->data['phone1'] = array('name' => 'phone1',
 				'id' => 'phone1',
 				'class' => 'require',
@@ -974,10 +1039,14 @@ class Auth extends Ionauth {
 				$this->page_header_data = array_merge($this->page_header_data,
 					array(
 						'title'=>'Register User - ' . $this->config->item('product_name'),
-						'description'=>'Register user for ' . $this->config->item('product_name')
+						'description'=>'Register user for ' . $this->config->item('product_name'),
+						'arr_headjs_line'=>array(
+							'{popup: "' . $this->config->item("base_url_assets") . 'js/jquery/popup.min.js"}',
+						)
 					)
 				);
 			}
+			$this->carabiner->css('popup.css');
 			$this->page_header_data['section_nav'] = $this->load->view('auth/section_nav', NULL, TRUE);
 			$this->data['page_header'] = $this->load->view('page_header', $this->page_header_data, TRUE);
 			$this->data['page_heading'] = 'Register User - ' . $this->config->item('product_name');
@@ -987,6 +1056,8 @@ class Auth extends Ionauth {
 				)
 			);
 			$this->data['page_footer'] = $this->load->view('page_footer', $footer_data, TRUE);
+			$this->data['cs_phone'] = $this->config->item('cust_serv_phone');
+			$this->data['base_url_assets'] = $this->config->item("base_url_assets");
 			$this->load->view('auth/create_user', $this->data);
 		}
 	}
@@ -1021,7 +1092,7 @@ class Auth extends Ionauth {
 		$this->form_validation->set_rules('section_id[]', 'Section');
 		
 		$email_in = $this->input->post('email');
-		$is_submitted = empty($email_in)?FALSE:TRUE;
+		$is_submitted = empty($email_in) ? FALSE : TRUE;
 		$is_validated = $this->form_validation->run();
 		if ($is_validated === TRUE) {
 			//populate data fields for specific group choices
@@ -1035,7 +1106,7 @@ class Auth extends Ionauth {
 			if($this->as_ion_auth->has_permission("Edit All Users") || $this->as_ion_auth->has_permission("Edit Users In Region")){
 				$arr_posted_group_id = $this->input->post('group_id');
 				if(!$this->as_ion_auth->group_assignable($arr_posted_group_id)){
-					$this->session->set_flashdata('message', 'You do not have permissions to edit a user with the user group you selected.  Please try again, or contact ' . $this->config->item('cust_serv_company','ion_auth') . ' at ' . $this->config->item('cust_serv_email','ion_auth') . ' or ' . $this->config->item('cust_serv_phone','ion_auth') . '.');
+					$this->session->set_flashdata('message', 'You do not have permissions to edit a user with the user group you selected.  Please try again, or contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . '.');
 					redirect(site_url("auth/edit_user/$user_id"), 'refresh');
 					exit();
 				}
@@ -1047,7 +1118,6 @@ class Auth extends Ionauth {
 			/*if($this->input->post('herd_code') && $this->input->post('herd_code') != $obj_user->herd_code){
 				$herd_code = $this->input->post('herd_code') ? $this->input->post('herd_code') : NULL;
 				$herd_release_code = $this->input->post('herd_release_code');
-				$this->load->model('herd_model');
 				$error = $this->herd_model->herd_authorization_error($herd_code, $herd_release_code);
 				if($error){
 					$this->as_ion_auth->set_error($error);
@@ -1248,7 +1318,8 @@ class Auth extends Ionauth {
 	}
 	
 	function set_role($group_id){
-		$redirect_url = set_redirect_url('login');
+		$redirect_url = set_redirect_url($this->uri->uri_string(), $this->session->flashdata('redirect_url'), $this->as_ion_auth->referrer);
+		$this->session->set_flashdata('redirect_url', $redirect_url);
 		if(array_key_exists($group_id, $this->session->userdata('arr_groups'))){
 			$this->session->set_userdata('active_group_id', $group_id);
 		}
@@ -1320,5 +1391,19 @@ class Auth extends Ionauth {
 	        var_dump($graph);
 	    	//$this->load->view('default', $graph);
 */	}
-
+	protected function _record_access($event_id){
+		$herd_code = $this->session->userdata('herd_code');
+		$herd_enroll_status_id = empty($herd_code) ? NULL : $this->session->userdata('herd_enroll_status_id');
+		$recent_test = $this->session->userdata('recent_test_date');
+		$recent_test = empty($recent_test) ? NULL : $recent_test;
+		
+		$this->access_log_model->write_entry(
+			$event_id,
+			$herd_code,
+			$recent_test,
+			$herd_enroll_status_id,
+			$this->session->userdata('user_id'),
+			$this->session->userdata('active_group_id')
+		);
+	}
 }

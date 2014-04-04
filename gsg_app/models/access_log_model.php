@@ -9,7 +9,7 @@ class Access_log_model extends Report_Model {
 		 * back to the access log model does not cause problem.  That is the only other model that call the get block links method.
 		 */ 
 		$this->section_id = '3';
-		$this->arr_blocks = $this->get_block_links($this->section_id);
+		//$this->arr_blocks = $this->get_block_links($this->section_id);
 		$this->primary_table_name = $this->tables['access_log'];
 		$this->arr_joins = array(
 			'section_id'=>array('table' => $this->tables['pages'], 'join_text' => $this->tables['access_log'] . '.page_id = ' . $this->tables['pages'] . '.id')
@@ -115,54 +115,6 @@ class Access_log_model extends Report_Model {
 		}
 		return $arr_fields;
 	}
-
-	/** function prep_where_criteria -- overrode parent function to set where criteria to end of the date given (on form, the user enters only the date).
-	 * DATES NOW ACCOUNTED FOR IN PARENT??
-	 * translates filter criteria into sql format
-	 * @param $arr_filter_criteria
-	 * @return void
-	
-	protected function prep_where_criteria($arr_filter_criteria){
-		foreach($arr_filter_criteria as $k => $v){
-			if(empty($v) === FALSE){
-				if(is_array($v)){
-					if(($tmp_key = array_search('NULL', $v)) !== FALSE){
-						unset($v[$tmp_key]);
-						$text = implode(',', $v);
-						if(!empty($v)) $this->{$this->db_group_name}->where("($k IS NULL OR $k IN ( $text ))");
-						else $this->{$this->db_group_name}->where("$k IS NULL");
-					}
-					else $this->{$this->db_group_name}->where_in($k, $v);
-				}
-				else { //is not an array
-					if(substr($k, -5) == "_dbto"){ //ranges
-						$db_field = substr($k, 0, -5);
-						//overrode this line only--if we add time to user form, this function can be removed.
-						$this->{$this->db_group_name}->where("$db_field BETWEEN '" . date_to_mysqldatetime($arr_filter_criteria[$db_field . '_dbfrom']) . "' AND '" . date_to_mysqldatetime($arr_filter_criteria[$db_field . '_dbto'] . ' 23:59:59') . "'");
-					}
-					elseif(substr($k, -7) != "_dbfrom"){ //default--it skips the opposite end of the range as _dbto
-						$this->{$this->db_group_name}->where($k, $v);
-					}
-				} 
-			}
-		}
-	}
-	 */
-	
-	/**
-	 * @method get_section_select_data()
-	 * @access public
-	 *
-	function get_section_select_data(){
-		$arr_ret = array();
-		$arr_section = $this->db->get_sections_by_user($this->session->userdata('user_id'))->result_array();
-		if(is_array($arr_section)){
-			foreach($arr_section as $s){
-				$arr_ret[$s['id']] = $s['name'];
-			}
-		}
-	}	 **/
-
 
 	/**
 	 * get_page_filters
@@ -329,7 +281,7 @@ FUNCTION MOVED?
 		$arr_return = array();
 		if(isset($section_id)) $this->{$this->db_group_name}->where('p.section_id', $section_id);
 		$result = $this->{$this->db_group_name}
-		->select("p.id AS page_id, b.id, p.section_id, b.url_segment, b.name, ct.name AS chart_type, b.description, p.url_segment AS page, p.name AS page_name, CASE WHEN dt.name LIKE '%chart' THEN 'chart' ELSE dt.name END AS display,s.path AS section_path, b.max_rows, b.cnt_row, b.sum_row, b.avg_row, b.bench_row, pf.db_field_name AS pivot_db_field, b.is_summary")
+		->select("p.id AS page_id, b.id, p.section_id, b.url_segment, b.name, ct.name AS chart_type, b.description, p.url_segment AS page, p.name AS page_name, CASE WHEN dt.name LIKE '%chart' THEN 'chart' ELSE dt.name END AS display_type,s.path AS section_path, b.max_rows, b.cnt_row, b.sum_row, b.avg_row, b.bench_row, pf.db_field_name AS pivot_db_field, b.is_summary")
 		->join($this->tables['pages'] . ' AS p', 'p.section_id = s.id', 'left')
 		->join($this->tables['pages_blocks'] . ' AS pb', 'p.id = pb.page_id', 'left')
 		->join($this->tables['blocks'] . ' AS b', 'pb.block_id = b.id', 'left')
@@ -340,20 +292,21 @@ FUNCTION MOVED?
 		->where('b.url_segment IS NOT NULL')
 		->order_by('s.list_order', 'asc')
 		->order_by('p.list_order', 'asc')
-		->order_by('b.list_order', 'asc')
+		->order_by('pb.list_order', 'asc')
 		->get($this->tables['sections'] . ' AS s')->result_array();
 		if(is_array($result) && !empty($result)){
 			foreach($result as $r){
 				$arr_return[$r['page']]['page_id'] = $r['page_id'];
 				$arr_return[$r['page']]['name'] = $r['page_name'];
 				if(empty($r['url_segment']) === FALSE){
-					$arr_return[$r['page']]['display'][$r['display']][$r['url_segment']] = array(
+					$arr_return[$r['page']]['blocks'][$r['url_segment']] = array(
 						'id'=>$r['id'],
 						'section_id'=>$r['section_id'],
 						'name'=>$r['name'],
 						'description'=>$r['description'],
 						'url_segment'=>$r['url_segment'],
 						'section_path'=>$r['section_path'],
+						'display_type'=>$r['display_type'],
 						'chart_type'=>$r['chart_type'],
 						'max_rows'=>$r['max_rows'],
 						'cnt_row'=>$r['cnt_row'],
@@ -365,7 +318,7 @@ FUNCTION MOVED?
 					);
 				} 
 				else	{
-					$arr_return[$r['page']]['display'][$r['display']][] = array(
+					$arr_return[$r['page']]['blocks'][$r['url_segment']] = array(
 						'id'=>$r['id'],
 						'section_id'=>$r['section_id'],
 						'name'=>$r['name'],
@@ -376,7 +329,7 @@ FUNCTION MOVED?
 					);
 				}
  			}
-			return $arr_return;
+ 			return $arr_return;
 		}
 		else return FALSE;
 	}
@@ -384,25 +337,32 @@ FUNCTION MOVED?
 	/**
 	 * write_entry
 	 *
-	 * @param int page id
+	 * @param int event id
+	 * @param string herd code
+	 * @param string most recent test date for herd
+	 * @param int herd enrollment status (id represents none, paid or trial)
+	 * @param int user_id
+	 * @param int group_id
 	 * @param string format (web, pdf or csv) defaults to web
 	 * @param string sort order (NULL, ASC or DESC) defaults to NULL
 	 * @param string filter text, defaults to NULL
 	 * @return boolean
 	 * @author Chris Tranel
 	 **/
-	function write_entry($page_id, $format='web', $sort=NULL, $filters=NULL){
-		if($this->as_ion_auth->is_admin()) return 1; //do not record admin action
+	function write_entry($event_id, $herd_code, $recent_test_date, $herd_enroll_status_id, $user_id, $group_id, $format='web', $report_page_id = NULL, $sort=NULL, $filters=NULL){
+		//if($this->as_ion_auth->is_admin()) return 1; //do not record admin action
 		$tmp_array = array(
-			'page_id'=>$page_id,
-			'format'=>$format,
-			'user_id'=>$this->session->userdata('user_id'),
-			'group_id'=>$this->session->userdata('active_group_id'),
-			'herd_code'=>$this->session->userdata('herd_code'),
-			'user_supervisor_acct_num'=>$this->session->userdata('supervisor_acct_num'),
-			'user_association_acct_num'=>implode(',', array_keys($this->session->userdata('arr_regions'))),
-			'access_time'=> date('Y-m-d H:i:s')
+			'event_id' => $event_id,
+			'herd_code' => $herd_code,
+			'recent_test_date' => $recent_test_date,
+			'herd_enroll_status_id' => $herd_enroll_status_id,
+			'user_id' => $user_id,
+			'group_id' => $group_id,
+			'format' => $format,
+			'report_page_id' => $report_page_id,
+			'access_time' => date('Y-m-d H:i:s')
 		);
+		if ($report_page_id) $tmp_array['report_page_id'] = $report_page_id;
 		if ($sort) $tmp_array['sort_text'] = $sort;
 		if ($filters) $tmp_array['filter_text'] = $filters;
 		return $this->{$this->db_group_name}->insert($this->tables['access_log'], $tmp_array);

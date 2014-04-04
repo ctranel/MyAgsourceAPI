@@ -78,10 +78,8 @@ class As_ion_auth extends Ion_auth {
 			//$this->arr_task_permissions = $this->ion_auth_model->get_task_permissions('3');
 		//}
 		parent::__construct();
-		$this->load->library('herd_manage');
 		$this->load->model('access_log_model');
 		$this->load->model('region_model');
-		$this->load->model('herd_model');
 		$this->load->helper('url');
 
 		//set supersection if there is one
@@ -103,16 +101,13 @@ class As_ion_auth extends Ion_auth {
 			$arr_scope = array('subscription','public','unmanaged');
 			if($this->is_admin) $arr_scope[] = 'admin';
 			$this->arr_user_super_sections = $this->get_super_sections_array($this->session->userdata('active_group_id'), $this->session->userdata('user_id'), $this->session->userdata('herd_code'), $arr_scope);
-			$this->arr_user_sections = $this->get_sections_array($this->session->userdata('active_group_id'), $this->session->userdata('user_id'), $this->session->userdata('herd_code'), $this->super_section_id, $arr_scope);
+			$this->arr_user_sections = $this->get_sections_array($this->session->userdata('active_group_id'), $this->session->userdata('user_id'), $this->session->userdata('herd_code'), array($this->super_section_id), $arr_scope);
 		}
-		elseif($this->session->userdata('herd_code') == $this->config->item('default_herd', 'ion_auth')) {
-/*			$this->session->set_userdata('herd_code', $this->config->item('default_herd', 'ion_auth'));
-			$this->session->set_userdata('arr_pstring', $this->herd_model->get_pstring_array($this->config->item('default_herd', 'ion_auth'), FALSE));
-			//$this->session->set_userdata('active_group_id', 2);
-*/			$arr_scope = array('subscription','public','unmanaged');
+		elseif($this->session->userdata('herd_code') == $this->config->item('default_herd')) {
+			$arr_scope = array('subscription','public','unmanaged');
 			//the first parameter is group id--use producer (2) if no one is logged in, second param is user id. 
 			$this->arr_user_super_sections = $this->get_super_sections_array(2, $this->session->userdata('user_id'), $this->session->userdata('herd_code'), $arr_scope);
-			$this->arr_user_sections = $this->get_sections_array(2, $this->session->userdata('user_id'), $this->session->userdata('herd_code'), $this->super_section_id, $arr_scope);
+			$this->arr_user_sections = $this->get_sections_array(2, $this->session->userdata('user_id'), $this->session->userdata('herd_code'), array($this->super_section_id), $arr_scope);
 		}
 	}
 	
@@ -149,9 +144,9 @@ class As_ion_auth extends Ion_auth {
 			else {
 				$message = $this->load->view($this->config->item('email_templates', 'ion_auth').$this->config->item('user_herd_data', 'ion_auth'), $data, true);
 				$this->email->clear();
-				$this->email->from($this->config->item('admin_email', 'ion_auth'), $this->config->item('site_title', 'ion_auth'));
-				$this->email->to($this->config->item('cust_serv_email','ion_auth'));
-				$this->email->subject($this->config->item('site_title', 'ion_auth') . ' - Account Activation Info');
+				$this->email->from($this->config->item('admin_email'), $this->config->item('site_title'));
+				$this->email->to($this->config->item('cust_serv_email'));
+				$this->email->subject($this->config->item('site_title') . ' - Account Activation Info');
 				$this->email->message($message);
 				$this->email->send();
 			}
@@ -172,6 +167,8 @@ class As_ion_auth extends Ion_auth {
 		$this->session->unset_userdata('active_group_id');
 		$this->session->unset_userdata('herd_code');
 		$this->session->unset_userdata('arr_pstring');
+		$this->session->unset_userdata('herd_code');
+		$this->session->unset_userdata('herd_code');
 		$this->session->unset_userdata('first_name');
 		$this->session->unset_userdata('last_name');
 //		$this->session->unset_userdata('company');
@@ -257,27 +254,35 @@ class As_ion_auth extends Ion_auth {
 	/**
 	 * @method get_viewable_herds()
 	 * @param int user_id
-	 * @param int region_num (need to accept array?)
+	 * @param array of region acct_num=>name
 	 * @return mixed array of herds or boolean
 	 * @access public
 	 *
 	 **/
-	public function get_viewable_herds($user_id, $region_num = false, $limit_in = NULL){
+	public function get_viewable_herds($user_id, $arr_regions = false, $limit_in = NULL){
 		$arr_return_reg = array();
 		$arr_return_user = array();
 		$arr_return_permission = array();
-		
 		if($this->has_permission('View All Herds')){
 			return $this->herd_model->get_herds();
 		}
+		
 		if($this->has_permission('View Herds In Region')){
-			$arr_return_reg = $this->herd_model->get_herds_by_region($region_num, $limit_in);
+			if(!isset($arr_regions) || !is_array($arr_regions)){
+				return FALSE;
+			}
+			//extract region number from account number
+			$arr_region_nums = array();
+			foreach($arr_regions AS $k => $v){
+				$arr_region_nums[] = substr($k, -3);
+			}
+			$arr_return_reg = $this->herd_model->get_herds_by_region($arr_region_nums, $limit_in);
 		}
 		if($this->has_permission('View Assigned Herds')){
 			$arr_return_user = $this->herd_model->get_herds_by_user($user_id, $limit_in);
 		}
 		if($this->has_permission('View non-own w permission')){
-			$arr_return_permission = $this->herd_model->get_herds_by_consultant($limit_in);
+			$arr_return_permission = $this->herd_model->get_herds_by_consultant($user_id, $limit_in);
 		}
 		return array_merge($arr_return_reg, $arr_return_user, $arr_return_permission);
 	}
@@ -332,7 +337,7 @@ class As_ion_auth extends Ion_auth {
 			}
 		}
 		if(empty($arr_groups)){
-			$arr_groups[] = array('id'=>'13', 'name'=>'Producer');
+			$arr_groups[] = array('id'=>'2', 'name'=>'Producer');
 			$arr_groups[] = array('id'=>'9', 'name'=>'Consultant');
 		}
 		if(is_array($arr_groups)) {
@@ -482,10 +487,10 @@ class As_ion_auth extends Ion_auth {
 		$config['mailtype'] = $this->config->item('email_type', 'ion_auth');
 		$this->email->initialize($config);
 		$this->email->set_newline("\r\n");
-		$this->email->from($this->config->item('admin_email', 'ion_auth'), $this->config->item('site_title', 'ion_auth'));
+		$this->email->from($this->config->item('admin_email'), $this->config->item('site_title'));
 		$this->email->to($data['email']);
-		$this->email->cc($this->config->item('cust_serv_email', 'ion_auth'));
-		$this->email->subject($this->config->item('site_title', 'ion_auth') . ' - Product Inquiry');
+		$this->email->cc($this->config->item('cust_serv_email'));
+		$this->email->subject($this->config->item('site_title') . ' - Product Inquiry');
 		$this->email->message($message);
 
 		if ($this->email->send()){
@@ -543,6 +548,8 @@ class As_ion_auth extends Ion_auth {
 		else {
 			$tmp_array = $this->ion_auth_model->get_subscribed_super_sections_array($group_id, $user_id, $herd_code);
 		}
+/*	for now, consultant have access to all super sections
+ * 
 		if(!$this->has_permission("View Non-owned Herds") && $this->has_permission("View non-own w permission") && !$this->ion_auth_model->user_owns_herd($herd_code) && !empty($herd_code)){
 			if(is_array($tmp_array) && !empty($tmp_array)){
 				$arr_return = array();
@@ -555,8 +562,8 @@ class As_ion_auth extends Ion_auth {
 			}
 			return FALSE;
 		}
-
-		else return $tmp_array;
+ */
+		return $tmp_array;
 	}
 
 	/**
@@ -569,13 +576,13 @@ class As_ion_auth extends Ion_auth {
 	 * @access public
 	 *
 	 **/
-	public function get_sections_array($group_id, $user_id, $herd_code, $super_section_id = NULL, $arr_scope = NULL){
+	public function get_sections_array($group_id, $user_id, $herd_code, $arr_super_section_id = array(), $arr_scope = NULL){
 		if(isset($arr_scope) && is_array($arr_scope)){
 			$tmp_array = array();
 			foreach($arr_scope as $s){
 				switch ($s) {
 					case 'subscription':
-						$a = $this->ion_auth_model->get_subscribed_sections_array($group_id, $user_id, $super_section_id, $herd_code);
+						$a = $this->ion_auth_model->get_subscribed_sections_array($group_id, $user_id, $arr_super_section_id, $herd_code);
 						if(!empty($a)) $tmp_array = array_merge($tmp_array, $a);
 						break;
 					case 'unmanaged':
@@ -589,14 +596,14 @@ class As_ion_auth extends Ion_auth {
 //						}
 //						break;
 					default: //public, account, user-specific
-						$a = $this->ion_auth_model->get_child_sections_by_scope($s, $super_section_id);
+						$a = $this->ion_auth_model->get_child_sections_by_scope($s, $arr_super_section_id);
 						if(!empty($a)) $tmp_array = array_merge($tmp_array, $a);
 						break;
 				}
 			}
 		}
 		else {
-			$tmp_array = $this->ion_auth_model->get_subscribed_sections_array($group_id, $user_id, $super_section_id, $herd_code);
+			$tmp_array = $this->ion_auth_model->get_subscribed_sections_array($group_id, $user_id, $arr_super_section_id, $herd_code);
 		}
 		if(!$this->has_permission("View Non-owned Herds") && $this->has_permission("View non-own w permission") && !$this->ion_auth_model->user_owns_herd($herd_code) && !empty($herd_code)){
 			if(is_array($tmp_array) && !empty($tmp_array)){
@@ -652,8 +659,29 @@ class As_ion_auth extends Ion_auth {
 	}
 
 	/**
-	 * @method allow_consult()
-	 * @abstract write consultant-herd relationship record
+	 * @method service_grp_exists()
+	 * @description does service group account number exist?
+	 * @param string service group account number
+	 * @return boolean
+	 * @access public
+	 *
+	 **/
+	public function service_grp_exists($sg_acct_num){
+		if(empty($sg_acct_num)){
+			$this->set_error('service_group_required');
+			return FALSE;
+		}
+		$tmp = $this->ion_auth_model->get_service_group_account($sg_acct_num);
+		if(isset($tmp)){
+			return TRUE;
+		}
+		$this->set_error('service_group_not_found');
+		return FALSE;
+	}
+	
+	/**
+	 * @method allow_service_grp()
+	 * @description write consultant-herd relationship record
 	 * @param string consultant user id
 	 * @param string herd code
 	 * @param array sections for which consultant should be give permissions
@@ -661,8 +689,8 @@ class As_ion_auth extends Ion_auth {
 	 * @access public
 	 *
 	 **/
-	public function allow_consult($arr_relationship_data, $arr_section_id) {
-		$old_relationship_id = $this->ion_auth_model->get_consult_relationship_id($arr_relationship_data['consultant_user_id'], $arr_relationship_data['herd_code']);
+	public function allow_service_grp($arr_relationship_data, $arr_section_id) {
+		$old_relationship_id = $this->ion_auth_model->get_consult_relationship_id($arr_relationship_data['sg_user_id'], $arr_relationship_data['herd_code']);
 		//insert into consulants_herds
 		$relationship_id = $this->ion_auth_model->set_consult_relationship($arr_relationship_data, $old_relationship_id);
 		//insert each section into consulants_herds_sections
@@ -672,7 +700,7 @@ class As_ion_auth extends Ion_auth {
 				$this->set_message('consultant_status_update_successful');
 				//send e-mail
 				$arr_herd_info = $this->herd_model->header_info($this->session->userdata('herd_code'));
-				$consultant_info = $this->ion_auth_model->user($arr_relationship_data['consultant_user_id'])->result_array();
+				$consultant_info = $this->ion_auth_model->user($arr_relationship_data['sg_user_id'])->result_array();
 				$consultant_info = $consultant_info[0];
 
 				if($arr_relationship_data['request_status_id'] == 1) $message = $this->load->view($this->config->item('email_templates', 'ion_auth').$this->config->item('consult_granted', 'ion_auth'), $arr_herd_info, true);
@@ -680,10 +708,10 @@ class As_ion_auth extends Ion_auth {
 
 				if(isset($message)){
 					$this->email->clear();
-					$this->email->from($this->config->item('admin_email', 'ion_auth'), $this->config->item('site_title', 'ion_auth'));
+					$this->email->from($this->config->item('admin_email'), $this->config->item('site_title'));
 					$this->email->to($consultant_info['email']);
 					$this->email->cc($this->session->userdata('email'));
-					$this->email->subject($this->config->item('site_title', 'ion_auth') . ' - Consultant Access');
+					$this->email->subject($this->config->item('site_title') . ' - Consultant Access');
 					$this->email->message($message);
 
 					if ($this->email->send() == TRUE) {
@@ -700,7 +728,7 @@ class As_ion_auth extends Ion_auth {
 	}
 
 	/**
-	 * @method consult_request()
+	 * @method service_grp_request()
 	 * @abstract write consultant-herd relationship record
 	 * @param string herd code
 	 * @param int consultant's user id
@@ -710,8 +738,8 @@ class As_ion_auth extends Ion_auth {
 	 * @access public
 	 *
 	 **/
-	public function consult_request($arr_relationship_data, $arr_section_id) {
-		$old_relationship_id = $this->ion_auth_model->get_consult_relationship_id($arr_relationship_data['consultant_user_id'], $arr_relationship_data['herd_code']);
+	public function service_grp_request($arr_relationship_data, $arr_section_id, $cust_serv_email) {
+		$old_relationship_id = $this->ion_auth_model->get_consult_relationship_id($arr_relationship_data['sg_user_id'], $arr_relationship_data['herd_code']);
 		//insert into consulants_herds
 		$relationship_id = $this->ion_auth_model->set_consult_relationship($arr_relationship_data, $old_relationship_id);
 		//insert each section into consulants_herds_sections
@@ -719,8 +747,7 @@ class As_ion_auth extends Ion_auth {
 			$success = $this->ion_auth_model->set_consult_sections($arr_section_id, $relationship_id, $old_relationship_id);
 			if($success){
 				$this->set_message('consultant_request_recorded');
-				$this->send_consultant_request($arr_relationship_data, $relationship_id);
-
+				$this->send_consultant_request($arr_relationship_data, $relationship_id, $cust_serv_email);
 				return TRUE; // Even if e-mail is not sent, consultant info was recorded
 			}
 		}
@@ -738,20 +765,34 @@ class As_ion_auth extends Ion_auth {
 	 * @access public
 	 * @todo remove "die" before uploading to server
 	 **/
-	function send_consultant_request($arr_relationship_data, $relationship_id){
+	function send_consultant_request($arr_relationship_data, $relationship_id, $cust_serv_email){
 		//send e-mail
-		$consultant_info = $this->ion_auth_model->user($arr_relationship_data['consultant_user_id'])->result_array();
+		$consultant_info = $this->ion_auth_model->user($arr_relationship_data['sg_user_id'])->result_array();
 		$consultant_info[0]['relationship_id'] = $relationship_id;
-		$message = $this->load->view($this->config->item('email_templates', 'ion_auth').$this->config->item('consult_request', 'ion_auth'), $consultant_info[0], TRUE);
+		$email_data = array(
+			'id' => $consultant_info[0]['id'],
+			'company' => '',//$consultant_info[0]['company'],
+			'first_name' => $consultant_info[0]['first_name'],
+			'last_name' => $consultant_info[0]['last_name'],
+			'herd_code' => $arr_relationship_data['herd_code'],
+			'sg_acct_num' => $consultant_info[0]['sg_acct_num'],
+		);
+		$message = $this->load->view($this->config->item('email_templates', 'ion_auth').$this->config->item('service_grp_request', 'ion_auth'), $email_data, TRUE);
 		$arr_herd_emails = $this->herd_model->get_herd_emails($arr_relationship_data['herd_code']);
-		$arr_herd_emails = array_flatten($arr_herd_emails);
+		//If there are no myagsource users, send email to customer service
+		if(isset($arr_herd_emails) && is_array($arr_herd_emails)){
+			$arr_herd_emails = array_flatten($arr_herd_emails);
+		}
+		else{
+			$arr_herd_emails = array($cust_serv_email);
+		}
 
 		if(isset($message)){
 			$this->email->clear();
-			$this->email->from($this->config->item('admin_email', 'ion_auth'), $this->config->item('site_title', 'ion_auth'));
+			$this->email->from($this->config->item('admin_email'), $this->config->item('site_title'));
 			$this->email->to($arr_herd_emails);
-			$this->email->cc($this->session->userdata('email'));
-			$this->email->subject($this->config->item('site_title', 'ion_auth') . ' - Consultant Access');
+			//$this->email->cc($this->session->userdata('email'));
+			$this->email->subject($this->config->item('site_title') . ' - Consultant Access');
 			$this->email->message($message);
 
 			if ($this->email->send() == TRUE) {
@@ -760,9 +801,7 @@ class As_ion_auth extends Ion_auth {
 			}
 		}
 		$this->set_error('consultant_status_email_unsuccessful');
-die($message);
+//die($message);
 		return FALSE;
 	}
-	//WHEN LOOKING UP HERDS FOR CONSULTANTS, ENSURE THAT IT IS NOT EXPIRED, AND THAT IT HAS BEEN APPROVED
-
 }

@@ -27,13 +27,13 @@
       				echo form_dropdown('assoc_acct_num[]', $assoc_acct_options, $assoc_acct_selected, $assoc_acct_num);
 	      	?></p>
 	      	<?php
-	      		else: 
+	      		else:
 	      			echo form_input($assoc_acct_num);
 	      		endif;
 	      	endif;
 	      	 
 	      	if(isset($supervisor_acct_num)):?>
-		      	<p id="tech"><?php 
+		      	<p id="tech"><?php
 	     			echo form_label('Link to DHI Supervisor', 'supervisor_acct_num', NULL, $supervisor_acct_num);
 	     			echo form_dropdown('supervisor_acct_num', $supervisor_acct_num_options, $supervisor_acct_num_selected, $supervisor_acct_num);
 			    ?></p>
@@ -49,10 +49,18 @@
 	      
 	      <p><?php echo form_label('Herd Release Code', 'herd_release_code', NULL, $herd_release_code) ?>
 	      <?php echo form_input($herd_release_code);?>
+	      <?php echo anchor($base_url_assets . 'img/find_release_code.png', 'Find release code', 'class="image-link"'); ?>
 	      </p>
 	    </div>
       
-      <p><?php echo form_label('Phone', 'phone1', NULL, $phone1) ?>
+	  <div id="sg">
+	      <p><?php echo form_label('Service Group Acct Num', 'sg_acct_num', NULL, $sg_acct_num) ?>
+	      <?php echo form_input($sg_acct_num);?>
+	      Account numbers are 8 character long and start with &quot;SG&quot;.  If you don't have a Service Group account, please call <?php echo $cs_phone; ?>.
+	      </p>
+      </div>
+	      
+	  <p><?php echo form_label('Phone', 'phone1', NULL, $phone1) ?>
       <?php echo form_input($phone1);?>-<?php echo form_input($phone2);?>-<?php echo form_input($phone3);?>
       </p>
       
@@ -81,7 +89,7 @@
 			endforeach;
 			echo form_fieldset_close();
 		endif; ?>
-     <!--  <p><?php echo form_checkbox('terms', 'Y', set_checkbox('terms','Y'))?> By checking this box, I am confirming that I understand that the account associated with the herd number entered above will be billed according to (<?php echo anchor('gsg/animal_report/billing', $this->config->item("cust_serv_company","ion_auth") . ' billing procedures')?>) for the requested reports.</p> -->
+     <!--  <p><?php echo form_checkbox('terms', 'Y', set_checkbox('terms','Y'))?> By checking this box, I am confirming that I understand that the account associated with the herd number entered above will be billed according to (<?php echo anchor('gsg/animal_report/billing', $this->config->item('cust_serv_company') . ' billing procedures')?>) for the requested reports.</p> -->
       <?php endif; ?>
       <p><?php echo form_submit('submit', 'Create User');?></p>
    <?php echo form_close();?>

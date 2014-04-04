@@ -10,35 +10,29 @@ class Uhm_summary extends parent_report {
 		} */
 	}
 
-	 function index($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL){
+	 function index($block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
 	 	redirect(site_url('summary_reports/uhm_summary/uhm_risk_grp'));
 	 }
-	function uhm_risk_grp($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL){
+	function uhm_risk_grp($block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
 	 	$this->product_name = 'UHM - Risk Analysis';
 		parent::display($block_in, $display_format);
 	 }
-	function uhm_dist_scc($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL){
+	function uhm_dist_scc($block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
 	 	$this->product_name = 'UHM - Distribution by SCC';
 		parent::display($block_in, $display_format);
 	 }
-	 function uhm_dim($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL){
+	 function uhm_dim($block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
 	 	$this->product_name = 'UHM - DIM at First Test';
 	 	parent::display($block_in, $display_format);
 	 }
-	 function uhm_infect($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL){
+	 function uhm_infect($block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
 	 	$this->product_name = 'UHM - Infection by Lact Group';
 	 	parent::display($block_in, $display_format);
 	 }
-	 function uhm_wgt_scc($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL){
+	 function uhm_wgt_scc($block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
 	 	$this->product_name = 'UHM - Weighted Avg SCC';
 	 	parent::display($block_in, $display_format);
 	 }
-	 
-	 /*
-	 * ajax_report: Called via AJAX to populate graphs
-	 * to add flexibility (any graph/table can be called from any page),
-	 * all block generation code has been moved to the report parent ajax_report function
-	 */
 	 
 	 protected function get_section_data($block, $pstring, $sort_by, $sort_order, $report_count){
 	 	$arr_return = array(

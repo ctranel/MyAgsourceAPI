@@ -12,36 +12,31 @@ class Herd_summary extends parent_report {
 		} */
 	}
 
-	 function index($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL){
+	 function index($block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
 	 	redirect(site_url('summary_reports/herd_summary/hs_prod'));
 	 }
-	function hs_prod($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL){
+	function hs_prod($block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
 	 	$this->product_name = 'Herd Summary Production';
 //		$this->page = 'hs_prod'; //corresponds with DB 'pages' table and function name.
 //		$this->report_path = $this->section_path . '/' . $this->page;
  	 
 		parent::display($block_in, $display_format);
 	 }
-	function hs_prod_charts($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL){
+	function hs_prod_charts($block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
 	 	$this->product_name = 'Herd Summary Production Charts';
 		parent::display($block_in, $display_format);
 	 }
-	function hs_repro($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL){
+	function hs_repro($block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
 	 	$this->product_name = 'Herd Summary Reproduction';
 		parent::display($block_in, $display_format);
 	 }
-	function hs_gen($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL){
+	function hs_gen($block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
 	 	$this->product_name = 'Herd Summary Genetics';
 		parent::display($block_in, $display_format);
 	 }
 
-	function hs_inv($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL){
+	function hs_inv($block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
 	 	$this->product_name = 'Herd Summary Inventory';
 		parent::display($block_in, $display_format);
 	 }
-	 /*
-	 * ajax_report: Called via AJAX to populate graphs
-	 * to add flexibility (any graph/table can be called from any page),
-	 * all block generation code has been moved to the report parent ajax_report function
-	 */
 }

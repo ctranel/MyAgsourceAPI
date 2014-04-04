@@ -6,18 +6,17 @@ class Cow_lookup extends CI_Controller {
 	
 	function __construct(){
 		parent::__construct();
-		if((!isset($this->as_ion_auth) || !$this->as_ion_auth->logged_in()) && $this->session->userdata('herd_code') != $this->config->item('default_herd', 'ion_auth')){
+		$this->session->keep_flashdata('message');
+		//make sure previous page remains as the redirect url 
+		$redirect_url = set_redirect_url($this->uri->uri_string(), $this->session->flashdata('redirect_url'), $this->as_ion_auth->referrer);
+		$this->session->set_flashdata('redirect_url', $redirect_url);
+		
+		if((!isset($this->as_ion_auth) || !$this->as_ion_auth->logged_in()) && $this->session->userdata('herd_code') != $this->config->item('default_herd')){
 			$msg = $this->load->view('session_expired', array('url'=>$this->session->flashdata('redirect_url')), true);
 			echo $msg;
 			exit;
 		}
 		
-		$this->session->keep_flashdata('message');
-		
-		//make sure previous page remains as the redirect url 
-//		$tmp = $this->session->flashdata('redirect_url');
-//		$redirect_url = $tmp !== FALSE ? $tmp : $this->as_ion_auth->referrer;
-		set_redirect_url($this->uri->uri_string());
 		/* Load the profile.php config file if it exists
 		if (ENVIRONMENT == 'development') {
 			$this->config->load('profiler', false, true);
@@ -40,6 +39,7 @@ class Cow_lookup extends CI_Controller {
 			,'events_content' => $this->load->view('cow_lookup/events', $events_data, true)
     		,'tab' => $tab
     	);
+    	$this->_record_access(93);
     	$this->load->view('cow_lookup/land', $data);
 	}
 	
@@ -139,8 +139,19 @@ class Cow_lookup extends CI_Controller {
 		$this->curr_calving_date = $events_data['curr_calving_date'];
 	} 
 	
-	function log_page(){
-		echo $this->access_log_model->write_entry(); //19 is the page code for DM Login
-		exit;
+	protected function _record_access($event_id){
+		$herd_code = $this->session->userdata('herd_code');
+		$herd_enroll_status_id = empty($herd_code) ? NULL : $this->session->userdata('herd_enroll_status_id');
+		$recent_test = $this->session->userdata('recent_test_date');
+		$recent_test = empty($recent_test) ? NULL : $recent_test;
+		
+		$this->access_log_model->write_entry(
+			$event_id,
+			$herd_code,
+			$recent_test,
+			$herd_enroll_status_id,
+			$this->session->userdata('user_id'),
+			$this->session->userdata('active_group_id')
+		);
 	}
 }

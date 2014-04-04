@@ -8,7 +8,6 @@ class Land extends parent_report {
 	}
 	
 	function index($pstring = NULL){
-		$this->load->model('herd_model');
 		$this->load->model('alert_model');
 		$arr_pstring = $this->session->userdata('arr_pstring');
 		if(isset($pstring)){
@@ -59,7 +58,7 @@ class Land extends parent_report {
 		
 //		if((is_array($arr_nav_data['arr_pages']) && count($arr_nav_data['arr_pages']) > 1) || (is_array($arr_nav_data['arr_pstring']) && count($arr_nav_data['arr_pstring']) > 1)) $data['report_nav'] = $this->load->view($report_nav_path, $arr_nav_data, TRUE);
 		
-		//$this->access_log_model->write_entry($this->{$this->primary_model}->arr_blocks[$this->page]['page_id'], 'web');
+		$this->_record_access(94, NULL, 'web');
 		$this->load->view('auth/dashboard/main-bench', $this->data);
 		//$this->load->view('report', $data);
 	}
@@ -77,7 +76,7 @@ class Land extends parent_report {
 			$this->session->keep_flashdata('redirect_url');
 			redirect(site_url('change_herd/select'));
 		}
-		$this->data['message'] = $this->session->flashdata('message');
+		$this->page_header_data['message'] = $this->session->flashdata('message');
 
 		//set variables for sample report card
 //		$this->load->model('report_card_model');
@@ -110,16 +109,6 @@ class Land extends parent_report {
 				)
 			);
 		}
-		$this->footer_data = Array(
-/*			'arr_foot_line'=>array(
-				'<script type="text/javascript"> //for chart
-					head.ready("card_helper", function(){//load_chart("' . $ajax_url . '", false);
-						load_chart("' . site_url("/report_card/ajax_graph/production/" . $pstring . "/chart/" . $benchmarks_id . "/" . $all_breeds_code) . '", "snapshot-chart");
-						load_chart("' . site_url("/report_card/ajax_graph/inventory/" . $pstring . "/chart/" . $benchmarks_id . "/" . $all_breeds_code) . '");
-					});
-				</script>'
-			)
-*/		);
 
 		//header and footer
 		$this->page_header_data['section_nav'] = $this->load->view('auth/section_nav', NULL, TRUE);
@@ -128,7 +117,6 @@ class Land extends parent_report {
 //		$this->load->_ci_cached_vars = array();
 		//widgets (pull from DB?)
 		//get_herd_data
-		$this->load->model('herd_model');
 		$herd_data = $this->herd_model->header_info($this->session->userdata('herd_code'));
 		$this->data['widget']['sections'][] = array(
 			'content' => $this->load->view('auth/dashboard/herd_data', $herd_data, TRUE),
@@ -175,7 +163,7 @@ class Land extends parent_report {
 			if(isset($consultants_by_status['open']) && is_array($consultants_by_status['open'])){
 				$section_data['content'] = $this->_set_consult_section($consultants_by_status['open'], 'open', 'Open Requests', array('Grant Access', 'Deny Access'));
 				$this->data['widget']['info'][] = array(
-					'content' => $this->load->view('auth/dashboard/open_consult_requests', $section_data, TRUE),
+					'content' => $this->load->view('auth/dashboard/open_service_grp_requests', $section_data, TRUE),
 					'title' => 'Open Consultant Requests'
 				);
 			}
@@ -196,7 +184,7 @@ class Land extends parent_report {
 		);
 		$this->data['widget']['agsource'][] = array(
 			'content' => $this->load->view('auth/dashboard/youtube', NULL, TRUE),
-			'title' => $this->config->item("cust_serv_company","ion_auth") . ' Video'
+			'title' => $this->config->item("cust_serv_company") . ' Video'
 		);
 		$full_width['inner_html'] = $this->load->view('chart', NULL, TRUE);
 		$this->data['widget']['full_width'][] = array(

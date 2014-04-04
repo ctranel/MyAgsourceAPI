@@ -66,7 +66,7 @@ if(isset($arr_events) && is_array($arr_events)): ?>
 			$class = $cnt % 2 == 1 ? 'odd' : 'even'; ?>
 			<tr class="<?php echo $class; ?>">
 				<td><?php echo $e['event_date']; ?></td>
-				<td><?php echo $e['event_desc']; ?></td>
+				<td><?php echo $e['short_desc']; ?></td>
 				<td><?php echo $e['event_data']; ?></td>
 			</tr>
 <?php 	$cnt++;
