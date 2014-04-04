@@ -46,7 +46,7 @@ class Herd_model extends CI_Model {
 	 * @author ctranel
 	 **/
 	function get_herds_by_region($region_arr_in, $limit = NULL){
-		if (!isset($region_arr_in) or empty($region_arr_in)) {
+		if (!isset($region_arr_in)  || !is_array($region_arr_in) || empty($region_arr_in)) {
 			return FALSE;
 		}	
 		$this->db->where_in('h.association_num', $region_arr_in);
@@ -68,8 +68,6 @@ class Herd_model extends CI_Model {
 		->where('(ch.exp_date > GETDATE() OR ch.exp_date IS NULL)')
 		->where('request_status_id', 1);
 		return $this->get_herds();
-		
-		
 	}
 	/**
 	 * @method get_herds_by_user
@@ -206,14 +204,9 @@ class Herd_model extends CI_Model {
 	 * @author ctranel
 	 **/
 	function get_herd_codes_by_region($region_arr_in, $limit = NULL){
-		if (!isset($region_arr_in) or empty($region_arr_in)) {
-			// no region(s) were sent to this function -- fail this function.
+		if (!isset($region_arr_in) || !is_array($region_arr_in) || empty($region_arr_in)) {
 			return FALSE;
 		}	
-		// incoming array might be a multi-dimentional array. If so, need to flatten it into simple array before it can be used in the where clause.
-		$region_arr_in = array_keys($region_arr_in);
-		
-		if(!is_array($region_arr_in)) $region_arr_in = array($region_arr_in);
 		$this->db->where_in('association_num', $region_arr_in);
 		return $this->get_herd_codes($limit);
 	}

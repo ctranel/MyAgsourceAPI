@@ -295,7 +295,7 @@ class As_ion_auth extends Ion_auth {
 	 * @access public
 	 *
 	 **/
-	public function get_viewable_herd_codes($user_id, $region_num = false, $limit_in = NULL){
+	public function get_viewable_herd_codes($user_id, $arr_regions = false, $limit_in = NULL){
 		$arr_return_reg = array();
 		$arr_return_user = array();
 		$arr_return_permission = array();
@@ -304,7 +304,15 @@ class As_ion_auth extends Ion_auth {
 			return $this->herd_model->get_herd_codes(null, null, $limit_in);
 		}
 		if($this->has_permission('View Herds In Region')){
-			$tmp = $this->herd_model->get_herd_codes_by_region($region_num, $limit_in);
+			if(!isset($arr_regions) || !is_array($arr_regions)){
+				return FALSE;
+			}
+			//extract region number from account number
+			$arr_region_nums = array();
+			foreach($arr_regions AS $k => $v){
+				$arr_region_nums[] = substr($k, -3);
+			}
+			$tmp = $this->herd_model->get_herd_codes_by_region($arr_region_nums, $limit_in);
 			if(isset($tmp) && is_array($tmp)) $arr_return_reg = $tmp;
 			unset($tmp);
 		}
