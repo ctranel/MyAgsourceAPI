@@ -45,7 +45,7 @@
 	$config['tables']['dhi_supervisors']  		= 'address.dbo.dhi_supervisor';
 	$config['tables']['users_dhi_supervisors']  = 'users.dbo.users_dhi_supervisors';//address.dbo.dhi_supervisor';
 	$config['tables']['regions']  				= 'address.dbo.association';//users.dbo.regions';
-	//$config['tables']['users_associations']  	= 'users.dbo.users_associations';
+	$config['tables']['users_associations']  	= 'users.dbo.users_associations';
 	$config['tables']['users']   				= 'users.dbo.users';
 	$config['tables']['users_groups']    		= 'users.dbo.users_groups';
 	$config['tables']['meta']    				= 'users_meta'; 
@@ -66,7 +66,7 @@
 	 * Meta sections to be included with profile.
 	 * Each should have a config setting for 'towrite' 'tables', 'join' and 'columns'
 	 **/
-	$config['meta_sections']         = array('users_service_groups','users_dhi_supervisors', 'users_herds', 'users_sections');////'meta', 'users_associations', 
+	$config['meta_sections']         = array('users_associations','users_service_groups','users_dhi_supervisors', 'users_herds', 'users_sections');////'meta', 
 //	$config['herd_meta_sections']         = array('herds_sections');
 	
 	/**
@@ -75,7 +75,7 @@
 	 **/
 	$config['towrite'] = array(
 		'users_herds'		=> array('herd_code'),
-		//'users_associations'	=> array('assoc_acct_num'),//associations can be derived from supervisor data
+		'users_associations'	=> array('assoc_acct_num'),
 		'users_dhi_supervisors'=> array('supervisor_acct_num'),
 		'users_service_groups'=> array('sg_acct_num'),
 		//'meta'		=> array(),
@@ -92,7 +92,7 @@
 		'groups'	=> 'group_id',//from ion_auth
 		'users'		=> 'user_id', //from ion_auth
 		'users_herds'		=> 'user_id',
-		//'users_associations'	=> 'user_id',//associations can be derived from supervisor data
+		'users_associations'	=> 'user_id',
 		'users_dhi_supervisors'=> 'user_id',
 		'users_service_groups'=> 'user_id',
 		//'meta'		=> 'user_id',
@@ -105,7 +105,7 @@
 	 **/
 	$config['columns'] = array(
 		'users_herds'		=> array('herd_code'),
-		//'users_associations'	=> array('assoc_acct_num'), //associations can be derived from supervisor data
+		'users_associations'	=> array('assoc_acct_num'),
 		'users_dhi_supervisors'=> array('supervisor_acct_num'),
 		'users_service_groups'=> array('sg_acct_num'),
 		//'meta'		=> array('first_name', 'last_name', 'company', 'phone'),
