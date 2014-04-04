@@ -183,7 +183,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 	{
 		if (!empty($this->meta_sections)){
 			foreach($this->meta_sections as $s){
-				if($s != 'users_sections'){ //creates multiple records for users with multiple sections.
+				if($s != 'users_sections' && $s != 'users_herds'){ //creates multiple records for users with multiple sections.
 					if (!empty($this->columns[$s])) {
 						foreach ($this->columns[$s] as $field){
 							$this->db->select($this->tables[$s].'.'. $field);
@@ -218,7 +218,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 		}
 		
 		$this->db->select("CAST(REPLACE((SELECT group_id AS [data()] FROM " . $this->tables['users_groups'] . " AS g2 WHERE " . $this->tables['users_groups'] . ".user_id = g2.user_id ORDER BY group_id FOR xml path('')), ' ', ', ') AS VARCHAR(45)) AS arr_groups",FALSE);
-		$this->db->select("CAST(REPLACE((SELECT herd_code AS [data()] FROM " . $this->tables['users_herds'] . " AS h2 WHERE " . $this->tables['users_herds'] . ".user_id = h2.user_id ORDER BY herd_code FOR xml path('')), ' ', ', ') AS VARCHAR(180)) AS herd_code",FALSE);
+		//$this->db->select("CAST(REPLACE((SELECT herd_code AS [data()] FROM " . $this->tables['users_herds'] . " AS h2 WHERE " . $this->tables['users_herds'] . ".user_id = h2.user_id ORDER BY herd_code FOR xml path('')), ' ', ', ') AS VARCHAR(180)) AS herd_code",FALSE);
 		
 		if($limit) $this->db->limit($limit, $offset);
 		$this->db->distinct();
