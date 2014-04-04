@@ -55,9 +55,9 @@ class Filters{
 		return $this->log_filter_text;
 	}
 
-	public function displayFilters(){
+	public function displayFilters($is_summary){
 		$arr_display_filters = array_diff($this->arr_filters_list, array('pstring'));
-		$ret_val = count($arr_display_filters) > 0 || count($this->primary_model->arr_pstring) > 1;
+		$ret_val = count($arr_display_filters) > 0 || (count($this->primary_model->arr_pstring) > 1 && !$is_summary);
 		return $ret_val;
 	}
 	

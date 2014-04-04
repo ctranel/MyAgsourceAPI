@@ -314,7 +314,7 @@ abstract class parent_report extends CI_Controller {
 		$this->carabiner->css('chart.css', 'print');
 		$this->carabiner->css('report.css', 'print');
 		$this->carabiner->css($this->section_path . '.css', 'screen');
-		if($this->filters->displayFilters()){
+		if($this->filters->displayFilters($this->bool_is_summary)){
 			$this->carabiner->css('filters.css', 'screen');
 		}
 		else{
