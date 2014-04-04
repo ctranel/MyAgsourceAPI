@@ -289,10 +289,10 @@ class Ion_auth_model extends Ion_auth_parent_model
 	{
 		if(!isset($assoc_acct_num)) return FALSE;
 		if(!is_array($assoc_acct_num)) $assoc_acct_num = array($assoc_acct_num);
-		$this->db->join($this->tables['users_dhi_supervisors'] . ' us', 'u.id = us.user_id')
-		->join($this->tables['dhi_supervisors'] . ' s', 'us.supervisor_acct_num = s.account_num')
-		->join($this->tables['regions'] . ' r', 's.affiliate_num = r.affiliate_num AND s.association_num = r.association_num')
-		->where_in('r.account_num', $assoc_acct_num);
+		$this->db
+			->join($this->tables['users_associations'] . ' ua',  'u.id = ua.user_id')
+			->join($this->tables['regions'] . ' r', 'ua.assoc_acct_num = r.account_num')
+			->where_in('r.account_num', $assoc_acct_num);
 		$this->users();
 		return $this;
 	}
@@ -329,11 +329,11 @@ class Ion_auth_model extends Ion_auth_parent_model
 		
 		$arr_db_regions = $this->db
 			->select('r.account_num, r.assoc_name')
-			->join($this->tables['users_dhi_supervisors'] . ' us', 'u.id = us.user_id')
-			->join($this->tables['dhi_supervisors'] . ' s', 'us.supervisor_acct_num = s.account_num')
-			->join($this->tables['regions'] . ' r', 's.affiliate_num = r.affiliate_num AND s.association_num = r.association_num')
+			->join($this->tables['users_associations'] . ' ua', 'u.id = ua.user_id')
+			->join($this->tables['regions'] . ' r', 'ua.assoc_acct_num = r.account_num')
 			->where('u.id', $id)
 			->where('u.status', 1)
+			->where('r.status_active', 1)
 			->get($this->tables['users'] . ' u')
 			->result_array();
 
@@ -1080,7 +1080,10 @@ SELECT DISTINCT id, name, list_order FROM cteAnchor ORDER BY list_order;";
 	 * @author ctranel
 	 **/
 	public function get_dhi_supervisors() {
-		return $this->db->get($this->tables['dhi_supervisors']);
+		return $this->db
+		->where($this->tables['dhi_supervisors'] . '.status_code', 'A')
+		->where($this->tables['dhi_supervisors'] . '.termination_date IS NULL')
+		->get($this->tables['dhi_supervisors']);
 	}
 
 	/**
