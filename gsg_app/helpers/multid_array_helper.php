@@ -318,7 +318,7 @@ if ( ! function_exists('get_elements_by_key')) {
 	 * @author ctranel
 	 */
  
-	function get_elements_by_key($key, $array, &$ret_val = NULL){
+	function get_elements_by_key($key, $array, &$ret_val = array()){
 		foreach($array as $k => $v){
 			if($k === $key){
 				$ret_val[] = $v;
