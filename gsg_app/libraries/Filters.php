@@ -20,6 +20,7 @@ class Filters{
 	private $ci;
 	private $sect_id;
 	private $page;
+	private $arr_filters_list;
 	private $arr_params;
 	private $criteria;
 	private $primary_model;
@@ -39,9 +40,8 @@ class Filters{
 		$this->primary_model = $lib_data['primary_model'];
 		$this->log_filter_text = $lib_data['log_filter_text'];
 		$this->report_path = $lib_data['report_path'];
-		
 	}
-
+	
 	public static function get_filter_array($json_array){
 		//get arguments from json
 		$ci =& get_instance();
@@ -54,9 +54,14 @@ class Filters{
 	public function get_filter_text(){
 		return $this->log_filter_text;
 	}
-		
+
+	public function displayFilters(){
+		$arr_display_filters = array_diff($this->arr_filters_list, array('pstring'));
+		$ret_val = count($arr_display_filters) > 0 || count($this->primary_model->arr_pstring) > 1;
+		return $ret_val;
+	}
 	
-	public function set_filters($is_summary = TRUE){
+	public function set_filters(){
 		//get filters from DB for the current page
 		$arr_page_filters = $this->ci->filter_model->get_page_filters($this->sect_id, $this->page);
 		
@@ -77,7 +82,7 @@ class Filters{
 				list($this->criteria[$k . '_dbfrom'], $this->criteria[$k . '_dbto']) = explode('|', $f['default_value']);
 			}
 			elseif(!isset($this->criteria[$k])) $this->criteria[$k] = $f['default_value'];
-			$arr_filters_list[] = $f['db_field_name'];
+			$this->arr_filters_list[] = $f['db_field_name'];
 		}
 		
 		$this->arr_params = array_filter($this->arr_params, function($val){
@@ -128,7 +133,7 @@ class Filters{
 
 		//create array of all filter data		
 		$filter_data = array(
-				'arr_filters'=>isset($arr_filters_list) && is_array($arr_filters_list)?$arr_filters_list:array(),
+				'arr_filters'=>isset($this->arr_filters_list) && is_array($this->arr_filters_list)?$this->arr_filters_list:array(),
 				'filter_selected'=>$this->criteria,
 				'report_path'=>$this->report_path,
 				'arr_pstring'=>$this->primary_model->arr_pstring);				

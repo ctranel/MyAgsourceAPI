@@ -226,7 +226,7 @@ abstract class parent_report extends CI_Controller {
 		$this->load->library('filters',$filter_lib_data);
 		$this->load->library('form_validation');
 
-		$arr_filter_data = $this->filters->set_filters($this->bool_is_summary);
+		$arr_filter_data = $this->filters->set_filters();
 		
 		$this->arr_filter_criteria = $arr_filter_data['filter_selected'];
 
@@ -314,9 +314,13 @@ abstract class parent_report extends CI_Controller {
 		$this->carabiner->css('chart.css', 'print');
 		$this->carabiner->css('report.css', 'print');
 		$this->carabiner->css($this->section_path . '.css', 'screen');
-		if($this->bool_is_summary) $this->carabiner->css('hide_filters.css', 'screen');
-		else $this->carabiner->css('filters.css', 'screen');
-
+		if($this->filters->displayFilters()){
+			$this->carabiner->css('filters.css', 'screen');
+		}
+		else{
+			$this->carabiner->css('hide_filters.css', 'screen');
+		}
+		$this->filters->displayFilters();
 		//get_herd_data
 		$herd_data = $this->herd_model->header_info($this->session->userdata('herd_code'));
 		
@@ -356,7 +360,6 @@ abstract class parent_report extends CI_Controller {
 						'sort_by' => $sort_by,
 						'sort_order' => $sort_order,
 					);
-//print($arr_blk_data['link_url']);
 					$arr_view_blocks[] = $this->load->view($display, $arr_blk_data, TRUE);
 					//add js line to populate the block after the page loads
 					$tmp_container_div = $display == 'chart' ? 'graph-canvas' . $x : 'table-canvas' . $x;
@@ -422,7 +425,9 @@ abstract class parent_report extends CI_Controller {
 		}
 		$this->page_footer_data = array();
 		$report_nav_path = 'report_nav';
-		if(file_exists(APPPATH . 'views' . FS_SEP . $this->section_path . FS_SEP . 'report_nav.php')) $report_nav_path =  $this->section_path . '/' . $report_nav_path;
+		if(file_exists(APPPATH . 'views' . FS_SEP . $this->section_path . FS_SEP . 'report_nav.php')){
+			$report_nav_path =  $this->section_path . '/' . $report_nav_path;
+		}
 		if(count($arr_nav_data['arr_pages']) < 2) {
 			$this->carabiner->css('hide_report_nav.css', 'screen');
 		}
@@ -484,7 +489,7 @@ abstract class parent_report extends CI_Controller {
 			//load required libraries
 			$this->load->library('filters',$filter_lib_data);
 
-			$arr_filter_data = $this->filters->set_filters($this->bool_is_summary);
+			$arr_filter_data = $this->filters->set_filters();
 
 			$this->arr_filter_criteria = $arr_filter_data['filter_selected'];
 			
