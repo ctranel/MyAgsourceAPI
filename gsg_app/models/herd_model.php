@@ -49,11 +49,7 @@ class Herd_model extends CI_Model {
 		if (!isset($region_arr_in) or empty($region_arr_in)) {
 			return FALSE;
 		}	
-		// incoming array might be a multi-dimentional array. If so, need to flatten it into simple array before it can be used in the where clause.
-		$region_arr_in = array_keys($region_arr_in);
-		
-		if(!is_array($region_arr_in)) $region_arr_in = array($region_arr_in);
-		$this->db->where_in('association_num', $region_arr_in);
+		$this->db->where_in('h.association_num', $region_arr_in);
 		return $this->get_herds($limit);
 	}
 
