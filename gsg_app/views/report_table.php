@@ -58,16 +58,13 @@
 										$params = substr($params, 0, -1);
 									}
 								}
-								if(empty($link)){
-									//do nothing.  This prevents error when there is data entered in params, but not for links
-								}
-								elseif(substr($link, 0, 1) == '#'){
+								if(substr($link, 0, 1) == '#'){
 									$value = anchor($link, $value, $rel . $title . $class);
 								}
-								elseif(strpos($link, 'http') === FALSE || strpos($link, 'myagsource.com') !== FALSE){
+								elseif((strpos($link, 'http') === FALSE && !empty($link)) || strpos($link, 'myagsource.com') !== FALSE){
 									$value = anchor(site_url($link . $site_params), $value, $rel . $title . $class);
 								}
-								else{
+								elseif(!empty($link)){
 									$value = anchor(site_url($link . '?' . $params), $value, $rel . $title . $class);
 								}
 							}
