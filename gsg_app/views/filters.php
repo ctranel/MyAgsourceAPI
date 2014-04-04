@@ -3,7 +3,6 @@
 <div id="filters">
 <?php echo validation_errors(); ?>
 <?php if(isset($form_url) === false) $form_url = current_url(); ?>
-<?php //$link_url = str_replace('display', 'filter', $form_url)?>
 <div class="handle"><a id="set-filters" class="handle">Set Filters </a></div>
 <?php //echo anchor("#","Apply Filters", 'class="handle"'); ?>
 <?php echo form_open($form_url, array('name'=>'filter-form', 'id'=>'filter-form'));?>

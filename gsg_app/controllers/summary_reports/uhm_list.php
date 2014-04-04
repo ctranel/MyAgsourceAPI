@@ -12,38 +12,38 @@ class UHM_List extends parent_report {
 		} */
 	}
 
-	 function index($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL){
+	 function index($block_in = NULL, $display_format = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
 	 	redirect(site_url('summary_reports/uhm_list/uhl_chronic'));
 	 }
-	function uhl_chronic($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL){
+	function uhl_chronic($block_in = NULL, $display_format = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
 	 	$this->product_name = 'UHM Chronic Cow List';
 		parent::display($block_in, $display_format);
 	 }
-	function uhl_fail($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL){
+	function uhl_fail($block_in = NULL, $display_format = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
 	 	$this->product_name = 'UHM Dry Period Failure to Cure List';
 		parent::display($block_in, $display_format);
 	 }
-	 	function uhl_dry($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL){
+	 	function uhl_dry($block_in = NULL, $display_format = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
 	 	$this->product_name = 'UHM Dry Cow List';
 		parent::display($block_in, $display_format);
 	 }
-	function uhl_fr_inf($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL){
+	function uhl_fr_inf($block_in = NULL, $display_format = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
 	 	$this->product_name = 'UHM Fresh Cow Infection List';
 		parent::display($block_in, $display_format);
 	 }
-	function uhl_lact_inf($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL){
+	function uhl_lact_inf($block_in = NULL, $display_format = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
 	 	$this->product_name = 'UHM Lactating Cow New Infection List';
 		parent::display($block_in, $display_format);
 	 }
-	function uhl_response($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL){
+	function uhl_response($block_in = NULL, $display_format = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
 	 	$this->product_name = 'UHM Response to New Infection List';
 		parent::display($block_in, $display_format);
 	 }
-	function uhl_car_code($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL){
+	function uhl_car_code($block_in = NULL, $display_format = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
 	 	$this->product_name = 'UHM CAR Codes & Milk Withheld Indicator';
 		parent::display($block_in, $display_format);
 	 }
-	function uhl_high_scc($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL){
+	function uhl_high_scc($block_in = NULL, $display_format = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
 	 	$this->product_name = 'UHM High SCC Cows';
 		parent::display($block_in, $display_format);
 	 }

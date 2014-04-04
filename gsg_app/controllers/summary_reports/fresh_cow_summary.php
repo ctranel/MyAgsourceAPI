@@ -10,18 +10,18 @@ class Fresh_cow_summary extends parent_report {
 		} */
 	}
 
-	 function index($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL){
+	 function index($block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
 	 	redirect(site_url('summary_reports/fresh_cow_summary/fc_tci'));
 	 }
-	function fc_tci($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL){
+	function fc_tci($block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
 	 	$this->product_name = 'Fresh Cow Summary - TCI';
 		parent::display($block_in, $display_format);
 	 }
-	function fc_cull($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL){
+	function fc_cull($block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
 	 	$this->product_name = 'Fresh Cow Summary - Culling';
 		parent::display($block_in, $display_format);
 	 }
-	function fc_health($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL){
+	function fc_health($block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
 	 	$this->product_name = 'Fresh Cow Summary - Health';
 		parent::display($block_in, $display_format);
 	 }

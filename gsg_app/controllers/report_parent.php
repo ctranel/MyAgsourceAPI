@@ -234,7 +234,7 @@ abstract class parent_report extends CI_Controller {
 			$data = array();
 			if(isset($arr_blocks) && is_array($arr_blocks)){
 				foreach($arr_blocks as $pb){
-					if($pb['display_type'] == 'table'){
+					if($pb['display_type'] !== 'table'){
 						continue;
 					}
 					if(($arr_block_in !== NULL && in_array($pb['url_segment'], $arr_block_in)) || $arr_block_in == NULL){
@@ -347,14 +347,16 @@ abstract class parent_report extends CI_Controller {
 					elseif($x == ($cnt - 1)) $odd_even = 'chart-last-odd';
 					else $odd_even = 'chart-odd';
 					if($display == 'table') $cnt = 0;
-
 					$arr_blk_data = array(
 						'block_num' => $x, 
-						'link_url' => site_url($this->section_path . '/' . $this->page . '/' . $pb['url_segment'] . '/' . $sort_by . '/' . $sort_order), 
+						'link_url' => site_url($this->section_path) . '/' . $this->page . '/' . $pb['url_segment'], 
 						'form_id' => $this->report_form_id,
 						'odd_even' => $odd_even,
 						'block' => $pb['url_segment'],
+						'sort_by' => $sort_by,
+						'sort_order' => $sort_order,
 					);
+//print($arr_blk_data['link_url']);
 					$arr_view_blocks[] = $this->load->view($display, $arr_blk_data, TRUE);
 					//add js line to populate the block after the page loads
 					$tmp_container_div = $display == 'chart' ? 'graph-canvas' . $x : 'table-canvas' . $x;

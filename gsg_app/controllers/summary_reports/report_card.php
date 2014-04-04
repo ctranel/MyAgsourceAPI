@@ -12,14 +12,14 @@ class Report_card extends parent_report {
 		} */
 	}
 
-	 function index($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL){
+	 function index($block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
 	 	redirect(site_url('summary_reports/report_card/rc_curr'));
 	 }
-	function rc_curr($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL){
+	function rc_curr($block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
 	 	$this->product_name = 'Report Card - Current Test';
 		parent::display($block_in, $display_format);
 	 }
-	function rc_long($block_in = NULL, $sort_by = NULL, $sort_order = NULL, $display_format = NULL){
+	function rc_long($block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
 	 	$this->product_name = 'Report Card - Long View';
 		parent::display($block_in, $display_format);
 	 }
