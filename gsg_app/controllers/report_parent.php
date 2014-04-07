@@ -56,7 +56,8 @@ abstract class parent_report extends CI_Controller {
 		$this->report_form_id = 'report_criteria';//filter-form';
 		$this->herd_code = strlen($this->session->userdata('herd_code')) == 8?$this->session->userdata('herd_code'):NULL;
 		$this->page_header_data['user_sections'] = $this->as_ion_auth->arr_user_super_sections;
-
+		$this->page_header_data['num_herds'] = $this->as_ion_auth->get_num_viewable_herds($this->session->userdata('user_id'), $this->session->userdata('arr_regions'));
+		
 		//load most specific model available.  Must load model before setting section_id
 		if(file_exists(APPPATH . 'models' . FS_SEP . $this->section_path . FS_SEP . $this->primary_model . '_model.php')){
 			$this->load->model($this->section_path . '/' . $this->primary_model, '', FALSE, $this->section_path);

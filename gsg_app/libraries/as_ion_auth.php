@@ -324,6 +324,20 @@ class As_ion_auth extends Ion_auth {
 		}
 		return array_merge($arr_return_reg, $arr_return_user, $arr_return_permission);
 	}
+	
+	/**
+	 * @method get_viewable_herds()
+	 * @param int user_id
+	 * @param array of region acct_num=>name
+	 * @return mixed array of herds or boolean
+	 * @access public
+	 *
+	 **/
+	public function get_num_viewable_herds($user_id, $arr_regions = false){
+		return count($this->get_viewable_herd_codes($user_id, $arr_regions));
+	}
+	
+	
 
 	/**
 	 * @method get_group_dropdown_data()

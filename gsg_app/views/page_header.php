@@ -93,7 +93,7 @@
 					<li><?php echo anchor('auth/manage_service_grp', 'Manage Consultant Access'); ?></li>
 					<!-- <li><?php echo anchor('auth/service_grp_access', 'Grant Herd Access'); ?></li> -->
 				<?php endif; ?>
-				<?php if($this->as_ion_auth->has_permission("Select Herd")): ?>
+				<?php if($this->as_ion_auth->has_permission("Select Herd") && isset($num_herds) && $num_herds > 1): ?>
 					<li><?php echo anchor('change_herd/select', 'Change Herd'); ?></li>
 				<?php endif; ?>
 				<?php if($this->as_ion_auth->has_permission("Request Herd")): ?>
@@ -111,26 +111,28 @@
 			<?php if(isset($section_nav) && !empty($section_nav)):
 				echo $section_nav;
 			endif;
-			if(($this->as_ion_auth->logged_in())): ?>
-				<li class="sectionnav"><a class="dropdown-toggle" data-toggle="dropdown" name="section-nav">Select Report</a><br />
-					<ul class="dropdown-menu" role="menu">
-						<?php $arr_tmp = $user_sections;
-						if(isset($arr_tmp) && is_array($arr_tmp)):
-							foreach($arr_tmp as $a): ?>
-								<li role="presentation"><?php echo anchor($url . $a['path'], $a['name']);?></li>
-							<?php endforeach;
-						endif; ?>
-					</ul>
-				</li> <!-- close "Select Section" li -->
-				<?php $arr_groups = $this->session->userdata('arr_groups');
+			if(($this->as_ion_auth->logged_in())):
+				if(false): ?>
+					<li class="sectionnav"><a class="dropdown-toggle" data-toggle="dropdown" name="section-nav">Select Report</a><br />
+						<ul class="dropdown-menu" role="menu">
+							<?php $arr_tmp = $user_sections;
+							if(isset($arr_tmp) && is_array($arr_tmp)):
+								foreach($arr_tmp as $a): ?>
+									<li role="presentation"><?php echo anchor($url . $a['path'], $a['name']);?></li>
+								<?php endforeach;
+							endif; ?>
+						</ul>
+					</li> <!-- close "Select Section" li -->
+				<?php endif;
+				$arr_groups = $this->session->userdata('arr_groups');
 				if(isset($arr_groups) && is_array($arr_groups) && count($arr_groups) > 1): ?>
-				<li class="groupnav"><a class="dropdown-toggle" data-toggle="dropdown"><?php echo $arr_groups[$this->session->userdata('active_group_id')]; ?></a><br />
-					<ul class="dropdown-menu" role="menu">
-						<?php foreach($arr_groups as $k=>$v): ?>
-							<li role="presentation"><?php echo anchor($url . 'auth/set_role/'. $k, $v);?></li>
-						<?php endforeach; ?>
-					</ul>
-				</li> <!-- close "Select Section" li -->
+					<li class="groupnav"><a class="dropdown-toggle" data-toggle="dropdown"><?php echo $arr_groups[$this->session->userdata('active_group_id')]; ?></a><br />
+						<ul class="dropdown-menu" role="menu">
+							<?php foreach($arr_groups as $k=>$v): ?>
+								<li role="presentation"><?php echo anchor($url . 'auth/set_role/'. $k, $v);?></li>
+							<?php endforeach; ?>
+						</ul>
+					</li> <!-- close "Select Section" li -->
 				<?php endif; ?>
 			<?php endif; ?>
 		</ul>

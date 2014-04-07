@@ -14,6 +14,7 @@ class Custom_report extends CI_Controller {
 //		}
 
 		$this->page_header_data['user_sections'] = $this->as_ion_auth->arr_user_super_sections;
+		$this->page_header_data['num_herds'] = $this->as_ion_auth->get_num_viewable_herds($this->session->userdata('user_id'), $this->session->userdata('arr_regions'));
 		
 		//load necessary files
 		$this->load->model('custom_report_model');
