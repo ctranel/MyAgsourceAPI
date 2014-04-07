@@ -139,7 +139,6 @@ class Reports{
 		$delimiter = ",";
 		$newline = "\r\n";
 		$this->ci->config->set_item('compress_output', FALSE);
-		//$this->load->helper('table_header');
 		$this->ci->load->helper('csv');
 		
 		$filename = $this->herd_code . '-' . date('mdy-His') . '.csv';

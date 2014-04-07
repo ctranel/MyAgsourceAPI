@@ -266,7 +266,7 @@ abstract class parent_report extends CI_Controller {
 			exit;
 		}
 		elseif ($display_format == 'pdf' && !is_null($arr_block_in)) {
-			$this->load->helper('table_header');
+			$this->load->library('table_header');
 			$data = array();
 			$herd_data = $this->herd_model->header_info($this->session->userdata('herd_code'));
 			$i = 0;
@@ -295,7 +295,7 @@ abstract class parent_report extends CI_Controller {
 						$tmp_pdf_width = $this->{$this->primary_model}->get_pdf_widths(); 
 						$block[$i]['arr_pdf_widths'] = $tmp_pdf_width;
 						$arr_header_data = $this->{$this->primary_model}->get_fields(); // was $model
-						$block[$i]['header_structure'] = get_table_header_array($arr_header_data, $tmp_pdf_width);
+						$block[$i]['header_structure'] = $this->table_header->get_table_header_array($arr_header_data, $tmp_pdf_width);
 						$block[$i]['title'] = $pb['description'];
 						$i++;
 					}
@@ -715,6 +715,7 @@ abstract class parent_report extends CI_Controller {
 	//	$bench_text = $this->benchmarks_lib->get_bench_text();
 		$this->report_data = array(
 			'table_header' => $this->load->view('table_header', $table_header_data, TRUE),
+			'num_columns' => $table_header_data['num_columns'],
 			'table_id' => $arr_this_block['url_segment'],
 			'fields' => $this->{$this->primary_model}->get_fieldlist_array(),
 			'report_data' => $results,

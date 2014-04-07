@@ -161,9 +161,9 @@ class Access_log extends parent_report {
 
 		elseif ($display_format == 'pdf') {
 			$this->load->library('Reports');
-			$this->load->helper('table_header');
+			$this->load->library('table_header');
 			$arr_pdf_widths = $this->access_log_model->get_pdf_widths();
-			$header_structure = get_table_header_array($arr_data_fields, $arr_pdf_widths);
+			$header_structure = $this->table_header->get_table_header_array($arr_data_fields, $arr_pdf_widths);
 
 			$this->reports->create_pdf(array($results), $this->product_name, $arr_filter_text, $arr_pdf_widths, NULL, $header_structure);
 			$this->_record_access(5, NULL, 'pdf', $this->reports->sort_text_brief($arr_sort_by, $arr_sort_order), $log_filter_text);
@@ -171,14 +171,14 @@ class Access_log extends parent_report {
 		}
 //		else{
 			// set up table header
-			$this->load->helper('table_header');
+			$this->load->library('table_header');
 			$table_header_data = array(
 				'arr_unsortable_columns' => $this->access_log_model->get_unsortable_columns(),
 				'form_id' => $this->report_form_id,
 				'report_path' => $this->report_path,
 				'arr_sort_by' => $arr_sort_by,
 				'arr_sort_order' => $arr_sort_order,
-				'structure' => get_table_header_array($arr_data_fields), //table header helper function
+				'structure' => $this->table_header->get_table_header_array($arr_data_fields), //table header helper function
 				'arr_field_sort' => $this->access_log_model->get_field_sort(),
 				'arr_header_data' => $arr_data_fields
 			);

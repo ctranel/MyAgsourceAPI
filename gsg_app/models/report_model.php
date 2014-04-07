@@ -180,13 +180,14 @@ class Report_model extends CI_Model {
 	 * @author ctranel
 	 **/
 	function get_table_header_data(){
-		$this->load->helper('table_header');
+		$this->load->library('table_header');
 		$table_header_data = array(
 			'arr_unsortable_columns' => $this->arr_unsortable_columns,
 			'arr_field_sort' => $this->arr_field_sort,
 			'arr_header_data' => $this->arr_fields,
 		);
-		$table_header_data['structure'] = get_table_header_array($table_header_data['arr_header_data']); //table header helper function
+		$table_header_data['structure'] = $this->table_header->get_table_header_array($table_header_data['arr_header_data']);
+		$table_header_data['num_columns'] = $this->table_header->get_column_count();
 		return $table_header_data;
 	}
 

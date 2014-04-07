@@ -76,8 +76,8 @@
 					?></tr><?php
 					$c++;
 				endforeach;
-			else: //@todo should generate colspan when creating header, but this will do for now 
-				?><tr><td colspan="25">No data was found.</td></tr><?php
+			else:
+				?><tr><td colspan="<?php echo $num_columns; ?>">No data was found.</td></tr><?php
 			endif; 
 		?></tbody>
 	</table>
