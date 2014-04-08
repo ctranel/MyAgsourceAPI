@@ -32,7 +32,7 @@
    		<label for="exp_date">Expiration Date</label>
       	<?php echo form_input($exp_date);?> (leave blank for no expiration)
    </p>
-   <p><?php echo form_checkbox($disclaimer); ?> I understand that when I allow a consultant to access my information, that consultant can access my herd and animal data through their own <?php echo $this->config->item('product_name'); ?> account.  At no point does any consultant have access to my account information...e-mail will be sent....</p>
+   <p><?php echo form_checkbox($disclaimer); ?> I have discussed how I will use this herd&apos;s information with the producer (herd owner). The producer will receive an email detailing this request and can grant or deny access to their herd&apos;s information. I understand that if access is granted, I will be billed for access to this herd&apos;s information if they are <b>not</b> enrolled on <?php echo $this->config->item('product_name'); ?>.</p>
    <p><?php echo form_submit('submit', 'Request Access');?></p>
    <?php echo form_close();?>
 </div>

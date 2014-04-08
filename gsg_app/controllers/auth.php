@@ -134,12 +134,14 @@ class Auth extends Ionauth {
 			$this->data['arr_sections']['herd_revoked'] = $this->load->view('auth/service_grp/service_grp_section_container', $section_data, TRUE);
 		}
 		$this->carabiner->css('accordion.css', 'screen');
-		$this->data['title'] = "Manage Consultants";
 		if(is_array($this->page_header_data)){
 			$this->page_header_data = array_merge($this->page_header_data,
 				array(
 					'title'=>'Manage Herd Access - ' . $this->config->item('product_name'),
 					'description'=>'Manage Herd Access, ' . $this->config->item('product_name'),
+					'arr_headjs_line'=>array(
+						'{sg_helper: "' . $this->config->item("base_url_assets") . 'js/consultant_helper.js"}',
+					)
 				)
 			);
 		}
@@ -274,6 +276,22 @@ class Auth extends Ionauth {
 			foreach($data as $h) {
 				$h['is_editable'] = TRUE;
 				$this->section_data['arr_records'][] = $this->load->view('auth/service_grp/service_grp_line', $h, TRUE);
+			}
+			//add disclaimer field for when producer can grant access
+			if($key === 'open') {
+				$this->section_data['disclaimer'] = array(
+					'name' => 'disclaimer',
+					'id' => 'disclaimer',
+					'type' => 'checkbox',
+					'value' => '1',
+					'checked' => FALSE,
+					'class' => 'required',
+				);
+				$this->section_data['disclaimer_text'] = ' I understand that if I grant a consultant access to my herd&apos;s information, that consultant will be able to use any animal and herd summary data through their own MyAgSource account. This consultant will not have access to my account information. An email will be sent to the consultant to inform them whether access has been granted or denied, and include any expiration date that is specified above.<p>Because relationships with consultants change over time, it is highly recommended that you do not share your login information with any consultant.</p>';
+			}
+			//vars are cached between view loads, so we need to include the disclaimer var even when it shouldn't be set
+			else {
+				$this->section_data['disclaimer'] = NULL;
 			}
 			return $this->load->view('auth/service_grp/service_grp_section', $this->section_data, TRUE);
 		}

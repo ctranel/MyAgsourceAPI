@@ -15,7 +15,7 @@
 <?php
 	    $this->carabiner->css('corporate.css', 'screen');
 		$this->carabiner->css('print.css', 'print');
-		$this->carabiner->css('myags.css', 'screen');
+		$this->carabiner->css('myags-d2.css', 'screen');
 		$this->carabiner->css('myags.css', 'print');
 		$this->carabiner->display('css');
 	?>
@@ -30,7 +30,8 @@
 		head.js(
 			{jquery: "https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"},
 			{bootstrap: "http://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"},
-			{sectionhelper: "<?php echo $this->config->item('base_url_assets'); ?>js/as_section_helper.js"}
+			{sectionhelper: "<?php echo $this->config->item('base_url_assets'); ?>js/as_section_helper.js"},
+			{formhelper: "<?php echo $this->config->item('base_url_assets'); ?>js/form_helper.js"}
 			<?php
 				if(!empty($arr_headjs_line) && is_array($arr_headjs_line) !== FALSE):
 					$c = count($arr_headjs_line);

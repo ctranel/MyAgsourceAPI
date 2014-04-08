@@ -66,3 +66,21 @@ function getSelectedCheckboxValue(buttonGroup) {
    }
    return retArr;
 }
+
+function checkRequired(event){
+	var msg = '';
+	$(event.target).find('.required').each(function(){
+		if(($(this).is(":checkbox") && !$(this).is(":checked")) || $(this).val() === ""){
+			msg += $(this).prop('name') + ' is required\n';
+		}
+	})
+	if(msg != ''){
+		alert(msg);
+		event.preventDefault();
+		return false;
+	}
+}
+
+head.ready(function() {
+	$('form').on('submit',checkRequired);
+})

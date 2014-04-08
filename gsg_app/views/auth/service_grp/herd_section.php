@@ -13,7 +13,7 @@
 			
 			</table>
 		<?php if(isset($arr_submit_options) && is_array($arr_submit_options)): ?>
-			With selected:
+			<label>With selected</label>
 			<?php foreach($arr_submit_options as $so): ?>
 				&nbsp;&nbsp;&nbsp;<?php echo form_submit(array('type' => 'submit', 'name' => 'submit', 'value' => $so));?>
 			<?php endforeach; ?>

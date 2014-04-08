@@ -217,7 +217,9 @@ class Change_herd extends CI_Controller {
 		$this->load->library('herd', array('herd_code' => $herd_code));
 		$enroll_status = $this->herd->getHerdEnrollStatus($this->herd_model, $this->config->item('product_report_code'));
 		$recent_test = $this->herd->getRecentTest($this->herd_model);
-		//has the current user accessed requested herd during this test period? access_log->is first load of test(user, herd)
+		/*
+		 *@todo: has the current user accessed requested herd during this test period? access_log->is first load of test(user, herd)
+		 */
 		echo json_encode(array('enroll_status' => $enroll_status, 'new_test' => true));
 		exit;
 	}
