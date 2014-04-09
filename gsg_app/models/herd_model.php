@@ -146,7 +146,7 @@ class Herd_model extends CI_Model {
 	public function get_herds($limit=NULL, $offset=NULL, $order_by='herd_owner')
 	{
 		$this->db
-		->join('address.dbo.email e', 'h.herd_code = e.account_num', 'inner')
+		->join('address.dbo.email e', 'h.herd_code = e.account_num', 'left')
 		->select('h.[herd_code],h.[farm_name],h.[herd_owner],h.[contact_fn],h.[contact_ln],h.[address_1],h.[address_2]
 				,h.[city],h.[state],h.[zip_5],h.[zip_4],h.[primary_area_code],h.[primary_phone_num],h.[association_num]
 				,h.[dhi_affiliate_num],h.[supervisor_num],h.[owner_privacy],h.[records_release_code], e.[email_address] AS email')
