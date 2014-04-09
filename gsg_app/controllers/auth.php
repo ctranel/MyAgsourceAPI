@@ -1231,13 +1231,13 @@ class Auth extends Ionauth {
 				$this->data['supervisor_acct_num_options'] = !empty($arr_form_assoc_acct_num)?$this->as_ion_auth->get_dhi_supervisor_dropdown_data($arr_tech_obj):array();
 				$this->data['supervisor_acct_num_selected'] = $this->form_validation->set_value('supervisor_acct_num', !empty($obj_user->supervisor_acct_num) ? $obj_user->supervisor_acct_num : $this->session->userdata('supervisor_acct_num'));
 				$this->data['supervisor_acct_num'] = 'class = "require"';
-				$obj_user->section_id = $this->as_ion_auth->set_form_array($this->ion_auth_model->get_subscribed_sections_array($obj_user->arr_groups, $user_id, $this->as_ion_auth->super_section_id), 'id', 'id'); // populate array of sections for which user is enrolled
+				$obj_user->section_id = $this->as_ion_auth->set_form_array($this->web_content_model->get_subscribed_sections_array($obj_user->arr_groups, $user_id, $this->as_ion_auth->super_section_id), 'id', 'id'); // populate array of sections for which user is enrolled
 				$arr_form_section_id = $this->form_validation->set_value('section_id[]', $obj_user->section_id);
 				$this->data['section_selected'] = $arr_form_section_id;
 			}
 			if($this->as_ion_auth->has_permission("Assign Sections")){
 				$this->data['section_id'] = 'id="section_id"';
-				$this->data['section_options'] = $this->ion_auth_model->get_keyed_section_array(array('subscription'));
+				$this->data['section_options'] = $this->web_content_model->get_keyed_section_array(array('subscription'));
 				$this->data['section_selected'] = $this->form_validation->set_value('section_id[]', $obj_user->section_id);
 			}
 
@@ -1340,7 +1340,7 @@ class Auth extends Ionauth {
 		$redirect_url = set_redirect_url($this->uri->uri_string(), $this->session->flashdata('redirect_url'), $this->as_ion_auth->referrer);
 		$this->session->set_flashdata('redirect_url', $redirect_url);
 		if(array_key_exists($group_id, $this->session->userdata('arr_groups'))){
-			$this->session->set_userdata('active_group_id', $group_id);
+			$this->session->set_userdata('active_group_id', (int)$group_id);
 		}
 		else {
 			$this->session->set_flashdata('message', "You do not have rights to the requested group.");

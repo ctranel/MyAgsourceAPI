@@ -79,13 +79,14 @@ class As_ion_auth extends Ion_auth {
 		//}
 		parent::__construct();
 		$this->load->model('access_log_model');
+		$this->load->model('web_content_model');
 		$this->load->model('region_model');
 		$this->load->helper('url');
 
 		//set supersection if there is one
 		$section_path = $this->router->fetch_class(); //this should match the name of this file (minus ".php".  Also used as base for css and js file names and model directory name
 		if($this->uri->segment(1) != $section_path){
-			$this->super_section_id = $this->ion_auth_model->get_super_section_id_by_path($this->uri->segment(1));
+			$this->super_section_id = $this->web_content_model->get_super_section_id_by_path($this->uri->segment(1));
 		} 
 
 		//reliably set the referrer, used when determining whether to set the redirect variable on pages like select herd
@@ -479,7 +480,7 @@ class As_ion_auth extends Ion_auth {
 
 		$this->load->helper('multid_array_helper');
 		$arr_subscribed_sections = array_extract_value_recursive('name', $arr_subscribed_sections);
-		$arr_all_sections = $this->ion_auth_model->get_sections_by_herd()->result_array();
+		$arr_all_sections = $this->web_content_model->get_sections_by_herd()->result_array();
 		$arr_all_sections = array_extract_value_recursive('name', $arr_all_sections);
 		//$arr_subscribed_sections[] = 'My Account';
 		//$arr_subscribed_sections[] = 'Alert';
@@ -553,22 +554,22 @@ class As_ion_auth extends Ion_auth {
 			foreach($arr_scope as $s){
 				switch ($s) {
 					case 'subscription':
-						$a = $this->ion_auth_model->get_subscribed_super_sections_array($group_id, $user_id, $herd_code);
+						$a = $this->web_content_model->get_subscribed_super_sections_array($group_id, $user_id, $herd_code);
 						if(!empty($a)) $tmp_array = array_merge($tmp_array, $a);
 						break;
 					case 'unmanaged':
-						$a = $this->ion_auth_model->get_unmanaged_super_sections_array($group_id, $user_id, $herd_code);
+						$a = $this->web_content_model->get_unmanaged_super_sections_array($group_id, $user_id, $herd_code);
 						if(!empty($a)) $tmp_array = array_merge($tmp_array, $a);
 					break;
 					default:
-						$a = $this->ion_auth_model->get_super_sections_by_scope($s);
+						$a = $this->web_content_model->get_super_sections_by_scope($s);
 						if(!empty($a)) $tmp_array = array_merge($tmp_array, $a);
 					break;
 				}
 			}
 		}
 		else {
-			$tmp_array = $this->ion_auth_model->get_subscribed_super_sections_array($group_id, $user_id, $herd_code);
+			$tmp_array = $this->web_content_model->get_subscribed_super_sections_array($group_id, $user_id, $herd_code);
 		}
 /*	for now, consultant have access to all super sections
  * 
@@ -604,28 +605,28 @@ class As_ion_auth extends Ion_auth {
 			foreach($arr_scope as $s){
 				switch ($s) {
 					case 'subscription':
-						$a = $this->ion_auth_model->get_subscribed_sections_array($group_id, $user_id, $arr_super_section_id, $herd_code);
+						$a = $this->web_content_model->get_subscribed_sections_array($group_id, $user_id, $arr_super_section_id, $herd_code);
 						if(!empty($a)) $tmp_array = array_merge($tmp_array, $a);
 						break;
 					case 'unmanaged':
-						$a = $this->ion_auth_model->get_unmanaged_sections_array($group_id, $user_id, $herd_code);
+						$a = $this->web_content_model->get_unmanaged_sections_array($group_id, $user_id, $herd_code);
 						if(!empty($a)) $tmp_array = array_merge($tmp_array, $a);
 						break;
 //					case 'admin':
 //						if($this->is_admin){
-//							$a = $this->ion_auth_model->get_child_sections_by_scope($s, $super_section_id);
+//							$a = $this->web_content_model->get_child_sections_by_scope($s, $super_section_id);
 //							if(!empty($a)) $tmp_array = array_merge($tmp_array, $a);
 //						}
 //						break;
 					default: //public, account, user-specific
-						$a = $this->ion_auth_model->get_child_sections_by_scope($s, $arr_super_section_id);
+						$a = $this->web_content_model->get_child_sections_by_scope($s, $arr_super_section_id);
 						if(!empty($a)) $tmp_array = array_merge($tmp_array, $a);
 						break;
 				}
 			}
 		}
 		else {
-			$tmp_array = $this->ion_auth_model->get_subscribed_sections_array($group_id, $user_id, $arr_super_section_id, $herd_code);
+			$tmp_array = $this->web_content_model->get_subscribed_sections_array($group_id, $user_id, $arr_super_section_id, $herd_code);
 		}
 		if(!$this->has_permission("View Non-owned Herds") && $this->has_permission("View non-own w permission") && !$this->ion_auth_model->user_owns_herd($herd_code) && !empty($herd_code)){
 			if(is_array($tmp_array) && !empty($tmp_array)){

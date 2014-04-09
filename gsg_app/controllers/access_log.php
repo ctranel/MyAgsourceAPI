@@ -37,9 +37,8 @@ class Access_log extends parent_report {
 			$this->reports->herd_code = $this->herd_code;
 			$this->arr_pages = $this->access_log_model->arr_pages;
 			$this->arr_filters = array('access_time', 'sections', 'pages', 'format', 'groups', 'user_association_num', 'user_tech_num', 'herd_code');
-//			$this->arr_keyed_pages = $this->access_log_model->get_keyed_page_array();
-			$this->arr_keyed_sections = $this->ion_auth_model->get_keyed_section_array();
-			$this->arr_keyed_pages = $this->access_log_model->get_keyed_page_array();
+			$this->arr_keyed_sections = $this->web_content_model->get_keyed_section_array();
+			$this->arr_keyed_pages = $this->web_content_model->get_keyed_page_array();
 		}
 		else {
 			

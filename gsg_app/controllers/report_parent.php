@@ -127,7 +127,7 @@ abstract class parent_report extends CI_Controller {
 		//if section scope is public, pass unsubscribed test
 		//@todo: build display_hierarchy/report_organization, etc interface with get_scope function (with classes for super_sections, sections, etc)
 		$pass_unsubscribed_test = true; //$this->as_ion_auth->get_scope('sections', $this->section_id) == 'pubic';
-		$pass_unsubscribed_test = $this->as_ion_auth->has_permission("View Unsubscribed Herds") || $this->ion_auth_model->herd_is_subscribed($this->section_id, $this->herd_code);
+		$pass_unsubscribed_test = $this->as_ion_auth->has_permission("View Unsubscribed Herds") || $this->web_content_model->herd_is_subscribed($this->section_id, $this->herd_code);
 		$pass_view_nonowned_test = $this->as_ion_auth->has_permission("View All Herds") || $this->session->userdata('herd_code') == $this->config->item('default_herd');
 		if(!$pass_view_nonowned_test) $pass_view_nonowned_test = in_array($this->herd_code, $this->as_ion_auth->get_viewable_herd_codes($this->session->userdata('user_id'), $this->session->userdata('arr_regions')));//$this->as_ion_auth->has_permission("View Non-owned Herds") || $this->ion_auth_model->user_owns_herd($this->herd_code);
 		if($pass_unsubscribed_test && $pass_view_nonowned_test) return TRUE;
@@ -372,7 +372,7 @@ abstract class parent_report extends CI_Controller {
 		//set up page header
 		if(is_array($this->page_header_data)){
 			$arr_sec_nav_data = array(
-				'arr_pages' => $this->as_ion_auth->arr_user_sections,//$this->access_log_model->get_pages_by_criteria(array('section_id' => $this->section_id))->result_array(),
+				'arr_pages' => $this->as_ion_auth->arr_user_sections,//$this->web_content_model->get_pages_by_criteria(array('section_id' => $this->section_id))->result_array(),
 				'section_id' => $this->section_id,
 				'section_path' => $this->section_path,
 			);
@@ -416,7 +416,7 @@ abstract class parent_report extends CI_Controller {
 			'section_path' => $this->section_path,
 //			'benchmarks_id' => $this->arr_filter_criteria['benchmarks_id'],
 			'curr_page' => $this->page,
-			'arr_pages' => $this->access_log_model->get_pages_by_criteria(array('section_id' => $this->section_id))->result_array()
+			'arr_pages' => $this->web_content_model->get_pages_by_criteria(array('section_id' => $this->section_id))->result_array()
 		);
 		if($this->bool_is_summary && (substr($this->page,0,3)!= 'mun')){
 			$arr_nav_data['arr_pstring'] = $this->{$this->primary_model}->arr_pstring;
