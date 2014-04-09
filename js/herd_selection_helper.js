@@ -11,7 +11,7 @@ head.ready(function() {
 	});
 	
 	$("#select_herd").on("submit", function() {
-		var ret_val = false;
+		var ret_val = true;
 		var herd_code = $("#herd_code").val();
 		$.ajax({
 			url: "ajax_herd_enrolled/" + herd_code,
