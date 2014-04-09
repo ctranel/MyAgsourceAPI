@@ -204,7 +204,7 @@ function process_chart(div_id){ //chart_data is defined globally at the top of t
 		var tmpData = {};
 		if(typeof chart_data[block_index].section_data !== 'undefined') section_data = chart_data[block_index].section_data;
 		if(typeof chart_data[block_index].data === 'undefined' || chart_data[block_index].data == false){
-			$('#' + div_id).html('<p class-"chart-error">Sorry, there is no data available for this report.  Please try again, or contact AgSource at 1-800-236-0097 for assistance.</p>');
+			$('#' + div_id).html('<p class-"chart-error">Sorry, there is no data available for this report.  Please try again, or contact AgSource for assistance.</p>');
 		}
 		else if(typeof(section_data.redirect) !== 'undefined'){
 			if(section_data.redirect == 'login') window.location.href = window.location.protocol + window.location.host + window.location.path;
@@ -250,7 +250,7 @@ function process_table(div_id){
 		var tmpData = {};
 		if(typeof table_data[block_index].section_data !== 'undefined') section_data = table_data[block_index].section_data;
 		if(typeof table_data[block_index].html === 'undefined' || table_data[block_index].html == false){
-			$('#' + div_id).html('<p class-"chart-error">Sorry, there is no data available for the ' + table_data[chart_index].config.title.text + ' report.  Please try again, or contact AgSource at 1-800-236-0097 for assistance.</p>');
+			$('#' + div_id).html('<p class-"chart-error">Sorry, there is no data available for the ' + table_data[chart_index].config.title.text + ' report.  Please try again, or contact AgSource for assistance.</p>');
 			exit;
 		}
 		else{

@@ -287,7 +287,7 @@ class Auth extends Ionauth {
 					'checked' => FALSE,
 					'class' => 'required',
 				);
-				$this->section_data['disclaimer_text'] = ' I understand that if I grant a consultant access to my herd&apos;s information, that consultant will be able to use any animal and herd summary data through their own MyAgSource account. This consultant will not have access to my account information. An email will be sent to the consultant to inform them whether access has been granted or denied, and include any expiration date that is specified above.<p>Because relationships with consultants change over time, it is highly recommended that you do not share your login information with any consultant.</p>';
+				$this->section_data['disclaimer_text'] = ' I understand that if I grant a consultant access to my herd&apos;s information, that consultant will be able to use any animal and herd summary data through their own ' . $this->config->item('product_name') . ' account. This consultant will not have access to my account information. An email will be sent to the consultant to inform them whether access has been granted or denied, and include any expiration date that is specified above.<p>Because relationships with consultants change over time, it is highly recommended that you do not share your login information with any consultant.</p>';
 			}
 			//vars are cached between view loads, so we need to include the disclaimer var even when it shouldn't be set
 			else {
@@ -493,7 +493,7 @@ class Auth extends Ionauth {
 		$is_validated = $this->form_validation->run();
 		if ($is_validated === TRUE) {
 			$herd_code = $this->input->post('herd_code');
-			/* herd does not have to be registered for MyAgSource at this point
+			/* herd does not have to be registered at this point
 			if(!$this->herd_model->herd_is_registered($herd_code)){
 				$this->session->set_flashdata('message', 'Herd ' . $herd_code . ' is not registered for ' . $this->config->item('product_name') . '.  In order to access their data, they must be registered for ' . $this->config->item('product_name') . '.');
 				redirect(site_url('auth/service_grp_request'));

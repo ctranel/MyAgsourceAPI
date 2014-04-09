@@ -804,7 +804,7 @@ class As_ion_auth extends Ion_auth {
 		);
 		$message = $this->load->view($this->config->item('email_templates', 'ion_auth').$this->config->item('service_grp_request', 'ion_auth'), $email_data, TRUE);
 		$arr_herd_emails = $this->herd_model->get_herd_emails($arr_relationship_data['herd_code']);
-		//If there are no myagsource users, send email to customer service
+		//If there are no matching users, send email to customer service
 		if(isset($arr_herd_emails) && is_array($arr_herd_emails)){
 			$arr_herd_emails = array_flatten($arr_herd_emails);
 		}

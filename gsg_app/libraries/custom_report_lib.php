@@ -1,6 +1,6 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /**
-* Name:  Custom Report Library (for MyAgSource)
+* Name:  Custom Report Library
 *
 * Author: ctranel
 *

@@ -1,6 +1,6 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /**
-* Name:  Table Header Library (for MyAgSource)
+* Name:  Table Header Library
 *
 * Author: ctranel
 *

@@ -6,7 +6,7 @@
 *  
 * Created:  1-11-2013
 *
-* Description:  Works with the report model of MyAgSource to set benchmark criteria, calculate benchmarks and return benchmark data.
+* Description:  Works with the report model to set benchmark criteria, calculate benchmarks and return benchmark data.
 *
 * Requirements: PHP5 or above
 *
@@ -21,7 +21,7 @@ class Benchmarks_lib
 	protected $db_table;
 
 	/**
-	 * date field used in benchmarks (for MyAgSource, this will always be test date?)
+	 * date field used in benchmarks (will always be test date?)
 	 * @var string
 	 **/
 	protected $primary_table_date_field;

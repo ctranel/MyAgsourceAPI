@@ -36,7 +36,7 @@
 	              <li>Individual cow performance measures</li>
 	              <li>Benchmarking tools for effective herd management</li>
 		        </ul>
-		        <p>To learn more  about our DHI services, please call 1-800-236-0097, email <a href="mailto:info@agsource.com">info@agsource.com</a>, or visit <a href="http://www.agsource.com">www.agsource.com</a>. </p>
+		        <p>To learn more  about our DHI services, please call <?php echo $this->config->item('cust_serv_phone'); ?>, email <a href="mailto:info@agsource.com">info@agsource.com</a>, or visit <a href="http://www.agsource.com">www.agsource.com</a>. </p>
         	</div>
 		</div>
 		<div class="col-sm-6">

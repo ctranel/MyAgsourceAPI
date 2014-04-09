@@ -14,6 +14,7 @@
 	<div>Farm Name: <?php echo $arr_herd['farm_name']; ?></div>
 	<div>Address: <?php echo $arr_herd['address_1'] . '<br>' . $arr_herd['address_2'] . '<br>' . $arr_herd['city'] . ', ' . $arr_herd['state'] . ' ' . $arr_herd['zip_5']; ?></div>
 	<div>Contact: <?php echo $arr_herd['contact_fn'] . ' ' . $arr_herd['contact_ln']; ?></div>
+	<div>Email: <?php echo $arr_herd['email']; ?></div>
 	<div>Primary Phone: <?php echo $arr_herd['primary_area_code'] . '-' . $arr_herd['primary_phone_num']; ?></div>
 	<h2>Tech Information</h2>
 	<div>Name: <?php echo $arr_tech['first_name'] . ' ' . $arr_tech['last_name']; ?></div>

@@ -98,7 +98,7 @@ class Tech_model extends CI_Model {
 	public function get_techs($limit=NULL, $offset=NULL, $order_by='t.last_name')
 	{
 		$this->db
-		->select("t.[account_num], t.[association_num], t.[supervisor_num],t.[first_name],t.[last_name],t.[voice_mail_num], CONCAT(hp.area_code, '-', hp.phone_num) AS home_phone, CONCAT(hp.area_code, '-', hp.phone_num) AS cell_phone")
+		->select("t.[account_num], t.[association_num], t.[supervisor_num],t.[first_name],t.[last_name],t.[voice_mail_num], CONCAT(hp.area_code, '-', hp.phone_num) AS home_phone, CONCAT(cp.area_code, '-', cp.phone_num) AS cell_phone")
 		->where('t.status_code', 'A')
 		->where('t.termination_date IS NULL')
 		->join('address.dbo.phone hp', 't.account_num = hp.account_num AND hp.phone_type_code = 1', 'left')

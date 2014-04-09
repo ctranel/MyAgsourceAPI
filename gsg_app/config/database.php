@@ -78,7 +78,7 @@
 
 */
 
-$active_group = "default"; //Chris: set up for users database on testdare/myagsource
+$active_group = "default";
 $active_record = TRUE;
 $db_server = 'myagsource';
 
@@ -89,7 +89,7 @@ switch (ENVIRONMENT)
 		$db['default']['username'] = 'webuser';
 		$db['default']['password'] = 'm1$AgSourze';
 		$db['default']['database'] = "users";
-		$db['default']['dbdriver'] = 'mssql';//"mysqli";
+		$db['default']['dbdriver'] = 'mssql';
 		$db['default']['dbprefix'] = "";
 		$db['default']['pconnect'] = FALSE;
 		$db['default']['db_debug'] = TRUE;
@@ -106,7 +106,7 @@ switch (ENVIRONMENT)
 		$db['default']['username'] = 'webuser';
 		$db['default']['password'] = 'm1$AgSourze';
 		$db['default']['database'] = "users";
-		$db['default']['dbdriver'] = 'mssql';//"mysqli";
+		$db['default']['dbdriver'] = 'mssql';
 		$db['default']['dbprefix'] = "";
 		$db['default']['pconnect'] = FALSE;
 		$db['default']['db_debug'] = TRUE;
@@ -124,7 +124,7 @@ switch (ENVIRONMENT)
 		$db['default']['username'] = 'webuser';
 		$db['default']['password'] = 'm1$AgS_R0';
 		$db['default']['database'] = "users";
-		$db['default']['dbdriver'] = 'mssql';//"mysqli";
+		$db['default']['dbdriver'] = 'mssql';
 		$db['default']['dbprefix'] = "";
 		$db['default']['pconnect'] = FALSE;
 		$db['default']['db_debug'] = TRUE;

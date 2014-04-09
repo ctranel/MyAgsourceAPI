@@ -217,8 +217,8 @@
 	$tcpdf['header_margin'] = 5;
 	$tcpdf['header_title'] = 'MyAgSource';
 	$tcpdf['header_string'] = "";
-	$tcpdf['header_logo'] = 'AgSource.jpg';
-	$tcpdf['header_logo_width'] = 68;//83.87;//317px
+	$tcpdf['header_logo'] = 'logo-m.jpg';
+	$tcpdf['header_logo_width'] = 14;//83.87;//317px
 	
 	
 	/************************************************************
