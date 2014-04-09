@@ -1,4 +1,4 @@
-<?php
+<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /* parent of all report models */
 /* -----------------------------------------------------------------
  *  UPDATE comment
@@ -60,8 +60,8 @@ class Report_model extends CI_Model {
 
 		$this->db_group_name = 'default';
 		$this->{$this->db_group_name} = $this->load->database($this->db_group_name, TRUE);
-		if(isset($section_path)) $this->section_id = $this->ion_auth_model->get_section_id_by_path($section_path);
-		if(isset($this->section_id)) $this->arr_blocks = $this->access_log_model->get_block_links($this->section_id);
+		if(isset($section_path)) $this->section_id = $this->web_content_model->get_section_id_by_path($section_path);
+		if(isset($this->section_id)) $this->arr_blocks = $this->web_content_model->get_block_links($this->section_id);
 	}
 	function get_primary_table_name(){
 		return $this->primary_table_name;

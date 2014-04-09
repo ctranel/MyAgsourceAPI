@@ -616,44 +616,6 @@ SELECT DISTINCT id, name, list_order FROM cteAnchor ORDER BY list_order;";
 	}
 
 	/**
-	 * @method get_subscribed_super_sections_array
-	 * @param int $group_id for active session
-	 * @param int $user_id
-	 * @param string $herd_code
-	 * @return array of section data for given user
-	 * @author ctranel
-	 **/
-	public function get_subscribed_super_sections_array($group_id, $user_id, $herd_code = FALSE) {
-		if(is_array($group_id)) {
-			if(in_array(2, $group_id) && count($group_id) == 1) $group_id = 2;
-		}
-		else if(!isset($group_id) || !$group_id) $group_id = $this->session->userdata('active_group_id');
-		
-		if(isset($group_id) && !empty($group_id)){
-			$tmp_arr_sections = array();
-			$this->db
-			->where($this->tables['super_sections'] . '.active', 1)
-			->where($this->tables['super_sections'] . '.scope_id', 2); // 2 = subscription
-			//if($this->has_permission("View Unsubscribed Herds")){ //if the logged in user has permission to view reports to which the herd is not subscribed
-			if($group_id == 2){ //if this is a producer
-			//if(!$this->has_permission("View Non-owned Herds")){
-				if(isset($herd_code) && !empty($herd_code)){
-					$tmp_arr_sections = $this->get_super_sections_by_herd($herd_code);
-				}
-			}
-			else{
-				if(!isset($user_id) || !$user_id){
-					$user_id = $this->session->userdata('user_id');
-				}
-				if(isset($user_id) && !empty($user_id)){
-					$tmp_arr_sections = $this->get_super_sections_by_user($user_id);
-				}
-			}
-			return $tmp_arr_sections;
-		}
-	}
-
-	/**
 	 * @method has_permission
 	 * @param string task name
 	 * @return boolean
@@ -664,79 +626,6 @@ SELECT DISTINCT id, name, list_order FROM cteAnchor ORDER BY list_order;";
 		$tmp_array = $this->get_task_permissions();
 		if(is_array($tmp_array) !== FALSE) return in_array($task_name, $tmp_array);
 		else return FALSE;
-	}
-
-	/**
-	 * @method get_subscribed_sections_array
-	 * @param int $group_id for active session
-	 * @param int $user_id
-	 * @param string $herd_code
-	 * @return array of section data for given user
-	 * @author ctranel
-	 **/
-	public function get_subscribed_sections_array($group_id, $user_id, $arr_super_section_id, $herd_code = FALSE) {
-		if(is_array($group_id)) {
-			if(in_array(2, $group_id) && count($group_id) == 1) $group_id = 2;
-		}
-		else if(!isset($group_id) || !$group_id) $group_id = $this->session->userdata('active_group_id');
-		
-		if(isset($group_id) && !empty($group_id)){
-			$tmp_arr_sections = array();
-			$this->db
-			->where($this->tables['sections'] . '.active', 1)
-			->where($this->tables['sections'] . '.scope_id', 2) // 2 = subscription
-			->where_in($this->tables['sections'] . '.super_section_id', $arr_super_section_id);
-			//if($this->has_permission("View Unsubscribed Herds")){ //if the logged in user has permission to view reports to which the herd is not subscribed
-			if($group_id == 2){ //if this is a producer
-			//if(!$this->has_permission("View Non-owned Herds")){
-				if(isset($herd_code) && !empty($herd_code)){
-					$tmp_arr_sections = $this->get_sections_by_herd($herd_code);
-				}
-			}
-			else{
-				if(!isset($user_id) || !$user_id){
-					$user_id = $this->session->userdata('user_id');
-				}
-				if(isset($user_id) && !empty($user_id)){
-					$tmp_arr_sections = $this->get_sections_by_user($user_id);
-				}
-			}
-			return $tmp_arr_sections;
-		}
-	}
-		
-	/**
-	 * @method get_unmanaged_super_sections_array
-	 * @param int $group_id
-	 * @param int $user_id
-	 * @param string $herd_code
-	 * @return array of section data for given user
-	 * @author ctranel
-	 **/
-	public function get_unmanaged_super_sections_array($group_id, $user_id, $herd_code = FALSE) {
-		//$this->load->model('dm_model');
-		if(false){//$credentials = $this->dm_model->get_credentials()) {
-			$this->db->where($this->tables['super_sections'] . '.id', 6);
-			return $this->get_super_sections();
-		}
-		else return array();
-	}
-	
-	/**
-	 * @method get_unmanaged_sections_array
-	 * @param int $group_id
-	 * @param int $user_id
-	 * @param string $herd_code
-	 * @return array of section data for given user
-	 * @author ctranel
-	 **/
-	public function get_unmanaged_sections_array($group_id, $user_id, $herd_code = FALSE) {
-		//$this->load->model('dm_model');
-		if(false){//$credentials = $this->dm_model->get_credentials()) {
-			$this->db->where($this->tables['sections'] . '.id', 6);
-			return $this->get_sections();
-		}
-		else return array();
 	}
 
 	/**
@@ -758,179 +647,6 @@ SELECT DISTINCT id, name, list_order FROM cteAnchor ORDER BY list_order;";
 		else return FALSE;
 	}
 
-	/**
-	 * @method herd_is_subscribed
-	 * @param int section_id
-	 * @param string herd_code
-	 * @return array of section data for given user
-	 * @author ctranel
-	 **/
-	public function herd_is_subscribed($section_id, $herd_code) {
-		//$this->db->where($this->tables['sections'] . '.id', $section_id);
-		//return $this->get_sections();
-		return TRUE;
-	}
-	
-	/**
-	 * @method get_keyed_section_array
-	 *
-	 * @param array scope options to include
-	 * @return 1d array (id=>name)
-	 * @author ctranel
-	 **/
-	public function get_keyed_section_array($arr_scope = NULL) {
-		$this->db
-		->select($this->tables['sections'] . '.id, ' . $this->tables['sections'] . '.name AS name')
-		->join($this->tables['lookup_scopes'], $this->tables['sections'] . '.scope_id = ' . $this->tables['lookup_scopes'] . '.id', 'left')
-		->order_by('name', 'asc');
-		if(isset($arr_scope) && is_array($arr_scope)){
-			$this->db->where_in($this->tables['lookup_scopes'] . '.name', $arr_scope);
-		}
-		$arr_section_obj = $this->get_sections()->result();
-		if(is_array($arr_section_obj)) {
-			foreach($arr_section_obj as $e){
-				$ret_array[$e->id] = $e->name;
-			}
-			return $ret_array;
-		}
-		else return false;
-	}
-
-	/**
-	 * @method get_blocks_by_section array
-	 * @param int section
-	 * @return array of block for given section
-	 * @author ctranel
-	 **/
-	public function get_blocks_by_section($section, $display = NULL) {
-		$this->db
-			->join($this->tables['pages_blocks'], $this->tables['blocks'] . '.id = ' . $this->tables['pages_blocks'] . '.block_id', 'left')
-			->join($this->tables['pages'], $this->tables['pages_blocks'] . '.page_id = ' . $this->tables['pages'] . '.id', 'left')
-			->join($this->tables['lookup_display_types'], $this->tables['blocks'] . '.display_type_id = ' . $this->tables['lookup_display_types'] . '.id', 'left')
-			->where($this->tables['pages'] . '.section_id', $section);
-		if(isset($display)) $this->db->where($this->tables['lookup_display_types'] . '.name', $display);
-		return $this->get_blocks();
-	}
-
-    /**
-	 * @method get_blocks
-	 * @return array of block data
-	 * @author ctranel
-	 **/
-	public function get_blocks() {
-		$this->db
-			->select('name,[description],url_segment,display_type_id')
-			->where($this->tables['blocks'] . '.active', 1)
-			->order_by('list_order', 'asc')
-			->from($this->tables['blocks']);
-		return $this->db->get()->result_array();
-	}
-
-		/**
-	 * @method get_super_sections_by_scope array
-	 * @param string scope
-	 * @return array of section data for given user
-	 * @author ctranel
-	 **/
-	public function get_super_sections_by_scope($scope) {
-		$this->db
-		->select($this->tables['super_sections'] . '.*')
-		->join($this->tables['lookup_scopes'], $this->tables['super_sections'] . '.scope_id = ' . $this->tables['lookup_scopes'] . '.id', 'left')
-		->where($this->tables['lookup_scopes'] . '.name', $scope);
-		return $this->get_super_sections();
-	}
-	
-		/**
-	 * @method get_sections_by_scope array
-	 * @param string scope
-	 * @return array of section data for given user
-	 * @author ctranel
-	 **/
-	public function get_sections_by_scope($scope) {
-		$this->db
-		->select($this->tables['sections'] . '.*')
-		->join($this->tables['lookup_scopes'], $this->tables['sections'] . '.scope_id = ' . $this->tables['lookup_scopes'] . '.id', 'left')
-		->where($this->tables['lookup_scopes'] . '.name', $scope);
-		return $this->get_sections();
-	}
-	
-	/**
-	 * @method get_sections_by_scope array
-	 * @param string scope
-	 * @return array of section data for given user
-	 * @author ctranel
-	 **/
-	public function get_child_sections_by_scope($scope, $arr_parent_section_id) {
-		$this->db
-			->where_in($this->tables['sections'] . '.super_section_id', $arr_parent_section_id);
-		return $this->get_sections_by_scope($scope);
-	}
-	
-	/**
-	 * @method get_section_id_by_path()
-	 * @param string section path
-	 * @return int id of section
-	 * @access public
-	 *
-	 **/
-	public function get_section_id_by_path($section_path){
-		$arr_res = $this->db
-			->select('id')
-			->like('path', $section_path)
-			->get($this->tables['sections'])
-			->result_array();
-		if(is_array($arr_res) && !empty($arr_res)){
-			return $arr_res[0]['id'];
-		}
-		return FALSE;
-	}
-
-	/**
-	 * @method get_super_section_id_by_path()
-	 * @param string super section path
-	 * @return int id of super section
-	 * @access public
-	 *
-	 **/
-	public function get_super_section_id_by_path($super_section_path){
-		$arr_res = $this->db
-			->select('id')
-			->like('path', $super_section_path)
-			->get($this->tables['super_sections'])
-			->result_array();
-		if(is_array($arr_res) && !empty($arr_res)){
-			return $arr_res[0]['id'];
-		}
-		return FALSE;
-	}
-	
-	/**
-	 * @method get_super_sections
-	 * @return array of section data
-	 * @author ctranel
-	 **/
-	public function get_super_sections() {
-		$this->db
-			->where($this->tables['super_sections'] . '.active', 1)
-			->order_by($this->tables['super_sections'] . '.list_order', 'asc')
-			->from($this->tables['super_sections']);
-		return $this->db->get()->result_array();
-	}
-	
-    /**
-	 * @method get_sections
-	 * @return array of section data
-	 * @author ctranel
-	 **/
-	public function get_sections() {
-		$this->db
-			->where($this->tables['sections'] . '.active', 1)
-			->order_by('super_section_id', 'asc')
-			->order_by('list_order', 'asc')
-			->from($this->tables['sections']);
-		return $this->db->get()->result_array();
-	}
-	
 	/**
 	 * get_user_herd_settings
 	 *
@@ -959,58 +675,6 @@ SELECT DISTINCT id, name, list_order FROM cteAnchor ORDER BY list_order;";
 	}
 
 	/**
-	 * get_super_sections_by_user
-	 *
-	 * @return array of super_section data for given user
-	 * @author ctranel
-	 **/
-	public function get_super_sections_by_user($user_id){
-		$this->db
-		->select($this->tables['super_sections'] . '.id, ' . $this->tables['super_sections'] . '.name, ' . $this->tables['super_sections'] . '.path, ' . $this->tables['super_sections'] . '.list_order')
-		->distinct()
-		->join($this->tables['sections'], $this->tables['super_sections'] . '.id = ' . $this->tables['sections'] . '.super_section_id', 'left')
-		->where("(" . $this->tables['sections'] . '.user_id IS NULL OR ' . $this->tables['sections'] . '.user_id = ' . $user_id . ")");
-		return $this->get_super_sections();
-	}
-	
-	/**
-	 * get_super_sections_by_herd
-	 *
-	 * @return array of super_section data for given herd
-	 * @author ctranel
-	 **/
-	public function get_super_sections_by_herd(){
-		$this->db
-		->where($this->tables['super_sections'] . '.scope_id', 2); // 2 = subscription
-		return $this->get_super_sections();
-	}
-
-		/**
-	 * get_sections_by_user
-	 *
-	 * @return array of section data for given user
-	 * @author ctranel
-	 **/
-	public function get_sections_by_user($user_id){
-		$this->db
-		->select($this->tables['sections'] . '.id, ' . $this->tables['sections'] . '.name, ' . $this->tables['sections'] . '.path')
-		->where("(" . $this->tables['sections'] . '.user_id IS NULL OR ' . $this->tables['sections'] . '.user_id = ' . $user_id . ")");
-		return $this->get_sections();
-	}
-	
-	/**
-	 * get_herd_sections
-	 *
-	 * @return array of section data for given herd
-	 * @author ctranel
-	 **/
-	public function get_herd_sections(){
-		$this->db
-		->where($this->tables['sections'] . '.scope_id', 2); // 2 = subscription
-		return $this->get_sections();
-	}
-
-	/**
 	 * @method get_task_permissions
 	 *
 	 * @param int section id FOR FUTURE USE
@@ -1032,6 +696,7 @@ SELECT DISTINCT id, name, list_order FROM cteAnchor ORDER BY list_order;";
 
 	/**
 	 * @method _filter_data
+	 * @description overrides ion_auth_parent_model method
 	 * @param string table
 	 * @param array of data to filter
 	 * @access protected
@@ -1131,18 +796,6 @@ SELECT DISTINCT id, name, list_order FROM cteAnchor ORDER BY list_order;";
 	}
 
 //PRODUCER FUNCTIONS
-	/**
-	 * get_sections_by_herd
-	 *
-	 * @param string herd code
-	 * @return array of section data for given herd
-	 * @author ctranel
-	 **/
-	private function get_sections_by_herd($herd_code){
-		$this->db->select($this->tables['sections'] . '.id, ' . $this->tables['sections'] . '.name, ' . $this->tables['sections'] . '.path');
-		return $this->get_sections();
-	}
-
 	/**
 	 * @method get_users_by_group_and_association
 	 * 

@@ -24,7 +24,7 @@ class Help extends parent_report{
 	function generatePageHeader() {
 		$this->load->helper('multid_array_helper');
 		$arr_scope = array('subscription','public','unmanaged');
-		$this->super_section_id = $this->ion_auth_model->get_super_section_id_by_path($this->uri->segment(1));
+		$this->super_section_id = $this->web_content_model->get_super_section_id_by_path($this->uri->segment(1));
 		$this->arr_user_super_sections = $this->as_ion_auth->get_super_sections_array($this->session->userdata('active_group_id'), $this->session->userdata('user_id'), $this->session->userdata('herd_code'), $arr_scope);
 		$this->arr_user_sections = $this->as_ion_auth->get_sections_array($this->session->userdata('active_group_id'), $this->session->userdata('user_id'), $this->session->userdata('herd_code'), array($this->super_section_id), $arr_scope);
 		

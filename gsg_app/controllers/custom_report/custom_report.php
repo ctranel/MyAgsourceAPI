@@ -160,7 +160,7 @@ class Custom_report extends CI_Controller {
 					//'value' => $this->form_validation->set_value('email', $obj_user->email),
 					//'class' => 'require'
 				);
-				$this->data['report_super_section_options'] = $this->as_ion_auth->set_form_array($this->ion_auth_model->get_subscribed_super_sections_array($obj_user->arr_groups, $user_id), 'id', 'name');//$this->access_log_model->get_section_select_data();
+				$this->data['report_super_section_options'] = $this->as_ion_auth->set_form_array($this->web_content_model->get_subscribed_super_sections_array($obj_user->arr_groups, $user_id), 'id', 'name');//$this->web_content_model->get_section_select_data();
 				$this->data['report_super_section'] = 'id="super_section_id"';
 				$this->data['report_super_section_selected'] = NULL;
 				$this->data['report_section_options'] = NULL;
@@ -172,11 +172,11 @@ class Custom_report extends CI_Controller {
 				$this->data['insert_after'] = 'name="insert_after" id="insert_after"';
 				$this->data['insert_after_selected'] = NULL;
 				$this->data['insert_after_options'] = NULL;
-				$this->data['report_display_options'] = $this->as_ion_auth->set_form_array($this->access_log_model->get_block_display_types()->result_array(), 'id', 'name');
+				$this->data['report_display_options'] = $this->as_ion_auth->set_form_array($this->web_content_model->get_block_display_types()->result_array(), 'id', 'name');
 				$this->data['report_display'] = 'id="section_id" class="require"';
 				$this->data['report_display_selected'] = NULL;
 				$this->data['max_rows'] = array('name' => 'max_rows', 'id' => 'max_rows');
-				$this->data['chart_type_options'] = $this->as_ion_auth->set_form_array($this->access_log_model->get_chart_display_types()->result_array(), 'id', 'name');
+				$this->data['chart_type_options'] = $this->as_ion_auth->set_form_array($this->web_content_model->get_chart_display_types()->result_array(), 'id', 'name');
 				$this->data['chart_type'] = 'id="chart_type_id"';
 				$this->data['chart_type_selected'] = NULL;
 				$this->data['series_chart_type'] = 'id="series_chart_type-0"';
@@ -237,13 +237,13 @@ class Custom_report extends CI_Controller {
 	/***********  AJAX FUNCTIONS  **********************/
 	function select_section_data($super_section_id){
 		header('Content-type: application/json');
-		$data = $this->access_log_model->get_sections_select_data($super_section_id);
+		$data = $this->web_content_model->get_sections_select_data($super_section_id);
 		echo json_encode($data);
 		exit();
 	}
 	function select_page_data($section_id){
 		header('Content-type: application/json');
-		$data = $this->access_log_model->get_pages_select_data($section_id);
+		$data = $this->web_content_model->get_pages_select_data($section_id);
 		echo json_encode($data);
 		exit();
 	}

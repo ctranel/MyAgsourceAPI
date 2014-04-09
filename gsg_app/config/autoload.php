@@ -109,8 +109,7 @@ $autoload['language'] = array();
 |
 */
 
-//$autoload['model'] = array('access_log_model', 'cow_model', 'ion_auth_model', 'region_model');
-$autoload['model'] = array('access_log_model', 'herd_model');//,'dm_model');
+$autoload['model'] = array('access_log_model', 'herd_model', 'web_content_model');//,'dm_model');
 
 
 
