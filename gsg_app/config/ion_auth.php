@@ -39,7 +39,8 @@
 	$config['tables']['pages_blocks']  			= 'users.dbo.pages_blocks';
 	$config['tables']['blocks']  				= 'users.dbo.blocks';
 	$config['tables']['access_log']  			= 'users.dbo.access_log';
-
+	$config['tables']['access_log_events']		= 'users.dbo.access_log_events';
+	
 	$config['tables']['users_sections']    		= 'users.dbo.users_sections';
 	$config['tables']['groups']  				= 'users.dbo.groups';
 	$config['tables']['dhi_supervisors']  		= 'address.dbo.dhi_supervisor';

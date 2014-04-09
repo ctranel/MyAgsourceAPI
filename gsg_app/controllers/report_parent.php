@@ -745,7 +745,8 @@ abstract class parent_report extends CI_Controller {
 		$recent_test = empty($recent_test) ? NULL : $recent_test;
 		
 		$filter_text = isset($this->filters) ? $this->filters->get_filter_text() : NULL;
-		$this->access_log_model->write_entry(
+		$this->access_log->write_entry(
+			$this->as_ion_auth->is_admin(),
 			$event_id,
 			$herd_code,
 			$recent_test,

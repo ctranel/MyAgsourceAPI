@@ -148,7 +148,8 @@ class Cow_lookup extends CI_Controller {
 		$recent_test = $this->session->userdata('recent_test_date');
 		$recent_test = empty($recent_test) ? NULL : $recent_test;
 		
-		$this->access_log_model->write_entry(
+		$this->access_log->write_entry(
+			$this->as_ion_auth->is_admin(),
 			$event_id,
 			$herd_code,
 			$recent_test,

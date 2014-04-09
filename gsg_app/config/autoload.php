@@ -52,7 +52,7 @@ $autoload['packages'] = array();
 |	$autoload['libraries'] = array('database', 'session', 'xmlrpc');
 */
 
-$autoload['libraries'] = array('database','as_ion_auth','session','carabiner');
+$autoload['libraries'] = array('database','as_ion_auth','session','carabiner','access_log');
 
 
 /*
@@ -109,7 +109,7 @@ $autoload['language'] = array();
 |
 */
 
-$autoload['model'] = array('access_log_model', 'herd_model', 'web_content_model');//,'dm_model');
+$autoload['model'] = array('herd_model', 'web_content_model');//,'dm_model');
 
 
 

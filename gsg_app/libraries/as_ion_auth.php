@@ -79,6 +79,8 @@ class As_ion_auth extends Ion_auth {
 		//}
 		parent::__construct();
 		$this->load->model('access_log_model');
+		$this->load->library('access_log'); //, array('access_log_model' => $this->access_log_model)
+		$this->access_log->setModel($this->access_log_model);
 		$this->load->model('web_content_model');
 		$this->load->model('region_model');
 		$this->load->helper('url');

@@ -217,10 +217,8 @@ class Change_herd extends CI_Controller {
 		$this->load->library('herd', array('herd_code' => $herd_code));
 		$enroll_status = $this->herd->getHerdEnrollStatus($this->herd_model, $this->config->item('product_report_code'));
 		$recent_test = $this->herd->getRecentTest($this->herd_model);
-		/*
-		 *@todo: has the current user accessed requested herd during this test period? access_log->is first load of test(user, herd)
-		 */
-		echo json_encode(array('enroll_status' => $enroll_status, 'new_test' => true));
+		$has_accessed = $this->access_log->sgHasAccessedTest($this->session->userdata('sg_acct_num'), $herd_code, $recent_test);
+		echo json_encode(array('enroll_status' => $enroll_status, 'new_test' => !$has_accessed));
 		exit;
 	}
 	
@@ -240,7 +238,8 @@ class Change_herd extends CI_Controller {
 		$recent_test = $this->session->userdata('recent_test_date');
 		$recent_test = empty($recent_test) ? NULL : $recent_test;
 		
-		$this->access_log_model->write_entry(
+		$this->access_log->write_entry(
+			$this->as_ion_auth->is_admin(),
 			$event_id,
 			$herd_code,
 			$recent_test,
