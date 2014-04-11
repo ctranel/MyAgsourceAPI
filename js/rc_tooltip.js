@@ -63,7 +63,7 @@ $(document).ready(
 							// corner
 							title : {
 								background : '#003C39',
-								color : '#DBFFD4'
+								color : '#E6F4F4'
 							}
 						}
 					}

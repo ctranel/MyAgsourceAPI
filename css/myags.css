@@ -16,8 +16,6 @@ dk green #588528
 lt gray #E8E8E8
 med grad: #666
 
-med tan: #D3D09E
-
 bright red; #F60E27
 
 */
@@ -30,11 +28,21 @@ h1 {margin: 12px 0 10px 0;
 	font-weight:bold;
 	color:#00958E;
 }
-h2{
+/*h2{
 	font-family:"Helvetica", "Arial", "Verdana", sans-serif;
 	font-size:12pt;
+	font-weight: bold;
 	padding:0px 0px 10px 0px;
 	margin:0px;
+}*/
+h2 {
+	font-family:"Helvetica", "Arial", "Verdana", sans-serif;
+	font-size:12pt;
+	font-weight: bold;
+	color:#EF5C29; 
+	padding:0px 0px 10px 0px;
+	margin:0px; 
+	font-weight: bold;
 }
 h3 {font-family:"Helvetica", "Arial", "Verdana", sans-serif;
 	font-size:12pt;

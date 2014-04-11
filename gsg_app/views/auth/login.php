@@ -33,7 +33,7 @@
 		<div class="col-sm-6">
 			<div class="box login">
 				<h3>Laboratories</h3>
-				<h4>Soil, Plant Tissue, Manure and Media</h4>
+				<h4>Soil, Water, Plant Tissue, Manure and Media</h4>
 				<form action="http://mylabresults.agsource.com//User/Login?loginModel=AgSource.NET.ViewModels.Shared.LoginModel" class="home" method="post">
 				    <p>
 				    	<label for="txtEmail">Email</label>
@@ -57,9 +57,9 @@
 			    
 			    <p>Having trouble?  Please call AgSource Laboratories:</p>
 			    <ul>
-				    <li>Lincoln, NE: 402-476-0300</li>
-				    <li>Bonduel, WI: 715-758-2178</li>
-				    <li>Umatilla, OR: 541-922-4894</li>
+				    <li>Lincoln, Neb: 402-476-0300</li>
+				    <li>Bonduel, Wis: 715-758-2178</li>
+				    <li>Umatilla, Ore: 541-922-4894</li>
 			    </ul>
 			    
           		<p>To learn how our services can help improve your production email <a href="mailto:labinfo@agsource.com">labinfo@agsource.com</a> or visit <a href="http://www.agsource.com/laboratories">www.agsource.com\laboratories</a>.</p>

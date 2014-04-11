@@ -43,7 +43,7 @@
   display: none; }
 
 .mfp-content {
-  background: #D3D09E;
+  background: #E6F4F4;
   padding: 7px;
   position: relative;
   display: inline-block;
@@ -107,7 +107,7 @@
 .mfp-s-error .mfp-content {
   display: none; }
 
-button.mfp-close {background-color: #003C39; color: #DBFFD4;}
+button.mfp-close {background-color: #003C39; color: #E6F4F4;}
 
 button.mfp-close, button.mfp-arrow {
   overflow: visible;
@@ -147,7 +147,7 @@ button::-moz-focus-inner {
   .mfp-close:active {
     top: 1px; }
 
-.mfp-close-btn-in .mfp-close {color: #DBFFD4;}
+.mfp-close-btn-in .mfp-close {color: #E6F4F4;}
 
 .mfp-image-holder .mfp-close, .mfp-iframe-holder .mfp-close {
   color: white;
