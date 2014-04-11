@@ -1,9 +1,11 @@
 if(document.getElementById('group_id')) AddEvent(document.getElementById('group_id'), 'change', function(){toggle_fields();});
 toggle_fields();
 
-$('.image-link').magnificPopup({
-	type: 'image'
-});
+if($('.image-link').length > 0){
+	$('.image-link').magnificPopup({
+		type: 'image'
+	});
+}
 
 function AddEvent(html_element, event_name, event_function) {
 	if (html_element.attachEvent) // Internet Explorer
