@@ -82,7 +82,7 @@
        <?php endif; ?>
       
       <?php echo form_input($user_id);?>
-      <p><?php echo form_submit('submit', 'Submit');?></p>
+      <p><?php echo form_submit('submit', 'Submit', 'class="button"');?></p>
 
       
     <?php echo form_close(); ?>

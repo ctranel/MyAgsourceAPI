@@ -34,7 +34,7 @@
       <?php echo form_input($phone1);?>-<?php echo form_input($phone2);?>-<?php echo form_input($phone3);?>
       </p>
 
-      <p><?php echo form_submit('submit', 'Submit');?></p>
+      <p><?php echo form_submit('submit', 'Submit', 'class="button"');?></p>
 
       
     <?php echo form_close();?>

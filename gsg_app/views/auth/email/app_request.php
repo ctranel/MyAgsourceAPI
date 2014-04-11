@@ -1,8 +1,8 @@
 <html>
 <body style="font-family: Helvetica,Arial,Verdana,sans-serif">
-	<div style="background-color: #D3D09E; color:#000; border:solid 5px #D3D09E;"><img src="<?php echo $this->config->item('base_url')?>/img/agsource_logo_sm.jpg" alt="<?php echo $this->config->item("cust_serv_company"); ?>"></div>
-	<div style="color: #D3D09E; background-color:#004147; border:solid 5px #004147; font-weight:bold;"><?php echo $this->config->item("product_name"); ?> - <?php echo $this->config->item("cust_serv_company"); ?></div>
-	<h1 style="font-size: 1.1em; background-color: #fff; color:#004147;">Product Information Request</h1>
+	<div><img src="<?php echo $this->config->item('base_url')?>/img/logo-m.png" alt="<?php echo $this->config->item('cust_serv_company'); ?>"></div>
+	<div style="color: #E6F4F4; background-color:#00958E; border-top:solid 5px #EF5C29; font-weight:bold; padding: 5px"><?php echo $this->config->item('product_name'); ?> - <?php echo $this->config->item('cust_serv_company'); ?></div>
+	<h1 style="font-size: 1.1em; background-color: #fff; color:#003C39;">Product Information Request</h1>
 	<p>Thank you for requesting additional information about <?php echo $this->config->item("cust_serv_company"); ?> products.  An <?php echo $this->config->item("cust_serv_company"); ?> representative will follow-up with you about the following products:</p>
 	<ul>
 		<?php 

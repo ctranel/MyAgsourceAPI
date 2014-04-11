@@ -26,7 +26,7 @@
 				echo form_textarea(array('name'=>'comments', 'id'=>'comments', 'rows'=>'3', 'cols'=>'30'));
 				?></p><?php
 				?><p><?php
-				echo form_submit('submit_sections','Request More Information') ?>
+				echo form_submit('submit_sections','Request More Information', 'class="button"') ?>
 				</p>
 			</form>
 		<?php

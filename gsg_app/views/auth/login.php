@@ -1,12 +1,12 @@
 <?php if(isset($page_header) !== false) echo $page_header; ?>
 <div class='mainInfo'>
 	<?php if(isset($page_heading) !== false) echo heading($page_heading); ?>
-	<p>Please login with your email address and password below.</p>
 
 	<div class="row">
 		<div class="col-sm-6">
-			<div class="box">
-				<h3>DHI (Dairy, Milk and Animal Health Diagnostics)</h3>
+			<div class="box login">
+				<h3>DHI</h3>
+			    <h4>Dairy, Milk and Animal Health Diagnostics</h4>
 			    <?php echo form_open("auth/login");?>
 			      <p>
 			      	<label for="identity">Email</label>
@@ -20,28 +20,20 @@
 				      <label for="remember">Remember Me</label>
 				      <?php echo form_checkbox('remember', '1', FALSE, 'id="remember"');?>
 				  </p>
-			      <p><?php echo form_submit('submit', 'Login');?></p>
+			      <p><?php echo form_submit('submit', 'Log In', 'class="button"');?></p>
 			    <?php echo form_close();?>
 			
 			    <p>Forgot your password?  <?php echo anchor('auth/forgot_password', 'Click here'); ?></p>
 			    <p>Not currently enrolled?  <?php echo anchor('auth/create_user', 'Register now.'); ?></p>
 			    <p>Want to see more?  <?php echo anchor('demo', 'View Demo Herd.'); ?></p>
 
-		        <p>AgSource is the largest full service Dairy Herd Improvement (DHI) provider including field services, dairy records processing center, laboratory and meter center   in the United States  offering:</p>
-		        <ul>
-	              <li>On-farm milk recording and sampling services</li>
-	              <li>Laboratory analysis</li>
-	              <li>Data processing</li>
-	              <li>Creation of management information</li>
-	              <li>Individual cow performance measures</li>
-	              <li>Benchmarking tools for effective herd management</li>
-		        </ul>
 		        <p>To learn more  about our DHI services, please call <?php echo $this->config->item('cust_serv_phone'); ?>, email <a href="mailto:info@agsource.com">info@agsource.com</a>, or visit <a href="http://www.agsource.com">www.agsource.com</a>. </p>
         	</div>
 		</div>
 		<div class="col-sm-6">
-			<div class="box">
-				<h3>Laboratories (Soil, Plant Tissue, Manure and Media)</h3>
+			<div class="box login">
+				<h3>Laboratories</h3>
+				<h4>Soil, Plant Tissue, Manure and Media</h4>
 				<form action="http://mylabresults.agsource.com//User/Login?loginModel=AgSource.NET.ViewModels.Shared.LoginModel" class="home" method="post">
 				    <p>
 				    	<label for="txtEmail">Email</label>
@@ -57,26 +49,19 @@
 				        <input name="RememberMe" type="hidden" value="false" />
 				    </p>
 				    <p>
-				        <input type="submit" id="login" value="Login" />
+				        <input type="submit" id="login" value="Log In" class="button" />
 				    </p>
 				</form>
+			    <p>Forgot your password?  <?php echo anchor('http://mylabresults.agsource.com/User/ForgotPassword', 'Click here'); ?></p>
+			    <p>Not currently enrolled?  <?php echo anchor('http://mylabresults.agsource.com/User/AddUserRequest', 'Register now.'); ?></p>
 			    
-			    <p>Having trouble accessing your report?  Please call customer service at:</p>
+			    <p>Having trouble?  Please call AgSource Laboratories:</p>
 			    <ul>
-				    <li>AgSource Harris Laboratories: 402-476-0300</li>
-				    <li>AgSource Bonduel Laboratories: 715-758-2178</li>
-				    <li>AgSource Umatilla Laboratories: 541-922-4894</li>
+				    <li>Lincoln, NE: 402-476-0300</li>
+				    <li>Bonduel, WI: 715-758-2178</li>
+				    <li>Umatilla, OR: 541-922-4894</li>
 			    </ul>
 			    
-			    <p>AgSource Laboratories is the industry leader in  broad-based agronomic testing services. With seven locations throughout the  Midwest and the Northwest, our laboratories provide analysis for: </p>
-	            <ul>
-	              <li>Soil, compost and manure</li>
-	              <li>Feed and Forage</li>
-	              <li>Irrigation and livestock water</li>
-	              <li>Water and environmental</li>
-	              <li>Food and ingredients</li>
-	              <li>Nutrient management planning</li>
-	            </ul>
           		<p>To learn how our services can help improve your production email <a href="mailto:labinfo@agsource.com">labinfo@agsource.com</a> or visit <a href="http://www.agsource.com/laboratories">www.agsource.com\laboratories</a>.</p>
 			</div>
 		</div>

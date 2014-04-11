@@ -208,7 +208,7 @@
 
 
 
-      <p><?php echo form_submit('submit', 'Create Report');?></p>
+      <p><?php echo form_submit('submit', 'Create Report', 'class="button"');?></p>
    <?php echo form_close();?>
 
 </div>

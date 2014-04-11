@@ -30,7 +30,7 @@
       
       <?php echo form_input($user_id);?>
       <?php echo form_hidden($csrf); ?>
-      <p><?php echo form_submit('submit', 'Change');?></p>
+      <p><?php echo form_submit('submit', 'Change', 'class="button"');?></p>
       
 <?php echo form_close();?>
 <?php if(isset($page_footer) !== false) echo $page_footer;

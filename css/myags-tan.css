@@ -1,0 +1,109 @@
+@CHARSET "UTF-8";
+/*
+med orange: #EF5C29
+dk orange: #A03B22
+
+dk tan: #C8C488
+med tan: #D3D09E
+
+lt lt teal #f0f9f4
+lt teal #B0D9DB
+med teal #92C2C2
+
+dkk green #004147
+
+lt gray #E8E8E8
+med grad: #666
+
+bright red; #F60E27
+
+*/
+
+/* override agsource styles */
+h1 {margin: 5px 0 0 0; padding: 0 0 10px;}
+h3 {font-weight: bold;}
+img, embed, object, video {border: none; max-width: 100%;}
+sup {font-size: .7em;}
+a {text-decoration: underline;}
+/*
+.page_header {background-color:#C8C488; color:#000; text-align:right; min-width:769px; width:100%;}
+.right_header {width:475px; height:127px; float:right;}
+.shadow_left {float:left; position:relative; left:-7px;}
+.shadow_right {float:right; position:relative; left:7px;}
+ */
+#main-content {padding:0 10px; text-align: left;}
+td.menu-padding {width:20px;}
+p {padding: 0 0 5px;}
+#header {height:127px; background: #C8C488 url("http://agsource.crinet.com/images/AgSource-Cooperative-Services/img-header-lft.gif") no-repeat left top; padding: 0; clear: both;}
+#header a {text-decoration:none;}
+.header-link {width:342px; height:127px;}
+ul.primary-nav {background-image: url("http://agsource.crinet.com/images/Common-Images/navbar-stretch.gif"); background-repeat: repeat-x; color: #FFFFFF; font-size: 9pt; height: 25px; padding: 1px 1px; margin: 0;}
+ul.primary-nav li {float: left; border-left: solid 1px #B0D9DB; list-style: none; padding: 3px 10px;}
+ul.primary-nav li.first {border-left: none;}
+/* end agsource override */
+
+/* new styles */
+.container {margin:0 auto; display:table; border: solid 2px #E8E8E8; padding:0;}
+#header {background-color:#CAC68A;}
+h3.tight-to-table {margin: 20px 0 0; border: solid 1px black;}
+
+a.button {
+	background-color: #92C2C2;
+	font-family: "Helvetica","Arial","Verdana",sans-serif;
+	font-weight: bold;
+	padding: 2px 5px;
+	margin: 5px;
+	display: inline-block;
+	border: solid 1px black;
+	text-decoration: none;
+}
+
+/* end new styles */
+
+/* general */
+a, .footer a:link, a:hover, a:active, a:visited {color: #004147;}
+.important-message {font-size: 1.3em; color:#F60E27; background-color:inherit; font-weight:bold;}
+/* end general */
+
+/* application navigation */
+ul.primary-nav {white-space: nowrap; border: none;}
+ul.primary-nav li a {white-space:nowrap; color: #B0D9DB; font-weight:bold; padding: 0; text-align: center; text-decoration: none; text-transform: uppercase;}
+ul.primary-nav li.current {background-color:#B0D9DB;}
+ul.primary-nav li.current a {background-color:#B0D9DB; color: #004147;}
+ul.primary-nav a:hover {color: #fff;}
+
+/* section nav and group nav dropdowns */
+ul.primary-nav li.sectionnav, ul.primary-nav li.sectionnav ul, ul.primary-nav li.groupnav, ul.primary-nav li.groupnav ul {float: right; margin: 0; list-style: none; border: none;}
+ul.primary-nav li.sectionnav, ul.primary-nav li.groupnav {padding: 3px 5px 3px 0; width: 120px;}
+ul.primary-nav li.sectionnav ul, ul.primary-nav li.groupnav ul {position:relative;}/* cursor: pointer; visibility: hidden; margin: 4px -6px 0 0; height: 1px; overflow: visible;}*/
+ul.primary-nav li.sectionnav ul li, ul.primary-nav li.groupnav ul li {margin:0; padding: 5px; float: none; border-bottom: solid 1px #004147; border-left: solid 1px #004147; border-right: solid 1px #004147; background-color:#B0D9DB}
+ul.primary-nav li.sectionnav ul li a, ul.primary-nav li.groupnav ul li a {font: normal .85em helvetica,arial,sans-serif; color:#004147; background-color: #B0D9DB; display:block; text-align: left;}
+
+ul#session-nav {margin: 0; padding: 5px 0 0; list-style: none;}
+ul#session-nav li {padding: 0 5px; margin: 0; float: right; line-height: 1.1em; border-left: solid 1px #666; border-right: solid 1px #666;}
+ul#session-nav a {text-decoration: none;}
+ul#session-nav {float:right;}
+
+.hover {display:block;}
+
+/* override bootstrap styles for top nav and dropdowns */
+.navbar-inverse {border: none; min-height: 25px; margin: 0; border-radius:0;}
+.navbar-inverse li {border-left: solid 1px #555;}
+.navbar-inverse li.current {background-color: #555; border-top: solid 2px #f00;}
+.navbar-inverse li.current a {background-color: #555;}
+.nav li a {padding: 3px 8px; text-decoration: none; font-weight: bold;}
+.dropdown-menu {background-color: transparent; box-shadow: none;}
+.navbar-nav {margin: 0;}
+
+/* forms */
+label, fieldset legend {color:#004147;}
+label {display:inline;}
+label:after {content: ":";}
+input.require, input.required, select.require {background-color: #9CD7DD}
+label require {color:#004147;}
+
+/* tables */
+.odd {background-color:#fff; color:#000;}
+.even {background-color:#D3D09E; color:#000;}
+#infoMessage p, #infoMessage {background-color:#fff; color:#f00;}
+div#infoMessage {margin: 0 0 10px 0;}

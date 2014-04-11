@@ -40,7 +40,7 @@
       </p>
     <p><?php echo form_checkbox($disclaimer); ?> I understand that when I allow a consultant to access my information through this form (we do not recommend giving our your login information), that consultant can access my herd and animal data through their own <?php echo $this->config->item('product_name')?> account.  At no point does any consultant have access to my account information...e-mail will be sent....</p>
 
-      <p><?php echo form_submit('submit', 'Set Consultant Access');?></p>
+      <p><?php echo form_submit('submit', 'Set Consultant Access', 'class="button"');?></p>
     <?php echo form_close();?>
 </div>
 <?php if(isset($page_footer) !== false) echo $page_footer;

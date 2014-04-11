@@ -53,7 +53,7 @@ $(document).ready(
 							border : {
 								width : 1,
 								radius : 4,
-								color : '#004147'
+								color : '#003C39'
 							},
 							width : { // Set the tooltip width
 								max : 500
@@ -62,7 +62,7 @@ $(document).ready(
 							// tooltip at the designated tooltip
 							// corner
 							title : {
-								background : '#004147',
+								background : '#003C39',
 								color : '#DBFFD4'
 							}
 						}

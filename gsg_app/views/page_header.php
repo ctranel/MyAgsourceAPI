@@ -15,7 +15,7 @@
 <?php
 	    $this->carabiner->css('corporate.css', 'screen');
 		$this->carabiner->css('print.css', 'print');
-		$this->carabiner->css('myags-d2.css', 'screen');
+		$this->carabiner->css('myags.css', 'screen');
 		$this->carabiner->css('myags.css', 'print');
 		$this->carabiner->display('css');
 	?>
@@ -100,7 +100,7 @@
 				<?php if($this->as_ion_auth->has_permission("Request Herd")): ?>
 					<li><?php echo anchor('change_herd/request', 'Request Herd'); ?></li>
 				<?php endif; ?>
-				<?php else:?>
+				<?php elseif($this->router->fetch_method() != 'login'): ?>
 				<li><?php echo anchor('auth/login', 'Log In');?></li>
 				<li><?php echo anchor('auth/create_user', 'Register');?></li>
 			<?php endif; ?>

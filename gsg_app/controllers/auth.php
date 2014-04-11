@@ -457,7 +457,7 @@ class Auth extends Ionauth {
 			}
 			$this->page_header_data['section_nav'] = $this->load->view('auth/section_nav', NULL, TRUE);
 			$this->data['page_header'] = $this->load->view('page_header', $this->page_header_data, TRUE);
-			$this->data['page_heading'] = 'Grant Consultant Access - ' . $this->config->item('product_name');
+			$this->data['page_heading'] = 'Grant Consultant Access';
 			$footer_data = array(
 			);
 			$this->data['page_footer'] = $this->load->view('page_footer', $footer_data, TRUE);
@@ -614,7 +614,7 @@ class Auth extends Ionauth {
 			}
 			$this->page_header_data['section_nav'] = $this->load->view('auth/section_nav', NULL, TRUE);
 			$this->data['page_header'] = $this->load->view('page_header', $this->page_header_data, TRUE);
-			$this->data['page_heading'] = 'Request Data Access - ' . $this->config->item('product_name');
+			$this->data['page_heading'] = 'Request Data Access';
 			$footer_data = array(
 			);
 			$this->data['page_footer'] = $this->load->view('page_footer', $footer_data, TRUE);
@@ -633,7 +633,6 @@ class Auth extends Ionauth {
 		$this->data['users'] = $this->as_ion_auth->get_editable_users();
 		$this->data['arr_group_lookup'] = $this->ion_auth_model->get_group_lookup();
 		
-		$this->carabiner->css('report.css', 'screen');
 		$this->carabiner->css('datatables/table_ui.css', 'screen');
 		if(is_array($this->page_header_data)){
 			$this->page_header_data = array_merge($this->page_header_data,
@@ -657,7 +656,7 @@ class Auth extends Ionauth {
 		);
 		$this->page_header_data['section_nav'] = $this->load->view('auth/section_nav', NULL, TRUE);
 		$this->data['page_header'] = $this->load->view('page_header', $this->page_header_data, true);
-		$this->data['page_heading'] = 'User List - ' . $this->config->item('product_name');
+		$this->data['page_heading'] = 'User List';
 		$this->data['page_footer'] = $this->load->view('page_footer', $this->footer_data, TRUE);
 		$this->load->view('auth/index', $this->data);
 	}
@@ -715,17 +714,18 @@ class Auth extends Ionauth {
 				'type' => 'password',
 			);
 
+			$this->carabiner->css('login.css', 'screen');
 			if(is_array($this->page_header_data)){
 				$this->page_header_data = array_merge($this->page_header_data,
 					array(
-						'title'=>'Log In - ' . $this->config->item('product_name'),
+						'title'=>'Login - ' . $this->config->item('product_name'),
 						'description'=>'Log In Form for ' . $this->config->item('product_name')
 					)
 				);
 			}
 			$this->page_header_data['section_nav'] = $this->load->view('auth/section_nav', NULL, TRUE);
 			$this->data['page_header'] = $this->load->view('page_header', $this->page_header_data, TRUE);
-			$this->data['page_heading'] = 'Log In - ' . $this->config->item('product_name');
+			$this->data['page_heading'] = 'Login';
 			$this->data['page_footer'] = $this->load->view('page_footer', NULL, TRUE);
 
 			$this->load->view('auth/login', $this->data);
@@ -763,7 +763,7 @@ class Auth extends Ionauth {
 		}
 		$this->page_header_data['section_nav'] = $this->load->view('auth/section_nav', NULL, TRUE);
 		$this->data['page_header'] = $this->load->view('page_header', $this->page_header_data, true);
-		$this->data['page_heading'] = 'Update Password - ' . $this->config->item('product_name');
+		$this->data['page_heading'] = 'Update Password';
 		$this->data['page_footer'] = $this->load->view('page_footer', null, true);
 		parent::change_password;
 	}
@@ -781,7 +781,7 @@ class Auth extends Ionauth {
 		}
 		$this->page_header_data['section_nav'] = $this->load->view('auth/section_nav', NULL, TRUE);
 		$this->data['page_header'] = $this->load->view('page_header', $this->page_header_data, TRUE);
-		$this->data['page_heading'] = 'Forgotten Password - ' . $this->config->item('product_name');
+		$this->data['page_heading'] = 'Forgotten Password';
 		$this->data['page_footer'] = $this->load->view('page_footer', null, TRUE);
 		parent::forgot_password();
 	}
@@ -798,7 +798,7 @@ class Auth extends Ionauth {
 		}
 		$this->page_header_data['section_nav'] = $this->load->view('auth/section_nav', NULL, TRUE);
 		$this->data['page_header'] = $this->load->view('page_header', $this->page_header_data, TRUE);
-		$this->data['page_heading'] = 'Forgotten Password - ' . $this->config->item('product_name');
+		$this->data['page_heading'] = 'Forgotten Password';
 		$this->data['page_footer'] = $this->load->view('page_footer', null, TRUE);
 		parent::reset_password($code);
 	}
@@ -816,7 +816,7 @@ class Auth extends Ionauth {
 		}
 		$this->page_header_data['section_nav'] = $this->load->view('auth/section_nav', NULL, TRUE);
 		$this->data['page_header'] = $this->load->view('page_header', $this->page_header_data, true);
-		$this->data['page_heading'] = 'Deactivate User - ' . $this->config->item('product_name');
+		$this->data['page_heading'] = 'Deactivate User';
 		$this->data['page_footer'] = $this->load->view('page_footer', null, true);
 		parent::deactivate($id);
 	}
@@ -1068,7 +1068,7 @@ class Auth extends Ionauth {
 			$this->carabiner->css('popup.css');
 			$this->page_header_data['section_nav'] = $this->load->view('auth/section_nav', NULL, TRUE);
 			$this->data['page_header'] = $this->load->view('page_header', $this->page_header_data, TRUE);
-			$this->data['page_heading'] = 'Register User - ' . $this->config->item('product_name');
+			$this->data['page_heading'] = 'Register User';
 			$footer_data = array(
 				'arr_deferred_js'=>array(
 					$this->config->item('base_url_assets') . 'js/gs_auth_form_helper.js',
@@ -1321,7 +1321,7 @@ class Auth extends Ionauth {
 				)
 			);
 			$this->data['page_header'] = $this->load->view('page_header', $this->page_header_data, true);
-			$this->data['page_heading'] = 'Edit User - ' . $this->config->item('product_name');
+			$this->data['page_heading'] = 'Edit User';
 			$this->data['page_footer'] = $this->load->view('page_footer', $this->footer_data, true);
 			$this->load->view('auth/edit_user', $this->data);
 		}

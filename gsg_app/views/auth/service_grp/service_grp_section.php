@@ -22,7 +22,7 @@
 		<?php if(isset($arr_submit_options) && is_array($arr_submit_options)): ?>
 			<label>With selected</label>
 			<?php foreach($arr_submit_options as $so): ?>
-				&nbsp;&nbsp;&nbsp;<?php echo form_submit(array('type' => 'submit', 'name' => 'submit', 'value' => $so, 'id' => strtolower(str_replace(' ', '_', $so))));?>
+				&nbsp;&nbsp;&nbsp;<?php echo form_submit(array('type' => 'submit', 'name' => 'submit', 'class' => 'button', 'value' => $so, 'id' => strtolower(str_replace(' ', '_', $so))));?>
 			<?php endforeach; ?>
 		<?php endif; ?>
 		

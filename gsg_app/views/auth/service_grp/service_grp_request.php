@@ -33,7 +33,7 @@
       	<?php echo form_input($exp_date);?> (leave blank for no expiration)
    </p>
    <p><?php echo form_checkbox($disclaimer); ?> I have discussed how I will use this herd&apos;s information with the producer (herd owner). The producer will receive an email detailing this request and can grant or deny access to their herd&apos;s information. I understand that if access is granted, I will be billed for access to this herd&apos;s information if they are <b>not</b> enrolled on <?php echo $this->config->item('product_name'); ?>.</p>
-   <p><?php echo form_submit('submit', 'Request Access');?></p>
+   <p><?php echo form_submit('submit', 'Request Access', 'class="button"');?></p>
    <?php echo form_close();?>
 </div>
 <?php if(isset($page_footer) !== false) echo $page_footer;

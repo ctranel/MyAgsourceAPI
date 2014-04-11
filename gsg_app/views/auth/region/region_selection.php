@@ -8,7 +8,7 @@ if(isset($association_options) && is_array($association_options)):
 	<?php echo form_open('region', array('name'=>'select_region', 'id'=>'select_region')); ?>
 
 	<p><?php echo form_label('Select Region/Association to Edit', 'association_num'); ?><?php echo form_dropdown('association_num', $association_options, $association_selected, $association_num)?></p>
-	<p><?php echo form_submit('region_submit', 'Edit Region'); ?></p>
+	<p><?php echo form_submit('region_submit', 'Edit Region', 'class="button"'); ?></p>
  
 	<?php echo form_close(); ?>
 <?php
