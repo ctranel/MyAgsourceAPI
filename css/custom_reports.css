@@ -3,7 +3,7 @@
 .form-grouping {border: solid 1px #000; margin: 0 0 20px 15.5em; padding: 5px;}
 .form-subgrouping {border: solid 1px #999; margin: 0 auto; overflow: auto;}
 
-.field-target{background-color:#b3dfdd;}
+.field-target{background-color:#CCEAE8;}
 
 .remove-fld, .add-fld, .remove-head, .remove-col, .remove-trend-col{font-weight:bold; color:#d33;}
 .split {font-weight: normal; font-size: 80%; padding-right:20px; text-decoration:underline;}
@@ -17,7 +17,7 @@
 /* END GENERAL BLOCK FIELDS */
 
 /* FIELD LISTING ("DRAG FROM" CONTAINER) */
-#field-container{height:15em; overflow:auto; border: solid 1px #999; background-color:#b3dfdd;}
+#field-container{height:15em; overflow:auto; border: solid 1px #999; background-color:#CCEAE8;}
 /* END FIELD LISTING ("DRAG FROM" CONTAINER) */
 
 /* BUILD SELECT FIELDS */

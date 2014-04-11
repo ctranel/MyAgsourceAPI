@@ -43,7 +43,7 @@ a.download-links:hover {color:#E6F4F4; background-color:#00958E;}
 .hide-column {display:none; font-size:50%; color:#a22;}
 
 .odd {background-color:#fff; color:#000;}
-.even {background-color:#D6E4E4; color:#000;}
+.even {background-color:#CCEAE8; color:#000;}
 
 /* table headings */
 h2.block {
@@ -64,7 +64,7 @@ h3.block {
 	background: none;
 }
 th.cat-heading, th.subcat-heading {font-size:.92em; text-align: center; border:solid 1px #000; vertical-align:bottom; padding:2px;}
-th.cat-heading, th.cat-heading a {color:#000; background-color:#b3dfdd; white-space:nowrap;}
+th.cat-heading, th.cat-heading a {color:#000; background-color:#CCEAE8; white-space:nowrap;}
 th.subcat-heading, th.subcat-heading a {color:#fff; background-color:#00958E; font-size:.92em; font-weight:normal;}
 th span.hide-column {cursor: pointer;}
 

@@ -2,11 +2,10 @@
 /*
 lt orange #EF5C29
 
-lt lt lt teal #E6F4F4
-lt lt teal #D6E4E4
-lt teal #b3dfdd
+lt lt teal #E6F4F4
+lt teal #CCEAE8
 med teal #66bfbb
-dk teal #00958E
+dk teal #00958E **All shades based on this color**
 dk dk teal #003C39
 
 med green #7bb634
@@ -28,13 +27,6 @@ h1 {margin: 12px 0 10px 0;
 	font-weight:bold;
 	color:#00958E;
 }
-/*h2{
-	font-family:"Helvetica", "Arial", "Verdana", sans-serif;
-	font-size:12pt;
-	font-weight: bold;
-	padding:0px 0px 10px 0px;
-	margin:0px;
-}*/
 h2 {
 	font-family:"Helvetica", "Arial", "Verdana", sans-serif;
 	font-size:12pt;
@@ -126,7 +118,7 @@ ul.primary-nav li.first {border-left: none;}
 ul.primary-nav li a {white-space:nowrap; color: #E6F4F4; padding: 0; text-align: center; text-decoration: none;}
 ul.primary-nav li.current {background-color:#E6F4F4;}
 ul.primary-nav li.current a {background-color:#E6F4F4; color: #00958E; font-weight: bold;}
-ul.primary-nav a:hover {color: #b3dfdd;}
+ul.primary-nav a:hover {color: #CCEAE8;}
 
 /* section nav and group nav dropdowns */
 ul.primary-nav li.sectionnav, ul.primary-nav li.sectionnav ul, ul.primary-nav li.groupnav, ul.primary-nav li.groupnav ul {float: right; margin: 0; list-style: none; border: none;}
@@ -156,7 +148,7 @@ ul#session-nav {float:right;}
 label, fieldset legend {color:#003C39;}
 label {display:inline;}
 label:after {content: ":";}
-input.require, input.required, select.require {background-color: #b3dfdd}
+input.require, input.required, select.require {background-color: #CCEAE8}
 label .require {color:#003C39; font-weight:bold;}
 
 #infoMessage p, #infoMessage {background-color:#fff; color:#F60E27;}
