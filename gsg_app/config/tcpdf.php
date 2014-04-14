@@ -36,8 +36,6 @@
 	 * 
 	 * ADD TRAILING SLASH!
 	 ***********************************************************/
-//	$tcpdf['app_base_url'] = 'http://localhost/app/';
-//	$tcpdf['app_base_url'] = 'http://newdata.crinet.com/app/';
 	$thisci =& get_instance();
 	$tcpdf['app_base_url'] = $thisci->config->item('base_url');
 	$tcpdf['base_url'] = $tcpdf['app_base_url'] . 'third_party/tcpdf/';

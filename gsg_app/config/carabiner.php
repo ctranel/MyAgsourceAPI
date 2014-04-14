@@ -62,9 +62,6 @@ $config['cache_dir'] = 'asset_cache/';
 
 $thisci =& get_instance();
 $config['base_uri'] = $thisci->config->item('base_url');
-//$config['base_uri'] = 'http://newdata.crinet.com/app/';
-//$config['base_uri'] = 'http://newdata.crinet.com/app/';
-
 
 /*
 |--------------------------------------------------------------------------
