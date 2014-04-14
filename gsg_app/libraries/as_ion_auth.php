@@ -149,7 +149,8 @@ class As_ion_auth extends Ion_auth {
 				$this->email->clear();
 				$this->email->from($this->config->item('admin_email'), $this->config->item('site_title'));
 				$this->email->to($this->config->item('cust_serv_email'));
-				$this->email->subject($this->config->item('site_title') . ' - Account Activation Info');
+				$this->email->subject($this->config->item('site_title') . ' - Account Activation Info - ' . $additional_data['last_name']);
+//				$this->email->subject($this->config->item('site_title') . ' - Account Activation Info');
 				$this->email->message($message);
 				$this->email->send();
 			}

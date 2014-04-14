@@ -349,7 +349,8 @@ class Ion_auth
 				$this->email->clear();
 				$this->email->from($this->config->item('admin_email', 'ion_auth'), $this->config->item('site_title', 'ion_auth'));
 				$this->email->to($this->config->item('cust_serv_email'));//was $this->email->to($email);
-				$this->email->subject($this->config->item('site_title', 'ion_auth') . ' - Account Activation');
+// edit ctranel				$this->email->subject($this->config->item('site_title', 'ion_auth') . ' - Account Activation');
+				$this->email->subject($this->config->item('site_title', 'ion_auth') . ' - Account Activation - ' . $additional_data['last_name']);
 				$this->email->message($message);
 
 				if ($this->email->send() == TRUE)
