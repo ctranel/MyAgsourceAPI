@@ -7,6 +7,12 @@ if($('.image-link').length > 0){
 	});
 }
 
+if($('.ajax-popup').length > 0){
+	$('.ajax-popup').magnificPopup({
+		type:'ajax'
+	});
+}
+
 function AddEvent(html_element, event_name, event_function) {
 	if (html_element.attachEvent) // Internet Explorer
 		html_element.attachEvent("on" + event_name, function() {

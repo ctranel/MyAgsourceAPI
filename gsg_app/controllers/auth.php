@@ -15,13 +15,13 @@ class Auth extends Ionauth {
 		$this->load->library('form_validation');
 		$this->load->helper('cookie');
 
-		/* Load the profile.php config file if it exists*/
+		/* Load the profile.php config file if it exists
 		if (ENVIRONMENT == 'development') {
 			$this->config->load('profiler', false, true);
 			if ($this->config->config['enable_profiler']) {
 				$this->output->enable_profiler(TRUE);
 			} 
-		}
+		}*/
 	}
 	
 	function index($pstring = NULL){
@@ -840,7 +840,7 @@ class Auth extends Ionauth {
 		$this->form_validation->set_rules('password', 'Password', 'trim|required|min_length[' . $this->config->item('min_password_length', 'ion_auth') . ']|max_length[' . $this->config->item('max_password_length', 'ion_auth') . ']|matches[password_confirm]');
 		$this->form_validation->set_rules('password_confirm', 'Password Confirmation', 'trim|required');
 		$this->form_validation->set_rules('group_id[]', 'Name of User Group');
-		//$this->form_validation->set_rules('terms', 'Agree to Terms', 'required|exact_length[1]');
+		$this->form_validation->set_rules('terms', 'Terms of Use Acknowledgement', 'required|exact_length[1]');
 		$this->form_validation->set_rules('herd_code', 'Herd Code', 'exact_length[8]');
 		$this->form_validation->set_rules('herd_release_code', 'Release Code', 'trim|exact_length[10]');
 		$this->form_validation->set_rules('section_id[]', 'Section');
@@ -1334,6 +1334,10 @@ class Auth extends Ionauth {
 		$return_val = json_encode($supervisor_acct_num_options);
 		echo $return_val;
 		exit();
+	}
+	
+	function ajax_terms(){
+		$this->load->view('auth/terms', array());
 	}
 	
 	function set_role($group_id){
