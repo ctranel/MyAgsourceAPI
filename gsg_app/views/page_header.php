@@ -11,7 +11,7 @@
     <meta name="description" content="<?php if(isset($description)) echo $description; ?>">
     <meta name="keywords" content="<?php echo $this->config->item('cust_serv_company'); ?>, DHI Testing, DHI, DHIA, milk testing, soil testing, forage testing, manure testing, " />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-	<link rel="stylesheet" href='http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css'>
+	<link rel="stylesheet" href='https://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css'>
 <?php
 	    $this->carabiner->css('corporate.css', 'screen');
 		$this->carabiner->css('print.css', 'print');
@@ -29,7 +29,7 @@
 	<script type="text/javascript">
 		head.js(
 			{jquery: "https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"},
-			{bootstrap: "http://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"},
+			{bootstrap: "https://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"},
 			{sectionhelper: "<?php echo $this->config->item('base_url_assets'); ?>js/as_section_helper.js"},
 			{formhelper: "<?php echo $this->config->item('base_url_assets'); ?>js/form_helper.js"}
 			<?php
