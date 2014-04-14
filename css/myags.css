@@ -74,7 +74,8 @@ a.button, .button {
 	
 	/* Opera 11.10+ */
 	background: -o-linear-gradient(top, #66bfbb, #00958E);
-color: #E6F4F4;
+	background-color: #00958E;
+	color: #E6F4F4;
 	font-family: "Helvetica","Arial","Verdana",sans-serif;
 	font-weight: bold;
 	padding: 3px 7px;
@@ -111,6 +112,7 @@ ul.primary-nav {
 	
 	/* Opera 11.10+ */
 	background: -o-linear-gradient(top, #66bfbb, #00958E);
+	background-color: #00958E;
 	white-space: nowrap; border: none; color: #FFFFFF; font-size: 9pt; height: 30px; padding: 1px 3px; margin: 0; border-radius: 0; min-height: 30px; border-top: solid 5px #EF5C29;}
 	
 ul.primary-nav li {float: left; border-left: solid 1px #E6F4F4; list-style: none; padding: 3px 10px;}
