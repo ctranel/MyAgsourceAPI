@@ -14,16 +14,16 @@
 	switch (ENVIRONMENT)
 	{
 		case 'development':
-			$config['base_url']	= "http://localhost/MyAgSource/";
-			$config['base_url_assets']	= "http://localhost/MyAgSource/";
+			$config['base_url']	= "https://localhost/MyAgSource/";
+			$config['base_url_assets']	= "https://localhost/MyAgSource/";
 		break;
 		case 'testing':
-			$config['base_url']	= "http://feweb.verona.crinet/myagsource/";
-			$config['base_url_assets']	= "http://feweb.verona.crinet/myagsource/";
+			$config['base_url']	= "https://feweb.verona.crinet/myagsource/";
+			$config['base_url_assets']	= "https://feweb.verona.crinet/myagsource/";
 		break;
 		case 'production':
-			$config['base_url']	= "http://myagsource.com/myagsource/";
-			$config['base_url_assets']	= "http://myagsource.com/myagsource/";
+			$config['base_url']	= "https://myagsource.com/myagsource/";
+			$config['base_url_assets']	= "https://myagsource.com/myagsource/";
 		break;
 		default:
 			exit('The application environment is not set correctly. - base_url');
