@@ -13,7 +13,7 @@ $('.section-checkbox').bind('click', function(event) {
 
 head.ready(function() {
 	//confirmation should not be required for denying access
-	$('#deny_access').on('click',function(event){
-		$(event.target.form).off('submit', checkRequired);
+//	$('#deny_access').on('click',function(event){
+//		$(event.target.form).off('submit', checkRequired);
 	});
 })
