@@ -82,5 +82,5 @@ function checkRequired(event){
 }
 
 head.ready(function() {
-	$('form').on('submit',checkRequired);
+//	$('form').on('submit',checkRequired);
 })
