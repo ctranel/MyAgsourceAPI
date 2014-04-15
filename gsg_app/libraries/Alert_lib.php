@@ -21,7 +21,7 @@ class Alert_lib extends Reports{
 	
 	public function __construct(){
 		$this->ci =& get_instance();
-		$this->ci->load->model('alert_model');
+		$this->ci->load->model('dhi/alert_model');
 	}
 
 	/**

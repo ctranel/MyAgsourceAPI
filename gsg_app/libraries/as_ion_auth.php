@@ -82,7 +82,7 @@ class As_ion_auth extends Ion_auth {
 		$this->load->library('access_log'); //, array('access_log_model' => $this->access_log_model)
 		$this->access_log->setModel($this->access_log_model);
 		$this->load->model('web_content_model');
-		$this->load->model('region_model');
+		$this->load->model('dhi/region_model');
 		$this->load->helper('url');
 
 		//set supersection if there is one
@@ -130,7 +130,7 @@ class As_ion_auth extends Ion_auth {
 		$id = parent::register($username, $password, $email, $additional_data, $group_name);
 		$herd_code = $additional_data['herd_code'];
 		
-		$this->load->model('tech_model');
+		$this->load->model('dhi/tech_model');
 		
 		if($id && isset($herd_code) && !empty($herd_code)){
 			$data = array(
@@ -477,7 +477,7 @@ class As_ion_auth extends Ion_auth {
 
 		$arr_subscribed_sections = $this->arr_user_sections;
 		// handle DM
-		//$this->load->model('dm_model');
+		//$this->load->model('dhi/dm_model');
 		//if($credentials = $this->dm_model->get_credentials()) $arr_subscribed_sections[] = array('name'=>'AgSourceDM');
 		if(!is_array($arr_subscribed_sections)) return array();
 

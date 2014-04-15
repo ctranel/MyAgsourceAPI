@@ -83,7 +83,9 @@ class MY_Profiler extends CI_Profiler {
 			// Loop through each model to set the database object
 			foreach($autoload['model'] as $model) {
 	 
-				// Define the database object name			
+				// Define the database object name	
+				$model = explode('/', $model);
+				$model = $model[(count($model) - 1)];
 				if(method_exists($this->CI->$model, 'get_database_group')) $database = $this->CI->$model->get_database_group();
 				else $database = 'db'; //'db' is the default
 

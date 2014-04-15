@@ -8,7 +8,7 @@ class Land extends parent_report {
 	}
 	
 	function index($pstring = NULL){
-		$this->load->model('alert_model');
+		$this->load->model('dhi/alert_model');
 		$arr_pstring = $this->session->userdata('arr_pstring');
 		if(isset($pstring)){
 			$this->session->set_userdata('pstring', $pstring);
@@ -49,7 +49,7 @@ class Land extends parent_report {
 			'page_header' => $this->load->view('page_header', $this->page_header_data, TRUE)
 			,'page_heading' => 'My Account'
 			,'herd_code' => $this->session->userdata('herd_code')
-			,'herd_data' => $this->load->view('herd_info', $herd_data, TRUE)
+			,'herd_data' => $this->load->view('dhi/herd_info', $herd_data, TRUE)
 			,'table_heading' => 'Herd Overview'
 			,'page_footer' => $this->load->view('page_footer', $this->footer_data, TRUE)
 			,'bench_data' => $this->alert_model->get_benchmarks($this->session->userdata('herd_code'), $pstring)
@@ -74,7 +74,7 @@ class Land extends parent_report {
 		$tmp = $this->session->userdata('herd_code');
 		if(!isset($tmp) || empty($tmp)){
 			$this->session->keep_flashdata('redirect_url');
-			redirect(site_url('change_herd/select'));
+			redirect(site_url('dhi/change_herd/select'));
 		}
 		$this->page_header_data['message'] = $this->session->flashdata('message');
 
@@ -103,7 +103,7 @@ class Land extends parent_report {
 						'{highcharts: "https://cdnjs.cloudflare.com/ajax/libs/highcharts/3.0.2/highcharts.js"}',
 						'{exporting: "https://cdnjs.cloudflare.com/ajax/libs/highcharts/3.0.2/modules/exporting.js"}',
 						'{graph_helper: "' . $this->config->item("base_url_assets") . 'js/charts/graph_helper.js"}',
-						'{card_helper: "' . $this->config->item("base_url_assets") . 'js/summary_reports/report_card_helper.js"}',
+						'{card_helper: "' . $this->config->item("base_url_assets") . 'js/dhi/summary_reports/report_card_helper.js"}',
 						'{helper: "' . $this->config->item("base_url_assets") . 'js/as_dashboard_helper.js"}'
 					)
 				)

@@ -55,12 +55,19 @@
 				foreach($user_sections as $a):
 					$class_name = $first?'first':'';
 					$first = FALSE;
+					
+					$class = $this->router->fetch_class();
 					$arr_cur_path = explode('/', $this->uri->uri_string());
-					$arr_link_path = explode('/', $a['path']);
-					if(!empty($a['path']) && $arr_cur_path[0] == $arr_link_path[0]) $class_name .= ' current';
-					if($arr_link_path[0] == $arr_cur_path[0]) $class_name .= ' current'; 
-						$href = $url . $a['path']; ?>
-						<li<?php if(!empty($class_name)) echo ' class="' . $class_name . '"'; ?>><?php echo anchor($href, $a['name']);?></li>
+					$class_index = array_pop(array_keys($arr_cur_path, $class));
+					if($class_index):
+						$dir_index = $class_index - 1;
+											
+						$arr_link_path = explode('/', $a['path']);
+						if(!empty($a['path']) && $arr_cur_path[$dir_index] == $arr_link_path[$dir_index]) $class_name .= ' current';
+						if($arr_link_path[$dir_index] == $arr_cur_path[$dir_index]) $class_name .= ' current'; 
+					endif;
+					$href = $url . $a['path']; ?>
+					<li<?php if(!empty($class_name)) echo ' class="' . $class_name . '"'; ?>><?php echo anchor($href, $a['name']);?></li>
 				<?php endforeach;
 			endif; ?>
 
@@ -95,10 +102,10 @@
 					<!-- <li><?php echo anchor('auth/service_grp_access', 'Grant Herd Access'); ?></li> -->
 				<?php endif; ?>
 				<?php if($this->as_ion_auth->has_permission("Select Herd") && isset($num_herds) && $num_herds > 1): ?>
-					<li><?php echo anchor('change_herd/select', 'Change Herd'); ?></li>
+					<li><?php echo anchor('dhi/change_herd/select', 'Change Herd'); ?></li>
 				<?php endif; ?>
 				<?php if($this->as_ion_auth->has_permission("Request Herd")): ?>
-					<li><?php echo anchor('change_herd/request', 'Request Herd'); ?></li>
+					<li><?php echo anchor('dhi/change_herd/request', 'Request Herd'); ?></li>
 				<?php endif; ?>
 				<?php elseif($this->router->fetch_method() != 'login'): ?>
 				<li><?php echo anchor('auth/login', 'Log In');?></li>

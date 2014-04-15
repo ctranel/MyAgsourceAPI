@@ -25,7 +25,7 @@
 			
 			    <p>Forgot your password?  <?php echo anchor('auth/forgot_password', 'Click here'); ?></p>
 			    <p>Not currently enrolled?  <?php echo anchor('auth/create_user', 'Register now.'); ?></p>
-			    <p>Want to see more?  <?php echo anchor('demo', 'View Demo Herd.'); ?></p>
+			    <p>Want to see more?  <?php echo anchor('dhi/demo', 'View Demo Herd.'); ?></p>
 
 		        <p>To learn more  about our DHI services, please call <?php echo $this->config->item('cust_serv_phone'); ?>, email <a href="mailto:info@agsource.com">info@agsource.com</a>, or visit <a href="http://www.agsource.com">www.agsource.com</a>. </p>
         	</div>

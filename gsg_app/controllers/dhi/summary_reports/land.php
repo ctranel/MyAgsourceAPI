@@ -1,0 +1,11 @@
+<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+class Land extends CI_Controller {
+	function __construct(){
+die('here');
+		parent::__construct();
+	}
+	
+	function index(){
+		redirect(site_url('dhi/summary_reports/herd_summary'));
+	}
+}

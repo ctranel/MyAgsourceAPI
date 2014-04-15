@@ -99,10 +99,10 @@
 
 //@todo TEMPORARY CODE FOR RECORDING CLICKS OFF TO AGSOURCE DM (until DM is integrated)
 	//attach load event to body
-	$("#dm-anchor").bind('click', function(event){
+/*	$("#dm-anchor").bind('click', function(event){
 		event.preventDefault();
 		$.get("/app/dm/log_event");
 	    $("#agsourcedm").submit();
-	});
+	});*/
 
 // END TEMPORARY CODE FOR RECORDING CLICKS OFF TO AGSOURCE DM

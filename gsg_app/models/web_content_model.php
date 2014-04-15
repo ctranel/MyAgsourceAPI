@@ -124,7 +124,7 @@ class Web_content_model extends CI_Model {
 	 * @author ctranel
 	 **/
 	public function get_unmanaged_super_sections_array($group_id, $user_id, $herd_code = FALSE) {
-		//$this->load->model('dm_model');
+		//$this->load->model('dhi/dm_model');
 		if(false){//$credentials = $this->dm_model->get_credentials()) {
 			$this->db->where($this->tables['super_sections'] . '.id', 6);
 			return $this->get_super_sections();
@@ -265,7 +265,7 @@ class Web_content_model extends CI_Model {
 	 * @author ctranel
 	 **/
 	public function get_unmanaged_sections_array($group_id, $user_id, $herd_code = FALSE) {
-		//$this->load->model('dm_model');
+		//$this->load->model('dhi/dm_model');
 		if(false){//$credentials = $this->dm_model->get_credentials()) {
 			$this->db->where($this->tables['sections'] . '.id', 6);
 			return $this->get_sections();

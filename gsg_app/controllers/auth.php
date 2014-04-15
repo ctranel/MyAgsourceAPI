@@ -690,7 +690,7 @@ class Auth extends Ionauth {
 				$this->_record_access(1); //1 is the page code for login for the user management section
 				$this->session->set_flashdata('message', $this->as_ion_auth->messages());
 				$this->session->set_flashdata('redirect_url', $redirect_url);
-				redirect(site_url('change_herd/select'));
+				redirect(site_url('dhi/change_herd/select'));
 			}
 			else
 			{ //if the login was un-successful

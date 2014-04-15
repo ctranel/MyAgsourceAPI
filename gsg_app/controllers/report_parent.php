@@ -45,11 +45,15 @@ abstract class parent_report extends CI_Controller {
 	
 	function __construct(){
 		parent::__construct();
-		$class = $this->router->fetch_class(); //this should match the name of this file (minus ".php".  Also used as base for css and js file names and model directory name
-		$this->section_path = $class;
-		if($this->uri->segment(1) != $this->section_path){
-			$this->section_path = $this->uri->segment(1) . '/' . $this->section_path;
-		} 
+		$class_dir = $this->router->fetch_directory(); //this should match the name of this file (minus ".php".  Also used as base for css and js file names and model directory name
+		$class = $this->router->fetch_class();
+		$method = $this->router->fetch_method();
+//var_dump($class_dir, $class, $method);
+		$this->section_path = $class_dir . $class;
+//		if($this->uri->segment(1) != $this->section_path){
+//			$this->section_path = $this->uri->segment(1) . '/' . $this->section_path;
+//		} 
+//var_dump($this->section_path);
 		$this->page = $this->router->fetch_method();
 		$this->report_path = $this->section_path . '/' . $this->page;
 		$this->primary_model = $this->page . '_model';
@@ -85,7 +89,7 @@ abstract class parent_report extends CI_Controller {
 		
 		if($this->session->userdata('herd_code') == ''){ // || $this->session->userdata('herd_code') == '35990571'
 			$this->session->keep_flashdata('redirect_url');
-			redirect(site_url('change_herd/select'));			
+			redirect(site_url('dhi/change_herd/select'));			
 		}
 		/* Load the profile.php config file if it exists*/
 		if (ENVIRONMENT == 'development') {
@@ -120,7 +124,7 @@ abstract class parent_report extends CI_Controller {
 				$this->session->set_flashdata('message',  $this->session->flashdata('message') . "Please select a herd and try again.");
 				if($this->session->flashdata('message')) $this->session->keep_flashdata('message');
 				$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
-				redirect(site_url('change_herd/select'));
+				redirect(site_url('dhi/change_herd/select'));
 			}
   			exit;
 		}
@@ -139,7 +143,7 @@ abstract class parent_report extends CI_Controller {
 				$this->session->set_flashdata('message', 'Herd ' . $this->herd_code . ' is not subscribed to the ' . $this->product_name . ', nor do you have permission to view this report for herd ' . $this->herd_code . '.  Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' if you have questions or concerns.');
  				if($this->session->flashdata('message')) $this->session->keep_flashdata('message');
 				$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
-				redirect(site_url('change_herd/select'));
+				redirect(site_url('dhi/change_herd/select'));
       		}
 			exit;
 		}
@@ -163,7 +167,7 @@ abstract class parent_report extends CI_Controller {
 				$this->session->set_flashdata('message', 'You do not have permission to view the ' . $this->product_name . ' for herd ' . $this->herd_code . '.  Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' if you have questions or concerns.');
  				if($this->session->flashdata('message')) $this->session->keep_flashdata('message');
 				$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
-				redirect(site_url('change_herd/select'));
+				redirect(site_url('dhi/change_herd/select'));
 			}
 			exit;
 		}
@@ -436,7 +440,7 @@ abstract class parent_report extends CI_Controller {
 		$data = array(
 			'page_header' => $this->load->view('page_header', $this->page_header_data, TRUE),
 			'herd_code' => $this->session->userdata('herd_code'),
-			'herd_data' => $this->load->view('herd_info', $herd_data, TRUE),
+			'herd_data' => $this->load->view('dhi/herd_info', $herd_data, TRUE),
 			'page_footer' => $this->load->view('page_footer', $this->page_footer_data, TRUE),
 			'blocks' => $arr_view_blocks,
 			'print_all' => $this->print_all,
