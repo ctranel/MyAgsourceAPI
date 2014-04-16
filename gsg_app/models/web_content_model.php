@@ -95,27 +95,6 @@ class Web_content_model extends CI_Model {
 	}
 	
 	/**
-	 * @method get_sections_select_data()
-	 * @return int id of super section
-	 * @access public
-	 *
-	 **/
-	public function get_sections_select_data($super_section_id){
-		$arr_return = array();
-		$this->{$this->db_group_name}
-		->select('id, name')
-		->where($this->tables['sections'] . '.super_section_id', $super_section_id);
-		$tmp = $this->get_sections()->result_array();
-		if(is_array($tmp)){
-			$arr_return[0] = 'Select one';
-			foreach($tmp as $t){
-				$arr_return[$t['id']] = $t['name'];
-			}
-		}
-		return $arr_return;
-	}
-	
-	/**
 	 * @method get_unmanaged_super_sections_array
 	 * @param int $group_id
 	 * @param int $user_id
@@ -256,6 +235,27 @@ class Web_content_model extends CI_Model {
 		return FALSE;
 	}
 
+	/**
+	 * @method get_sections_select_data()
+	 * @return int id of super section
+	 * @access public
+	 *
+	 **/
+	public function get_sections_select_data($super_section_id){
+		$arr_return = array();
+		$this->{$this->db_group_name}
+		->select('id, name')
+		->where($this->tables['sections'] . '.super_section_id', $super_section_id);
+		$tmp = $this->get_sections();
+		if(is_array($tmp)){
+			$arr_return[0] = 'Select one';
+			foreach($tmp as $t){
+				$arr_return[$t['id']] = $t['name'];
+			}
+		}
+		return $arr_return;
+	}
+	
 	/**
 	 * @method get_unmanaged_sections_array
 	 * @param int $group_id
