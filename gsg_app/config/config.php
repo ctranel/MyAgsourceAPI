@@ -90,7 +90,7 @@
 			$config['index_page'] = "";
 		break;
 		case 'production':
-			$config['index_page'] = "";
+			$config['index_page'] = "index.php/";
 		break;
 		default:
 			exit('The application environment is not set correctly - index_page.');
