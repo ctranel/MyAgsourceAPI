@@ -48,12 +48,8 @@ abstract class parent_report extends CI_Controller {
 		$class_dir = $this->router->fetch_directory(); //this should match the name of this file (minus ".php".  Also used as base for css and js file names and model directory name
 		$class = $this->router->fetch_class();
 		$method = $this->router->fetch_method();
-//var_dump($class_dir, $class, $method);
 		$this->section_path = $class_dir . $class;
-//		if($this->uri->segment(1) != $this->section_path){
-//			$this->section_path = $this->uri->segment(1) . '/' . $this->section_path;
-//		} 
-//var_dump($this->section_path);
+
 		$this->page = $this->router->fetch_method();
 		$this->report_path = $this->section_path . '/' . $this->page;
 		$this->primary_model = $this->page . '_model';

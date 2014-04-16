@@ -47,7 +47,6 @@ class Report_model extends CI_Model {
 	public $arr_pstring = array();
 	public $arr_blocks = array();
 	public $arr_messages = array();
-//	public $section_id;
 	
 	public function __construct($section_path = NULL){
 		parent::__construct();
@@ -60,9 +59,12 @@ class Report_model extends CI_Model {
 
 		$this->db_group_name = 'default';
 		$this->{$this->db_group_name} = $this->load->database($this->db_group_name, TRUE);
-		if(isset($section_path)) $this->section_id = $this->web_content_model->get_section_id_by_path($section_path);
-//var_dump($this->section_id);
-		if(isset($this->section_id)) $this->arr_blocks = $this->web_content_model->get_block_links($this->section_id);
+		if(isset($section_path)){
+			$this->section_id = $this->web_content_model->get_section_id_by_path($section_path);
+		}
+		if(isset($this->section_id)){
+			$this->arr_blocks = $this->web_content_model->get_block_links($this->section_id);
+		}
 	}
 	function get_primary_table_name(){
 		return $this->primary_table_name;
