@@ -1,12 +1,6 @@
-<?php if(isset($page_header) !== FALSE) echo $page_header;
-/*	$filepath = APPPATH.'helpdocs'.FS_SEP.strtolower($product_name).'.html';
-
-	if (file_exists($filepath)) {
-		ob_start();
-		include $filepath;
-		echo ob_get_clean();
-	} */
-?>
+<?php if(isset($page_header) !== FALSE):
+	echo $page_header;
+endif; ?>
 <div class='mainInfo'>
 	<h1>Support</h1>
 	<h2>How to reach us</h2>
