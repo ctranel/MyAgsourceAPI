@@ -87,7 +87,7 @@
 			$config['index_page'] = "index.php/";
 		break;
 		case 'testing':
-			$config['index_page'] = "";
+			$config['index_page'] = "index.php/";
 		break;
 		case 'production':
 			$config['index_page'] = "index.php/";
