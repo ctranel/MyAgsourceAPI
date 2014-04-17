@@ -53,7 +53,18 @@
 	<h2>Report Builder</h2>
 	<div id="choose-field" style="overflow: hidden">
 		<p id="p-cow-or-summary">
-			<span class="form-radio"><?php echo form_radio('cow_or_summary', 'cow', $cow_or_summary_selected == 'cow', 'class = "radio cow_or_summary"'); ?>Cow</span> <span class="form-radio"><?php echo form_radio('cow_or_summary', 'summary', $cow_or_summary_selected == 'summary', 'class = "radio cow_or_summary"'); ?>Summary</span>
+			<span class="form-radio">
+				<?php echo form_radio('cow_or_summary', 'cow', $cow_or_summary_selected == 'cow', 'class = "radio cow_or_summary"'); ?>
+				Cow
+			</span>
+			<span class="form-radio">
+				<?php echo form_radio('cow_or_summary', 'summary', $cow_or_summary_selected == 'summary', 'class = "radio cow_or_summary"'); ?>
+				Summary
+			</span>
+			<span class="form-radio">
+				<?php echo form_radio('cow_or_summary', 'admin', $cow_or_summary_selected == 'admin', 'class = "radio cow_or_summary"'); ?>
+				Admin
+			</span>
 		</p>
 		<p id="p-choose-table"><?php echo form_label('Choose Table', 'choose_table');
 			if(empty($choose_table_options)) $choose_table_options = array();

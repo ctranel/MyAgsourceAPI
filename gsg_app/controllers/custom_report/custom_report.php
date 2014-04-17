@@ -249,7 +249,21 @@ class Custom_report extends CI_Controller {
 	}
 	function select_table_data($cow_or_summary){
 		header('Content-type: application/json');
-		$cat_id = $cow_or_summary == 'summary' ? 2 : 1;
+		switch ($cow_or_summary){
+			case 'summary':
+				$cat_id = 2;
+				break;
+			case 'cow':
+				$cat_id = 1;
+				break;
+			case 'admin':
+				$cat_id = 34;
+				break;
+			default:
+				$cat_id = null;
+				break;
+		}
+		
 		$data = $this->custom_report_model->get_tables_select_data($cat_id);
 		echo json_encode($data);
 		exit();
