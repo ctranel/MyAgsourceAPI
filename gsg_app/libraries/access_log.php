@@ -56,7 +56,7 @@ class Access_log
 	 * @author ctranel
 	 **/
 	function write_entry($is_admin, $event_id, $herd_code, $recent_test_date, $herd_enroll_status_id, $user_id, $group_id, $format='web', $report_page_id = NULL, $sort=NULL, $filters=NULL){
-		//if($is_admin) return 1; //do not record admin action
+		if($is_admin) return 1; //do not record admin action
 		$tmp_array = array(
 			'event_id' => $event_id,
 			'herd_code' => $herd_code,
