@@ -73,13 +73,13 @@ abstract class parent_report extends CI_Controller {
 		
 		$this->section_id = $this->{$this->primary_model}->get_section_id();
 
-		if($this->authorize()) {
+		if($this->authorize($method)) {
 			$this->load->library('reports');
 			$this->reports->herd_code = $this->herd_code;
 		}
 //		else {  //redirect to login if not logged in or session is expired
 //			if($this->session->flashdata('message')) $this->session->keep_flashdata('message');
-//			if($this->uri->segment(3) != 'ajax_report') $this->session->set_flashdata('redirect_url', $this->uri->uri_string());
+//			if($method != 'ajax_report') $this->session->set_flashdata('redirect_url', $this->uri->uri_string());
 //			redirect(site_url('auth/login'));
 //		}
 		
@@ -96,16 +96,16 @@ abstract class parent_report extends CI_Controller {
 		}
 	}
 
-	protected function authorize(){
+	protected function authorize($method){
 		if(!isset($this->as_ion_auth)){
-	       	if($this->uri->segment(3) == 'ajax_report' && $this->session->userdata('herd_code') != $this->config->item('default_herd')){
-				echo "Your session has expired, please log in and try again.";
+	       	if($method == 'ajax_report' && $this->herd_code != $this->config->item('default_herd')){
+				echo "Your session has expired, please log in and try again..";
 			}
 			else return FALSE;
 		}
-		if(!$this->as_ion_auth->logged_in() && $this->session->userdata('herd_code') != $this->config->item('default_herd')) {
-	       	if($this->uri->segment(3) == 'ajax_report'){
-				echo "Your session has expired, please log in and try again.";
+		if(!$this->as_ion_auth->logged_in() && $this->herd_code != $this->config->item('default_herd')) {
+	       	if($method == 'ajax_report'){
+				echo "Your session has expired, please log in and try again...";
 			}
 			else {
 	       		$this->session->set_flashdata('message', "Please log in.");
@@ -113,7 +113,7 @@ abstract class parent_report extends CI_Controller {
 			}
 		}
 		if(!isset($this->herd_code)){
-	       	if($this->uri->segment(3) == 'ajax_report'){
+	       	if($method == 'ajax_report'){
 				echo 'Please select a herd and try again.';
 			}
 			else {
@@ -132,7 +132,7 @@ abstract class parent_report extends CI_Controller {
 		if(!$pass_view_nonowned_test) $pass_view_nonowned_test = in_array($this->herd_code, $this->as_ion_auth->get_viewable_herd_codes($this->session->userdata('user_id'), $this->session->userdata('arr_regions')));//$this->as_ion_auth->has_permission("View Non-owned Herds") || $this->ion_auth_model->user_owns_herd($this->herd_code);
 		if($pass_unsubscribed_test && $pass_view_nonowned_test) return TRUE;
 		elseif(!$pass_unsubscribed_test && !$pass_view_nonowned_test) {
-			if($this->uri->segment(3) == 'ajax_report') {
+			if($method == 'ajax_report') {
 				echo 'Herd ' . $this->herd_code . ' is not subscribed to the ' . $this->product_name . ', nor do you have permission to view this report for herd ' . $this->herd_code . '.  Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' if you have questions or concerns.';
 			}
 			else {
@@ -144,7 +144,7 @@ abstract class parent_report extends CI_Controller {
 			exit;
 		}
 		elseif(!$pass_unsubscribed_test) {
-			if($this->uri->segment(3) == 'ajax_report') {
+			if($method == 'ajax_report') {
 				echo 'Herd ' . $this->herd_code . ' is not subscribed to the ' . $this->product_name . '.  Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' if you have questions or concerns.';
 			}
 			else {
@@ -156,7 +156,7 @@ abstract class parent_report extends CI_Controller {
 			exit;
 		}
 		elseif(!$pass_view_nonowned_test) {
-			if($this->uri->segment(3) == 'ajax_report') {
+			if($method == 'ajax_report') {
 				echo 'You do not have permission to view the ' . $this->product_name . ' for herd ' . $this->herd_code . '.  Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' if you have questions or concerns.';
 			}
 			else {
@@ -357,8 +357,8 @@ abstract class parent_report extends CI_Controller {
 						'form_id' => $this->report_form_id,
 						'odd_even' => $odd_even,
 						'block' => $pb['url_segment'],
-						'sort_by' => $sort_by,
-						'sort_order' => $sort_order,
+						'sort_by' => urlencode($sort_by),
+						'sort_order' => urlencode($sort_order),
 					);
 					$arr_view_blocks[] = $this->load->view($display, $arr_blk_data, TRUE);
 					//add js line to populate the block after the page loads

@@ -50,21 +50,15 @@
 	<nav class="navbar navbar-inverse" role="navigation">
 		<ul class="nav navbar-nav">
 		<?php
+			//@todo MOVE THIS BLOCK TO THE CONTROLLERS OR MAYBE A LIBRARY?
 			if(isset($user_sections) && is_array($user_sections)):
 				$first = TRUE;
 				foreach($user_sections as $a):
 					$class_name = $first?'first':'';
 					$first = FALSE;
-					
-					$class = $this->router->fetch_class();
-					$arr_cur_path = explode('/', $this->uri->uri_string());
-					$class_index = array_pop(array_keys($arr_cur_path, $class));
-					if($class_index):
-						$dir_index = $class_index - 1;
-											
-						$arr_link_path = explode('/', $a['path']);
-						if(!empty($a['path']) && $arr_cur_path[$dir_index] == $arr_link_path[$dir_index]) $class_name .= ' current';
-						if($arr_link_path[$dir_index] == $arr_cur_path[$dir_index]) $class_name .= ' current'; 
+					$path = $this->router->fetch_directory();// . $this->router->fetch_class();
+					if(substr($a['path'], 0, strrpos( $a['path'], '/')) . '/' === $path):
+						$class_name .= ' current'; 
 					endif;
 					$href = $url . $a['path']; ?>
 					<li<?php if(!empty($class_name)) echo ' class="' . $class_name . '"'; ?>><?php echo anchor($href, $a['name']);?></li>
