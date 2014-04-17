@@ -357,8 +357,8 @@ abstract class parent_report extends CI_Controller {
 						'form_id' => $this->report_form_id,
 						'odd_even' => $odd_even,
 						'block' => $pb['url_segment'],
-						'sort_by' => $sort_by,
-						'sort_order' => $sort_order,
+						'sort_by' => urlencode($sort_by),
+						'sort_order' => urlencode($sort_order),
 					);
 					$arr_view_blocks[] = $this->load->view($display, $arr_blk_data, TRUE);
 					//add js line to populate the block after the page loads
