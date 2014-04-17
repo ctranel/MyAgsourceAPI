@@ -484,7 +484,7 @@ class As_ion_auth extends Ion_auth {
 
 		$this->load->helper('multid_array_helper');
 		$arr_subscribed_sections = array_extract_value_recursive('name', $arr_subscribed_sections);
-		$arr_all_sections = $this->web_content_model->get_sections_by_herd()->result_array();
+		$arr_all_sections = $this->web_content_model->get_sections_by_herd();
 		$arr_all_sections = array_extract_value_recursive('name', $arr_all_sections);
 		//$arr_subscribed_sections[] = 'My Account';
 		//$arr_subscribed_sections[] = 'Alert';

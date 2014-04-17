@@ -5,8 +5,8 @@
 	<div class="row">
 		<div class="col-sm-6">
 			<div class="box login">
-				<h3>DHI</h3>
-			    <h4>Dairy, Milk and Animal Health Diagnostics</h4>
+				<h2>DHI</h2>
+			    <h3>Dairy, Milk and Animal Health Diagnostics</h3>
 			    <?php echo form_open("auth/login");?>
 			      <p>
 			      	<label for="identity">Email</label>
@@ -32,8 +32,8 @@
 		</div>
 		<div class="col-sm-6">
 			<div class="box login">
-				<h3>Laboratories</h3>
-				<h4>Soil, Water, Plant Tissue, Manure and Media</h4>
+				<h2>Laboratories</h2>
+				<h3>Soil, Water, Plant Tissue, Manure and Media</h3>
 				<form action="http://mylabresults.agsource.com//User/Login?loginModel=AgSource.NET.ViewModels.Shared.LoginModel" class="home" method="post">
 				    <p>
 				    	<label for="txtEmail">Email</label>

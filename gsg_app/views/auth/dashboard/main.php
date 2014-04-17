@@ -1,33 +1,32 @@
 <?php
 if (!empty($page_header)) echo $page_header;
-if (!empty($page_heading)) echo heading($page_heading); ?>
-<div id="d-sections" class="d-column accordion">
-	<?php if(isset($widget['blocks'])): 
-		foreach($widget['blocks'] as $w): ?>
-			<div id="<?php echo str_replace(' ', '-', $w['title']); ?>" class="accordion-section widget">
-				<h2><a href="<?php echo '#' . str_replace(' ', '-', $w['title']) ?>" title="Show <?php echo $w['title']; ?>"><?php echo $w['title']; ?></a></h2>
+if (!empty($page_heading)) echo heading($page_heading);
+if (!empty($report_nav)) echo $report_nav; ?>
+<div id="d-herd" class="col-sm-3">
+	<?php if(isset($widget['herd'])): 
+		foreach($widget['herd'] as $w): ?>
+			<div id="<?php echo str_replace(' ', '-', $w['title']); ?>" class="box">
+				<h2><?php echo $w['title']; ?></h2>
 				<?php echo $w['content']; ?>
 			</div>
 		<?php endforeach;
 	endif; ?>
 </div>
-<div class="d-space">&nbsp;</div>
-<div id="d-info" class="d-column accordion">
+<div id="d-feature" class="col-sm-6">
+	<?php if(isset($widget['feature'])): 
+		foreach($widget['feature'] as $w): ?>
+			<div id="<?php echo str_replace(' ', '-', $w['title']); ?>" class="box">
+				<h2><?php echo $w['title']; ?></h2>
+				<?php echo $w['content']; ?>
+			</div>
+		<?php endforeach;
+	endif; ?>
+</div>
+<div id="d-info" class="col-sm-3">
 	<?php if(isset($widget['info'])): 
 		foreach($widget['info'] as $w): ?>
-			<div id="<?php echo str_replace(' ', '-', $w['title']); ?>" class="accordion-section widget">
-				<h2><a href="<?php echo '#' . str_replace(' ', '-', $w['title']) ?>" title="Show <?php echo $w['title']; ?>"><?php echo $w['title']; ?></a></h2>
-				<?php echo $w['content']; ?>
-			</div>
-		<?php endforeach;
-	endif; ?>
-</div>
-<div class="d-space">&nbsp;</div>
-<div id="d-agsource" class="d-column accordion">
-	<?php if(isset($widget['agsource'])): 
-		foreach($widget['agsource'] as $w): ?>
-			<div id="<?php echo str_replace(' ', '-', $w['title']); ?>" class="accordion-section widget">
-				<h2><a href="<?php echo '#' . str_replace(' ', '-', $w['title']) ?>" title="Show <?php echo $w['title']; ?>"><?php echo $w['title']; ?></a></h2>
+			<div id="<?php echo str_replace(' ', '-', $w['title']); ?>" class="box">
+				<h2><?php echo $w['title']; ?></h2>
 				<?php echo $w['content']; ?>
 			</div>
 		<?php endforeach;
@@ -35,10 +34,10 @@ if (!empty($page_heading)) echo heading($page_heading); ?>
 </div>
 
 <?php if(isset($widget['full_width'])): ?>
-	<div id="d-full-width" class="accordion">
+	<div id="d-full-width" class="col-sm-12">
 		<?php foreach($widget['full_width'] as $w): ?>
-			<div class="accordion-section widget">
-				<h2><a href="<?php echo '#' . str_replace(' ', '-', $w['title']) ?>" title="Show <?php echo $w['title']; ?>"><?php echo $w['title']; ?></a></h2>
+			<div class="box">
+				<h2><?php echo $w['title']; ?></h2>
 				<?php echo $w['content']; ?>
 			</div>
 		<?php endforeach; ?>

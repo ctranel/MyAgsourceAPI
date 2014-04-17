@@ -1,4 +1,4 @@
-head.ready("twitter", function(){
+/*head.ready("twitter", function(){
 	if($("#tweet-feed")){
 		$("#tweet-feed").jTweetsAnywhere({
 			username: 'agsource',
@@ -20,7 +20,7 @@ head.ready("twitter", function(){
 		    }
 	    }); 
 	}
-});
+}); */
 
 if($('#view-benchmarks')) {
 	$('#view-benchmarks').bind('click', function(){ document.getElementById('benchmark-form').submit(); });

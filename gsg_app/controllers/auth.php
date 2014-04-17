@@ -714,6 +714,7 @@ class Auth extends Ionauth {
 				'type' => 'password',
 			);
 
+			$this->carabiner->css('boxes.css', 'screen');
 			$this->carabiner->css('login.css', 'screen');
 			if(is_array($this->page_header_data)){
 				$this->page_header_data = array_merge($this->page_header_data,
