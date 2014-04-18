@@ -28,7 +28,7 @@
 <div class="row">
 	<div class="col-sm-6 col-xs-12">
 		<div class="box">
-			<h3>Sire</h3>
+			<h2>Sire</h2>
 			<div class="row">
 				<div class="col-xs-6">
 					<label>NAAB</label> <?php echo $sire_naab; ?>
@@ -48,7 +48,7 @@
 	</div>
 	<div class="col-sm-6 col-xs-12">
 		<div class="box">
-			<h3>Dam</h3>
+			<h2>Dam</h2>
 			<div class="row">
 				<div class="col-xs-6">
 					<label>CNTL #</label> <?php echo $dam_control_num; ?>
@@ -70,7 +70,7 @@
 <div class="row">
 	<div class="col-sm-4" col-xs-12>
 		<div class="box">
-			<h3>Maternal Grand Sire</h3>
+			<h2>Maternal Grand Sire</h2>
 			<div class="row">
 				<div class="col-xs-6">
 					<label>NAAB</label> <?php echo $mgr_sire_naab; ?>
@@ -90,7 +90,7 @@
 	</div>
 	<div class="col-sm-4" col-xs-12>
 		<div class="box">
-			<h3>Maternal Great Grand Sire</h3>
+			<h2>Maternal Great Grand Sire</h2>
 			<div class="row">
 				<div class="col-xs-6">
 					<label>NAAB</label> <?php echo $mgrtgr_sire_naab; ?>
@@ -110,7 +110,7 @@
 	</div>
 	<div class="col-sm-4" col-xs-12>
 		<div class="box">
-			<h3>Maternal Grand Dam</h3>
+			<h2>Maternal Grand Dam</h2>
 			<div class="row">
 				<div class="col-xs-6">
 					<label>CNTL #</label> <?php echo $mgr_dam_control_num; ?>

@@ -1,6 +1,12 @@
 @CHARSET "UTF-8";
 /* TAB CONTAINER */
-#tab-container h2 {background-color: #003C39; color: #E6F4F4; padding: 2px; margin: 0 0 5px 0; font-weight: bold;}
+#tab-container h2 {
+	background-color: #003C39; 
+	color: #E6F4F4; 
+	padding: 2px; 
+	margin: 0 0 5px 0; 
+	font-weight: bold;
+}
 
 /* TABS */
 ul.nav-tabs {background-color: #E6F4F4; color: #000}
@@ -14,6 +20,30 @@ ul.nav-tabs li a:hover {background-color: #00958E; color: #003C39; border-color:
 .tab-content .gen-info {margin: 8px 0 15px;}
 .tab-content .gen-info .row .col-md-4 {white-space: nowrap}
 
-.tab-content .box {border: solid 1px #E6F4F4; margin: 8px 0 0 0;}
-.tab-content .box h3 {background-color: #00958E; color: #E6F4F4; border-bottom: solid 1px #E6F4F4; font-weight: bold; padding: 0 0 0 3px; margin: 0 0 3px 0;}
-.tab-content .box .row { padding-left: 3px;}
+.tab-content .boxx {border: solid 1px #E6F4F4; margin: 8px 0 0 0;}
+.tab-content .boxx h3 {background-color: #00958E; color: #E6F4F4; border-bottom: solid 1px #E6F4F4; font-weight: bold; padding: 0 0 0 3px; margin: 0 0 3px 0;}
+.tab-content .boxx .row { padding-left: 3px;}
+
+#tab-container .tab-content  h2.table {
+	margin: 20px 0 0;
+	font-family:"Helvetica", "Arial", "Verdana", sans-serif;
+	font-size:1.1em;
+	font-weight:bold;
+	background-color: #00958E;
+	/* Safari 4-5, Chrome 1-9 */
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#66bfbb), to(#00958E));
+	
+	/* Safari 5.1, Chrome 10+ */
+	background: -webkit-linear-gradient(top, #00958E, #66bfbb);
+	
+	/* Firefox 3.6+ */
+	background: -moz-linear-gradient(top, #00958E, #66bfbb);
+	
+	/* IE 10 */
+	background: -ms-linear-gradient(top, #00958E, #66bfbb);
+	
+	/* Opera 11.10+ */
+	background: -o-linear-gradient(top, #00958E, #66bfbb);
+	color: #E6F4F4;
+	padding:5px;
+}

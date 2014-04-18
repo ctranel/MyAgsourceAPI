@@ -1,6 +1,8 @@
 @charset "UTF-8";
 .box{
-	border-radius: 6px
+	border: solid 3px #00958E;
+	border-radius: 6px;
+	margin-bottom: 15px;
 }
 
 .box h2{
@@ -37,11 +39,7 @@
 	border-bottom: solid 2px #EF5C29;
 }
 
-.box{
-	border: solid 3px #00958E;
-	/*margin-bottom: 10px;
-	padding: 2px;*/
-}
-
-.box form, .box p, .box div{
+.box #herd-text{
+	float: none;
+	margin: 0;
 }

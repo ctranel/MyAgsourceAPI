@@ -1,7 +1,7 @@
 <div class="row">
 	<div class="col-sm-8 col-xs-12">
 		<div class="box">
-			<h3>Sire</h3>
+			<h2>Sire</h2>
 			<div class="row">
 				<div class="col-xs-6">
 					<label>NAAB</label> <?php echo $sire_naab; ?>
@@ -28,7 +28,7 @@
 	</div>
 	<div class="col-sm-4 col-xs-12">
 		<div class="box">
-			<h3>Paternal Grand Sire</h3>
+			<h2>Paternal Grand Sire</h2>
 			<div class="row">
 				<div class="col-xs-12">
 					<label>NAAB</label> <?php echo $pgr_sire_primary_naab; ?>
@@ -47,7 +47,7 @@
 
 	<div class="col-xs-12">
 		<div class="box">
-			<h3>Sire PTA</h3>
+			<h2>Sire PTA</h2>
 			<div class="row">
 				<div class="col-sm-3 col-xs-6">
 					<label>Eval Date</label> <?php echo $sire_load_date; ?>

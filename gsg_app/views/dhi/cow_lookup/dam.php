@@ -4,7 +4,7 @@ if(isset($dam) && !empty($dam)):
 	<div class="row">
 		<div class="col-sm-12 col-xs-6">
 			<div class="box">
-				<h3>Dam</h3>
+				<h2>Dam</h2>
 				<div class="row">
 					<div class="col-sm-3 col-xs-12">
 						<label>Cntl#</label> <?php echo $dam['dam_control_num']; ?>
@@ -23,7 +23,7 @@ if(isset($dam) && !empty($dam)):
 		</div>
 		<div class="col-sm-4 col-xs-6">
 			<div class="box">
-				<h3>Maternal Grand Dam</h3>
+				<h2>Maternal Grand Dam</h2>
 				<div class="row">
 					<div class="col-xs-12">
 						<label>Cntl#</label> <?php echo $dam['mgr_dam_control_num']; ?>
@@ -42,7 +42,7 @@ if(isset($dam) && !empty($dam)):
 		</div>
 		<div class="col-sm-4 col-xs-6">
 			<div class="box">
-				<h3>Maternal Grand Sire</h3>
+				<h2>Maternal Grand Sire</h2>
 				<div class="row">
 					<div class="col-xs-12">
 						<label>NAAB</label> <?php echo $dam['mgr_sire_primary_naab']; ?>
@@ -61,7 +61,7 @@ if(isset($dam) && !empty($dam)):
 		</div>
 		<div class="col-sm-4 col-xs-6">
 			<div class="box">
-				<h3>Maternal Great Grand Sire</h3>
+				<h2>Maternal Great Grand Sire</h2>
 				<div class="row">
 					<div class="col-xs-12">
 						<label>NAAB</label> <?php echo $dam['mgrtgr_sire_naab']; ?>

@@ -56,7 +56,6 @@ p {padding: 0 0 5px;}
 
 /* new styles */
 .container {margin:0 auto; display:table; border: solid 2px #E8E8E8; padding:0;}
-h3.tight-to-table {margin: 20px 0 0; border: solid 1px black;}
 
 a.button, .button {
 	background-color: #00958E;
