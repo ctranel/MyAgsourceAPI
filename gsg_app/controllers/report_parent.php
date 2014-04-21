@@ -100,12 +100,14 @@ abstract class parent_report extends CI_Controller {
 		if(!isset($this->as_ion_auth)){
 	       	if($method == 'ajax_report' && $this->herd_code != $this->config->item('default_herd')){
 				echo "Your session has expired, please log in and try again..";
+				exit;
 			}
 			else return FALSE;
 		}
 		if(!$this->as_ion_auth->logged_in() && $this->herd_code != $this->config->item('default_herd')) {
 	       	if($method == 'ajax_report'){
 				echo "Your session has expired, please log in and try again...";
+				exit;
 			}
 			else {
 	       		$this->session->set_flashdata('message', "Please log in.");

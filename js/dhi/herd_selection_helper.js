@@ -13,6 +13,9 @@ head.ready(function() {
 	$("#select_herd").on("submit", function() {
 		var ret_val = true;
 		var herd_code = $("#herd_code").val();
+		if(herd_code == 0){
+			alert('Please select a herd from the dropdown to continue.');
+		}
 		$.ajax({
 			url: "ajax_herd_enrolled/" + herd_code,
 			async: false,
