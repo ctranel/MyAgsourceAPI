@@ -6,7 +6,7 @@
 <p>CRI authorizes you to use the CRI Website for your personal educational and non-commercial purposes.  Use of the CRI Website for any public or commercial purpose is strictly prohibited.  If you make copies of the Materials, you must retain on copies all copyright and proprietary notices contained in the original Materials.  Unauthorized use of the CRI Website may violate copyright, trademark, and other laws.</p>
 
 <h2>Access</h2>
-<p>You are responsible for obtaining and maintaining all equipment and services needed for access to and use of the CRI Website and for paying all charges related thereto.  When you register on the CRI Website, CRI may collect personal information.  CRI&apos;s use of information is governed by the CRI Online Privacy Statement.</p>
+<p>You are responsible for obtaining and maintaining all equipment and services needed for access to and use of the CRI Website and for paying all charges related thereto.  When you register on the CRI Website, CRI may collect personal information.  CRI&apos;s use of information is governed by the <a href="#privacy-statement" title="CRI Online Privacy Statement">CRI Online Privacy Statement</a>.</p>
 
 <h2>Prohibited Uses</h2>
 <p>You agree not to use the CRI Website including Materials or Services obtained through use of the CRI Website in a manner that violates any law.  You agree to not interfere or disrupt the servers or networks connected to the CRI Website.  You further agree not to use any data mining, robots, or similar data gathering or extraction methods in connection with the CRI Website; or attempt to gain unauthorized access to any portion of the CRI Website or networks.</p>
@@ -39,7 +39,8 @@
 
 <p>You may not use CRI trademarks in a manner likely to mislead consumers as to your relationship with CRI, as to CRI&apos;s sponsorship or endorsement of your company, products or services, or as to the origin of your products or services.  Any use of CRI trademarks that is likely to confuse or mislead the public is unlawful and expressly prohibited.</p> 
 
-<h2>Privacy Statement and User Submission</h2>
+
+<h2><a name="privacy-statement"></a>Privacy Statement and User Submission</h2>
 <p>CRI and its subsidiaries (herein &quot;CRI&quot;) respect your privacy.  This Privacy Statement informs you of our privacy practices and the way information about you is collected and how that information is used by CRI.  CRI will not sell your information to another party or utilize it for non CRI use.</p>
 
 <p>All information gathered on the CRI Website is stored and maintained in securely with access limited to authorized personnel through access-control procedures.  The CRI Website is regularly tested for security breaches to ensure all collected information is secure from unauthorized viewing.</p>  

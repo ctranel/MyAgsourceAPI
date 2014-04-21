@@ -379,6 +379,6 @@ img.mfp-img {
 	height: 500px;
 }
 .ajax-html h1, .ajax-html .mfp-close{
-	position: fixed;
+	position: relative;
 	top: 0px;
 }
