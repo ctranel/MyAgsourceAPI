@@ -160,10 +160,10 @@ function updateBlock(container_div_id, block_in, block_index, sort_field, sort_o
 	if(typeof(sort_order) == 'undefined') sort_order = null;
 	switch(display){
 		case "table": 
-			load_table(base_url + '/ajax_report/' + encodeURIComponent(page) + '/' + encodeURIComponent(block_in) + '/' + pstring + '/' + display + '/' + encodeURIComponent(sort_field) + '/' + sort_order + '/web/null/' + block_index + '/' + params + '/' + first + '/' + cache_bust, container_div_id, block_index, params);
+			load_table(base_url + '/ajax_report/' + encodeURIComponent(page) + '/' + encodeURIComponent(block_in) + '/' + display + '/' + encodeURIComponent(sort_field) + '/' + sort_order + '/web/null/' + block_index + '/' + params + '/' + first + '/' + cache_bust, container_div_id, block_index, params);
 			break;
 		case "chart":
-			load_chart(base_url + '/ajax_report/' + encodeURIComponent(page) + '/' + encodeURIComponent(block_in) + '/' + pstring + '/' + display + '/' + encodeURIComponent(sort_field) + '/' + sort_order + '/web/null/' + block_index + '/' + params + '/' + first + '/' + cache_bust, container_div_id, block_index, params);
+			load_chart(base_url + '/ajax_report/' + encodeURIComponent(page) + '/' + encodeURIComponent(block_in) + '/' + display + '/' + encodeURIComponent(sort_field) + '/' + sort_order + '/web/null/' + block_index + '/' + params + '/' + first + '/' + cache_bust, container_div_id, block_index, params);
 			break;
 	}
 	return false;

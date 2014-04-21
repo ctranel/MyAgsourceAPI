@@ -251,7 +251,7 @@ abstract class parent_report extends CI_Controller {
 							$sort_order = implode('|', $this->arr_sort_order);
 						}
 						$this->reports->sort_text($this->arr_sort_by, $this->arr_sort_order);//this function sets text, and could return it if needed
-						$tmp_data = $this->ajax_report(urlencode($this->page), urlencode($pb['url_segment']), $this->session->userdata('pstring'), 'array', urlencode($sort_by), $sort_order, 'csv', NULL);
+						$tmp_data = $this->ajax_report(urlencode($this->page), urlencode($pb['url_segment']), 'array', urlencode($sort_by), $sort_order, 'csv', NULL);
 						$data[] = array('test_date' => $pb['description']);
 						$data = array_merge($data, $tmp_data);
 					}
@@ -292,7 +292,7 @@ abstract class parent_report extends CI_Controller {
 						}
 
 						$this->{$this->primary_model}->populate_field_meta_arrays($pb['id']);
-						$block[$i]['data'] = $this->ajax_report(urlencode($this->page), urlencode($pb['url_segment']), $this->session->userdata('pstring'), 'array', urlencode($sort_by), $sort_order, 'pdf', NULL);
+						$block[$i]['data'] = $this->ajax_report(urlencode($this->page), urlencode($pb['url_segment']), 'array', urlencode($sort_by), $sort_order, 'pdf', NULL);
 						$tmp_pdf_width = $this->{$this->primary_model}->get_pdf_widths(); 
 						$block[$i]['arr_pdf_widths'] = $tmp_pdf_width;
 						$arr_header_data = $this->{$this->primary_model}->get_fields(); // was $model
@@ -458,9 +458,8 @@ abstract class parent_report extends CI_Controller {
 	 * @param string output: method of output (chart, table, etc)
 	 * @param boolean/string file_format: return the value of function (TRUE), or echo it (FALSE).  Defaults to FALSE
 	 * @param string cache_buster: text to make page appear as a different page so that new data is retrieved
-	 * @todo phasing out passing the pstring in the url, using the filter form instead (passed as $json_filter_data) --- the pstring parameter is no longer being used, but I have not removed it from the URLs that call ajax_report
 	 */
-	public function ajax_report($page, $block, $pstring, $output, $sort_by = 'null', $sort_order = 'null', $file_format = 'web', $test_date = FALSE, $report_count=0, $json_filter_data = NULL, $first=FALSE, $cache_buster = NULL) {//, $herd_size_code = FALSE, $all_breeds_code = FALSE
+	public function ajax_report($page, $block, $output, $sort_by = 'null', $sort_order = 'null', $file_format = 'web', $test_date = FALSE, $report_count=0, $json_filter_data = NULL, $first=FALSE, $cache_buster = NULL) {//, $herd_size_code = FALSE, $all_breeds_code = FALSE
 		$first = ($first === 'true');
 		$page = urldecode($page);
 		$block = urldecode($block);
