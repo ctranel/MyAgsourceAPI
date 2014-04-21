@@ -372,9 +372,13 @@ class Auth extends Ionauth {
 			//set the flash data error message if there is one
 			$this->page_header_data['message'] = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
 			//check of an existing record for this relationship
-			if(isset($cuid) && !empty($cuid)) $arr_relationship = $this->ion_auth_model->get_consult_relationship($cuid, $this->session->userdata('herd_code'));
+			if(isset($cuid) && !empty($cuid)){
+				$arr_relationship = $this->ion_auth_model->get_consult_relationship($cuid, $this->session->userdata('herd_code'));
+				$requester = $this->ion_auth_model->user($cuid)->row();
+				$this->data['requester_name'] = $requester->first_name . ' ' . $requester->last_name;
+			}
 			else $arr_relationship = FALSE;
-
+			
 			// get sections for user
 /*			if($arr_relationship['service_grp_request']){
 				$arr_form_section_id = $this->ion_auth_model->get_consult_rel_sections($arr_relationship['id']);

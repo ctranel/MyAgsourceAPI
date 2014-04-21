@@ -4,8 +4,9 @@
     <?php echo form_open("auth/service_grp_access");
     if(isset($sg_user_id)):
     	echo form_input($sg_user_id);
-    endif;
-        
+    endif; ?>
+	<p>Please submit the form below to grant or deny <?php echo $requester_name; ?> access to your herd&apos;s data.</p>
+    <?php
     if(isset($write_data) || isset($section_options)): ?>
       	<?php echo form_fieldset('Data to Share', array('id' => 'data_shared')); 
 			if(isset($write_data)): ?>

@@ -785,7 +785,7 @@ SELECT DISTINCT id, name, list_order FROM cteAnchor ORDER BY list_order;";
 	 *
 	 * @param string/array association account number
 	 * @param int child user id
-	 * @return object
+	 * @return boolean
 	 * @author ctranel
 	 **/
 	public function is_child_user_by_association($assoc_acct_num, $child_id)
@@ -817,7 +817,7 @@ SELECT DISTINCT id, name, list_order FROM cteAnchor ORDER BY list_order;";
 	 *
 	 * @param string/array association account number
 	 * @param int child user id
-	 * @return object
+	 * @return boolean
 	 * @author ctranel
 	 **/
 	public function is_child_user_by_group_and_association($group_id, $assoc_acct_num, $child_id)
@@ -837,10 +837,9 @@ SELECT DISTINCT id, name, list_order FROM cteAnchor ORDER BY list_order;";
 	 * @author ctranel
 	 **/
 	public function get_consult_relationship_id($sg_user_id, $herd_code){
-		$result = $this->db
-		->select('id')
-		->get_where($this->tables['consultants_herds'], array('sg_user_id' => $sg_user_id, 'herd_code' => $herd_code))->result();
-		if(!empty($result)) return $result[0]->id;
+		$this->db->select('id');
+		$result = $this->get_consult_relationship($sg_user_id, $herd_code);
+		if(!empty($result)) return $result['id'];
 		else return FALSE;
 	}
 
