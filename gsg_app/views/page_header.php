@@ -46,6 +46,7 @@
 </head>
 <body>
 <?php $url = site_url(); ?>
+<div class="navbar-background"></div>
 <div class="container">
 	<nav class="navbar navbar-inverse" role="navigation">
 		<ul class="nav navbar-nav">

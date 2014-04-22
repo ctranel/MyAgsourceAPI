@@ -47,3 +47,10 @@ ul.nav-tabs li a:hover {background-color: #00958E; color: #003C39; border-color:
 	color: #E6F4F4;
 	padding:5px;
 }
+
+#tab-container .tab-content table th {
+	background-color: #66bfbb;
+	color: #003C39;
+	font-weight: bold;
+}
+}
