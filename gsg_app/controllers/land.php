@@ -13,6 +13,7 @@ class Land extends CI_Controller {
 		}
 		$this->page_header_data['user_sections'] = $this->as_ion_auth->arr_user_super_sections;
 		$this->page_header_data['num_herds'] = $this->as_ion_auth->get_num_viewable_herds($this->session->userdata('user_id'), $this->session->userdata('arr_regions'));
+		$this->load->library('form_validation');
 		/* Load the profile.php config file if it exists */
 		if (ENVIRONMENT == 'development') {
 			$this->config->load('profiler', false, true);
@@ -46,8 +47,6 @@ class Land extends CI_Controller {
 
 		// Select modules for logged in user
 
-		//$this->carabiner->css('jquery.tweet.css', 'screen');
-//		$this->carabiner->css('jquery.jtweetsanywhere-1.2.0.css', 'screen');
 		$this->carabiner->css('dashboard.css', 'screen');
 //		$this->carabiner->css('accordion.css', 'screen');
 		$this->carabiner->css('benchmarks.css');
@@ -83,10 +82,6 @@ class Land extends CI_Controller {
 			'content' => $this->load->view('auth/dashboard/herd_data', $herd_data, TRUE),
 			'title' => 'Herd Data'
 		);
-		$this->data['widget']['herd'][] = array(
-			'content' => $this->load->view('auth/dashboard/untreated_scc', NULL, TRUE),
-			'title' => 'High SCC Cows with no Recent Treatment'
-		);
 
 		$resource_data = Array('email' => $this->session->userdata('email'), 'name' => $this->session->userdata('first_name') . ' ' . $this->session->userdata('last_name'));
 		$this->data['widget']['info'][] = array(
@@ -96,17 +91,18 @@ class Land extends CI_Controller {
 
 		require_once APPPATH . 'controllers/dhi/herd_overview.php';
 		$tmp = new Herd_overview();
+		$arr_content = $tmp->index($pstring);
 		$this->data['widget']['feature'][] = array(
-			'content' => $tmp->index($pstring),
-			'title' => 'Herd Overview'
+			'content' => $arr_content['content'],
+			'title' => $arr_content['title'],
+			'subtitle' => $arr_content['subtitle'],
 		);
 
-		if($this->session->userdata('active_group_id') == 2){
+		if($this->as_ion_auth->has_permission('Update SG Access')){
 			$consultants_by_status = $this->ion_auth_model->get_consultants_by_herd($this->session->userdata('herd_code'));
 			if(isset($consultants_by_status['open']) && is_array($consultants_by_status['open'])){
-				$section_data['content'] = $this->_set_consult_section($consultants_by_status['open'], 'open', 'Open Requests', array('Grant Access', 'Deny Access'));
-				$this->data['widget']['info'][] = array(
-					'content' => $this->load->view('auth/dashboard/open_service_grp_requests', $section_data, TRUE),
+				$this->data['widget']['feature'][] = array(
+					'content' => $this->_set_consult_section($consultants_by_status['open'], 'open', array('Grant Access', 'Deny Access')),
 					'title' => 'Open Consultant Requests'
 				);
 			}
@@ -128,5 +124,36 @@ class Land extends CI_Controller {
 		$this->data['report_nav'] = $this->load->view('auth/dashboard/report_nav', $nav_data, TRUE);
 		
 		$this->load->view('auth/dashboard/main', $this->data);
+	}
+	
+	function _set_consult_section($data, $key, $arr_submit_options){
+	//this code is also used in auth/_set_consult_section
+			if(isset($data) && is_array($data)){
+			$this->section_data = array(
+				'arr_submit_options' => $arr_submit_options,
+				'attributes' => array('class' => $key . ' consult-form'),
+			);
+			foreach($data as $h) {
+				$h['is_editable'] = TRUE;
+				$this->section_data['arr_records'][] = $this->load->view('auth/service_grp/service_grp_line', $h, TRUE);
+			}
+			//add disclaimer field for when producer can grant access
+			if($key === 'open') {
+				$this->section_data['disclaimer'] = array(
+					'name' => 'disclaimer',
+					'id' => 'disclaimer',
+					'type' => 'checkbox',
+					'value' => '1',
+					'checked' => FALSE,
+					'class' => 'required',
+				);
+				$this->section_data['disclaimer_text'] = ' I understand that if I grant a consultant access to my herd&apos;s information, that consultant will be able to use any animal and herd summary data through their own ' . $this->config->item('product_name') . ' account. This consultant will not have access to my account information. An email will be sent to the consultant to inform them whether access has been granted or denied, and include any expiration date that is specified above.</p><p>Because relationships with consultants change over time, it is highly recommended that you do not share your login information with any consultant.';
+			}
+			//vars are cached between view loads, so we need to include the disclaimer var even when it shouldn't be set
+			else {
+				$this->section_data['disclaimer'] = NULL;
+			}
+			return $this->load->view('auth/service_grp/service_grp_section', $this->section_data, TRUE);
+		}
 	}
 }

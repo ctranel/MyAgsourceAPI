@@ -17,8 +17,9 @@
 			<hr><p>
 			<?php
 			echo form_checkbox($disclaimer);
-			echo $disclaimer_text;
-		endif; ?>
+			echo $disclaimer_text; ?>
+			</p>
+		<?php endif; ?>
 		<?php if(isset($arr_submit_options) && is_array($arr_submit_options)): ?>
 			<label>With selected</label>
 			<?php foreach($arr_submit_options as $so): ?>

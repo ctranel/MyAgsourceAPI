@@ -13,7 +13,7 @@ class Auth extends Ionauth {
 		
 		//load necessary files
 		$this->load->library('form_validation');
-		$this->load->helper('cookie');
+		//$this->load->helper('cookie');
 
 		/* Load the profile.php config file if it exists
 		if (ENVIRONMENT == 'development') {
@@ -268,6 +268,7 @@ class Auth extends Ionauth {
 	}
 	
 	function _set_consult_section($data, $key, $arr_submit_options){
+	//this code is also used in land/_set_consult_section
 		if(isset($data) && is_array($data)){
 			$this->section_data = array(
 				'arr_submit_options' => $arr_submit_options,
@@ -287,7 +288,7 @@ class Auth extends Ionauth {
 					'checked' => FALSE,
 					'class' => 'required',
 				);
-				$this->section_data['disclaimer_text'] = ' I understand that if I grant a consultant access to my herd&apos;s information, that consultant will be able to use any animal and herd summary data through their own ' . $this->config->item('product_name') . ' account. This consultant will not have access to my account information. An email will be sent to the consultant to inform them whether access has been granted or denied, and include any expiration date that is specified above.<p>Because relationships with consultants change over time, it is highly recommended that you do not share your login information with any consultant.</p>';
+				$this->section_data['disclaimer_text'] = ' I understand that if I grant a consultant access to my herd&apos;s information, that consultant will be able to use any animal and herd summary data through their own ' . $this->config->item('product_name') . ' account. This consultant will not have access to my account information. An email will be sent to the consultant to inform them whether access has been granted or denied, and include any expiration date that is specified above.</p><p>Because relationships with consultants change over time, it is highly recommended that you do not share your login information with any consultant.';
 			}
 			//vars are cached between view loads, so we need to include the disclaimer var even when it shouldn't be set
 			else {

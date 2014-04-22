@@ -1,9 +1,9 @@
 <?php if(isset($page_header) !== false) echo $page_header; ?>
 <div class='mainInfo'>
 	<?php if(isset($page_heading) !== false) echo heading($page_heading); ?>
-    <?php echo form_open("auth/service_grp_access");
-    if(isset($sg_user_id)):
-    	echo form_input($sg_user_id);
+<?php echo form_open("auth/service_grp_access");
+if(isset($sg_user_id)):
+echo form_input($sg_user_id);
     endif; ?>
 	<p>Please submit the form below to grant or deny <?php echo $requester_name; ?> access to your herd&apos;s data.</p>
     <?php
@@ -39,9 +39,8 @@
       	<label for="exp_date">Expiration Date</label>
       	<?php echo form_input($exp_date);?>
       </p>
-    <p><?php echo form_checkbox($disclaimer); ?> I understand that when I allow a consultant to access my information through this form (we do not recommend giving our your login information), that consultant can access my herd and animal data through their own <?php echo $this->config->item('product_name')?> account.  At no point does any consultant have access to my account information...e-mail will be sent....</p>
-
+    <p><?php echo form_checkbox($disclaimer); ?> I understand that if I grant a consultant access to my herd&apos;s information, that consultant will be able to use any animal and herd summary data through their own <?php echo $this->config->item('product_name') ?> account. This consultant will not have access to my account information. An email will be sent to the consultant to inform them whether access has been granted or denied, and include any expiration date that is specified above.</p><p>Because relationships with consultants change over time, it is highly recommended that you do not share your login information with any consultant.</p>
       <p><?php echo form_submit('submit', 'Set Consultant Access', 'class="button"');?></p>
     <?php echo form_close();?>
-</div>
+	</div>
 <?php if(isset($page_footer) !== false) echo $page_footer;

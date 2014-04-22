@@ -35,11 +35,14 @@
 	background-color: #66bfbb;
 	color: #003C39;
 	padding:0px 10px 10px 10px;
-	margin:0px 0px 18px 0px;
-	border-bottom: solid 2px #EF5C29;
+	margin:0px;
 }
 
 .box #herd-text{
 	float: none;
 	margin: 0;
+}
+
+.box ul {
+	margin:0;
 }

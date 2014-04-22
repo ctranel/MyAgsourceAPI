@@ -7,7 +7,10 @@ if (!empty($report_nav)) echo $report_nav; ?>
 		foreach($widget['herd'] as $w): ?>
 			<div id="<?php echo str_replace(' ', '-', $w['title']); ?>" class="box">
 				<h2><?php echo $w['title']; ?></h2>
-				<?php echo $w['content']; ?>
+				<?php if(isset($w['subtitle'])): ?>
+					<h3><?php echo $w['subtitle']; ?></h3>
+				<?php endif; ?>
+				<div class="widget-content"><?php echo $w['content']; ?></div>
 			</div>
 		<?php endforeach;
 	endif; ?>
@@ -17,7 +20,10 @@ if (!empty($report_nav)) echo $report_nav; ?>
 		foreach($widget['feature'] as $w): ?>
 			<div id="<?php echo str_replace(' ', '-', $w['title']); ?>" class="box">
 				<h2><?php echo $w['title']; ?></h2>
-				<?php echo $w['content']; ?>
+				<?php if(isset($w['subtitle'])): ?>
+					<h3><?php echo $w['subtitle']; ?></h3>
+				<?php endif; ?>
+				<div class="widget-content"><?php echo $w['content']; ?></div>
 			</div>
 		<?php endforeach;
 	endif; ?>
@@ -27,7 +33,10 @@ if (!empty($report_nav)) echo $report_nav; ?>
 		foreach($widget['info'] as $w): ?>
 			<div id="<?php echo str_replace(' ', '-', $w['title']); ?>" class="box">
 				<h2><?php echo $w['title']; ?></h2>
-				<?php echo $w['content']; ?>
+				<?php if(isset($w['subtitle'])): ?>
+					<h3><?php echo $w['subtitle']; ?></h3>
+				<?php endif; ?>
+				<div class="widget-content"><?php echo $w['content']; ?></div>
 			</div>
 		<?php endforeach;
 	endif; ?>
@@ -38,7 +47,10 @@ if (!empty($report_nav)) echo $report_nav; ?>
 		<?php foreach($widget['full_width'] as $w): ?>
 			<div class="box">
 				<h2><?php echo $w['title']; ?></h2>
-				<?php echo $w['content']; ?>
+				<?php if(isset($w['subtitle'])): ?>
+					<h3><?php echo $w['subtitle']; ?></h3>
+				<?php endif; ?>
+				<div class="widget-content"><?php echo $w['content']; ?></div>
 			</div>
 		<?php endforeach; ?>
 	</div>
