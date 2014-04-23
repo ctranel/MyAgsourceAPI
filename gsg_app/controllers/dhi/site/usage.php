@@ -13,7 +13,7 @@ class Usage extends parent_report {
 	}
 
 	 function index($block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
-	 	redirect(site_url('dhi/site/usage/proto'));
+	 	redirect(site_url('dhi/site/usage/stats'));
 	 }
 	function stats($block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
 	 	$this->product_name = 'Usage Statistics';
