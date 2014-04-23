@@ -396,9 +396,9 @@ abstract class parent_report extends CI_Controller {
 						'</script>'
 					),
 					'arr_headjs_line'=>array(
-						'{highcharts: "https://cdnjs.cloudflare.com/ajax/libs/highcharts/3.0.10/highcharts.js"}',
-						'{highcharts_more: "https://cdnjs.cloudflare.com/ajax/libs/highcharts/3.0.10/highcharts-more.js"}',
-						'{exporting: "https://cdnjs.cloudflare.com/ajax/libs/highcharts/3.0.10/modules/exporting.js"}',
+						'{highcharts: "https://cdnjs.cloudflare.com/ajax/libs/highcharts/3.0.7/highcharts.js"}',
+						'{highcharts_more: "https://cdnjs.cloudflare.com/ajax/libs/highcharts/3.0.7/highcharts-more.js"}',
+						'{exporting: "https://cdnjs.cloudflare.com/ajax/libs/highcharts/3.0.7/modules/exporting.js"}',
 						'{popup: "' . $this->config->item("base_url_assets") . 'js/jquery/popup.min.js"}',
 						'{graph_helper: "' . $this->config->item("base_url_assets") . 'js/charts/graph_helper.js"}',
 						'{report_helper: "' . $this->config->item("base_url_assets") . 'js/report_helper.js"}',

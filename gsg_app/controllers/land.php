@@ -61,8 +61,6 @@ class Land extends CI_Controller {
 					'description'=>'Dashboard for ' . $this->config->item("product_name"),
 					'arr_headjs_line'=>array(
 //						'{twitter: "' . $this->config->item("base_url_assets") . 'js/jquery/jquery.jtweetsanywhere-1.2.1.min.js"}',
-//						'{highcharts: "https://cdnjs.cloudflare.com/ajax/libs/highcharts/3.0.2/highcharts.js"}',
-//						'{exporting: "https://cdnjs.cloudflare.com/ajax/libs/highcharts/3.0.2/modules/exporting.js"}',
 //						'{graph_helper: "' . $this->config->item("base_url_assets") . 'js/charts/graph_helper.js"}',
 						'{helper: "' . $this->config->item("base_url_assets") . 'js/as_dashboard_helper.js"}'
 					)

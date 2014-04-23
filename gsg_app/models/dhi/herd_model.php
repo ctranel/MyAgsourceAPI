@@ -47,7 +47,8 @@ class Herd_model extends CI_Model {
 	 **/
 	function get_herds_by_region($region_arr_in, $limit = NULL){
 		if (!isset($region_arr_in)  || !is_array($region_arr_in) || empty($region_arr_in)) {
-			return FALSE;
+			//return FALSE;
+			return array();
 		}	
 		$this->db->where_in('h.association_num', $region_arr_in);
 		return $this->get_herds($limit);

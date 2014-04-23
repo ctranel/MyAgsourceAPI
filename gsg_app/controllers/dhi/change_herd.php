@@ -82,9 +82,9 @@ class Change_herd extends CI_Controller {
 		}
 		else
 		{
-			$this->page_header_data['message'] = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
+			$err = '';
 			$tmp_arr = $this->as_ion_auth->get_viewable_herds($this->session->userdata('user_id'), $this->session->userdata('arr_regions'));
-			if(is_array($tmp_arr)){
+			if(is_array($tmp_arr) && !empty($tmp_arr)){
 				if(count($tmp_arr) == 1){
 					$this->load->library('herd', array('herd_code' => $tmp_arr[0]['herd_code']));
 					$this->set_herd_session_data();
@@ -96,10 +96,9 @@ class Change_herd extends CI_Controller {
 				unset($tmp_arr);
 			}
 			else{
-				$this->session->set_flashdata('message', 'A list of herds could not be generated for your account.  If you believe this is an error, please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . '.');
-				redirect(site_url($redirect_url));
-				exit();
+				$err = 'A list of herds could not be generated for your account.  If you believe this is an error, please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . '.';
 			}
+
 
 			$this->data['herd_code_fill'] = array('name' => 'herd_code_fill',
 				'id' => 'herd_code_fill',
@@ -121,9 +120,8 @@ class Change_herd extends CI_Controller {
 					)
 				);
 			}
-			$this->page_footer_data = array(
-			);
-			$this->page_header_data['message'] = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
+			$this->page_footer_data = array();
+			$this->page_header_data['message'] = compose_error($err, validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages());
 			$arr_redirect_url = explode('/', $redirect_url);
 			if(file_exists($arr_redirect_url[0] . FS_SEP . 'section_nav')) $this->page_header_data['section_nav'] = $this->load->view($arr_redirect_url[0] . '/section_nav', NULL, TRUE);
 			$this->data['page_header'] = $this->load->view('page_header', $this->page_header_data, TRUE);

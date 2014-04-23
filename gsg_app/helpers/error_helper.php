@@ -9,6 +9,8 @@
  * @access public
  * @param string
  * @param string
+ * @param string
+ * @param string
  * @return string
  */
 if ( ! function_exists('compose_error')) {
