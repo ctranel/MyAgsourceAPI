@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en">
-<head>
+<head profile="http://www.w3.org/2005/10/profile">
+	<link rel="icon" type="image/png" href="https://myagsource.com/favicon.ico">
 	<title><?php if(isset($title)) echo $title; ?></title>
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">    
     <meta http-equiv="pragma" content="no-cache">
