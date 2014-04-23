@@ -200,10 +200,10 @@ button.datepick-cmd {
 	background-color: #CCEAE8;
 }
 .datepick-month td .datepick-today {
-	background-color: #E6F4F4;
+	background-color: #66bfbb;
 }
 .datepick-month td .datepick-selected {
-	background-color: #00958E;
+	background-color: #EF5C29;
 	color: #fff;
 }
 .datepick-status {
