@@ -12,8 +12,6 @@
 if ( ! function_exists('set_redirect_url'))
 {
 	function set_redirect_url($curr_control_path, $redirect_url_in, $referrer_in){
-//print('<br>2');
-//var_dump($curr_control_path, $redirect_url_in, $referrer_in);
 		if(
 			$referrer_in == $curr_control_path
 			|| $referrer_in == 'auth/login'
@@ -21,14 +19,13 @@ if ( ! function_exists('set_redirect_url'))
 			|| $referrer_in == 'auth/logout'
 			|| $referrer_in == 'benchmarks'
 			|| strpos($referrer_in, 'cow_page') !== FALSE
+			|| strpos($referrer_in, 'help') !== FALSE
 			|| strpos($referrer_in, 'custom_reports/select') !== FALSE
 			|| strpos($referrer_in, 'custom_reports/insert') !== FALSE
 		){
 			$referrer_in = '';
 		}
-//print('<br>3' . $referrer_in);
 		$redirect_url = $redirect_url_in !== FALSE ? str_replace('/csv', '', str_replace('/pdf', '', $redirect_url_in)) : $referrer_in;
-//print('<br>4' . $redirect_url);
 		return $redirect_url;
 	}
 }

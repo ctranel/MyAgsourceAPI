@@ -7,6 +7,7 @@ class Cow_lookup extends CI_Controller {
 	function __construct(){
 		parent::__construct();
 		$this->session->keep_flashdata('message');
+		$this->session->keep_flashdata('redirect_url');
 		//make sure previous page remains as the redirect url 
 		$redirect_url = set_redirect_url($this->uri->uri_string(), $this->session->flashdata('redirect_url'), $this->as_ion_auth->referrer);
 		$this->session->set_flashdata('redirect_url', $redirect_url);

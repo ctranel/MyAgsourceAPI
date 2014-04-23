@@ -4,7 +4,7 @@ class Change_herd extends CI_Controller {
 	
 	function __construct(){
 		parent::__construct();
-//die('1' . $this->session->flashdata('redirect_url'));
+		$this->session->keep_flashdata('redirect_url');
 		if(!isset($this->as_ion_auth)){
 			redirect('auth/login', 'refresh');
 		}
@@ -55,12 +55,9 @@ class Change_herd extends CI_Controller {
  * @return	void
  */
 	function select(){
-//print('1' . $this->session->flashdata('redirect_url'));
 		$tmp_uri = $this->uri->uri_string();
 		$redirect_url = set_redirect_url($tmp_uri, $this->session->flashdata('redirect_url'), $this->as_ion_auth->referrer);
-//print('<br>5' . $redirect_url . '<br>');
 		$this->session->set_flashdata('redirect_url', $redirect_url);
-//print('<br>6' . $redirect_url);
 		if(empty($redirect_url) && $this->as_ion_auth->referrer !== $tmp_uri) $redirect_url = $tmp_uri;
 		if(!$this->as_ion_auth->has_permission("Select Herd") && $this->as_ion_auth->has_permission("Request Herd")){
 			redirect(site_url('dhi/change_herd/request'));
@@ -80,7 +77,6 @@ class Change_herd extends CI_Controller {
 			$this->load->library('herd', array('herd_code' => $this->input->post('herd_code')));
 			$this->set_herd_session_data();
 			$this->_record_access(2); //2 is the page code for herd change
-//print('<br>7' . $redirect_url);
 			redirect(site_url($redirect_url));
 			exit();
 		}

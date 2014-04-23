@@ -3,11 +3,14 @@
 require_once APPPATH . 'controllers/ionauth.php';
 
 class Auth extends Ionauth {
+	protected $redirect_url;
+	
 	function __construct()
 	{
 		parent::__construct();
-		$redirect_url = set_redirect_url($this->uri->uri_string(), $this->session->flashdata('redirect_url'), $this->as_ion_auth->referrer);
-		$this->session->set_flashdata('redirect_url', $redirect_url);
+		$this->session->keep_flashdata('redirect_url');
+		$this->redirect_url = set_redirect_url($this->uri->uri_string(), $this->session->flashdata('redirect_url'), $this->as_ion_auth->referrer);
+		$this->session->set_flashdata('redirect_url', $this->redirect_url);
 		$this->page_header_data['user_sections'] = $this->as_ion_auth->arr_user_super_sections;
 		$this->page_header_data['num_herds'] = $this->as_ion_auth->get_num_viewable_herds($this->session->userdata('user_id'), $this->session->userdata('arr_regions'));
 		
@@ -361,7 +364,7 @@ class Auth extends Ionauth {
 				$msg = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
 				$this->_record_access(34);
 				$this->session->set_flashdata('message', $msg);
-				redirect(site_url($redirect_url)); //to access management page?
+				redirect(site_url($this->redirect_url)); //to access management page?
 			}
 			else { //if the request was un-successful
 				$msg = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
@@ -534,7 +537,7 @@ class Auth extends Ionauth {
 				$this->_record_access(35);
 				$msg = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
 				$this->session->set_flashdata('message', $msg);
-				redirect(site_url($redirect_url)); //  to manage access page
+				redirect(site_url($this->redirect_url)); //  to manage access page
 			}
 			else { //if the request was un-successful
 				//redirect them back to the login page
@@ -669,8 +672,9 @@ class Auth extends Ionauth {
 	//CDT overrides built-in function to allow us to redirect user to the original page they requested after login in
 	function login()
 	{
-		$redirect_url = set_redirect_url($this->uri->uri_string(), $this->session->flashdata('redirect_url'), $this->as_ion_auth->referrer);
-		$this->session->set_flashdata('redirect_url', $redirect_url);
+		//$this->session->keep_flashdata('redirect_url');
+		//$this->redirect_url = set_redirect_url($this->uri->uri_string(), $this->session->flashdata('redirect_url'), $this->as_ion_auth->referrer);
+		//$this->session->set_flashdata('redirect_url', $this->redirect_url);
 		$this->data['title'] = "Login";
 
 		//validate form input
@@ -694,12 +698,12 @@ class Auth extends Ionauth {
 			{ //if the login is successful
 				$this->_record_access(1); //1 is the page code for login for the user management section
 				$this->session->set_flashdata('message', $this->as_ion_auth->messages());
-				$this->session->set_flashdata('redirect_url', $redirect_url);
+				$this->session->set_flashdata('redirect_url', $this->redirect_url);
 				redirect(site_url('dhi/change_herd/select'));
 			}
 			else
 			{ //if the login was un-successful
-				$this->session->set_flashdata('redirect_url', $redirect_url);
+				$this->session->set_flashdata('redirect_url', $this->redirect_url);
 				$this->session->set_flashdata('message', $this->as_ion_auth->errors());
 				redirect(site_url('auth/login')); //use redirects instead of loading views for compatibility with MY_Controller libraries
 			}
@@ -1347,15 +1351,13 @@ class Auth extends Ionauth {
 	}
 	
 	function set_role($group_id){
-		$redirect_url = set_redirect_url($this->uri->uri_string(), $this->session->flashdata('redirect_url'), $this->as_ion_auth->referrer);
-		$this->session->set_flashdata('redirect_url', $redirect_url);
 		if(array_key_exists($group_id, $this->session->userdata('arr_groups'))){
 			$this->session->set_userdata('active_group_id', (int)$group_id);
 		}
 		else {
 			$this->session->set_flashdata('message', "You do not have rights to the requested group.");
 		}
-		redirect(site_url($redirect_url));
+		redirect(site_url($this->redirect_url));
 	}
 	
 	// used with dashboard graph
