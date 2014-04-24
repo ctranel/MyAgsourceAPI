@@ -11,6 +11,7 @@
 * Requirements: PHP5 or above
 *
 */
+
 class Benchmarks_lib
 {
 	/**
