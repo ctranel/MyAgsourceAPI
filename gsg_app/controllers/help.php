@@ -6,20 +6,8 @@ class Help extends CI_Controller{
 
 	function __construct(){
 		parent::__construct();
-			if(!isset($this->as_ion_auth)){
+		if(!isset($this->as_ion_auth)){
 			redirect('auth/login', 'refresh');
-		}
-		if((!$this->as_ion_auth->logged_in())){
-			$this->session->keep_flashdata('redirect_url');
-			$redirect_url = set_redirect_url($this->uri->uri_string(), $this->session->flashdata('redirect_url'), $this->as_ion_auth->referrer);
-			$this->session->set_flashdata('redirect_url', $redirect_url);
-			if(strpos($this->session->flashdata('message'), 'Please log in.') === FALSE){
-				$this->session->set_flashdata('message',  $this->session->flashdata('message') . 'Please log in.');
-			}
-			else{
-				$this->session->keep_flashdata('message');
-			}
-			redirect(site_url('auth/login'));
 		}
 		$this->page_header_data['user_sections'] = $this->as_ion_auth->arr_user_super_sections;
 		$this->page_header_data['num_herds'] = $this->as_ion_auth->get_num_viewable_herds($this->session->userdata('user_id'), $this->session->userdata('arr_regions'));
