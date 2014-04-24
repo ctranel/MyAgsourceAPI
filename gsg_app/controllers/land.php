@@ -7,7 +7,7 @@ class Land extends CI_Controller {
 	
 	function __construct(){
 		parent::__construct();
-			if(!isset($this->as_ion_auth) || !$this->as_ion_auth->logged_in()){
+		if(!isset($this->as_ion_auth) || $this->session->userdata('herd_code') === FALSE){
 			$this->session->keep_flashdata('redirect_url');
 			redirect(site_url('auth/login'));
 		}
@@ -21,15 +21,11 @@ class Land extends CI_Controller {
 				$this->output->enable_profiler(TRUE);
 			} 
 		}
+//die($this->session->userdata('herd_code') . ' - ' . var_dump(isset($this->as_ion_auth)));
 	}
 
 	//dashboard
 	function index($pstring = NULL){
-		if(!isset($this->as_ion_auth) || !$this->as_ion_auth->logged_in()){
-			$this->session->keep_flashdata('redirect_url');
-			redirect(site_url('auth/login'));
-		}
-
 		$arr_pstring = $this->session->userdata('arr_pstring');
 		if(isset($pstring)){
 			$this->session->set_userdata('pstring', $pstring);

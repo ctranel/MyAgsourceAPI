@@ -19,6 +19,13 @@ class Demo extends CI_Controller {
 		$this->load->library('herd', array('herd_code' => $this->config->item('default_herd')));
 		$this->set_herd_session_data();
 		redirect(site_url());
+		/* Load the profile.php config file if it exists*/
+		if (ENVIRONMENT == 'development') {
+			$this->config->load('profiler', false, true);
+			if ($this->config->config['enable_profiler']) {
+				$this->output->enable_profiler(TRUE);
+			} 
+		}
 	}
 
 	protected function set_herd_session_data(){

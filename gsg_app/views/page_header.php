@@ -106,6 +106,7 @@
 				<?php elseif($this->router->fetch_method() != 'login'): ?>
 				<li><?php echo anchor('auth/login', 'Log In');?></li>
 				<li><?php echo anchor('auth/create_user', 'Register');?></li>
+				<li><?php echo anchor('', 'Home/Account'); ?></li>
 				<li><?php echo anchor('help', 'Help'); ?></li>
 			<?php endif; ?>
 		</ul>
