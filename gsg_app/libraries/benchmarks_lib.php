@@ -343,8 +343,40 @@ class Benchmarks_lib
 	}
 	
 	/**
-	 * builds sql based on object variables
-	 *
+	 * @method get_bench_settings()
+	 * @return array of data for the graph
+	 * @access protected
+	 **/
+	protected function get_bench_settings($arr_user_herd_settings, $herd_info){
+		//arr_criteria (field_name, sort_order, table_name, join_field) and arr_herd_size (herd_size_floor, herd_size_ceiling) are arrays, region must be translated to arr_states
+		$arr_default = $this->get_default_settings($herd_info['herd_size'], $herd_info['state']);
+		if(isset($arr_user_herd_settings) && is_array($arr_user_herd_settings)){
+			$arr_common = array_intersect_key($arr_default, $arr_user_herd_settings);
+			if(is_array($arr_common) && !empty($arr_common)){
+				foreach($arr_common as $k=>$v){
+					$arr_default[$k] = $arr_user_herd_settings[$k];
+				}
+			}
+		}
+		return $arr_default;
+	}
+	
+	function addBenchmarkRow($sess_benchmarks, &$benchmark_model, $arr_user_herd_settings, $herd_info){
+		$bench_settings = $this->get_bench_settings($arr_user_herd_settings, $herd_info);
+		$this->set_criteria($this->primary_table_name, $header_field, $bench_settings['metric'], $bench_settings['criteria'], $bench_settings['arr_herd_size'], $bench_settings['arr_states']);
+		$bench_sql = $this->build_benchmark_query();
+		$arr_benchmarks = $this->benchmark_model->getBenchmarkData($bench_sql);
+		$arr_summary_fields[ucwords(strtolower(str_replace('_', ' ', $sess_benchmarks['metric']))) . ' (n=' . $arr_benchmarks['cnt_herds'] . ')'] = 'benchmark';
+		$this->arr_pdf_widths['benchmark'] = $header_field_width;
+		$this->arr_field_sort['benchmark'] = 'ASC';
+		$this->arr_unsortable_columns[] = 'benchmark';
+	}
+	
+	/**
+	 * @description builds sql based on object variables
+	 * @param object report_model
+	 * @param string arr_fields_to_exclude
+	 * @param array of strings arr_group_by (db field names)
 	 * @return string
 	 * @author ctranel
 	 **/
