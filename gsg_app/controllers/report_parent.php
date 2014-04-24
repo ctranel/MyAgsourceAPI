@@ -696,7 +696,18 @@ abstract class parent_report extends CI_Controller {
 		$subtitle = 'Herd ' . $this->session->userdata('herd_code');
 		$this->{$this->primary_model}->populate_field_meta_arrays($arr_this_block['id']);// was $model in place of $this->primary_model
 		$results = $this->{$this->primary_model}->search($this->session->userdata('herd_code'), $arr_this_block['url_segment'], $this->arr_filter_criteria, $this->arr_sort_by, $this->arr_sort_order, $this->max_rows);
-		if(!empty($this->pivot_db_field)) $results = $this->{$this->primary_model}->pivot($results, $this->pivot_db_field, 10, 10, $this->avg_row, $this->sum_row, $this->bench_row);
+		if($this->bench_row){
+			$this->load->model('benchmark_model');
+			$this->load->library('benchmarks_lib');
+			$arr_user_herd_settings = $this->benchmark_model->getHerdBenchmarkSettings();
+			$herd_info = $this->herd_model->header_info($this->herd_code);
+			$sess_benchmarks = $this->session->userdata('benchmarks');
+			$results = $this->benchmarks_lib->addBenchmarkRow($sess_benchmarks, $this->benchmark_model, $arr_user_herd_settings, $herd_info);
+		}
+		
+		if(!empty($this->pivot_db_field)){
+			$results = $this->{$this->primary_model}->pivot($results, $this->pivot_db_field, 10, 10, $this->avg_row, $this->sum_row);
+		}
 		
 		$tmp = array(
 			'form_id' => $this->report_form_id,
