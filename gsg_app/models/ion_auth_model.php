@@ -648,33 +648,6 @@ SELECT DISTINCT id, name, list_order FROM cteAnchor ORDER BY list_order;";
 	}
 
 	/**
-	 * get_user_herd_settings
-	 *
-	 * @return array of user-herd settings
-	 * @author ctranel
-	 **/
-	public function get_user_herd_settings(){
-		//REMOVE IF WE DECIDE TO STORE PREFERENCES
-		$arr_sess_benchmarks = $this->session->userdata('benchmarks');
-		if(isset($arr_sess_benchmarks) && !empty($arr_sess_benchmarks)){
-			$arr_tmp['metric'] = $arr_sess_benchmarks['metric'];
-			$arr_tmp['criteria'] = $arr_sess_benchmarks['criteria'];
-			$arr_tmp['arr_states'] = $arr_sess_benchmarks['arr_states'];
-			$arr_tmp['arr_herd_size'] = $arr_sess_benchmarks['arr_herd_size'];
-			return $arr_tmp;
-		}
-		else return FALSE; 
-/*		$user_id = $this->session->userdata('user_id');
-		$result = $this->db
-		->select()
-		->get($this->tables['users_herds_settings'])
-		->return_array();
-		
-		if(is_array($result) && !empty($result)) return $result[0];
-		else return FALSE;*/
-	}
-
-	/**
 	 * @method get_task_permissions
 	 *
 	 * @param int section id FOR FUTURE USE
