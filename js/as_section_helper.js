@@ -75,7 +75,10 @@
     		oForm = document.getElementById("filter-form");
     		var frm_elements = oForm.elements;
     		for (i = 0; i < frm_elements.length; i++) {  
-    		    field_type = frm_elements[i].type.toLowerCase();  
+    			if(typeof(frm_elements[i].type) == 'undefined'){
+    				continue;
+    			}
+    			field_type = frm_elements[i].type.toLowerCase();  
     	
     		    switch (field_type) {  
     			    case "text":  
