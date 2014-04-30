@@ -21,10 +21,16 @@ class Benchmarks_lib
 	protected $db_table;
 
 	/**
-	 * date field used in benchmarks (will always be test date?)
+	 * table that stores most recent data for all herd/pstring data for deriving benchmark groups
 	 * @var string
 	 **/
-	protected $primary_table_date_field;
+	protected $herd_benchmark_pool_table = 'herd_bench_pool';
+
+	/**
+	 * key field used in benchmarks (will always be test date?)
+	 * @var string
+	 **/
+//	protected $arr_key_fields;
 
 	/**
 	 * metric used in benchmarks (avg, qtile, top 10%, etc ...)
@@ -80,8 +86,6 @@ class Benchmarks_lib
 	 **/
 	protected $arr_criteria_table;
 	
-	private $ci;
-	
 	/**
 	 * __construct
 	 *
@@ -90,8 +94,6 @@ class Benchmarks_lib
 	 **/
 	public function __construct()
 	{
-		$this->ci =& get_instance();
-		//$this->load->config('ion_auth', TRUE);
 		$this->arr_states_in_region = array(
 			'NE' => array('NY','PA','OH','VT','ME','CT','NH','MA','NJ','RI'),
 			'SE' => array('FL','VA','GA','MD','KY','NC','TN','SC','LA','MS','WV','AL','AK','DE'),
@@ -106,8 +108,14 @@ class Benchmarks_lib
 			3 => array('floor' => 501, 'ceiling' => 2000),
 			4 => array('floor' => 2001, 'ceiling' => 100000),
 		);
+
 		$this->arr_criteria_table = array(
-			'p.herd_rha' => 			array('join_text' => " LEFT JOIN herd_summary.dbo.herd_rha p ON td.herd_code = p.herd_code AND td.recent_test_date = p.test_date", 'sort_order' => 'desc', 'date_field' => 'test_date'),
+			'production' => array(
+				'field' => 'rha_milk_lbs',
+				'sort_order' => 'desc',
+			),
+				
+//			'p.herd_rha' => 			array('join_text' => " LEFT JOIN herd_summary.dbo.herd_rha p ON td.herd_code = p.herd_code AND td.recent_test_date = p.test_date", 'sort_order' => 'desc', 'date_field' => 'test_date'),
 //			'r.herd_preg_rate' => 		array('join_text' => " LEFT JOIN dbo.v_repro_dashboard r ON td.herd_code = r.herd_code AND td.recent_test_date = r.test_date", 'sort_order' => 'desc', 'date_field' => 'test_date'),
 //			'hr.preg_rate_395_vwp' => 	array('join_text' => " LEFT JOIN dbo.v_heifer_repro_dashboard hr ON td.herd_code = hr.herd_code AND td.recent_test_date = hr.recent_test_date", 'sort_order' => 'desc', 'date_field' => 'test_date'),
 //			'q.avg_linear' =>			array('join_text' => " LEFT JOIN dbo.v_quality_dashboard q ON td.herd_code = q.herd_code AND td.recent_test_date= q.test_date", 'sort_order' => 'asc', 'date_field' => 'test_date'),
@@ -140,7 +148,7 @@ class Benchmarks_lib
 	 **/
 	public function get_criteria_options(){
 		return array(
-			'p.avg_milk' => 'Average Milk',
+			'production' => 'Average Milk',
 //			'r.herd_preg_rate' => 'Cow Preg Rate',
 //			'hr.preg_rate_395_vwp' => 'Heifer Preg Rate',
 //			'q.avg_linear' => 'Average Linear Score',
@@ -168,8 +176,7 @@ class Benchmarks_lib
 	 * @return string
 	 * @author ctranel
 	 **/
-	public function get_bench_text(){
-		$sess_benchmarks = $this->ci->session->userdata('benchmarks');
+	public function get_bench_text($sess_benchmarks){
 		$criteria_options = $this->get_criteria_options();
 		$bench_text = 'Benchmark herds determined by ' . $criteria_options[$sess_benchmarks['criteria']];
 		if(isset($sess_benchmarks['arr_herd_size'])) $bench_text .= ' for Herds between ' . $sess_benchmarks['arr_herd_size'][0] . ' and ' . $sess_benchmarks['arr_herd_size'][1] . ' animals.';
@@ -212,7 +219,7 @@ class Benchmarks_lib
 	public function get_default_settings($herd_size = FALSE, $state = FALSE){
 		return array(
 			'metric' => 'TOP10_PCT',
-			'criteria' => 'p.avg_milk',
+			'criteria' => 'production',
 			'arr_herd_size' => $this->get_default_herd_range($herd_size),
 			'arr_states' => $this->get_default_states($state)
 		);
@@ -242,8 +249,6 @@ class Benchmarks_lib
 					}					
 				}
 			}
-//echo "<b>get default states:</b>";
-//var_dump($arr_states);
 			return $arr_states;
 		}
 		else return NULL;
@@ -274,8 +279,7 @@ class Benchmarks_lib
 
 	 * @return array of default settings
 	 * @author ctranel
-	 **/
-	public function set_herd_defaults($herd_code){
+	private function set_herd_defaults($herd_code){
 		$herd_info = $this->ci->herd_model->header_info($this->ci->session->userdata('herd_code'));
 		$arr_tmp = array(
 			'metric' => 'TOP10_PCT',
@@ -286,6 +290,7 @@ class Benchmarks_lib
 		$this->ci->session->set_userdata('benchmarks', $arr_tmp);
 		return $arr_tmp;
 	}
+	 **/
 
 	/**
 	 * sets criteria for benchmarks
@@ -299,10 +304,10 @@ class Benchmarks_lib
 	 * @return void
 	 * @author ctranel
 	 **/
-	public function set_criteria($db_table, $date_field, $metric = 'TOP10_PCT', $criteria = 'p.herd_rha', $arr_herd_size = NULL, array $arr_states = NULL){
-		if(isset($db_table)) $this->db_table = $db_table;
-		if(isset($date_field)) $this->date_field = $date_field;
-		else return FALSE;
+	private function set_criteria($date_field, $metric, $criteria, $arr_herd_size = NULL, array $arr_states = NULL){
+//		if(isset($db_table)) $this->db_table = $db_table;
+//		if(isset($date_field)) $this->date_field = $date_field;
+//		else return FALSE;
 		$this->metric = $metric;
 		$this->criteria = $criteria;
 		if(is_array($arr_herd_size)){
@@ -361,9 +366,19 @@ class Benchmarks_lib
 		return $arr_default;
 	}
 	
-	function addBenchmarkRow($sess_benchmarks, &$benchmark_model, $arr_user_herd_settings, $herd_info){
+	/**
+	 * @description builds sql based on object variables
+	 * @param object report_model
+	 * @param string arr_fields_to_exclude
+	 * @param array of strings arr_group_by (db field names)
+	 * @return string
+	 * @author ctranel
+	 **/
+	function addBenchmarkRow($db_table, $sess_benchmarks, &$benchmark_model, $arr_user_herd_settings, $herd_info){
+		if(isset($db_table)) $this->db_table = $db_table;
 		$bench_settings = $this->get_bench_settings($arr_user_herd_settings, $herd_info);
-		$this->set_criteria($this->primary_table_name, $header_field, $bench_settings['metric'], $bench_settings['criteria'], $bench_settings['arr_herd_size'], $bench_settings['arr_states']);
+//@todo: is hard-coding test_date OK?
+		$this->set_criteria('test_date', $bench_settings['metric'], $bench_settings['criteria'], $bench_settings['arr_herd_size'], $bench_settings['arr_states']);
 		$bench_sql = $this->build_benchmark_query();
 		$arr_benchmarks = $this->benchmark_model->getBenchmarkData($bench_sql);
 		$arr_summary_fields[ucwords(strtolower(str_replace('_', ' ', $sess_benchmarks['metric']))) . ' (n=' . $arr_benchmarks['cnt_herds'] . ')'] = 'benchmark';
@@ -380,7 +395,7 @@ class Benchmarks_lib
 	 * @return string
 	 * @author ctranel
 	 **/
-	public function build_benchmark_query(&$report_model, $arr_fields_to_exclude = NULL, $arr_group_by = NULL){
+	public function build_benchmark_query($arr_fields_to_exclude = NULL, $arr_group_by = NULL){
 		$sql = '';
 		$cte = '';
 		$addl_select_fields = '';
@@ -388,22 +403,24 @@ class Benchmarks_lib
 		$where = '';
 		$group_by = '';
 		$order_by = '';
-		$criteria_date_field = $this->arr_criteria_table[$this->criteria]['date_field'];
-		$this->primary_table_date_field = $report_model->date_field;
+//var_dump($this->arr_criteria_table);
+//		$criteria_date_field = $this->arr_criteria_table[$this->criteria]['date_field'];
+//		$this->primary_table_date_field = $report_model->date_field;
 		
 		if($this->metric == "AVG") {
 			$cte = $this->build_cte();
-			$from = " FROM benchmark_herds bh INNER JOIN " . $this->db_table . " p ON bh.herd_code = p.herd_code AND bh.recent_" . $report_model->date_field . " = p." . $report_model->date_field;
+			$from = " FROM benchmark_herds bh INNER JOIN " . $this->db_table . " p ON bh.herd_code = p.herd_code AND bh.test_date = p.test_date";
 		}
 		else {
 			$cte = $this->build_cte();
-			$from = " FROM benchmark_herds bh LEFT JOIN " . $this->db_table . " p ON bh.herd_code = p.herd_code AND bh.recent_" . $report_model->date_field . " = p." . $report_model->date_field;
+			$from = " FROM benchmark_herds bh LEFT JOIN " . $this->db_table . " p ON bh.herd_code = p.herd_code AND bh.test_date = p.test_date";
 		}
 		if(strpos($this->metric, 'QTILE') !== FALSE){
 			$where = " WHERE bh.quartile = " . str_replace('QTILE', '', $this->metric);
 		}
 		
-		$avg_fields = $report_model->get_benchmark_fields($arr_fields_to_exclude);
+		$avg_fields = $benchmark_model->get_benchmark_fields($this->db_table, $arr_fields_to_exclude);
+var_dump($avg_fields);
 		
 		if(isset($arr_group_by) && is_array($arr_group_by)){
 			$group_by = " GROUP BY " . $arr_group_by[0];
@@ -417,44 +434,37 @@ class Benchmarks_lib
 			}
 		}
 		$sql = $cte . "SELECT COUNT(1) AS cnt_herds, " . $addl_select_fields. $avg_fields . $from . $where . $group_by . $order_by;
+die($sql);
 		return $sql;
 	}
 	
 	protected function build_cte(){
 		$sql = '';
-		$cte_top = '';
+		$cte_qualifier = '';
 		$cte_order_by = '';
-		$criteria_date_field = $this->arr_criteria_table[$this->criteria]['date_field'];
-		list($table_pre, $table_name) = explode('.', $this->criteria);
+		$arr_criteria_data = $this->arr_criteria_table[$this->criteria];
 		
-		if($this->metric == "AVG") $cte_top = "WITH benchmark_herds(herd_code, recent_test_date) AS (SELECT td.herd_code, td.recent_test_date FROM";
-		if($this->metric == "TOP10_PCT"){
-			$cte_top = "WITH benchmark_herds(herd_code, recent_test_date) AS (SELECT TOP(10)PERCENT td.herd_code, td.recent_test_date FROM";
-			$cte_order_by = "ORDER BY " . $this->criteria . " " . $this->arr_criteria_table[$this->criteria]['sort_order'];
+		if($this->metric == 'AVG') $cte_qualifier = '';
+		if($this->metric == 'TOP10_PCT'){
+			$cte_qualifier = 'TOP(10)PERCENT ';
+			$cte_order_by = 'ORDER BY ' . $arr_criteria_data['field'] . ' ' . $arr_criteria_data['sort_order'];
 		}
 		if(strpos($this->metric, 'QTILE') !== FALSE){
-			$cte_top = "WITH benchmark_herds(quartile, herd_code, recent_test_date) AS (SELECT NTILE(4) OVER (ORDER BY " . $this->criteria . " " . $this->arr_criteria_table[$this->criteria]['sort_order'] . ") AS quartile, td.herd_code, td.recent_test_date FROM";
+			$cte_qualifier = 'NTILE(4) OVER (ORDER BY ' . $arr_criteria_data['field'] . ' ' . $arr_criteria_data['sort_order'] . ') AS quartile, ';
 		}
 		
-		$sql = $cte_top . "(
-				SELECT i.herd_code, MAX(p.test_date) AS recent_test_date 
-				FROM herd.dbo.herd_id h
-				LEFT JOIN herd_summary.dbo.herd_inventory i ON h.herd_code = i.herd_code
-				LEFT JOIN herd_summary.dbo.herd_rha p ON i.herd_code = p.herd_code AND i.test_date = p.test_date";
-		$sql .= " GROUP BY i.herd_code, i.test_date
-			HAVING (SELECT MAX(test_date) FROM inventory WHERE herd_code = i.herd_code";
-
-		if(isset($this->herd_size_floor) && isset($this->herd_size_ceiling)) $sql .= " AND hi.milk_cow_cnt BETWEEN " . $this->herd_size_floor . " AND " . $this->herd_size_ceiling;
-		if(isset($this->arr_states) && is_array($this->arr_states) && !empty($this->arr_states)) " AND state_prov IN (" . implode(',', $this->arr_states) . ")";
+		$sql =  'WITH benchmark_herds(herd_code, recent_test_date) AS (SELECT ' . $cte_qualifier . 'herd_code, recent_test_date FROM ' . $this->herd_benchmark_pool_table;
 		
-		$sql .= ") = i.test_date
-		) td";
-		if(isset($this->arr_criteria_table[$this->criteria]['join_text'])) {
-			$sql .= $this->arr_criteria_table[$this->criteria]['join_text'];
+		$sql .= ' WHERE DATEDIFF(MONTH, GETDATE(), test_date) < 4 AND ' . $arr_criteria_data['field'] . ' IS NOT NULL ';
+		if(isset($this->herd_size_floor) && isset($this->herd_size_ceiling)){
+			$sql .= ' AND milk_cow_cnt BETWEEN ' . $this->herd_size_floor . ' AND ' . $this->herd_size_ceiling;
 		}
-		$sql .= " WHERE DATEDIFF(MONTH, GETDATE(), " . $table_pre . "." . $criteria_date_field . ") < 4 AND " . $this->criteria . " IS NOT NULL " .
-			$cte_order_by .
-		")";
+		if(isset($this->arr_states) && is_array($this->arr_states) && !empty($this->arr_states)){
+			$sql .= ' AND state_prov IN (' . implode(',', $this->arr_states) . ')';
+		}
+		
+		$sql .= $cte_order_by;
+		$sql .= ')';
 		return $sql;
 	}
 }

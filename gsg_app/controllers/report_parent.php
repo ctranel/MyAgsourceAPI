@@ -726,10 +726,11 @@ abstract class parent_report extends CI_Controller {
 		if($this->bench_row){
 			$this->load->model('benchmark_model');
 			$this->load->library('benchmarks_lib');
+			$db_table = $this->{$this->primary_model}->get_primary_table_name();
 			$arr_user_herd_settings = $this->benchmark_model->getHerdBenchmarkSettings();
 			$herd_info = $this->herd_model->header_info($this->herd_code);
 			$sess_benchmarks = $this->session->userdata('benchmarks');
-			$results = $this->benchmarks_lib->addBenchmarkRow($sess_benchmarks, $this->benchmark_model, $arr_user_herd_settings, $herd_info);
+			$results = $this->benchmarks_lib->addBenchmarkRow($this->{$this->primary_model}, $db_table, $sess_benchmarks, $this->benchmark_model, $arr_user_herd_settings, $herd_info);
 		}
 		
 		if(!empty($this->pivot_db_field)){
@@ -747,13 +748,7 @@ abstract class parent_report extends CI_Controller {
 		$tmp2 = $this->{$this->primary_model}->get_table_header_data();
 		$table_header_data = array_merge($tmp, $tmp2);
 
-/*		$sess_benchmarks = $this->session->userdata('benchmarks');
-		$criteria_options = $this->benchmarks_lib->get_criteria_options();
-		$bench_text = 'Benchmark herds determined by ' . $criteria_options[$sess_benchmarks['criteria']];
-		if(isset($sess_benchmarks['arr_herd_size'])) $bench_text .= ' for Herds between ' . $sess_benchmarks['arr_herd_size'][0] . ' and ' . $sess_benchmarks['arr_herd_size'][1] . ' animals.';
-		if(isset($sess_benchmarks['arr_states'])) $bench_text .= ' for Herds in ' . implode(',', $sess_benchmarks['arr_states']) . '.';
-*/
-	//	$bench_text = $this->benchmarks_lib->get_bench_text();
+		$bench_text = $this->benchmarks_lib->get_bench_text($this->session->userdata('benchmarks'));
 		$this->report_data = array(
 			'table_header' => $this->load->view('table_header', $table_header_data, TRUE),
 			'num_columns' => $table_header_data['num_columns'],
