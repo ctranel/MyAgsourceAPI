@@ -7,4 +7,13 @@
 				colors: [var_arr_graph_colors[0], var_arr_graph_colors[0], var_arr_graph_colors[1], var_arr_graph_colors[1]],
 			});
 		}
+
+		//if fpr, set yaxis tick interval to .2
+		if(section_data['block'] == 'ratio_of_first_test_fat_t'){
+			Highcharts.setOptions({
+				yAxis: {
+			        tickInterval: .2
+			    }
+			});
+		}
 	}
