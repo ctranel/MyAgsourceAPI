@@ -12,8 +12,8 @@
 			<?php if(!empty($association_num)):?>
 				<div><label>Association</label> <?php echo $association_num; ?></div>
 			<?php endif; ?>
-			<?php if(!empty($supervisor_num)):?>
-				<div><label>Tech Num</label> <?php echo $supervisor_num; ?></div>
+			<?php if(!empty($supervisor_name)):?>
+				<div><label>Tech</label> <?php echo $supervisor_name; ?></div>
 			<?php endif; ?>
 			<?php if(!empty($test_date)):?>
 				<div><label>Test Date</label> <?php echo $test_date; ?></div>
