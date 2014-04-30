@@ -43,15 +43,15 @@ if(isset($arr_tests) && is_array($arr_tests)): ?>
 			<tr class="<?php echo $class; ?>">
 				<td><?php echo $t['date']; ?></td>
 				<td><?php echo $t['lact_dim']; ?></td>
-				<td><?php echo $t['td_milk_lbs']; ?></td>
-				<td><?php echo $t['fat_pct']; ?></td>
-				<td><?php echo $t['pro_pct']; ?></td>
-				<td><?php echo $t['snf_pct']; ?></td>
-				<td><?php echo $t['fcm_lbs']; ?></td>
-				<td><?php echo $t['ecm_lbs']; ?></td>
-				<td><?php echo $t['mlm_lbs']; ?></td>
+				<td><?php echo number_format($t['td_milk_lbs'], 1); ?></td>
+				<td><?php echo number_format($t['fat_pct'], 1); ?></td>
+				<td><?php echo number_format($t['pro_pct'], 1); ?></td>
+				<td><?php echo number_format($t['snf_pct'], 1); ?></td>
+				<td><?php echo number_format($t['fcm_lbs'], 1); ?></td>
+				<td><?php echo number_format($t['ecm_lbs'], 1); ?></td>
+				<td><?php echo number_format($t['mlm_lbs'], 1); ?></td>
 				<td><?php echo $t['scc_cnt']; ?></td>
-				<td><?php echo $t['linear_score']; ?></td>
+				<td><?php echo number_format($t['linear_score'], 1); ?></td>
 				<td><?php echo $t['pct_last_milk']; ?></td>
 				<td><?php echo $t['car_1']; ?></td>
 				<td><?php echo $t['mun']; ?></td>

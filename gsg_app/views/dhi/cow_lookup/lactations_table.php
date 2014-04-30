@@ -44,7 +44,7 @@ if(isset($arr_lacts) && is_array($arr_lacts)): ?>
 				<td><?php echo $t['first_bred_dim']; ?></td>
 				<td><?php echo $t['days_open']; ?></td>
 				<td><?php echo $t['calving_int_days']; ?></td>
-				<td><?php echo $t['avg_linear_score']; ?></td>
+				<td><?php echo number_format($t['avg_linear_score'], 1); ?></td>
 				<td><?php echo $t['d305_milk_lbs']; ?></td>
 				<td><?php echo $t['d305_fat_lbs']; ?></td>
 				<td><?php echo $t['d305_pro_lbs']; ?></td>
