@@ -93,10 +93,10 @@ class Benchmark_model extends CI_Model {
 	 * @access protected
 	 *
 	 **/
-	public function get_benchmark_fields($arr_excluded_fields = NULL){
-		$sql = "SELECT CAST ((select ',AVG('+quotename(C.name)+') AS '+quotename(C.name)
+	public function get_benchmark_fields($db_table, $arr_excluded_fields = NULL){
+		$sql = "SELECT CAST ((select ',AVG(CAST('+quotename(C.name)+' AS DECIMAL(12,0))) AS '+quotename(C.name)
          from sys.columns as C
-         where C.object_id = object_id('" . $this->primary_table_name . "')";
+         where C.object_id = object_id('" . $db_table . "')";
         if(is_array($arr_excluded_fields) && !empty($arr_excluded_fields)) $sql .= " and C.name NOT IN('" . implode("','", $arr_excluded_fields) . "')";// AND C.name NOT LIKE 'cnt%'";
         $sql .= " AND TYPE_NAME(C.user_type_id) NOT IN('char','smalldatetime','varchar','date')";
 		$sql .= "for xml path('')) AS text) AS fields";

@@ -24,7 +24,11 @@ class Benchmarks_lib
 	 * table that stores most recent data for all herd/pstring data for deriving benchmark groups
 	 * @var string
 	 **/
+<<<<<<< Upstream, based on master
 	protected $herd_benchmark_pool_table = 'vma.dbo.vma_bench_criteria_summary';
+=======
+	protected $herd_benchmark_pool_table = 'herd_bench_pool';
+>>>>>>> 24e08ea UPDATE: CTE Composition
 
 	/**
 	 * key field used in benchmarks (will always be test date?)
@@ -115,11 +119,19 @@ class Benchmarks_lib
 				'sort_order' => 'desc',
 			),
 				
+<<<<<<< Upstream, based on master
 //			'p.herd_rha' => 			array('join_text' => " LEFT JOIN herd_summary.dbo.herd_rha p ON td.herd_code = p.herd_code AND td.test_date = p.test_date", 'sort_order' => 'desc', 'date_field' => 'test_date'),
 //			'r.herd_preg_rate' => 		array('join_text' => " LEFT JOIN dbo.v_repro_dashboard r ON td.herd_code = r.herd_code AND td.test_date = r.test_date", 'sort_order' => 'desc', 'date_field' => 'test_date'),
 //			'hr.preg_rate_395_vwp' => 	array('join_text' => " LEFT JOIN dbo.v_heifer_repro_dashboard hr ON td.herd_code = hr.herd_code AND td.test_date = hr.test_date", 'sort_order' => 'desc', 'date_field' => 'test_date'),
 //			'q.avg_linear' =>			array('join_text' => " LEFT JOIN dbo.v_quality_dashboard q ON td.herd_code = q.herd_code AND td.test_date= q.test_date", 'sort_order' => 'asc', 'date_field' => 'test_date'),
 //			'g.avg_net_merit' => 		array('join_text' => " LEFT JOIN dbo.genetics g ON td.herd_code = g.herd_code AND td.test_date = g.test_date", 'sort_order' => 'desc', 'date_field' => 'test_date')
+=======
+//			'p.herd_rha' => 			array('join_text' => " LEFT JOIN herd_summary.dbo.herd_rha p ON td.herd_code = p.herd_code AND td.recent_test_date = p.test_date", 'sort_order' => 'desc', 'date_field' => 'test_date'),
+//			'r.herd_preg_rate' => 		array('join_text' => " LEFT JOIN dbo.v_repro_dashboard r ON td.herd_code = r.herd_code AND td.recent_test_date = r.test_date", 'sort_order' => 'desc', 'date_field' => 'test_date'),
+//			'hr.preg_rate_395_vwp' => 	array('join_text' => " LEFT JOIN dbo.v_heifer_repro_dashboard hr ON td.herd_code = hr.herd_code AND td.recent_test_date = hr.recent_test_date", 'sort_order' => 'desc', 'date_field' => 'test_date'),
+//			'q.avg_linear' =>			array('join_text' => " LEFT JOIN dbo.v_quality_dashboard q ON td.herd_code = q.herd_code AND td.recent_test_date= q.test_date", 'sort_order' => 'asc', 'date_field' => 'test_date'),
+//			'g.avg_net_merit' => 		array('join_text' => " LEFT JOIN dbo.genetics g ON td.herd_code = g.herd_code AND td.recent_test_date = g.recent_test_date", 'sort_order' => 'desc', 'date_field' => 'test_date')
+>>>>>>> 24e08ea UPDATE: CTE Composition
 		);
 	}
 
@@ -177,9 +189,12 @@ class Benchmarks_lib
 	 * @author ctranel
 	 **/
 	public function get_bench_text($sess_benchmarks){
+<<<<<<< Upstream, based on master
 		if(!isset($sess_benchmarks) || $sess_benchmarks === FALSE){
 			return "Benchmark session not set";
 		}
+=======
+>>>>>>> 24e08ea UPDATE: CTE Composition
 		$criteria_options = $this->get_criteria_options();
 		$bench_text = 'Benchmark herds determined by ' . $criteria_options[$sess_benchmarks['criteria']];
 		if(isset($sess_benchmarks['arr_herd_size'])) $bench_text .= ' for Herds between ' . $sess_benchmarks['arr_herd_size'][0] . ' and ' . $sess_benchmarks['arr_herd_size'][1] . ' animals.';
@@ -378,11 +393,16 @@ class Benchmarks_lib
 	 * @return string
 	 * @author ctranel
 	 **/
+<<<<<<< Upstream, based on master
 	function addBenchmarkRow($db_table, $sess_benchmarks, &$benchmark_model, $arr_user_herd_settings, $herd_info, $arr_fields_to_exclude = array('herd_code', 'pstring', 'lact_group_code', 'ls_type_code', 'sol_group_code')){
+=======
+	function addBenchmarkRow($db_table, $sess_benchmarks, &$benchmark_model, $arr_user_herd_settings, $herd_info){
+>>>>>>> 24e08ea UPDATE: CTE Composition
 		if(isset($db_table)) $this->db_table = $db_table;
 		$bench_settings = $this->get_bench_settings($arr_user_herd_settings, $herd_info);
 //@todo: is hard-coding test_date OK?
 		$this->set_criteria('test_date', $bench_settings['metric'], $bench_settings['criteria'], $bench_settings['arr_herd_size'], $bench_settings['arr_states']);
+<<<<<<< Upstream, based on master
 
 		$avg_fields = $benchmark_model->get_benchmark_fields($this->db_table, $arr_fields_to_exclude);
 		
@@ -392,6 +412,11 @@ class Benchmarks_lib
  * 
  *	@todo: need to fix this, all model vars
  *	@todo: benchmark session not being set, benchmark text not being displayed in tables
+=======
+		$bench_sql = $this->build_benchmark_query();
+		$arr_benchmarks = $this->benchmark_model->getBenchmarkData($bench_sql);
+		$arr_summary_fields[ucwords(strtolower(str_replace('_', ' ', $sess_benchmarks['metric']))) . ' (n=' . $arr_benchmarks['cnt_herds'] . ')'] = 'benchmark';
+>>>>>>> 24e08ea UPDATE: CTE Composition
 		$this->arr_pdf_widths['benchmark'] = $header_field_width;
 		$this->arr_field_sort['benchmark'] = 'ASC';
 		$this->arr_unsortable_columns[] = 'benchmark';
@@ -413,7 +438,11 @@ class Benchmarks_lib
 	 * @return string
 	 * @author ctranel
 	 **/
+<<<<<<< Upstream, based on master
 	public function build_benchmark_query($avg_fields, $arr_group_by = NULL){
+=======
+	public function build_benchmark_query($arr_fields_to_exclude = NULL, $arr_group_by = NULL){
+>>>>>>> 24e08ea UPDATE: CTE Composition
 		$sql = '';
 		$cte = '';
 		$addl_select_fields = '';
@@ -436,6 +465,12 @@ class Benchmarks_lib
 		if(strpos($this->metric, 'QTILE') !== FALSE){
 			$where = " WHERE bh.quartile = " . str_replace('QTILE', '', $this->metric);
 		}
+<<<<<<< Upstream, based on master
+=======
+		
+		$avg_fields = $benchmark_model->get_benchmark_fields($this->db_table, $arr_fields_to_exclude);
+var_dump($avg_fields);
+>>>>>>> 24e08ea UPDATE: CTE Composition
 		
 		if(isset($arr_group_by) && is_array($arr_group_by)){
 			$group_by = " GROUP BY " . $arr_group_by[0];
@@ -449,6 +484,7 @@ class Benchmarks_lib
 			}
 		}
 		$sql = $cte . "SELECT COUNT(1) AS cnt_herds, " . $addl_select_fields. $avg_fields . $from . $where . $group_by . $order_by;
+die($sql);
 		return $sql;
 	}
 	
@@ -467,11 +503,21 @@ class Benchmarks_lib
 			$cte_qualifier = 'NTILE(4) OVER (ORDER BY ' . $arr_criteria_data['field'] . ' ' . $arr_criteria_data['sort_order'] . ') AS quartile, ';
 		}
 		
+<<<<<<< Upstream, based on master
 		$sql =  'WITH benchmark_herds(herd_code, test_date) AS (SELECT ' . $cte_qualifier . 'herd_code, test_date FROM ' . $this->herd_benchmark_pool_table;
+=======
+		$sql =  'WITH benchmark_herds(herd_code, recent_test_date) AS (SELECT ' . $cte_qualifier . 'herd_code, recent_test_date FROM ' . $this->herd_benchmark_pool_table;
+>>>>>>> 24e08ea UPDATE: CTE Composition
 		
+<<<<<<< Upstream, based on master
 		$sql .= ' WHERE DATEDIFF(MONTH, test_date, GETDATE()) < 4 AND ' . $arr_criteria_data['field'] . ' IS NOT NULL ';
 		if(isset($this->herd_size_floor) && isset($this->herd_size_ceiling)){
 			$sql .= ' AND rha_cow_cnt BETWEEN ' . $this->herd_size_floor . ' AND ' . $this->herd_size_ceiling;
+=======
+		$sql .= ' WHERE DATEDIFF(MONTH, GETDATE(), test_date) < 4 AND ' . $arr_criteria_data['field'] . ' IS NOT NULL ';
+		if(isset($this->herd_size_floor) && isset($this->herd_size_ceiling)){
+			$sql .= ' AND milk_cow_cnt BETWEEN ' . $this->herd_size_floor . ' AND ' . $this->herd_size_ceiling;
+>>>>>>> 24e08ea UPDATE: CTE Composition
 		}
 		if(isset($this->arr_states) && is_array($this->arr_states) && !empty($this->arr_states)){
 			$sql .= ' AND state_prov IN (' . implode(',', $this->arr_states) . ')';

@@ -13,11 +13,7 @@
 				<div><label>Association</label> <?php echo $association_num; ?></div>
 			<?php endif; ?>
 			<?php if(!empty($supervisor_name)):?>
-<<<<<<< Upstream, based on master
 				<div><label>Tech Name</label> <?php echo ucwords(strtolower($supervisor_name)); ?></div>
-=======
-				<div><label>Tech</label> <?php echo $supervisor_name; ?></div>
->>>>>>> 2884636 UPDATE: CTE Composition
 			<?php endif; ?>
 			<?php if(!empty($test_date)):?>
 				<div><label>Test Date</label> <?php echo $test_date; ?></div>
