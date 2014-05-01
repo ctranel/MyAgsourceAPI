@@ -5,6 +5,14 @@ class Cowpopulations_model extends Report_model {
 		parent::__construct($section_path);
 	}
 	
+	//Overriding parent function to allow for an average row that includes values that can't be made by simply calculating the average (current month is incomplete and so is excluded in average)
+	
+	function get_fieldlist_array(){
+		$arr_average = array('Average'=>'average');
+		array_insert($this->arr_db_field_list,-1, $arr_average);
+		return $this->arr_db_field_list;
+	}
+	
 	/*  
 	 * @method pivot() overrides report_model
 	 * @param array dataset
@@ -16,18 +24,23 @@ class Cowpopulations_model extends Report_model {
 	 * @author ctranel
 	 */
 	public function pivot($arr_dataset, $header_field, $header_field_width, $label_column_width, $bool_avg_column = FALSE, $bool_sum_column = FALSE, $bool_bench_column = FALSE){
-//var_dump($arr_dataset);
-		$avg_l1_calving_cnt = $arr_dataset[0]['l1_calving_cnt'];
-		$avg_l4_calving_cnt = $arr_dataset[0]['l4_calving_cnt'];
-		$avg_l0_calving_cnt = $arr_dataset[0]['l0_calving_cnt'];
+		$l1_avg_calving_cnt = $arr_dataset[0]['l1_avg_calving_cnt'];
+		$l4_avg_calving_cnt = $arr_dataset[0]['l4_avg_calving_cnt'];
+		$l0_avg_calving_cnt = $arr_dataset[0]['l0_avg_calving_cnt'];
+		$l1_tot_calving_cnt = $arr_dataset[0]['l1_calving_cnt'];
+		$l4_tot_calving_cnt = $arr_dataset[0]['l4_calving_cnt'];
+		$l0_tot_calving_cnt = $arr_dataset[0]['l0_calving_cnt'];
 		$new_dataset = parent::pivot($arr_dataset, $header_field, $header_field_width, $label_column_width, $bool_avg_column, $bool_sum_column, $bool_bench_column);
 		//update total field in new dataset
-		$new_dataset['l1_calving_cnt']['total'] = round($avg_l1_calving_cnt);
-		$new_dataset['l4_calving_cnt']['total'] = round($avg_l4_calving_cnt);
-		$new_dataset['l0_calving_cnt']['total'] = round($avg_l0_calving_cnt);
-		$new_dataset['l1_calving_cnt']['average'] = round($avg_l1_calving_cnt / 12);
-		$new_dataset['l4_calving_cnt']['average'] = round($avg_l4_calving_cnt / 12);
-		$new_dataset['l0_calving_cnt']['average'] = round($avg_l0_calving_cnt / 12);
+		unset($new_dataset['l1_avg_calving_cnt']);
+		unset($new_dataset['l4_avg_calving_cnt']);
+		unset($new_dataset['l0_avg_calving_cnt']);
+		$new_dataset['l1_calving_cnt']['total'] = $l1_tot_calving_cnt;
+		$new_dataset['l4_calving_cnt']['total'] = $l4_tot_calving_cnt;
+		$new_dataset['l0_calving_cnt']['total'] = $l0_tot_calving_cnt;
+		$new_dataset['l1_calving_cnt']['average'] = $l1_avg_calving_cnt;
+		$new_dataset['l4_calving_cnt']['average'] = $l4_avg_calving_cnt;
+		$new_dataset['l0_calving_cnt']['average'] = $l0_avg_calving_cnt;
 		//Change Header Text
 		$this->arr_fields['Annual Average'] = 'average';
 		unset($this->arr_fields['Average']);

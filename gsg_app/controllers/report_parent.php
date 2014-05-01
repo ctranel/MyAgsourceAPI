@@ -48,6 +48,7 @@ abstract class parent_report extends CI_Controller {
 		$class_dir = $this->router->fetch_directory(); //this should match the name of this file (minus ".php".  Also used as base for css and js file names and model directory name
 		$class = $this->router->fetch_class();
 		$method = $this->router->fetch_method();
+//		echo $class_dir .' '.$class.' '.$method;
 		$this->section_path = $class_dir . $class;
 
 		$this->page = $this->router->fetch_method();
@@ -59,16 +60,22 @@ abstract class parent_report extends CI_Controller {
 		$this->page_header_data['num_herds'] = $this->as_ion_auth->get_num_viewable_herds($this->session->userdata('user_id'), $this->session->userdata('arr_regions'));
 		
 		//load most specific model available.  Must load model before setting section_id
-		if(file_exists(APPPATH . 'models' . FS_SEP . $this->section_path . FS_SEP . $this->primary_model . '_model.php')){
+		$path = uri_string();
+		$arr_path = explode('/',$path);
+		$tmp_index = array_search($method,$arr_path);
+		$block = $arr_path[($tmp_index +2)];
+		if(file_exists(APPPATH . 'models' . FS_SEP . $this->section_path . FS_SEP . $block . '_model.php')){
+			$this->primary_model = $block. '_model';
 			$this->load->model($this->section_path . '/' . $this->primary_model, '', FALSE, $this->section_path);
+			
 		}
 		elseif(file_exists(APPPATH . 'models' . FS_SEP . $this->section_path . FS_SEP . $class . '_model.php')){
-			$this->load->model($this->section_path . '/' . $class . '_model', '', FALSE, $this->section_path);
 			$this->primary_model = $class . '_model';
+			$this->load->model($this->section_path . '/' . $this->primary_model, '', FALSE, $this->section_path);
 		}
 		else{
-			$this->load->model('report_model', '', FALSE, $this->section_path);
 			$this->primary_model = 'report_model';
+			$this->load->model('report_model', '', FALSE, $this->section_path);
 		}
 		
 		$this->section_id = $this->{$this->primary_model}->get_section_id();
