@@ -62,8 +62,13 @@ abstract class parent_report extends CI_Controller {
 		//load most specific model available.  Must load model before setting section_id
 		$path = uri_string();
 		$arr_path = explode('/',$path);
-		$tmp_index = array_search($method,$arr_path);
-		$block = $arr_path[($tmp_index +2)];
+		if($method == 'ajax_report') {
+			$tmp_index = array_search($method,$arr_path);
+			$block = $arr_path[($tmp_index +2)];
+		}
+		else {
+			$block = '';
+		}
 		if(file_exists(APPPATH . 'models' . FS_SEP . $this->section_path . FS_SEP . $block . '_model.php')){
 			$this->primary_model = $block. '_model';
 			$this->load->model($this->section_path . '/' . $this->primary_model, '', FALSE, $this->section_path);
