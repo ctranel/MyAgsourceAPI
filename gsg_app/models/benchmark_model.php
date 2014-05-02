@@ -1,19 +1,25 @@
-<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php  
+if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /* -----------------------------------------------------------------
 *  @description: Benchmark data access
 *  @author: ctranel
-*  @date: Nov 15, 2013
 *
 *
 *  -----------------------------------------------------------------
 */
+
 class Benchmark_model extends CI_Model {
-	//public function __construct(){
-	//	parent::construct();
-	//}
+	//db object for views
+	protected $view_database;
+	
+	public function __construct(){
+		parent::__construct();
+		$this->view_database = $this->load->database('vma', TRUE);
+	}
 
 	/**
 	 * @method get_benchmark_fields()
+	 * @param string table from which benchmarks are pulled
 	 * @param array fields to exclude from the returned value
 	 * @return array of data fields for the current primary table, excluding those fields in the param
 	 * @access protected
@@ -27,10 +33,10 @@ class Benchmark_model extends CI_Model {
         $sql .= " AND TYPE_NAME(C.user_type_id) NOT IN('char','smalldatetime','varchar','date')";
 		$sql .= "for xml path('')) AS text) AS fields";
 
-        $results = $this->{$this->db_group_name}
+		$results = $this->view_database
 		->query($sql)
 		->result_array();
-		return substr($results[0]['fields'], 1);
+        return substr($results[0]['fields'], 1);
 	}
 	
 	/**
@@ -63,5 +69,6 @@ class Benchmark_model extends CI_Model {
 	public function getBenchmarkData($bench_sql){
 		$arr_benchmarks = $this->db->query($bench_sql)->result_array();
 		$arr_benchmarks = $arr_benchmarks[0];
+		return $arr_benchmarks;
 	}
 }
