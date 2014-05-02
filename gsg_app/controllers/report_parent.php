@@ -718,7 +718,7 @@ abstract class parent_report extends CI_Controller {
 			$arr_user_herd_settings = $this->benchmark_model->getHerdBenchmarkSettings();
 			$herd_info = $this->herd_model->header_info($this->herd_code);
 			$sess_benchmarks = $this->session->userdata('benchmarks');
-			$results = $this->benchmarks_lib->addBenchmarkRow($this->{$this->primary_model}, $db_table, $sess_benchmarks, $this->benchmark_model, $arr_user_herd_settings, $herd_info);
+			$results[] = $this->benchmarks_lib->addBenchmarkRow($db_table, $sess_benchmarks, $this->benchmark_model, $arr_user_herd_settings, $herd_info);
 		}
 		
 		if(!empty($this->pivot_db_field)){
@@ -736,7 +736,9 @@ abstract class parent_report extends CI_Controller {
 		$tmp2 = $this->{$this->primary_model}->get_table_header_data();
 		$table_header_data = array_merge($tmp, $tmp2);
 
-		$bench_text = $this->benchmarks_lib->get_bench_text($this->session->userdata('benchmarks'));
+		if(isset($this->benchmarks_lib)){
+			$bench_text = $this->benchmarks_lib->get_bench_text($this->session->userdata('benchmarks'));
+		}
 		$this->report_data = array(
 			'table_header' => $this->load->view('table_header', $table_header_data, TRUE),
 			'num_columns' => $table_header_data['num_columns'],
