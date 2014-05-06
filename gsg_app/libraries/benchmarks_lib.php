@@ -24,7 +24,7 @@ class Benchmarks_lib
 	 * table that stores most recent data for all herd/pstring data for deriving benchmark groups
 	 * @var string
 	 **/
-	protected $herd_benchmark_pool_table = 'vma.dbo.vma_bench_criteria_summary';
+	protected $herd_benchmark_pool_table = 'vma.dbo.bench_criteria_summary'; //'vma.dbo.vma_bench_criteria_summary';
 
 	/**
 	 * key field used in benchmarks (will always be test date?)
@@ -431,7 +431,7 @@ class Benchmarks_lib
 		}
 		else {
 			$cte = $this->build_cte();
-			$from = " FROM benchmark_herds bh LEFT JOIN " . $this->db_table . " p ON bh.herd_code = p.herd_code AND bh.test_date = p.test_date";
+			$from = " FROM benchmark_herds bh INNER JOIN " . $this->db_table . " p ON bh.herd_code = p.herd_code AND bh.test_date = p.test_date";
 		}
 		if(strpos($this->metric, 'QTILE') !== FALSE){
 			$where = " WHERE bh.quartile = " . str_replace('QTILE', '', $this->metric);
@@ -449,6 +449,7 @@ class Benchmarks_lib
 			}
 		}
 		$sql = $cte . "SELECT COUNT(1) AS cnt_herds, " . $addl_select_fields. $avg_fields . $from . $where . $group_by . $order_by;
+//die($sql);
 		return $sql;
 	}
 	
@@ -456,20 +457,22 @@ class Benchmarks_lib
 		$sql = '';
 		$cte_qualifier = '';
 		$cte_order_by = '';
+		$cte_fields = 'herd_code, test_date';
 		$arr_criteria_data = $this->arr_criteria_table[$this->criteria];
 		
 		if($this->metric == 'AVG') $cte_qualifier = '';
 		if($this->metric == 'TOP10_PCT'){
 			$cte_qualifier = 'TOP(10)PERCENT ';
-			$cte_order_by = 'ORDER BY ' . $arr_criteria_data['field'] . ' ' . $arr_criteria_data['sort_order'];
+			$cte_order_by = ' ORDER BY ' . $arr_criteria_data['field'] . ' ' . $arr_criteria_data['sort_order'];
 		}
 		if(strpos($this->metric, 'QTILE') !== FALSE){
+			$cte_fields = 'quartile, ' . $cte_fields;
 			$cte_qualifier = 'NTILE(4) OVER (ORDER BY ' . $arr_criteria_data['field'] . ' ' . $arr_criteria_data['sort_order'] . ') AS quartile, ';
 		}
 		
-		$sql =  'WITH benchmark_herds(herd_code, test_date) AS (SELECT ' . $cte_qualifier . 'herd_code, test_date FROM ' . $this->herd_benchmark_pool_table;
+		$sql =  'WITH benchmark_herds(' . $cte_fields . ') AS (SELECT ' . $cte_qualifier . 'herd_code, test_date FROM ' . $this->herd_benchmark_pool_table;
 		
-		$sql .= ' WHERE DATEDIFF(MONTH, test_date, GETDATE()) < 4 AND ' . $arr_criteria_data['field'] . ' IS NOT NULL ';
+		$sql .= ' WHERE test_date > DATEADD(MONTH, -4, GETDATE()) AND ' . $arr_criteria_data['field'] . ' IS NOT NULL ';
 		if(isset($this->herd_size_floor) && isset($this->herd_size_ceiling)){
 			$sql .= ' AND rha_cow_cnt BETWEEN ' . $this->herd_size_floor . ' AND ' . $this->herd_size_ceiling;
 		}
