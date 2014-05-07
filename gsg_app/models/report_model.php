@@ -546,6 +546,7 @@ class Report_model extends CI_Model {
 				}
 			}
 		}
+
 		return($arr_select_fields);
 	}
 	

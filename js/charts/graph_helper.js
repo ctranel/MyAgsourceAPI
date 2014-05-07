@@ -239,6 +239,7 @@ function process_chart(div_id){ //chart_data is defined globally at the top of t
 			}
 			options.chart.renderTo = div_id;
 			if(typeof pre_render == 'function') pre_render(options, section_data);
+console.log(options);
 			chart[block_index] = new Highcharts.Chart(options);
 			while(chart[block_index].series.length > count) chart[block_index].series[count].remove(true);
 		}

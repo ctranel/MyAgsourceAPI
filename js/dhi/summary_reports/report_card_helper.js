@@ -5,15 +5,10 @@
 			if(section_data.block.substring(0, 7) !== 'rc_long'){
 				var tmpdata = Array();
 				tmpdata[0] = options_in.series[0].data
-				tmpdata[1] = '';
-				var x = 1;
-				while(typeof(options_in.series[x]) != 'undefined'){
-					if(typeof(options_in.series[x].data) != 'undefined') tmpdata[1] = tmpdata[1] + options_in.series[x].data;
-					x++;
-				}
+				tmpdata[1] = options_in.series[1].data;
 				options_in.series = [
-				    {type:"bar",name:"Percentile",data:tmpdata[0]},
-				    {type:"scatter",marker:{radius:0,data:tmpdata[1]}}
+				    {type:"bar",data:tmpdata[0],name:"Percentile"},
+				    {type:"scatter",data:tmpdata[1],marker:{radius:0}}
 				];
 				Highcharts.setOptions({
 					legend: {enabled: false}
@@ -28,18 +23,20 @@
 	               enabled: true,
 	               align: 'right',
 	               x: -8,
-	               y: 4,
-	               color: '#c0c0c0',
-	               formatter:function(){return this.point.value;}
+	               y: 0,
+	               color: '#303030',
+	               formatter:function(){return this.point.val;}
 	            }
 	        },
 	        options_in.plotOptions.scatter = {
 	            dataLabels: {
+	            	crop: false,
+	            	overflow: "none",
 	                enabled: true,
 	                align: 'right',
-	                y: 22,
-	                x: -3,
-	                color: '#AA4643',
+	                y: -4,//28,
+	                x: 0,
+	                color: '#EF5C29',
 	                formatter:function(){return this.point.val;}
 	            }
 	        },
@@ -57,6 +54,7 @@
 			    {color:'rgba(100,204,100,.1)',from:80,to:100}
 			];
 		}
+		//remove odd/even classes so that charts do not appear side-by-side
 		$('.chart-container').each(function(){
 			$(this).addClass('chart-only').removeClass('chart-odd').removeClass('chart-even').removeClass('chart-last-odd');
 		})
