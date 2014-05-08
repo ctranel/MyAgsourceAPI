@@ -1,5 +1,5 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
-class Cow_quartiles extends CI_Controller {
+class Supplemental extends CI_Controller {
 	
 	function __construct(){
 		parent::__construct();
@@ -26,18 +26,27 @@ class Cow_quartiles extends CI_Controller {
 	
     function index(){
 		$msg = 'Direct access to this page is not allowed.';
-		$this->load->view('quartiles', $msg);
+		$this->load->view('dhi/genetics/quartiles', array('msg'=>$msg));
     }
 
     function ajax_cow() {
-    	$this->load('dhi/genetics/cow');
-    	$arr_avg = $this->getCowAverages(
+    	$this->load->model('dhi/genetics/cow_qtile_model');
+    	$arr_avg = $this->cow_qtile_model->getCowAverages(
 				$this->session->userdata('herd_code'),
     			$this->session->userdata('pstring'),
-    			$this->session->userdata('test_date')
+    			$this->session->userdata('recent_test_date')
     	);
-		$this->load->view('quartiles', $arr_avg);
-    	
+		$this->load->view('dhi/genetics/quartiles', $arr_avg);
+    }
+
+    function ajax_heifer() {
+    	$this->load->model('dhi/genetics/heifer_qtile_model');
+    	$arr_avg = $this->heifer_qtile_model->getHeiferAverages(
+    			$this->session->userdata('herd_code'),
+    			$this->session->userdata('pstring'),
+    			$this->session->userdata('recent_test_date')
+    	);
+    	$this->load->view('dhi/genetics/quartiles', $arr_avg);
     }
     
 }
