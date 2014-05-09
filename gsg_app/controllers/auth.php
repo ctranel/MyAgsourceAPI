@@ -725,14 +725,14 @@ class Auth extends Ionauth {
 			if(is_array($this->page_header_data)){
 				$this->page_header_data = array_merge($this->page_header_data,
 					array(
-						'title'=>'Login - ' . $this->config->item('product_name'),
-						'description'=>'Log In Form for ' . $this->config->item('product_name')
+						'title'=>$this->config->item('product_name') . 'Login',
+						'description'=>$this->config->item('product_name') . 'Log In Form'
 					)
 				);
 			}
 			$this->page_header_data['section_nav'] = $this->load->view('auth/section_nav', NULL, TRUE);
 			$this->data['page_header'] = $this->load->view('page_header', $this->page_header_data, TRUE);
-			$this->data['page_heading'] = 'Login';
+			$this->data['page_heading'] = $this->config->item('product_name') . 'Login';
 			$this->data['page_footer'] = $this->load->view('page_footer', NULL, TRUE);
 
 			$this->load->view('auth/login', $this->data);

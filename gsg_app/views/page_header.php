@@ -1,7 +1,6 @@
 <!doctype html>
 <html lang="en">
 <head profile="http://www.w3.org/2005/10/profile">
-	<link rel="icon" type="image/png" href="https://myagsource.com/favicon.ico">
 	<title><?php if(isset($title)) echo $title; ?></title>
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">    
     <meta http-equiv="pragma" content="no-cache">
@@ -10,9 +9,10 @@
     <meta name="robots" content="NO FOLLOW,NO INDEX">
     <meta name="googlebot" content="NOARCHIVE">
     <meta name="description" content="<?php if(isset($description)) echo $description; ?>">
-    <meta name="keywords" content="<?php echo $this->config->item('cust_serv_company'); ?>, DHI Testing, DHI, DHIA, milk testing, soil testing, forage testing, manure testing, " />
+    <meta name="keywords" content="<?php echo $this->config->item('product_name'); ?> - <?php echo $this->config->item('cust_serv_company'); ?>" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 	<link rel="stylesheet" href='https://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css'>
+	<link rel="icon" type="image/png" href="https://myagsource.com/favicon.ico">
 <?php
 	    $this->carabiner->css('corporate.css', 'screen');
 		$this->carabiner->css('print.css', 'print');
