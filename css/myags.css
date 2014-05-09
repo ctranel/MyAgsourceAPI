@@ -85,6 +85,7 @@ a.button, .button {
 }
 a.button:hover {color: #fff;}
 
+.emph {font-weight: bold; color: #EF5C29;}
 
 /* end new styles */
 

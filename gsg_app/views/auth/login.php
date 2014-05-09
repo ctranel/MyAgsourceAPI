@@ -7,6 +7,7 @@
 			<div class="box login">
 				<h2>DHI</h2>
 			    <h3>Dairy, Milk and Animal Health Diagnostics</h3>
+			    <p class="emph">Members, register for a FREE 90 day trial, <?php echo anchor('auth/create_user', 'click here'); ?>!</p>
 			    <?php echo form_open("auth/login");?>
 			      <p>
 			      	<label for="identity">Email</label>
