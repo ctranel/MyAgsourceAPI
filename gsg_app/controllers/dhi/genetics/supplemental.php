@@ -49,4 +49,14 @@ class Supplemental extends CI_Controller {
     	$this->load->view('dhi/genetics/quartiles', $arr_avg);
     }
     
+    function ajax_progeny() {
+    	$this->load->model('dhi/genetics/progeny_qtile_model');
+    	$arr_avg = $this->progeny_qtile_model->getProgenyAverages(
+				$this->session->userdata('herd_code'),
+    			$this->session->userdata('recent_test_date')
+    	);
+//    	var_dump($arr_avg);
+    	$this->load->view('dhi/genetics/calves_due', array('arr_avg'=>$arr_avg));
+    }
+    
 }
