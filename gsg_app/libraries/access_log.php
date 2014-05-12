@@ -43,6 +43,7 @@ class Access_log
 	/**
 	 * write_entry
 	 *
+	 * @param int is_admin
 	 * @param int event id
 	 * @param string herd code
 	 * @param string most recent test date for herd
