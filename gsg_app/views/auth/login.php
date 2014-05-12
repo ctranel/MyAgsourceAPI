@@ -7,6 +7,7 @@
 			<div class="box login">
 				<h2>DHI</h2>
 			    <h3>Dairy, Milk and Animal Health Diagnostics</h3>
+			    <p class="emph">DHI Members, register for a FREE 90 day trial of <?php echo $this->config->item('product_name'); ?>, <?php echo anchor('auth/create_user', 'click here'); ?>!</p>
 			    <?php echo form_open("auth/login");?>
 			      <p>
 			      	<label for="identity">Email</label>
@@ -27,7 +28,7 @@
 			    <p>Not currently enrolled?  <?php echo anchor('auth/create_user', 'Register now.'); ?></p>
 			    <p>Want to see more?  <?php echo anchor('dhi/demo', 'View Demo Herd.'); ?></p>
 
-		        <p>To learn more  about our DHI services, please call <?php echo $this->config->item('cust_serv_phone'); ?>, email <a href="mailto:info@agsource.com">info@agsource.com</a>, or visit <a href="http://www.agsource.com">www.agsource.com</a>. </p>
+		        <p>To learn more about <?php echo $this->config->item('product_name'); ?> or other DHI services, please call <?php echo $this->config->item('cust_serv_phone'); ?>, email <a href="mailto:info@agsource.com">info@agsource.com</a>, or visit <a href="http://www.agsource.com">www.agsource.com</a>. </p>
         	</div>
 		</div>
 		<div class="col-sm-6">

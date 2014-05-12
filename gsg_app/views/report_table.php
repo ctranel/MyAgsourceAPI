@@ -81,8 +81,3 @@
 			endif; 
 		?></tbody>
 	</table>
-	
-	<!-- popup div -->
-	<div id="datafield-popup" class="datafield-popup mfp-hide">
-		Popup content
-	</div>

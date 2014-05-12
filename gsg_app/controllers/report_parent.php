@@ -457,6 +457,7 @@ abstract class parent_report extends CI_Controller {
 			'print_all' => $this->print_all,
 			'report_path' => $this->report_path
 		);
+		
 		if(isset($arr_filter_data)) $data['filters'] = $this->load->view($report_filter_path, $arr_filter_data, TRUE);
 		if((is_array($arr_nav_data['arr_pages']) && count($arr_nav_data['arr_pages']) > 1) || (isset($arr_nav_data['arr_pstring']) && is_array($arr_nav_data['arr_pstring']) && count($arr_nav_data['arr_pstring']) > 1)){
 			$data['report_nav'] = $this->load->view($report_nav_path, $arr_nav_data, TRUE);

@@ -231,7 +231,7 @@ class Report_model extends CI_Model {
 					,'rel' => $fd['a_rel']
 					,'title' => $fd['a_title']
 					,'class' => $fd['a_class']
-					,'params' => $this->get_field_link_params($fd['bsf_id'])
+					,'params' => $this->get_field_link_params($fd['supp_id'])
 				);
 				if(!array_filter($this->arr_field_links[$fn])){
 					unset($this->arr_field_links[$fn]);
@@ -410,13 +410,13 @@ class Report_model extends CI_Model {
 	 * @return array
 	 * @author ctranel
 	 */
-	public function get_field_link_params($bsf_id){
+	public function get_field_link_params($supp_id){
 		$arr_return = array();
 		$arr_link_params = $this->{$this->db_group_name}
-		->select('l.parameter_name, f.db_field_name, l.param_value')
-		->from('users.dbo.select_field_link_params l')
+		->select('l.param_name, f.db_field_name, l.param_value')
+		->from('users.dbo.supp_link_params l')
 		->join('users.dbo.db_fields f', 'l.param_value_field_id = f.id', 'LEFT')
-		->where(array('l.blocks_select_fields_id'=>$bsf_id))
+		->where(array('l.sl_id'=>$supp_id))
 		->order_by('l.list_order', 'ASC')
 		->get()
 		->result_array();
@@ -427,7 +427,7 @@ class Report_model extends CI_Model {
 		
 		
 		foreach($arr_link_params as $p){
-			$arr_return[$p['parameter_name']] = array('field' => $p['db_field_name'], 'value' => $p['param_value']);
+			$arr_return[$p['param_name']] = array('field' => $p['db_field_name'], 'value' => $p['param_value']);
 		}
 		return $arr_return;
 	}
