@@ -456,7 +456,7 @@ class Herd_model extends CI_Model {
 			->select('report_code, bill_account_num')
 			->where('herd_code', $herd_code)
 			->where('end_date IS NULL')
-			->where('activity_code', 'A')
+			->where('activity_code !=', 'Q')
 			->get('[herd].[dbo].[herd_output]')
 			->result_array();
 		if(is_array($result)){
