@@ -5,7 +5,7 @@
 * @author ctranel
 *
 */
-class Cow extends CI_Model {
+class Cow_qtile_model extends CI_Model {
 	protected $db_group_name; //name of database group
 	protected $tables; //array of tables configured in ion_auth config file
 	
@@ -27,12 +27,12 @@ class Cow extends CI_Model {
 		->where('test_date', $test_date)
 		->get('vma.dbo.vma_GSG_Cow_Quartile_Averages')
 		->result_array();
-	
 		if(is_array($arr_ret)){
 			return $arr_ret[0];
 		}
 		return false;
 	}
+	
 }
 
 ?>
