@@ -220,7 +220,7 @@ class Benchmarks_lib
 	 **/
 	public function get_default_settings($herd_size = FALSE, $state = FALSE){
 		return array(
-			'metric' => 'TOP10_PCT',
+			'metric' => 'AVG',
 			'criteria' => 'production',
 			'arr_herd_size' => $this->get_default_herd_range($herd_size),
 			'arr_states' => null//$this->get_default_states($state)
