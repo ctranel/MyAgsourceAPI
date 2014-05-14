@@ -90,7 +90,7 @@
 			echo form_fieldset_close();
 		endif; ?>
       <?php endif; ?>
-      <p><?php echo form_checkbox('terms', 'Y', set_checkbox('terms','Y'), 'class="required"')?> By checking this box, I confirm that I have read and understand the <?php echo anchor(site_url('auth/ajax_terms'), 'terms of use', 'title="terms of use" class="ajax-popup"')?> for the requested reports.</p>
+      <p><?php echo form_checkbox('terms', 'Y', set_checkbox('terms','Y'), 'class="required"')?> By checking this box, I confirm that I have read and understand the <?php echo anchor(site_url('auth/ajax_terms'), 'terms of use', 'title="terms of use" class="popup-ajax"')?> for the requested reports.</p>
       <p><?php echo form_submit('submit', 'Create User', 'class="button"');?></p>
    <?php echo form_close();?>
 

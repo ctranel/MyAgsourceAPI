@@ -27,6 +27,49 @@ if($('#filter-form')){ //if there is a filter form (only on pages with one table
 	})
 }
 
+
+function attachDataFieldEvents(){
+	//datacell overlay
+	$('.popup-ajax').magnificPopup({
+		type:'ajax'
+	});
+	
+	//header tooltips
+	$('.qtip-ajax').on('click', function(e){e.preventDefault();});
+	
+	$('.qtip-ajax').qtip({
+	    content: {
+	        text: function(event, api) {
+	        	$.ajax({
+	                url: event.target.href//element.data('url') // Use data-url attribute for the URL
+	            })
+	            .then(function(content) {
+	                // Set the tooltip content upon successful retrieval
+	                api.set('content.text', content);
+	            }, function(xhr, status, error) {
+	                // Upon failure... set the tooltip content to the status and error value
+	                api.set('content.text', status + ': ' + error);
+	            });
+	
+	            return 'Loading...'; // Set some initial text
+	        }
+	    },
+	    show: {
+	    	solo: true
+	    },
+	    hide: {
+	    	distance: 150
+	    },
+	    style: {
+	    	classes: 'qtip-wiki'
+	    },
+	    position: {
+	    	my: 'bottom left',
+	    	at: 'top right'
+	    }
+	});
+}
+
 (function($) {
 	  return $.fn.serializeObject = function() {
 	    var json, patterns, push_counters,

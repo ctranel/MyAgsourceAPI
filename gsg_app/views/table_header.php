@@ -25,21 +25,51 @@ foreach($structure as $row): ?>
 				$after_text = $sort_order=='ASC'?"▲":"▼";
 			endif;
  			//$extra = array('rel'=>$th['text'], 'id'=>$th['field_name'] . '_tip');
-			?> class = "<?php echo $class?>">
-			<?php
 			if (is_array($arr_unsortable_columns) && !in_array($th['field_name'], $arr_unsortable_columns)):
 				$submit_url = '#';
 				$extra = Array('onclick'=>"return updateBlock('table-canvas" . $report_count . "', '$block', $report_count, '". $th['field_name'] . "', '$link_sort_order', 'table', true);");
 
-				echo anchor($submit_url, $th['text'], $extra);
-				echo $after_text;
-			else:
-				echo $th['text'] . $after_text;
+				$th['text'] = anchor($submit_url, $th['text'], $extra);
 			endif;
-		else:
-			?>class = "<?php echo $class ?>"><?php
-			echo $th['text'];
-		endif;
+			$th['text'] .= $after_text;
+		//Column tips
+			if(isset($arr_header_links[$th['field_name']])):
+				$tip_text = '<div class="tip">';
+				$link = $arr_header_links[$th['field_name']]['href'];
+				$params = '';
+				$site_params = '';
+				if(isset($arr_header_links[$th['field_name']]['comment_id']) && !empty($arr_header_links[$th['field_name']]['comment_id'])){
+					$arr_header_links[$th['field_name']]['params']['comment_id']['value'] = $arr_header_links[$th['field_name']]['comment_id'];
+				}
+				$t_class = !empty($arr_header_links[$th['field_name']]['class']) ? ' class="' . $arr_header_links[$th['field_name']]['class'] . '"' : '';
+				$rel = !empty($arr_header_links[$th['field_name']]['rel']) ? ' rel="' . $arr_header_links[$th['field_name']]['rel'] . '"' : '';
+				$title = !empty($arr_header_links[$th['field_name']]['title']) ? ' title="' . $arr_header_links[$th['field_name']]['title'] . '"' : '';
+				if(is_array($arr_header_links[$th['field_name']]['params']) && !empty($arr_header_links[$th['field_name']]['params'])):
+					foreach($arr_header_links[$th['field_name']]['params'] as $k => $v):
+						if(isset($cr[$v['field']])):
+							$params .= "$k=" . urlencode($cr[$v['field']]) . "&";
+							$site_params .= "/" . urlencode($cr[$v['field']]);
+						else:
+							$params .= "$k=" . urlencode($v['value']) . "&";
+							$site_params .= "/" . urlencode($v['value']);
+						endif;
+						$params = substr($params, 0, -1);
+					endforeach;
+				endif;
+				if(substr($link, 0, 1) == '#'):
+					$tip_text .= anchor($link, 'tip', $rel . $title . $t_class);
+				elseif((strpos($link, 'http') === FALSE && !empty($link)) || strpos($link, 'myagsource.com') !== FALSE):
+					$tip_text .= anchor(site_url($link . $site_params), 'tip', $rel . $title . $t_class);
+				elseif(!empty($link)):
+					$tip_text .= anchor(site_url($link . '?' . $params), 'tip', $rel . $title . $t_class);
+				endif;
+				$tip_text .= '</div>';
+				$th['text'] = $tip_text . $th['text'];
+			endif; //isset: arr_header_links
+		//End column tips
+		endif;//isset($th['field_name'])
+		?> class = "<?php echo $class ?>"><?php
+		echo $th['text'];
 		?></th><?php
 	endforeach;
 ?></tr><?php

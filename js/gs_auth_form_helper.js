@@ -7,8 +7,8 @@ if($('.image-link').length > 0){
 	});
 }
 
-if($('.ajax-popup').length > 0){
-	$('.ajax-popup').magnificPopup({
+if($('.popup-ajax').length > 0){
+	$('.popup-ajax').magnificPopup({
 		type:'ajax'
 	});
 }

@@ -330,6 +330,7 @@ abstract class parent_report extends CI_Controller {
 		$this->carabiner->css('chart.css', 'print');
 		$this->carabiner->css('report.css', 'print');
 		$this->carabiner->css($this->section_path . '.css', 'screen');
+		$this->carabiner->css('http://cdn.jsdelivr.net/qtip2/2.2.0/basic/jquery.qtip.min.css', 'screen');
 		if($this->filters->displayFilters($this->bool_is_summary)){
 			$this->carabiner->css('filters.css', 'screen');
 		}
@@ -415,6 +416,7 @@ abstract class parent_report extends CI_Controller {
 						'{graph_helper: "' . $this->config->item("base_url_assets") . 'js/charts/graph_helper.js"}',
 						'{report_helper: "' . $this->config->item("base_url_assets") . 'js/report_helper.js"}',
 						'{table_sort: "' . $this->config->item("base_url_assets") . 'js/jquery/stupidtable.min.js"}',
+						'{tooltip: "http://cdn.jsdelivr.net/qtip2/2.2.0/basic/jquery.qtip.min.js"}',
 					)
 				)
 			);

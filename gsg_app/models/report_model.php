@@ -34,6 +34,7 @@ class Report_model extends CI_Model {
 	protected $arr_bool_display = array(); //numeric key, must be in same order as $arr_select_fields (array_flatten($this->arr_fields), only located in search function)
 	protected $arr_decimal_points = array();//DB field name is key
 	protected $arr_field_links = array();//DB field name is key
+	protected $arr_header_links = array();//DB field name is key
 	public $arr_unit_of_measure;//DB field name is key
 	protected $arr_where_field = array();// CODE set in child classes
 	protected $arr_where_operator = array();// CODE set in child classes
@@ -188,6 +189,7 @@ class Report_model extends CI_Model {
 			'arr_unsortable_columns' => $this->arr_unsortable_columns,
 			'arr_field_sort' => $this->arr_field_sort,
 			'arr_header_data' => $this->arr_fields,
+			'arr_header_links' => $this->arr_header_links,
 		);
 		$table_header_data['structure'] = $this->table_header->get_table_header_array($table_header_data['arr_header_data']);
 		$table_header_data['num_columns'] = $this->table_header->get_column_count();
@@ -235,6 +237,17 @@ class Report_model extends CI_Model {
 				);
 				if(!array_filter($this->arr_field_links[$fn])){
 					unset($this->arr_field_links[$fn]);
+				}
+				$this->arr_header_links[$fn] = array(//comment_id
+					'href' => $fd['head_a_href']
+					,'rel' => $fd['head_a_rel']
+					,'title' => $fd['head_a_title']
+					,'class' => $fd['head_a_class']
+					,'comment_id' => $fd['head_comment_id']
+					,'params' => $this->get_field_link_params($fd['head_supp_id'])
+				);
+				if(!array_filter($this->arr_header_links[$fn])){
+					unset($this->arr_header_links[$fn]);
 				}
 				$this->arr_pdf_widths[$fn] = $fd['pdf_width'];
 				$this->arr_aggregates[] = $fd['aggregate'];
