@@ -1,31 +1,33 @@
 var arr_sort_by = new Array();
 var arr_sort_order = new Array();
+var inline_form_width = 0;
 
-if($('#filter-form')){ //if there is a filter form (only on pages with one table)
-	$('#filter-form').submit(function(ev){
+// set all inline forms to be the same width
+$('.handle').each(function(){
+	//get the width of the section that immediately follows the .handle element
+	var width = $(this).next().width();
+	if(width > inline_form_width){
+		inline_form_width = width;
+	}
+});
+$('.handle').each(function(){
+	$(this).width(inline_form_width);
+	$(this).next().width(inline_form_width);
+});
+// end set all inline forms to be the same width
+
+	$('.handle').click(function(ev){
 		ev.preventDefault();
-		updatePage(this);
-	});
-	
-	$('#set-filters').click(function(ev){
-		ev.preventDefault();
-		if($('#set-filters').hasClass('expanded')){
-			$('#set-filters').removeClass('expanded');
-			$('#filter-form').removeClass('expanded');
+		if($(this).hasClass('expanded')){
+			$(this).removeClass('expanded');
+			$(this).next().removeClass('expanded');
 		}
 		else{
-			//var width = $('#set-filters').parent().width();
-			$('#set-filters').addClass('expanded');
-			$('#filter-form').addClass('expanded');
-			//$('#set-filters').parent().width(width);
+//@todo: close all other expandables
+			$(this).addClass('expanded');
+			$(this).next().addClass('expanded');
 		}
 	})
-
-	$('.download-links').click(function(ev){
-		params = encodeURIComponent(JSON.stringify($("#filter-form").serializeObject()));
-		ev.target.setAttribute('href', ev.target.getAttribute('href') + '/' + params)
-	})
-}
 
 
 function attachDataFieldEvents(){
