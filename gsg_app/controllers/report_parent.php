@@ -327,12 +327,13 @@ abstract class parent_report extends CI_Controller {
 		$this->carabiner->css('popup.css');
 		$this->carabiner->css('tabs.css');
 		$this->carabiner->css('report.css');
+		$this->carabiner->css('expandable.css');
 		$this->carabiner->css('chart.css', 'print');
 		$this->carabiner->css('report.css', 'print');
 		$this->carabiner->css($this->section_path . '.css', 'screen');
 		$this->carabiner->css('http://cdn.jsdelivr.net/qtip2/2.2.0/basic/jquery.qtip.min.css', 'screen');
 		if($this->filters->displayFilters($this->bool_is_summary)){
-			$this->carabiner->css('filters.css', 'screen');
+			//$this->carabiner->css('filters.css', 'screen');
 		}
 		else{
 			$this->carabiner->css('hide_filters.css', 'screen');
@@ -427,6 +428,16 @@ abstract class parent_report extends CI_Controller {
 			$this->page_header_data['arr_headjs_line'][] = 'function(){' . $tmp_js . ';}';
 		}
 		unset($this->{$this->primary_model}->arr_messages); //clear message var once it is displayed
+		$arr_benchmark_data = array(
+			'arr_breed_options' => array('HO' => 'Holstein', 'JE' => 'Jersey', 'BS' => 'Brown Swiss', 'AY' => 'Ayrshire', 'GU' => 'Guernsey', 'XX' => 'Cross-bred', 'MS' => 'Milking Shorthorn'),
+			'arr_breed_selected' => array('HO'),
+			'arr_metric_options' => array('TOP10_PCT' => 'Top 10%', 'TOP20_PCT' => 'Top 20%', 'QTILE1' => '1st Quartile', 'QTILE2' => '2nd Quartile', 'QTILE3' => '3rd Quartile', 'QTILE4' => '4th Quartile', 'AVG' => 'Average'),
+			'arr_metrics_selected' => array('TOP20_PCT'),
+			'arr_criteria_options' => array('PROD' => 'Production', 'GEN' => 'Genetics', 'REPRO' => 'Cow Reproduction', 'UH' => 'Udder Health'),
+			'arr_criteria_selected' => array('PROD'),
+			'herd_size_dbfrom' => 100,
+			'herd_size_dbto' => 500,
+		);
 		$arr_nav_data = array(
 			//if I do not add this empty array, the array in the view somehow populated (should only be populated if code in bool_is_summary block below is executed)
 			'arr_pstring' => array(),
@@ -461,11 +472,13 @@ abstract class parent_report extends CI_Controller {
 		);
 		
 		if(isset($arr_filter_data)) $data['filters'] = $this->load->view($report_filter_path, $arr_filter_data, TRUE);
+		if(isset($arr_benchmark_data)) $data['benchmarks'] = $this->load->view('set_benchmarks', $arr_benchmark_data, TRUE);
 		if((is_array($arr_nav_data['arr_pages']) && count($arr_nav_data['arr_pages']) > 1) || (isset($arr_nav_data['arr_pstring']) && is_array($arr_nav_data['arr_pstring']) && count($arr_nav_data['arr_pstring']) > 1)){
 			$data['report_nav'] = $this->load->view($report_nav_path, $arr_nav_data, TRUE);
 		}
 		
 		$this->_record_access(90, $this->objPage['page_id'], 'web');
+//var_dump($data['benchmarks']);
 		$this->load->view('report', $data);
 	}
 	

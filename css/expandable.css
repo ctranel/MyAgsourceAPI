@@ -1,0 +1,61 @@
+@CHARSET "UTF-8";
+.expand-group {
+	background-color: #E6F4F4;
+	border: 1px solid #003C39;
+	float: right;
+	margin: 10px;
+	clear: both;
+/*	border-radius: 7px;
+	position: absolute;
+	right: 20px;
+	display:none; */
+}
+
+.expand-group .handle {
+	color:#E6F4F4;
+	background-color:#003C39;
+	padding:4px;
+/*	border-radius: 3px 3px 0 0;
+	filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
+	-webkit-transform: rotate(-90deg); 
+	-moz-transform: rotate(-90deg);
+	cursor: pointer; 
+	position:relative;
+	top:-23px;
+	left:-21px; */
+}
+.expand-group .handle a {
+	font-size:.9em;
+	font-weight:bold;
+	cursor: pointer;
+}
+.expand-group .handle a, .expand-group .handle a:hover, .expand-group .handle a:active {
+	text-decoration:none; color:#fff;
+}
+.expand-group .handle a:before {
+	content: "▼";
+}
+
+.expand {visibility: hidden; height: 0px; background-color: #E6F4F4; position: absolute; border: 3px solid #003C39;}
+
+.expand.expanded{z-index: 10; visibility: visible; float:right; height: auto;}
+.expand-group a.expanded:before {content: "▲";}
+
+.expand-group p {padding: 10px 20px 0px 20px;}
+
+.expand-group fieldset {border: solid 1px #003C39; border-radius: 3px; margin: 0 10px 5px; padding: 5px; font-size: .85em; width:auto;}
+.expand-group fieldset fieldset {width:97%; margin: 1px 0 0 1%;}
+/* .benchmark-checkbox {float:left;}
+html legend{
+    position:absolute;
+    top: -.5em;
+    left: .5em;
+    } */
+
+.expand-group form legend {
+	border: none; width: auto; font-size: inherit; margin-bottom: 0; padding: 0 3px;
+}
+.expand-group p.checkbox {padding:2px 0 2px 40px;}
+.expand-group span.checkbox {white-space:nowrap; display:inline-block;}
+
+.expand-group .submit {margin: 10px 20px;}
