@@ -6,7 +6,7 @@ window.onload=function(){
 <?php
 
 if(isset($page_header)) echo $page_header;
-echo 'The address <strong>http://www.myagsource.com'.$_SERVER['REQUEST_URI'].'</strong> is invalid.<br /><br />';
+echo 'The address <strong>'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'].'</strong> is invalid.<br /><br />';
 
 echo 'If you arrived here from a link on our site, please <a id="contact_us" href="mailto:support@myagsource.com">contact us</a>, 
 		describe where the link was, and check the box "Include a screenshot of this page" on the feedback window.<br /><br />';
