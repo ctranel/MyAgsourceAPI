@@ -3,7 +3,7 @@ if(isset($page_header) !== false) echo $page_header;
 if(isset($page_header)) echo $page_header; ?>
 <div id="benchmarks" class="expand-group">
 	<?php echo validation_errors(); ?>
-	<div class="handle"><a id="set-benchmarks" class="handle">Set Benchmarks </a></div>
+	<div class="handle"><a id="set-benchmarks">Set Benchmarks </a></div>
 	<div class="expand">
 		<?php echo form_open('benchmarks', array('name'=>'benchmark-form', 'id'=>'benchmark-form'));	
 			echo form_fieldset('Select Breed', array('id' => 'breed-fieldset'));

@@ -3,9 +3,9 @@
 <div id="filters" class="expand-group">
 	<?php echo validation_errors(); ?>
 	<?php if(isset($form_url) === false) $form_url = current_url(); ?>
-	<div class="handle"><a id="set-filters" class="handle">Set Filters </a></div>
+	<div class="handle"><a id="set-filters">Set Filters </a></div>
 	<div class="expand">
-	<?php //echo anchor("#","Apply Filters", 'class="handle"'); ?>
+	<?php //echo anchor("#","Apply Filters"); ?>
 	<?php echo form_open($form_url, array('name'=>'filter-form', 'id'=>'filter-form'));?>
 	<?php if(is_array($arr_filters)):
 		 foreach($arr_filters as $f):

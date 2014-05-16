@@ -554,7 +554,6 @@ class Report_model extends CI_Model {
 				}
 			}
 		}
-
 		return($arr_select_fields);
 	}
 	
@@ -689,6 +688,11 @@ class Report_model extends CI_Model {
 			}
 			else {
 				$new_dataset[$v][$header_field] = $k;
+				//also need to add labels as keys to number formatting arrays so that they can be referenced in the view
+				if(in_array($v, $this->arr_numeric_fields)){
+					$this->arr_decimal_points[$k] = $this->arr_decimal_points[$v];
+					$this->arr_numeric_fields[] = $k;
+				}
 			}
 		}
 		$this->arr_fields = array($header_text => $header_field); //used for labels in left-most column that are set in foreach loop above
@@ -704,7 +708,8 @@ class Report_model extends CI_Model {
 					$this->arr_unsortable_columns[] = $val;
 				}
 				elseif(strpos($name, 'isnull') === FALSE && isset($row[$header_field]) && !empty($row[$header_field])) { //2nd part eliminates rows where fresh date is null (FCS)
-					if(isset($this->arr_decimal_points[$k])) $val = round($val, $this->arr_decimal_points[$k]);
+					//is this being done in the view now?
+					//if(isset($this->arr_decimal_points[$k])) $val = round($val, $this->arr_decimal_points[$k]);
 
 					if(isset($new_dataset[$name]['total']) === FALSE && $val !== NULL){
 						$new_dataset[$name]['total'] = 0;
@@ -802,25 +807,25 @@ class Report_model extends CI_Model {
 		else return FALSE;
 	}
 
-       /**
-       * @function get_start_test_date
-       * @param string date_field - db name of the date field used for this trend
-       * @param int num_dates - number of test dates to include in report
-       * @param string date_format - database string for formatting date
-       * @param int num_dates_to_shift - number of dates to shift the results back
-       * @return string date
-       * @author ctranel
-       **/
-       public function get_start_date($date_field = 'test_date', $num_dates = 12, $date_format = 'MMM-yy', $num_dates_to_shift = 0) {
-              $sql = "SELECT FORMAT(a." . $date_field . ", 'MM-dd-yyyy', 'en-US') AS " . $date_field . "
-              FROM (SELECT DISTINCT TOP " . ($num_dates + $num_dates_to_shift) . " " . $date_field . "
-                     FROM " . $this->primary_table_name . " 
-                     WHERE herd_code = '" . $this->session->userdata('herd_code') . "' AND pstring = '" . $this->session->userdata('pstring') . "' AND " . $date_field . " IS NOT NULL
-                     ORDER BY " . $date_field . " DESC) a";
-              $result = $this->{$this->db_group_name}->query($sql)->result_array();
-              if(is_array($result) && !empty($result)) return $result[(count($result) - 1)][$date_field];
-              else return FALSE;
-       }	
+    /**
+    * @function get_start_test_date
+    * @param string date_field - db name of the date field used for this trend
+    * @param int num_dates - number of test dates to include in report
+    * @param string date_format - database string for formatting date
+    * @param int num_dates_to_shift - number of dates to shift the results back
+    * @return string date
+    * @author ctranel
+    **/
+    public function get_start_date($date_field = 'test_date', $num_dates = 12, $date_format = 'MMM-yy', $num_dates_to_shift = 0) {
+		$sql = "SELECT FORMAT(a." . $date_field . ", 'MM-dd-yyyy', 'en-US') AS " . $date_field . "
+    		FROM (SELECT DISTINCT TOP " . ($num_dates + $num_dates_to_shift) . " " . $date_field . "
+                FROM " . $this->primary_table_name . " 
+                WHERE herd_code = '" . $this->session->userdata('herd_code') . "' AND pstring = '" . $this->session->userdata('pstring') . "' AND " . $date_field . " IS NOT NULL
+                ORDER BY " . $date_field . " DESC) a";
+        $result = $this->{$this->db_group_name}->query($sql)->result_array();
+        if(is_array($result) && !empty($result)) return $result[(count($result) - 1)][$date_field];
+		else return FALSE;
+	}	
 	
 /******* CHART FUNCTIONS ****************/
 	public function set_chart_fields($block_in){

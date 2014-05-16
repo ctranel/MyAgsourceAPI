@@ -428,12 +428,13 @@ abstract class parent_report extends CI_Controller {
 			$this->page_header_data['arr_headjs_line'][] = 'function(){' . $tmp_js . ';}';
 		}
 		unset($this->{$this->primary_model}->arr_messages); //clear message var once it is displayed
+		$this->load->library('benchmarks_lib');
 		$arr_benchmark_data = array(
-			'arr_breed_options' => array('HO' => 'Holstein', 'JE' => 'Jersey', 'BS' => 'Brown Swiss', 'AY' => 'Ayrshire', 'GU' => 'Guernsey', 'XX' => 'Cross-bred', 'MS' => 'Milking Shorthorn'),
+			'arr_breed_options' => $this->benchmarks_lib->get_breed_options(),
 			'arr_breed_selected' => array('HO'),
-			'arr_metric_options' => array('TOP10_PCT' => 'Top 10%', 'TOP20_PCT' => 'Top 20%', 'QTILE1' => '1st Quartile', 'QTILE2' => '2nd Quartile', 'QTILE3' => '3rd Quartile', 'QTILE4' => '4th Quartile', 'AVG' => 'Average'),
+			'arr_metric_options' => $this->benchmarks_lib->get_metric_options(),
 			'arr_metrics_selected' => array('TOP20_PCT'),
-			'arr_criteria_options' => array('PROD' => 'Production', 'GEN' => 'Genetics', 'REPRO' => 'Cow Reproduction', 'UH' => 'Udder Health'),
+			'arr_criteria_options' => $this->benchmarks_lib->get_criteria_options(),
 			'arr_criteria_selected' => array('PROD'),
 			'herd_size_dbfrom' => 100,
 			'herd_size_dbto' => 500,
@@ -478,7 +479,6 @@ abstract class parent_report extends CI_Controller {
 		}
 		
 		$this->_record_access(90, $this->objPage['page_id'], 'web');
-//var_dump($data['benchmarks']);
 		$this->load->view('report', $data);
 	}
 	
@@ -722,16 +722,17 @@ abstract class parent_report extends CI_Controller {
 	protected function load_table(&$arr_this_block, $report_count){
 		$title = $arr_this_block['description'];
 		$subtitle = 'Herd ' . $this->session->userdata('herd_code');
-		$this->{$this->primary_model}->populate_field_meta_arrays($arr_this_block['id']);// was $model in place of $this->primary_model
+		$this->{$this->primary_model}->populate_field_meta_arrays($arr_this_block['id']);
+		$arr_field_list = $this->{$this->primary_model}->get_fieldlist_array();
 		$results = $this->{$this->primary_model}->search($this->session->userdata('herd_code'), $arr_this_block['url_segment'], $this->arr_filter_criteria, $this->arr_sort_by, $this->arr_sort_order, $this->max_rows);
 		if($this->bench_row){
 			$this->load->model('benchmark_model');
+			$this->load->model('db_table_model');
 			$this->load->library('benchmarks_lib');
-			$db_table = $this->{$this->primary_model}->get_primary_table_name();
-			$arr_user_herd_settings = $this->benchmark_model->getHerdBenchmarkSettings();
-			$herd_info = $this->herd_model->header_info($this->herd_code);
+			$this->load->library('db_table', array('table_name' => $this->{$this->primary_model}->get_primary_table_name(), 'db_table_model' => $this->db_table_model));
 			$sess_benchmarks = $this->session->userdata('benchmarks');
-			$results[] = $this->benchmarks_lib->addBenchmarkRow($db_table, $sess_benchmarks, $this->benchmark_model, $arr_user_herd_settings, $herd_info);
+			$herd_info = $this->herd_model->header_info($this->herd_code);
+			$results[] = $this->benchmarks_lib->addBenchmarkRow($this->db_table, $sess_benchmarks, $this->benchmark_model, $this->session->userdata('user_id'), $herd_info, $this->pivot_db_field, $arr_field_list);
 		}
 		
 		if(!empty($this->pivot_db_field)){
@@ -758,6 +759,7 @@ abstract class parent_report extends CI_Controller {
 			'table_id' => $arr_this_block['url_segment'],
 			'fields' => $this->{$this->primary_model}->get_fieldlist_array(),
 			'report_data' => $results,
+			'table_benchmark_text' => $bench_text,
 			'table_heading' => $title,
 			'table_sub_heading' => $subtitle,
 			'arr_numeric_fields' => $this->{$this->primary_model}->get_numeric_fields(),

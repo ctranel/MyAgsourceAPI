@@ -29,14 +29,13 @@ class Benchmark_model extends CI_Model {
 		$sql = "SELECT CAST ((select ',AVG(CAST('+quotename(C.name)+' AS DECIMAL(12,0))) AS '+quotename(C.name)
          from sys.columns as C
          where C.object_id = object_id('" . $db_table . "')";
-        if(is_array($arr_excluded_fields) && !empty($arr_excluded_fields)) $sql .= " and C.name NOT IN('" . implode("','", $arr_excluded_fields) . "')";// AND C.name NOT LIKE 'cnt%'";
+        if(is_array($arr_excluded_fields) && !empty($arr_excluded_fields)) $sql .= " and C.name IN('" . implode("','", $arr_excluded_fields) . "')";// AND C.name NOT LIKE 'cnt%'";
         $sql .= " AND TYPE_NAME(C.user_type_id) NOT IN('char','smalldatetime','varchar','date')";
 		$sql .= "for xml path('')) AS text) AS fields";
-
 		$results = $this->view_database
 		->query($sql)
 		->result_array();
-        return substr($results[0]['fields'], 1);
+		return substr($results[0]['fields'], 1);
 	}
 	
 	/**
@@ -45,9 +44,8 @@ class Benchmark_model extends CI_Model {
 	 * @return array of user-herd settings
 	 * @author ctranel
 	 **/
-	public function getHerdBenchmarkSettings(){
+	public function getUserHerdBenchmarkSettings($arr_sess_benchmarks){
 		//REMOVE IF WE DECIDE TO STORE PREFERENCES
-		$arr_sess_benchmarks = $this->session->userdata('benchmarks');
 		if(isset($arr_sess_benchmarks) && !empty($arr_sess_benchmarks)){
 			$arr_tmp['metric'] = $arr_sess_benchmarks['metric'];
 			$arr_tmp['criteria'] = $arr_sess_benchmarks['criteria'];
