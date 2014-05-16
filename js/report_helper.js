@@ -16,19 +16,24 @@ $('.handle').each(function(){
 });
 // end set all inline forms to be the same width
 
-	$('.handle').click(function(ev){
-		ev.preventDefault();
-		if($(this).hasClass('expanded')){
-			$(this).removeClass('expanded');
-			$(this).next().removeClass('expanded');
-		}
-		else{
-//@todo: close all other expandables
-			$(this).addClass('expanded');
-			$(this).next().addClass('expanded');
-		}
-	})
+$('.handle').click(function(ev){
+	ev.preventDefault();
+console.log($(this).attr('class'))
+	if($(this).hasClass('expanded')){
+console.log('2')
+		$(this).removeClass('expanded');
+		$(this).next().removeClass('expanded');
+	}
+	else{
+		closeExpanded();
+		$(this).addClass('expanded');
+		$(this).next().addClass('expanded');
+	}
+})
 
+function closeExpanded(){
+	$('.expanded').removeClass('expanded');
+}
 
 function attachDataFieldEvents(){
 	//datacell overlay

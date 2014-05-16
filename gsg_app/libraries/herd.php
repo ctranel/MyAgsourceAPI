@@ -18,6 +18,13 @@
 class Herd
 {
 	/**
+	 * herd model
+	 *
+	 * @var herd_model
+	 **/
+	protected $herd_model;
+
+	/**
 	 * herd identifier
 	 *
 	 * @var string
@@ -60,6 +67,7 @@ class Herd
 	 **/
 	public function __construct($arr) {
 		$this->herd_code = $arr['herd_code'];
+		$this->herd_model = $arr['herd_model'];
 	}
 
 	/**
@@ -89,30 +97,28 @@ class Herd
 
 	/**
 	 * @method getRecentTest()
-	 * @param Herd_model
 	 * @return string recent test date
 	 * @access public
 	 *
 	 **/
-	public function getRecentTest(Herd_model $herd_model){
+	public function getRecentTest(){
 		if(!isset($this->recent_test_date)){
-			$this->recent_test_date = $herd_model->get_recent_test($this->herd_code);
+			$this->recent_test_date = $this->herd_model->get_recent_test($this->herd_code);
 		}
 		return $this->recent_test_date;
 	}
 
 	/**
 	 * @method getHerdEnrollStatus()
-	 * @param Herd_model
 	 * @return string recent test date
 	 * @access public
 	 *
 	 **/
-	public function getHerdEnrollStatus(Herd_model $herd_model, $report_code = NULL){
+	public function getHerdEnrollStatus($report_code = NULL){
 		//no output record = none (1)
 		//billing account of AS035099 = unpaid (2)
 		//billing account of 00000001 = paid (3)
-		$herd_output = $herd_model->get_herd_output($this->herd_code, $report_code);
+		$herd_output = $this->herd_model->get_herd_output($this->herd_code, $report_code);
 		if(!$herd_output || count($herd_output) == 0){
 			$return_val = 1;
 		}
@@ -123,5 +129,21 @@ class Herd
 			$return_val = 3;
 		}
 		return $return_val;
+	}
+	
+	/* -----------------------------------------------------------------
+	 *  Returns array of general herd information used in header and other locations
+
+	 *  Returns array of general herd information used in header and other locations
+
+	 *  @since: 1.0
+	 *  @author: ctranel
+	 *  @date: May 20, 2014
+	 *  @param: string herd code
+	 *  @return: array
+	 *  @throws: 
+	 * -----------------------------------------------------------------*/
+	public function header_info() {
+		return $this->herd_model->header_info($this->herd_code);
 	}
 }
