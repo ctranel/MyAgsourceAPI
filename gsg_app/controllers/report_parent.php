@@ -619,7 +619,14 @@ abstract class parent_report extends CI_Controller {
 		$arr_axes = $this->{$this->primary_model}->get_chart_axes($arr_this_block['id']); 
 		$x_axis_date_field = NULL;
 		$this->graph['config'] = get_chart_options($arr_this_block['chart_type']);
-		$this->graph['config']['subtitle']['text'] = "Herd " . $this->session->userdata('herd_code');
+		$arr_pstring = $this->session->userdata('arr_pstring');
+		$pstring = $this->session->userdata('pstring');
+		if (empty($arr_pstring)){
+			$this->graph['config']['subtitle']['text'] = "Herd: ".$this->session->userdata('herd_code');
+		} 
+		else {
+			$this->graph['config']['subtitle']['text'] = "Herd: ".$this->session->userdata('herd_code').' Pstring: '.$pstring;
+		}
 		$this->graph['config']['title']['text'] = $arr_this_block['description'];
 		$this->graph['config']['exporting']['filename'] = $arr_this_block['name'];
 		$this->graph['config']['title']['text'] = $arr_this_block['description'];
