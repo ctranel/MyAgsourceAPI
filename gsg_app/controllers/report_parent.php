@@ -759,13 +759,15 @@ abstract class parent_report extends CI_Controller {
 			'table_id' => $arr_this_block['url_segment'],
 			'fields' => $this->{$this->primary_model}->get_fieldlist_array(),
 			'report_data' => $results,
-			'table_benchmark_text' => $bench_text,
 			'table_heading' => $title,
 			'table_sub_heading' => $subtitle,
 			'arr_numeric_fields' => $this->{$this->primary_model}->get_numeric_fields(),
 			'arr_decimal_places' => $this->{$this->primary_model}->get_decimal_places(),
 			'arr_field_links' => $this->{$this->primary_model}->get_field_links(),
 		);
+		if(isset($bench_text)){
+			$this->report_data['table_benchmark_text'] = $bench_text;
+		}
 		if(isset($this->report_data) && is_array($this->report_data)) {
 			$this->html = $this->load->view('report_table.php', $this->report_data, TRUE);
 		}
