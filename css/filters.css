@@ -55,6 +55,8 @@ html legend{
     top: -.5em;
     left: .5em;
     } */
+#filters fieldset .checkbox, #filters fieldset .radio {margin-top: -5px;}
+
 
 #filter-form legend {
 	border: none; width: auto; font-size: inherit; margin-bottom: 0; padding: 0 3px;

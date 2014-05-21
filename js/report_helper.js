@@ -18,9 +18,7 @@ $('.handle').each(function(){
 
 $('.handle').click(function(ev){
 	ev.preventDefault();
-console.log($(this).attr('class'))
 	if($(this).hasClass('expanded')){
-console.log('2')
 		$(this).removeClass('expanded');
 		$(this).next().removeClass('expanded');
 	}
