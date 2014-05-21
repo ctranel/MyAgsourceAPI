@@ -1,29 +1,16 @@
 @CHARSET "UTF-8";
 .expand-group {
-	background-color: #E6F4F4;
-	border: 1px solid #003C39;
 	float: right;
 	margin-top: 3px;
 	clear: both;
-	min-width: 33%;
-/*	border-radius: 7px;
-	position: absolute;
-	right: 20px;
-	display:none; */
+	overflow: hide;
 }
 
 .expand-group .handle {
 	color:#E6F4F4;
 	background-color:#003C39;
 	padding:4px;
-/*	border-radius: 3px 3px 0 0;
-	filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
-	-webkit-transform: rotate(-90deg); 
-	-moz-transform: rotate(-90deg);
-	cursor: pointer; 
-	position:relative;
-	top:-23px;
-	left:-21px; */
+	margin: 0;
 }
 .expand-group .handle a {
 	font-size:.9em;
@@ -37,10 +24,10 @@
 	content: "▼";
 }
 
-.expand {visibility: hidden; height: 0px; background-color: #E6F4F4; position: absolute; border: 3px solid #003C39; padding: 10px 0 0 0;}
+.expand {visibility: hidden; height: 0px; background-color: #E6F4F4; position: absolute; border: 3px solid #003C39; padding: 10px 0 0 0; min-width: 33%;}
 
 .expand.expanded{z-index: 10; visibility: visible; float:right; height: auto;}
-.expand-group a.expanded:before {content: "▲";}
+.expand-group .expanded a:before {content: "▲";}
 
 .expand-group p {padding: 10px 20px 0px 20px;}
 
@@ -48,12 +35,6 @@
 .expand-group fieldset .checkbox, .expand-group fieldset .radio {margin: -2px 0 0 0;}
 .expand-group fieldset .checkbox input[type="checkbox"], input[type="radio"] {margin: 2px 0 0 -14px;}
 .expand-group fieldset fieldset {width:97%; margin: 1px 0 0 1%;}
-/* .benchmark-checkbox {float:left;}
-html legend{
-    position:absolute;
-    top: -.5em;
-    left: .5em;
-    } */
 
 .expand-group form legend {
 	border: none; width: auto; font-size: inherit; margin-bottom: 0; padding: 0 3px;

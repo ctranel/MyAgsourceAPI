@@ -332,11 +332,11 @@ abstract class parent_report extends CI_Controller {
 		$this->carabiner->css('report.css', 'print');
 		$this->carabiner->css($this->section_path . '.css', 'screen');
 		$this->carabiner->css('http://cdn.jsdelivr.net/qtip2/2.2.0/basic/jquery.qtip.min.css', 'screen');
-		if($this->filters->displayFilters($this->bool_is_summary)){
-			//$this->carabiner->css('filters.css', 'screen');
-		}
-		else{
+		if(!$this->filters->displayFilters($this->bool_is_summary)){
 			$this->carabiner->css('hide_filters.css', 'screen');
+		}
+		if(false){
+			$this->carabiner->css('hide_benchmarks.css', 'screen');
 		}
 		//get_herd_data
 		$herd_data = $this->herd_model->header_info($this->session->userdata('herd_code'));
