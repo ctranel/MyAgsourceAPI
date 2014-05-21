@@ -5,7 +5,8 @@ var inline_form_width = 0;
 // set all inline forms to be the same width
 $('.handle').each(function(){
 	//get the width of the section that immediately follows the .handle element
-	var width = $(this).next().width();
+	var new_el = $(this).next();
+	var width = new_el.width() + parseInt(new_el.css("border-left-width")) + parseInt(new_el.css("border-right-width"));
 	if(width > inline_form_width){
 		inline_form_width = width;
 	}
@@ -13,6 +14,7 @@ $('.handle').each(function(){
 $('.handle').each(function(){
 	$(this).width(inline_form_width);
 	$(this).next().width(inline_form_width);
+//	$(this).parent().width(inline_form_width);
 });
 // end set all inline forms to be the same width
 

@@ -328,6 +328,7 @@ abstract class parent_report extends CI_Controller {
 		$this->carabiner->css('popup.css');
 		$this->carabiner->css('tabs.css');
 		$this->carabiner->css('report.css');
+		$this->carabiner->css('expandable.css');
 		$this->carabiner->css('chart.css', 'print');
 		$this->carabiner->css('report.css', 'print');
 		$this->carabiner->css($this->section_path . '.css', 'screen');
