@@ -11,5 +11,5 @@ if(isset($_GET['debugger_connect']) && $_GET['debugger_connect'] == 1) {
 		echo "No connector is installed afafaghkgkgsfa.";
 	}
 }
-// KLM 20140416 Creating bogus change to push thru new post-update hook on FEWEB/5nines
+// KLM 20140527 Testing Branch configuration
 ?>
