@@ -40,33 +40,12 @@
 							elseif(in_array($field_name,$arr_numeric_fields) && $value !== NULL) $value = number_format($value, $arr_decimal_places[$field_name]);
 							if(isset($arr_field_links[$field_name])){
 								$link = $arr_field_links[$field_name]['href'];
-								$params = '';
-								$site_params = '';
 								$class = !empty($arr_field_links[$field_name]['class']) ? ' class="' . $arr_field_links[$field_name]['class'] . '"' : '';
 								$rel = !empty($arr_field_links[$field_name]['rel']) ? ' rel="' . $arr_field_links[$field_name]['rel'] . '"' : '';
 								$title = !empty($arr_field_links[$field_name]['title']) ? ' title="' . $arr_field_links[$field_name]['title'] . '"' : '';
-								if(is_array($arr_field_links[$field_name]['params']) && !empty($arr_field_links[$field_name]['params'])){
-									foreach($arr_field_links[$field_name]['params'] as $k => $v){
-										if(isset($cr[$v['field']])){
-											$params .= "$k=" . urlencode($cr[$v['field']]) . "&";
-											$site_params .= "/" . urlencode($cr[$v['field']]);
-										}
-										else{
-											$params .= "$k=" . urlencode($v['value']) . "&";
-											$site_params .= "/" . urlencode($v['value']);
-										}
-										$params = substr($params, 0, -1);
-									}
-								}
-								if(substr($link, 0, 1) == '#'){
-									$value = anchor($link, $value, $rel . $title . $class);
-								}
-								elseif((strpos($link, 'http') === FALSE && !empty($link)) || strpos($link, 'myagsource.com') !== FALSE){
-									$value = anchor(site_url($link . $site_params), $value, $rel . $title . $class);
-								}
-								elseif(!empty($link)){
-									$value = anchor(site_url($link . '?' . $params), $value, $rel . $title . $class);
-								}
+								
+								$link = prep_href($link, $arr_field_links[$field_name]['params'], $cr);
+								$value = anchor($link, $value, $rel . $title . $class);
 							}
 							?><td><?php echo $value; ?></td><?php
 						endforeach;

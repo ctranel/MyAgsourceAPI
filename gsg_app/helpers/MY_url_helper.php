@@ -30,6 +30,48 @@ if ( ! function_exists('set_redirect_url'))
 	}
 }
 // ------------------------------------------------------------------------
+/**
+ * Anchor Link
+ *
+ * Creates an anchor based on the local URL.
+ *
+ * @access	public
+ * @param	string	the URL
+ * @param	string	the link title
+ * @param	mixed	any attributes
+ * @return	string
+ */
+if ( ! function_exists('prep_href'))
+{
+	function prep_href($link, $arr_params, &$cr)
+	{
+		$params = '';
+		$site_params = '';
+		if(is_array($arr_params) && !empty($arr_params)){
+			foreach($arr_params as $k => $v){
+				if(isset($cr[$v['field']])){
+					$params .= "$k=" . urlencode($cr[$v['field']]) . "&";
+					$site_params .= "/" . urlencode($cr[$v['field']]);
+				}
+				else{
+					$params .= "$k=" . urlencode($v['value']) . "&";
+					$site_params .= "/" . urlencode($v['value']);
+				}
+				$params = substr($params, 0, -1);
+			}
+		}
+		
+		if(substr($link, 0, 1) == '#'){
+			return $link;
+		}
+		elseif((strpos($link, 'http') === FALSE && !empty($link)) || strpos($link, 'myagsource.com') !== FALSE){
+			return site_url($link . $site_params);
+		}
+		elseif(!empty($link)){
+			return site_url($link . '?' . $params);
+		}
+	}
+}
 
 /**
  * Anchor Link

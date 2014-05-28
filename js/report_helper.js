@@ -30,18 +30,70 @@ if($('#filter-form')){ //if there is a filter form (only on pages with one table
 
 function attachDataFieldEvents(){
 	//datacell overlay
-	$('.popup-ajax').magnificPopup({
+	$('.ajax-popup').on('click', function(e){e.preventDefault();});
+	/*	$('.ajax-popup').qtip({
+	    position: {
+	    	my: 'center center',
+	    	at: 'center center',
+	    	target: $(window),
+	    	adjust:{
+	    		screen: true
+	    	}
+	    },
+	   style: {
+		   tip: {
+			   corner: false
+		   },
+		   classes: 'qtip-overlay'
+	   },
+	   title: {
+		   text: 'title',
+		   button: true
+	   },
+	   content: {
+	        text: function(event, api) {
+	        	$.ajax({
+	                url: api.elements.target.attr('href')//event.target.href
+	            })
+	            .then(function(content) {
+	                // Set the tooltip content upon successful retrieval
+	                api.set('content.text', content);
+	            }, function(xhr, status, error) {
+	                // Upon failure... set the tooltip content to the status and error value
+	                api.set('content.text', status + ': ' + error);
+	            });
+	
+	            return 'Loading...'; // Set some initial text
+	        },
+	        title: 'title'
+	    },
+	    show: {
+	    	solo: true,
+	    	modal: {
+	    		on: true,
+	    		blur: false
+	    	},
+	    	event: 'click'
+	    },
+	    hide: false
+	});
+	//$('.qtip').attr('style','');
+*/$('.ajax-popup').magnificPopup({
 		type:'ajax'
 	});
 	
 	//header tooltips
 	$('.qtip-ajax').on('click', function(e){e.preventDefault();});
-	
 	$('.qtip-ajax').qtip({
-	    content: {
+	    position: {
+	    	my: 'bottom left',
+	    	at: 'top right',
+	    	viewport: $(window)
+	    },
+	   content: {
 	        text: function(event, api) {
 	        	$.ajax({
-	                url: event.target.href//element.data('url') // Use data-url attribute for the URL
+	                url: api.elements.target.attr('href')//event.target.href
 	            })
 	            .then(function(content) {
 	                // Set the tooltip content upon successful retrieval
@@ -55,20 +107,16 @@ function attachDataFieldEvents(){
 	        }
 	    },
 	    show: {
-	    	solo: true
+	    	solo: true,
 	    },
-	    hide: {
-	    	distance: 150
-	    },
-	    style: {
-	    	classes: 'qtip-wiki'
-	    },
-	    position: {
-	    	my: 'bottom left',
-	    	at: 'top right'
-	    }
+//	    hide: {
+//	    	event: false,
+//	    	distance: 180,
+//	    	leave: false
+//	    }
 	});
 }
+
 
 (function($) {
 	  return $.fn.serializeObject = function() {

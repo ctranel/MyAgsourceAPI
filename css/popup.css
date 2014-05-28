@@ -1,3 +1,23 @@
+/* qtip 
+.qtip-overlay {
+  font-size: 14px;
+  line-height: 20px;
+  color: #000001;
+  background-color: #E6F4F4;
+  border: solid 2px #00958E;
+  margin: 0 auto;
+  max-width: 90% !important;
+  min-width: 50%;
+} */
+.qtip-default{
+	color: #003C39;
+	border: solid 2px #588528;
+	background-color: #f0f0f0;
+	border-radius: 5px 5px 5px 0;
+}
+
+
+
 /* Magnific Popup CSS */
 .mfp-bg {
   top: 0;
@@ -50,6 +70,7 @@
   vertical-align: middle;
   max-width: 90% !important;
   margin: 0 auto;
+  border: solid 4px #00958E;
   text-align: left;
   z-index: 1045;
   overflow: auto;

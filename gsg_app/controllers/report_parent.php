@@ -324,13 +324,13 @@ abstract class parent_report extends CI_Controller {
 		// render page
 		$this->carabiner->css('chart.css');
 		$this->carabiner->css('boxes.css');
+		$this->carabiner->css('http://cdn.jsdelivr.net/qtip2/2.2.0/jquery.qtip.min.css', 'screen');
 		$this->carabiner->css('popup.css');
 		$this->carabiner->css('tabs.css');
 		$this->carabiner->css('report.css');
 		$this->carabiner->css('chart.css', 'print');
 		$this->carabiner->css('report.css', 'print');
 		$this->carabiner->css($this->section_path . '.css', 'screen');
-		$this->carabiner->css('http://cdn.jsdelivr.net/qtip2/2.2.0/basic/jquery.qtip.min.css', 'screen');
 		if($this->filters->displayFilters($this->bool_is_summary)){
 			$this->carabiner->css('filters.css', 'screen');
 		}
@@ -416,7 +416,7 @@ abstract class parent_report extends CI_Controller {
 						'{graph_helper: "' . $this->config->item("base_url_assets") . 'js/charts/graph_helper.js"}',
 						'{report_helper: "' . $this->config->item("base_url_assets") . 'js/report_helper.js"}',
 						'{table_sort: "' . $this->config->item("base_url_assets") . 'js/jquery/stupidtable.min.js"}',
-						'{tooltip: "http://cdn.jsdelivr.net/qtip2/2.2.0/basic/jquery.qtip.min.js"}',
+						'{tooltip: "http://cdn.jsdelivr.net/qtip2/2.2.0/jquery.qtip.min.js"}',
 					)
 				)
 			);
