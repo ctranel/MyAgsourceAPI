@@ -333,6 +333,8 @@ abstract class parent_report extends CI_Controller {
 		$this->carabiner->css($this->section_path . '.css', 'screen');
 		if($this->filters->displayFilters($this->bool_is_summary)){
 			$this->carabiner->css('filters.css', 'screen');
+			$this->carabiner->css('agsource.datepick.css', 'screen');
+			$this->carabiner->css('jquery.datetimeentry.css', 'screen');
 		}
 		else{
 			$this->carabiner->css('hide_filters.css', 'screen');
@@ -379,7 +381,9 @@ abstract class parent_report extends CI_Controller {
 					$arr_view_blocks[] = $this->load->view($display, $arr_blk_data, TRUE);
 					//add js line to populate the block after the page loads
 					$tmp_container_div = $display == 'chart' ? 'graph-canvas' . $x : 'table-canvas' . $x;
-					$tmp_js .= "updateBlock(\"$tmp_container_div\", \"" . $pb['url_segment'] . "\", \"$x\", \"null\", \"null\", \"$display\",\"false\")\n";//, \"" . $this->{$this->primary_model}->arr_blocks[$this->page]['display'][$display][$block]['description'] . "\", \"" . $bench_text . "\");\n";
+					$tmp_js .= "updateBlock(\"$tmp_container_div\", \"" . $pb['url_segment'] . "\", \"$x\", \"null\", \"null\", \"$display\",\"false\");\n";//, \"" . $this->{$this->primary_model}->arr_blocks[$this->page]['display'][$display][$block]['description'] . "\", \"" . $bench_text . "\");\n";
+					$tmp_js .= "if ($( '#datepickfrom' ).length > 0) $( '#datepickfrom' ).datepick({dateFormat: 'mm-dd-yyyy'});";
+					$tmp_js .= "if ($( '#datepickto' ).length > 0) $( '#datepickto' ).datepick({dateFormat: 'mm-dd-yyyy'});";
 					$tmp_block = $pb['url_segment'];
 					$x++;
 				}
@@ -417,6 +421,7 @@ abstract class parent_report extends CI_Controller {
 						'{report_helper: "' . $this->config->item("base_url_assets") . 'js/report_helper.js"}',
 						'{table_sort: "' . $this->config->item("base_url_assets") . 'js/jquery/stupidtable.min.js"}',
 						'{tooltip: "http://cdn.jsdelivr.net/qtip2/2.2.0/jquery.qtip.min.js"}',
+						'{datepick: "' . $this->config->item("base_url_assets") . 'js/jquery/jquery.datepick.min.js"}'
 					)
 				)
 			);

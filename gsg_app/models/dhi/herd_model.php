@@ -261,10 +261,11 @@ class Herd_model extends CI_Model {
 	 **/
 	public function header_info($herd_code){
 		// results query
-		$q = $this->db->select("h.herd_code, h.farm_name, h.herd_owner, r.assoc_name, supervisor_num, FORMAT(ct.test_date,'MM-dd-yyyy') AS test_date", FALSE)
+		$q = $this->db->select("h.herd_code, h.farm_name, h.herd_owner, r.assoc_name, h.supervisor_num, FORMAT(ct.test_date,'MM-dd-yyyy') AS test_date, CONCAT(a.first_name,' ',a.last_name) AS supervisor_name", FALSE)
 		->from($this->tables['herds'] . ' h')
 		->join('[herd].[dbo].[view_herd_id_curr_test] ct', 'h.herd_code = ' . 'ct.herd_code', 'left')
 		->join($this->tables['regions'] . ' r', 'ct.association_num = r.association_num', 'left')
+		->join("[address].[dbo].[dhi_supervisor] a", "a.account_num = CONCAT('sp',h.supervisor_num)", "left")
 		->where('h.herd_code',$herd_code);
 		$ret = $q->get()->result_array();
 		if(!empty($ret) && is_array($ret)) return $ret[0];
