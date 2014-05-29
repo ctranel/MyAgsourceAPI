@@ -420,7 +420,7 @@ abstract class parent_report extends CI_Controller {
 						'{graph_helper: "' . $this->config->item("base_url_assets") . 'js/charts/graph_helper.js"}',
 						'{report_helper: "' . $this->config->item("base_url_assets") . 'js/report_helper.js"}',
 						'{table_sort: "' . $this->config->item("base_url_assets") . 'js/jquery/stupidtable.min.js"}',
-						'{tooltip: "http://cdn.jsdelivr.net/qtip2/2.2.0/jquery.qtip.min.js"}',
+						'{tooltip: "https://cdn.jsdelivr.net/qtip2/2.2.0/jquery.qtip.min.js"}',
 						'{datepick: "' . $this->config->item("base_url_assets") . 'js/jquery/jquery.datepick.min.js"}'
 					)
 				)
