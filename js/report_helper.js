@@ -14,7 +14,6 @@ $('.handle').each(function(){
 $('.handle').each(function(){
 	$(this).width(inline_form_width);
 	$(this).next().width(inline_form_width);
-//	$(this).parent().width(inline_form_width);
 });
 // end set all inline forms to be the same width
 
@@ -29,6 +28,12 @@ $('.handle').click(function(ev){
 		$(this).addClass('expanded');
 		$(this).next().addClass('expanded');
 	}
+})
+
+$('.expand').on('mouseleave', function(ev){
+	console.log($(this).attr('class'))
+	$(this).removeClass('expanded');
+	$(this).prev().removeClass('expanded');
 })
 
 function closeExpanded(){

@@ -60,21 +60,12 @@
 							4th&nbsp;&nbsp;
 						</span>
 					<?php echo form_fieldset_close();
-<<<<<<< Upstream, based on master
 				break;
-			case 'test_date':
-				echo form_fieldset('Test Date Range', array('id' => 'test_date-fieldset')); ?>
-					Between <?php echo form_input(array('name'=>'test_date_dbfrom', 'value'=>$filter_selected['test_date_dbfrom'], 'size'=>'10','maxlength'=>'10', 'id'=>'datepickfrom')) ?>
-					and <?php echo form_input(array('name'=>'test_date_dbto', 'value'=>$filter_selected['test_date_dbto'], 'size'=>'10', 'maxlength'=>'10', 'id'=>'datepickto')); ?>
-				<?php echo form_fieldset_close();
-				break;
-		endswitch; 
-	endforeach;
-endif; ?>
-<div class="submit"><?php echo form_submit('filter_submit', 'Apply Filter', 'class="button"');?>&nbsp;&nbsp;&nbsp;<?php echo form_button('reset_filter', 'Reset Filter', 'onclick="form_reset()" class="button"')?>
-</div>
-<?php echo form_close();?>
-=======
+				case 'test_date':
+					echo form_fieldset('Test Date Range', array('id' => 'test_date-fieldset')); ?>
+						Between <?php echo form_input(array('name'=>'test_date_dbfrom', 'value'=>$filter_selected['test_date_dbfrom'], 'size'=>'10','maxlength'=>'10', 'id'=>'datepickfrom')) ?>
+						and <?php echo form_input(array('name'=>'test_date_dbto', 'value'=>$filter_selected['test_date_dbto'], 'size'=>'10', 'maxlength'=>'10', 'id'=>'datepickto')); ?>
+					<?php echo form_fieldset_close();
 					break;
 				case 'lact_num': ?>
 					<?php echo form_fieldset('Lactation #', array('id' => 'lact-num-fieldset')); ?>
@@ -169,7 +160,6 @@ endif; ?>
 	</div>
 	<?php echo form_close();?>
 	</div>
->>>>>>> 5ba0788 UPDATE: Created layout for benchmark form
 </div>
 
 <?php if(isset($page_footer) !== false) echo $page_footer;
