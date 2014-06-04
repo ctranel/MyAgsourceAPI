@@ -14,6 +14,10 @@ $('.handle').each(function(){
 $('.handle').each(function(){
 	$(this).width(inline_form_width);
 	$(this).next().width(inline_form_width);
+<<<<<<< HEAD
+=======
+//	$(this).parent().width(inline_form_width);
+>>>>>>> branch 'benchmarks' of ssh://ctranel@feweb.verona.crinet/var/local/repos/MyAgsource.git
 });
 // end set all inline forms to be the same width
 
@@ -30,12 +34,15 @@ $('.handle').click(function(ev){
 	}
 })
 
+<<<<<<< HEAD
 $('.expand').on('mouseleave', function(ev){
 	console.log($(this).attr('class'))
 	$(this).removeClass('expanded');
 	$(this).prev().removeClass('expanded');
 })
 
+=======
+>>>>>>> branch 'benchmarks' of ssh://ctranel@feweb.verona.crinet/var/local/repos/MyAgsource.git
 function closeExpanded(){
 	$('.expanded').removeClass('expanded');
 }

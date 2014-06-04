@@ -15,7 +15,7 @@
 class Benchmarks_lib
 {
 	/**
-	 * table used in benchmarks
+	 * table object used in benchmarks
 	 * @var string
 	 **/
 	protected $db_table;

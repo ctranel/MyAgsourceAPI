@@ -13,7 +13,11 @@
 				<div><label>Association</label> <?php echo $association_num; ?></div>
 			<?php endif; ?>
 			<?php if(!empty($supervisor_name)):?>
+<<<<<<< HEAD
 				<div><label>Tech Name</label> <?php echo ucwords(strtolower($supervisor_name)); ?></div>
+=======
+				<div><label>Tech</label> <?php echo $supervisor_name; ?></div>
+>>>>>>> branch 'benchmarks' of ssh://ctranel@feweb.verona.crinet/var/local/repos/MyAgsource.git
 			<?php endif; ?>
 			<?php if(!empty($test_date)):?>
 				<div><label>Test Date</label> <?php echo $test_date; ?></div>

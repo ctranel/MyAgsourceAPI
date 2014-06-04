@@ -3,12 +3,20 @@
 a.#set_filters {}
 
 #filters {
+<<<<<<< HEAD
 /*	background-color: #E6F4F4;
+=======
+	background-color: #E6F4F4;
+>>>>>>> branch 'benchmarks' of ssh://ctranel@feweb.verona.crinet/var/local/repos/MyAgsource.git
 	border: 1px solid #003C39;
 	float: right;
 	margin: 10px;
 	clear: both;
+<<<<<<< HEAD
 	border-radius: 7px;
+=======
+/*	border-radius: 7px;
+>>>>>>> branch 'benchmarks' of ssh://ctranel@feweb.verona.crinet/var/local/repos/MyAgsource.git
 	position: absolute;
 	right: 20px;
 	display:none; */
