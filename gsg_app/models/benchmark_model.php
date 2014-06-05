@@ -69,8 +69,4 @@ class Benchmark_model extends CI_Model {
 		$arr_benchmarks = $arr_benchmarks[0];
 		return $arr_benchmarks;
 	}
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> branch 'benchmarks' of ssh://ctranel@feweb.verona.crinet/var/local/repos/MyAgsource.git
