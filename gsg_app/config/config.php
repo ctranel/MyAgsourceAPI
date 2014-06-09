@@ -14,6 +14,10 @@
 	switch (ENVIRONMENT)
 	{
 		case 'development':
+			$config['base_url']	= "https://" . $_SERVER['HTTP_HOST'] . "/";
+			$config['base_url_assets']	= "https://" . $_SERVER['HTTP_HOST'] . "/";
+		break;
+		case 'localhost':
 			$config['base_url']	= "http://localhost/MyAgSource/";
 			$config['base_url_assets']	= "http://localhost/MyAgSource/";
 		break;
@@ -56,6 +60,11 @@
 			$config['cust_serv_email']		= "ghartmann@agsource.com"; //custom CDT
 			$config['cust_serv_phone']		= "1-800-236-4995"; //custom CDT
 			break;
+		case 'localhost':
+			$config['admin_email']          = "ghartmann@agsource.com"; 	// Admin Email, admin@example.com
+			$config['cust_serv_email']		= "ghartmann@agsource.com"; //custom CDT
+			$config['cust_serv_phone']		= "1-800-236-4995"; //custom CDT
+			break;
 		case 'testing':
 			$config['admin_email']          = "ghartmann@agsource.com"; 	// Admin Email, admin@example.com
 			$config['cust_serv_email']		= "ghartmann@agsource.com"; //custom CDT
@@ -84,6 +93,9 @@
 	switch (ENVIRONMENT)
 	{
 		case 'development':
+			$config['index_page'] = "";
+		break;
+		case 'localhost':
 			$config['index_page'] = "index.php/";
 		break;
 		case 'testing':
@@ -253,6 +265,9 @@ $config['directory_trigger']	= 'd'; // experimental not currently in use
 		case 'development':
 			$config['log_threshold'] = 4;
 			break;
+		case 'localhost':
+			$config['log_threshold'] = 4;
+			break;
 		case 'testing':
 			$config['log_threshold'] = 4;
 			break;
@@ -275,6 +290,9 @@ $config['directory_trigger']	= 'd'; // experimental not currently in use
 	switch (ENVIRONMENT)
 	{
 		case 'development':
+			$config['log_path'] = '/var/www/myagsource/logs/';
+			break;
+		case 'localhost':
 			$config['log_path'] = 'C:\\MyAgSource\\logs\\';
 			break;
 		case 'testing':
@@ -413,8 +431,11 @@ $config['csrf_expire'] = 7200;
 		case 'development':
 			$config['compress_output'] = FALSE;
 		break;
-		case 'testing':
+		case 'localhost':
 			$config['compress_output'] = FALSE;
+		break;
+		case 'testing':
+			$config['compress_output'] = TRUE;
 		break;
 		case 'production':
 			$config['compress_output'] = TRUE;

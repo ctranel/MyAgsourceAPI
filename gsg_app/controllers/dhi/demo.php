@@ -20,7 +20,7 @@ class Demo extends CI_Controller {
 		$this->set_herd_session_data();
 		redirect(site_url());
 		/* Load the profile.php config file if it exists*/
-		if (ENVIRONMENT == 'development') {
+		if (ENVIRONMENT == 'development' || ENVIRONMENT == 'localhost') {
 			$this->config->load('profiler', false, true);
 			if ($this->config->config['enable_profiler']) {
 				$this->output->enable_profiler(TRUE);

@@ -82,10 +82,8 @@ $active_group = "default";
 $active_record = TRUE;
 $db_server = 'myagsource';
 
-switch (ENVIRONMENT)
+if(ENVIRONMENT == 'development' || ENVIRONMENT == 'localhost' || ENVIRONMENT == 'testing')
 {
-	case 'development':
-		//default (users)
 		$db['default']['hostname'] = 'testdare.verona.crinet\\' . $db_server;
 		$db['default']['username'] = 'webuser';
 		$db['default']['password'] = 'm1$AgSourze';
@@ -117,43 +115,9 @@ switch (ENVIRONMENT)
 		$db['vma']['swap_pre'] = '';
 		$db['vma']['autoinit'] = TRUE;
 		$db['vma']['stricton'] = FALSE;
-		break;
-	case 'testing':
-		//default (users)
-		$db['default']['hostname'] = 'testdare.verona.crinet\\' . $db_server;
-		$db['default']['username'] = 'webuser';
-		$db['default']['password'] = 'm1$AgSourze';
-		$db['default']['database'] = "users";
-		$db['default']['dbdriver'] = 'mssql';
-		$db['default']['dbprefix'] = "";
-		$db['default']['pconnect'] = FALSE;
-		$db['default']['db_debug'] = TRUE;
-		$db['default']['cache_on'] = TRUE;
-		$db['default']['cachedir'] = "";
-		$db['default']['char_set'] = 'windows-1252';
-		$db['default']['dbcollat'] = 'sql_latin1_general_cp1_ci_as';
-		$db['default']['swap_pre'] = '';
-		$db['default']['autoinit'] = TRUE;
-		$db['default']['stricton'] = FALSE;
-		//views database
-		$db['vma']['hostname'] = 'testdare.verona.crinet\\' . $db_server;
-		$db['vma']['username'] = 'webuser';
-		$db['vma']['password'] = 'm1$AgSourze';
-		$db['vma']['database'] = "vma";
-		$db['vma']['dbdriver'] = 'mssql';
-		$db['vma']['dbprefix'] = "";
-		$db['vma']['pconnect'] = FALSE;
-		$db['vma']['db_debug'] = TRUE;
-		$db['vma']['cache_on'] = TRUE;
-		$db['vma']['cachedir'] = "";
-		$db['vma']['char_set'] = 'windows-1252';
-		$db['vma']['dbcollat'] = 'sql_latin1_general_cp1_ci_as';
-		$db['vma']['swap_pre'] = '';
-		$db['vma']['autoinit'] = TRUE;
-		$db['vma']['stricton'] = FALSE;
-		break;
-	case 'production':
-		//default (users)
+}
+elseif(ENVIRONMENT == 'production'){
+	//default (users)
 		$db['default']['hostname'] = '173.229.1.155' ;
 		$db['default']['username'] = 'webuser';
 		$db['default']['password'] = 'm1$AgS_R0';
@@ -185,9 +149,9 @@ switch (ENVIRONMENT)
 		$db['vma']['swap_pre'] = '';
 		$db['vma']['autoinit'] = TRUE;
 		$db['vma']['stricton'] = FALSE;
-		break;
-	default:
-		exit('The application environment is not set correctly - database.');
+}
+else{
+	exit('The application environment is not set correctly - database.');
 }
 
 

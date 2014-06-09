@@ -145,6 +145,9 @@ switch (ENVIRONMENT)
 	case 'development':
 		$config['admin_email']          = "ghartmann@agsource.com"; 	// Admin Email, admin@example.com
 		break;
+	case 'localhost':
+		$config['admin_email']          = "ghartmann@agsource.com"; 	// Admin Email, admin@example.com
+		break;
 	case 'testing':
 		$config['admin_email']          = "ghartmann@agsource.com"; 	// Admin Email, admin@example.com
 		break;

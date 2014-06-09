@@ -100,7 +100,7 @@ abstract class parent_report extends CI_Controller {
 			redirect(site_url('dhi/change_herd/select'));			
 		}
 		/* Load the profile.php config file if it exists*/
-		if (ENVIRONMENT == 'development') {
+		if (ENVIRONMENT == 'development' || ENVIRONMENT == 'localhost') {
 			$this->config->load('profiler', false, true);
 			if ($this->config->config['enable_profiler']) {
 				$this->output->enable_profiler(TRUE);

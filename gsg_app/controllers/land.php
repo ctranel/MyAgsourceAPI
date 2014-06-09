@@ -15,7 +15,7 @@ class Land extends CI_Controller {
 		$this->page_header_data['num_herds'] = $this->as_ion_auth->get_num_viewable_herds($this->session->userdata('user_id'), $this->session->userdata('arr_regions'));
 		$this->load->library('form_validation');
 		/* Load the profile.php config file if it exists */
-		if (ENVIRONMENT == 'development') {
+		if (ENVIRONMENT == 'development' || ENVIRONMENT == 'localhost') {
 			$this->config->load('profiler', false, true);
 			if ($this->config->config['enable_profiler']) {
 				$this->output->enable_profiler(TRUE);

@@ -19,7 +19,7 @@ class Cow_lookup extends CI_Controller {
 		}
 		
 		/* Load the profile.php config file if it exists
-		if (ENVIRONMENT == 'development') {
+		if (ENVIRONMENT == 'development' || ENVIRONMENT == 'localhost') {
 			$this->config->load('profiler', false, true);
 			if ($this->config->config['enable_profiler']) {
 				$this->output->enable_profiler(TRUE);
