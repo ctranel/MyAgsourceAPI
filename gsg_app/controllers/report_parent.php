@@ -342,6 +342,7 @@ abstract class parent_report extends CI_Controller {
 		}
 		if(false){
 			$this->carabiner->css('hide_benchmarks.css', 'screen');
+		}
 		//get_herd_data
 		$herd_data = $this->herd_model->header_info($this->session->userdata('herd_code'));
 		
