@@ -21,7 +21,6 @@ class Land extends CI_Controller {
 				$this->output->enable_profiler(TRUE);
 			} 
 		}
-//die($this->session->userdata('herd_code') . ' - ' . var_dump(isset($this->as_ion_auth)));
 	}
 
 	//dashboard

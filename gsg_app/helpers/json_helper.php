@@ -47,7 +47,6 @@ function json_encode_jsfunc($input = array(), $funcs = array(), $level = 0, &$fu
 
 if (!function_exists('json_encode')){
 	function json_encode( $data ) {            
-//var_dump($data);
 		if( is_array($data) || is_object($data) ) { 
 	        $islist = is_array($data) && ( empty($data) || array_keys($data) === range(0,count($data)-1) );
 	         

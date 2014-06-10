@@ -1,4 +1,9 @@
-<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php
+require_once APPPATH . 'libraries' . FS_SEP . 'db_objects' . FS_SEP . 'db_table.php';
+
+use libraries\db_objects\db_table;
+ 
+if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /* -----------------------------------------------------------------
  *	CLASS comments
@@ -741,15 +746,27 @@ abstract class parent_report extends CI_Controller {
 		$arr_field_list = $this->{$this->primary_model}->get_fieldlist_array();
 		$results = $this->{$this->primary_model}->search($this->session->userdata('herd_code'), $arr_this_block['url_segment'], $this->arr_filter_criteria, $this->arr_sort_by, $this->arr_sort_order, $this->max_rows);
 		if($this->bench_row){
+		//if the data is pivoted, set the pivoted field as the row header, else use the first non-pstring column
+			$row_head_field = NULL;
+			if(!empty($this->pivot_db_field)){
+				$row_head_field = $this->pivot_db_field;
+			}
+			else{
+				foreach($arr_field_list as $fl){
+					if($fl != 'pstring'){
+						$row_head_field = $fl;
+						break;
+					}
+				}
+			}
 			$this->load->model('benchmark_model');
 			$this->load->model('db_table_model');
 			$this->load->library('benchmarks_lib');
-			$this->load->library('db_table', array('table_name' => $this->{$this->primary_model}->get_primary_table_name(), 'db_table_model' => $this->db_table_model));
+			$this->db_table = new db_table($this->{$this->primary_model}->get_primary_table_name(), $this->db_table_model);
 			$sess_benchmarks = $this->session->userdata('benchmarks');
 			$herd_info = $this->herd_model->header_info($this->herd_code);
-			$results[] = $this->benchmarks_lib->addBenchmarkRow($this->db_table, $sess_benchmarks, $this->benchmark_model, $this->session->userdata('user_id'), $herd_info, $this->pivot_db_field, $arr_field_list);
+			$results[] = $this->benchmarks_lib->addBenchmarkRow($this->db_table, $sess_benchmarks, $this->benchmark_model, $this->session->userdata('user_id'), $herd_info, $row_head_field, $arr_field_list);
 		}
-		
 		if(!empty($this->pivot_db_field)){
 			$results = $this->{$this->primary_model}->pivot($results, $this->pivot_db_field, 10, 10, $this->avg_row, $this->sum_row);
 		}

@@ -144,8 +144,6 @@ echo "group_by <br>";
 		$arr_col_vals = $this->input->post('column');
 		$arr_aggregate_vals = $this->input->post('aggregate');
 		$arr_header_group_index_vals = $this->input->post('col_head_group_index');
-//var_dump($arr_col_vals);
-//var_dump($this->arr_header_groups_data);
 		if(isset($arr_col_vals) && is_array($arr_col_vals)){
 			$arr_column_data = array();
 			$cnt = 1;

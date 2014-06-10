@@ -16,7 +16,7 @@ class Benchmarks_lib
 {
 	/**
 	 * table object used in benchmarks
-	 * @var string
+	 * @var object db_table
 	 **/
 	protected $db_table;
 
@@ -173,7 +173,7 @@ class Benchmarks_lib
 	 * @return void
 	 * @author ctranel
 	 **/
-	private function set_criteria($pivot_field, $metric, $criteria, $arr_herd_size = NULL, $arr_breed_codes = NULL){
+	private function set_criteria($metric, $criteria, $arr_herd_size = NULL, $arr_breed_codes = NULL){
 		$this->metric = $metric;
 		$this->criteria = $criteria;
 		if(is_array($arr_herd_size)){
@@ -303,15 +303,16 @@ class Benchmarks_lib
 	 * @return string
 	 * @author ctranel
 	 **/
-	function addBenchmarkRow($db_table, $sess_benchmarks, &$benchmark_model, $user_id, $herd_info, $pivot_field, $arr_fields_to_exclude = array('herd_code', 'pstring', 'lact_group_code', 'ls_type_code', 'sol_group_code')){
+	function addBenchmarkRow($db_table, $sess_benchmarks, &$benchmark_model, $user_id, $herd_info, $row_head_field, $arr_fields_to_exclude = array('herd_code', 'pstring', 'lact_group_code', 'ls_type_code', 'sol_group_code')){
 		if(isset($db_table)){
 			$this->db_table = $db_table;
 		}
-		$bench_settings = $this->get_bench_settings($user_id, $herd_info);
-		$this->set_criteria($pivot_field, $bench_settings['metric'], $bench_settings['criteria'], $bench_settings['arr_herd_size'], $bench_settings['arr_breeds']);
 
-		$avg_fields = $benchmark_model->get_benchmark_fields($this->db_table->table_name(), $arr_fields_to_exclude);
-		$bench_sql = $this->build_benchmark_query($db_table, $avg_fields);
+		$bench_settings = $this->get_bench_settings($user_id, $herd_info);
+		$this->set_criteria($bench_settings['metric'], $bench_settings['criteria'], $bench_settings['arr_herd_size'], $bench_settings['arr_breeds']);
+
+		$avg_fields = $benchmark_model->get_benchmark_fields($this->db_table->full_table_name(), $arr_fields_to_exclude);
+		$bench_sql = $benchmark_model->build_benchmark_query($this->db_table, $avg_fields);
 		$arr_benchmarks = $benchmark_model->getBenchmarkData($bench_sql);
 /*
  * 
@@ -323,14 +324,16 @@ class Benchmarks_lib
 */
 		//$this->metric in place of $sess_benchmarks['metric']?
 		$tmp_metric = $this->get_metric_options();
-		$tmp_key = ucwords(strtolower($tmp_metric[$this->metric])) . ' (n=' . $arr_benchmarks['cnt_herds'] . ')';
+		$bench_head_text = ucwords(strtolower($tmp_metric[$this->metric])) . ' (n=' . $arr_benchmarks['cnt_herds'] . ')';
 /*
  * @todo: make this flexible (work for lact groups (and other) and test date based tables), not dhi-specific
  * 
  */
 		unset($arr_benchmarks['cnt_herds']);
-//'pstring' => 0 ?
-		$arr_benchmarks = array($pivot_field => $tmp_key) + $arr_benchmarks;
+		if(isset($arr_benchmarks['pstring'])){
+			$arr_benchmarks['pstring'] = '';
+		}
+		$arr_benchmarks = array($row_head_field => $bench_head_text) + $arr_benchmarks;
 		return $arr_benchmarks;
 	}
 	
@@ -350,17 +353,16 @@ class Benchmarks_lib
 		$where = '';
 		$group_by = '';
 		$order_by = '';
-//var_dump($this->arr_criteria_table);
 //		$criteria_date_field = $this->arr_criteria_table[$this->criteria]['date_field'];
 //		$this->primary_table_date_field = $report_model->date_field;
 		
 		if($this->metric == "AVG") {
 			$cte = $this->build_cte();
-			$from = " FROM benchmark_herds bh INNER JOIN " . $this->db_table->table_name() . " p ON bh.herd_code = p.herd_code";
+			$from = " FROM benchmark_herds bh INNER JOIN " . $this->db_table->full_table_name() . " p ON bh.herd_code = p.herd_code";
 		}
 		else {
 			$cte = $this->build_cte();
-			$from = " FROM benchmark_herds bh INNER JOIN " . $this->db_table->table_name() . " p ON bh.herd_code = p.herd_code";
+			$from = " FROM benchmark_herds bh INNER JOIN " . $this->db_table->full_table_name() . " p ON bh.herd_code = p.herd_code";
 			if($db_table->field_exists('test_date')){
 				$from .= " AND bh.test_date = p.test_date";
 			}

@@ -55,7 +55,6 @@ class Supplemental extends CI_Controller {
 				$this->session->userdata('herd_code'),
     			$this->session->userdata('recent_test_date')
     	);
-//    	var_dump($arr_avg);
     	$this->load->view('dhi/genetics/calves_due', array('arr_avg'=>$arr_avg));
     }
     

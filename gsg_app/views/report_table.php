@@ -49,14 +49,12 @@
 							}
 							//if data is from a pivot, use $field_label else $field_name
 							$tmp_key = isset($arr_decimal_places[$field_label]) ? $field_label : $field_name;
-//var_dump($arr_numeric_fields);
 							if($field_name == 'control_num' || $field_name == 'list_order_num'){
 								$value = number_format($value,$arr_decimal_places[$tmp_key],'.','');
 							}
-							elseif(in_array($tmp_key, $arr_numeric_fields) && $value !== NULL && $tmp_key != $value){
+							elseif(in_array($tmp_key, $arr_numeric_fields) && is_numeric($value) && $tmp_key != $value){
 								$value = number_format($value, $arr_decimal_places[$tmp_key]);
 							}
-//print($value);
 							if(isset($arr_field_links[$field_name])){
 								$link = $arr_field_links[$field_name]['href'];
 								$class = !empty($arr_field_links[$field_name]['class']) ? ' class="' . $arr_field_links[$field_name]['class'] . '"' : '';
