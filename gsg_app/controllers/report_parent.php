@@ -765,7 +765,26 @@ abstract class parent_report extends CI_Controller {
 			$this->db_table = new db_table($this->{$this->primary_model}->get_primary_table_name(), $this->db_table_model);
 			$sess_benchmarks = $this->session->userdata('benchmarks');
 			$herd_info = $this->herd_model->header_info($this->herd_code);
-			$results[] = $this->benchmarks_lib->addBenchmarkRow($this->db_table, $sess_benchmarks, $this->benchmark_model, $this->session->userdata('user_id'), $herd_info, $row_head_field, $arr_field_list);
+			$arr_group_by = $this->{$this->primary_model}->get_group_by_fields($arr_this_block['id']);
+//			$arr_group_by = array_filter($arr_group_by);
+			$arr_bench_data = $this->benchmarks_lib->addBenchmarkRow(
+					$this->db_table, $sess_benchmarks,
+					$this->benchmark_model,
+					$this->session->userdata('user_id'),
+					$herd_info,
+					$row_head_field,
+					$arr_field_list,
+					$this->{$this->primary_model}->get_group_by_fields($arr_this_block['id'])
+				);
+			if(count($arr_bench_data) > 1){
+			/*
+			 * @todo: if block_group_by isset (i.e., there are multiple rows of benchmarks), need to iterate through result set and place benchmark rows in correct spots.
+			 * 	(i.e., when the value of the group_by field changes, insert the benchmark row that matches the previous value in the group by field)
+			 */
+			}
+			else{
+				$results[] = $arr_bench_data[0];
+			}
 		}
 		if(!empty($this->pivot_db_field)){
 			$results = $this->{$this->primary_model}->pivot($results, $this->pivot_db_field, 10, 10, $this->avg_row, $this->sum_row);

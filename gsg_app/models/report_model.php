@@ -167,8 +167,13 @@ class Report_model extends CI_Model {
 			->result_array();
 		if(is_array($arr_res)){
 			foreach($arr_res as $s){
-				$arr_ret[] = $s['db_field_name'];
+				if(isset($s['db_field_name'])){
+					$arr_ret[] = $s['db_field_name'];
+				}
 			}
+		}
+		if(empty($arr_ret)){
+			return FALSE;
 		}
 		return $arr_ret;
 	}

@@ -176,6 +176,7 @@ class Benchmarks_lib
 	private function set_criteria($metric, $criteria, $arr_herd_size = NULL, $arr_breed_codes = NULL){
 		$this->metric = $metric;
 		$this->criteria = $criteria;
+		$this->arr_breeds = $arr_breed_codes;
 		if(is_array($arr_herd_size)){
 			if(count($arr_herd_size) == 1){ //the size of the current herd was passed
 				foreach($this->arr_herd_size_groups as $k=>$v){
@@ -213,7 +214,7 @@ class Benchmarks_lib
 		if(isset($sess_benchmarks['arr_breeds'])){
 			$bench_text .= ' ' . implode(',', $sess_benchmarks['arr_breeds']);
 		}
-		if(isset($sess_benchmarks['arr_herd_size'])){
+		if(isset($sess_benchmarks['arr_herd_size']) && in_array('HO', $sess_benchmarks['arr_breeds'])){
 			$bench_text .= ' herds between ' . $sess_benchmarks['arr_herd_size'][0] . ' and ' . $sess_benchmarks['arr_herd_size'][1] . ' animals';
 		}
 		return $bench_text;
@@ -274,15 +275,33 @@ class Benchmarks_lib
 	 * @author ctranel
 	 **/
 	private function get_default_settings($breed, $herd_size = FALSE){
-		return array(
-				'metric' => 'TOP20_PCT',
+		$arr_ret = array(
+				'metric' => 'AVG',
 				'criteria' => 'PROD',
-				'arr_herd_size' => $this->get_default_herd_size_range($herd_size),
+				'arr_herd_size' => NULL,
+				//system built with the capability to include multiple breeds in benchmark group, so we make breed an array
 				'arr_breeds' => array($breed)
 		);
+		if($breed === 'HO' || $breed === 'JE'){
+			$arr_ret['metric'] = 'TOP20_PCT';
+		}
+		if($breed === 'HO'){
+			$arr_ret['arr_herd_size'] = $this->get_default_herd_size_range($herd_size);
+		}
+		return $arr_ret;
 	}
 	
+	/**
+	 * gets default get_default_herd_size_range for benchmarks based on herd size parameter
+	 * 
+	 * Currently used only for Holstein herds
+	 *
+	 * @param int herd size
+	 * @return array of default settings (2 elements: (floor, ceiling))
+	 * @author ctranel
+	 **/
 	private function get_default_herd_size_range($herd_size){
+		//We can set this, but it will currently only be used for Holstein herds
 		if($herd_size){
 			foreach($this->arr_herd_size_groups as $k=>$v){
 				if($v['floor'] <= $herd_size && $v['ceiling'] >= $herd_size){
@@ -296,125 +315,57 @@ class Benchmarks_lib
 	}
 	
 	/**
-	 * @description builds sql based on object variables
-	 * @param object report_model
-	 * @param string arr_fields_to_exclude
+	 * @method addBenchmarkRow
+	 * @description retrieves row(s) of benchmark data into an array
+	 * @param object database table
+	 * @param array session benchmarks
+	 * @param object benchmark model
+	 * @param int user id
+	 * @param array herd overview info
+	 * @param string row_head_field - the db field name of the column into which benchmark header text is inserted
+	 * @param array of strings db field names to exclude
 	 * @param array of strings arr_group_by (db field names)
-	 * @return string
+	 * @return array
 	 * @author ctranel
 	 **/
-	function addBenchmarkRow($db_table, $sess_benchmarks, &$benchmark_model, $user_id, $herd_info, $row_head_field, $arr_fields_to_exclude = array('herd_code', 'pstring', 'lact_group_code', 'ls_type_code', 'sol_group_code')){
+	function addBenchmarkRow($db_table, $sess_benchmarks, &$benchmark_model, $user_id, $herd_info, $row_head_field, $arr_fields_to_exclude = array('herd_code', 'pstring', 'lact_group_code', 'ls_type_code', 'sol_group_code'), $arr_group_by){
 		if(isset($db_table)){
 			$this->db_table = $db_table;
 		}
-
+		
 		$bench_settings = $this->get_bench_settings($user_id, $herd_info);
 		$this->set_criteria($bench_settings['metric'], $bench_settings['criteria'], $bench_settings['arr_herd_size'], $bench_settings['arr_breeds']);
 
 		$avg_fields = $benchmark_model->get_benchmark_fields($this->db_table->full_table_name(), $arr_fields_to_exclude);
-		$bench_sql = $benchmark_model->build_benchmark_query($this->db_table, $avg_fields);
+		$bench_sql = $benchmark_model->build_benchmark_query(
+			$this->db_table,
+			$avg_fields,
+			$this->arr_criteria_table[$this->criteria],
+			$this->herd_benchmark_pool_table,
+			$this->metric,
+			$this->herd_size_floor,
+			$this->herd_size_ceiling,
+			$this->arr_breeds,
+			$arr_group_by
+		);
 		$arr_benchmarks = $benchmark_model->getBenchmarkData($bench_sql);
 /*
- * 
- *	@todo: need to fix this, all model vars
- *	@todo: benchmark session not being set, benchmark text not being displayed in tables
+ *	@todo: benchmark session not being set
 		$this->arr_pdf_widths['benchmark'] = $header_field_width;
 		$this->arr_field_sort['benchmark'] = 'ASC';
 		$this->arr_unsortable_columns[] = 'benchmark';
 */
 		//$this->metric in place of $sess_benchmarks['metric']?
 		$tmp_metric = $this->get_metric_options();
-		$bench_head_text = ucwords(strtolower($tmp_metric[$this->metric])) . ' (n=' . $arr_benchmarks['cnt_herds'] . ')';
-/*
- * @todo: make this flexible (work for lact groups (and other) and test date based tables), not dhi-specific
- * 
- */
-		unset($arr_benchmarks['cnt_herds']);
-		if(isset($arr_benchmarks['pstring'])){
-			$arr_benchmarks['pstring'] = '';
+		$bench_head_text = ucwords(strtolower($tmp_metric[$this->metric])) . ' (n=' . $arr_benchmarks[0]['cnt_herds'] . ')';
+
+		foreach($arr_benchmarks as &$b){
+			unset($b['cnt_herds']);
+			if(isset($b['pstring'])){
+				$b['pstring'] = '';
+			}
+			$b = array($row_head_field => $bench_head_text) + $b;
 		}
-		$arr_benchmarks = array($row_head_field => $bench_head_text) + $arr_benchmarks;
 		return $arr_benchmarks;
-	}
-	
-	/**
-	 * @description builds sql based on object variables
-	 * @param object report_model
-	 * @param string arr_fields_to_exclude
-	 * @param array of strings arr_group_by (db field names)
-	 * @return string
-	 * @author ctranel
-	 **/
-	public function build_benchmark_query($db_table, $avg_fields, $arr_group_by = NULL){
-		$sql = '';
-		$cte = '';
-		$addl_select_fields = '';
-		$from = '';
-		$where = '';
-		$group_by = '';
-		$order_by = '';
-//		$criteria_date_field = $this->arr_criteria_table[$this->criteria]['date_field'];
-//		$this->primary_table_date_field = $report_model->date_field;
-		
-		if($this->metric == "AVG") {
-			$cte = $this->build_cte();
-			$from = " FROM benchmark_herds bh INNER JOIN " . $this->db_table->full_table_name() . " p ON bh.herd_code = p.herd_code";
-		}
-		else {
-			$cte = $this->build_cte();
-			$from = " FROM benchmark_herds bh INNER JOIN " . $this->db_table->full_table_name() . " p ON bh.herd_code = p.herd_code";
-			if($db_table->field_exists('test_date')){
-				$from .= " AND bh.test_date = p.test_date";
-			}
-		}
-		if(strpos($this->metric, 'QTILE') !== FALSE){
-			$where = " WHERE bh.quartile = " . str_replace('QTILE', '', $this->metric);
-		}
-		
-		if(isset($arr_group_by) && is_array($arr_group_by)){
-			$group_by = " GROUP BY " . $arr_group_by[0];
-			$order_by = " ORDER BY " . $arr_group_by[0];
-			$addl_select_fields = $arr_group_by[0] . ',';
-			$high_index = (count($arr_group_by) - 1);
-			for($i=1; $i<=$high_index; $i++){
-				$addl_select_fields .= $arr_group_by[$i] . ',';
-				$group_by .= ", " . $arr_group_by[$i];
-				$order_by .= ", " . $arr_group_by[$i];
-			}
-		}
-		$sql = $cte . "SELECT COUNT(1) AS cnt_herds, " . $addl_select_fields. $avg_fields . $from . $where . $group_by . $order_by;
-		return $sql;
-	}
-	
-	protected function build_cte(){
-		$sql = '';
-		$cte_qualifier = '';
-		$cte_order_by = '';
-		$cte_fields = 'herd_code, test_date';
-		$arr_criteria_data = $this->arr_criteria_table[$this->criteria];
-		
-		if($this->metric == 'AVG') $cte_qualifier = '';
-		if($this->metric == 'TOP10_PCT'){
-			$cte_qualifier = 'TOP(10)PERCENT ';
-			$cte_order_by = ' ORDER BY ' . $arr_criteria_data['field'] . ' ' . $arr_criteria_data['sort_order'];
-		}
-		if(strpos($this->metric, 'QTILE') !== FALSE){
-			$cte_fields = 'quartile, ' . $cte_fields;
-			$cte_qualifier = 'NTILE(4) OVER (ORDER BY ' . $arr_criteria_data['field'] . ' ' . $arr_criteria_data['sort_order'] . ') AS quartile, ';
-		}
-		
-		$sql =  'WITH benchmark_herds(' . $cte_fields . ') AS (SELECT ' . $cte_qualifier . 'herd_code, test_date FROM ' . $this->herd_benchmark_pool_table;
-		
-		$sql .= ' WHERE test_date > DATEADD(MONTH, -4, GETDATE()) AND ' . $arr_criteria_data['field'] . ' IS NOT NULL ';
-		if(isset($this->herd_size_floor) && isset($this->herd_size_ceiling)){
-			$sql .= ' AND rha_cow_cnt BETWEEN ' . $this->herd_size_floor . ' AND ' . $this->herd_size_ceiling;
-		}
-		if(isset($this->arr_breeds) && is_array($this->arr_breeds) && !empty($this->arr_breeds)){
-			$sql .= ' AND breed_code IN (' . implode(',', $this->arr_breeds) . ')';
-		}
-		
-		$sql .= $cte_order_by;
-		$sql .= ')';
-		return $sql;
 	}
 }

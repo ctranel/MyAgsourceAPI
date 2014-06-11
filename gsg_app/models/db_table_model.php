@@ -18,9 +18,9 @@
 	}
 
 	/**
-	 * Checks whether given field exists in table
+	 * Retrieves column metadata for give db and table
 	 * 
-	 * Checks whether given field exists in table
+	 * Retrieves column metadata for give db and table
 
 	*  @since: 1.0
 	*  @author: ctranel
@@ -30,7 +30,7 @@
 	 * @return boolean
 	*  @throws:
 	 **/
-	public function field_exists($db_name, $table_name){
+	public function get_columns($db_name, $table_name){
 		$sql = "USE $db_name; SELECT COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH, NUMERIC_PRECISION FROM INFORMATION_SCHEMA.Columns WHERE TABLE_NAME = '$table_name'";
 		$result = $this->db->query($sql)->result_array();
 		return $result;

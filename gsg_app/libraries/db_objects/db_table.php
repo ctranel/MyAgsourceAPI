@@ -65,7 +65,7 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 	public function field_exists($col_name){
 		//require_once APPPATH . 'helpers/multid_array_helper.php';
 		if(!isset($this->arr_fields)){
-			$this->arr_fields = $this->db_table_model->field_exists($this->database_name, $this->table_name);
+			$this->arr_fields = $this->db_table_model->get_columns($this->database_name, $this->table_name);
 		}
 		return (bool)array_search_recursive($col_name, $this->arr_fields);
 	}
