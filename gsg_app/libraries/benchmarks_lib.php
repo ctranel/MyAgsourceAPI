@@ -24,7 +24,7 @@ class Benchmarks_lib
 	 * table that stores most recent data for all herd/pstring data for deriving benchmark groups
 	 * @var string
 	 **/
-	protected $herd_benchmark_pool_table = 'vma.dbo.bench_criteria_summary'; //'vma.dbo.vma_bench_criteria_summary';
+	protected $herd_benchmark_pool_table = 'herd.dbo.bench_criteria_summary'; //'vma.dbo.vma_bench_criteria_summary';
 
 	/**
 	 * key field used in benchmarks (will always be test date?)

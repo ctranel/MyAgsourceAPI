@@ -149,6 +149,8 @@ class Benchmark_model extends CI_Model {
 		$sql =  'WITH benchmark_herds(' . $cte_fields . ') AS (SELECT ' . $cte_qualifier . 'herd_code, test_date FROM ' . $herd_benchmark_pool_table;
 	
 		$sql .= ' WHERE test_date > DATEADD(MONTH, -4, GETDATE()) AND ' . $arr_criteria_data['field'] . ' IS NOT NULL ';
+//the following line should not be necessary if we eliminate records where pstring != 0 from the table (could also eliminate records older than 4 months)
+		$sql .= ' AND pstring = 0 ';
 		if(isset($arr_breeds) && is_array($arr_breeds) && !empty($arr_breeds)){
 			$sql .= " AND breed_code IN ('" . implode("','", $arr_breeds) . "')";
 		}
