@@ -3,7 +3,7 @@ class Download extends CI_Controller {
 	
 	function __construct(){
 		parent::__construct();
-		if(!isset($this->as_ion_auth)){
+/*		if(!isset($this->as_ion_auth)){
 			redirect('auth/login', 'refresh');
 		}
 		if((!$this->as_ion_auth->logged_in())){
@@ -17,7 +17,7 @@ class Download extends CI_Controller {
 				$this->session->keep_flashdata('message');
 			}
 			redirect(site_url('auth/login'));
-		}
+		} */
 	}
 
 	function bench_all(){
