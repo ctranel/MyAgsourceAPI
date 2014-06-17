@@ -208,9 +208,13 @@ function process_chart(div_id){ //chart_data is defined globally at the top of t
 	if(typeof(chart_data[block_index]) != 'undefined'){
 		// set up the temporary array that holds the data
 		var tmpData = {};
+		console.log(dump(chart_data[block_index]));
 		if(typeof chart_data[block_index].section_data !== 'undefined') section_data = chart_data[block_index].section_data;
 		if(typeof chart_data[block_index].data === 'undefined' || chart_data[block_index].data == false){
-			$('#' + div_id).html('<p class-"chart-error">Sorry, there is no data available for this report.  Please try again, or contact AgSource for assistance.</p>');
+			var block_header = '<h2 class="block">'+chart_data[block_index].config.title.text+'</h2>';
+			block_header += '<h3 class="block">'+chart_data[block_index].config.subtitle.text+'</h3>';
+			block_header += '<p class-"chart-error">Sorry, there is no data available for this item.  Please contact <a href="mailto:custserv@myagsource.com">customer service</a> if you believe this is in error.</p>';
+				$('#' + div_id).html(block_header);
 		}
 		else if(typeof(section_data.redirect) !== 'undefined'){
 			if(section_data.redirect == 'login') window.location.href = window.location.protocol + window.location.host + window.location.path;
