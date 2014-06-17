@@ -22,6 +22,7 @@ if ( ! function_exists('set_redirect_url'))
 			|| strpos($referrer_in, 'help') !== FALSE
 			|| strpos($referrer_in, 'custom_reports/select') !== FALSE
 			|| strpos($referrer_in, 'custom_reports/insert') !== FALSE
+			|| strpos($referrer_in, 'download/') !== FALSE
 		){
 			$referrer_in = '';
 		}
