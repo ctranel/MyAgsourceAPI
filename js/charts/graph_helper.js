@@ -155,7 +155,6 @@ function updateBlock(container_div_id, block_in, block_index, sort_field, sort_o
 	if($("#filter-form")){
 		params = encodeURIComponent(JSON.stringify($("#filter-form").serializeObject()));
 	}
-console.log(params);
 	if(typeof(sort_field) == 'undefined') sort_field = null;
 	if(typeof(sort_order) == 'undefined') sort_order = null;
 	switch(display){
