@@ -226,7 +226,7 @@ class Change_herd extends CI_Controller {
 	
 	protected function set_herd_session_data(){
 		$this->session->set_userdata('herd_code', $this->herd->getHerdCode());
-		$this->session->set_userdata('arr_pstring', $this->herd_model->get_pstring_array($this->herd->getHerdCode(), FALSE));
+		$this->session->set_userdata('arr_pstring', $this->herd_model->get_pstring_array($this->herd->getHerdCode()));
 		$this->session->set_userdata('herd_enroll_status_id', $this->herd->getHerdEnrollStatus($this->herd_model, $this->config->item('product_report_code')));
 		$this->session->set_userdata('recent_test_date', $this->herd->getRecentTest($this->herd_model));
 	}

@@ -128,20 +128,20 @@ function updatePage(el){
 		block_index = div_id.replace('graph-canvas','');
 		sort_field = null;
 		sort_order = null;
-		display = 'chart'
+		display = 'chart';
 		updateBlock(div_id, block_name, block_index, sort_field, sort_order, display, first);
 		first = false;
-	})
+	});
 	$('.table-container').each(function(){
 		div_id = $(this).attr('id');
 		block_name = $(this).attr('data-block');
 		block_index = div_id.replace('table-canvas','');
 		sort_field = null;
 		sort_order = null;
-		display = 'table'
+		display = 'table';
 		updateBlock(div_id, block_name, block_index, sort_field, sort_order, display, first);
-		first = false
-	})
+		first = false;
+	});
 	
 	$('.pstring-link').css('fontWeight', 'normal');
 	el.style.fontWeight = 'bold';
@@ -151,11 +151,11 @@ function updateBlock(container_div_id, block_in, block_index, sort_field, sort_o
 //load and process ajax data - base_url and page are defined globally in the controller
 	var params = '';
 	var cache_bust = Math.floor(Math.random()*1000);
-	var pstring = $('.pstring-filter-item > input:checked').val();
+	//var pstring = $('.pstring-filter-item > input:checked').val();
 	if($("#filter-form")){
 		params = encodeURIComponent(JSON.stringify($("#filter-form").serializeObject()));
 	}
-
+console.log(params);
 	if(typeof(sort_field) == 'undefined') sort_field = null;
 	if(typeof(sort_order) == 'undefined') sort_order = null;
 	switch(display){
@@ -170,9 +170,9 @@ function updateBlock(container_div_id, block_in, block_index, sort_field, sort_o
 }
 
 function load_table(server_path, div_id, block_index, params){
-	if(typeof(params) == 'undefined' && $("#filter-form")){
+	/* if(typeof(params) == 'undefined' && $("#filter-form")){
 		params = encodeURIComponent(JSON.stringify($("#filter-form").serializeObject()));
-	}
+	} */
 	if(!server_path) {
 		alert("No data found.");
 		return false;
@@ -188,9 +188,9 @@ function load_table(server_path, div_id, block_index, params){
 }
 
 function load_chart(server_path, div_id, block_index, params){
-	if(typeof(params) == 'undefined' && $("#filter-form")){
+	/* if(typeof(params) == 'undefined' && $("#filter-form")){
 		params = encodeURIComponent(JSON.stringify($("#filter-form").serializeObject()));
-	}
+	} */
 	if(!server_path) {
 		alert("No data found.");
 		return false;
@@ -208,7 +208,6 @@ function process_chart(div_id){ //chart_data is defined globally at the top of t
 	if(typeof(chart_data[block_index]) != 'undefined'){
 		// set up the temporary array that holds the data
 		var tmpData = {};
-		console.log(dump(chart_data[block_index]));
 		if(typeof chart_data[block_index].section_data !== 'undefined') section_data = chart_data[block_index].section_data;
 		if(typeof chart_data[block_index].data === 'undefined' || chart_data[block_index].data == false){
 			var block_header = '<h2 class="block">'+chart_data[block_index].config.title.text+'</h2>';

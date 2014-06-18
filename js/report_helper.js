@@ -19,12 +19,12 @@ if($('#filter-form')){ //if there is a filter form (only on pages with one table
 			$('#filter-form').addClass('expanded');
 			//$('#set-filters').parent().width(width);
 		}
-	})
+	});
 
 	$('.download-links').click(function(ev){
 		params = encodeURIComponent(JSON.stringify($("#filter-form").serializeObject()));
-		ev.target.setAttribute('href', ev.target.getAttribute('href') + '/' + params)
-	})
+		ev.target.setAttribute('href', ev.target.getAttribute('href') + '/' + params);
+	});
 }
 
 

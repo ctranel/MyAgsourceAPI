@@ -82,44 +82,7 @@ $active_group = "default";
 $active_record = TRUE;
 $db_server = 'myagsource';
 
-switch (ENVIRONMENT)
-{
-	case 'development':
-		$db['default']['hostname'] = 'testdare.verona.crinet\\' . $db_server;
-		$db['default']['username'] = 'webuser';
-		$db['default']['password'] = 'm1$AgSourze';
-		$db['default']['database'] = "users";
-		$db['default']['dbdriver'] = 'mssql';
-		$db['default']['dbprefix'] = "";
-		$db['default']['pconnect'] = FALSE;
-		$db['default']['db_debug'] = TRUE;
-		$db['default']['cache_on'] = TRUE;
-		$db['default']['cachedir'] = "";
-		$db['default']['char_set'] = 'windows-1252';
-		$db['default']['dbcollat'] = 'sql_latin1_general_cp1_ci_as';
-		$db['default']['swap_pre'] = '';
-		$db['default']['autoinit'] = TRUE;
-		$db['default']['stricton'] = FALSE;
-		break;
-	case 'testing':
-		$db['default']['hostname'] = 'testdare.verona.crinet\\' . $db_server;
-		$db['default']['username'] = 'webuser';
-		$db['default']['password'] = 'm1$AgSourze';
-		$db['default']['database'] = "users";
-		$db['default']['dbdriver'] = 'mssql';
-		$db['default']['dbprefix'] = "";
-		$db['default']['pconnect'] = FALSE;
-		$db['default']['db_debug'] = TRUE;
-		$db['default']['cache_on'] = TRUE;
-		$db['default']['cachedir'] = "";
-		$db['default']['char_set'] = 'windows-1252';
-		$db['default']['dbcollat'] = 'sql_latin1_general_cp1_ci_as';
-		$db['default']['swap_pre'] = '';
-		$db['default']['autoinit'] = TRUE;
-		$db['default']['stricton'] = FALSE;
-		break;
-	case 'production':
-		//default is the user database
+if(ENVIRONMENT == 'production'){
 		$db['default']['hostname'] = '173.229.1.155' ;
 		$db['default']['username'] = 'webuser';
 		$db['default']['password'] = 'm1$AgS_R0';
@@ -135,16 +98,24 @@ switch (ENVIRONMENT)
 		$db['default']['swap_pre'] = '';
 		$db['default']['autoinit'] = TRUE;
 		$db['default']['stricton'] = FALSE;
-		break;
-	default:
-		exit('The application environment is not set correctly - database.');
 }
-
-
-
-
-
-
+else{
+		$db['default']['hostname'] = 'testdare.verona.crinet\\' . $db_server;
+		$db['default']['username'] = 'webuser';
+		$db['default']['password'] = 'm1$AgSourze';
+		$db['default']['database'] = "users";
+		$db['default']['dbdriver'] = 'mssql';
+		$db['default']['dbprefix'] = "";
+		$db['default']['pconnect'] = FALSE;
+		$db['default']['db_debug'] = TRUE;
+		$db['default']['cache_on'] = TRUE;
+		$db['default']['cachedir'] = "";
+		$db['default']['char_set'] = 'windows-1252';
+		$db['default']['dbcollat'] = 'sql_latin1_general_cp1_ci_as';
+		$db['default']['swap_pre'] = '';
+		$db['default']['autoinit'] = TRUE;
+		$db['default']['stricton'] = FALSE;
+}
 
 /* -----------------------------------------------------------------
  *  UPDATE comment
