@@ -512,6 +512,7 @@ abstract class parent_report extends CI_Controller {
 			$this->filters = new Filters();
 			$primary_table = $this->{$this->primary_model}->get_primary_table_name();
 			$recent_test_date = isset($primary_table) ? $this->{$this->primary_model}->get_recent_dates() : NULL;
+			$this->load->helper('multid_array_helper');
 			$this->filters->set_filters(
 					$this->session->userdata('herd_code'),
 					$this->pstring,
