@@ -50,7 +50,7 @@ class Report_model extends CI_Model {
 		 * back to the access log model does not cause problem.  That is the only other model that calls the get block links method.
 		 */
 		$this->load->model('dhi/herd_model');
-		$this->arr_pstring = $this->herd_model->get_pstring_array($this->session->userdata('herd_code'));
+		$this->arr_pstring = $this->session->userdata('arr_pstring');
 		$this->tables  = $this->config->item('tables', 'ion_auth');
 
 		$this->db_group_name = 'default';
@@ -376,7 +376,7 @@ class Report_model extends CI_Model {
 	 **/
 	protected function adjust_fields($herd_code){
 		//remove pstring column if the herd does not have pstrings
-		$this->arr_pstring = $this->herd_model->get_pstring_array($herd_code);
+		$this->arr_pstring = $this->session->userdata('arr_pstring');
 		if (empty($this->arr_pstring) || count($this->arr_pstring) == 1) {
 			if (($key = array_search('pstring', $this->arr_fields)) !== false) {
 				unset($arr_select_fields[$key]);

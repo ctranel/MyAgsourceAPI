@@ -17,6 +17,27 @@ $('.handle').each(function(){
 });
 // end set all inline forms to be the same width
 
+if($('#filter-form')){ //if there is a filter form (only on pages with one table)
+	$('#filter-form').submit(function(ev){
+		ev.preventDefault();
+		updatePage(this);
+	});
+	
+	$('#set-filters').click(function(ev){
+		ev.preventDefault();
+		if($('#set-filters').hasClass('expanded')){
+			$('#set-filters').removeClass('expanded');
+			$('#filter-form').removeClass('expanded');
+		}
+		else{
+			//var width = $('#set-filters').parent().width();
+			$('#set-filters').addClass('expanded');
+			$('#filter-form').addClass('expanded');
+			//$('#set-filters').parent().width(width);
+		}
+	});
+}
+
 $('.handle').click(function(ev){
 	ev.preventDefault();
 	if($(this).hasClass('expanded')){
@@ -28,16 +49,19 @@ $('.handle').click(function(ev){
 		$(this).addClass('expanded');
 		$(this).next().addClass('expanded');
 	}
-})
+});
 
 $('.expand').on('mouseleave', function(ev){
-	console.log($(this).attr('class'))
 	$(this).removeClass('expanded');
 	$(this).prev().removeClass('expanded');
-})
+});
 
 function closeExpanded(){
 	$('.expanded').removeClass('expanded');
+	$('.download-links').click(function(ev){
+		params = encodeURIComponent(JSON.stringify($("#filter-form").serializeObject()));
+		ev.target.setAttribute('href', ev.target.getAttribute('href') + '/' + params);
+	});
 }
 
 function attachDataFieldEvents(){
@@ -128,7 +152,6 @@ function attachDataFieldEvents(){
 //	    }
 	});
 }
-
 
 (function($) {
 	  return $.fn.serializeObject = function() {

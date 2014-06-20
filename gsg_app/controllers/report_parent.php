@@ -2,7 +2,8 @@
 require_once APPPATH . 'libraries' . FS_SEP . 'db_objects' . FS_SEP . 'db_table.php';
 
 use libraries\db_objects\db_table;
- 
+use \myagsource\reports\Filters;
+
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /* -----------------------------------------------------------------
@@ -35,6 +36,7 @@ abstract class parent_report extends CI_Controller {
 	protected $html;
 	protected $graph;
 	protected $page; //url segment of current page
+	protected $filters; //filters object
 	protected $objPage; //object of current page
 	protected $block;
 	protected $report_count;
@@ -53,7 +55,6 @@ abstract class parent_report extends CI_Controller {
 		$class_dir = $this->router->fetch_directory(); //this should match the name of this file (minus ".php".  Also used as base for css and js file names and model directory name
 		$class = $this->router->fetch_class();
 		$method = $this->router->fetch_method();
-//		echo $class_dir .' '.$class.' '.$method;
 		$this->section_path = $class_dir . $class;
 
 		$this->page = $this->router->fetch_method();
@@ -193,7 +194,7 @@ abstract class parent_report extends CI_Controller {
 		redirect(site_url($this->report_path));
 	}
 
-	function display($arr_block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL, $json_filter_data = NULL){
+	function display($arr_block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
 		$this->pstring = $this->session->userdata('pstring');
 		if(!isset($this->pstring) || empty($this->pstring)){
 			$tmp = $this->{$this->primary_model}->get_current_pstring();
@@ -227,29 +228,23 @@ abstract class parent_report extends CI_Controller {
 		}
 
 		//FILTERS
-		include(APPPATH.'libraries/Filters.php');
-		//set arr_params to filter data from json
-		$arr_params = Filters::get_filter_array($json_filter_data);
-
-		//prep data for filter library
-		$filter_lib_data = array(
-			'page'=>$this->page,
-			'params'=>$arr_params,
-			'section'=>$this->section_id,
-			'criteria'=>$this->arr_filter_criteria,
-			'primary_model'=>$this->{$this->primary_model},
-			'log_filter_text'=>$this->log_filter_text,
-			'report_path'=>$this->report_path
-		);
-		
 		//load required libraries
-		$this->load->library('filters',$filter_lib_data);
-		$this->load->library('form_validation');
-
-		$arr_filter_data = $this->filters->set_filters();
-		
-		$this->arr_filter_criteria = $arr_filter_data['filter_selected'];
-
+		$this->load->model('filter_model');
+		require_once(APPPATH.'libraries/Filters.php');
+		$this->filters = new Filters();
+		$recent_test_date = isset($primary_table) ? $this->{$this->primary_model}->get_recent_dates() : NULL;
+		$this->filters->set_filters(
+				$this->session->userdata('herd_code'),
+				$this->pstring,
+				$recent_test_date,
+				$this->filter_model,
+				$this->section_id,
+				$this->page,
+				NULL, //filter form submissions never trigger a new page load (i.e., this function is never fired by a form submission)
+				$this->session->userdata('arr_pstring')
+		);
+		$this->arr_filter_criteria = $this->filters->criteria();
+		//END FILTERS
 		if ($display_format == 'csv'){
 			$data = array();
 			if(isset($arr_blocks) && is_array($arr_blocks)){
@@ -474,7 +469,9 @@ abstract class parent_report extends CI_Controller {
 			$this->carabiner->css('hide_report_nav.css', 'screen');
 		}
 		$report_filter_path = 'filters';
-		if(file_exists(APPPATH . 'views' . FS_SEP . $this->section_path . FS_SEP . 'filters.php')) $report_filter_path =  $this->section_path . '/' . $report_filter_path;
+		if(file_exists(APPPATH . 'views' . FS_SEP . $this->section_path . FS_SEP . 'filters.php')){
+			$report_filter_path =  $this->section_path . '/' . $report_filter_path;
+		}
 		$data = array(
 			'page_header' => $this->load->view('page_header', $this->page_header_data, TRUE),
 			'herd_code' => $this->session->userdata('herd_code'),
@@ -485,6 +482,11 @@ abstract class parent_report extends CI_Controller {
 			'report_path' => $this->report_path
 		);
 		
+		$arr_filter_data = array(
+			'arr_filters' => $this->filters->filter_list(),
+			'filter_selected' => $this->arr_filter_criteria,
+			'arr_pstring' => $this->session->userdata('arr_pstring'),
+		);
 		if(isset($arr_filter_data)) $data['filters'] = $this->load->view($report_filter_path, $arr_filter_data, TRUE);
 		if(isset($arr_benchmark_data)) $data['benchmarks'] = $this->load->view('set_benchmarks', $arr_benchmark_data, TRUE);
 		if((is_array($arr_nav_data['arr_pages']) && count($arr_nav_data['arr_pages']) > 1) || (isset($arr_nav_data['arr_pstring']) && is_array($arr_nav_data['arr_pstring']) && count($arr_nav_data['arr_pstring']) > 1)){
@@ -514,28 +516,33 @@ abstract class parent_report extends CI_Controller {
 			if(isset($arr_params['csrf_test_name']) && $arr_params['csrf_test_name'] != $this->security->get_csrf_hash()) die("I don't recognize your browser session, your session may have expired, or you may have cookies turned off.");
 			unset($arr_params['csrf_test_name']);
 			//ASSUMING ONLY ONE PSTRING WILL BE SELECTED FOR NOW
-			$pstring = (!isset($arr_params['pstring']) || empty($arr_params['pstring'][0]))?'0':$arr_params['pstring'][0];
-			$this->session->set_userdata('pstring', $pstring);
-			$this->pstring = $pstring;
-
+			if(isset($arr_params['pstring']) && (!empty($arr_params['pstring'][0]) || $arr_params['pstring'][0] === '0')){
+				$this->pstring = $arr_params['pstring'][0];
+				$this->session->set_userdata('pstring', $this->pstring);
+			}
+			else{
+				$this->pstring = $this->session->userdata('pstring');
+			}
 			//prep data for filter library
-			$filter_lib_data = array(
-					'page'=>$page,
-					'params'=>$arr_params,
-					'section'=>$this->section_id,
-					'criteria'=>$this->arr_filter_criteria,
-					'primary_model'=>$this->{$this->primary_model},
-					'log_filter_text'=>$this->log_filter_text,
-					'report_path'=>$this->report_path
-			);
-				
-			//load required libraries
-			$this->load->library('filters',$filter_lib_data);
-
-			$arr_filter_data = $this->filters->set_filters();
-
-			$this->arr_filter_criteria = $arr_filter_data['filter_selected'];
+			$this->load->model('filter_model');
 			
+			//load required libraries
+			require_once(APPPATH.'libraries/Filters.php');
+			$this->filters = new Filters();
+			$primary_table = $this->{$this->primary_model}->get_primary_table_name();
+			$recent_test_date = isset($primary_table) ? $this->{$this->primary_model}->get_recent_dates() : NULL;
+			$this->load->helper('multid_array_helper');
+			$this->filters->set_filters(
+					$this->session->userdata('herd_code'),
+					$this->pstring,
+					$recent_test_date,
+					$this->filter_model,
+					$this->section_id,
+					$page,
+					$arr_params,
+					$this->session->userdata('arr_pstring')
+			);
+			$this->arr_filter_criteria = $this->filters->criteria();
 		}
 		$this->load->helper('report_chart_helper');
 		if($sort_by != 'null' && $sort_order != 'null') {
