@@ -27,15 +27,14 @@ endif; ?>
 		possibly have predicted and give feedback. This is why beta-testers
 		are an essential and greatly appreciated part of every project's
 		community.</p>
-		<p>Thank you for helping us make www.myagsource.com fulfill your
+		<p>Thank you for helping us make myagsource.com fulfill your
 		needs and the needs of our cooperative as a whole.</p>
 	<h2>Known Issues</h2>
 		<ul>
 			<li>Google Chrome
 				<p><label>Version 32</label> Chrome 32 contains a bug that affects our
-					scatter plot graphs. Google is aware of the issue and has a fix in
-					the pipeline that should be released with Chrome 34. Expected
-					release date of Chrome 34 is early 2nd quarter.
+					scatter plot graphs. Google pushed the fix up to Chrome 33.  If you're
+					still using Chrome 32, please update to 33 or higher.
 				</p>
 			</li>
 			<li>Internet Explorer
@@ -44,7 +43,7 @@ endif; ?>
 					when clicking on their identification links. If you wish to be
 					able to use this feature on a windows machine running Windows XP,
 					consider using a different browser when visiting
-					www.myagsource.com.
+					myagsource.com.
 				</p>
 			</li>
 		</ul>
@@ -60,7 +59,7 @@ endif; ?>
 			email links provided above.</p>
 		<p> In the meantime, if you would like to view the website as it
 			is intended to look for comparison, the browser most compatibile
-			with the site as of 2/14/2014 is <strong>Firefox</strong>.</p>
+			with the site as of 6/23/2014 is <strong>Firefox</strong>.</p>
 		<p> We will never require you to change browsers if it is within
 			our power to fix an issue. However, some things are beyond our
 			control and those things will be listed above in our Known Issues
