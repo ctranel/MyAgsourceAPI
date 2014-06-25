@@ -107,7 +107,6 @@ class Benchmarks_lib
 				'sort_order' => 'asc',
 			),
 		);
-//		'p.herd_rha' => 			array('join_text' => " LEFT JOIN herd_summary.dbo.herd_rha p ON td.herd_code = p.herd_code AND td.test_date = p.test_date", 'sort_order' => 'desc', 'date_field' => 'test_date'),
 	}
 
 	/**
@@ -200,34 +199,31 @@ class Benchmarks_lib
 	}
 
 	/**
-	 * gets text description of benchmarks being used
+	 * get_user_herd_settings
 	 *
-	 * @return string
+	 * @return array of user-herd settings
 	 * @author ctranel
 	 **/
-	public function get_bench_text($sess_benchmarks){
-		if(!isset($sess_benchmarks) || $sess_benchmarks === FALSE){
-			return "Benchmark session not set";
+	private function getUserHerdBenchmarkSettings($user_id, $herd_info){
+		//REMOVE IF WE DECIDE TO STORE PREFERENCES
+		if(isset($arr_tmp['criteria'])){
+			$arr_tmp['metric'] = $arr_sess_benchmarks['metric'];
+			$arr_tmp['criteria'] = $arr_sess_benchmarks['criteria'];
+			$arr_tmp['arr_breeds'] = $arr_sess_benchmarks['arr_breeds'];
+			$arr_tmp['arr_herd_size'] = $arr_sess_benchmarks['arr_herd_size'];
+			return $arr_tmp;
 		}
-		$criteria_options = $this->get_criteria_options();
-		$bench_text = 'Benchmark herds determined by ' . $criteria_options[$sess_benchmarks['criteria']] . ' for';
-		if(isset($sess_benchmarks['arr_breeds'])){
-			$bench_text .= ' ' . implode(',', $sess_benchmarks['arr_breeds']);
-		}
-		if(isset($sess_benchmarks['arr_herd_size']) && in_array('HO', $sess_benchmarks['arr_breeds'])){
-			$bench_text .= ' herds between ' . $sess_benchmarks['arr_herd_size'][0] . ' and ' . $sess_benchmarks['arr_herd_size'][1] . ' animals';
-		}
-		return $bench_text;
+		else return FALSE;
 	}
-	
+
 	/**
 	 * @method get_bench_settings()
 	 * @return array of data for the graph
 	 * @access protected
 	 **/
-	public function get_bench_settings($user_id, $herd_info, $arr_sess_benchmarks = null){
+	public function get_bench_settings($user_id, $herd_info){
 		//arr_criteria (field_name, sort_order, table_name, join_field) and arr_herd_size (herd_size_floor, herd_size_ceiling) are arrays
-		$arr_user_herd_settings = $this->getUserHerdBenchmarkSettings($user_id, $herd_info, $arr_sess_benchmarks);
+		$arr_user_herd_settings = $this->getUserHerdBenchmarkSettings($user_id, $herd_info);
 		$arr_default = $this->get_default_settings($herd_info['breed_code'], $herd_info['herd_size']);
 		if(isset($arr_user_herd_settings) && is_array($arr_user_herd_settings)){
 			$arr_common = array_intersect_key($arr_default, $arr_user_herd_settings);
@@ -240,32 +236,6 @@ class Benchmarks_lib
 		return $arr_default;
 	}
 	
-	/**
-	 * get_user_herd_settings
-	 *
-	 * @return array of user-herd settings
-	 * @author ctranel
-	 **/
-	private function getUserHerdBenchmarkSettings($user_id, $herd_info, $arr_sess_benchmarks){
-		//REMOVE IF WE DECIDE TO STORE PREFERENCES
-		if(isset($arr_sess_benchmarks) && !empty($arr_sess_benchmarks)){
-			$arr_tmp['metric'] = $arr_sess_benchmarks['metric'];
-			$arr_tmp['criteria'] = $arr_sess_benchmarks['criteria'];
-			$arr_tmp['arr_breeds'] = $arr_sess_benchmarks['arr_breeds'];
-			$arr_tmp['arr_herd_size'] = $arr_sess_benchmarks['arr_herd_size'];
-			return $arr_tmp;
-		}
-		else return FALSE;
-		/*		$user_id = $this->session->userdata('user_id');
-			$result = $this->db
-		->select()
-		->get($this->tables['users_herds_settings'])
-		->return_array();
-	
-		if(is_array($result) && !empty($result)) return $result[0];
-		else return FALSE;*/
-	}
-
 	/**
 	 * gets default criteria for benchmarks
 	 *
@@ -312,6 +282,27 @@ class Benchmarks_lib
 			return array($herd_size_floor, $herd_size_ceiling);
 		}
 		else return NULL;
+	}
+	
+	/**
+	 * gets text description of benchmarks being used
+	 *
+	 * @return string
+	 * @author ctranel
+	 **/
+	public function get_bench_text($sess_benchmarks){
+		if(!isset($sess_benchmarks) || $sess_benchmarks === FALSE){
+			return "Benchmark session not set";
+		}
+		$criteria_options = $this->get_criteria_options();
+		$bench_text = 'Benchmark herds determined by ' . $criteria_options[$sess_benchmarks['criteria']] . ' for';
+		if(isset($sess_benchmarks['arr_breeds'])){
+			$bench_text .= ' ' . implode(',', $sess_benchmarks['arr_breeds']);
+		}
+		if(isset($sess_benchmarks['arr_herd_size']) && in_array('HO', $sess_benchmarks['arr_breeds'])){
+			$bench_text .= ' herds between ' . $sess_benchmarks['arr_herd_size'][0] . ' and ' . $sess_benchmarks['arr_herd_size'][1] . ' animals';
+		}
+		return $bench_text;
 	}
 	
 	/**

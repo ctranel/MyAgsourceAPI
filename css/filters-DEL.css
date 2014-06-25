@@ -27,10 +27,10 @@ a.#set_filters {}
 	content: "▼";
 }
 
-#filter-form {visibility: hidden; height: 0px; background-color: #E6F4F4; position: absolute;}
+#filter-forms {visibility: hidden; height: 0px; background-color: #E6F4F4; position: absolute;}
 
 #filters {}
-#filter-form.expanded{z-index: 10; visibility: visible; float:right; height: auto;}
+#filter-forms.expanded{z-index: 10; visibility: visible; float:right; height: auto;}
 #filters a.expanded:before {content: "▲";}
 
 #filters p {padding: 10px 20px 0px 20px;}

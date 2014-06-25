@@ -333,7 +333,7 @@ abstract class parent_report extends CI_Controller {
 		$this->carabiner->css('report.css', 'print');
 		$this->carabiner->css($this->section_path . '.css', 'screen');
 		if($this->filters->displayFilters($this->bool_is_summary)){
-			$this->carabiner->css('filters.css', 'screen');
+			//$this->carabiner->css('filters.css', 'screen');
 			$this->carabiner->css('agsource.datepick.css', 'screen');
 			$this->carabiner->css('jquery.datetimeentry.css', 'screen');
 		}
@@ -437,6 +437,7 @@ abstract class parent_report extends CI_Controller {
 		}
 		unset($this->{$this->primary_model}->arr_messages); //clear message var once it is displayed
 		$this->load->library('benchmarks_lib');
+		$this->load->library('settings');
 		$arr_benchmark_data = array(
 			'arr_breed_options' => $this->benchmarks_lib->get_breed_options(),
 			'arr_breed_selected' => array('HO'),
