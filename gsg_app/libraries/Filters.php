@@ -190,7 +190,7 @@ class Filters{
 			if($f['db_field_name'] == 'pstring' && (!isset($f['default_value']) || empty($f['default_value']))){
 				$this->criteria['pstring'] = $sess_pstring;
 			}
-			elseif($f['db_field_name'] == 'test_date' && (!isset($f['default_value']) || empty($f['default_value']))){
+			elseif($f['db_field_name'] == 'test_date' && $f['type'] != 'date range' && (!isset($f['default_value']) || empty($f['default_value']))){
 				$this->criteria['test_date'] = $recent_test_date;
 			}
 
@@ -288,7 +288,7 @@ class Filters{
 			else{
 				if(substr($k, -5) == "_dbto" && !empty($v)){ //ranges
 					$db_field = substr($k, 0, -5);
-					$arr_filter_text[] = ucwords(str_replace('_', ' ', $db_field)) . ': Between ' . $arr_filters[$db_field . '_dbfrom'] . ' and ' . $arr_filters[$db_field . '_dbto'];
+					$arr_filter_text[] = ucwords(str_replace('_', ' ', $db_field)) . ': Between ' . $this->criteria[$db_field . '_dbfrom'] . ' and ' . $this->criteria[$db_field . '_dbto'];
 				}
 				elseif(substr($k, -7) != "_dbfrom" && $k != 'herd_code' && !empty($v)){ //default--it skips the opposite end of the range as _dbto
 					$arr_filter_text[] = ucwords(str_replace('_', ' ', $k)) . ': ' . $v;
