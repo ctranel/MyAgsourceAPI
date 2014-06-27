@@ -1,8 +1,13 @@
 <?php
+//namespace myagsource;
 require_once APPPATH . 'libraries' . FS_SEP . 'db_objects' . FS_SEP . 'db_table.php';
+require_once APPPATH . 'libraries' . FS_SEP . 'settings' . FS_SEP . 'Session_settings.php';
+require_once(APPPATH.'libraries' . FS_SEP . 'Filters.php');
+require_once(APPPATH.'libraries' . FS_SEP . 'benchmarks_lib.php');
 
-use libraries\db_objects\db_table;
-use \myagsource\reports\Filters;
+use \myagsource;
+use \myagsource\db_objects;
+use \myagsource\settings;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
@@ -49,6 +54,12 @@ abstract class parent_report extends CI_Controller {
 	protected $avg_row;
 	protected $pivot_db_field;
 	protected $bool_is_summary;
+	/**
+	 * Benchmark settings
+	 * 
+	 * @var Session_settings object
+	protected $bench_setting;
+	 */
 	
 	function __construct(){
 		parent::__construct();
@@ -230,8 +241,7 @@ abstract class parent_report extends CI_Controller {
 		//FILTERS
 		//load required libraries
 		$this->load->model('filter_model');
-		require_once(APPPATH.'libraries/Filters.php');
-		$this->filters = new Filters();
+		$this->filters = new myagsource\Filters();
 		$recent_test_date = isset($primary_table) ? $this->{$this->primary_model}->get_recent_dates() : NULL;
 		$this->filters->set_filters(
 				$this->session->userdata('herd_code'),
@@ -436,18 +446,19 @@ abstract class parent_report extends CI_Controller {
 			$this->page_header_data['arr_headjs_line'][] = 'function(){' . $tmp_js . ';}';
 		}
 		unset($this->{$this->primary_model}->arr_messages); //clear message var once it is displayed
-		$this->load->library('benchmarks_lib');
-		$this->load->library('settings');
-		$arr_benchmark_data = array(
-			'arr_breed_options' => $this->benchmarks_lib->get_breed_options(),
+		$this->load->model('setting_model');
+		$this->benchmarks_lib = new myagsource\settings\Benchmarks_lib($this->session->userdata('user_id'), $this->input->post('herd_code'), $this->herd_model->header_info($this->herd_code), $this->setting_model);
+		$arr_benchmark_data = $this->benchmarks_lib->getFormData(); 
+		/*array(
+			'arr_breed_options' => $this->benchmarks_lib->get_breed_options(),//settings obj
 			'arr_breed_selected' => array('HO'),
-			'arr_metric_options' => $this->benchmarks_lib->get_metric_options(),
+			'arr_metric_options' => $this->benchmarks_lib->get_metric_options(),//settings obj
 			'arr_metrics_selected' => array('TOP20_PCT'),
-			'arr_criteria_options' => $this->benchmarks_lib->get_criteria_options(),
+			'arr_criteria_options' => $this->benchmarks_lib->get_criteria_options(),//settings obj
 			'arr_criteria_selected' => array('PROD'),
 			'herd_size_dbfrom' => 100,
 			'herd_size_dbto' => 500,
-		);
+		);*/
 		$arr_nav_data = array(
 			//if I do not add this empty array, the array in the view somehow populated (should only be populated if code in bool_is_summary block below is executed)
 			'arr_pstring' => array(),
@@ -528,8 +539,7 @@ abstract class parent_report extends CI_Controller {
 			$this->load->model('filter_model');
 			
 			//load required libraries
-			require_once(APPPATH.'libraries/Filters.php');
-			$this->filters = new Filters();
+			$this->filters = new myagsource\Filters();
 			$primary_table = $this->{$this->primary_model}->get_primary_table_name();
 			$recent_test_date = isset($primary_table) ? $this->{$this->primary_model}->get_recent_dates() : NULL;
 			$this->load->helper('multid_array_helper');
@@ -769,17 +779,17 @@ abstract class parent_report extends CI_Controller {
 			}
 			$this->load->model('benchmark_model');
 			$this->load->model('db_table_model');
-			$this->load->library('benchmarks_lib');
-			$this->db_table = new db_table($this->{$this->primary_model}->get_primary_table_name(), $this->db_table_model);
-			$sess_benchmarks = $this->session->userdata('benchmarks');
+			$this->load->model('setting_model');
 			$herd_info = $this->herd_model->header_info($this->herd_code);
+			$this->benchmarks_lib = new myagsource\settings\Benchmarks_lib($this->session->userdata('user_id'), $this->input->post('herd_code'), $herd_info, $this->setting_model);
+			$this->db_table = new myagsource\db_objects\db_table($this->{$this->primary_model}->get_primary_table_name(), $this->db_table_model);
+			$sess_benchmarks = $this->session->userdata('benchmarks');
 			$arr_group_by = $this->{$this->primary_model}->get_group_by_fields($arr_this_block['id']);
 //			$arr_group_by = array_filter($arr_group_by);
 			$arr_bench_data = $this->benchmarks_lib->addBenchmarkRow(
-					$this->db_table, $sess_benchmarks,
+					$this->db_table,
+					$sess_benchmarks,
 					$this->benchmark_model,
-					$this->session->userdata('user_id'),
-					$herd_info,
 					$row_head_field,
 					$arr_field_list,
 					$this->{$this->primary_model}->get_group_by_fields($arr_this_block['id'])

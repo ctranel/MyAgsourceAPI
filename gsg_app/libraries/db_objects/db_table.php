@@ -1,5 +1,5 @@
 <?php
-namespace libraries\db_objects;
+namespace myagsource\db_objects;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /* -----------------------------------------------------------------

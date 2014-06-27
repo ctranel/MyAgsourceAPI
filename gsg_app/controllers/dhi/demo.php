@@ -1,4 +1,12 @@
-<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php
+//namespace myagsource;
+
+require_once(APPPATH.'libraries' . FS_SEP . 'settings' . FS_SEP . 'Session_settings.php');
+require_once(APPPATH.'libraries' . FS_SEP . 'benchmarks_lib.php');
+
+use \myagsource;
+
+if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /* -----------------------------------------------------------------
  *	CLASS comments
@@ -30,8 +38,14 @@ class Demo extends CI_Controller {
 
 	protected function set_herd_session_data(){
 		$this->session->set_userdata('herd_code', $this->herd->getHerdCode());
+		$this->session->set_userdata('pstring', 0);
 		$this->session->set_userdata('arr_pstring', $this->herd_model->get_pstring_array($this->herd->getHerdCode()));
 		$this->session->set_userdata('herd_enroll_status_id', 4);//hard-code sample herd id, was: $this->herd->getHerdEnrollStatus(), $this->config->item('product_report_code'));
 		$this->session->set_userdata('recent_test_date', $this->herd->getRecentTest());
+		//load new benchmarks
+		$this->load->model('setting_model');
+		$benchmarks_lib = new myagsource\settings\Benchmarks_lib($this->session->userdata('user_id'), $this->input->post('herd_code'), $this->herd->header_info($this->input->post('herd_code')), $this->setting_model);
+		$arr_tmp = $benchmarks_lib->getSettingKeyValues();
+		$this->session->set_userdata('benchmarks', $arr_tmp);
 	}
 }
