@@ -33,12 +33,6 @@ class Benchmarks_lib extends Session_settings
 	protected $herd_benchmark_pool_table = 'herd.dbo.bench_criteria_summary'; //'vma.dbo.vma_bench_criteria_summary';
 
 	/**
-	 * key field used in benchmarks (will always be test date?)
-	 * @var string
-	 **/
-//	protected $arr_key_fields;
-
-	/**
 	 * array of herd size groups
 	 * @var array
 	 **/
@@ -56,9 +50,9 @@ class Benchmarks_lib extends Session_settings
 	 * @return void
 	 * @author ctranel
 	 **/
-	public function __construct($user_id, $herd_code, $herd_info, $setting_model)
+	public function __construct($user_id, $herd_code, $herd_info, $setting_model, $session_values = NULL)
 	{
-		parent::__construct($user_id, $herd_code, $setting_model, 'benchmarks');
+		parent::__construct($user_id, $herd_code, $setting_model, 'benchmarks', $session_values);
 		
 		$this->arr_herd_size_groups = array(
 			1 => array('floor' => 1, 'ceiling' => 124),
@@ -166,7 +160,7 @@ class Benchmarks_lib extends Session_settings
 	 * @return array
 	 * @author ctranel
 	 **/
-	function addBenchmarkRow($db_table, $sess_benchmarks, &$benchmark_model, $row_head_field, $arr_fields_to_exclude = array('herd_code', 'pstring', 'lact_group_code', 'ls_type_code', 'sol_group_code'), $arr_group_by){
+	function addBenchmarkRow($db_table, &$benchmark_model, $row_head_field, $arr_fields_to_exclude = array('herd_code', 'pstring', 'lact_group_code', 'ls_type_code', 'sol_group_code'), $arr_group_by){
 		if(isset($db_table)){
 			$this->db_table = $db_table;
 		}

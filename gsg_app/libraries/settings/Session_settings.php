@@ -48,12 +48,20 @@ class Session_settings {
 	 */
 	protected $setting_model;
 	
+	/**
+	 * array session_values
+	 *
+	 * @var array
+	 */
+	protected $session_values;
 	
-	function __construct($user_id, $herd_code, $setting_model, $category) {
+	
+	function __construct($user_id, $herd_code, $setting_model, $category, $session_values = NULL) {
 		$this->user_id = $user_id;
 		$this->herd_code = $herd_code;
 		$this->setting_model = $setting_model;
 		$this->category = $category;
+		$this->session_values = $session_values;
 	}
 
 	/* -----------------------------------------------------------------
@@ -116,7 +124,7 @@ class Session_settings {
 	protected function loadSettings(){
 		$setting_data = $this->setting_model->getSettingsByCategory($this->category, $this->user_id, $this->herd_code);
 		foreach($setting_data as $s){
-			$this->arr_settings[$s['name']] = new Setting($s, $this->setting_model);
+			$this->arr_settings[$s['name']] = new Setting($s, $this->session_values[$s['name']], $this->setting_model);
 		}
 	}
 	
@@ -153,6 +161,46 @@ class Session_settings {
 	*/
 	public function setValue($setting_name, $value){
 		$this->arr_settings[$setting_name]->setValue($value);
+	}
+	
+	/* -----------------------------------------------------------------
+	*  Sets the specified session setting value in collection
+
+	*  Sets the specified session setting value in collection
+
+	*  @since: version 1
+	*  @author: ctranel
+	*  @date: Jun 30, 2014
+	*  @param: string setting name
+	*  @param: mixed value
+	*  @return void
+	*  @throws: 
+	* -----------------------------------------------------------------
+	*/
+	public function setSessionValue($setting_name, $value){
+		$this->arr_settings[$setting_name]->setSessionValue($value);
+	}
+	
+	/* -----------------------------------------------------------------
+	*  Sets all session setting value in collection
+
+	*  Sets all session setting value in collection
+
+	*  @since: version 1
+	*  @author: ctranel
+	*  @date: Jun 30, 2014
+	*  @param: array k=>v array of settings
+	*  @return void
+	*  @throws: 
+	* -----------------------------------------------------------------
+	*/
+	public function setSessionValues($arr_session_settings){
+		if(!isset($arr_session_settings) || !is_array()){
+			return false;
+		}
+		foreach($arr_session_settings as $k=>$s){
+			$this->arr_settings[$k]->setSessionValue($value);
+		}
 	}
 	
 	/* -----------------------------------------------------------------

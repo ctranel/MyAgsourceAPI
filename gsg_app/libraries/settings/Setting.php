@@ -56,6 +56,12 @@ class Setting {
 	 * 
 	 * @var mixed
 	 */
+	protected $session_value;
+	
+	/**
+	 * 
+	 * @var mixed
+	 */
 	protected $value;
 	
 	/**
@@ -75,7 +81,7 @@ class Setting {
 	 */
 	protected $setting_model;
 	
-	function __construct($arr_setting_data, $setting_model) {
+	function __construct($arr_setting_data, $session_data, $setting_model) {
 //		$this->category_id = $arr_setting_data['category_id'];
 		$this->setting_model = $setting_model;
 		$this->id = $arr_setting_data['id'];
@@ -84,6 +90,12 @@ class Setting {
 		$this->data_type = $arr_setting_data['type'];
 		$this->name = $arr_setting_data['name'];
 		$this->description = $arr_setting_data['description'];
+		if($this->data_type === 'array' && isset($session_data) && !is_array($session_data)){
+			$this->session_value = array($session_data);
+		}
+		else{
+			$this->session_value = $session_data;
+		}
 		if($this->data_type === 'array' && isset($arr_setting_data['value']) && !is_array($arr_setting_data['value'])){
 			$this->value = array($arr_setting_data['value']);
 		}
@@ -91,7 +103,7 @@ class Setting {
 			$this->value = $arr_setting_data['value'];
 		}
 		if($this->data_type === 'array' && isset($arr_setting_data['default_value']) && !is_array($arr_setting_data['default_value'])){
-			$this->default_value = $arr_setting_data['default_value'];
+			$this->default_value = array($arr_setting_data['default_value']);
 		}
 		else{
 			$this->default_value = $arr_setting_data['default_value'];
@@ -114,13 +126,32 @@ class Setting {
 	* -----------------------------------------------------------------
 	*/
 	public function getCurrValue(){
+		$value = (isset($this->session_data)) ? $this->session_data : (isset($this->value)) ? $this->value : $this->default_value;
 		return (!isset($this->value)) ? $this->default_value : $this->value;
+	}
+
+	/* -----------------------------------------------------------------
+	 *  Set session setting value
+	
+	*  Set session setting value
+	
+	*  @since: version 1
+	*  @author: ctranel
+	*  @date: Jun 30, 2014
+	*  @param: mixed new value
+	*  @return void
+	*  @throws:
+	* -----------------------------------------------------------------
+	*/
+
+	public function setSessionValue($new_value){
+		$this->session_value = $new_value;
 	}
 
 	/* -----------------------------------------------------------------
 	 *  Set setting value
 	
-	*  Long Description
+	*  Set setting value
 	
 	*  @since: version 1
 	*  @author: ctranel
@@ -130,11 +161,12 @@ class Setting {
 	*  @throws:
 	* -----------------------------------------------------------------
 	*/
-
+	
 	public function setValue($new_value){
 		$this->value = $new_value;
 	}
-
+	
+	
 	/* -----------------------------------------------------------------
 	 *  Return text used for display
 	

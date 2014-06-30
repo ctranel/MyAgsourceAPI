@@ -1,7 +1,6 @@
 <?php
 //namespace myagsource;
 
-require_once(APPPATH.'libraries' . FS_SEP . 'settings' . FS_SEP . 'Session_settings.php');
 require_once(APPPATH.'libraries' . FS_SEP . 'benchmarks_lib.php');
 
 use \myagsource;
@@ -45,7 +44,6 @@ class Demo extends CI_Controller {
 		//load new benchmarks
 		$this->load->model('setting_model');
 		$benchmarks_lib = new myagsource\settings\Benchmarks_lib($this->session->userdata('user_id'), $this->input->post('herd_code'), $this->herd->header_info($this->input->post('herd_code')), $this->setting_model);
-		$arr_tmp = $benchmarks_lib->getSettingKeyValues();
-		$this->session->set_userdata('benchmarks', $arr_tmp);
+		$this->session->set_userdata('benchmarks', $benchmarks_lib->getSettingKeyValues());
 	}
 }
