@@ -3,7 +3,7 @@
 
 require_once(APPPATH.'libraries' . FS_SEP . 'benchmarks_lib.php');
 
-use \myagsource;
+use \myagsource\Benchmarks_lib;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
@@ -43,7 +43,7 @@ class Demo extends CI_Controller {
 		$this->session->set_userdata('recent_test_date', $this->herd->getRecentTest());
 		//load new benchmarks
 		$this->load->model('setting_model');
-		$benchmarks_lib = new myagsource\settings\Benchmarks_lib($this->session->userdata('user_id'), $this->input->post('herd_code'), $this->herd->header_info($this->input->post('herd_code')), $this->setting_model);
+		$benchmarks_lib = new Benchmarks_lib($this->session->userdata('user_id'), $this->input->post('herd_code'), $this->herd->header_info($this->input->post('herd_code')), $this->setting_model);
 		$this->session->set_userdata('benchmarks', $benchmarks_lib->getSettingKeyValues());
 	}
 }

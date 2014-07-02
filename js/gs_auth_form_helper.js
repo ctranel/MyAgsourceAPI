@@ -18,12 +18,11 @@ function AddEvent(html_element, event_name, event_function) {
 		html_element.attachEvent("on" + event_name, function() {
 			event_function.call(html_element);
 		});
-	else if (html_element.addEventListener) // Firefox & company
+	else if (html_element.addEventListener) // standards compliant
 		html_element.addEventListener(event_name, event_function, false);
 }
 
 function toggle_fields() {
-	var obj_group = document.getElementById('group_id');
 	var arr_group_id = $('#group_id').val();
 	
 	//hide all optional sections
@@ -56,7 +55,7 @@ function toggle_fields() {
 		document.getElementById('region').style.display = "block";
 		document.getElementById('tech').style.display = "block";
 		
-		$('#region').find('select').change(populate_techs)
+		$('#region').find('select').change(populate_techs);
 		$('#region').addClass('required');
 		$('#tech').addClass('required');
 	}
@@ -69,7 +68,7 @@ function toggle_fields() {
 }
 
 	if($('#region').css('display') == 'block' && $('#tech').css('display') == 'block'){
-		$('#region').find('select').change(populate_techs)
+		$('#region').find('select').change(populate_techs);
 	}
 
 function populate_techs(ev){
@@ -80,7 +79,7 @@ function populate_techs(ev){
 				$("<option></option>")
 					.text(item)
 					.val(index)
-			)
-		})
+			);
+		});
 	});
 }

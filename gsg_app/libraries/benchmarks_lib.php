@@ -50,9 +50,9 @@ class Benchmarks_lib extends Session_settings
 	 * @return void
 	 * @author ctranel
 	 **/
-	public function __construct($user_id, $herd_code, $herd_info, $setting_model, $session_values = NULL)
+	public function __construct($user_id, $herd_code, $herd_info, $setting_model)
 	{
-		parent::__construct($user_id, $herd_code, $setting_model, 'benchmarks', $session_values);
+		parent::__construct($user_id, $herd_code, $setting_model, 'benchmarks');
 		
 		$this->arr_herd_size_groups = array(
 			1 => array('floor' => 1, 'ceiling' => 124),
@@ -142,9 +142,9 @@ class Benchmarks_lib extends Session_settings
 		if(!isset($sess_benchmarks) || $sess_benchmarks === FALSE){
 			return "Benchmark session not set";
 		}
-		$bench_text = 'Benchmark herds determined by ' . $this->arr_settings['criteria']->getDisplayText();
-		$bench_text .= ' for ' . $this->arr_settings['breed']->getDisplayText();
-		$bench_text .= ' herds ' . $this->arr_settings['herd_size']->getDisplayText() . ' animals';
+		$bench_text = 'Benchmark herds determined by ' . $this->arr_settings['criteria']->getDisplayText($sess_benchmarks['criteria']);
+		$bench_text .= ' for ' . $this->arr_settings['breed']->getDisplayText($sess_benchmarks['breed']);
+		$bench_text .= ' herds ' . $this->arr_settings['herd_size']->getDisplayText($sess_benchmarks['herd_size']) . ' animals';
 		return $bench_text;
 	}
 	
@@ -160,36 +160,53 @@ class Benchmarks_lib extends Session_settings
 	 * @return array
 	 * @author ctranel
 	 **/
-	function addBenchmarkRow($db_table, &$benchmark_model, $row_head_field, $arr_fields_to_exclude = array('herd_code', 'pstring', 'lact_group_code', 'ls_type_code', 'sol_group_code'), $arr_group_by){
+	function addBenchmarkRow($db_table, $session_values, &$benchmark_model, $row_head_field, $arr_fields_to_exclude = array('herd_code', 'pstring', 'lact_group_code', 'ls_type_code', 'sol_group_code'), $arr_group_by){
 		if(isset($db_table)){
 			$this->db_table = $db_table;
 		}
 		
-		$bench_settings = $this->getSettingKeyValues();
+		$bench_settings = $this->getSettingKeyValues($session_values);
 
 		$avg_fields = $benchmark_model->get_benchmark_fields($this->db_table->full_table_name(), $arr_fields_to_exclude);
-		list($herd_size_floor, $herd_size_ceiling) = explode('|', $this->arr_settings['herd_size']->getCurrValue());
+		
+		//make sure we have something to pass for all session vars
+		$sess_herd_size = isset($session_values['herd_size']) ? $session_values['herd_size'] : null;
+		list($herd_size_floor, $herd_size_ceiling) = explode('|', $this->arr_settings['herd_size']->getCurrValue($sess_herd_size));
+		$sess_criteria = isset($session_values['criteria']) ? $session_values['criteria'] : null;
+		$sess_metric = isset($session_values['metric']) ? $session_values['metric'] : null;
+		$sess_breed = isset($session_values['breed']) ? $session_values['breed'] : null;
+		
 		$bench_sql = $benchmark_model->build_benchmark_query(
 			$this->db_table,
 			$avg_fields,
-			$this->arr_criteria_table[$this->arr_settings['criteria']->getCurrValue()],
+			$this->arr_criteria_table[$this->arr_settings['criteria']->getCurrValue($sess_criteria)],
 			$this->herd_benchmark_pool_table,
-			$this->arr_settings['metric']->getCurrValue(),
+			$this->arr_settings['metric']->getCurrValue($sess_metric),
 			$herd_size_floor,
 			$herd_size_ceiling,
-			$this->arr_settings['breed']->getCurrValue(),
+			$this->arr_settings['breed']->getCurrValue($sess_breed),
 			$arr_group_by
 		);
 		$arr_benchmarks = $benchmark_model->getBenchmarkData($bench_sql);
 
-		//$this->arr_settings['metric']->getCurrValue() in place of $sess_benchmarks['metric']?
 		$tmp_metric = $this->arr_settings['metric']->getLookupOptions();
-		$bench_head_text = ucwords(strtolower($tmp_metric[$this->arr_settings['metric']->getCurrValue()])) . ' (n=' . $arr_benchmarks[0]['cnt_herds'] . ')';
-
+		$bench_head_text = ucwords(strtolower($tmp_metric[$this->arr_settings['metric']->getCurrValue($sess_metric)]));
+		if($arr_benchmarks[0]['cnt_herds'] < 3){
+			$bench_head_text .= '<br>(benchmarks not available)';
+		}
+		else{
+			$bench_head_text .= ' (n=' . $arr_benchmarks[0]['cnt_herds'] . ')';
+		}
+		
 		foreach($arr_benchmarks as &$b){
+			$cnt = $b['cnt_herds'];
 			unset($b['cnt_herds']);
 			if(isset($b['pstring'])){
 				$b['pstring'] = '';
+			}
+			if($cnt < 3){
+				$keys = array_keys($b);
+				$b = array_fill_keys($keys, 'na');
 			}
 			$b = array($row_head_field => $bench_head_text) + $b;
 		}

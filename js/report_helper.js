@@ -22,7 +22,30 @@ if($('#filter-form')){ //if there is a filter form (only on pages with one table
 		ev.preventDefault();
 		updatePage(this);
 	});
+}
+
+if($('#benchmark-form')){ //if there is a filter form (only on pages with one table)
+	$('#default').click(function(ev){
+		$('#make_default').val('1');
+	});
 	
+	$('#set').click(function(ev){
+		$('#make_default').val('0');
+	});
+	
+	$('#benchmark-form').submit(function(ev){
+		ev.preventDefault();
+		params = encodeURIComponent(JSON.stringify($(this).serializeObject()));
+		$.post(site_url + 'benchmark/ajax_set/' + params)
+			.done(function(){
+				updatePage(this);
+			})
+			.fail(function(){});
+
+		
+	});
+	
+/*
 	$('#set-filters').click(function(ev){
 		ev.preventDefault();
 		if($('#set-filters').hasClass('expanded')){
@@ -35,7 +58,7 @@ if($('#filter-form')){ //if there is a filter form (only on pages with one table
 			$('#filter-form').addClass('expanded');
 			//$('#set-filters').parent().width(width);
 		}
-	});
+	}); */
 }
 
 $('.handle').click(function(ev){

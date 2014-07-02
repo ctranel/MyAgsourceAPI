@@ -15,6 +15,8 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 class Setting {
 	/**
+	 * id of the actual setting, not the id of the user-herd instance
+	 * 
 	 * @var int
 	 */
 	protected $id;
@@ -55,8 +57,8 @@ class Setting {
 	/**
 	 * 
 	 * @var mixed
-	 */
 	protected $session_value;
+	 */
 	
 	/**
 	 * 
@@ -81,7 +83,7 @@ class Setting {
 	 */
 	protected $setting_model;
 	
-	function __construct($arr_setting_data, $session_data, $setting_model) {
+	function __construct($arr_setting_data, $setting_model) {
 //		$this->category_id = $arr_setting_data['category_id'];
 		$this->setting_model = $setting_model;
 		$this->id = $arr_setting_data['id'];
@@ -90,25 +92,19 @@ class Setting {
 		$this->data_type = $arr_setting_data['type'];
 		$this->name = $arr_setting_data['name'];
 		$this->description = $arr_setting_data['description'];
-		if($this->data_type === 'array' && isset($session_data) && !is_array($session_data)){
-			$this->session_value = array($session_data);
-		}
-		else{
-			$this->session_value = $session_data;
-		}
-		if($this->data_type === 'array' && isset($arr_setting_data['value']) && !is_array($arr_setting_data['value'])){
+		if(($this->data_type === 'array' || $this->data_type === 'data_lookup_arr') && isset($arr_setting_data['value']) && !is_array($arr_setting_data['value'])){
 			$this->value = array($arr_setting_data['value']);
 		}
 		else{
 			$this->value = $arr_setting_data['value'];
 		}
-		if($this->data_type === 'array' && isset($arr_setting_data['default_value']) && !is_array($arr_setting_data['default_value'])){
+		if(($this->data_type === 'array' || $this->data_type === 'data_lookup_arr') && isset($arr_setting_data['default_value']) && !is_array($arr_setting_data['default_value'])){
 			$this->default_value = array($arr_setting_data['default_value']);
 		}
 		else{
 			$this->default_value = $arr_setting_data['default_value'];
 		}
-		if($this->data_type === 'data_lookup'){
+		if($this->data_type === 'data_lookup' || $this->data_type === 'data_lookup_arr'){
 			$this->loadLookupOptions();
 		}
 	}
@@ -125,27 +121,35 @@ class Setting {
 	*  @throws: 
 	* -----------------------------------------------------------------
 	*/
-	public function getCurrValue(){
-		$value = (isset($this->session_data)) ? $this->session_data : (isset($this->value)) ? $this->value : $this->default_value;
-		return (!isset($this->value)) ? $this->default_value : $this->value;
+	public function getCurrValue($session_value = null){
+		//if a string is sent for array type, insert string into array
+		if(($this->data_type === 'array' || $this->data_type === 'data_lookup_arr') && isset($session_value) && !is_array($session_value)){
+			$session_value = array($session_value);
+		}
+		
+		if(isset($session_value)){
+			return $session_value;
+		}
+		if(isset($this->value)){
+			return $this->value;
+		}
+		return $this->default_value;
 	}
-
+	
 	/* -----------------------------------------------------------------
-	 *  Set session setting value
-	
-	*  Set session setting value
-	
+	*  Returns setting ID
+
+	*  Returns setting ID
+
 	*  @since: version 1
 	*  @author: ctranel
-	*  @date: Jun 30, 2014
-	*  @param: mixed new value
-	*  @return void
-	*  @throws:
+	*  @date: Jul 2, 2014
+	*  @return int
+	*  @throws: 
 	* -----------------------------------------------------------------
 	*/
-
-	public function setSessionValue($new_value){
-		$this->session_value = $new_value;
+	public function getSettingID(){
+		return $this->id;
 	}
 
 	/* -----------------------------------------------------------------
@@ -180,16 +184,16 @@ class Setting {
 	*  @throws:
 	* -----------------------------------------------------------------
 	*/
-	public function getDisplayText(){
+	public function getDisplayText($session_value){
 		if($this->data_type === 'range'){
-			list($from, $to) = explode('|', $this->value);
+			list($from, $to) = explode('|', $this->getCurrValue($session_value));
 			return 'between ' . $from . ' and ' . $to;
 		}
-		elseif($this->data_type === 'array'){
-			return implode(', ', $this->value);
+		elseif($this->data_type === 'array' || $this->data_type === 'data_lookup_arr'){
+			return implode(', ', $this->getCurrValue($session_value));
 		}
 		else{
-			return $this->value;
+			return $this->getCurrValue($session_value);
 		}
 	}
 	
@@ -226,7 +230,7 @@ class Setting {
 	* -----------------------------------------------------------------
 	*/
 	public function getLookupOptions(){
-		if($this->data_type !== 'data_lookup'){
+		if($this->data_type !== 'data_lookup' && $this->data_type !== 'data_lookup_arr'){
 			return false;
 		}
 		return $this->lookup_options;
@@ -246,7 +250,7 @@ class Setting {
 	* -----------------------------------------------------------------
 	*/
 	protected function loadLookupOptions(){
-		if($this->data_type !== 'data_lookup'){
+		if($this->data_type !== 'data_lookup' && $this->data_type !== 'data_lookup_arr'){
 			return false;
 		}
 		$options = $this->setting_model->getLookupOptions($this->id);
@@ -269,24 +273,25 @@ class Setting {
 	*  @throws: 
 	* -----------------------------------------------------------------
 	*/
-	public function getFormData(){
-		if($this->data_type === 'data_lookup'){
+	public function getFormData($session_value = null){
+		if($this->data_type === 'data_lookup' || $this->data_type === 'data_lookup_arr'){
 			$ret_val['options'] = $this->lookup_options;
-			$ret_val['selected'] = $this->getCurrValue();
+			$ret_val['selected'] = $this->getCurrValue($session_value);
 			return $ret_val;
 		}
 		if($this->data_type === 'range'){
-			list($from, $to) = explode('|', $this->getCurrValue());
+			list($from, $to) = explode('|', $this->getCurrValue($session_value));
 			$ret_val['dbfrom'] = $from;
 			$ret_val['dbto'] = $to;
 			return $ret_val;
 		}
-		if($this->data_type === 'array'){
-			return $this->getCurrValue();
-		}
+//		if($this->data_type === 'array'){
+//			return $this->getCurrValue($session_value);
+//		}
 		/*
 		 * @todo: add remaining data types
 		 */
-		die("Sorry, I don't recognize the form field data type in Settings\Form");
+
+		die("Sorry, I don't recognize the form field data type (" . $this->data_type . ") in Settings\Form");
 	}
 }

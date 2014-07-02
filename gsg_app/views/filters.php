@@ -62,7 +62,6 @@
 					<?php echo form_fieldset_close();
 					break;
 				case 'test_date':
-var_dump($filter_selected);
 					echo form_fieldset('Test Date Range', array('id' => 'test_date-fieldset')); ?>
 						Between <?php echo form_input(array('name'=>'test_date_dbfrom', 'value'=>$filter_selected['test_date_dbfrom'], 'size'=>'10','maxlength'=>'10', 'id'=>'datepickfrom')) ?>
 						and <?php echo form_input(array('name'=>'test_date_dbto', 'value'=>$filter_selected['test_date_dbto'], 'size'=>'10', 'maxlength'=>'10', 'id'=>'datepickto')); ?>

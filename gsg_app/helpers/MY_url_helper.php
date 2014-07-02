@@ -13,16 +13,17 @@ if ( ! function_exists('set_redirect_url'))
 {
 	function set_redirect_url($curr_control_path, $redirect_url_in, $referrer_in){
 		if(
-			$referrer_in == $curr_control_path
-			|| $referrer_in == 'auth/login'
+			$referrer_in === $curr_control_path
+			|| $referrer_in === 'auth/login'
 			|| strpos($referrer_in, 'change_herd') !== FALSE
-			|| $referrer_in == 'auth/logout'
-			|| $referrer_in == 'benchmarks'
+			|| $referrer_in === 'auth/logout'
+			|| $referrer_in === 'benchmarks'
 			|| strpos($referrer_in, 'cow_page') !== FALSE
 			|| strpos($referrer_in, 'help') !== FALSE
 			|| strpos($referrer_in, 'custom_reports/select') !== FALSE
 			|| strpos($referrer_in, 'custom_reports/insert') !== FALSE
 			|| strpos($referrer_in, 'download/') !== FALSE
+			|| strpos($referrer_in, 'ajax_') !== FALSE
 		){
 			$referrer_in = '';
 		}
