@@ -77,8 +77,10 @@ $('.handle').click(function(ev){
 });
 
 $('.expand').on('mouseleave', function(ev){
-	$(this).removeClass('expanded');
-	$(this).prev().removeClass('expanded');
+	if(ev.target.tagName.toLowerCase() != "select" && ev.target.tagName.toLowerCase() != "fieldset") {
+		$(this).removeClass('expanded');
+		$(this).prev().removeClass('expanded');
+	}
 });
 
 function closeExpanded(){
