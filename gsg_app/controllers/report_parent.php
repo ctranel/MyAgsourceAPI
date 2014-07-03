@@ -1,5 +1,11 @@
 <?php
-use \myagsource\reports\Filters;
+//namespace myagsource;
+require_once APPPATH . 'libraries' . FS_SEP . 'db_objects' . FS_SEP . 'db_table.php';
+require_once(APPPATH.'libraries' . FS_SEP . 'Filters.php');
+require_once(APPPATH.'libraries' . FS_SEP . 'benchmarks_lib.php');
+
+use \myagsource\db_objects\db_table;
+use \myagsource\settings\Benchmarks_lib;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
@@ -46,6 +52,12 @@ abstract class parent_report extends CI_Controller {
 	protected $avg_row;
 	protected $pivot_db_field;
 	protected $bool_is_summary;
+	/**
+	 * Benchmark settings
+	 * 
+	 * @var Session_settings object
+	protected $bench_setting;
+	 */
 	
 	function __construct(){
 		parent::__construct();
@@ -214,7 +226,6 @@ abstract class parent_report extends CI_Controller {
 		$this->objPage = $this->{$this->primary_model}->arr_blocks[$this->page];
 		$arr_blocks = $this->objPage['blocks'];
 
-
 		//Determine if any report blocks have is_summary flag - will determine if tstring needs to be loaded and filters shown
 		$this->load->helper('multid_array_helper');
 		$this->bool_is_summary = array_search(1, get_elements_by_key('is_summary', $arr_blocks)) === FALSE ? FALSE : TRUE;
@@ -227,8 +238,7 @@ abstract class parent_report extends CI_Controller {
 		//FILTERS
 		//load required libraries
 		$this->load->model('filter_model');
-		require_once(APPPATH.'libraries/Filters.php');
-		$this->filters = new Filters();
+		$this->filters = new myagsource\Filters();
 		$recent_test_date = isset($primary_table) ? $this->{$this->primary_model}->get_recent_dates() : NULL;
 		$this->filters->set_filters(
 				$this->session->userdata('herd_code'),
@@ -319,33 +329,21 @@ abstract class parent_report extends CI_Controller {
 		}
 
 		// render page
-		$this->carabiner->css('chart.css');
-		$this->carabiner->css('boxes.css');
-		$this->carabiner->css('http://cdn.jsdelivr.net/qtip2/2.2.0/jquery.qtip.min.css', 'screen');
-		$this->carabiner->css('popup.css');
-		$this->carabiner->css('tabs.css');
-		$this->carabiner->css('report.css');
-		$this->carabiner->css('chart.css', 'print');
-		$this->carabiner->css('report.css', 'print');
-		$this->carabiner->css($this->section_path . '.css', 'screen');
-		if($this->filters->displayFilters($this->bool_is_summary)){
-			$this->carabiner->css('filters.css', 'screen');
-			$this->carabiner->css('agsource.datepick.css', 'screen');
-			$this->carabiner->css('jquery.datetimeentry.css', 'screen');
-		}
-		else{
-			$this->carabiner->css('hide_filters.css', 'screen');
-		}
 		//get_herd_data
 		$herd_data = $this->herd_model->header_info($this->session->userdata('herd_code'));
 		
 		//set js lines and load views for each block to be displayed on page
 		$tmp_js = '';
 		$arr_view_blocks = NULL;
+		$has_benchmarks = false;
 		if(isset($arr_blocks) && !empty($arr_blocks)){
 			$x = 0;
 			$cnt = count($arr_blocks);
 			foreach($arr_blocks as $c => $pb){
+				if($pb['bench_row'] === 1){
+					$has_benchmarks = true;
+				}
+				
 				$display = $pb['display_type'];
 				//load view for placeholder for block display
 				if(isset($sort_by) && isset($sort_order)){
@@ -387,6 +385,28 @@ abstract class parent_report extends CI_Controller {
 			}
 		}
 		//set up page header
+		$this->carabiner->css('chart.css');
+		$this->carabiner->css('boxes.css');
+		$this->carabiner->css('https://cdn.jsdelivr.net/qtip2/2.2.0/jquery.qtip.min.css', 'screen');
+		$this->carabiner->css('popup.css');
+		$this->carabiner->css('tabs.css');
+		$this->carabiner->css('report.css');
+		$this->carabiner->css('expandable.css');
+		$this->carabiner->css('chart.css', 'print');
+		$this->carabiner->css('report.css', 'print');
+		$this->carabiner->css($this->section_path . '.css', 'screen');
+		if($this->filters->displayFilters($this->bool_is_summary)){
+			//$this->carabiner->css('filters.css', 'screen');
+			$this->carabiner->css('agsource.datepick.css', 'screen');
+			$this->carabiner->css('jquery.datetimeentry.css', 'screen');
+		}
+		else{
+			$this->carabiner->css('hide_filters.css', 'screen');
+		}
+		if(!$has_benchmarks){
+			$this->carabiner->css('hide_benchmarks.css', 'screen');
+		}
+		
 		if(is_array($this->page_header_data)){
 			$arr_sec_nav_data = array(
 				'arr_pages' => $this->as_ion_auth->arr_user_sections,//$this->web_content_model->get_pages_by_criteria(array('section_id' => $this->section_id))->result_array(),
@@ -405,6 +425,7 @@ abstract class parent_report extends CI_Controller {
 						'<script type="text/javascript">',
 						'	var page = "' . $this->page . '";',
 						'	var base_url = "' . site_url($this->section_path) . '";',
+						'	var site_url = "' . site_url() . '";',
 						'	var herd_code = "' . $this->session->userdata('herd_code') . '";',
 						'	var block = "' . $tmp_block	. '"',
 						'</script>'
@@ -429,6 +450,9 @@ abstract class parent_report extends CI_Controller {
 			$this->page_header_data['arr_headjs_line'][] = 'function(){' . $tmp_js . ';}';
 		}
 		unset($this->{$this->primary_model}->arr_messages); //clear message var once it is displayed
+		$this->load->model('setting_model');
+		$this->benchmarks_lib = new Benchmarks_lib($this->session->userdata('user_id'), $this->input->post('herd_code'), $this->herd_model->header_info($this->herd_code), $this->setting_model);
+		$arr_benchmark_data = $this->benchmarks_lib->getFormData($this->session->userdata('benchmarks')); 
 		$arr_nav_data = array(
 			//if I do not add this empty array, the array in the view somehow populated (should only be populated if code in bool_is_summary block below is executed)
 			'arr_pstring' => array(),
@@ -469,7 +493,12 @@ abstract class parent_report extends CI_Controller {
 			'filter_selected' => $this->arr_filter_criteria,
 			'arr_pstring' => $this->session->userdata('arr_pstring'),
 		);
-		if(isset($arr_filter_data)) $data['filters'] = $this->load->view($report_filter_path, $arr_filter_data, TRUE);
+		if(isset($arr_filter_data)){
+			$data['filters'] = $this->load->view($report_filter_path, $arr_filter_data, TRUE);
+		}
+		if(isset($arr_benchmark_data)){
+			$data['benchmarks'] = $this->load->view('set_benchmarks', $arr_benchmark_data, TRUE);
+		}
 		if((is_array($arr_nav_data['arr_pages']) && count($arr_nav_data['arr_pages']) > 1) || (isset($arr_nav_data['arr_pstring']) && is_array($arr_nav_data['arr_pstring']) && count($arr_nav_data['arr_pstring']) > 1)){
 			$data['report_nav'] = $this->load->view($report_nav_path, $arr_nav_data, TRUE);
 		}
@@ -508,8 +537,7 @@ abstract class parent_report extends CI_Controller {
 			$this->load->model('filter_model');
 			
 			//load required libraries
-			require_once(APPPATH.'libraries/Filters.php');
-			$this->filters = new Filters();
+			$this->filters = new myagsource\Filters();
 			$primary_table = $this->{$this->primary_model}->get_primary_table_name();
 			$recent_test_date = isset($primary_table) ? $this->{$this->primary_model}->get_recent_dates() : NULL;
 			$this->load->helper('multid_array_helper');
@@ -730,9 +758,53 @@ abstract class parent_report extends CI_Controller {
 	protected function load_table(&$arr_this_block, $report_count){
 		$title = $arr_this_block['description'];
 		$subtitle = 'Herd ' . $this->session->userdata('herd_code');
-		$this->{$this->primary_model}->populate_field_meta_arrays($arr_this_block['id']);// was $model in place of $this->primary_model
+		$this->{$this->primary_model}->populate_field_meta_arrays($arr_this_block['id']);
+		$arr_field_list = $this->{$this->primary_model}->get_fieldlist_array();
 		$results = $this->{$this->primary_model}->search($this->session->userdata('herd_code'), $arr_this_block['url_segment'], $this->arr_filter_criteria, $this->arr_sort_by, $this->arr_sort_order, $this->max_rows);
-		if(!empty($this->pivot_db_field)) $results = $this->{$this->primary_model}->pivot($results, $this->pivot_db_field, 10, 10, $this->avg_row, $this->sum_row, $this->bench_row);
+		if($this->bench_row){
+		//if the data is pivoted, set the pivoted field as the row header, else use the first non-pstring column
+			$row_head_field = NULL;
+			if(!empty($this->pivot_db_field)){
+				$row_head_field = $this->pivot_db_field;
+			}
+			else{
+				foreach($arr_field_list as $fl){
+					if($fl != 'pstring'){
+						$row_head_field = $fl;
+						break;
+					}
+				}
+			}
+			$this->load->model('benchmark_model');
+			$this->load->model('db_table_model');
+			$this->load->model('setting_model');
+			$herd_info = $this->herd_model->header_info($this->herd_code);
+			$this->benchmarks_lib = new Benchmarks_lib($this->session->userdata('user_id'), $this->input->post('herd_code'), $herd_info, $this->setting_model, $this->session->userdata('benchmarks'));
+			$this->db_table = new db_table($this->{$this->primary_model}->get_primary_table_name(), $this->db_table_model);
+			//$sess_benchmarks = $this->session->userdata('benchmarks');
+			$arr_group_by = $this->{$this->primary_model}->get_group_by_fields($arr_this_block['id']);
+//			$arr_group_by = array_filter($arr_group_by);
+			$arr_bench_data = $this->benchmarks_lib->addBenchmarkRow(
+					$this->db_table,
+					$this->session->userdata('benchmarks'),
+					$this->benchmark_model,
+					$row_head_field,
+					$arr_field_list,
+					$this->{$this->primary_model}->get_group_by_fields($arr_this_block['id'])
+				);
+			if(count($arr_bench_data) > 1){
+			/*
+			 * @todo: if block_group_by isset (i.e., there are multiple rows of benchmarks), need to iterate through result set and place benchmark rows in correct spots.
+			 * 	(i.e., when the value of the group_by field changes, insert the benchmark row that matches the previous value in the group by field)
+			 */
+			}
+			else{
+				$results[] = $arr_bench_data[0];
+			}
+		}
+		if(!empty($this->pivot_db_field)){
+			$results = $this->{$this->primary_model}->pivot($results, $this->pivot_db_field, 10, 10, $this->avg_row, $this->sum_row);
+		}
 		
 		$tmp = array(
 			'form_id' => $this->report_form_id,
@@ -745,13 +817,9 @@ abstract class parent_report extends CI_Controller {
 		$tmp2 = $this->{$this->primary_model}->get_table_header_data();
 		$table_header_data = array_merge($tmp, $tmp2);
 
-/*		$sess_benchmarks = $this->session->userdata('benchmarks');
-		$criteria_options = $this->benchmarks_lib->get_criteria_options();
-		$bench_text = 'Benchmark herds determined by ' . $criteria_options[$sess_benchmarks['criteria']];
-		if(isset($sess_benchmarks['arr_herd_size'])) $bench_text .= ' for Herds between ' . $sess_benchmarks['arr_herd_size'][0] . ' and ' . $sess_benchmarks['arr_herd_size'][1] . ' animals.';
-		if(isset($sess_benchmarks['arr_states'])) $bench_text .= ' for Herds in ' . implode(',', $sess_benchmarks['arr_states']) . '.';
-*/
-	//	$bench_text = $this->benchmarks_lib->get_bench_text();
+		if(isset($this->benchmarks_lib)){
+			$bench_text = $this->benchmarks_lib->get_bench_text($this->session->userdata('benchmarks'));
+		}
 		$this->report_data = array(
 			'table_header' => $this->load->view('table_header', $table_header_data, TRUE),
 			'num_columns' => $table_header_data['num_columns'],
@@ -764,6 +832,9 @@ abstract class parent_report extends CI_Controller {
 			'arr_decimal_places' => $this->{$this->primary_model}->get_decimal_places(),
 			'arr_field_links' => $this->{$this->primary_model}->get_field_links(),
 		);
+		if(isset($bench_text)){
+			$this->report_data['table_benchmark_text'] = $bench_text;
+		}
 		if(isset($this->report_data) && is_array($this->report_data)) {
 			$this->html = $this->load->view('report_table.php', $this->report_data, TRUE);
 		}

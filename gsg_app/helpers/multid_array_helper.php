@@ -93,6 +93,26 @@ if(! function_exists('multid_remove_element')){
 	 }
 }
 
+if ( ! function_exists('array_search_recursive')) {
+	/**
+	 * @method array_search_recursive()
+	 * @param string needle
+	 * @param array haystack
+	 * @return mixed key
+	 * @author ctranel
+	 **/
+
+	function array_search_recursive($needle,$haystack) {
+		foreach($haystack as $key=>$val) {
+			$current_key=$key;
+			if($needle === $val || (is_array($val) && array_search_recursive($needle,$val) !== false)) {
+				return $current_key;
+			}
+		}
+		return false;
+	}
+}
+
 
 if ( ! function_exists('array_flatten')) {
 	/**

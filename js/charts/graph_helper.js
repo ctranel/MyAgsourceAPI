@@ -144,7 +144,9 @@ function updatePage(el){
 	});
 	
 	$('.pstring-link').css('fontWeight', 'normal');
-	el.style.fontWeight = 'bold';
+	if(typeof(el.style) !== 'undefined'){
+		el.style.fontWeight = 'bold';
+	}
 }
 
 function updateBlock(container_div_id, block_in, block_index, sort_field, sort_order, display, first){//}, title, benchmark_text){

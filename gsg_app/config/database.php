@@ -98,6 +98,22 @@ if(ENVIRONMENT == 'production'){
 		$db['default']['swap_pre'] = '';
 		$db['default']['autoinit'] = TRUE;
 		$db['default']['stricton'] = FALSE;
+		//views database
+		$db['vma']['hostname'] = '173.229.1.155' ;
+		$db['vma']['username'] = 'webuser';
+		$db['vma']['password'] = 'm1$AgS_R0';
+		$db['vma']['database'] = "vma";
+		$db['vma']['dbdriver'] = 'mssql';
+		$db['vma']['dbprefix'] = "";
+		$db['vma']['pconnect'] = FALSE;
+		$db['vma']['db_debug'] = TRUE;
+		$db['vma']['cache_on'] = TRUE;
+		$db['vma']['cachedir'] = "";
+		$db['vma']['char_set'] = 'windows-1252';
+		$db['vma']['dbcollat'] = 'sql_latin1_general_cp1_ci_as';
+		$db['vma']['swap_pre'] = '';
+		$db['vma']['autoinit'] = TRUE;
+		$db['vma']['stricton'] = FALSE;
 }
 else{
 		$db['default']['hostname'] = 'testdare.verona.crinet\\' . $db_server;
@@ -115,6 +131,22 @@ else{
 		$db['default']['swap_pre'] = '';
 		$db['default']['autoinit'] = TRUE;
 		$db['default']['stricton'] = FALSE;
+		//views database
+		$db['vma']['hostname'] = 'testdare.verona.crinet\\' . $db_server;
+		$db['vma']['username'] = 'webuser';
+		$db['vma']['password'] = 'm1$AgSourze';
+		$db['vma']['database'] = "vma";
+		$db['vma']['dbdriver'] = 'mssql';
+		$db['vma']['dbprefix'] = "";
+		$db['vma']['pconnect'] = FALSE;
+		$db['vma']['db_debug'] = TRUE;
+		$db['vma']['cache_on'] = TRUE;
+		$db['vma']['cachedir'] = "";
+		$db['vma']['char_set'] = 'windows-1252';
+		$db['vma']['dbcollat'] = 'sql_latin1_general_cp1_ci_as';
+		$db['vma']['swap_pre'] = '';
+		$db['vma']['autoinit'] = TRUE;
+		$db['vma']['stricton'] = FALSE;
 }
 
 /* -----------------------------------------------------------------

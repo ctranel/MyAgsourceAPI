@@ -16,7 +16,7 @@ class Supplemental extends CI_Controller {
 		}
 		
 		/* Load the profile.php config file if it exists
-		if (ENVIRONMENT == 'development') {
+		if (ENVIRONMENT == 'development' || ENVIRONMENT == 'localhost') {
 			$this->config->load('profiler', false, true);
 			if ($this->config->config['enable_profiler']) {
 				$this->output->enable_profiler(TRUE);
@@ -55,7 +55,6 @@ class Supplemental extends CI_Controller {
 				$this->session->userdata('herd_code'),
     			$this->session->userdata('recent_test_date')
     	);
-//    	var_dump($arr_avg);
     	$this->load->view('dhi/genetics/calves_due', array('arr_avg'=>$arr_avg));
     }
     

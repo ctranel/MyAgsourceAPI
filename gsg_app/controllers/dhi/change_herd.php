@@ -1,7 +1,12 @@
-<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php
+//namespace myagsource;
+
+require_once(APPPATH.'libraries' . FS_SEP . 'benchmarks_lib.php');
+
+use \myagsource\settings\Benchmarks_lib;
+
+if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 class Change_herd extends CI_Controller {
-	//protected $herd; //herd object
-	
 	function __construct(){
 		parent::__construct();
 		$this->session->keep_flashdata('redirect_url');
@@ -22,7 +27,7 @@ class Change_herd extends CI_Controller {
 		$this->page_header_data['user_sections'] = $this->as_ion_auth->arr_user_super_sections;
 		$this->page_header_data['num_herds'] = $this->as_ion_auth->get_num_viewable_herds($this->session->userdata('user_id'), $this->session->userdata('arr_regions'));
 		/* Load the profile.php config file if it exists */
-		if (ENVIRONMENT == 'development') {
+		if (ENVIRONMENT == 'development' || ENVIRONMENT == 'localhost') {
 			$this->config->load('profiler', false, true);
 			if ($this->config->config['enable_profiler']) {
 				$this->output->enable_profiler(TRUE);
@@ -74,7 +79,7 @@ class Change_herd extends CI_Controller {
 		//$this->form_validation->set_rules('herd_code_fill', 'Type Herd Code');
 
 		if ($this->form_validation->run() == TRUE) { //successful submission
-			$this->load->library('herd', array('herd_code' => $this->input->post('herd_code')));
+			$this->load->library('herd', array('herd_code' => $this->input->post('herd_code'), 'herd_model' => $this->herd_model));
 			$this->set_herd_session_data();
 			$this->_record_access(2); //2 is the page code for herd change
 			redirect(site_url($redirect_url));
@@ -86,7 +91,7 @@ class Change_herd extends CI_Controller {
 			$tmp_arr = $this->as_ion_auth->get_viewable_herds($this->session->userdata('user_id'), $this->session->userdata('arr_regions'));
 			if(is_array($tmp_arr) && !empty($tmp_arr)){
 				if(count($tmp_arr) == 1){
-					$this->load->library('herd', array('herd_code' => $tmp_arr[0]['herd_code']));
+					$this->load->library('herd', array('herd_code' => $tmp_arr[0]['herd_code'], 'herd_model' => $this->herd_model));
 					$this->set_herd_session_data();
 					redirect(site_url($redirect_url));
 					exit();
@@ -169,7 +174,7 @@ class Change_herd extends CI_Controller {
 		}
 
 		if ($this->form_validation->run() == TRUE) { //if validation is successful
-			$this->load->library('herd', array('herd_code' => $this->input->post('herd_code')));
+			$this->load->library('herd', array('herd_code' => $this->input->post('herd_code'), 'herd_model' => $this->herd_model));
 			$this->set_herd_session_data();
 			$this->_record_access(2); //2 is the page code for herd change
 			redirect(site_url($redirect_url));
@@ -216,9 +221,9 @@ class Change_herd extends CI_Controller {
 			echo json_encode(array('enroll_status' => 0, 'new_test' => false));
 			exit;
 		}
-		$this->load->library('herd', array('herd_code' => $herd_code));
-		$enroll_status = $this->herd->getHerdEnrollStatus($this->herd_model, $this->config->item('product_report_code'));
-		$recent_test = $this->herd->getRecentTest($this->herd_model);
+		$this->load->library('herd', array('herd_code' => $herd_code, 'herd_model' => $this->herd_model));
+		$enroll_status = $this->herd->getHerdEnrollStatus($this->config->item('product_report_code'));
+		$recent_test = $this->herd->getRecentTest();
 		$has_accessed = $this->access_log->sgHasAccessedTest($this->session->userdata('sg_acct_num'), $herd_code, $recent_test);
 		echo json_encode(array('enroll_status' => $enroll_status, 'new_test' => !$has_accessed));
 		exit;
@@ -226,9 +231,14 @@ class Change_herd extends CI_Controller {
 	
 	protected function set_herd_session_data(){
 		$this->session->set_userdata('herd_code', $this->herd->getHerdCode());
+		$this->session->set_userdata('pstring', 0);
 		$this->session->set_userdata('arr_pstring', $this->herd_model->get_pstring_array($this->herd->getHerdCode()));
-		$this->session->set_userdata('herd_enroll_status_id', $this->herd->getHerdEnrollStatus($this->herd_model, $this->config->item('product_report_code')));
-		$this->session->set_userdata('recent_test_date', $this->herd->getRecentTest($this->herd_model));
+		$this->session->set_userdata('herd_enroll_status_id', $this->herd->getHerdEnrollStatus($this->config->item('product_report_code')));
+		$this->session->set_userdata('recent_test_date', $this->herd->getRecentTest());
+		//load new benchmarks
+		$this->load->model('setting_model');
+		$benchmarks_lib = new Benchmarks_lib($this->session->userdata('user_id'), $this->input->post('herd_code'), $this->herd->header_info($this->input->post('herd_code')), $this->setting_model);
+		$this->session->set_userdata('benchmarks', $benchmarks_lib->getSettingKeyValues());
 	}
 
 	protected function _record_access($event_id){

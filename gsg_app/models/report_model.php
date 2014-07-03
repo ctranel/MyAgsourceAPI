@@ -1,12 +1,7 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
-/* parent of all report models */
 /* -----------------------------------------------------------------
- *  UPDATE comment
-*  @author: carolmd
-*  @date: Nov 15, 2013
-*
-*  @description: changed to load the default database instead of the reports database.
-*
+*  @description: Base data access for database-driven report generation
+*  @author: ctranel
 *  -----------------------------------------------------------------
 */
 class Report_model extends CI_Model {
@@ -172,8 +167,13 @@ class Report_model extends CI_Model {
 			->result_array();
 		if(is_array($arr_res)){
 			foreach($arr_res as $s){
-				$arr_ret[] = $s['db_field_name'];
+				if(isset($s['db_field_name'])){
+					$arr_ret[] = $s['db_field_name'];
+				}
 			}
+		}
+		if(empty($arr_ret)){
+			return FALSE;
 		}
 		return $arr_ret;
 	}
@@ -559,7 +559,6 @@ class Report_model extends CI_Model {
 				}
 			}
 		}
-
 		return($arr_select_fields);
 	}
 	
@@ -679,10 +678,8 @@ class Report_model extends CI_Model {
 	 * @return array pivoted resultset
 	 * @author ctranel
 	 */
-	public function pivot($arr_dataset, $header_field, $header_field_width, $label_column_width, $bool_avg_column = FALSE, $bool_sum_column = FALSE, $bool_bench_column = FALSE){
-$bool_bench_column = FALSE;
+	public function pivot($arr_dataset, $header_field, $header_field_width, $label_column_width, $bool_avg_column = FALSE, $bool_sum_column = FALSE){
 		$this->date_field = $header_field;
-		$sess_benchmarks = $this->session->userdata('benchmarks');
 		$header_text = ' ';
 		$new_dataset = array();
 		//headers not used in pivot tables, so we flatten the array
@@ -696,6 +693,11 @@ $bool_bench_column = FALSE;
 			}
 			else {
 				$new_dataset[$v][$header_field] = $k;
+				//also need to add labels as keys to number formatting arrays so that they can be referenced in the view
+				if(in_array($v, $this->arr_numeric_fields)){
+					$this->arr_decimal_points[$k] = $this->arr_decimal_points[$v];
+					$this->arr_numeric_fields[] = $k;
+				}
 			}
 		}
 		$this->arr_fields = array($header_text => $header_field); //used for labels in left-most column that are set in foreach loop above
@@ -711,7 +713,8 @@ $bool_bench_column = FALSE;
 					$this->arr_unsortable_columns[] = $val;
 				}
 				elseif(strpos($name, 'isnull') === FALSE && isset($row[$header_field]) && !empty($row[$header_field])) { //2nd part eliminates rows where fresh date is null (FCS)
-					if(isset($this->arr_decimal_points[$k])) $val = round($val, $this->arr_decimal_points[$k]);
+					//is this being done in the view now?
+					//if(isset($this->arr_decimal_points[$k])) $val = round($val, $this->arr_decimal_points[$k]);
 
 					if(isset($new_dataset[$name]['total']) === FALSE && $val !== NULL){
 						$new_dataset[$name]['total'] = 0;
@@ -727,19 +730,6 @@ $bool_bench_column = FALSE;
 				}				
 			}
 		}
-		//begin benchmarks
-		if($bool_bench_column){
-			$this->load->library('benchmarks_lib');
-			$bench_settings = $this->get_bench_settings();
-			$this->benchmarks_lib->set_criteria($this->primary_table_name, $header_field, $bench_settings['metric'], $bench_settings['criteria'], $bench_settings['arr_herd_size'], $bench_settings['arr_states']);
-			$bench_sql = $this->benchmarks_lib->build_benchmark_query($this);
-			$arr_benchmarks = $this->{$this->db_group_name}->query($bench_sql)->result_array();
-			$arr_benchmarks = $arr_benchmarks[0];
-			$arr_summary_fields[ucwords(strtolower(str_replace('_', ' ', $sess_benchmarks['metric']))) . ' (n=' . $arr_benchmarks['cnt_herds'] . ')'] = 'benchmark';
-			$this->arr_pdf_widths['benchmark'] = $header_field_width;
-			$this->arr_field_sort['benchmark'] = 'ASC';
-			$this->arr_unsortable_columns[] = 'benchmark';
-		}
 		if($bool_avg_column){
 			$this->arr_fields['Average'] = 'average';
 			$this->arr_pdf_widths['average'] = $header_field_width;
@@ -754,10 +744,10 @@ $bool_bench_column = FALSE;
 			}
 		foreach($new_dataset as $k=>$a){
 			if(!empty($k)){
-				if($bool_bench_column){
-					if($arr_benchmarks[$k] !== NULL) $sum_data['benchmark'] = round($arr_benchmarks[$k], $this->arr_decimal_points[$k]);//strpos($arr_benchmarks[$k], '.') !== FALSE ? trim(trim($arr_benchmarks[$k],'0'), '.') : $arr_benchmarks[$k];
-					else $sum_data['benchmark'] = NULL;
-				}
+//				if($bool_bench_column){
+//					if($arr_benchmarks[$k] !== NULL) $sum_data['benchmark'] = round($arr_benchmarks[$k], $this->arr_decimal_points[$k]);//strpos($arr_benchmarks[$k], '.') !== FALSE ? trim(trim($arr_benchmarks[$k],'0'), '.') : $arr_benchmarks[$k];
+//					else $sum_data['benchmark'] = NULL;
+//				}
 				if($bool_avg_column){
 					$new_dataset[$k]['average'] = $new_dataset[$k]['total'] / $new_dataset[$name]['count'];
 					if(isset($this->arr_decimal_points[$k])) $new_dataset[$k]['average'] = round($new_dataset[$k]['average'], $this->arr_decimal_points[$k]);
@@ -822,25 +812,25 @@ $bool_bench_column = FALSE;
 		else return FALSE;
 	}
 
-       /**
-       * @function get_start_test_date
-       * @param string date_field - db name of the date field used for this trend
-       * @param int num_dates - number of test dates to include in report
-       * @param string date_format - database string for formatting date
-       * @param int num_dates_to_shift - number of dates to shift the results back
-       * @return string date
-       * @author ctranel
-       **/
-       public function get_start_date($date_field = 'test_date', $num_dates = 12, $date_format = 'MMM-yy', $num_dates_to_shift = 0) {
-              $sql = "SELECT FORMAT(a." . $date_field . ", 'MM-dd-yyyy', 'en-US') AS " . $date_field . "
-              FROM (SELECT DISTINCT TOP " . ($num_dates + $num_dates_to_shift) . " " . $date_field . "
-                     FROM " . $this->primary_table_name . " 
-                     WHERE herd_code = '" . $this->session->userdata('herd_code') . "' AND pstring = '" . $this->session->userdata('pstring') . "' AND " . $date_field . " IS NOT NULL
-                     ORDER BY " . $date_field . " DESC) a";
-              $result = $this->{$this->db_group_name}->query($sql)->result_array();
-              if(is_array($result) && !empty($result)) return $result[(count($result) - 1)][$date_field];
-              else return FALSE;
-       }	
+    /**
+    * @function get_start_test_date
+    * @param string date_field - db name of the date field used for this trend
+    * @param int num_dates - number of test dates to include in report
+    * @param string date_format - database string for formatting date
+    * @param int num_dates_to_shift - number of dates to shift the results back
+    * @return string date
+    * @author ctranel
+    **/
+    public function get_start_date($date_field = 'test_date', $num_dates = 12, $date_format = 'MMM-yy', $num_dates_to_shift = 0) {
+		$sql = "SELECT FORMAT(a." . $date_field . ", 'MM-dd-yyyy', 'en-US') AS " . $date_field . "
+    		FROM (SELECT DISTINCT TOP " . ($num_dates + $num_dates_to_shift) . " " . $date_field . "
+                FROM " . $this->primary_table_name . " 
+                WHERE herd_code = '" . $this->session->userdata('herd_code') . "' AND pstring = '" . $this->session->userdata('pstring') . "' AND " . $date_field . " IS NOT NULL
+                ORDER BY " . $date_field . " DESC) a";
+        $result = $this->{$this->db_group_name}->query($sql)->result_array();
+        if(is_array($result) && !empty($result)) return $result[(count($result) - 1)][$date_field];
+		else return FALSE;
+	}	
 	
 /******* CHART FUNCTIONS ****************/
 	public function set_chart_fields($block_in){
@@ -1018,50 +1008,6 @@ $bool_bench_column = FALSE;
 		else return FALSE;
 	}
 
-	
-	/**
-	 * @method get_benchmark_fields()
-	 * @param array fields to exclude from the returned value
-	 * @return array of data fields for the current primary table, excluding those fields in the param
-	 * @access protected
-	 *
-	 **/
-	function get_benchmark_fields($arr_excluded_fields = NULL){
-		$sql = "SELECT CAST ((select ',AVG('+quotename(C.name)+') AS '+quotename(C.name)
-         from sys.columns as C
-         where C.object_id = object_id('" . $this->primary_table_name . "')";
-        if(is_array($arr_excluded_fields) && !empty($arr_excluded_fields)) $sql .= " and C.name NOT IN('" . implode("','", $arr_excluded_fields) . "')";// AND C.name NOT LIKE 'cnt%'";
-        $sql .= " AND TYPE_NAME(C.user_type_id) NOT IN('char','smalldatetime','varchar','date')";
-		$sql .= "for xml path('')) AS text) AS fields";
-
-        $results = $this->{$this->db_group_name}
-		->query($sql)
-		->result_array();
-		return substr($results[0]['fields'], 1);
-	}
-	
-	/**
-	 * @method get_bench_settings()
-	 * @return array of data for the graph
-	 * @access protected
-	 **/
-	protected function get_bench_settings(){
-		//arr_criteria (field_name, sort_order, table_name, join_field) and arr_herd_size (herd_size_floor, herd_size_ceiling) are arrays, region must be translated to arr_states
-		$arr_user_herd_settings = $this->ion_auth_model->get_user_herd_settings();
-		$herd_info = $this->herd_model->header_info($this->herd_code);
-		$arr_default = $this->benchmarks_lib->get_default_settings($herd_info['herd_size'], $herd_info['state']);
-		if(isset($arr_user_herd_settings) && is_array($arr_user_herd_settings)){
-			$arr_common = array_intersect_key($arr_default, $arr_user_herd_settings);
-			if(is_array($arr_common) && !empty($arr_common)){
-				foreach($arr_common as $k=>$v){
-					$arr_default[$k] = $arr_user_herd_settings[$k];
-				}
-			}
-		}
-		return $arr_default;
-	}
-	
-	
 	/**
 	 * @method set_boxplot_data()
 	 * @param array of data from active record result_array() function

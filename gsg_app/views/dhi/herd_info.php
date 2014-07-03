@@ -7,7 +7,7 @@
 				<div><label>Name</label> <?php echo $farm_name; ?></div>
 			<?php endif; ?>
 			<?php if(!empty($herd_owner)):?>
-				<div><label>Owner</label> <?php echo $herd_owner; ?></div>
+				<div><label>Owner</label> <?php echo ucwords(strtolower($herd_owner)); ?></div>
 			<?php endif; ?>
 			<?php if(!empty($association_num)):?>
 				<div><label>Association</label> <?php echo $association_num; ?></div>
