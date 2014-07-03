@@ -277,12 +277,14 @@ class Setting {
 		if($this->data_type === 'data_lookup' || $this->data_type === 'data_lookup_arr'){
 			$ret_val['options'] = $this->lookup_options;
 			$ret_val['selected'] = $this->getCurrValue($session_value);
+			$ret_val['class'] = $this->grouping;
 			return $ret_val;
 		}
 		if($this->data_type === 'range'){
 			list($from, $to) = explode('|', $this->getCurrValue($session_value));
 			$ret_val['dbfrom'] = $from;
 			$ret_val['dbto'] = $to;
+			$ret_val['class'] = $this->grouping;
 			return $ret_val;
 		}
 //		if($this->data_type === 'array'){

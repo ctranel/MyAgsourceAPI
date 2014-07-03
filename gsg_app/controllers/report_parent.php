@@ -226,7 +226,6 @@ abstract class parent_report extends CI_Controller {
 		$this->objPage = $this->{$this->primary_model}->arr_blocks[$this->page];
 		$arr_blocks = $this->objPage['blocks'];
 
-
 		//Determine if any report blocks have is_summary flag - will determine if tstring needs to be loaded and filters shown
 		$this->load->helper('multid_array_helper');
 		$this->bool_is_summary = array_search(1, get_elements_by_key('is_summary', $arr_blocks)) === FALSE ? FALSE : TRUE;
@@ -330,37 +329,21 @@ abstract class parent_report extends CI_Controller {
 		}
 
 		// render page
-		$this->carabiner->css('chart.css');
-		$this->carabiner->css('boxes.css');
-		$this->carabiner->css('https://cdn.jsdelivr.net/qtip2/2.2.0/jquery.qtip.min.css', 'screen');
-		$this->carabiner->css('popup.css');
-		$this->carabiner->css('tabs.css');
-		$this->carabiner->css('report.css');
-		$this->carabiner->css('expandable.css');
-		$this->carabiner->css('chart.css', 'print');
-		$this->carabiner->css('report.css', 'print');
-		$this->carabiner->css($this->section_path . '.css', 'screen');
-		if($this->filters->displayFilters($this->bool_is_summary)){
-			//$this->carabiner->css('filters.css', 'screen');
-			$this->carabiner->css('agsource.datepick.css', 'screen');
-			$this->carabiner->css('jquery.datetimeentry.css', 'screen');
-		}
-		else{
-			$this->carabiner->css('hide_filters.css', 'screen');
-		}
-		if(false){
-			$this->carabiner->css('hide_benchmarks.css', 'screen');
-		}
 		//get_herd_data
 		$herd_data = $this->herd_model->header_info($this->session->userdata('herd_code'));
 		
 		//set js lines and load views for each block to be displayed on page
 		$tmp_js = '';
 		$arr_view_blocks = NULL;
+		$has_benchmarks = false;
 		if(isset($arr_blocks) && !empty($arr_blocks)){
 			$x = 0;
 			$cnt = count($arr_blocks);
 			foreach($arr_blocks as $c => $pb){
+				if($pb['bench_row'] === 1){
+					$has_benchmarks = true;
+				}
+				
 				$display = $pb['display_type'];
 				//load view for placeholder for block display
 				if(isset($sort_by) && isset($sort_order)){
@@ -402,6 +385,28 @@ abstract class parent_report extends CI_Controller {
 			}
 		}
 		//set up page header
+		$this->carabiner->css('chart.css');
+		$this->carabiner->css('boxes.css');
+		$this->carabiner->css('https://cdn.jsdelivr.net/qtip2/2.2.0/jquery.qtip.min.css', 'screen');
+		$this->carabiner->css('popup.css');
+		$this->carabiner->css('tabs.css');
+		$this->carabiner->css('report.css');
+		$this->carabiner->css('expandable.css');
+		$this->carabiner->css('chart.css', 'print');
+		$this->carabiner->css('report.css', 'print');
+		$this->carabiner->css($this->section_path . '.css', 'screen');
+		if($this->filters->displayFilters($this->bool_is_summary)){
+			//$this->carabiner->css('filters.css', 'screen');
+			$this->carabiner->css('agsource.datepick.css', 'screen');
+			$this->carabiner->css('jquery.datetimeentry.css', 'screen');
+		}
+		else{
+			$this->carabiner->css('hide_filters.css', 'screen');
+		}
+		if(!$has_benchmarks){
+			$this->carabiner->css('hide_benchmarks.css', 'screen');
+		}
+		
 		if(is_array($this->page_header_data)){
 			$arr_sec_nav_data = array(
 				'arr_pages' => $this->as_ion_auth->arr_user_sections,//$this->web_content_model->get_pages_by_criteria(array('section_id' => $this->section_id))->result_array(),

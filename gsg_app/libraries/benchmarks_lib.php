@@ -98,9 +98,9 @@ class Benchmarks_lib extends Session_settings
 		if(!isset($this->arr_settings)){
 			$this->loadSettings();
 		}
+		//OVERRIDE DEFAULTS
 		//the breed setting is an array
-		$this->arr_settings['breed']->setDefaultValue(array($breed));
-		
+		$this->arr_settings['breed']->setDefaultValue(explode('|',$breed));
 		if($breed === 'HO' || $breed === 'JE'){
 			$this->arr_settings['metric']->setDefaultValue('TOP20_PCT');
 		}

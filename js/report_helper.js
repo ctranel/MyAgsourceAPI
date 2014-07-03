@@ -45,20 +45,22 @@ if($('#benchmark-form')){ //if there is a filter form (only on pages with one ta
 		
 	});
 	
-/*
-	$('#set-filters').click(function(ev){
-		ev.preventDefault();
-		if($('#set-filters').hasClass('expanded')){
-			$('#set-filters').removeClass('expanded');
-			$('#filter-form').removeClass('expanded');
+	$('#breed').change(function(){
+		if($('#breed').val() === 'HO'){
+			$('.HO').show();
+			$('.HO_JE').show();
+		}
+		else if($('#breed').val() === 'JE'){
+			$('.HO').hide();
+			$('.HO_JE').show();
 		}
 		else{
-			//var width = $('#set-filters').parent().width();
-			$('#set-filters').addClass('expanded');
-			$('#filter-form').addClass('expanded');
-			//$('#set-filters').parent().width(width);
+			$('.HO').hide();
+			$('.HO_JE').hide();
 		}
-	}); */
+	});
+	
+	$('#breed').trigger("change");
 }
 
 $('.handle').click(function(ev){
