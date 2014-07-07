@@ -77,7 +77,7 @@ $('.handle').click(function(ev){
 });
 
 $('.expand').on('mouseleave', function(ev){
-	if(ev.target.tagName.toLowerCase() != "select" && ev.target.tagName.toLowerCase() != "fieldset") {
+	if(ev.target.tagName.toLowerCase() == "div") {
 		$(this).removeClass('expanded');
 		$(this).prev().removeClass('expanded');
 	}
