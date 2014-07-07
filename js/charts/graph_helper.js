@@ -254,8 +254,7 @@ function process_chart(div_id){ //chart_data is defined globally at the top of t
 	$('#chart-container' + block_index).show();
 }
 
-function process_table(div_id){
-	block_index = div_id.charAt( div_id.length-1 );
+function process_table(div_id, block_index){
 	if(typeof(table_data[block_index]) != 'undefined'){
 		var tmpData = {};
 		if(typeof table_data[block_index].section_data !== 'undefined') section_data = table_data[block_index].section_data;
