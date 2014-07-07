@@ -62,7 +62,7 @@ class Benchmarks_lib extends Session_settings
 		);
 
 		/**
-		 * @todo : need a more elegent/flexible/reliable (using DB) way to set a multidimensional setting
+		 * @todo : need a more elegent/flexible/reliable (using DB?) way to set a multidimensional setting
 		 */
 		$this->arr_criteria_table = array(
 			'PROD' => array(
@@ -146,6 +146,30 @@ class Benchmarks_lib extends Session_settings
 		$bench_text .= ' for ' . $this->arr_settings['breed']->getDisplayText($sess_benchmarks['breed']);
 		$bench_text .= ' herds ' . $this->arr_settings['herd_size']->getDisplayText($sess_benchmarks['herd_size']) . ' animals';
 		return $bench_text;
+	}
+
+	/* -----------------------------------------------------------------
+	 *  parses form data according to data type conventions.
+	
+	*  Parses form data according to data type conventions.
+	
+	*  @since: version 1
+	*  @author: ctranel
+	*  @date: July 7, 2014
+	*  @param array of key-value pairs from form submission
+	*  @return void
+	*  @throws:
+	* -----------------------------------------------------------------
+	*/
+	public static function parseFormData($form_data){
+		if($form_data['breed'] !== 'HO'){
+			$form_data['herd_size_dbfrom'] = '1';
+			$form_data['herd_size_dbto'] = '100000';
+		}
+		if($form_data['breed'] !== 'HO' && $form_data['breed'] !== 'JE'){
+			$form_data['metric'] = 'AVG';
+		}
+		return parent::parseFormData($form_data);
 	}
 	
 	/**
