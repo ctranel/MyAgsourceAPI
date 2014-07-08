@@ -377,12 +377,12 @@ abstract class parent_report extends CI_Controller {
 					//add js line to populate the block after the page loads
 					$tmp_container_div = $display == 'chart' ? 'graph-canvas' . $x : 'table-canvas' . $x;
 					$tmp_js .= "updateBlock(\"$tmp_container_div\", \"" . $pb['url_segment'] . "\", \"$x\", \"null\", \"null\", \"$display\",\"false\");\n";//, \"" . $this->{$this->primary_model}->arr_blocks[$this->page]['display'][$display][$block]['description'] . "\", \"" . $bench_text . "\");\n";
+					$tmp_js .= "if ($( '#datepickfrom' ).length > 0) $( '#datepickfrom' ).datepick({dateFormat: 'mm-dd-yyyy'});";
+					$tmp_js .= "if ($( '#datepickto' ).length > 0) $( '#datepickto' ).datepick({dateFormat: 'mm-dd-yyyy'});";
 					$tmp_block = $pb['url_segment'];
 					$x++;
 				}
 			}
-			$tmp_js .= "if ($( '#datepickfrom' ).length > 0) $( '#datepickfrom' ).datepick({dateFormat: 'mm-dd-yyyy'});";
-			$tmp_js .= "if ($( '#datepickto' ).length > 0) $( '#datepickto' ).datepick({dateFormat: 'mm-dd-yyyy'});";
 		}
 		//set up page header
 		$this->carabiner->css('chart.css');
@@ -471,7 +471,7 @@ abstract class parent_report extends CI_Controller {
 		if(file_exists(APPPATH . 'views' . FS_SEP . $this->section_path . FS_SEP . 'report_nav.php')){
 			$report_nav_path =  $this->section_path . '/' . $report_nav_path;
 		}
-		if(count($arr_nav_data['arr_pages']) < 2) {
+		if(count($arr_nav_data['arr_pages']) < 2 && count($this->session->userdata('arr_pstring')) < 2) {
 			$this->carabiner->css('hide_report_nav.css', 'screen');
 		}
 		$report_filter_path = 'filters';

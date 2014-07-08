@@ -1,5 +1,6 @@
 <?php
-namespace myagsource\dhi
+namespace myagsource\dhi;
+
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /**
 * Name:  Herd 
@@ -67,9 +68,9 @@ class Herd
 	 * @return void
 	 * @author Chris
 	 **/
-	public function __construct($arr) {
-		$this->herd_code = $arr['herd_code'];
-		$this->herd_model = $arr['herd_model'];
+	public function __construct($herd_code, $herd_model) {
+		$this->herd_code = $herd_code;
+		$this->herd_model = $herd_model;
 	}
 
 	/**
@@ -148,8 +149,8 @@ class Herd
 	*  @throws: 
 	* -----------------------------------------------------------------
 	*/
-	protected function getTrialDays($access_log, $herd_code, $report_code){
-		$initial_access = $access_log->getInitialAccessDate(null, $herd_code, $report_code);
+	protected function getTrialDays($access_log, $user_id, $herd_code, $report_code){
+		$initial_access = $access_log->getInitialAccessDate($user_id, $herd_code, $report_code);
 		$d_start = new DateTime($initial_access);
 		$d_end  = new DateTime();
 		$d_diff = $d_start->diff($d_end)->days;

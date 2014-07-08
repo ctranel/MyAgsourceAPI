@@ -89,4 +89,22 @@ class Access_log
 		$log = $this->access_log_model->getLogBySgHerdTest($user_id, $herd_code, $test_date);
 		return count($log) > 0;
 	}
+	
+	/* -----------------------------------------------------------------
+	 *  Short Description
+	
+	*  Long Description
+	
+	*  @since: version 1
+	*  @author: ctranel
+	*  @date: Jul 7, 2014
+	*  @param: int user id
+	*  @param: string herd code
+	*  @return date
+	*  @throws:
+	* -----------------------------------------------------------------
+	*/
+	public function getInitialAccessDate($user_id, $herd_code, $report_code){
+		return $this->access_log_model->getInitialAccessDate($user_id, $herd_code, $report_code);
+	}
 }

@@ -41,4 +41,38 @@ class Access_log_model extends Report_Model {
 			->get($this->tables['access_log'] . ' al')
 			->result_array();
 	}
+
+	/* -----------------------------------------------------------------
+	 * returns the first date that the given user accessed
+	
+	*  Long Description
+	
+	*  @since: version 1
+	*  @author: ctranel
+	*  @date: Jul 7, 2014
+	*  @param: int user id
+	*  @param: string herd code
+	*  @param: string report code
+	*  @return date
+	*  @throws:
+	* -----------------------------------------------------------------
+	*/
+	public function getInitialAccessDate($user_id, $herd_code, $report_code){
+		if(isset($user_id) && !empty($user_id)){
+			$this->db->where('user_id', $user_id);
+		}
+		if(isset($herd_code) && !empty($herd_code)){
+			$this->db->where('herd_code', $herd_code);
+		}
+		if(isset($report_code) && !empty($report_code)){
+			$this->db->where('report_code', $report_code);
+		}
+		
+		$results = $this->db
+			->select('TOP 1 CONVERT(char(10), access_time, 126) as first_access')
+			->order_by('access_time', 'asc')
+			->get($this->tables['access_log'])
+			->result_array();
+		return $results['first_access'];
+	}
 }

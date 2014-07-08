@@ -1,9 +1,11 @@
 <?php
 //namespace myagsource;
 
-require_once(APPPATH.'libraries' . FS_SEP . 'benchmarks_lib.php');
+require_once(APPPATH . 'libraries' . FS_SEP . 'benchmarks_lib.php');
+require_once(APPPATH . 'libraries' . FS_SEP .'dhi' . FS_SEP . 'herd.php');
 
-use \myagsource\Benchmarks_lib;
+use \myagsource\settings\Benchmarks_lib;
+use \myagsource\dhi\Herd;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
@@ -21,9 +23,13 @@ class Demo extends CI_Controller {
 	
 	protected $arr_user_super_sections;
 	protected $arr_user_sections;
+	/* 
+	 * @var Herd object
+	 */
+	protected $herd;
 	
 	function index(){
-		$this->load->library('herd', array('herd_code' => $this->config->item('default_herd'), 'herd_model' => $this->herd_model));
+		$this->herd = new Herd($this->config->item('default_herd'), $this->herd_model);
 		$this->set_herd_session_data();
 		redirect(site_url());
 		/* Load the profile.php config file if it exists*/
