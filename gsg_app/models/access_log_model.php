@@ -43,9 +43,9 @@ class Access_log_model extends Report_Model {
 	}
 
 	/* -----------------------------------------------------------------
-	 * returns the first date that the given user accessed
+	 * returns the first date that the given user accessed the given report/product
 	
-	*  Long Description
+	*  returns the first date that the given user accessed the given report/product
 	
 	*  @since: version 1
 	*  @author: ctranel
@@ -73,6 +73,9 @@ class Access_log_model extends Report_Model {
 			->order_by('access_time', 'asc')
 			->get($this->tables['access_log'])
 			->result_array();
-		return $results['first_access'];
+		if(empty($results)){
+			return 0;
+		}
+		return $results[0]['first_access'];
 	}
 }

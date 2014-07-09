@@ -60,7 +60,7 @@ class Benchmark_model extends CI_Model {
 		$where = '';
 		$group_by = '';
 		$order_by = '';
-	
+
 		if($metric == "AVG") {
 			$cte = $this->build_cte($arr_criteria_data, $herd_benchmark_pool_table, $metric, $herd_size_floor, $herd_size_ceiling, $arr_breeds);
 			$from = " FROM benchmark_herds bh INNER JOIN " . $db_table->full_table_name() . " p ON bh.herd_code = p.herd_code";

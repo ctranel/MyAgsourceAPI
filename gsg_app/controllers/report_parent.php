@@ -3,9 +3,11 @@
 require_once APPPATH . 'libraries' . FS_SEP . 'db_objects' . FS_SEP . 'db_table.php';
 require_once(APPPATH.'libraries' . FS_SEP . 'Filters.php');
 require_once(APPPATH.'libraries' . FS_SEP . 'benchmarks_lib.php');
+require_once(APPPATH.'libraries' . FS_SEP . 'access_log.php');
 
 use \myagsource\db_objects\db_table;
 use \myagsource\settings\Benchmarks_lib;
+use \myagsource\Access_log;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
@@ -854,7 +856,11 @@ abstract class parent_report extends CI_Controller {
 		$recent_test = empty($recent_test) ? NULL : $recent_test;
 		
 		$filter_text = isset($this->filters) ? $this->filters->get_filter_text() : NULL;
-		$this->access_log->write_entry(
+
+		$this->load->model('access_log_model');
+		$access_log = new Access_log($this->access_log_model);
+		
+		$access_log->write_entry(
 			$this->as_ion_auth->is_admin(),
 			$event_id,
 			$herd_code,

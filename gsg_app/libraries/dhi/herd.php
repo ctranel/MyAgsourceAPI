@@ -1,6 +1,8 @@
 <?php
 namespace myagsource\dhi;
 
+use \DateTime;
+
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /**
 * Name:  Herd 
@@ -112,15 +114,19 @@ class Herd
 	}
 
 	/**
+	 * Returns enrollment status id of the herd for the given report code
+	 * 
+	 * 	Possible options are:
+	 *  (1) no output record = none
+	 *  (2) billing account of AS035099 = unpaid
+	 *  (3) billing account of 00000001 = paid
+	 * 
 	 * @method getHerdEnrollStatus()
 	 * @return string recent test date
 	 * @access public
 	 *
 	 **/
 	public function getHerdEnrollStatus($report_code = NULL){
-		//no output record = none (1)
-		//billing account of AS035099 = unpaid (2)
-		//billing account of 00000001 = paid (3)
 		$herd_output = $this->herd_model->get_herd_output($this->herd_code, $report_code);
 		if(!$herd_output || count($herd_output) == 0){
 			$return_val = 1;
@@ -135,21 +141,24 @@ class Herd
 	}
 	
 	/* -----------------------------------------------------------------
-	*  Short Description
+	*  Returns number of days since the initial access for herds that
+	*  are not paying for the specified product.
 
-	*  Long Description
+	*  Returns number of days since the initial access for herds that
+	*  are not paying for the specified product.
 
 	*  @since: version 1
 	*  @author: ctranel
 	*  @date: Jul 7, 2014
-	*  @param: string
-	*  @param: int
-	*  @param: array
+	*  @param: access log object
+	*  @param: int user id
+	*  @param: string herd code
+	*  @param: string report code
 	*  @return int 
 	*  @throws: 
 	* -----------------------------------------------------------------
 	*/
-	protected function getTrialDays($access_log, $user_id, $herd_code, $report_code){
+	public function getTrialDays($access_log, $user_id, $herd_code, $report_code){
 		$initial_access = $access_log->getInitialAccessDate($user_id, $herd_code, $report_code);
 		$d_start = new DateTime($initial_access);
 		$d_end  = new DateTime();

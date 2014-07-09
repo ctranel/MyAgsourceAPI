@@ -2,8 +2,10 @@
 //namespace myagsource;
 
 require_once(APPPATH . 'libraries' . FS_SEP .'dhi' . FS_SEP . 'herd.php');
+require_once(APPPATH.'libraries' . FS_SEP . 'access_log.php');
 require_once(APPPATH.'libraries' . FS_SEP . 'benchmarks_lib.php');
 
+use \myagsource\Access_log;
 use \myagsource\dhi\Herd;
 use \myagsource\settings\Benchmarks_lib;
 
@@ -13,7 +15,11 @@ class Change_herd extends CI_Controller {
 	 * @var Herd object
 	 */
 	protected $herd;
-	
+	/* 
+	 * @var Access_log object
+	 */
+	protected $access_log;
+
 	function __construct(){
 		parent::__construct();
 		$this->session->keep_flashdata('redirect_url');
@@ -31,6 +37,10 @@ class Change_herd extends CI_Controller {
 			}
 			redirect(site_url('auth/login'));
 		}
+
+		$this->load->model('access_log_model');
+		$this->access_log = new Access_log($this->access_log_model);
+				
 		$this->page_header_data['user_sections'] = $this->as_ion_auth->arr_user_super_sections;
 		$this->page_header_data['num_herds'] = $this->as_ion_auth->get_num_viewable_herds($this->session->userdata('user_id'), $this->session->userdata('arr_regions'));
 		/* Load the profile.php config file if it exists */
@@ -87,21 +97,21 @@ class Change_herd extends CI_Controller {
 
 		if ($this->form_validation->run() == TRUE) { //successful submission
 			$this->herd = new Herd($this->input->post('herd_code'), $this->herd_model);
-
 			$herd_enroll_status_id = $this->herd->getHerdEnrollStatus($this->config->item('product_report_code'));
 			if($herd_enroll_status_id == 2 && $this->session->userdata('active_group_id') == 2){ //herd is not paying, and user is a producer
-				$access_log = new Access_log();
-				$trial_days = $this->herd->getTrialDays($access_log, $this->session->userdata('herd_code'), $this->config->item('product_report_code'));
-				echo $trial_days;
-				if($trial_days > $this->config->item('trial_length')){
-					$this->as_ion_auth->logout();
-					$this->session->set_flashdata('message', 'Your trial period has expired. Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' to enroll on ' . $this->config->item('product_name') . '.');
+				$trial_days = $this->herd->getTrialDays($this->access_log, $this->session->userdata('user_id'), $this->input->post('herd_code'), $this->config->item('product_report_code'));
+				if($trial_days >= $this->config->item('trial_length')){
+					$this->session->set_flashdata('message', 'The trial period for herd ' . $this->input->post('herd_code') . ' has expired. Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' to enroll on ' . $this->config->item('product_name') . '.');
+					//redirect back to select herd page again
+					redirect(site_url('dhi/change_herd/select'), 'refresh');
+					exit();
 				}
-				elseif($trial_days > $this->config->item('trial_warning')){
-					return 2;
+				elseif($trial_days >= $this->config->item('trial_warning')){
+					$this->session->set_flashdata('message', 'You have ' . ($this->config->item('trial_length') - $trial_days) . ' days remaining on your free trial.  To ensure uninterrupted access, please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' to enroll on ' . $this->config->item('product_name') . '.');
 				}
 			}
 			$this->set_herd_session_data($herd_enroll_status_id);
+			
 			$this->_record_access(2); //2 is the page code for herd change
 			redirect(site_url($redirect_url));
 			exit();
@@ -115,18 +125,17 @@ class Change_herd extends CI_Controller {
 					$this->herd = new Herd($tmp_arr[0]['herd_code'], $this->herd_model);
 					$herd_enroll_status_id = $this->herd->getHerdEnrollStatus($this->config->item('product_report_code'));
 					if($herd_enroll_status_id == 2 && $this->session->userdata('active_group_id') == 2){ //herd is not paying, and user is a producer
-						$access_log = new Access_log();
-						$trial_days = $this->herd->getTrialDays($access_log, $this->session->userdata('user_id'), $this->session->userdata('herd_code'), $this->config->item('product_report_code'));
-						echo $trial_days;
-						if($trial_days > $this->config->item('trial_length')){
-							$this->session->set_flashdata('message', 'Your trial period has expired. Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' to enroll on ' . $this->config->item('product_name') . '.');
+						$trial_days = $this->herd->getTrialDays($this->access_log, $this->session->userdata('user_id'), $tmp_arr[0]['herd_code'], $this->config->item('product_report_code'));
+						if($trial_days >= $this->config->item('trial_length')){
 							//logout user
 							$this->as_ion_auth->logout();
+							$this->session->set_flashdata('message', 'Your free trial period has expired. Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' to enroll on ' . $this->config->item('product_name') . '.');
 							//redirect to login
-							
+							redirect('auth/login', 'refresh');
+							exit();
 						}
-						elseif($trial_days > $this->config->item('trial_warning')){
-							return 2;
+						elseif($trial_days >= $this->config->item('trial_warning')){
+							$this->session->set_flashdata('message', 'You have ' . ($this->config->item('trial_length') - $trial_days) . ' days remaining on your free trial.  To ensure uninterrupted access, please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' to enroll on ' . $this->config->item('product_name') . '.');
 						}
 					}
 					$this->set_herd_session_data($herd_enroll_status_id);
@@ -212,7 +221,20 @@ class Change_herd extends CI_Controller {
 
 		if ($this->form_validation->run() == TRUE) { //if validation is successful
 			$this->herd = new Herd($this->input->post('herd_code'), $this->herd_model);
-			$this->set_herd_session_data();
+			$herd_enroll_status_id = $this->herd->getHerdEnrollStatus($this->config->item('product_report_code'));
+			if($herd_enroll_status_id == 2 && $this->session->userdata('active_group_id') == 2){ //herd is not paying, and user is a producer
+				$trial_days = $this->herd->getTrialDays($this->access_log, $this->session->userdata('user_id'), $this->input->post('herd_code'), $this->config->item('product_report_code'));
+				if($trial_days >= $this->config->item('trial_length')){
+					$this->session->set_flashdata('message', 'The trial period for herd ' . $this->input->post('herd_code') . ' has expired. Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' to enroll on ' . $this->config->item('product_name') . '.');
+					//redirect back to select herd page again
+					redirect(site_url('dhi/change_herd/request'), 'refresh');
+					exit();
+				}
+				elseif($trial_days >= $this->config->item('trial_warning')){
+					$this->session->set_flashdata('message', 'You have ' . ($this->config->item('trial_length') - $trial_days) . ' days remaining on your free trial.  To ensure uninterrupted access, please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' to enroll on ' . $this->config->item('product_name') . '.');
+				}
+			}
+			$this->set_herd_session_data($herd_enroll_status_id);
 			
 			$this->_record_access(2); //2 is the page code for herd change
 			redirect(site_url($redirect_url));

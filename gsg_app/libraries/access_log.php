@@ -1,4 +1,7 @@
-<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php
+namespace myagsource;
+
+if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /**
 * Name:  Access Log
 *
@@ -26,20 +29,10 @@ class Access_log
 	 * @return void
 	 * @author ctranel
 	 **/
-	public function __construct(){//$access_log_model
-		//$this->access_log_model = $access_log_model;
+	public function __construct($access_log_model){
+		$this->access_log_model = $access_log_model;
 	}
 
-	/*
-	 * @method setModel
-	 * @param object access model
-	 * @return void
-	 * @author ctranel
-	 */
-	public function setModel($model){
-		$this->access_log_model = $model;
-	}
-	
 	/**
 	 * write_entry
 	 *
@@ -91,15 +84,16 @@ class Access_log
 	}
 	
 	/* -----------------------------------------------------------------
-	 *  Short Description
+	 * returns the first date that the given user accessed the given report/product
 	
-	*  Long Description
+	*  returns the first date that the given user accessed the given report/product
 	
 	*  @since: version 1
 	*  @author: ctranel
 	*  @date: Jul 7, 2014
 	*  @param: int user id
 	*  @param: string herd code
+	*  @param: string report code
 	*  @return date
 	*  @throws:
 	* -----------------------------------------------------------------

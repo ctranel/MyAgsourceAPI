@@ -1,4 +1,8 @@
-<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php 
+
+use \myagsource\Access_log;
+
+if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
 * Name:  AS Ion Auth
@@ -8,6 +12,7 @@
 */
 
 require_once APPPATH . 'libraries/Ion_auth.php';
+require_once APPPATH . 'libraries/access_log.php';
 class As_ion_auth extends Ion_auth {
 
 	/**
@@ -78,9 +83,8 @@ class As_ion_auth extends Ion_auth {
 			//$this->arr_task_permissions = $this->ion_auth_model->get_task_permissions('3');
 		//}
 		parent::__construct();
-		$this->load->model('access_log_model');
-		$this->load->library('access_log'); //, array('access_log_model' => $this->access_log_model)
-		$this->access_log->setModel($this->access_log_model);
+//		$this->load->model('access_log_model');
+//		$this->access_log = new Access_log($this->access_log_model);
 		$this->load->model('web_content_model');
 		$this->load->model('dhi/region_model');
 		$this->load->helper('url');
@@ -331,7 +335,7 @@ class As_ion_auth extends Ion_auth {
 	}
 	
 	/**
-	 * @method get_viewable_herds()
+	 * @method get_num_viewable_herds()
 	 * @param int user_id
 	 * @param array of region acct_num=>name
 	 * @return mixed array of herds or boolean

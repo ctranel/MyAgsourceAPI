@@ -1,6 +1,11 @@
-<?php defined('BASEPATH') OR exit('No direct script access allowed');
+<?php 
+
+use \myagsource\Access_log;
+
+defined('BASEPATH') OR exit('No direct script access allowed');
 
 require_once APPPATH . 'controllers/ionauth.php';
+require_once APPPATH . 'libraries/access_log.php';
 
 class Auth extends Ionauth {
 	protected $redirect_url;
@@ -1428,7 +1433,10 @@ class Auth extends Ionauth {
 		$recent_test = $this->session->userdata('recent_test_date');
 		$recent_test = empty($recent_test) ? NULL : $recent_test;
 		
-		$this->access_log->write_entry(
+		$this->load->model('access_log_model');
+		$access_log = new Access_log($this->access_log_model);
+				
+		$access_log->write_entry(
 			$this->as_ion_auth->is_admin(),
 			$event_id,
 			$herd_code,
