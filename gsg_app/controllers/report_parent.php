@@ -875,4 +875,3 @@ abstract class parent_report extends CI_Controller {
 		);
 	}
 }
-
