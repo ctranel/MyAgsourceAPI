@@ -15,6 +15,10 @@ class Access_log_model extends Report_Model {
 	 * @author ctranel
 	 **/
 	function write_entry_to_db($data){
+		if(isset($data['product_code'])){
+			$data['report_code'] = $data['product_code'];
+			unset($data['product_code']);
+		}
 		return $this->{$this->db_group_name}->insert($this->tables['access_log'], $data);
 	}
 

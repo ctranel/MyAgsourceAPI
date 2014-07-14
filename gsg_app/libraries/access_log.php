@@ -49,8 +49,10 @@ class Access_log
 	 * @return boolean
 	 * @author ctranel
 	 **/
-	function write_entry($is_admin, $event_id, $herd_code, $recent_test_date, $herd_enroll_status_id, $user_id, $group_id, $format='web', $report_page_id = NULL, $sort=NULL, $filters=NULL){
-		if($is_admin) return 1; //do not record admin action
+	function write_entry($is_admin, $event_id, $herd_code, $recent_test_date, $herd_enroll_status_id, $user_id, $group_id, $product_code = null, $format='web', $report_page_id = NULL, $sort=NULL, $filters=NULL){
+		if($is_admin){
+			return 1; //do not record admin action
+		}
 		$tmp_array = array(
 			'event_id' => $event_id,
 			'herd_code' => $herd_code,
@@ -62,6 +64,7 @@ class Access_log
 			'report_page_id' => $report_page_id,
 			'access_time' => date('Y-m-d H:i:s')
 		);
+		if ($product_code) $tmp_array['report_code'] = $product_code;
 		if ($report_page_id) $tmp_array['report_page_id'] = $report_page_id;
 		if ($sort) $tmp_array['sort_text'] = $sort;
 		if ($filters) $tmp_array['filter_text'] = $filters;

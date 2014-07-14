@@ -1,9 +1,9 @@
 <?php
 //namespace myagsource;
 require_once APPPATH . 'libraries' . FS_SEP . 'db_objects' . FS_SEP . 'db_table.php';
-require_once(APPPATH.'libraries' . FS_SEP . 'Filters.php');
-require_once(APPPATH.'libraries' . FS_SEP . 'benchmarks_lib.php');
-require_once(APPPATH.'libraries' . FS_SEP . 'access_log.php');
+require_once(APPPATH . 'libraries' . FS_SEP . 'Filters.php');
+require_once(APPPATH . 'libraries' . FS_SEP . 'benchmarks_lib.php');
+require_once(APPPATH . 'libraries' . FS_SEP . 'access_log.php');
 
 use \myagsource\db_objects\db_table;
 use \myagsource\settings\Benchmarks_lib;
@@ -282,7 +282,7 @@ abstract class parent_report extends CI_Controller {
 			}
 			if(is_array($data) && !empty($data)){
 				$this->reports->create_csv($data);
-				$this->_record_access(90, $this->objPage['page_id'], 'csv');
+				$this->_record_access(90, $this->objPage['page_id'], 'csv', $this->config->item('product_report_code'));
 			}
 			else {
 				$this->{$this->primary_model}->arr_messages[] = 'There is no data to export into an Excel file.';
@@ -325,7 +325,7 @@ abstract class parent_report extends CI_Controller {
 					}
 				}
 			}
-			$this->_record_access(90, $this->objPage['page_id'], 'pdf');
+			$this->_record_access(90, $this->objPage['page_id'], 'pdf', $this->config->item('product_report_code'));
 			$this->reports->create_pdf($block, $this->product_name, NULL, $herd_data, 'P');
 			exit;
 		}
@@ -505,7 +505,7 @@ abstract class parent_report extends CI_Controller {
 			$data['report_nav'] = $this->load->view($report_nav_path, $arr_nav_data, TRUE);
 		}
 		
-		$this->_record_access(90, $this->objPage['page_id'], 'web');
+		$this->_record_access(90, $this->objPage['page_id'], 'web', $this->config->item('product_report_code'));
 		$this->load->view('report', $data);
 	}
 	
@@ -580,13 +580,13 @@ abstract class parent_report extends CI_Controller {
 		//common functionality
 		if($file_format == 'csv'){
 			if($first){
-				$this->_record_access(90, $this->objPage['page_id'], 'csv');
+				$this->_record_access(90, $this->objPage['page_id'], 'csv', $this->config->item('product_report_code'));
 			}
 			return $this->report_data['report_data'];
 		}
 		elseif($file_format == 'pdf'){
 			if($first){
-				$this->_record_access(90, $this->objPage['page_id'], 'pdf');
+				$this->_record_access(90, $this->objPage['page_id'], 'pdf', $this->config->item('product_report_code'));
 			}
 			if($this->display == 'html') return $this->html;
 			else {
@@ -598,7 +598,7 @@ abstract class parent_report extends CI_Controller {
 		}
 
 		if($first){
-			$this->_record_access(90, $this->objPage['page_id'], 'web');
+			$this->_record_access(90, $this->objPage['page_id'], 'web', $this->config->item('product_report_code'));
 		}
 		$this->graph['section_data'] = $this->get_section_data($block, $this->pstring, $sort_by, $sort_order, $report_count);
 		$return_val = prep_output($this->display, $this->graph, $report_count, $file_format);
@@ -846,7 +846,7 @@ abstract class parent_report extends CI_Controller {
 		$this->display = 'table';
 	}
 	
-	protected function _record_access($event_id, $page_id, $format){
+	protected function _record_access($event_id, $page_id, $format, $product_code = null){
 		if($this->session->userdata('user_id') === FALSE){
 			return FALSE;
 		}
@@ -868,6 +868,7 @@ abstract class parent_report extends CI_Controller {
 			$herd_enroll_status_id,
 			$this->session->userdata('user_id'),
 			$this->session->userdata('active_group_id'),
+			$product_code,
 			$format,
 			$page_id,
 			$this->reports->sort_text_brief($this->arr_sort_by, $this->arr_sort_order),
