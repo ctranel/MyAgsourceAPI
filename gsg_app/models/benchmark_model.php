@@ -27,7 +27,7 @@ class Benchmark_model extends CI_Model {
 	public function get_benchmark_fields($db_table, $arr_excluded_fields = NULL){
 		list($db, $schema, $tbl) = explode('.', $db_table);
 		$sql = "USE " . $db . "
-		 SELECT CAST ((select ',AVG(CAST('+quotename(C.name)+' AS DECIMAL(12,0))) AS '+quotename(C.name)
+		 SELECT CAST ((select ',AVG(CAST('+quotename(C.name)+' AS DECIMAL(12,4))) AS '+quotename(C.name)
          from sys.columns as C
          where C.object_id = object_id('" . $db_table . "')";
         if(is_array($arr_excluded_fields) && !empty($arr_excluded_fields)) $sql .= " and C.name IN('" . implode("','", $arr_excluded_fields) . "')";// AND C.name NOT LIKE 'cnt%'";
