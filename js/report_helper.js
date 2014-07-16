@@ -172,11 +172,6 @@ function attachDataFieldEvents(){
 	    show: {
 	    	solo: true,
 	    },
-//	    hide: {
-//	    	event: false,
-//	    	distance: 180,
-//	    	leave: false
-//	    }
 	});
 }
 
