@@ -1,4 +1,8 @@
-<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php 
+
+use \myagsource\Access_log;
+
+if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 class Cow_lookup extends CI_Controller {
 	var $barn_name;
 	var $curr_lact_num;
@@ -149,7 +153,10 @@ class Cow_lookup extends CI_Controller {
 		$recent_test = $this->session->userdata('recent_test_date');
 		$recent_test = empty($recent_test) ? NULL : $recent_test;
 		
-		$this->access_log->write_entry(
+		$this->load->model('access_log_model');
+		$access_log = new Access_log($this->access_log_model);
+				
+		$access_log->write_entry(
 			$this->as_ion_auth->is_admin(),
 			$event_id,
 			$herd_code,
@@ -157,7 +164,7 @@ class Cow_lookup extends CI_Controller {
 			$herd_enroll_status_id,
 			$this->session->userdata('user_id'),
 			$this->session->userdata('active_group_id'),
-			$product_code
+			$this->config->item('product_report_code')
 		);
 	}
 }
