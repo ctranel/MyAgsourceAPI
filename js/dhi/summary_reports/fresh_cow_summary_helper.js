@@ -16,4 +16,11 @@
 			    }
 			});
 		}
+		else{
+			Highcharts.setOptions({
+				yAxis: {
+			        tickInterval: null
+			    }
+			});
+		}
 	}

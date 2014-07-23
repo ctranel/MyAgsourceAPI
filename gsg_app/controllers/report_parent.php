@@ -145,7 +145,7 @@ abstract class parent_report extends CI_Controller {
 		}
 		if(!isset($this->herd_code)){
 	       	if($method == 'ajax_report'){
-				echo 'Please select a herd and try again.';
+				echo 'Either your session expired, or you have not yet chosen a herd.  Please select a herd and try again.';
 			}
 			else {
 				$this->session->set_flashdata('message',  $this->session->flashdata('message') . "Please select a herd and try again.");
@@ -683,14 +683,8 @@ abstract class parent_report extends CI_Controller {
 		if(is_array($arr_axes['x'])){
 			foreach($arr_axes['x'] as $a){
 				$tmp_cat = isset($a['categories']) && !empty($a['categories']) ? $a['categories'] : NULL;
-				switch($a['data_type']) {
-					case 'datetime':
-						$label_format = "function(){return Highcharts.dateFormat('%b %e, %Y', this.value);}";
-						$x_axis_date_field = $a['db_field_name'];
-						break;
-					default:
-						$label_format = 'function(){return this.value}';
-						break;
+				if($a['data_type'] === 'datetime'){
+					$x_axis_date_field = $a['db_field_name'];
 				}
 				$tmp_array = array(
 					'type' => $a['data_type'], 
@@ -698,8 +692,8 @@ abstract class parent_report extends CI_Controller {
 				);
 				if($arr_this_block['chart_type'] != 'bar'){
 					$tmp_array['title'] = array('text' => $a['text']);
-					if($a['data_type'] == 'datetime') $tmp_array['labels'] = array('formatter' => $label_format, 'rotation' => -35, 'align' => 'left', 'x' => -50, 'y' => 55);
-					else $tmp_array['labels'] = array('formatter' => $label_format, 'rotation' => -35, 'y' => 25);
+					if($a['data_type'] == 'datetime') $tmp_array['labels'] = array('rotation' => -35, 'align' => 'left', 'x' => -50, 'y' => 55);
+					else $tmp_array['labels'] = array('rotation' => -35, 'y' => 25);
 				}
 				if(count($arr_axes['x']) > 1) $this->graph['config']['xAxis'][] = $tmp_array;
 				else $this->graph['config']['xAxis'] = $tmp_array;
@@ -710,30 +704,8 @@ abstract class parent_report extends CI_Controller {
 		if(is_array($arr_axes['y'])){
 			$cnt = 0;
 			foreach($arr_axes['y'] as $a){
-				$label_format = 'function(){return this.value}';
-				if(isset($x_axis_date_field)){
-					if($arr_this_block['chart_type'] == 'boxplot'){
-						$tooltip_format = 'function(){
-							var p = this.point;
-							if(this.series.options.type == "boxplot" || typeof(this.series.options.type) == "undefined"){
-								return "<b>" + Highcharts.dateFormat("%B %Y", this.x) +"</b><br/>" + this.series.name +"<br/>75th Percentile: "+ p.q1 + "<br/>50th Percentile: "+ p.median + "<br/>25th Percentile: "+ p.q3;
-							}
-							else {
-								return false;
-								//return "<b>"+ Highcharts.dateFormat("%B %Y", this.x) +"</b><br/>"+this.series.name +": "+ this.y;
-							}
-						}';
-					}
-					else{
-						$tooltip_format = "function(){return '<b>' + this.series.name + ':</b><br>' + Highcharts.dateFormat('%B %e, %Y', this.x) + ' - ' + this.y + ' " . $um . "';}";
-					}
-				}
-				else {
-					$tooltip_format = "function(){return '<b>' + this.series.name + ':</b>' + this.y + ' " . $um . "';}";
-				}
 				if($arr_this_block['chart_type'] != 'bar') $tmp_array['opposite'] = $a['opposite'];
 				if(isset($a['text'])) $tmp_array['title'] = array('text' => $a['text'], 'style'=>array('color'=>''));
-				if(isset($label_format) && $arr_this_block['chart_type'] != 'bar') $tmp_array['labels'] = array('formatter' => $label_format);
 				if(isset($a['data_type'])) $tmp_array['type'] = $a['data_type'];
 				if(isset($a['max'])) $tmp_array['max'] = $a['max'];
 				if(isset($a['min'])) $tmp_array['min'] = $a['min'];
@@ -752,7 +724,6 @@ abstract class parent_report extends CI_Controller {
 					else $this->graph['config']['yAxis'] = $tmp_array;
 				}
 			}
-			$this->graph['config']['tooltip']['formatter'] = $tooltip_format;
 		}
 		$this->graph['data'] = $this->{$this->primary_model}->get_graph_data($arr_fieldnames, $this->session->userdata('herd_code'), $this->max_rows, $x_axis_date_field, $arr_this_block['url_segment'], $this->graph['config']['xAxis']['categories']);
 	}

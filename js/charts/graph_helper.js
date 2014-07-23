@@ -1,7 +1,5 @@
 //global variables used in this script (included in the imported js file)
 var chart = new Array(); //array of chart object
-var chart_data = new Array(); //must match variable in the javascript files that are downloaded (report_chart_helper.php)
-var table_data = new Array(); //must match variable in the javascript files that are downloaded (report_chart_helper.php)
 
 //var var_arr_graph_colors = ['#FF3C3C','#FF5A5A','#FF7878','#FF9696','#FFB4B4']; //monochrome
 //var var_arr_graph_colors = ['#643b3b', '#825a5a', '#a07878', '#bd9696', '#dcb2b2'];  //monochrome
@@ -149,11 +147,10 @@ function updatePage(el){
 	}
 }
 
-function updateBlock(container_div_id, block_in, block_index, sort_field, sort_order, display, first){//}, title, benchmark_text){
+function updateBlock(container_div_id, block_in, block_index, sort_field, sort_order, display, first){
 //load and process ajax data - base_url and page are defined globally in the controller
 	var params = '';
 	var cache_bust = Math.floor(Math.random()*1000);
-	//var pstring = $('.pstring-filter-item > input:checked').val();
 	if($("#filter-form")){
 		params = encodeURIComponent(JSON.stringify($("#filter-form").serializeObject()));
 	}
@@ -171,9 +168,6 @@ function updateBlock(container_div_id, block_in, block_index, sort_field, sort_o
 }
 
 function load_table(server_path, div_id, block_index, params){
-	/* if(typeof(params) == 'undefined' && $("#filter-form")){
-		params = encodeURIComponent(JSON.stringify($("#filter-form").serializeObject()));
-	} */
 	if(!server_path) {
 		alert("No data found.");
 		return false;
@@ -181,38 +175,69 @@ function load_table(server_path, div_id, block_index, params){
 	if(typeof(div_id) === 'undefined' || !div_id) div_id = 'table-canvas0';
 	$('#table-wrapper' + block_index).find('table').hide();
 	$('#waiting-icon' + block_index).show();
-	
-	//load javascript file (with a cache-busting parameter) rather than calling with AJAX for consistency with charts
-	head.js(server_path, function() { process_table(div_id, block_index); });
+	$.get(server_path, '', function(data) { process_table(div_id, block_index, data); })
+		.fail(function(){console.log(this.responseText);});
 	//cancel link when called from anchor tag
 	return false;
 }
 
 function load_chart(server_path, div_id, block_index, params){
-	/* if(typeof(params) == 'undefined' && $("#filter-form")){
-		params = encodeURIComponent(JSON.stringify($("#filter-form").serializeObject()));
-	} */
 	if(!server_path) {
 		alert("No data found.");
 		return false;
 	}
 	if(typeof(div_id) == 'undefined' || !div_id) div_id = 'graph-canvas0';
 	
-	//load javascript file rather than calling with AJAX so that functions can be imported.  This javascript file will call the process_data function
 	$('#chart-container' + block_index).hide();
 	$('#waiting-icon' + block_index).show();
-	head.js(server_path, function() { process_chart(div_id); });
+	$.get(server_path, '', function(data) { process_chart(div_id, data); })
+		.fail(function(jqXHR, textStatus, errorThrown){console.log(errorThrown);});
 }
 
-function process_chart(div_id){ //chart_data is defined globally at the top of this page
+function process_chart(div_id, chart_data){
 	block_index = div_id.charAt( div_id.length-1 );
-	if(typeof(chart_data[block_index]) != 'undefined'){
+	if(typeof(chart_data) === 'undefined'){
+		$('#' + div_id).html('<p class-"chart-error">Sorry, the requested data was not able to be retrieved.  Please try again, or contact AgSource for assistance.</p>');
+	}
+	if(typeof(chart_data) === 'string'){
+		$('#' + div_id).html('<p class-"chart-error">' + chart_data + '</p>');
+	}
+	if(typeof(chart_data) === 'object'){
 		// set up the temporary array that holds the data
 		var tmpData = {};
-		if(typeof chart_data[block_index].section_data !== 'undefined') section_data = chart_data[block_index].section_data;
-		if(typeof chart_data[block_index].data === 'undefined' || chart_data[block_index].data == false){
-			var block_header = '<h2 class="block">'+chart_data[block_index].config.title.text+'</h2>';
-			block_header += '<h3 class="block">'+chart_data[block_index].config.subtitle.text+'</h3>';
+		//set axis labels
+		if(typeof(chart_data.config.xAxis.labels) === 'undefined'){
+			chart_data.config.xAxis.labels = {};
+		}
+		chart_data.config.xAxis.labels.formatter = getAxisLabelFormat(chart_data.config.xAxis.type);
+
+		if(chart_data.config.yAxis.length > 0){
+			for(x in chart_data.config.yAxis){
+				if(typeof(chart_data.config.yAxis[x].labels) === 'undefined'){
+					chart_data.config.yAxis[x].labels = {};
+				}
+				chart_data.config.yAxis[x].labels.formatter = getAxisLabelFormat(chart_data.config.yAxis[x].type);
+			}
+		}
+		else{
+			if(typeof(chart_data.config.yAxis.labels) === 'undefined'){
+				chart_data.config.yAxis.labels = {};
+			}
+			chart_data.config.yAxis.labels.formatter = getAxisLabelFormat(chart_data.config.yAxis.type);
+		}
+		//end set axis labels
+		//set tooltip format
+		if(typeof(chart_data.config.tooltip) === 'undefined'){
+			chart_data.config.tooltip = {};
+		}
+		chart_data.config.tooltip.formatter = getTooltipFormat(chart_data.config.chart.type, chart_data.config.xAxis.type);
+		
+		if(typeof chart_data.section_data !== 'undefined'){
+			section_data = chart_data.section_data;
+		}
+		if(typeof chart_data.data === 'undefined' || chart_data.data == false){
+			var block_header = '<h2 class="block">'+chart_data.config.title.text+'</h2>';
+			block_header += '<h3 class="block">'+chart_data.config.subtitle.text+'</h3>';
 			block_header += '<p class-"chart-error">Sorry, there is no current data available for this item.  Please contact <a href="mailto:custserv@myagsource.com">customer service</a> if you believe this is in error.</p>';
 				$('#' + div_id).html(block_header);
 		}
@@ -223,21 +248,23 @@ function process_chart(div_id){ //chart_data is defined globally at the top of t
 			$('#' + div_id).html('<p class-"chart-error">' + section_data.error + '</p>');
 		}
 		else{
-			tmpData = chart_data[block_index].data;
+			tmpData = chart_data.data;
 			var count = 0;
+			var options = {};
 			//convert the options array to 
-			if(typeof chart_data[block_index].config !== 'undefined'){
-				var options = chart_data[block_index].config;
+			if(typeof chart_data.config !== 'undefined'){
+				options = chart_data.config;
 				// combine with base options, but don't overwrite those from 
 				if(typeof(base_options) != 'undefined'){
-					var i;
-					for(i in base_options) {
+					for(var i in base_options) {
 						if(typeof(options[i]) == 'undefined') options[i] = base_options[i];
 					}
 				}
 			}
 			for(x in tmpData){
-				if(typeof options.series[count] === 'undefined') options.series[count] = {};
+				if(typeof options.series[count] === 'undefined'){
+					options.series[count] = {};
+				}
 				options.series[count].data = tmpData[x];
 				count++;
 			}
@@ -246,32 +273,68 @@ function process_chart(div_id){ //chart_data is defined globally at the top of t
 			chart[block_index] = new Highcharts.Chart(options);
 			while(chart[block_index].series.length > count) chart[block_index].series[count].remove(true);
 		}
+		if(typeof(section_data) == "object" && typeof post_render == 'function'){
+			post_render(section_data);
+		}
 	}
-
-	if(typeof(section_data) == "object" && typeof post_render == 'function') post_render(section_data);
-
 	$('#waiting-icon' + block_index).hide();
 	$('#chart-container' + block_index).show();
 }
 
-function process_table(div_id, block_index){
-	if(typeof(table_data[block_index]) != 'undefined'){
-		var tmpData = {};
-		if(typeof table_data[block_index].section_data !== 'undefined') section_data = table_data[block_index].section_data;
-		if(typeof table_data[block_index].html === 'undefined' || table_data[block_index].html == false){
-			$('#' + div_id).html('<p class-"chart-error">Sorry, there is no data available for the ' + table_data[chart_index].config.title.text + ' report.  Please try again, or contact AgSource for assistance.</p>');
-			exit;
+function process_table(div_id, block_index, table_data){
+	if(typeof(table_data) === 'undefined'){
+		$('#' + div_id).html('<p class-"chart-error">Sorry, the requested data was not able to be retrieved.  Please try again, or contact AgSource for assistance.</p>');
+	}
+	if(typeof(table_data) === 'string'){
+		$('#' + div_id).html('<p class-"chart-error">' + table_data + '</p>');
+	}
+	if(typeof(table_data) === 'object'){
+		if(typeof table_data.html === 'undefined' || table_data.html == false){
+			$('#' + div_id).html('<p class-"chart-error">Sorry, there is no data available for the ' + table_data.section_data.block + ' report.  Please try again, or contact AgSource for assistance.</p>');
+			$('#waiting-icon' + block_index).hide();
+			return false;
 		}
 		else{
-			$('#' + div_id).html(table_data[block_index].html);
+			$('#' + div_id).html(table_data.html);
 		}
+		if(typeof(table_data.section_data) == "object" && typeof post_render == 'function'){
+			post_render(table_data.section_data);
+		}
+		//attach events to new data fields
+		attachDataFieldEvents();
 	}
 
-	if(typeof(section_data) == "object" && typeof post_render == 'function') post_render(section_data);
 	$('#waiting-icon' + block_index).hide();
 	$('#table-wrapper' + block_index).find('table').show();
-	//attach events to new data fields
-	attachDataFieldEvents();
+}
+
+function getAxisLabelFormat(axis_type){
+	if(axis_type === "datetime"){
+		return function(){return Highcharts.dateFormat('%b %e, %Y', this.value);};
+	}
+	else{
+		return function(){return this.value;};
+	}
+}
+
+function getTooltipFormat(chart_type, xaxis_type){
+	if(xaxis_type === "datetime"){
+		if(chart_type === "boxplot"){
+			return function(){
+				var p = this.point;
+				if(this.series.options.type == "boxplot" || typeof(this.series.options.type) == "undefined"){
+					return "<b>" + Highcharts.dateFormat("%B %Y", this.x) +"</b><br/>" + this.series.name +"<br/>75th Percentile: "+ p.q1 + "<br/>50th Percentile: "+ p.median + "<br/>25th Percentile: "+ p.q3;
+				}
+				else {
+					return false;
+					//return "<b>"+ Highcharts.dateFormat("%B %Y", this.x) +"</b><br/>"+this.series.name +": "+ this.y;
+				}
+			};
+		}
+		else{
+			return function(){return '<b>' + this.series.name + ':</b><br>' + Highcharts.dateFormat('%B %e, %Y', this.x) + ' - ' + this.y + ' " . $um . "';};
+		}
+	}
 }
 
 function dump(arr,level) {
