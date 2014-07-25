@@ -339,15 +339,17 @@ class Report_model extends CI_Model {
 				$arr_ref[$ag['id']] = (string)$ag['text'];
 				$arr_order[(string)$ag['text']] = $ag['list_order'];
 				$c = 0;
-				foreach($arr_dates[0] as $key => $value){
-					if ($key == $ag['text']) {
-						if ($value == '0-0') {
-							$value='No Test (-'.$c.')';
+				if(isset($arr_dates) && is_array($arr_dates)){
+					foreach($arr_dates[0] as $key => $value){
+						if ($key == $ag['text']) {
+							if ($value == '0-0') {
+								$value='No Test (-'.$c.')';
+							}
+							$ag['text'] = $value;
+							break;
 						}
-						$ag['text'] = $value;
-						break;
+						$c++;
 					}
-					$c++;
 				}
 			}
 			unset($ag);
