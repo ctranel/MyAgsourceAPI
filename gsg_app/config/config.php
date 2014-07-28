@@ -74,7 +74,7 @@
 			break;
 		case 'production':
 			$config['admin_email']          = "support@myagsource.com"; 	// Admin Email, admin@example.com
-			$config['cust_serv_email']		= "custservice@myagsource.com"; //custom CDT
+			$config['cust_serv_email']		= "custserv@myagsource.com"; //custom CDT
 			$config['cust_serv_phone']		= "1-800-236-4995"; //custom CDT
 			break;
 		default:
