@@ -359,7 +359,7 @@ $config['encryption_key'] = "wdtgRDWYGBdet347537unb-trdFDE65k";
 |
 */
 $config['sess_cookie_name']		= 'myagsource_ses';
-$config['sess_expiration']		= (60 * 60 * 18); //remember user for 18 hours
+$config['sess_expiration']		= 14400; //(60 * 60 * 18); //remember user for 18 hours
 $config['sess_expire_on_close']	= TRUE;
 $config['sess_encrypt_cookie']	= TRUE;
 $config['sess_use_database']	= TRUE;
