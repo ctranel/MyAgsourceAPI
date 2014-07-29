@@ -269,7 +269,9 @@ function process_chart(div_id, chart_data){
 				count++;
 			}
 			options.chart.renderTo = div_id;
-			if(typeof pre_render == 'function') pre_render(options, section_data);
+			if(typeof pre_render == 'function'){
+				pre_render(options, section_data);
+			}
 			chart[block_index] = new Highcharts.Chart(options);
 			while(chart[block_index].series.length > count) chart[block_index].series[count].remove(true);
 		}
@@ -289,6 +291,9 @@ function process_table(div_id, block_index, table_data){
 		$('#' + div_id).html('<p class-"chart-error">' + table_data + '</p>');
 	}
 	if(typeof(table_data) === 'object'){
+		if(typeof pre_render_table == 'function'){
+			pre_render_table(div_id, table_data);
+		}
 		if(typeof table_data.html === 'undefined' || table_data.html == false){
 			$('#' + div_id).html('<p class-"chart-error">Sorry, there is no data available for the ' + table_data.section_data.block + ' report.  Please try again, or contact AgSource for assistance.</p>');
 			$('#waiting-icon' + block_index).hide();

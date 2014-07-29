@@ -14,6 +14,9 @@ class Alert_model extends CI_Model {
 	
 	public function get_benchmarks($herd_code, $pstring){
 		$ret = $this->db->get_where('[vma].[dbo].[vma_home_benchmarks]', array('herd_code' => $herd_code, 'pstring' => $pstring))->result_array();
-		return $ret[0];
+		if(isset($ret[0]) && is_array($ret[0])){
+			return $ret[0];
+		}
+		return false;
 	}
 }

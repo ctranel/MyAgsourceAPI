@@ -226,7 +226,7 @@ class Web_content_model extends CI_Model {
 	public function get_section_id_by_path($section_path){
 		$arr_res = $this->db
 			->select('id')
-			->like('path', $section_path)
+			->where('path', $section_path)
 			->get($this->tables['sections'])
 			->result_array();
 		if(is_array($arr_res) && !empty($arr_res)){
