@@ -177,7 +177,7 @@ class Land extends parent_report {
 			'subtitle' => $arr_content['subtitle'],
 		);
 		foreach($arr_view_blocks as $k => $b){
-			$this->data['widget']['feature'][] = array(
+			$this->data['widget']['feature2'][] = array(
 				'content' => $b,
 				'title' => $k,
 			);
