@@ -26,15 +26,22 @@ class Setting_model extends CI_Model {
 	 * @author ctranel
 	 **/
 	public function getSettingsByCategory($category, $user_id, $herd_code) {
-		$results = $this->db
-		->select('s.id, t.name AS type, c.name AS category, g.name AS [group], s.name, s.description, s.default_value, uhs.value')
-		->join('users.dbo.set_user_herd_settings uhs', "s.id = uhs.setting_id AND uhs.user_id = " . $user_id . " AND uhs.herd_code = '" . $herd_code . "'", 'left')
-		->join('users.dbo.set_lookup_types t', "s.type_id = t.id", 'inner')
-		->join('users.dbo.set_lookup_categories c', "s.category_id = c.id", 'inner')
-		->join('users.dbo.set_lookup_groups g', "s.group_id = g.id", 'inner')
-		->where('c.name', $category)
-		->where("(uhs.user_id = " . $user_id . " OR uhs.user_id IS NULL)")
-		->where("(uhs.herd_code = '" . $herd_code . "' OR uhs.herd_code IS NULL)")
+		$this->db
+			->select('s.id, t.name AS type, c.name AS category, g.name AS [group], s.name, s.description, s.default_value, uhs.value')
+			//->join('users.dbo.set_user_herd_settings uhs', "s.id = uhs.setting_id AND uhs.user_id = " . $user_id . " AND uhs.herd_code = '" . $herd_code . "'", 'left')
+			->join('users.dbo.set_lookup_types t', "s.type_id = t.id", 'inner')
+			->join('users.dbo.set_lookup_categories c', "s.category_id = c.id", 'inner')
+			->join('users.dbo.set_lookup_groups g', "s.group_id = g.id", 'inner')
+			->where('c.name', $category);
+		if($user_id){
+			$this->db->where("uhs.user_id = " . $user_id . "")
+				->join('users.dbo.set_user_herd_settings uhs', "s.id = uhs.setting_id AND uhs.user_id = " . $user_id . " AND uhs.herd_code = '" . $herd_code . "'", 'left');
+		}
+		else{
+			$this->db->where("uhs.user_id IS NULL")
+				->join('users.dbo.set_user_herd_settings uhs', "s.id = uhs.setting_id AND uhs.user_id IS NULL AND uhs.herd_code = '" . $herd_code . "'", 'left');
+		}
+		$results = $this->db->where("(uhs.herd_code = '" . $herd_code . "' OR uhs.herd_code IS NULL)")
 		->get('users.dbo.set_settings s')
 		->result_array();
 		

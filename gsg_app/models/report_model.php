@@ -262,7 +262,10 @@ class Report_model extends CI_Model {
 		$this->arr_fields = $header_data['arr_fields'];
 		//add actual field names to header hierarchy
 		 $tmp = key($arr_field_child);
-		 if(!empty($tmp)) $this->arr_fields = merge_arrays_on_value_key_match($this->arr_fields, $arr_field_child);
+		 if(!empty($tmp)){
+		 	$this->load->helper('multid_array_helper');
+		 	$this->arr_fields = merge_arrays_on_value_key_match($this->arr_fields, $arr_field_child);
+		 }
 		 else($this->arr_fields = $arr_field_child);
 
 /*		KEEPING THIS AROUND IN CASE THE NEED FOR THE 'arr_order' FUNCTIONALITY ARISES
