@@ -160,6 +160,9 @@ class Herd
 	*/
 	public function getTrialDays($access_log, $user_id, $herd_code, $report_code){
 		$initial_access = $access_log->getInitialAccessDate($user_id, $herd_code, $report_code);
+		if(empty($initial_access)){
+			return 0;
+		}
 		$d_start = new DateTime($initial_access);
 		$d_end  = new DateTime();
 		$d_diff = $d_start->diff($d_end)->days;
