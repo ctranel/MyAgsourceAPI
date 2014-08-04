@@ -82,7 +82,7 @@ function get_column_options(){
 		'xAxis' => array(
 			'type'=>'datetime',
 			'categories' => NULL, //clear out previously declared categories
-			'labels' => array('formatter' => "function(){return Highcharts.dateFormat('%b %e, %Y', this.value);}", 'rotation' => -35, 'align' => 'left', 'x' => -50, 'y' => 55)
+//			'labels' => array('formatter' => "function(){return Highcharts.dateFormat('%b %e, %Y', this.value);}", 'rotation' => -35, 'align' => 'left', 'x' => -50, 'y' => 55)
 		),
 
 		'yAxis' => array(
@@ -134,7 +134,7 @@ function get_line_options(){
 		'xAxis' => array(
 			'type'=>'datetime',
 			'categories' => NULL, //clear out previously declared categories
-			'labels' => array('formatter' => "function(){return Highcharts.dateFormat('%b %e, %Y', this.value);}", 'rotation' => -35, 'align' => 'left', 'x' => -50, 'y' => 55)
+//			'labels' => array('formatter' => "function(){return Highcharts.dateFormat('%b %e, %Y', this.value);}", 'rotation' => -35, 'align' => 'left', 'x' => -50, 'y' => 55)
 		),
 
 		'yAxis' => array(
@@ -153,7 +153,7 @@ function get_scatter_options(){
 			'xAxis' => array(
 					'type'=>'datetime',
 					'categories' => NULL, //clear out previously declared categories
-					'labels' => array('formatter' => "function(){return Highcharts.dateFormat('%b %e, %Y', this.value);}", 'rotation' => -35, 'align' => 'left', 'x' => -50, 'y' => 55)
+//					'labels' => array('formatter' => "function(){return Highcharts.dateFormat('%b %e, %Y', this.value);}", 'rotation' => -35, 'align' => 'left', 'x' => -50, 'y' => 55)
 			),
 
 			'yAxis' => array(
@@ -173,13 +173,17 @@ function prep_output($output, $graph, $report_count, $file_format = NULL){
 			exit;
 		}
 	}
-	elseif ($output == 'array') return $graph['data'];
+	elseif ($output == 'array'){
+		return $graph['data'];
+	}
     elseif ($output == 'chart' || $output == 'table') {
-		// Set the Javascript header
-    	header("Content-type: text/javascript"); //being sent as javascript file, not json
-    	if($output == 'table') $return_val = 'table_data[' . $report_count . '] = ' . json_encode_jsfunc($graph) . ';';
+    	//Set the Javascript header 
+    	header("Content-type: application/json"); //being sent as json
+    	if($output == 'table'){
+    		$return_val = json_encode_jsfunc($graph);
+    	}
     	elseif($output == 'chart'){
-			$return_val = 'chart_data[' . $report_count . '] = ' . json_encode_jsfunc($graph) . ';';
+			$return_val = json_encode_jsfunc($graph);
     	} 
 		if($file_format == 'pdf' || $file_format == 'csv') return $return_val;
     	else {

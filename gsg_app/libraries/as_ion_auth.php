@@ -92,6 +92,7 @@ class As_ion_auth extends Ion_auth {
 		//set supersection if there is one
 		$section_path = $this->router->fetch_class(); //this should match the name of this file (minus ".php".  Also used as base for css and js file names and model directory name
 		$control_dir = $this->router->fetch_directory();
+		//all sections must have directories in the main controller directory
 		if($control_dir != $section_path){
 			$this->super_section_id = $this->web_content_model->get_super_section_id_by_path($control_dir);
 		} 

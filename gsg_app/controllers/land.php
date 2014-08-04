@@ -1,6 +1,12 @@
-<?php defined('BASEPATH') OR exit('No direct script access allowed');
+<?php
+require_once(APPPATH.'libraries' . FS_SEP . 'benchmarks_lib.php');
+require_once APPPATH . 'controllers/report_parent.php';
 
-class Land extends CI_Controller {
+use \myagsource\settings\Benchmarks_lib;
+
+defined('BASEPATH') OR exit('No direct script access allowed');
+
+class Land extends parent_report {
 	protected $page_header_data;
 	protected $footer_data;
 	protected $data;
@@ -40,27 +46,107 @@ class Land extends CI_Controller {
 		
 		$this->page_header_data['message'] = $this->session->flashdata('message');
 
-		// Select modules for logged in user
+		//get web content generated reports
+		$this->objPage = $this->{$this->primary_model}->arr_blocks[$this->page];
+		$arr_blocks = $this->objPage['blocks'];
 
+		//set js lines and load views for each block to be displayed on page
+		$arr_block_in = NULL;
+		$tmp_js = '';
+		$arr_view_blocks = NULL;
+		$has_benchmarks = false;
+		if(isset($arr_blocks) && !empty($arr_blocks)){
+			$x = 0;
+			$cnt = count($arr_blocks);
+			foreach($arr_blocks as $c => $pb){
+				if($pb['bench_row'] === 1){
+					$has_benchmarks = true;
+				}
+		
+				$display = $pb['display_type'];
+				//load view for placeholder for block display
+				if(isset($sort_by) && isset($sort_order)){
+					$this->arr_sort_by = array_values(explode('|', $sort_by));
+					$this->arr_sort_order = array_values(explode('|', $sort_order));
+				}
+				else {
+					$tmp = $this->{$this->primary_model}->get_default_sort($pb['url_segment']);
+					$this->arr_sort_by = $tmp['arr_sort_by'];
+					$this->arr_sort_order = $tmp['arr_sort_order'];
+					$sort_by = implode('|', $this->arr_sort_by);
+					$sort_order = implode('|', $this->arr_sort_order);
+				}
+				if($arr_block_in == NULL || in_array($pb['url_segment'], $arr_block_in)){
+					$this->{$this->primary_model}->populate_field_meta_arrays($pb['id']);
+					if($cnt == 1) $odd_even = 'chart-only';
+					elseif($x % 2 == 1) $odd_even = 'chart-even';
+					elseif($x == ($cnt - 1)) $odd_even = 'chart-last-odd';
+					else $odd_even = 'chart-odd';
+					if($display == 'table') $cnt = 0;
+					$arr_blk_data = array(
+							'block_num' => $x,
+							'link_url' => site_url($this->section_path) . '/' . $this->page . '/' . $pb['url_segment'],
+							'form_id' => $this->report_form_id,
+							'odd_even' => $odd_even,
+							'block' => $pb['url_segment'],
+							'sort_by' => urlencode($sort_by),
+							'sort_order' => urlencode($sort_order),
+							'skip_heading' => true,
+					);
+					$arr_view_blocks[$pb['name']] = $this->load->view($display, $arr_blk_data, TRUE);
+					//add js line to populate the block after the page loads
+					$tmp_container_div = $display == 'chart' ? 'graph-canvas' . $x : 'table-canvas' . $x;
+					$tmp_js .= "updateBlock(\"$tmp_container_div\", \"" . $pb['url_segment'] . "\", \"$x\", \"null\", \"null\", \"$display\",\"false\");\n";//, \"" . $this->{$this->primary_model}->arr_blocks[$this->page]['display'][$display][$block]['description'] . "\", \"" . $bench_text . "\");\n";
+					$tmp_js .= "if ($( '#datepickfrom' ).length > 0) $( '#datepickfrom' ).datepick({dateFormat: 'mm-dd-yyyy'});";
+					$tmp_js .= "if ($( '#datepickto' ).length > 0) $( '#datepickto' ).datepick({dateFormat: 'mm-dd-yyyy'});";
+					$tmp_block = $pb['url_segment'];
+					$x++;
+				}
+			}
+		}
+		//end web content generated reports
+
+		
+		// Select modules for logged in user
 		$this->carabiner->css('dashboard.css', 'screen');
-//		$this->carabiner->css('accordion.css', 'screen');
 		$this->carabiner->css('benchmarks.css');
-		$this->carabiner->css('report.css');
-//		$this->carabiner->css('chart.css', 'print');
-		$this->carabiner->css('report.css', 'print');
+		$this->carabiner->css('chart.css');
 		$this->carabiner->css('boxes.css');
+		$this->carabiner->css('popup.css');
+		$this->carabiner->css('tabs.css');
+		$this->carabiner->css('report.css');
+		$this->carabiner->css('expandable.css');
+		$this->carabiner->css('chart.css', 'print');
+		$this->carabiner->css('report.css', 'print');
 		if(is_array($this->page_header_data)){
 			$this->page_header_data = array_merge($this->page_header_data,
 				array(
 					'title'=>'Dashboard - ' . $this->config->item("product_name"),
 					'description'=>'Dashboard for ' . $this->config->item("product_name"),
+					'arr_head_line' => array(
+							'<script type="text/javascript">',
+							'	var page = "' . $this->page . '";',
+							'	var base_url = "' . site_url($this->section_path) . '";',
+							'	var site_url = "' . site_url() . '";',
+							'	var herd_code = "' . $this->session->userdata('herd_code') . '";',
+							'	var block = "' . $tmp_block	. '"',
+							'</script>'
+					),
 					'arr_headjs_line'=>array(
-//						'{twitter: "' . $this->config->item("base_url_assets") . 'js/jquery/jquery.jtweetsanywhere-1.2.1.min.js"}',
-//						'{graph_helper: "' . $this->config->item("base_url_assets") . 'js/charts/graph_helper.js"}',
+						'{highcharts: "https://cdnjs.cloudflare.com/ajax/libs/highcharts/3.0.7/highcharts.js"}',
+						'{highcharts_more: "https://cdnjs.cloudflare.com/ajax/libs/highcharts/3.0.7/highcharts-more.js"}',
+						'{exporting: "https://cdnjs.cloudflare.com/ajax/libs/highcharts/3.0.7/modules/exporting.js"}',
+						'{popup: "' . $this->config->item("base_url_assets") . 'js/jquery/popup.min.js"}',
+						'{graph_helper: "' . $this->config->item("base_url_assets") . 'js/charts/graph_helper.js"}',
+						'{report_helper: "' . $this->config->item("base_url_assets") . 'js/report_helper.js"}',
+						'{table_sort: "' . $this->config->item("base_url_assets") . 'js/jquery/stupidtable.min.js"}',
+						'{tooltip: "https://cdn.jsdelivr.net/qtip2/2.2.0/jquery.qtip.min.js"}',
+						'{datepick: "' . $this->config->item("base_url_assets") . 'js/jquery/jquery.datepick.min.js"}',
 						'{helper: "' . $this->config->item("base_url_assets") . 'js/as_dashboard_helper.js"}'
 					)
 				)
 			);
+			$this->page_header_data['arr_headjs_line'][] = 'function(){' . $tmp_js . ';}';
 		}
 
 		//header and footer
@@ -90,6 +176,13 @@ class Land extends CI_Controller {
 			'title' => $arr_content['title'],
 			'subtitle' => $arr_content['subtitle'],
 		);
+		foreach($arr_view_blocks as $k => $b){
+			$this->data['widget']['feature2'][] = array(
+				'content' => $b,
+				'title' => $k,
+			);
+		}
+		
 
 		if($this->as_ion_auth->has_permission('Update SG Access')){
 			$consultants_by_status = $this->ion_auth_model->get_consultants_by_herd($this->session->userdata('herd_code'));

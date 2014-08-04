@@ -185,7 +185,7 @@ class Session_settings {
 	}
 	
 	/* -----------------------------------------------------------------
-	 *  Returns array with data needed to populate forms
+	*  Returns array with data needed to populate forms
 	
 	*  Returns array with data needed to populate forms
 	
@@ -266,8 +266,16 @@ class Session_settings {
 		}
 		$arr_data = array();
 		
-		foreach($arr_settings as $k=>$v){
-			$arr_data[] = "SELECT '" . $this->user_id . "' AS user_id, '" . $this->herd_code . "' AS herd_code, '" . $this->arr_settings[$k]->getSettingID() . "' AS setting_id, '" . $v . "' AS value";
+//var_dump($this->user_id);
+		if(isset($this->user_id) && !empty($this->user_id)){
+			foreach($arr_settings as $k=>$v){
+				$arr_data[] = "SELECT '" . $this->user_id . "' AS user_id, '" . $this->herd_code . "' AS herd_code, '" . $this->arr_settings[$k]->getSettingID() . "' AS setting_id, '" . $v . "' AS value";
+			}
+		}
+		else{
+			foreach($arr_settings as $k=>$v){
+				$arr_data[] = "SELECT null AS user_id, '" . $this->herd_code . "' AS herd_code, '" . $this->arr_settings[$k]->getSettingID() . "' AS setting_id, '" . $v . "' AS value";
+			}
 		}
 		$this->setting_model->mergeUserHerdSettings($arr_data);
 	}

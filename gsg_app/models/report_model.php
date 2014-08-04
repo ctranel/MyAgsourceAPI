@@ -46,9 +46,6 @@ class Report_model extends CI_Model {
 	
 	public function __construct($section_path = NULL){
 		parent::__construct();
-		/*in the case of the access log model, the section id is set AFTER the parent (this file/class) is called so that the reference
-		 * back to the access log model does not cause problem.  That is the only other model that calls the get block links method.
-		 */
 		$this->load->model('dhi/herd_model');
 		$this->arr_pstring = $this->session->userdata('arr_pstring');
 		$this->tables  = $this->config->item('tables', 'ion_auth');
@@ -265,7 +262,10 @@ class Report_model extends CI_Model {
 		$this->arr_fields = $header_data['arr_fields'];
 		//add actual field names to header hierarchy
 		 $tmp = key($arr_field_child);
-		 if(!empty($tmp)) $this->arr_fields = merge_arrays_on_value_key_match($this->arr_fields, $arr_field_child);
+		 if(!empty($tmp)){
+		 	$this->load->helper('multid_array_helper');
+		 	$this->arr_fields = merge_arrays_on_value_key_match($this->arr_fields, $arr_field_child);
+		 }
 		 else($this->arr_fields = $arr_field_child);
 
 /*		KEEPING THIS AROUND IN CASE THE NEED FOR THE 'arr_order' FUNCTIONALITY ARISES
@@ -339,15 +339,17 @@ class Report_model extends CI_Model {
 				$arr_ref[$ag['id']] = (string)$ag['text'];
 				$arr_order[(string)$ag['text']] = $ag['list_order'];
 				$c = 0;
-				foreach($arr_dates[0] as $key => $value){
-					if ($key == $ag['text']) {
-						if ($value == '0-0') {
-							$value='No Test (-'.$c.')';
+				if(isset($arr_dates) && is_array($arr_dates)){
+					foreach($arr_dates[0] as $key => $value){
+						if ($key == $ag['text']) {
+							if ($value == '0-0') {
+								$value='No Test (-'.$c.')';
+							}
+							$ag['text'] = $value;
+							break;
 						}
-						$ag['text'] = $value;
-						break;
+						$c++;
 					}
-					$c++;
 				}
 			}
 			unset($ag);

@@ -5,7 +5,7 @@ class Land extends CI_Controller {
 	}
 	
 	function index(){
-		redirect(site_url('info/phpinfo'));
+		phpinfo();
 	}
 	
 }
