@@ -59,7 +59,7 @@ endif; ?>
 			email links provided above.</p>
 		<p> In the meantime, if you would like to view the website as it
 			is intended to look for comparison, the browser most compatibile
-			with the site as of 6/23/2014 is <strong>Firefox</strong>.</p>
+			with the site as of 8/4/2014 is <strong>Firefox</strong>.</p>
 		<p> We will never require you to change browsers if it is within
 			our power to fix an issue. However, some things are beyond our
 			control and those things will be listed above in our Known Issues
