@@ -1,27 +1,4 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
- /* -----------------------------------------------------------------
- *  UPDATE comment
- *  @author: carolmd
- *  @date: Nov 18, 2013
- *
- *  @description: Kept the 'default' database connection.
- *  Removed all the other database connections.
- *  Revisions in several other files was needed to complete this change.
- *
- *
- *  -----------------------------------------------------------------
- */
-/* -----------------------------------------------------------------
- *  UPDATE comment
- *  @author: carolmd
- *  @date: Dec 17, 2013
- *
- *  @description: Changed default login from administrator to regular user id "webuser".
- *                This is for security purposes, so if any malicious SQL does get introduced through the web, it will
- *                not be able to do much damage to our data.
- *
- *  -----------------------------------------------------------------
- */
 /*
 | -------------------------------------------------------------------
 | DATABASE CONNECTIVITY SETTINGS
