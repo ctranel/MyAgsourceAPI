@@ -18,13 +18,13 @@ endif; ?>
 				always email us.
 			</li>
 		</ul>
-	<h2>A Message for our Beta Testers/Users who have found an error</h2>
+	<h2>A Message for our users who have found an error</h2>
 		<p>We are doing our best to address every issue in a timely manner.
 		However, we are undoubtly going to miss at least one thing as that
 		is the nature of the programming business.</p>
 		<p>This is where you, our users, come in. Every new program needs 
-		feedback from its users.  Users always try things in ways the
-		designers and programmers couldn't possibly have predicted. This is why engaged users
+		feedback from its users.  Users always try things in ways the designers
+		and programmers couldn't possibly have predicted. This is why engaged users
 		are an essential and greatly appreciated part of every project's
 		community.  Be sure to make use of uservoice linked above so we and
 		the rest of the MyAgsource community hears from you.</p>
