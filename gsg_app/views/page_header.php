@@ -6,8 +6,8 @@
     <meta http-equiv="pragma" content="no-cache">
     <meta http-equiv="cache-control" content="no-cache">
     <meta http-equiv="content-type" content="text/html;charset=UTF-8">
-    <meta name="robots" content="NO FOLLOW,NO INDEX">
-    <meta name="googlebot" content="NOARCHIVE">
+<!--     <meta name="robots" content="NO FOLLOW,NO INDEX">
+    <meta name="googlebot" content="NOARCHIVE"> -->
     <meta name="description" content="<?php if(isset($description)) echo $description; ?>">
     <meta name="keywords" content="<?php echo $this->config->item('product_name'); ?> - <?php echo $this->config->item('cust_serv_company'); ?>" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">

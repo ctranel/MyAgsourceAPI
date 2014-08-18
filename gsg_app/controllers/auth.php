@@ -730,8 +730,8 @@ class Auth extends Ionauth {
 			if(is_array($this->page_header_data)){
 				$this->page_header_data = array_merge($this->page_header_data,
 					array(
-						'title'=>$this->config->item('product_name') . 'Login',
-						'description'=>$this->config->item('product_name') . 'Log In Form'
+						'title'=>$this->config->item('product_name') . ' Login',
+						'description'=>$this->config->item('product_name') . ' Login Form'
 					)
 				);
 			}
