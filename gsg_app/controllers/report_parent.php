@@ -683,7 +683,7 @@ abstract class parent_report extends CI_Controller {
 		if(is_array($arr_axes['x'])){
 			foreach($arr_axes['x'] as $a){
 				$tmp_cat = isset($a['categories']) && !empty($a['categories']) ? $a['categories'] : NULL;
-				if($a['data_type'] === 'datetime'){
+				if($a['data_type'] === 'datetime' || $a['data_type'] === 'date'){
 					$x_axis_date_field = $a['db_field_name'];
 				}
 				$tmp_array = array(
