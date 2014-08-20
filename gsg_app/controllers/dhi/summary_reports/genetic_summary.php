@@ -21,23 +21,34 @@ class Genetic_summary extends parent_report {
 		parent::display($block_in, $display_format);
 	 }
 
-// 	function hs_prod_charts($block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
-// 	 	$this->product_name = 'Herd Summary Production Charts';
-// 		parent::display($block_in, $display_format);
-// 	 }
+	function ann_trends($block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
+	 	$this->product_name = 'Inbreeding Trend';
+		parent::display($block_in, $display_format);
+	 }
 	 
-// 	function hs_repro($block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
-// 	 	$this->product_name = 'Herd Summary Reproduction';
-// 		parent::display($block_in, $display_format);
-// 	 }
+	function cow_trends($block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
+	 	$this->product_name = 'Cow Trend Graphs';
+		parent::display($block_in, $display_format);
+	 }
 	 
-// 	function hs_gen($block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
-// 	 	$this->product_name = 'Herd Summary Genetics';
-// 		parent::display($block_in, $display_format);
-// 	 }
+	function inbreeding($block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
+	 	$this->product_name = 'Inbreeding Analysis';
+		parent::display($block_in, $display_format);
+	 }
 
-// 	function hs_inv($block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
-// 	 	$this->product_name = 'Herd Summary Inventory';
-// 		parent::display($block_in, $display_format);
-// 	 }
+	function sire_anl($block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
+	 	$this->product_name = 'Sire Analysis';
+		parent::display($block_in, $display_format);
+	 }
+	 
+	 function serv_sire_anl($block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
+	 	$this->product_name = 'Service Sire Analysis';
+	 	parent::display($block_in, $display_format);
+	 }
+
+	 function young_anl($block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
+	 	$this->product_name = 'Youngstock Analysis';
+	 	parent::display($block_in, $display_format);
+	 }
+	 
 }
