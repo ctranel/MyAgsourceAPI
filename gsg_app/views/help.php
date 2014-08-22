@@ -10,7 +10,7 @@ endif; ?>
 				proposed there. You can also post about a bug you believe may be
 				affecting more than yourself or about a feature you'd like to see
 				added to the site. Just visit uservoice via the link above and click
-				on &quot;Give Feedback&quot;. We'll be glad to hear what our members think of
+				on &quot;Give Feedback&quot;. We're always glad to hear what our members think of
 				this exciting new venture!
 			</li>
 			<li>Email: <a href="mailto:support@myagsource.com">support@myagsource.com</a><br />
@@ -18,16 +18,17 @@ endif; ?>
 				always email us.
 			</li>
 		</ul>
-	<h2>A Message for our Beta Testers</h2>
+	<h2>A Message for our users who have found an error</h2>
 		<p>We are doing our best to address every issue in a timely manner.
 		However, we are undoubtly going to miss at least one thing as that
 		is the nature of the programming business.</p>
-		<p>This is where you come in. Every new program needs a group of
-		potential users to try things in ways the designers couldn't
-		possibly have predicted and give feedback. This is why beta-testers
+		<p>This is where you, our users, come in. Every new program needs 
+		feedback from its users.  Users always try things in ways the designers
+		and programmers couldn't possibly have predicted. This is why engaged users
 		are an essential and greatly appreciated part of every project's
-		community.</p>
-		<p>Thank you for helping us make myagsource.com fulfill your
+		community.  Be sure to make use of uservoice linked above so we and
+		the rest of the MyAgsource community hears from you.</p>
+		<p>Thank you for helping us make MyAgsource.com fulfill your
 		needs and the needs of our cooperative as a whole.</p>
 	<h2>Known Issues</h2>
 		<ul>
@@ -53,17 +54,18 @@ endif; ?>
 			spectrum, we cannot promise 100% compatibility at all times with all
 			browsers. As such, we can only inform you of compatibility issues as
 			they arise and if/when they'll be addressed.</p>
-		<p> For the duration of the beta, we encourage you to use your
-			favorite browser as you normally would and please inform us of any
-			issues you encounter with the website either via the uservoice or
-			email links provided above.</p>
+		<p> We encourage you to use your favorite browser as you normally would
+			and please inform us of any issues you encounter with the website 
+			either via the uservoice or email links provided above.</p>
 		<p> In the meantime, if you would like to view the website as it
-			is intended to look for comparison, the browser most compatibile
-			with the site as of 8/4/2014 is <strong>Firefox</strong>.</p>
+			is intended to look for comparison, the browsers most compatibile
+			with the site as of 8/7/2014 are:
+			<ul><li><strong>Firefox</strong></li>
+			<li><strong>Chrome 33 and above</strong></li></ul></p>
 		<p> We will never require you to change browsers if it is within
 			our power to fix an issue. However, some things are beyond our
 			control and those things will be listed above in our Known Issues
-			section. The browser with the least known issues will be recommended
+			section. The browser(s) with the least known issues will be recommended
 			here.</p>
 		<p>Thanks for your understanding.</p>
 </div>

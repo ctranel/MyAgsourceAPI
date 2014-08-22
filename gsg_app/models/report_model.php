@@ -543,6 +543,10 @@ class Report_model extends CI_Model {
 		if (($key = array_search('peak_dim', $arr_select_fields)) !== FALSE) {
 			$arr_select_fields[$key] = "FORMAT(" . $this->primary_table_name . ".peak_dim, 'MM-dd-yy', 'en-US') AS peak_dim";//MMM-dd-yy
 		}
+		if (($key = array_search('birth_year', $arr_select_fields)) !== FALSE) {
+			$arr_select_fields[$key] = "FORMAT(" . $this->primary_table_name . ".birth_year, 'MM-dd-yy', 'en-US') AS birth_year";//MMM-dd-yy
+		}
+
 		foreach($arr_select_fields as $k => $v){
 			if(!empty($this->arr_aggregates[$k])){
 				$new_name = strtolower($this->arr_aggregates[$k]) . '_' . $v;

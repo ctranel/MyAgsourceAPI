@@ -96,6 +96,7 @@ class Custom_report extends CI_Controller {
 			$this->form_validation->set_rules('block_id', 'Block ID'); //null if adding
 			$this->form_validation->set_rules('report_name', 'Report Name', 'trim|required|max_length[25]');
 			$this->form_validation->set_rules('report_description', 'Report Description', 'trim|max_length[75]');
+			$this->form_validation->set_rules('super_section_id', 'Parent Section', 'required');
 			$this->form_validation->set_rules('section_id', 'Section ID');
 			$this->form_validation->set_rules('page_id', 'Page ID');
 			$this->form_validation->set_rules('insert_after', 'Insert After');
@@ -146,15 +147,17 @@ class Custom_report extends CI_Controller {
 				die();
 			}
 			else { //display the custom report form
+				$this->page_header_data['message'] = compose_error(validation_errors());
 				$obj_user = $this->ion_auth_model->user($this->session->userdata('user_id'))->row();
 				$this->data['form_attr'] = array('id'=>'rep-build');
 				$this->data['page_heading'] = 'Custom Reports';
 				$this->data['block_id'] = array('name' => 'block_id', 'id' => 'block_id', 'type' => 'hidden');
-				$this->data['report_name'] = array('name' => 'report_name', 'id' => 'report_name');
+				$this->data['report_name'] = array('name' => 'report_name', 'id' => 'report_name', 'value' => set_value('report_name'));
 				$this->data['report_description'] = array(
 					'name' => 'report_description',
 					'id' => 'report_description',
 					'type' => 'text',
+					'value' => set_value('report_description'),
 					'size' => '50',
 					'maxlength' => '75',
 					//'value' => $this->form_validation->set_value('email', $obj_user->email),
@@ -196,25 +199,23 @@ class Custom_report extends CI_Controller {
 					$this->page_header_data = array_merge($this->page_header_data,
 						array(
 							'title'=>'Custom Report - ' . $this->config->item('product_name'),
-							'description'=>'Custom report for ' . $this->config->item('product_name')
+							'description'=>'Custom report for ' . $this->config->item('product_name'),
+							'section_nav' => $this->load->view('auth/section_nav', NULL, TRUE),
+							'arr_head_line' => array(
+								'<script type="text/javascript">',
+								'	var page = "";',
+								'	var base_url = "' . site_url() . 'custom_report";',
+								'	var herd_code = "' . $this->session->userdata('herd_code') . '";',
+								'</script>'
+							),						
+							'user_sections' => $this->page_header_data['user_sections'],
+							'arr_headjs_line' => array(
+								'{customhelper: "' . $this->config->item('base_url_assets') . 'js/custom_report_helper.js"}',
+								'{formhelper: "' . $this->config->item('base_url_assets') . 'js/form_helper.js"}'
+							)
 						)
 					);
 				}
-				$this->page_header_data = array(
-					'section_nav' => $this->load->view('auth/section_nav', NULL, TRUE),
-					'arr_head_line' => array(
-						'<script type="text/javascript">',
-						'	var page = "";',
-						'	var base_url = "' . site_url() . 'custom_report";',
-						'	var herd_code = "' . $this->session->userdata('herd_code') . '";',
-						'</script>'
-					),
-					'user_sections' => $this->page_header_data['user_sections'],
-					'arr_headjs_line' => array(
-						'{customhelper: "' . $this->config->item('base_url_assets') . 'js/custom_report_helper.js"}',
-						'{formhelper: "' . $this->config->item('base_url_assets') . 'js/form_helper.js"}'
-					)
-				);
 				$this->carabiner->css('custom_reports.css', 'screen');
 				$this->footer_data = array(
 //					'arr_deferred_js'=>array(
