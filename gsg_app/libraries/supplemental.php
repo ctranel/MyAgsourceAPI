@@ -11,7 +11,7 @@
 *
 */
 
-class Supplemental_lib
+class Supplemental
 {
 	/**
 	 * table used in benchmarks
