@@ -438,6 +438,7 @@ abstract class parent_report extends CI_Controller {
 						'{exporting: "https://cdnjs.cloudflare.com/ajax/libs/highcharts/3.0.7/modules/exporting.js"}',
 						'{popup: "' . $this->config->item("base_url_assets") . 'js/jquery/popup.min.js"}',
 						'{graph_helper: "' . $this->config->item("base_url_assets") . 'js/charts/graph_helper.js"}',
+						'{chart_options: "' . $this->config->item("base_url_assets") . 'js/charts/chart_options.js"}',
 						'{report_helper: "' . $this->config->item("base_url_assets") . 'js/report_helper.js"}',
 						'{table_sort: "' . $this->config->item("base_url_assets") . 'js/jquery/stupidtable.min.js"}',
 						'{tooltip: "https://cdn.jsdelivr.net/qtip2/2.2.0/jquery.qtip.min.js"}',
@@ -567,16 +568,12 @@ abstract class parent_report extends CI_Controller {
 		}
 
 		$this->page = $page;
-		$this->graph = NULL;
+		$this->json = NULL;
 		$this->display = $output;
 		//set parameters for given block
 		
-		//can change functionality depending on block.  Suggest making chart changes in the JS file that corresponds with chart(one js file per section)
-		switch ($block) {
-			default:
-				$this->load_block($block, $report_count, $file_format);
-				break;
-		}
+		$this->load_block($block, $report_count, $file_format);
+
 		//common functionality
 		if($file_format == 'csv'){
 			if($first){
@@ -594,14 +591,14 @@ abstract class parent_report extends CI_Controller {
 			}
 		}
 		if($this->display == 'table'){
-			$this->graph['html'] = $this->html;
+			$this->json['html'] = $this->html;
 		}
 
 		if($first){
 			$this->_record_access(90, $this->objPage['page_id'], 'web', $this->config->item('product_report_code'));
 		}
-		$this->graph['section_data'] = $this->get_section_data($block, $this->pstring, $sort_by, $sort_order, $report_count);
-		$return_val = prep_output($this->display, $this->graph, $report_count, $file_format);
+		$this->json['section_data'] = $this->get_section_data($block, $this->pstring, $sort_by, $sort_order, $report_count);
+		$return_val = prep_output($this->display, $this->json, $report_count, $file_format);
 		if($return_val) {
 			return $return_val;
 		}
@@ -639,9 +636,15 @@ abstract class parent_report extends CI_Controller {
 		foreach($arr_fields as $k=>$f){
 			//these 2 arrays need to have the same numeric index so that the yaxis# can be correctly assigned to series
 			$return_val[$c]['name'] = $k;
-			if(isset($this->{$this->primary_model}->arr_unit_of_measure[$f]) && !empty($this->{$this->primary_model}->arr_unit_of_measure[$f])) $um = $this->{$this->primary_model}->arr_unit_of_measure[$f]; 
-			if(isset($arr_axis_index[$f]) && !empty($arr_axis_index[$f])) $return_val[$c]['yAxis'] = $arr_axis_index[$f];
-			if(isset($arr_chart_type[$f]) && !empty($arr_chart_type[$f])) $return_val[$c]['type'] = $arr_chart_type[$f];
+			if(isset($this->{$this->primary_model}->arr_unit_of_measure[$f]) && !empty($this->{$this->primary_model}->arr_unit_of_measure[$f])){
+				$return_val[$c]['um'] = $this->{$this->primary_model}->arr_unit_of_measure[$f]; 
+			}
+			if(isset($arr_axis_index[$f]) && !empty($arr_axis_index[$f])){
+				$return_val[$c]['yAxis'] = $arr_axis_index[$f];
+			}
+			if(isset($arr_chart_type[$f]) && !empty($arr_chart_type[$f])){
+				$return_val[$c]['type'] = $arr_chart_type[$f];
+			}
 			$c++;
 		}
 		return $return_val;
@@ -659,73 +662,36 @@ abstract class parent_report extends CI_Controller {
 	}
 	
 	protected function load_chart(&$arr_this_block, $report_count){
-		$um = '';//unit of measure
 		$arr_axes = $this->{$this->primary_model}->get_chart_axes($arr_this_block['id']); 
 		$x_axis_date_field = NULL;
-		$this->graph['config'] = get_chart_options($arr_this_block['chart_type']);
+		
+		$this->json['name'] = $arr_this_block['name'];
+		$this->json['description'] = $arr_this_block['description'];
+		$this->json['chart_type'] = $arr_this_block['chart_type'];
+
 		$arr_pstring = $this->session->userdata('arr_pstring');
-		$pstring = $this->session->userdata('pstring');
-		if (empty($arr_pstring)){
-			$this->graph['config']['subtitle']['text'] = "Herd: ".$this->session->userdata('herd_code');
-		} 
-		else {
-			$this->graph['config']['subtitle']['text'] = "Herd: ".$this->session->userdata('herd_code').' Pstring: '.$pstring;
+		$this->json['herd_code'] = $this->session->userdata('herd_code');
+		if (!empty($arr_pstring)){
+			$this->json['pstring'] = $this->session->userdata('pstring');
 		}
-		$this->graph['config']['title']['text'] = $arr_this_block['description'];
-		$this->graph['config']['exporting']['filename'] = $arr_this_block['name'];
-		$this->graph['config']['title']['text'] = $arr_this_block['description'];
 		$this->{$this->primary_model}->set_chart_fields($arr_this_block['id']);
 		$arr_fields = $this->{$this->primary_model}->get_fields();
 		if(is_array($arr_fields) && !empty($arr_fields)){
-			$this->graph['config']['series'] = $this->derive_series($arr_fields);
+			$this->json['series'] = $this->derive_series($arr_fields);
 			$arr_fieldnames = $this->derive_field_array($arr_fields);
-		}		
+		}
 		if(is_array($arr_axes['x'])){
 			foreach($arr_axes['x'] as $a){
-				$tmp_cat = isset($a['categories']) && !empty($a['categories']) ? $a['categories'] : NULL;
-				if($a['data_type'] === 'datetime'){
+				if($a['data_type'] === 'datetime' || $a['data_type'] === 'date'){
 					$x_axis_date_field = $a['db_field_name'];
 				}
-				$tmp_array = array(
-					'type' => $a['data_type'], 
-					'categories' => $tmp_cat
-				);
-				if($arr_this_block['chart_type'] != 'bar'){
-					$tmp_array['title'] = array('text' => $a['text']);
-					if($a['data_type'] == 'datetime') $tmp_array['labels'] = array('rotation' => -35, 'align' => 'left', 'x' => -50, 'y' => 55);
-					else $tmp_array['labels'] = array('rotation' => -35, 'y' => 25);
-				}
-				if(count($arr_axes['x']) > 1) $this->graph['config']['xAxis'][] = $tmp_array;
-				else $this->graph['config']['xAxis'] = $tmp_array;
-				unset($tmp_array);
-				if(isset($a['db_field_name']) && !empty($a['db_field_name'])) $this->{$this->primary_model}->add_field(array('Date' => $a['db_field_name'])); 
-			}
-		}
-		if(is_array($arr_axes['y'])){
-			$cnt = 0;
-			foreach($arr_axes['y'] as $a){
-				if($arr_this_block['chart_type'] != 'bar') $tmp_array['opposite'] = $a['opposite'];
-				if(isset($a['text'])) $tmp_array['title'] = array('text' => $a['text'], 'style'=>array('color'=>''));
-				if(isset($a['data_type'])) $tmp_array['type'] = $a['data_type'];
-				if(isset($a['max'])) $tmp_array['max'] = $a['max'];
-				if(isset($a['min'])) $tmp_array['min'] = $a['min'];
-				//check for opposite yAxes
-				if(isset($a['db_field_name']) && !empty($a['db_field_name']) && $a['opposite']){
-					$tmp_key = array_search($a['db_field_name'], $arr_fieldnames);
-					$this->graph['config']['series'][$tmp_key]['yAxis'] = 1;
-				}
-
-				if(count($arr_axes['y']) > 1) {
-					if(isset($this->graph['config']['yAxis'][$cnt])) $this->graph['config']['yAxis'][$cnt] = array_merge($this->graph['config']['yAxis'][$cnt], $tmp_array);
-					else $this->graph['config']['yAxis'][$cnt] = $tmp_array;
-				}
-				else {
-					if(isset($this->graph['config']['yAxis'])) $this->graph['config']['yAxis'] = array_merge($this->graph['config']['yAxis'][$cnt], $tmp_array);
-					else $this->graph['config']['yAxis'] = $tmp_array;
+				if(isset($a['db_field_name']) && !empty($a['db_field_name'])){
+					$this->{$this->primary_model}->add_field(array('Date' => $a['db_field_name'])); 
 				}
 			}
 		}
-		$this->graph['data'] = $this->{$this->primary_model}->get_graph_data($arr_fieldnames, $this->session->userdata('herd_code'), $this->max_rows, $x_axis_date_field, $arr_this_block['url_segment'], $this->graph['config']['xAxis']['categories']);
+		$this->json['arr_axes'] = $arr_axes;
+		$this->json['data'] = $this->{$this->primary_model}->get_graph_data($arr_fieldnames, $this->session->userdata('herd_code'), $this->max_rows, $x_axis_date_field, $arr_this_block['url_segment'], $this->graph['config']['xAxis']['categories']);
 	}
 		
 	protected function load_table(&$arr_this_block, $report_count){

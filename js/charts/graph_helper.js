@@ -13,98 +13,6 @@ if (!window.location.origin) window.location.origin = window.location.protocol+"
 var pathArray = window.location.href.split( '/' );
 var server_path = (typeof(pathArray[3]) == "string") ? pathArray[3] : '';
 
-var global_options = {
-	chart: {
-		backgroundColor: null
-	},
-	title: {
-		style: {
-			color: '#EF5C29',
-			fontWeight: 'bold'
-		}
-	},
-	colors: [var_arr_graph_colors[0], var_arr_graph_colors[1], var_arr_graph_colors[2], var_arr_graph_colors[3], var_arr_graph_colors[4]],
-	credits: {
-		href: window.location.origin + '/' + server_path + '/index.php',
-		text: '© AgSource Cooperative Services'
-	},
-	xAxis: {
-		gridLineColor : '#c0c0c0'
-			//type: 'datetime',
-			//tickInterval: 7 * 24 * 3600 * 1000, // one week
-			//formatter: function() { return Highcharts.dateFormat('%A, %b %e, %Y', this.value); }
-	},
-	yAxis: {
-		allowDecimals: false
-	},
-	tooltip : {
-		formatter : function(){
-			return this.y;
-			//return this.y + ["th","st","nd","rd"][!(this.y%10>3||Math.floor(this.y%100/10)==1)*this.y%10] + ' Percentile';
-		}
-	},
-	plotOptions: {
-		boxplot: {
-			grouping: false,
-			whiskerWidth: 0,
-            pointWidth: 8,
-            lineWidth: 8,
-            medianColor: null
-		},
-		area: {
-			marker: { 
-				enabled: false
-			},
-			stacking: 'normal'
-		},
-		column: {
-			marker: { 
-				enabled: false
-			},
-			stacking: 'normal'
-		},
-		series: {
-			cursor: 'pointer',
-            shadow: false
-		},
-        bar: {
-            dataLabels: {
-               enabled: true,
-               align: 'right',
-               color: '#C0C0C0',
-               formatter:function(){
-                    return this.point.value;   
-               }
-            }
-        },
-        scatter: {
-            dataLabels: {
-                enabled: true,
-                align: 'right',
-                color: '#AA4643',
-                formatter:function(){
-                     return this.point.val;   
-                }
-            }
-        },
-        spline: {
-            dataLabels: {
-    			color: '#c0c0c0'
-			}
-        },
-        line: {
-            dataLabels: {
-    			color: '#c0c0c0'
-			}
-        }
-	},
-    series: [{
-    }]
-	// SET MORE THEME-RELATED VARIABLES (COLOR, ETC)?
-};
-
-Highcharts.setOptions(global_options);
-
 function updateFilter(event, this_in, divid, field_in, value_in){
 	$('input[name=' + field_in + '][value=' + value_in + ']').attr("checked", true);
 	$('#filter-form').submit();
@@ -194,50 +102,145 @@ function load_chart(server_path, div_id, block_index, params){
 		.fail(function(jqXHR, textStatus, errorThrown){console.log(errorThrown);});
 }
 
-function process_chart(div_id, chart_data){
+function process_chart(div_id, data_in){
 	block_index = div_id.charAt( div_id.length-1 );
-	if(typeof(chart_data) === 'undefined'){
+	var options = base_options;
+	options = get_chart_options(options, data_in.chart_type);
+	options.title = {"text": data_in.description};
+	options.exporting = {"filename": data_in.name};
+	if (typeof(data_in.pstring) === 'undefined'){
+		options.subtitle = {"text": "Herd: " + data_in.herd_code};
+	} 
+	else {
+		options.subtitle = {"text": "Herd: " + data_in.herd_code + ' Pstring: ' + data_in.pstring};
+	}
+
+	if(typeof(data_in) === 'undefined'){
 		$('#' + div_id).html('<p class-"chart-error">Sorry, the requested data was not able to be retrieved.  Please try again, or contact AgSource for assistance.</p>');
 	}
-	if(typeof(chart_data) === 'string'){
-		$('#' + div_id).html('<p class-"chart-error">' + chart_data + '</p>');
+	if(typeof(data_in) === 'string'){
+		$('#' + div_id).html('<p class-"chart-error">' + data_in + '</p>');
 	}
-	if(typeof(chart_data) === 'object'){
-		// set up the temporary array that holds the data
-		var tmpData = {};
-		//set axis labels
-		if(typeof(chart_data.config.xAxis.labels) === 'undefined'){
-			chart_data.config.xAxis.labels = {};
-		}
-		chart_data.config.xAxis.labels.formatter = getAxisLabelFormat(chart_data.config.xAxis.type);
-
-		if(chart_data.config.yAxis.length > 0){
-			for(x in chart_data.config.yAxis){
-				if(typeof(chart_data.config.yAxis[x].labels) === 'undefined'){
-					chart_data.config.yAxis[x].labels = {};
+	if(typeof(data_in) === 'object'){
+		var x_len = Object.size(data_in.arr_axes.x);
+		if(x_len > 0){
+			if(typeof(options.xAxis) === 'undefined'){
+				options.xAxis = {};
+			}
+			var cnt = 0;
+			for(var c in data_in.arr_axes.x){
+				if(typeof(options.xAxis[cnt]) === 'undefined'){
+					options.xAxis[cnt] = {};
 				}
-				chart_data.config.yAxis[x].labels.formatter = getAxisLabelFormat(chart_data.config.yAxis[x].type);
+				options.xAxis[cnt].categories = typeof(data_in.arr_axes.x[c].categories) !== "undefined" ? data_in.arr_axes.x[c].categories : null;
+				options.xAxis[cnt].type = data_in.arr_axes.x[c].data_type;
+
+				if(data_in.chart_type != 'bar'){
+					options.xAxis[cnt].title = {"text": data_in.arr_axes.x[c].text};
+					if(data_in.arr_axes.x[c].data_type == 'datetime'){
+						options.xAxis[cnt].labels = {"rotation": -35, "align": 'left', "x": -50, "y": 55};
+					}
+					else{
+						options.xAxis[cnt].labels = {"rotation": -35, "y": 25};
+					}
+				}
+				//set x axis label
+				if(typeof(options.xAxis[cnt].labels) === 'undefined'){
+					options.xAxis[cnt].labels = {};
+				}
+				options.xAxis[cnt].labels.formatter = getAxisLabelFormat(options.xAxis[cnt].type);
+				cnt++;
+			}
+			if(Object.size(options.xAxis) <= 1){
+				options.xAxis = options.xAxis[0];
 			}
 		}
 		else{
-			if(typeof(chart_data.config.yAxis.labels) === 'undefined'){
-				chart_data.config.yAxis.labels = {};
+			alert("No x axis data");
+		}
+
+		var y_len = Object.size(data_in.arr_axes.y);
+		if(y_len > 0){
+			if(typeof(options.yAxis) === 'undefined'){
+				options.yAxis = {};
 			}
-			chart_data.config.yAxis.labels.formatter = getAxisLabelFormat(chart_data.config.yAxis.type);
+			var cnt = 0;
+			for(var x in data_in.arr_axes.y){
+				if(typeof(options.yAxis[cnt]) === 'undefined'){
+					options.yAxis[cnt] = {};
+				}
+				if(data_in.chart_type != 'bar' && data_in.arr_axes.y[x].opposite === true){
+					options.yAxis[cnt].opposite = true;
+				}
+				if(typeof(data_in.arr_axes.y[x].text) != 'undefined'){
+					options.yAxis[cnt].title = {"text": data_in.arr_axes.y[x].text};
+					//placeholder to allow color changes pre and post render
+					options.yAxis[cnt].title.style = {"color": ''};
+				}
+				if(typeof(data_in.arr_axes.y[x].data_type) != 'undefined'){
+					options.yAxis[cnt].type = data_in.arr_axes.y[x].data_type;
+				}
+				if(typeof(data_in.arr_axes.y[x].max) != 'undefined'){
+					options.yAxis[cnt].max = data_in.arr_axes.y[x].max;
+				}
+				if(typeof(data_in.arr_axes.y[x].min) != 'undefined'){
+					options.yAxis[cnt].min = data_in.arr_axes.y[x].min;
+				}
+
+				/*BLOCKS_SELECT_FIELDS TABLE HAS A COLUMN FOR AXES_INDEX, DO WE NEED THIS BLOCK?
+				if(typeof($a['db_field_name']) != 'undefined' && !empty($a['db_field_name']) && $a['opposite']){
+					$tmp_key = array_search($a['db_field_name'], $arr_fieldnames);
+					$this->graph['config']['series'][$tmp_key]['yAxis'] = 1;
+				}*/
+
+				/*Since this is being built entirely on the client, and built on to the object as we go, is this necessary?
+				if(data_in.arr_axes.y.length > 1) {
+					if(typeof(data_in.arr_axes.y[x]) != 'undefined'){
+						$this->graph['config']['yAxis'][$cnt] = $.extend(true, $this->graph['config']['yAxis'][$cnt], $tmp_array);
+					}
+					else{
+						$this->graph['config']['yAxis'][$cnt] = $tmp_array;
+					}
+				}
+				else {
+					if(typeof($this->graph['config']['yAxis']) != 'undefined'){
+						$this->graph['config']['yAxis'] = array_merge($this->graph['config']['yAxis'][$cnt], $tmp_array);
+					}
+					else{
+						$this->graph['config']['yAxis'] = $tmp_array;
+					}
+				}
+				cnt++;*/
+				var um = undefined;
+				if(typeof(data_in.arr_axes.y[x].labels) === 'undefined'){
+					options.yAxis[cnt].labels = {};
+				}
+				options.yAxis[cnt].labels.formatter = getAxisLabelFormat(options.yAxis[cnt].type, um);
+				cnt++;
+			}
+			if(Object.size(options.yAxis) <= 1){
+				options.yAxis = options.yAxis[0];
+			}
+		}
+		else{
+			alert('No yAxis data');
 		}
 		//end set axis labels
 		//set tooltip format
-		if(typeof(chart_data.config.tooltip) === 'undefined'){
-			chart_data.config.tooltip = {};
+		if(typeof(data_in.tooltip) === 'undefined'){
+			options.tooltip = {};
 		}
-		chart_data.config.tooltip.formatter = getTooltipFormat(chart_data.config.chart.type, chart_data.config.xAxis.type);
-		
-		if(typeof chart_data.section_data !== 'undefined'){
-			section_data = chart_data.section_data;
+		//@todo: line below will break if there is ever a chart with multiple x axes
+		options.tooltip.formatter = getTooltipFormat(options.type, options.xAxis.type);
+		if(typeof(data_in.series) !== 'undefined'){
+			options.series = data_in.series;
 		}
-		if(typeof chart_data.data === 'undefined' || chart_data.data == false){
-			var block_header = '<h2 class="block">'+chart_data.config.title.text+'</h2>';
-			block_header += '<h3 class="block">'+chart_data.config.subtitle.text+'</h3>';
+		if(typeof(data_in.section_data) !== 'undefined'){
+			section_data = data_in.section_data;
+		}
+		if(typeof(data_in.data) === 'undefined' || data_in.data == false){
+			var block_header = '<h2 class="block">'+options.title.text+'</h2>';
+			block_header += '<h3 class="block">'+options.subtitle.text+'</h3>';
 			block_header += '<p class-"chart-error">Sorry, there is no current data available for this item.  Please contact <a href="mailto:custserv@myagsource.com">customer service</a> if you believe this is in error.</p>';
 				$('#' + div_id).html(block_header);
 		}
@@ -248,20 +251,19 @@ function process_chart(div_id, chart_data){
 			$('#' + div_id).html('<p class-"chart-error">' + section_data.error + '</p>');
 		}
 		else{
-			tmpData = chart_data.data;
-			var count = 0;
-			var options = {};
-			//convert the options array to 
-			if(typeof chart_data.config !== 'undefined'){
-				options = chart_data.config;
-				// combine with base options, but don't overwrite those from 
+			/*started with base_options object and built on it, so there should be no need to merge 
+			if(typeof options !== 'undefined'){
+				// combine with base options, but don't overwrite those from (try jquery.extend?)
 				if(typeof(base_options) != 'undefined'){
 					for(var i in base_options) {
 						if(typeof(options[i]) == 'undefined') options[i] = base_options[i];
 					}
 				}
-			}
-			for(x in tmpData){
+			}*/
+			//add data to object
+			var tmpData = data_in.data;
+			var count = 0;
+			for(var x in tmpData){
 				if(typeof options.series[count] === 'undefined'){
 					options.series[count] = {};
 				}
@@ -272,8 +274,12 @@ function process_chart(div_id, chart_data){
 			if(typeof pre_render == 'function'){
 				pre_render(options, section_data);
 			}
+console.log(JSON.stringify(options));		
+
 			chart[block_index] = new Highcharts.Chart(options);
-			while(chart[block_index].series.length > count) chart[block_index].series[count].remove(true);
+			while(chart[block_index].series.length > count){//(Object.size(chart[block_index].series) > count){
+				chart[block_index].series[count].remove(true);
+			}
 		}
 		if(typeof(section_data) == "object" && typeof post_render == 'function'){
 			post_render(section_data);
@@ -327,7 +333,7 @@ function getTooltipFormat(chart_type, xaxis_type){
 		if(chart_type === "boxplot"){
 			return function(){
 				var p = this.point;
-				if(this.series.options.type == "boxplot" || typeof(this.series.options.type) == "undefined"){
+				if(this.series.options.type === "boxplot" || typeof(this.series.options.type) === "undefined"){
 					return "<b>" + Highcharts.dateFormat("%B %Y", this.x) +"</b><br/>" + this.series.name +"<br/>75th Percentile: "+ p.q1 + "<br/>50th Percentile: "+ p.median + "<br/>25th Percentile: "+ p.q3;
 				}
 				else {
@@ -337,7 +343,7 @@ function getTooltipFormat(chart_type, xaxis_type){
 			};
 		}
 		else{
-			return function(){return '<b>' + this.series.name + ':</b><br>' + Highcharts.dateFormat('%B %e, %Y', this.x) + ' - ' + this.y + ' " . $um . "';};
+			return function(){return '<b>' + this.series.name + ':</b><br>' + Highcharts.dateFormat('%B %e, %Y', this.x) + ' - ' + this.y + ' ' + this.series.um;};
 		}
 	}
 }
