@@ -162,7 +162,7 @@
 		<h2>Sort By</h2>
 		<div id="wsortby-0">
 			<input name="sort_by[0]" id="sortby-0">
-			<span class="form-radio"><?php echo form_radio('sort_order[0]', 'asc', FALSE, 'class = "radio sort-order"'); ?>ASC</span> <span class="form-radio"><?php echo form_radio('sort_order[0]', 'summary', FALSE, 'class = "radio sort-order"'); ?>DESC</span>
+			<span class="form-radio"><?php echo form_radio('sort_order[0]', 'asc', FALSE, 'class = "radio sort-order"'); ?>ASC</span> <span class="form-radio"><?php echo form_radio('sort_order[0]', 'desc', FALSE, 'class = "radio sort-order"'); ?>DESC</span>
 			<a class="remove-fld link">X</a>
 		</div>
 	</div>
