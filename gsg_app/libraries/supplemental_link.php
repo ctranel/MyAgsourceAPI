@@ -7,39 +7,61 @@
 * 
 * @author: ctranel
 * @date: May 9, 2014
-* Requirements: PHP5 or above
+* Requirements: PHP5.4 or above
 *
 */
 
-class Supplemental_lib
+class Supplemental_link
 {
 	/**
-	 * table used in benchmarks
+	 * link id
+	 * @var int
+	 **/
+	protected $id;
+
+	/**
+	 * link href
 	 * @var string
 	 **/
 	protected $href;
 
 	/**
-	 * date field used in benchmarks (will always be test date?)
+	 * link title
 	 * @var string
 	 **/
 	protected $title;
 
 	/**
-	 * metric used in benchmarks (avg, qtile, top 10%, etc ...)
+	 * link rel
 	 * @var string
 	 **/
-	protected $metric;
-	
+	protected $rel;
+
+	/**
+	 * link class
+	 * @var string
+	 **/
+	protected $class;
+
+	/**
+	 * collection of supplemental_link_param objects
+	 * @var array
+	 **/
+	protected $arr_params;
+
 	/**
 	 * __construct
 	 *
 	 * @return void
 	 * @author ctranel
 	 **/
-	public function __construct()
+	public function __construct($id, $href, $rel, $title, $class)
 	{
-		//nothing for now
+		$this->id = $id;
+		$this->href = $href;
+		$this->rel = $rel;
+		$this->title = $title;
+		$this->class = $class;
 	}
 	
 	/* -----------------------------------------------------------------

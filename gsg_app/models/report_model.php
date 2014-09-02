@@ -225,7 +225,7 @@ class Report_model extends CI_Model {
 				$header_data['arr_order'][$fd['name']] = $fd['list_order'];
 				$arr_field_child[$fd['block_header_group_id']][$fd['name']] = $fn; //used to create arr_fields nested array
 				$this->arr_field_sort[$fn] = $fd['default_sort_order'];
-				$this->arr_field_links[$fn] = array(
+				$this->arr_field_links[$fn] = array( //iWebContent->getSupplementalLink($fd['supp_id'], $fd['a_href'], $fd['a_rel'], $fd['a_title'], $fd['a_class'])
 					'href' => $fd['a_href']
 					,'rel' => $fd['a_rel']
 					,'title' => $fd['a_title']
@@ -685,7 +685,6 @@ class Report_model extends CI_Model {
 	 * @author ctranel
 	 */
 	public function pivot($arr_dataset, $header_field, $header_field_width, $label_column_width, $bool_avg_column = FALSE, $bool_sum_column = FALSE){
-		$this->date_field = $header_field;
 		$header_text = ' ';
 		$new_dataset = array();
 		//headers not used in pivot tables, so we flatten the array
@@ -900,11 +899,15 @@ class Report_model extends CI_Model {
 			->order_by('c.list_order', 'asc');
 		$result = $this->{$this->db_group_name}->get()->result_array();
 		
-		$arr_keep_keys = array('min' => '', 'max' => '', 'opposite' => '', 'data_type' => '', 'db_field_name' => '', 'field_name' => '', 'unit_of_measure' => '', 'text' => '');
+		$arr_keep_keys = array('min' => '', 'max' => '', 'opposite' => '', 'data_type' => '', 'db_field_name' => '', 'field_name' => '', 'text' => '');
 		if(is_array($result) && !empty($result)){
 			foreach($result as $a){
-				if(!isset($arr_return[$a['x_or_y']][$a['id']])) $arr_return[$a['x_or_y']][$a['id']] = array_intersect_key($a, $arr_keep_keys);
-				if(isset($a['category'])) $arr_return[$a['x_or_y']][$a['id']]['categories'][] = $a['category'];
+				if(!isset($arr_return[$a['x_or_y']][$a['id']])){
+					$arr_return[$a['x_or_y']][$a['id']] = array_intersect_key($a, $arr_keep_keys);
+				}
+				if(isset($a['category'])){
+					$arr_return[$a['x_or_y']][$a['id']]['categories'][] = $a['category'];
+				}
 			}
 			return $arr_return;
 		}
