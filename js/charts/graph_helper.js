@@ -21,7 +21,6 @@ head.ready(function() {
 		chart_width = Math.floor(container_width * .47);
 	}
 	else {
-	console.log('<768');
 		chart_width = Math.floor(container_width * .95);
 		$(".chart-odd, .chart-even").css("float", "none");
 		$(".chart-odd, .chart-even").css("clear", "both");
