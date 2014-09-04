@@ -1,17 +1,5 @@
 //global variables used in this script (included in the imported js file)
-var chart = new Array(); //array of chart object
-
-//var var_arr_graph_colors = ['#FF3C3C','#FF5A5A','#FF7878','#FF9696','#FFB4B4']; //monochrome
-//var var_arr_graph_colors = ['#643b3b', '#825a5a', '#a07878', '#bd9696', '#dcb2b2'];  //monochrome
-//var var_arr_graph_colors = ['#F15928', '#585C5F', '#08A04A', '#006C70', '#98E8F9']; //dpn?
-var var_arr_graph_colors = ['#E4B577', '#75C4E4', '#B6B6A5', '#E07F8D', '#97C4A4']; 
-//var var_arr_graph_colors = ['#00838C', '#939E77', '#B03500', '#BA91A8', '#97C4A4']; 
-//var var_arr_graph_colors = ['#D54C18', '#48495B', '#264071', '#9CA294'];
-var base_options = {chart: {backgroundColor: null}, yAxis:{}};//base options are specific to each report, see report helper functions (js files)
-//get current base url
-if (!window.location.origin) window.location.origin = window.location.protocol+"//"+window.location.host;
-var pathArray = window.location.href.split( '/' );
-var server_path = (typeof(pathArray[3]) == "string") ? pathArray[3] : '';
+var chart = new Array(); //array of chart objects
 
 //set width of page and charts
 head.ready(function() {
@@ -121,7 +109,7 @@ function load_chart(server_path, div_id, block_index, params){
 
 function process_chart(div_id, data_in){
 	block_index = div_id.charAt( div_id.length-1 );
-	var options = base_options;
+	var options = global_options;
 	options = get_chart_options(options, data_in.chart_type);
 	options.title = {"text": data_in.description};
 	options.exporting = {"filename": data_in.name};
@@ -268,15 +256,6 @@ function process_chart(div_id, data_in){
 			$('#' + div_id).html('<p class-"chart-error">' + section_data.error + '</p>');
 		}
 		else{
-			/*started with base_options object and built on it, so there should be no need to merge 
-			if(typeof options !== 'undefined'){
-				// combine with base options, but don't overwrite those from (try jquery.extend?)
-				if(typeof(base_options) != 'undefined'){
-					for(var i in base_options) {
-						if(typeof(options[i]) == 'undefined') options[i] = base_options[i];
-					}
-				}
-			}*/
 			//add data to object
 			var tmpData = data_in.data;
 			var count = 0;

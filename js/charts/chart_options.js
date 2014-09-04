@@ -1,3 +1,16 @@
+//var var_arr_graph_colors = ['#FF3C3C','#FF5A5A','#FF7878','#FF9696','#FFB4B4']; //monochrome
+//var var_arr_graph_colors = ['#643b3b', '#825a5a', '#a07878', '#bd9696', '#dcb2b2'];  //monochrome
+//var var_arr_graph_colors = ['#F15928', '#585C5F', '#08A04A', '#006C70', '#98E8F9']; //dpn?
+//var var_arr_graph_colors = ['#00838C', '#939E77', '#B03500', '#BA91A8', '#97C4A4']; 
+//var var_arr_graph_colors = ['#D54C18', '#48495B', '#264071', '#9CA294'];
+var var_arr_graph_colors = ['#E4B577', '#75C4E4', '#B6B6A5', '#E07F8D', '#97C4A4']; 
+
+//get current base url--used only on this page
+if (!window.location.origin) window.location.origin = window.location.protocol+"//"+window.location.host;
+var pathArray = window.location.href.split( '/' );
+var server_path = (typeof(pathArray[3]) == "string") ? pathArray[3] : '';
+
+
 var global_options = {
 	chart: {
 		backgroundColor: null
@@ -45,9 +58,6 @@ var global_options = {
 			stacking: 'normal'
 		},
 		column: {
-			marker: { 
-				enabled: false
-			},
 			stacking: 'normal'
 		},
 		series: {
@@ -131,23 +141,6 @@ function get_stacked_area_options(options_json){
 		}
 	};
 	return options_json;
-/*	return {      
-		'chart':{
-            'type': 'area'
-		 },
-		'xAxis':{
-			'type':'datetime',
-			'categories': null //clear out previously declared categories
-		},
-		'yAxis':{
-			'type':'linear'
-		},
-		'plotOptions':{
-			'area' :{
-				'stacking':'normal'
-			}
-		}
-	}; */
 }
 
 function get_stacked_column_options(options_json){
@@ -160,25 +153,6 @@ function get_stacked_column_options(options_json){
 		}
 	};
 	return options_json;
-/*	return {
-		'chart':{
-            'type': 'column'
-		 },
-		 		'xAxis':{
-			'type':'datetime',
-			'categories': null //clear out previously declared categories
-		},
-		'yAxis':{
-			'type':'linear'
-		},
-		'plotOptions':{
-			'column':{
-				'stacking': 'normal',
-				'shadow': false,
-				'borderWidth': 0
-			}
-		}
-	}; */
 }
 
 function get_column_options(options_json){
@@ -191,25 +165,6 @@ function get_column_options(options_json){
 		}
 	};
 	return options_json;
-/*		return {
-		'chart':{
-            'type': 'column'
-		 },
-		 	'xAxis':{
-			'type':'datetime',
-			'categories': null //clear out previously declared categories
-		},
-		'yAxis':{
-			'type':'linear'
-		},
-		'plotOptions':{
-			'column':{
-				'stacking': null,
-				'shadow': false,
-				'borderWidth': 0
-			}
-		}
-	}; */
 }
 
 function get_bar_options(options_json){
@@ -217,32 +172,11 @@ function get_bar_options(options_json){
 	options_json.xAxis.type = 'linear';
 	options_json.xAxis.categories = [];
 	return options_json;
-/*	return {
-		'chart':{
-            'type': 'bar'
-		 },
-		'xAxis':{
-			'type':'linear',
-			'categories': []
-		}
-	}; */
 }
 
 function get_boxplot_options(options_json){
 	options_json.chart.type = 'boxplot';
 	return options_json;
-/*	return {
-		'chart':{
-            'type': 'boxplot'
-		 },
-		'xAxis':{
-			'type':'datetime',
-			'categories': null //clear out previously declared categories
-		},
-		'yAxis':{
-			'type':'linear'
-		},
-	}; */
 }
 
 function get_line_options(options_json){
