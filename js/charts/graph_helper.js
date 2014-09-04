@@ -13,6 +13,24 @@ if (!window.location.origin) window.location.origin = window.location.protocol+"
 var pathArray = window.location.href.split( '/' );
 var server_path = (typeof(pathArray[3]) == "string") ? pathArray[3] : '';
 
+//set width of page and charts
+head.ready(function() {
+	var container_width = document.getElementById('container').offsetWidth;//Math.floor(doc_width * .95);
+	var chart_width = 520;
+	if(container_width >= 768) {
+		chart_width = Math.floor(container_width * .47);
+	}
+	else {
+	console.log('<768');
+		chart_width = Math.floor(container_width * .95);
+		$(".chart-odd, .chart-even").css("float", "none");
+		$(".chart-odd, .chart-even").css("clear", "both");
+	}
+	global_options['chart']['width'] = chart_width;
+	//add 2 to width to prevent scrollbar
+	$(".chart-odd, .chart-even, .chart-last-odd").css("width", (chart_width + 2));
+	$(".highcharts-container, .chart").css("width", chart_width);
+});
 function updateFilter(event, this_in, divid, field_in, value_in){
 	$('input[name=' + field_in + '][value=' + value_in + ']').attr("checked", true);
 	$('#filter-form').submit();
@@ -274,7 +292,7 @@ function process_chart(div_id, data_in){
 			if(typeof pre_render == 'function'){
 				pre_render(options, section_data);
 			}
-console.log(JSON.stringify(options));		
+//console.log(JSON.stringify(options));		
 
 			chart[block_index] = new Highcharts.Chart(options);
 			while(chart[block_index].series.length > count){//(Object.size(chart[block_index].series) > count){

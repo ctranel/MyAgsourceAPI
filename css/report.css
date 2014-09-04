@@ -2,12 +2,19 @@
 
 sub {color: #003E3F; font-size: 80%; font-family: "Arial Narrow","Arial","Verdana",sans-serif;}
 
-/* charts only */
+/* charts only
 .jqPlot {clear: left;}
 .chart-container {margin: 30px auto 0; text-align: center;}
 .chart-container a, text, tspan {text-decoration: none;}
 .chart {background:transparent url('i/logo-m-watermark.png') no-repeat center 140px; text-align: center;}
 .highcharts-container {border: solid 1px #c0c0c0; margin: 0 auto;}
+*/
+.chart-container {display:none; margin: 20px auto; border:solid 1px #999; width: auto; overflow: auto; background:transparent url('i/logo-m-watermark.png') no-repeat center 140px;} /**/
+.chart-odd {clear: both; float: left;}
+.chart-even {float: right;}
+.chart-last-odd {clear: both;}
+.chart {width: 520px;}
+
 
 /* report table */
 #main-report {border-collapse:collapse; clear:both; margin: 0 auto; max-width: 100%;}
