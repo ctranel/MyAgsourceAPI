@@ -628,12 +628,12 @@ abstract class parent_report extends CI_Controller {
 	}
 	
 	protected function derive_series($arr_fields){
+//as of 9/11/2014, in order to get labels correct, we need to change the header text in blocks_select_fields for the first {number of series'} fields
 		$return_val = array();
 		$c = 0;
 		$arr_chart_type = $this->{$this->primary_model}->get_chart_type_array();
 		$arr_axis_index = $this->{$this->primary_model}->get_axis_index_array();
 			
-//var_dump($arr_fields, $arr_chart_type, $arr_axis_index); die;
 		foreach($arr_fields as $k=>$f){
 			//these 2 arrays need to have the same numeric index so that the yaxis# can be correctly assigned to series
 			$return_val[$c]['name'] = $k;
@@ -648,7 +648,6 @@ abstract class parent_report extends CI_Controller {
 			}
 			$c++;
 		}
-//var_dump($return_val);
 		return $return_val;
 	}
 	
