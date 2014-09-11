@@ -10,6 +10,7 @@ sub {color: #003E3F; font-size: 80%; font-family: "Arial Narrow","Arial","Verdan
 .highcharts-container {border: solid 1px #c0c0c0; margin: 0 auto;}
 */
 .chart-container {display:none; margin: 20px auto; border:solid 1px #999; width: auto; overflow: auto; background:transparent url('i/logo-m-watermark.png') no-repeat center 140px;} /**/
+.chart-container a, text, tspan {text-decoration: none;}
 .chart-odd {clear: both; float: left;}
 .chart-even {float: right;}
 .chart-last-odd {clear: both;}

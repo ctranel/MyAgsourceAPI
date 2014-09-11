@@ -937,6 +937,7 @@ class Report_model extends CI_Model {
 					$count++;
 				}
 			}
+//var_dump($arr_return); die;
 			return $arr_return;
 		}
 		else return FALSE;
@@ -957,8 +958,12 @@ class Report_model extends CI_Model {
 	 **/
 	function get_graph_data($arr_fieldname, $herd_code, $num_dates, $date_field, $block_url, $arr_categories = NULL){
 		$data = $this->get_graph_dataset($herd_code, $num_dates, $date_field, $block_url);
-		if(isset($arr_categories) && is_array($arr_categories)) $return_val = $this->set_row_to_series($data, $arr_fieldname, $arr_categories);
-		else $return_val = $this->set_longitudinal_data($data, $date_field);
+		if(isset($arr_categories) && is_array($arr_categories)){
+			$return_val = $this->set_row_to_series($data, $arr_fieldname, $arr_categories);
+		}
+		else{
+			$return_val = $this->set_longitudinal_data($data, $date_field);
+		}
 		return $return_val;
 	}
 	

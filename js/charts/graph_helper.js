@@ -156,6 +156,7 @@ function process_chart(div_id, data_in){
 				options.xAxis[cnt].labels.formatter = getAxisLabelFormat(options.xAxis[cnt].type);
 				cnt++;
 			}
+console.log(JSON.stringify(options.xAxis));
 			if(Object.size(options.xAxis) <= 1){
 				options.xAxis = options.xAxis[0];
 			}

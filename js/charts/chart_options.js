@@ -26,17 +26,20 @@ var global_options = {
 		href: window.location.origin + '/' + server_path + '/index.php',
 		text: '© AgSource Cooperative Services'
 	},
-	xAxis: {
+	exporting: {
+		url: 'https://export.highcharts.com'
+	},
+	xAxis: [{
 		gridLineColor : '#c0c0c0',
 		type: 'datetime',
 		categories: null
 			//tickInterval: 7 * 24 * 3600 * 1000, // one week
 			//formatter: function() { return Highcharts.dateFormat('%A, %b %e, %Y', this.value); }
-	},
-	yAxis: {
+	}],
+	yAxis: [{
 		allowDecimals: false,
 		type: 'linear'
-	},
+	}],
 	tooltip : {
 		formatter : function(){
 			return this.y;

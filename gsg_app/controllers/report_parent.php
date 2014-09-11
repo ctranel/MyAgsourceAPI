@@ -433,9 +433,9 @@ abstract class parent_report extends CI_Controller {
 						'</script>'
 					),
 					'arr_headjs_line'=>array(
-						'{highcharts: "https://cdnjs.cloudflare.com/ajax/libs/highcharts/3.0.7/highcharts.js"}',
-						'{highcharts_more: "https://cdnjs.cloudflare.com/ajax/libs/highcharts/3.0.7/highcharts-more.js"}',
-						'{exporting: "https://cdnjs.cloudflare.com/ajax/libs/highcharts/3.0.7/modules/exporting.js"}',
+						'{highcharts: "https://code.highcharts.com/4.0.4/highcharts.js"}',
+						'{highcharts_more: "https://code.highcharts.com/4.0.4/highcharts-more.js"}',
+						'{exporting: "https://code.highcharts.com/4.0.4/modules/exporting.js"}',
 						'{popup: "' . $this->config->item("base_url_assets") . 'js/jquery/popup.min.js"}',
 						'{chart_options: "' . $this->config->item("base_url_assets") . 'js/charts/chart_options.js"}',
 						'{graph_helper: "' . $this->config->item("base_url_assets") . 'js/charts/graph_helper.js"}',
@@ -633,6 +633,7 @@ abstract class parent_report extends CI_Controller {
 		$arr_chart_type = $this->{$this->primary_model}->get_chart_type_array();
 		$arr_axis_index = $this->{$this->primary_model}->get_axis_index_array();
 			
+//var_dump($arr_fields, $arr_chart_type, $arr_axis_index); die;
 		foreach($arr_fields as $k=>$f){
 			//these 2 arrays need to have the same numeric index so that the yaxis# can be correctly assigned to series
 			$return_val[$c]['name'] = $k;
@@ -647,6 +648,7 @@ abstract class parent_report extends CI_Controller {
 			}
 			$c++;
 		}
+//var_dump($return_val);
 		return $return_val;
 	}
 	
@@ -692,7 +694,9 @@ abstract class parent_report extends CI_Controller {
 			}
 		}
 		$this->json['arr_axes'] = $arr_axes;
-		$this->json['data'] = $this->{$this->primary_model}->get_graph_data($arr_fieldnames, $this->session->userdata('herd_code'), $this->max_rows, $x_axis_date_field, $arr_this_block['url_segment'], $this->graph['config']['xAxis']['categories']);
+		$tmp_x_axis = current($this->json['arr_axes']['x']);
+		$tmp_categories = isset($tmp_x_axis['categories']) ? $tmp_x_axis['categories'] : null;
+		$this->json['data'] = $this->{$this->primary_model}->get_graph_data($arr_fieldnames, $this->session->userdata('herd_code'), $this->max_rows, $x_axis_date_field, $arr_this_block['url_segment'], $tmp_categories);
 	}
 		
 	protected function load_table(&$arr_this_block, $report_count){
