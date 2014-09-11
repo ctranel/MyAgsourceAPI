@@ -32,7 +32,7 @@ var global_options = {
 	xAxis: [{
 		gridLineColor : '#c0c0c0',
 		type: 'datetime',
-		categories: null
+		//categories: null
 			//tickInterval: 7 * 24 * 3600 * 1000, // one week
 			//formatter: function() { return Highcharts.dateFormat('%A, %b %e, %Y', this.value); }
 	}],
@@ -40,6 +40,7 @@ var global_options = {
 		allowDecimals: false,
 		type: 'linear'
 	}],
+//	legend : {floating: true},
 	tooltip : {
 		formatter : function(){
 			return this.y;
@@ -172,8 +173,8 @@ function get_column_options(options_json){
 
 function get_bar_options(options_json){
 	options_json.chart.type = 'bar';
-	options_json.xAxis.type = 'linear';
-	options_json.xAxis.categories = [];
+	options_json.xAxis[0].type = 'linear';
+	//options_json.xAxis.categories = [];
 	return options_json;
 }
 

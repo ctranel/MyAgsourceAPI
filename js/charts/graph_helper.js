@@ -143,10 +143,10 @@ function process_chart(div_id, data_in){
 				if(data_in.chart_type != 'bar'){
 					options.xAxis[cnt].title = {"text": data_in.arr_axes.x[c].text};
 					if(data_in.arr_axes.x[c].data_type == 'datetime'){
-						options.xAxis[cnt].labels = {"rotation": -35, "align": 'left', "x": -50, "y": 55};
+						options.xAxis[cnt].labels = {"rotation": -35};//, "align": 'left', "x": -50, "y": 55};
 					}
 					else{
-						options.xAxis[cnt].labels = {"rotation": -35, "y": 25};
+//						options.xAxis[cnt].labels = {"rotation": -35, "y": 25};
 					}
 				}
 				//set x axis label
@@ -156,7 +156,6 @@ function process_chart(div_id, data_in){
 				options.xAxis[cnt].labels.formatter = getAxisLabelFormat(options.xAxis[cnt].type);
 				cnt++;
 			}
-console.log(JSON.stringify(options.xAxis));
 			if(Object.size(options.xAxis) <= 1){
 				options.xAxis = options.xAxis[0];
 			}
@@ -269,7 +268,7 @@ console.log(JSON.stringify(options.xAxis));
 			}
 			options.chart.renderTo = div_id;
 			if(typeof pre_render == 'function'){
-				pre_render(options, section_data);
+				options = pre_render(options, section_data);
 			}
 //console.log(JSON.stringify(options));		
 

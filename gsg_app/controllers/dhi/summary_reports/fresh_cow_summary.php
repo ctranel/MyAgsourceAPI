@@ -26,15 +26,16 @@ class Fresh_cow_summary extends parent_report {
 		parent::display($block_in, $display_format);
 	 }
 	 
-	 protected function derive_series($arr_fields){
-	 	if($this->graph['config']['chart']['type'] !== 'boxplot'){
-	 		return parent::derive_series($arr_fields);
+	 protected function derive_series($arr_fields, $chart_type){
+	 	//@todo: move modified version of this into main object for chart type = boxplot
+	 	
+	 	if($chart_type !== 'boxplot'){
+	 		return parent::derive_series($arr_fields, $chart_type);
 	 	}
 		$return_val = array();
 	 	$c = 0;
 	 	$arr_chart_type = $this->{$this->primary_model}->get_chart_type_array();
 	 	$arr_axis_index = $this->{$this->primary_model}->get_axis_index_array();
-	 		
 	 	foreach($arr_fields as $k=>$f){
 	 		//for the median field, create 1 series for the boxplot and 1 for the trend line ("$c + 1" is the trend line)
 	 		if(strpos($f, 'median') !== FALSE){

@@ -627,7 +627,7 @@ abstract class parent_report extends CI_Controller {
 		elseif($this->display == 'chart'){$this->load_chart($arr_this_block, $report_count);}
 	}
 	
-	protected function derive_series($arr_fields){
+	protected function derive_series($arr_fields, $chart_type){
 //as of 9/11/2014, in order to get labels correct, we need to change the header text in blocks_select_fields for the first {number of series'} fields
 		$return_val = array();
 		$c = 0;
@@ -678,7 +678,7 @@ abstract class parent_report extends CI_Controller {
 		$this->{$this->primary_model}->set_chart_fields($arr_this_block['id']);
 		$arr_fields = $this->{$this->primary_model}->get_fields();
 		if(is_array($arr_fields) && !empty($arr_fields)){
-			$this->json['series'] = $this->derive_series($arr_fields);
+			$this->json['series'] = $this->derive_series($arr_fields, $this->json['chart_type']);
 			$arr_fieldnames = $this->derive_field_array($arr_fields);
 		}
 		if(is_array($arr_axes['x'])){
