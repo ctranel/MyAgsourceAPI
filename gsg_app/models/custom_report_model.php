@@ -1,9 +1,15 @@
 <?php
 class Custom_report_model extends CI_Model {
 
+	protected $error;
+	
 	public function __construct(){
 		parent::__construct();
 
+	}
+	
+	public function error(){
+		return $this->error;
 	}
 
 	function start_transaction(){
