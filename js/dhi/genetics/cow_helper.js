@@ -1,7 +1,10 @@
 	// this function allows you to change chart options immediately before chart is rendered
 	function pre_render(options_in){
 		//if there is a second yAxis, change the color
-		if(typeof options_in.yAxis[1] != 'undefined') options_in.yAxis[1].title.style.color = var_arr_graph_colors[1];
+		if(typeof options_in.yAxis[1] != 'undefined'){
+			options_in.yAxis[1].title.style.color = var_arr_graph_colors[1];
+		}
+		return options_in;
 	}
 	
 	//this function is called in the graph_helper.js file after the JSON data file has loaded.  It can make report specific updates after the data has been loaded (see commented code for example)

@@ -11,12 +11,11 @@
 				 if(typeof(chart) != 'undefined' && section_data['block'] == 'prev3_test_mgmt_mun') {
 					 
 					 //chart is global variable declared in graph_helper.js
-					 Highcharts.setOptions({
-							 xAxis: {tickPositions: [options_in.series[0].data[0][0],
+					 options_in.xAxis.tickPositions = [options_in.series[0].data[0][0],
 						                        options_in.series[0].data[1][0],
-						                        options_in.series[0].data[2][0]]}
-						});					 
+						                        options_in.series[0].data[2][0]];
 				}
 			}
 		}
+		return options_in;
 	}

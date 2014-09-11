@@ -40,7 +40,7 @@ var global_options = {
 		allowDecimals: false,
 		type: 'linear'
 	}],
-//	legend : {floating: true},
+	legend : {},
 	tooltip : {
 		formatter : function(){
 			return this.y;
