@@ -40,7 +40,11 @@ var global_options = {
 		allowDecimals: false,
 		type: 'linear'
 	}],
-	legend : {},
+	legend : {
+		margin: 0,
+		borderRadius: 5,
+		borderWidth: 1
+	},
 	tooltip : {
 		formatter : function(){
 			return this.y;
