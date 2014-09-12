@@ -53,8 +53,8 @@
 			];
 		}
 		//remove odd/even classes so that charts do not appear side-by-side
-		$('.chart-container').each(function(){
-			$(this).addClass('chart-only').removeClass('chart-odd').removeClass('chart-even').removeClass('chart-last-odd');
-		});
+//		$('.chart-container').each(function(){
+//			$(this).addClass('chart-only').removeClass('chart-odd').removeClass('chart-even').removeClass('chart-last-odd');
+//		});
 		return options_in;
 	}

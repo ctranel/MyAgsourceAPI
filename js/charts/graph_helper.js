@@ -15,7 +15,7 @@ head.ready(function() {
 	}
 	global_options['chart']['width'] = chart_width;
 	//add 2 to width to prevent scrollbar
-	$(".chart-odd, .chart-even, .chart-last-odd").css("width", (chart_width + 2));
+	$(".chart-odd, .chart-even, .chart-last-odd, .chart-only").css("width", (chart_width + 2));
 	$(".highcharts-container, .chart").css("width", chart_width);
 });
 function updateFilter(event, this_in, divid, field_in, value_in){
@@ -270,7 +270,7 @@ function process_chart(div_id, data_in){
 			if(typeof pre_render == 'function'){
 				options = pre_render(options, section_data);
 			}
-console.log(JSON.stringify(options));		
+//console.log(JSON.stringify(options));		
 
 			chart[block_index] = new Highcharts.Chart(options);
 			while(chart[block_index].series.length > count){//(Object.size(chart[block_index].series) > count){

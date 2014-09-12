@@ -340,8 +340,11 @@ abstract class parent_report extends CI_Controller {
 		$has_benchmarks = false;
 		if(isset($arr_blocks) && !empty($arr_blocks)){
 			$x = 0;
+			$consec_charts = 0;
+			$prev_display_type = '';
 			$cnt = count($arr_blocks);
 			foreach($arr_blocks as $c => $pb){
+//die(var_dump($pb));
 				if($pb['bench_row'] === 1){
 					$has_benchmarks = true;
 				}
@@ -361,11 +364,30 @@ abstract class parent_report extends CI_Controller {
 				}
 				if($arr_block_in == NULL || in_array($pb['url_segment'], $arr_block_in)){
 					$this->{$this->primary_model}->populate_field_meta_arrays($pb['id']);
-					if($cnt == 1) $odd_even = 'chart-only';
-					elseif($x % 2 == 1) $odd_even = 'chart-even';
-					elseif($x == ($cnt - 1)) $odd_even = 'chart-last-odd';
-					else $odd_even = 'chart-odd';
-					if($display == 'table') $cnt = 0;
+					//manage display details
+					$next_pb = next($arr_blocks);
+					$next_display_type = $next_pb['display_type'];
+//echo $display . '-' . $prev_display_type . '-' . $next_pb['display_type'] . "<br>";
+					if($display === 'chart' && $next_pb['display_type'] !== 'chart' && $prev_display_type !== 'chart'){
+//die('shouldnt be herre');
+						$odd_even = 'chart-only';
+					}
+					else{
+//echo $consec_charts % 2;
+						if($consec_charts % 2 == 1) $odd_even = 'chart-even';
+						elseif($consec_charts == ($cnt - 1)) $odd_even = 'chart-last-odd';
+						else $odd_even = 'chart-odd';
+//echo $odd_even;
+					}
+					//set up next iteration
+					$prev_display_type = $pb['display_type'];
+					if($display === 'table'){
+						$consec_charts = 0;
+					}
+					if($display === 'chart'){
+						$consec_charts++;
+					}
+					
 					$arr_blk_data = array(
 						'block_num' => $x, 
 						'link_url' => site_url($this->section_path) . '/' . $this->page . '/' . $pb['url_segment'], 

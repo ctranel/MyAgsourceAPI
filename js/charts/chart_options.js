@@ -173,7 +173,7 @@ function get_column_options(options_json){
 
 function get_bar_options(options_json){
 	options_json.chart.type = 'bar';
-	options_json.xAxis[0].type = 'linear';
+	options_json.xAxis.type = 'linear';
 	//options_json.xAxis.categories = [];
 	return options_json;
 }
