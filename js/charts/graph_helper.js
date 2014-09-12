@@ -53,7 +53,7 @@ function updatePage(el){
 		updateBlock(div_id, block_name, block_index, sort_field, sort_order, display, first);
 		first = false;
 	});
-	
+
 	$('.pstring-link').css('fontWeight', 'normal');
 	if(typeof(el.style) !== 'undefined'){
 		el.style.fontWeight = 'bold';
@@ -113,7 +113,8 @@ function process_chart(div_id, data_in){
 	options = get_chart_options(options, data_in.chart_type);
 	options.title = {"text": data_in.description};
 	options.exporting = {"filename": data_in.name};
-	if (typeof(data_in.pstring) === 'undefined'){
+console.log(dump(data_in));
+	if (typeof(data_in.pstring) === 'undefined' || data_in.pstring === null){
 		options.subtitle = {"text": "Herd: " + data_in.herd_code};
 	} 
 	else {

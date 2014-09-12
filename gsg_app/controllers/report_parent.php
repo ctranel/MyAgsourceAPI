@@ -630,7 +630,7 @@ abstract class parent_report extends CI_Controller {
 	protected function get_section_data($block, $pstring, $sort_by, $sort_order, $report_count){
 		return array(
 			'block' => $block,
-			'pstring' => $pstring,
+//			'pstring' => $pstring, //pstring is sent with general data, not section data
 			'sort_by' => $sort_by,
 			'sort_order' => $sort_order,
 			'graph_order' => $report_count
@@ -651,6 +651,7 @@ abstract class parent_report extends CI_Controller {
 	
 	protected function derive_series($arr_fields, $chart_type){
 //as of 9/11/2014, in order to get labels correct, we need to change the header text in blocks_select_fields for the first {number of series'} fields
+//in order for this function to work correctly, the DB view must have all fields in one row, or have series' as columns and categories as row keys.
 		$return_val = array();
 		$c = 0;
 		$arr_chart_type = $this->{$this->primary_model}->get_chart_type_array();
@@ -694,7 +695,7 @@ abstract class parent_report extends CI_Controller {
 
 		$arr_pstring = $this->session->userdata('arr_pstring');
 		$this->json['herd_code'] = $this->session->userdata('herd_code');
-		if (!empty($arr_pstring)){
+		if (!empty($arr_pstring) && count($arr_pstring) > 1){
 			$this->json['pstring'] = $this->session->userdata('pstring');
 		}
 		$this->{$this->primary_model}->set_chart_fields($arr_this_block['id']);
