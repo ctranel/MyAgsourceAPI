@@ -47,7 +47,7 @@ var global_options = {
 	},
 	tooltip : {
 		formatter : function(){
-			return this.y;
+			//return this.y;
 			//return this.y + ["th","st","nd","rd"][!(this.y%10>3||Math.floor(this.y%100/10)==1)*this.y%10] + ' Percentile';
 		}
 	},
@@ -77,9 +77,9 @@ var global_options = {
                enabled: true,
                align: 'right',
                color: '#C0C0C0',
-               formatter:function(){
-                    return this.point.value;   
-               }
+               //formatter:function(){
+               //     return this.point.value;   
+               //}
             }
         },
         scatter: {
@@ -87,9 +87,9 @@ var global_options = {
                 enabled: true,
                 align: 'right',
                 color: '#AA4643',
-                formatter:function(){
-                     return this.point.val;   
-                }
+                //formatter:function(){
+                //     return this.point.val;   
+                //}
             }
         },
         spline: {

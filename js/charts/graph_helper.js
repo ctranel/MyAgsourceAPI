@@ -110,10 +110,10 @@ function load_chart(server_path, div_id, block_index, params){
 function process_chart(div_id, data_in){
 	block_index = div_id.charAt( div_id.length-1 );
 	var options = global_options;
+	var um = undefined;
 	options = get_chart_options(options, data_in.chart_type);
 	options.title = {"text": data_in.description};
 	options.exporting = {"filename": data_in.name};
-console.log(dump(data_in));
 	if (typeof(data_in.pstring) === 'undefined' || data_in.pstring === null){
 		options.subtitle = {"text": "Herd: " + data_in.herd_code};
 	} 
@@ -192,36 +192,10 @@ console.log(dump(data_in));
 				if(typeof(data_in.arr_axes.y[x].min) != 'undefined'){
 					options.yAxis[cnt].min = data_in.arr_axes.y[x].min;
 				}
-
-				/*BLOCKS_SELECT_FIELDS TABLE HAS A COLUMN FOR AXES_INDEX, DO WE NEED THIS BLOCK?
-				if(typeof($a['db_field_name']) != 'undefined' && !empty($a['db_field_name']) && $a['opposite']){
-					$tmp_key = array_search($a['db_field_name'], $arr_fieldnames);
-					$this->graph['config']['series'][$tmp_key]['yAxis'] = 1;
-				}*/
-
-				/*Since this is being built entirely on the client, and built on to the object as we go, is this necessary?
-				if(data_in.arr_axes.y.length > 1) {
-					if(typeof(data_in.arr_axes.y[x]) != 'undefined'){
-						$this->graph['config']['yAxis'][$cnt] = $.extend(true, $this->graph['config']['yAxis'][$cnt], $tmp_array);
-					}
-					else{
-						$this->graph['config']['yAxis'][$cnt] = $tmp_array;
-					}
-				}
-				else {
-					if(typeof($this->graph['config']['yAxis']) != 'undefined'){
-						$this->graph['config']['yAxis'] = array_merge($this->graph['config']['yAxis'][$cnt], $tmp_array);
-					}
-					else{
-						$this->graph['config']['yAxis'] = $tmp_array;
-					}
-				}
-				cnt++;*/
-				var um = undefined;
 				if(typeof(data_in.arr_axes.y[x].labels) === 'undefined'){
 					options.yAxis[cnt].labels = {};
 				}
-				options.yAxis[cnt].labels.formatter = getAxisLabelFormat(options.yAxis[cnt].type, um);
+				options.yAxis[cnt].labels.formatter = getAxisLabelFormat(options.yAxis[cnt].type);
 				cnt++;
 			}
 			if(Object.size(options.yAxis) <= 1){
@@ -232,12 +206,6 @@ console.log(dump(data_in));
 			alert('No yAxis data');
 		}
 		//end set axis labels
-		//set tooltip format
-		if(typeof(data_in.tooltip) === 'undefined'){
-			options.tooltip = {};
-		}
-		//@todo: line below will break if there is ever a chart with multiple x axes
-		options.tooltip.formatter = getTooltipFormat(options.type, options.xAxis.type);
 		if(typeof(data_in.series) !== 'undefined'){
 			options.series = data_in.series;
 		}
@@ -264,9 +232,20 @@ console.log(dump(data_in));
 				if(typeof options.series[count] === 'undefined'){
 					options.series[count] = {};
 				}
+				if(typeof(options.series[count].um) !== 'undefined'){
+					um = options.series[count].um;
+				}
 				options.series[count].data = tmpData[x];
 				count++;
 			}
+			
+			//set tooltip format
+			if(typeof(data_in.tooltip) === 'undefined'){
+				options.tooltip = {};
+			}
+			//@todo: line below will break if there is ever a chart with multiple x axes
+			options.tooltip.formatter = getTooltipFormat(options.chart.type, options.xAxis.type, um);
+			
 			options.chart.renderTo = div_id;
 			if(typeof pre_render == 'function'){
 				options = pre_render(options, section_data);
@@ -325,23 +304,37 @@ function getAxisLabelFormat(axis_type){
 	}
 }
 
-function getTooltipFormat(chart_type, xaxis_type){
-	if(xaxis_type === "datetime"){
-		if(chart_type === "boxplot"){
-			return function(){
-				var p = this.point;
-				if(this.series.options.type === "boxplot" || typeof(this.series.options.type) === "undefined"){
-					return "<b>" + Highcharts.dateFormat("%B %Y", this.x) +"</b><br/>" + this.series.name +"<br/>75th Percentile: "+ p.q1 + "<br/>50th Percentile: "+ p.median + "<br/>25th Percentile: "+ p.q3;
+function getTooltipFormat(chart_type, xaxis_type, um){
+	if(typeof(um) === 'undefined'){
+		um = '';
+	}
+	if(chart_type === "boxplot"){
+		return function(){
+			var p = this.point;
+			var n = parseInt(this.x, 10);
+			if(this.series.options.type === "boxplot" || typeof(this.series.options.type) === "undefined"){
+				if(!isNaN(n) && n == this.x && n.toString() == this.x.toString() && n > 100000000000 && n < 9999999999999){
+					return "<b>" + Highcharts.dateFormat("%B %Y", this.x) +"</b><br>" + this.series.name +"<br>75th Percentile: "+ p.q1 + "<br>50th Percentile: "+ p.median + "<br>25th Percentile: "+ p.q3;
 				}
-				else {
-					return false;
-					//return "<b>"+ Highcharts.dateFormat("%B %Y", this.x) +"</b><br/>"+this.series.name +": "+ this.y;
-				}
+				else{
+					return '<b>' + this.x + ':</b><br>' + this.series.name +"<br>75th Percentile: "+ p.q1 + "<br>50th Percentile: "+ p.median + "<br>25th Percentile: "+ p.q3;
+				};
+			}
+			else { //no tooltip for non-boxplot series on boxplot charts
+				return false;
+			}
+		};
+	}
+	else {
+		return function(){
+			var n = parseInt(this.x, 10);
+			if(!isNaN(n) && n == this.x && n.toString() == this.x.toString() && n > 100000000000 && n < 9999999999999){
+				return '<b>' + this.series.name + ':</b><br>' + Highcharts.dateFormat('%B %e, %Y', this.x) + ' - ' + this.y + ' ' + um;
+			}
+			else{
+				return '<b>' + this.series.name + ':</b><br>' + this.x + ' - ' + this.y + ' ' + um;
 			};
-		}
-		else{
-			return function(){return '<b>' + this.series.name + ':</b><br>' + Highcharts.dateFormat('%B %e, %Y', this.x) + ' - ' + this.y + ' ' + this.series.um;};
-		}
+		};
 	}
 }
 
