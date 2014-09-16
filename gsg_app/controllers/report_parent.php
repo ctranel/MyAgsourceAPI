@@ -359,8 +359,11 @@ abstract class parent_report extends CI_Controller {
 		$has_benchmarks = false;
 		if(isset($arr_blocks) && !empty($arr_blocks)){
 			$x = 0;
+			$consec_charts = 0;
+			$prev_display_type = '';
 			$cnt = count($arr_blocks);
 			foreach($arr_blocks as $c => $pb){
+//die(var_dump($pb));
 				if($pb['bench_row'] === 1){
 					$has_benchmarks = true;
 				}
@@ -380,11 +383,30 @@ abstract class parent_report extends CI_Controller {
 				}
 				if($arr_block_in == NULL || in_array($pb['url_segment'], $arr_block_in)){
 					$this->{$this->primary_model}->populate_field_meta_arrays($pb['id']);
-					if($cnt == 1) $odd_even = 'chart-only';
-					elseif($x % 2 == 1) $odd_even = 'chart-even';
-					elseif($x == ($cnt - 1)) $odd_even = 'chart-last-odd';
-					else $odd_even = 'chart-odd';
-					if($display == 'table') $cnt = 0;
+					//manage display details
+					$next_pb = next($arr_blocks);
+					$next_display_type = $next_pb['display_type'];
+//echo $display . '-' . $prev_display_type . '-' . $next_pb['display_type'] . "<br>";
+					if($display === 'chart' && $next_pb['display_type'] !== 'chart' && $prev_display_type !== 'chart'){
+//die('shouldnt be herre');
+						$odd_even = 'chart-only';
+					}
+					else{
+//echo $consec_charts % 2;
+						if($consec_charts % 2 == 1) $odd_even = 'chart-even';
+						elseif($consec_charts == ($cnt - 1)) $odd_even = 'chart-last-odd';
+						else $odd_even = 'chart-odd';
+//echo $odd_even;
+					}
+					//set up next iteration
+					$prev_display_type = $pb['display_type'];
+					if($display === 'table'){
+						$consec_charts = 0;
+					}
+					if($display === 'chart'){
+						$consec_charts++;
+					}
+					
 					$arr_blk_data = array(
 						'block_num' => $x, 
 						'link_url' => site_url($this->section_path) . '/' . $this->page . '/' . $pb['url_segment'], 
@@ -452,12 +474,12 @@ abstract class parent_report extends CI_Controller {
 						'</script>'
 					),
 					'arr_headjs_line'=>array(
-						'{highcharts: "https://cdnjs.cloudflare.com/ajax/libs/highcharts/3.0.7/highcharts.js"}',
-						'{highcharts_more: "https://cdnjs.cloudflare.com/ajax/libs/highcharts/3.0.7/highcharts-more.js"}',
-						'{exporting: "https://cdnjs.cloudflare.com/ajax/libs/highcharts/3.0.7/modules/exporting.js"}',
+						'{highcharts: "https://code.highcharts.com/4.0.4/highcharts.js"}',
+						'{highcharts_more: "https://code.highcharts.com/4.0.4/highcharts-more.js"}',
+						'{exporting: "https://code.highcharts.com/4.0.4/modules/exporting.js"}',
 						'{popup: "' . $this->config->item("base_url_assets") . 'js/jquery/popup.min.js"}',
-						'{graph_helper: "' . $this->config->item("base_url_assets") . 'js/charts/graph_helper.js"}',
 						'{chart_options: "' . $this->config->item("base_url_assets") . 'js/charts/chart_options.js"}',
+						'{graph_helper: "' . $this->config->item("base_url_assets") . 'js/charts/graph_helper.js"}',
 						'{report_helper: "' . $this->config->item("base_url_assets") . 'js/report_helper.js"}',
 						'{table_sort: "' . $this->config->item("base_url_assets") . 'js/jquery/stupidtable.min.js"}',
 						'{tooltip: "https://cdn.jsdelivr.net/qtip2/2.2.0/jquery.qtip.min.js"}',
@@ -638,7 +660,7 @@ abstract class parent_report extends CI_Controller {
 	protected function get_section_data($block, $pstring, $sort_by, $sort_order, $report_count){
 		return array(
 			'block' => $block,
-			'pstring' => $pstring,
+//			'pstring' => $pstring, //pstring is sent with general data, not section data
 			'sort_by' => $sort_by,
 			'sort_order' => $sort_order,
 			'graph_order' => $report_count
@@ -653,16 +675,30 @@ abstract class parent_report extends CI_Controller {
 		$this->avg_row = $arr_this_block['avg_row'];
 		$this->bench_row = $arr_this_block['bench_row'];
 		$this->pivot_db_field = isset($arr_this_block['pivot_db_field']) ? $arr_this_block['pivot_db_field'] : NULL;
-		if($this->display == 'table' || $this->display == 'array') $this->load_table($arr_this_block, $report_count);
-		elseif($this->display == 'chart'){$this->load_chart($arr_this_block, $report_count);}
+		if($this->display == 'table' || $this->display == 'array'){
+			$this->load_table($arr_this_block, $report_count);
+		}
+		elseif($this->display == 'chart'){
+			$this->load_chart($arr_this_block, $report_count);
+		}
 	}
 	
-	protected function derive_series($arr_fields){
+	protected function derive_series($arr_fields, $chart_type, $arr_categories, $cnt_arr_datapoints){
+//as of 9/11/2014, in order to get labels correct, we need to change the header text in blocks_select_fields for the first {number of series'} fields
+//in order for this function to work correctly, the DB view must have all fields in one row, or have series' as columns and categories as row keys.
 		$return_val = array();
 		$c = 0;
 		$arr_chart_type = $this->{$this->primary_model}->get_chart_type_array();
 		$arr_axis_index = $this->{$this->primary_model}->get_axis_index_array();
-			
+
+		//allow for normalized or non-normalized data
+		if((int)($cnt_arr_datapoints / count($arr_fields)) === 1){
+			$num_series = count($arr_fields) / count($arr_categories);
+		}
+		else{
+			$num_series = count($arr_fields);
+		}
+		
 		foreach($arr_fields as $k=>$f){
 			//these 2 arrays need to have the same numeric index so that the yaxis# can be correctly assigned to series
 			$return_val[$c]['name'] = $k;
@@ -676,6 +712,9 @@ abstract class parent_report extends CI_Controller {
 				$return_val[$c]['type'] = $arr_chart_type[$f];
 			}
 			$c++;
+			if($c >= $num_series){
+				break;
+			}
 		}
 		return $return_val;
 	}
@@ -699,17 +738,22 @@ abstract class parent_report extends CI_Controller {
 		$this->json['description'] = $arr_this_block['description'];
 		$this->json['chart_type'] = $arr_this_block['chart_type'];
 
+		$this->json['arr_axes'] = $arr_axes;
+		$tmp_x_axis = current($this->json['arr_axes']['x']);
+		$tmp_categories = isset($tmp_x_axis['categories']) ? $tmp_x_axis['categories'] : null;
+		
 		$arr_pstring = $this->session->userdata('arr_pstring');
 		$this->json['herd_code'] = $this->session->userdata('herd_code');
-		if (!empty($arr_pstring)){
+		if (!empty($arr_pstring) && count($arr_pstring) > 1){
 			$this->json['pstring'] = $this->session->userdata('pstring');
 		}
 		$this->{$this->primary_model}->set_chart_fields($arr_this_block['id']);
 		$arr_fields = $this->{$this->primary_model}->get_fields();
-		if(is_array($arr_fields) && !empty($arr_fields)){
-			$this->json['series'] = $this->derive_series($arr_fields);
-			$arr_fieldnames = $this->derive_field_array($arr_fields);
+		if(!is_array($arr_fields) || empty($arr_fields)){
+			return false;
 		}
+		$arr_fieldnames = $this->derive_field_array($arr_fields);
+
 		if(is_array($arr_axes['x'])){
 			foreach($arr_axes['x'] as $a){
 				$tmp_cat = isset($a['categories']) && !empty($a['categories']) ? $a['categories'] : NULL;
@@ -721,8 +765,8 @@ abstract class parent_report extends CI_Controller {
 				}
 			}
 		}
-		$this->json['arr_axes'] = $arr_axes;
-		$this->json['data'] = $this->{$this->primary_model}->get_graph_data($arr_fieldnames, $this->session->userdata('herd_code'), $this->max_rows, $x_axis_date_field, $arr_this_block['url_segment'], $this->graph['config']['xAxis']['categories']);
+		$this->json['data'] = $this->{$this->primary_model}->get_graph_data($arr_fieldnames, $this->session->userdata('herd_code'), $this->max_rows, $x_axis_date_field, $arr_this_block['url_segment'], $tmp_categories);
+		$this->json['series'] = $this->derive_series($arr_fields, $this->json['chart_type'], $tmp_categories, count($this->json['data'], COUNT_RECURSIVE));
 	}
 		
 	protected function load_table(&$arr_this_block, $report_count){

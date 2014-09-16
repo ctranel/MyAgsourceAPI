@@ -137,6 +137,7 @@ class Land extends parent_report {
 						'{highcharts_more: "https://cdnjs.cloudflare.com/ajax/libs/highcharts/3.0.7/highcharts-more.js"}',
 						'{exporting: "https://cdnjs.cloudflare.com/ajax/libs/highcharts/3.0.7/modules/exporting.js"}',
 						'{popup: "' . $this->config->item("base_url_assets") . 'js/jquery/popup.min.js"}',
+						'{chart_options: "' . $this->config->item("base_url_assets") . 'js/charts/chart_options.js"}',
 						'{graph_helper: "' . $this->config->item("base_url_assets") . 'js/charts/graph_helper.js"}',
 						'{report_helper: "' . $this->config->item("base_url_assets") . 'js/report_helper.js"}',
 						'{table_sort: "' . $this->config->item("base_url_assets") . 'js/jquery/stupidtable.min.js"}',

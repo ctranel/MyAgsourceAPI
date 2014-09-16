@@ -921,7 +921,9 @@ class Report_model extends CI_Model {
 	}
 	
 	/**
-	 * @method set_row_to_series - used when each row from a set of database results corresponds with a series of data.
+	 * @method set_row_to_series - used when data for multiple series' are returned in one row.  
+	 * Breaks data down so that there is one row per category, each row having one entry for each series.
+	 * 
 	 * @param array of field name base text (for percentages, add '_pct')
 	 * @return array of data for the graph
 	 * @access protected
@@ -930,7 +932,6 @@ class Report_model extends CI_Model {
 	protected function set_row_to_series($data, $arr_fieldname_base, $arr_categories){
 		$mod_base = count($arr_categories);
 		if(is_array($data) && !empty($data)){
-			//loop for data in which each row represents a series.
 			$key = 0;
 			foreach($data as $k=>$row){
 				$count = 1;
@@ -963,8 +964,12 @@ class Report_model extends CI_Model {
 	 **/
 	function get_graph_data($arr_fieldname, $herd_code, $num_dates, $date_field, $block_url, $arr_categories = NULL){
 		$data = $this->get_graph_dataset($herd_code, $num_dates, $date_field, $block_url);
-		if(isset($arr_categories) && is_array($arr_categories)) $return_val = $this->set_row_to_series($data, $arr_fieldname, $arr_categories);
-		else $return_val = $this->set_longitudinal_data($data, $date_field);
+		if(isset($arr_categories) && is_array($arr_categories)){
+			$return_val = $this->set_row_to_series($data, $arr_fieldname, $arr_categories);
+		}
+		else{
+			$return_val = $this->set_longitudinal_data($data, $date_field);
+		}
 		return $return_val;
 	}
 	

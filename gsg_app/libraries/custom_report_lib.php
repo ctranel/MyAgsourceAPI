@@ -101,6 +101,7 @@ class Custom_report_lib
 		$bool_block_on_page = $this->custom_report_model->add_block_to_page(array('block_id' => $this->block_id, 'page_id' => $this->input->post('page_id')));
 //		if(!$bool_block_on_page) $this->cancel_add();
 		//table displays
+
 		if($arr_block_data['display_type_id'] == 1 || $arr_block_data['display_type_id'] == 3){
 echo "start <br>";
 			$this->header_groups();
@@ -113,7 +114,8 @@ echo "group_by <br>";
 echo "sort_by <br>";
 		}
 		//chart displays
-		elseif($arr_block_data['display_type_id'] == 2){
+		//@todo: add a section for type 5 that will add categories to x axis
+		elseif($arr_block_data['display_type_id'] == 2 || $arr_block_data['display_type_id'] == 5){
 echo "yaxis <br>";
 			$this->yaxes();
 echo "xaxis <br>";
@@ -123,7 +125,13 @@ echo "trend_columns <br>";
 echo "group_by <br>";
 			$this->group_by();
 		}
-		if ($this->db->trans_status() === FALSE) return FALSE;
+		else{
+			die('I do not recognize the display type');
+		}
+		if ($this->db->trans_status() === FALSE){
+			die($this->custom_report_model->error());
+			return FALSE;
+		}
 		
 		$this->custom_report_model->complete_transaction();
 		return $this->db->trans_status();

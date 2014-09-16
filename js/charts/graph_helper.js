@@ -1,18 +1,23 @@
 //global variables used in this script (included in the imported js file)
-var chart = new Array(); //array of chart object
+var chart = new Array(); //array of chart objects
 
-//var var_arr_graph_colors = ['#FF3C3C','#FF5A5A','#FF7878','#FF9696','#FFB4B4']; //monochrome
-//var var_arr_graph_colors = ['#643b3b', '#825a5a', '#a07878', '#bd9696', '#dcb2b2'];  //monochrome
-//var var_arr_graph_colors = ['#F15928', '#585C5F', '#08A04A', '#006C70', '#98E8F9']; //dpn?
-var var_arr_graph_colors = ['#E4B577', '#75C4E4', '#B6B6A5', '#E07F8D', '#97C4A4']; 
-//var var_arr_graph_colors = ['#00838C', '#939E77', '#B03500', '#BA91A8', '#97C4A4']; 
-//var var_arr_graph_colors = ['#D54C18', '#48495B', '#264071', '#9CA294'];
-var base_options = {chart: {backgroundColor: null}, yAxis:{}};//base options are specific to each report, see report helper functions (js files)
-//get current base url
-if (!window.location.origin) window.location.origin = window.location.protocol+"//"+window.location.host;
-var pathArray = window.location.href.split( '/' );
-var server_path = (typeof(pathArray[3]) == "string") ? pathArray[3] : '';
-
+//set width of page and charts
+head.ready(function() {
+	var container_width = document.getElementById('container').offsetWidth;//Math.floor(doc_width * .95);
+	var chart_width = 520;
+	if(container_width >= 768) {
+		chart_width = Math.floor(container_width * .47);
+	}
+	else {
+		chart_width = Math.floor(container_width * .95);
+		$(".chart-odd, .chart-even").css("float", "none");
+		$(".chart-odd, .chart-even").css("clear", "both");
+	}
+	global_options['chart']['width'] = chart_width;
+	//add 2 to width to prevent scrollbar
+	$(".chart-odd, .chart-even, .chart-last-odd, .chart-only").css("width", (chart_width + 2));
+	$(".highcharts-container, .chart").css("width", chart_width);
+});
 function updateFilter(event, this_in, divid, field_in, value_in){
 	$('input[name=' + field_in + '][value=' + value_in + ']').attr("checked", true);
 	$('#filter-form').submit();
@@ -48,7 +53,7 @@ function updatePage(el){
 		updateBlock(div_id, block_name, block_index, sort_field, sort_order, display, first);
 		first = false;
 	});
-	
+
 	$('.pstring-link').css('fontWeight', 'normal');
 	if(typeof(el.style) !== 'undefined'){
 		el.style.fontWeight = 'bold';
@@ -104,11 +109,12 @@ function load_chart(server_path, div_id, block_index, params){
 
 function process_chart(div_id, data_in){
 	block_index = div_id.charAt( div_id.length-1 );
-	var options = base_options;
+	var options = global_options;
+	var um = undefined;
 	options = get_chart_options(options, data_in.chart_type);
 	options.title = {"text": data_in.description};
 	options.exporting = {"filename": data_in.name};
-	if (typeof(data_in.pstring) === 'undefined'){
+	if (typeof(data_in.pstring) === 'undefined' || data_in.pstring === null){
 		options.subtitle = {"text": "Herd: " + data_in.herd_code};
 	} 
 	else {
@@ -138,10 +144,10 @@ function process_chart(div_id, data_in){
 				if(data_in.chart_type != 'bar'){
 					options.xAxis[cnt].title = {"text": data_in.arr_axes.x[c].text};
 					if(data_in.arr_axes.x[c].data_type == 'datetime'){
-						options.xAxis[cnt].labels = {"rotation": -35, "align": 'left', "x": -50, "y": 55};
+						options.xAxis[cnt].labels = {"rotation": -35};//, "align": 'left', "x": -50, "y": 55};
 					}
 					else{
-						options.xAxis[cnt].labels = {"rotation": -35, "y": 25};
+//						options.xAxis[cnt].labels = {"rotation": -35, "y": 25};
 					}
 				}
 				//set x axis label
@@ -152,7 +158,9 @@ function process_chart(div_id, data_in){
 				cnt++;
 			}
 			if(Object.size(options.xAxis) <= 1){
-				options.xAxis = options.xAxis[0];
+				var tmp = options.xAxis[0];
+				options.xAxis = tmp;
+				//delete options.xAxis[0];
 			}
 		}
 		else{
@@ -186,52 +194,21 @@ function process_chart(div_id, data_in){
 				if(typeof(data_in.arr_axes.y[x].min) != 'undefined'){
 					options.yAxis[cnt].min = data_in.arr_axes.y[x].min;
 				}
-
-				/*BLOCKS_SELECT_FIELDS TABLE HAS A COLUMN FOR AXES_INDEX, DO WE NEED THIS BLOCK?
-				if(typeof($a['db_field_name']) != 'undefined' && !empty($a['db_field_name']) && $a['opposite']){
-					$tmp_key = array_search($a['db_field_name'], $arr_fieldnames);
-					$this->graph['config']['series'][$tmp_key]['yAxis'] = 1;
-				}*/
-
-				/*Since this is being built entirely on the client, and built on to the object as we go, is this necessary?
-				if(data_in.arr_axes.y.length > 1) {
-					if(typeof(data_in.arr_axes.y[x]) != 'undefined'){
-						$this->graph['config']['yAxis'][$cnt] = $.extend(true, $this->graph['config']['yAxis'][$cnt], $tmp_array);
-					}
-					else{
-						$this->graph['config']['yAxis'][$cnt] = $tmp_array;
-					}
-				}
-				else {
-					if(typeof($this->graph['config']['yAxis']) != 'undefined'){
-						$this->graph['config']['yAxis'] = array_merge($this->graph['config']['yAxis'][$cnt], $tmp_array);
-					}
-					else{
-						$this->graph['config']['yAxis'] = $tmp_array;
-					}
-				}
-				cnt++;*/
-				var um = undefined;
 				if(typeof(data_in.arr_axes.y[x].labels) === 'undefined'){
 					options.yAxis[cnt].labels = {};
 				}
-				options.yAxis[cnt].labels.formatter = getAxisLabelFormat(options.yAxis[cnt].type, um);
+				options.yAxis[cnt].labels.formatter = getAxisLabelFormat(options.yAxis[cnt].type);
 				cnt++;
 			}
 			if(Object.size(options.yAxis) <= 1){
 				options.yAxis = options.yAxis[0];
+				delete options.yAxis[0];
 			}
 		}
 		else{
 			alert('No yAxis data');
 		}
 		//end set axis labels
-		//set tooltip format
-		if(typeof(data_in.tooltip) === 'undefined'){
-			options.tooltip = {};
-		}
-		//@todo: line below will break if there is ever a chart with multiple x axes
-		options.tooltip.formatter = getTooltipFormat(options.type, options.xAxis.type);
 		if(typeof(data_in.series) !== 'undefined'){
 			options.series = data_in.series;
 		}
@@ -251,15 +228,6 @@ function process_chart(div_id, data_in){
 			$('#' + div_id).html('<p class-"chart-error">' + section_data.error + '</p>');
 		}
 		else{
-			/*started with base_options object and built on it, so there should be no need to merge 
-			if(typeof options !== 'undefined'){
-				// combine with base options, but don't overwrite those from (try jquery.extend?)
-				if(typeof(base_options) != 'undefined'){
-					for(var i in base_options) {
-						if(typeof(options[i]) == 'undefined') options[i] = base_options[i];
-					}
-				}
-			}*/
 			//add data to object
 			var tmpData = data_in.data;
 			var count = 0;
@@ -267,12 +235,23 @@ function process_chart(div_id, data_in){
 				if(typeof options.series[count] === 'undefined'){
 					options.series[count] = {};
 				}
+				if(typeof(options.series[count].um) !== 'undefined'){
+					um = options.series[count].um;
+				}
 				options.series[count].data = tmpData[x];
 				count++;
 			}
+			
+			//set tooltip format
+			if(typeof(data_in.tooltip) === 'undefined'){
+				options.tooltip = {};
+			}
+			//@todo: line below will break if there is ever a chart with multiple x axes
+			options.tooltip.formatter = getTooltipFormat(options.chart.type, options.xAxis.type, um);
+			
 			options.chart.renderTo = div_id;
 			if(typeof pre_render == 'function'){
-				pre_render(options, section_data);
+				options = pre_render(options, section_data);
 			}
 console.log(JSON.stringify(options));		
 
@@ -328,23 +307,37 @@ function getAxisLabelFormat(axis_type){
 	}
 }
 
-function getTooltipFormat(chart_type, xaxis_type){
-	if(xaxis_type === "datetime"){
-		if(chart_type === "boxplot"){
-			return function(){
-				var p = this.point;
-				if(this.series.options.type === "boxplot" || typeof(this.series.options.type) === "undefined"){
-					return "<b>" + Highcharts.dateFormat("%B %Y", this.x) +"</b><br/>" + this.series.name +"<br/>75th Percentile: "+ p.q1 + "<br/>50th Percentile: "+ p.median + "<br/>25th Percentile: "+ p.q3;
+function getTooltipFormat(chart_type, xaxis_type, um){
+	if(typeof(um) === 'undefined'){
+		um = '';
+	}
+	if(chart_type === "boxplot"){
+		return function(){
+			var p = this.point;
+			var n = parseInt(this.x, 10);
+			if(this.series.options.type === "boxplot" || typeof(this.series.options.type) === "undefined"){
+				if(!isNaN(n) && n == this.x && n.toString() == this.x.toString() && n > 100000000000 && n < 9999999999999){
+					return "<b>" + Highcharts.dateFormat("%B %Y", this.x) +"</b><br>" + this.series.name +"<br>75th Percentile: "+ p.q1 + "<br>50th Percentile: "+ p.median + "<br>25th Percentile: "+ p.q3;
 				}
-				else {
-					return false;
-					//return "<b>"+ Highcharts.dateFormat("%B %Y", this.x) +"</b><br/>"+this.series.name +": "+ this.y;
-				}
+				else{
+					return '<b>' + this.x + ':</b><br>' + this.series.name +"<br>75th Percentile: "+ p.q1 + "<br>50th Percentile: "+ p.median + "<br>25th Percentile: "+ p.q3;
+				};
+			}
+			else { //no tooltip for non-boxplot series on boxplot charts
+				return false;
+			}
+		};
+	}
+	else {
+		return function(){
+			var n = parseInt(this.x, 10);
+			if(!isNaN(n) && n == this.x && n.toString() == this.x.toString() && n > 100000000000 && n < 9999999999999){
+				return '<b>' + this.series.name + ':</b><br>' + Highcharts.dateFormat('%B %e, %Y', this.x) + ' - ' + this.y + ' ' + um;
+			}
+			else{
+				return '<b>' + this.series.name + ':</b><br>' + this.x + ' - ' + this.y + ' ' + um;
 			};
-		}
-		else{
-			return function(){return '<b>' + this.series.name + ':</b><br>' + Highcharts.dateFormat('%B %e, %Y', this.x) + ' - ' + this.y + ' ' + this.series.um;};
-		}
+		};
 	}
 }
 
