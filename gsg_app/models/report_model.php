@@ -41,6 +41,7 @@ class Report_model extends CI_Model {
 	protected $arr_auto_filter_alert = array();
 	protected $num_results;
 	public $arr_pstring = array();
+	public $arr_breeds = array();
 	public $arr_blocks = array();
 	public $arr_messages = array();
 	
@@ -48,6 +49,7 @@ class Report_model extends CI_Model {
 		parent::__construct();
 		$this->load->model('dhi/herd_model');
 		$this->arr_pstring = $this->session->userdata('arr_pstring');
+		$this->arr_breeds = $this->session->userdata('arr_breeds');
 		$this->tables  = $this->config->item('tables', 'ion_auth');
 
 		$this->db_group_name = 'default';
@@ -103,6 +105,10 @@ class Report_model extends CI_Model {
 	}
 	function get_current_pstring(){
 		return current($this->arr_pstring);
+	}
+	
+	function get_current_breed(){
+		return current($this->arr_breeds);
 	}
 	
 	function set_primary_table($table_name){
