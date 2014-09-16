@@ -158,7 +158,9 @@ function process_chart(div_id, data_in){
 				cnt++;
 			}
 			if(Object.size(options.xAxis) <= 1){
-				options.xAxis = options.xAxis[0];
+				var tmp = options.xAxis[0];
+				options.xAxis = tmp;
+				//delete options.xAxis[0];
 			}
 		}
 		else{
@@ -200,6 +202,7 @@ function process_chart(div_id, data_in){
 			}
 			if(Object.size(options.yAxis) <= 1){
 				options.yAxis = options.yAxis[0];
+				delete options.yAxis[0];
 			}
 		}
 		else{
@@ -250,7 +253,7 @@ function process_chart(div_id, data_in){
 			if(typeof pre_render == 'function'){
 				options = pre_render(options, section_data);
 			}
-//console.log(JSON.stringify(options));		
+console.log(JSON.stringify(options));		
 
 			chart[block_index] = new Highcharts.Chart(options);
 			while(chart[block_index].series.length > count){//(Object.size(chart[block_index].series) > count){

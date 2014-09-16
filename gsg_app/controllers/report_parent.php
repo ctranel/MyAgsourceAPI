@@ -645,18 +645,30 @@ abstract class parent_report extends CI_Controller {
 		$this->avg_row = $arr_this_block['avg_row'];
 		$this->bench_row = $arr_this_block['bench_row'];
 		$this->pivot_db_field = isset($arr_this_block['pivot_db_field']) ? $arr_this_block['pivot_db_field'] : NULL;
-		if($this->display == 'table' || $this->display == 'array') $this->load_table($arr_this_block, $report_count);
-		elseif($this->display == 'chart'){$this->load_chart($arr_this_block, $report_count);}
+		if($this->display == 'table' || $this->display == 'array'){
+			$this->load_table($arr_this_block, $report_count);
+		}
+		elseif($this->display == 'chart'){
+			$this->load_chart($arr_this_block, $report_count);
+		}
 	}
 	
-	protected function derive_series($arr_fields, $chart_type){
+	protected function derive_series($arr_fields, $chart_type, $arr_categories, $cnt_arr_datapoints){
 //as of 9/11/2014, in order to get labels correct, we need to change the header text in blocks_select_fields for the first {number of series'} fields
 //in order for this function to work correctly, the DB view must have all fields in one row, or have series' as columns and categories as row keys.
 		$return_val = array();
 		$c = 0;
 		$arr_chart_type = $this->{$this->primary_model}->get_chart_type_array();
 		$arr_axis_index = $this->{$this->primary_model}->get_axis_index_array();
-			
+
+		//allow for normalized or non-normalized data
+		if((int)($cnt_arr_datapoints / count($arr_fields)) === 1){
+			$num_series = count($arr_fields) / count($arr_categories);
+		}
+		else{
+			$num_series = count($arr_fields);
+		}
+		
 		foreach($arr_fields as $k=>$f){
 			//these 2 arrays need to have the same numeric index so that the yaxis# can be correctly assigned to series
 			$return_val[$c]['name'] = $k;
@@ -670,6 +682,9 @@ abstract class parent_report extends CI_Controller {
 				$return_val[$c]['type'] = $arr_chart_type[$f];
 			}
 			$c++;
+			if($c >= $num_series){
+				break;
+			}
 		}
 		return $return_val;
 	}
@@ -693,6 +708,10 @@ abstract class parent_report extends CI_Controller {
 		$this->json['description'] = $arr_this_block['description'];
 		$this->json['chart_type'] = $arr_this_block['chart_type'];
 
+		$this->json['arr_axes'] = $arr_axes;
+		$tmp_x_axis = current($this->json['arr_axes']['x']);
+		$tmp_categories = isset($tmp_x_axis['categories']) ? $tmp_x_axis['categories'] : null;
+		
 		$arr_pstring = $this->session->userdata('arr_pstring');
 		$this->json['herd_code'] = $this->session->userdata('herd_code');
 		if (!empty($arr_pstring) && count($arr_pstring) > 1){
@@ -700,10 +719,11 @@ abstract class parent_report extends CI_Controller {
 		}
 		$this->{$this->primary_model}->set_chart_fields($arr_this_block['id']);
 		$arr_fields = $this->{$this->primary_model}->get_fields();
-		if(is_array($arr_fields) && !empty($arr_fields)){
-			$this->json['series'] = $this->derive_series($arr_fields, $this->json['chart_type']);
-			$arr_fieldnames = $this->derive_field_array($arr_fields);
+		if(!is_array($arr_fields) || empty($arr_fields)){
+			return false;
 		}
+		$arr_fieldnames = $this->derive_field_array($arr_fields);
+
 		if(is_array($arr_axes['x'])){
 			foreach($arr_axes['x'] as $a){
 				$tmp_cat = isset($a['categories']) && !empty($a['categories']) ? $a['categories'] : NULL;
@@ -715,10 +735,8 @@ abstract class parent_report extends CI_Controller {
 				}
 			}
 		}
-		$this->json['arr_axes'] = $arr_axes;
-		$tmp_x_axis = current($this->json['arr_axes']['x']);
-		$tmp_categories = isset($tmp_x_axis['categories']) ? $tmp_x_axis['categories'] : null;
 		$this->json['data'] = $this->{$this->primary_model}->get_graph_data($arr_fieldnames, $this->session->userdata('herd_code'), $this->max_rows, $x_axis_date_field, $arr_this_block['url_segment'], $tmp_categories);
+		$this->json['series'] = $this->derive_series($arr_fields, $this->json['chart_type'], $tmp_categories, count($this->json['data'], COUNT_RECURSIVE));
 	}
 		
 	protected function load_table(&$arr_this_block, $report_count){

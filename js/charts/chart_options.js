@@ -160,6 +160,7 @@ function get_stacked_column_options(options_json){
 			'borderWidth': 0
 		}
 	};
+	options_json.legend.reversed = true;
 	return options_json;
 }
 
