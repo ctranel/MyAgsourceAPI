@@ -61,8 +61,8 @@ class Filters{
 	* -----------------------------------------------------------------
 	*/
 	public function displayFilters($is_summary){
-		$arr_display_filters = array_diff($this->arr_filters_list, array('pstring'));
-		$ret_val = count($arr_display_filters) > 0 || (count($this->arr_pstring) > 1 && !$is_summary);
+		$arr_display_filters = array_diff($this->arr_filters_list, array('pstring', 'breed'));
+		$ret_val = (count($arr_display_filters) > 0 || (count($this->arr_pstring) > 1) && !$is_summary);
 		return $ret_val;
 	}
 	
@@ -82,30 +82,41 @@ class Filters{
 	*  @throws: 
 	* -----------------------------------------------------------------
 	*/
-	public function set_filters($sess_herd_code, $sess_pstring, $recent_test_date, $filter_model, $sect_id, $page, $arr_params, $arr_pstring){
+	public function set_filters($sess_herd_code, $sess_pstring, $sess_breed, $recent_test_date, $filter_model, $sect_id, $page, $arr_params, $arr_pstring, $arr_breeds){
 		//get filters from DB for the current page, set other vars
 		$arr_page_filters = $filter_model->get_page_filters($sect_id, $page);
 		$this->arr_pstring = $arr_pstring;
+		$this->arr_breeds = $arr_breeds;
 		$this->arr_filters_list = array();
 
-		//always have filters for herd & pstring (and page?)
-		if(array_key_exists('pstring', $arr_page_filters) === FALSE){ //all queries need to specify pstring
-			$arr_page_filters['pstring'] = array('db_field_name' => 'pstring', 'name' => 'PString', 'type' => 'select multiple', 'default_value' => array(0));
-			//if pstring isn't set in filter form, set it to the session value
-			if(isset($arr_params['pstring']) === FALSE){
-				$arr_params['pstring'] = array($sess_pstring);
+		//always have filters for herd & pstring (and page?) - Answer: no; Currently only exception is genetic summary
+		
+		if($sect_id == 60){
+			if(array_key_exists('breed', $arr_page_filters) === FALSE) {
+				$arr_page_filters['breed'] = array('db_field_name' => 'breed', 'name' => 'Breed', 'type' => 'select multiple', 'default_value' => array(0));
+				if(isset($arr_params['breed']) === FALSE) {
+					$arr_params['breed'] = array($sess_breed);
+				}
 			}
-		}
-
+		} else {
+		
+			if(array_key_exists('pstring', $arr_page_filters) === FALSE){ //all queries need to specify pstring
+				$arr_page_filters['pstring'] = array('db_field_name' => 'pstring', 'name' => 'PString', 'type' => 'select multiple', 'default_value' => array(0));
+				//if pstring isn't set in filter form, set it to the session value
+				if(isset($arr_params['pstring']) === FALSE){
+					$arr_params['pstring'] = array($sess_pstring);
+				}
+			}
+		}		
 		//set default criteria as base
-		$this->setDefaultCriteria($sess_herd_code, $sess_pstring, $recent_test_date, $arr_page_filters);
-
+		$this->setDefaultCriteria($sess_herd_code, $sess_pstring, $sess_breed, $recent_test_date, $arr_page_filters);
+		
 		// if form was submitted, add/overwrite with form criteria
 		if (is_array($arr_params) && !empty($arr_params)) {
 			$this->setFilterFormCriteria($arr_page_filters, $arr_params);
 		}
 	}
-	
+
 	/* -----------------------------------------------------------------
 	*  setFilterFormCriteria() sets filter criteria based on filter form submission
 
@@ -180,7 +191,7 @@ class Filters{
 	*  @throws: 
 	* -----------------------------------------------------------------
 	*/
-	protected function setDefaultCriteria($sess_herd_code, $sess_pstring, $recent_test_date, $arr_page_filters){
+	protected function setDefaultCriteria($sess_herd_code, $sess_pstring, $sess_breed, $recent_test_date, $arr_page_filters){
 		if(!isset($arr_page_filters)){
 			return false;
 		}
@@ -189,6 +200,9 @@ class Filters{
 		foreach($arr_page_filters as $k=>$f){
 			if($f['db_field_name'] == 'pstring' && (!isset($f['default_value']) || empty($f['default_value']))){
 				$this->criteria['pstring'] = $sess_pstring;
+			}
+			elseif($f['db_field_name'] == 'breed' && (!isset($f['default_value']) || empty($f['default_value']))){
+				$this->criteria['breed'] = $sess_breed;
 			}
 			elseif($f['db_field_name'] == 'test_date' && $f['type'] != 'date range' && (!isset($f['default_value']) || empty($f['default_value']))){
 				$this->criteria['test_date'] = $recent_test_date;
@@ -272,14 +286,27 @@ class Filters{
 				if(is_array($v)) {
 					$pstring_text = '';
 					if(!empty($v)) {
-						foreach($v as $e){
-							$pstring_text .= $this->arr_pstring[$e]['publication_name'] . ', ';
+						foreach($v as $k1=>$v1){
+							$pstring_text .= $this->arr_pstring[$k1]['publication_name'] . ', ';
 						}
 						$pstring_text = substr($pstring_text, 0, -2);
 					}
 				}
 				else $pstring_text = $this->arr_pstring[$v]['publication_name'];
 				$arr_filter_text[] = 'PString: ' . $pstring_text;
+			}
+			elseif($k == 'breed') {
+				if(is_array($v)) {
+					$breed_text = '';
+					if(!empty($v)) {
+						foreach($v as $k1=>$v1){
+							$breed_text .= $this->arr_breeds[$k1]['breed_name'] . ', ';
+						}
+						$breed_text = substr($breed_text, 0, -2);
+					}
+				}
+				else $breed_text = $this->arr_breeds[$v]['breed_name'];
+				$arr_filter_text[] = 'Breed: ' . $breed_text;
 			}
 			elseif(is_array($v) && !empty($v)){
 				if(($tmp_key = array_search('NULL', $v)) !== FALSE) unset($v[$tmp_key]);
