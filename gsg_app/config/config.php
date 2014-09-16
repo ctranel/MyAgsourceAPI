@@ -292,13 +292,13 @@ $config['directory_trigger']	= 'd'; // experimental not currently in use
 	switch (ENVIRONMENT)
 	{
 		case 'development':
-			$config['log_path'] = '/var/www/myagsource/logs/';
+			$config['log_path'] = 'logs/';
 			break;
 		case 'localhost':
 			$config['log_path'] = 'C:\\MyAgSource\\logs\\';
 			break;
 		case 'testing':
-			$config['log_path'] = '/var/www/myagsource/logs/';
+			$config['log_path'] = 'logs/';
 			break;
 		case 'production':
 			$config['log_path'] = '/var/www/myagsource/logs/';
