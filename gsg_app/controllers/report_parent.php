@@ -30,6 +30,7 @@ abstract class parent_report extends CI_Controller {
 	protected $arr_sort_by = array();
 	protected $arr_sort_order = array();
 	protected $pstring;
+	protected $breed;
 	protected $herd_code;
 	protected $product_name;
 	protected $report_path;
@@ -67,7 +68,7 @@ abstract class parent_report extends CI_Controller {
 		$class = $this->router->fetch_class();
 		$method = $this->router->fetch_method();
 		$this->section_path = $class_dir . $class;
-
+		
 		$this->page = $this->router->fetch_method();
 		$this->report_path = $this->section_path . '/' . $this->page;
 		$this->primary_model = $this->page . '_model';
@@ -213,6 +214,22 @@ abstract class parent_report extends CI_Controller {
 			$this->session->set_userdata('pstring', $this->pstring);
 		}
 		
+		$class = $this->router->fetch_class();
+		
+		if ($class == 'genetic_summary') {
+			$this->breed = $this->session->userdata('breed');
+			if(!isset($this->breed) || empty($this->breed)){
+				$tmp_breed = $this->{$this->primary_model}->get_current_breed();
+				if(isset($tmp_breed)) {
+					$this->breed = $tmp_breed[0];
+					$this->session->set_userdata('breed', $this->breed);
+				} else {
+					echo 'No breed found for this herd';
+					die();
+				}
+			}
+		}
+		
 		//Get Tstrings from DB
 		$this->arr_tstring = $this->herd_model->get_tstring_array($this->session->userdata('herd_code'));
 		//get current element from array
@@ -245,12 +262,14 @@ abstract class parent_report extends CI_Controller {
 		$this->filters->set_filters(
 				$this->session->userdata('herd_code'),
 				$this->pstring,
+				$this->breed,
 				$recent_test_date,
 				$this->filter_model,
 				$this->section_id,
 				$this->page,
 				NULL, //filter form submissions never trigger a new page load (i.e., this function is never fired by a form submission)
-				$this->session->userdata('arr_pstring')
+				$this->session->userdata('arr_pstring'),
+				$this->session->userdata('arr_breeds')
 		);
 		$this->arr_filter_criteria = $this->filters->criteria();
 		//END FILTERS
@@ -459,15 +478,23 @@ abstract class parent_report extends CI_Controller {
 		$arr_nav_data = array(
 			//if I do not add this empty array, the array in the view somehow populated (should only be populated if code in bool_is_summary block below is executed)
 			'arr_pstring' => array(),
+			'arr_breeds' => array(),
 			'section_path' => $this->section_path,
 //			'benchmarks_id' => $this->arr_filter_criteria['benchmarks_id'],
 			'curr_page' => $this->page,
-			'arr_pages' => $this->web_content_model->get_pages_by_criteria(array('section_id' => $this->section_id))->result_array()
+			'arr_pages' => $this->web_content_model->get_pages_by_criteria(array('section_id' => $this->section_id))->result_array(),
+			'class' => $class
 		);
 		if($this->bool_is_summary && (substr($this->page,0,3)!= 'mun')){
-			$arr_nav_data['arr_pstring'] = $this->{$this->primary_model}->arr_pstring;
-			$arr_nav_data['pstring_selected'] = $this->arr_filter_criteria['pstring'][0];
-			$arr_nav_data['curr_pstring'] = $this->pstring;
+			if($class == 'genetic_summary') {
+				$arr_nav_data['arr_links'] = $this->{$this->primary_model}->arr_breeds;
+				$arr_nav_data['link_selected'] = $this->arr_filter_criteria['breed'][0];
+				$arr_nav_data['curr_base_filter'] = $this->breed;
+			} else {
+				$arr_nav_data['arr_links'] = $this->{$this->primary_model}->arr_pstring;
+				$arr_nav_data['link_selected'] = $this->arr_filter_criteria['pstring'][0];
+				$arr_nav_data['curr_base_filter'] = $this->pstring;
+			}
 		}
 		$this->page_footer_data = array();
 		$report_nav_path = 'report_nav';
@@ -502,7 +529,8 @@ abstract class parent_report extends CI_Controller {
 		if(isset($arr_benchmark_data)){
 			$data['benchmarks'] = $this->load->view('set_benchmarks', $arr_benchmark_data, TRUE);
 		}
-		if((is_array($arr_nav_data['arr_pages']) && count($arr_nav_data['arr_pages']) > 1) || (isset($arr_nav_data['arr_pstring']) && is_array($arr_nav_data['arr_pstring']) && count($arr_nav_data['arr_pstring']) > 1)){
+		if((is_array($arr_nav_data['arr_pages']) && count($arr_nav_data['arr_pages']) > 1) || 
+				(isset($arr_nav_data['arr_links']) && is_array($arr_nav_data['arr_links']) && count($arr_nav_data['arr_links']) > 1)) {
 			$data['report_nav'] = $this->load->view($report_nav_path, $arr_nav_data, TRUE);
 		}
 		
@@ -547,12 +575,14 @@ abstract class parent_report extends CI_Controller {
 			$this->filters->set_filters(
 					$this->session->userdata('herd_code'),
 					$this->pstring,
+					$this->breed,
 					$recent_test_date,
 					$this->filter_model,
 					$this->section_id,
 					$page,
 					$arr_params,
-					$this->session->userdata('arr_pstring')
+					$this->session->userdata('arr_pstring'),
+					$this->session->userdata('arr_breeds')
 			);
 			$this->arr_filter_criteria = $this->filters->criteria();
 		}
