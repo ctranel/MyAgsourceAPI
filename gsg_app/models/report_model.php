@@ -107,7 +107,7 @@ class Report_model extends CI_Model {
 		return current($this->arr_pstring);
 	}
 	
-	function get_current_breed(){
+	function get_current_breed_code(){
 		return current($this->arr_breeds);
 	}
 	
@@ -609,8 +609,6 @@ class Report_model extends CI_Model {
 			if($block_url == 'dim_at_1st_breeding' && substr($k,-7)=='pstring' && $v==0){
 				continue;
 			}
-				
-						
 			
 			if(empty($v) === FALSE || $v === '0'){
 				if(is_array($v)){
