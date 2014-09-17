@@ -152,16 +152,18 @@
 	function post_render(app_data){
 		if(typeof(chart) != 'undefined' && app_data['block'] == 'peak_milk_trends'){
 			chart[app_data['graph_order']].addSeries({
-					type: 'spline',
-					color: chart[app_data['graph_order']].series[0].color,
-					marker: {enabled:false},
-					name: '1st Lact Trend',
-					data: (function() {return fitData(chart[app_data['graph_order']].series[0].data).data;})()
+				type: 'spline',
+				color: chart[app_data['graph_order']].series[0].color,
+				marker: {enabled:false},
+				enableMouseTracking: false,
+				name: '1st Lact Trend',
+				data: (function() {return fitData(chart[app_data['graph_order']].series[0].data).data;})()
 			});
 			chart[app_data['graph_order']].addSeries({
 				type: 'spline',
 				color: chart[app_data['graph_order']].series[1].color,
 				marker: {enabled:false},
+				enableMouseTracking: false,
 				name: '2+ Lact Trend',
 				data: (function() {return fitData(chart[app_data['graph_order']].series[1].data).data;})()
 			});

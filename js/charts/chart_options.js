@@ -152,12 +152,12 @@ function get_line_options(options_json){
 
 function get_scatter_options(options_json){
 	options_json.chart.type = 'scatter';
-	options_json.plotOptions.scatter = {
+/*	options_json.plotOptions.scatter = {
         dataLabels: {
             enabled: true,
             align: 'right',
             color: '#AA4643'
         }
-    };
+    };*/
 	return options_json;
 }
