@@ -61,7 +61,7 @@ class Filters{
 	* -----------------------------------------------------------------
 	*/
 	public function displayFilters($is_summary){
-		$arr_display_filters = array_diff($this->arr_filters_list, array('pstring', 'breed'));
+		$arr_display_filters = array_diff($this->arr_filters_list, array('pstring', 'breed_code'));
 		$ret_val = (count($arr_display_filters) > 0 || (count($this->arr_pstring) > 1) && !$is_summary);
 		return $ret_val;
 	}
@@ -82,20 +82,18 @@ class Filters{
 	*  @throws: 
 	* -----------------------------------------------------------------
 	*/
-	public function set_filters($sess_herd_code, $sess_pstring, $sess_breed, $recent_test_date, $filter_model, $sect_id, $page, $arr_params, $arr_pstring, $arr_breeds){
+	public function set_filters($sess_herd_code, $sess_pstring, $sess_breed_code, $recent_test_date, $filter_model, $sect_id, $page, $arr_params, $arr_pstring, $arr_breeds){
 		//get filters from DB for the current page, set other vars
 		$arr_page_filters = $filter_model->get_page_filters($sect_id, $page);
 		$this->arr_pstring = $arr_pstring;
 		$this->arr_breeds = $arr_breeds;
 		$this->arr_filters_list = array();
-
 		//always have filters for herd & pstring (and page?) - Answer: no; Currently only exception is genetic summary
-		
 		if($sect_id == 60){
-			if(array_key_exists('breed', $arr_page_filters) === FALSE) {
-				$arr_page_filters['breed'] = array('db_field_name' => 'breed', 'name' => 'Breed', 'type' => 'select multiple', 'default_value' => array(0));
-				if(isset($arr_params['breed']) === FALSE) {
-					$arr_params['breed'] = array($sess_breed);
+			if(array_key_exists('breed_code', $arr_page_filters) === FALSE) {
+				$arr_page_filters['breed_code'] = array('db_field_name' => 'breed_code', 'name' => 'Breed', 'type' => 'select multiple', 'default_value' => array('HO'));
+				if(isset($arr_params['breed_code']) === FALSE) {
+					$arr_params['breed_code'] = array($sess_breed_code);
 				}
 			}
 		} else {
@@ -109,7 +107,7 @@ class Filters{
 			}
 		}		
 		//set default criteria as base
-		$this->setDefaultCriteria($sess_herd_code, $sess_pstring, $sess_breed, $recent_test_date, $arr_page_filters);
+		$this->setDefaultCriteria($sess_herd_code, $sess_pstring, $sess_breed_code, $recent_test_date, $arr_page_filters);
 		
 		// if form was submitted, add/overwrite with form criteria
 		if (is_array($arr_params) && !empty($arr_params)) {
@@ -161,7 +159,7 @@ class Filters{
 					$arr_params[$k] = array_flatten($arr_params[$k]);
 					$this->criteria[$k] = $arr_params[$k];
 				}
-				if(!$this->criteria[$k] && $k != 'pstring') {
+				if(!$this->criteria[$k] && $k != 'pstring' && $k != 'breed_code') {
 					$this->criteria[$k] = array();
 				}
 				elseif(isset($arr_params[$k])) $this->criteria[$k] = $arr_params[$k];
@@ -191,18 +189,18 @@ class Filters{
 	*  @throws: 
 	* -----------------------------------------------------------------
 	*/
-	protected function setDefaultCriteria($sess_herd_code, $sess_pstring, $sess_breed, $recent_test_date, $arr_page_filters){
+	protected function setDefaultCriteria($sess_herd_code, $sess_pstring, $sess_breed_code, $recent_test_date, $arr_page_filters){
 		if(!isset($arr_page_filters)){
 			return false;
 		}
-		
+
 		$this->criteria['herd_code'] = $sess_herd_code;
 		foreach($arr_page_filters as $k=>$f){
 			if($f['db_field_name'] == 'pstring' && (!isset($f['default_value']) || empty($f['default_value']))){
 				$this->criteria['pstring'] = $sess_pstring;
 			}
-			elseif($f['db_field_name'] == 'breed' && (!isset($f['default_value']) || empty($f['default_value']))){
-				$this->criteria['breed'] = $sess_breed;
+			elseif($f['db_field_name'] == 'breed_code' && (!isset($f['default_value']) || empty($f['default_value']))){
+				$this->criteria['breed_code'] = $sess_breed_code;
 			}
 			elseif($f['db_field_name'] == 'test_date' && $f['type'] != 'date range' && (!isset($f['default_value']) || empty($f['default_value']))){
 				$this->criteria['test_date'] = $recent_test_date;
@@ -295,7 +293,7 @@ class Filters{
 				else $pstring_text = $this->arr_pstring[$v]['publication_name'];
 				$arr_filter_text[] = 'PString: ' . $pstring_text;
 			}
-			elseif($k == 'breed') {
+			elseif($k == 'breed_code') {
 				if(is_array($v)) {
 					$breed_text = '';
 					if(!empty($v)) {
