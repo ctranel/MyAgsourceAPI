@@ -321,7 +321,7 @@ class Change_herd extends CI_Controller {
 		$this->session->set_userdata('arr_pstring', $this->herd_model->get_pstring_array($this->herd->getHerdCode()));
 		$arr_breeds = $this->herd_model->get_breed_array($this->herd->getHerdCode());
 		$this->session->set_userdata('arr_breeds', $arr_breeds);
-		$this->session->set_userdata('breed', $arr_breeds[0]['breed_code']);
+		$this->session->set_userdata('breed_code', $arr_breeds[0]['breed_code']);
 		$this->session->set_userdata('herd_enroll_status_id', $herd_enroll_status_id);
 		$this->session->set_userdata('recent_test_date', $this->herd->getRecentTest());
 		//load new benchmarks
