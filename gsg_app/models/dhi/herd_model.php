@@ -350,6 +350,24 @@ class Herd_model extends CI_Model {
 		return $arr_results;
 	}
 	
+	/**
+	 * get_breed_array
+	 * @param string herd code
+	 * @return array (tstring) - using vma_genetic_summary_breeds
+	 * 			FUTURE?: Reports requiring historical tstrings will need to use milking_times table.
+	 * @author Kevin Marshall
+	 **/
+	public function get_breed_array($herd_code) {
+		$breed_db = $this->load->database('default', TRUE);
+		$breed_db->distinct();
+		$arr_results = $breed_db->select('breed_code, breed_name')
+		->where('herd_code', $herd_code)
+		->order_by('breed_code', 'asc')
+		->get('vma.dbo.vma_Genetic_Summary_Breeds')
+		->result_array();
+	
+		return $arr_results;
+	}
 
 	/**
 	 * herd_is_registered
