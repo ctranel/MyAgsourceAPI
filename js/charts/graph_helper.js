@@ -110,6 +110,7 @@ function load_chart(server_path, div_id, block_index, params){
 function process_chart(div_id, data_in){
 	block_index = div_id.charAt( div_id.length-1 );
 	var options = global_options;
+
 	var um = undefined;
 	options = get_chart_options(options, data_in.chart_type);
 	options.title = {"text": data_in.description};
@@ -157,10 +158,8 @@ function process_chart(div_id, data_in){
 				options.xAxis[cnt].labels.formatter = getAxisLabelFormat(options.xAxis[cnt].type);
 				cnt++;
 			}
-			if(Object.size(options.xAxis) <= 1){
-				var tmp = options.xAxis[0];
-				options.xAxis = tmp;
-				//delete options.xAxis[0];
+			if(typeof(options.xAxis[0]) !== 'undefined' && typeof(options.xAxis[1]) === 'undefined'){
+				options.xAxis = options.xAxis[0];
 			}
 		}
 		else{
@@ -200,9 +199,8 @@ function process_chart(div_id, data_in){
 				options.yAxis[cnt].labels.formatter = getAxisLabelFormat(options.yAxis[cnt].type);
 				cnt++;
 			}
-			if(Object.size(options.yAxis) <= 1){
+			if(typeof(options.yAxis[0]) !== 'undefined' && typeof(options.yAxis[1]) === 'undefined'){
 				options.yAxis = options.yAxis[0];
-				delete options.yAxis[0];
 			}
 		}
 		else{
