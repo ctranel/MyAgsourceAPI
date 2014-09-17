@@ -37,6 +37,20 @@
 						echo form_fieldset_close();
 					endif;
 					break;
+				case 'breed_code':
+					$arr_breeds = $this->session->userdata('arr_breeds');
+					if(!empty($arr_breeds) && count($arr_breeds) > 1):
+						echo form_fieldset('Breed', array('id' => 'pages_fieldset'));
+							$top=count($arr_breeds);
+							for( $c=0; $c < $top; $c++): ?>
+								<span class="breed-filter-item checkbox">
+									<?php echo form_checkbox('breed_code[]', $arr_breeds[$c]['breed_code'], in_array($arr_breeds[$c]['breed_code'], $filter_selected['breed_code']) !== FALSE);
+									echo $arr_breeds[$c]['breed_code']; ?>
+								</span>
+							<?php endfor;
+						echo form_fieldset_close();
+					endif;
+					break;
 				case 'decision_guide_qtile_num': ?>
 						<?php echo form_fieldset('Quartile', array('id' => 'quartile-fieldset')); ?>
 						<span class="checkbox">
