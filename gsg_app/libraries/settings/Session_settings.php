@@ -97,7 +97,7 @@ class Session_settings {
 	*  @throws: 
 	* -----------------------------------------------------------------
 	*/
-	public function getSettingKeyValues($session_values) {
+	public function getSettingKeyValues($session_values = null) {
 		if(!isset($this->arr_settings)){
 			return false;//$this->loadSettings();
 		}
