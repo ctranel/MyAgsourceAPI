@@ -773,7 +773,7 @@ abstract class parent_report extends CI_Controller {
 				}
 			}
 		}
-		$this->json['data'] = $this->{$this->primary_model}->get_graph_data($arr_fieldnames, $this->session->userdata('herd_code'), $this->max_rows, $x_axis_date_field, $arr_this_block['url_segment'], $tmp_categories);
+		$this->json['data'] = $this->{$this->primary_model}->get_graph_data($arr_fieldnames, $this->arr_filter_criteria, $this->max_rows, $x_axis_date_field, $arr_this_block['url_segment'], $tmp_categories);
 		$this->json['series'] = $this->derive_series($arr_fields, $this->json['chart_type'], $tmp_categories, count($this->json['data'], COUNT_RECURSIVE));
 	}
 		
