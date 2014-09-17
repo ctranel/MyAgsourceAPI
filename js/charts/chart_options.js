@@ -31,10 +31,7 @@ var global_options = {
 	},
 	xAxis: [{
 		gridLineColor : '#c0c0c0',
-		type: 'datetime',
-		//categories: null
-			//tickInterval: 7 * 24 * 3600 * 1000, // one week
-			//formatter: function() { return Highcharts.dateFormat('%A, %b %e, %Y', this.value); }
+		categories: null
 	}],
 	yAxis: [{
 		allowDecimals: false,
@@ -45,64 +42,8 @@ var global_options = {
 		borderRadius: 5,
 		borderWidth: 1
 	},
-	tooltip : {
-		formatter : function(){
-			//return this.y;
-			//return this.y + ["th","st","nd","rd"][!(this.y%10>3||Math.floor(this.y%100/10)==1)*this.y%10] + ' Percentile';
-		}
-	},
-	plotOptions: {
-		boxplot: {
-			grouping: false,
-			whiskerWidth: 0,
-            pointWidth: 8,
-            lineWidth: 8,
-            medianColor: null
-		},
-		area: {
-			marker: { 
-				enabled: false
-			},
-			stacking: 'normal'
-		},
-		column: {
-			stacking: 'normal'
-		},
-		series: {
-			cursor: 'pointer',
-            shadow: false
-		},
-        bar: {
-            dataLabels: {
-               enabled: true,
-               align: 'right',
-               color: '#C0C0C0',
-               //formatter:function(){
-               //     return this.point.value;   
-               //}
-            }
-        },
-        scatter: {
-            dataLabels: {
-                enabled: true,
-                align: 'right',
-                color: '#AA4643',
-                //formatter:function(){
-                //     return this.point.val;   
-                //}
-            }
-        },
-        spline: {
-            dataLabels: {
-    			color: '#c0c0c0'
-			}
-        },
-        line: {
-            dataLabels: {
-    			color: '#c0c0c0'
-			}
-        }
-	},
+	tooltip : {},
+	plotOptions: {},
     series: [{
     }]
 	// SET MORE THEME-RELATED VARIABLES (COLOR, ETC)?
@@ -143,22 +84,21 @@ function get_chart_options(options_json, chart_type){
 
 function get_stacked_area_options(options_json){
 	options_json.chart.type = 'area';
-	options_json.plotOptions = {
-		'column':{
-			'stacking': 'normal',
-		}
+	options_json.plotOptions.area = {
+		marker: { 
+			enabled: false
+		},
+		stacking: 'normal'
 	};
 	return options_json;
 }
 
 function get_stacked_column_options(options_json){
 	options_json.chart.type = 'column';
-	options_json.plotOptions = {
-		'column':{
-			'stacking': 'normal',
-			'shadow': false,
-			'borderWidth': 0
-		}
+	options_json.plotOptions.column = {
+		'stacking': 'normal',
+		'shadow': false,
+		'borderWidth': 0
 	};
 	options_json.legend.reversed = true;
 	return options_json;
@@ -166,18 +106,23 @@ function get_stacked_column_options(options_json){
 
 function get_column_options(options_json){
 	options_json.chart.type = 'column';
-	options_json.plotOptions = {
-		'column':{
-			'stacking': null,
-			'shadow': false,
-			'borderWidth': 0
-		}
+	options_json.plotOptions.column = {
+		'stacking': null,
+		'shadow': false,
+		'borderWidth': 0
 	};
 	return options_json;
 }
 
 function get_bar_options(options_json){
 	options_json.chart.type = 'bar';
+	options_json.plotOptions.bar = {
+        dataLabels: {
+            enabled: true,
+            align: 'right',
+            color: '#C0C0C0'
+         }
+     };
 	options_json.xAxis.type = 'linear';
 	//options_json.xAxis.categories = [];
 	return options_json;
@@ -185,15 +130,34 @@ function get_bar_options(options_json){
 
 function get_boxplot_options(options_json){
 	options_json.chart.type = 'boxplot';
+	options_json.plotOptions.boxplot = {
+		grouping: false,
+		whiskerWidth: 0,
+        pointWidth: 8,
+        lineWidth: 8,
+        medianColor: null
+	};
 	return options_json;
 }
 
 function get_line_options(options_json){
 	options_json.chart.type = 'line';
+	options_json.plotOptions.line = {
+        dataLabels: {
+			color: '#c0c0c0'
+		}
+    };
 	return options_json;
 }
 
 function get_scatter_options(options_json){
 	options_json.chart.type = 'scatter';
+/*	options_json.plotOptions.scatter = {
+        dataLabels: {
+            enabled: true,
+            align: 'right',
+            color: '#AA4643'
+        }
+    };*/
 	return options_json;
 }
