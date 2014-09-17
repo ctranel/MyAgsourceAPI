@@ -960,8 +960,8 @@ class Report_model extends CI_Model {
 	 * @access public
 	 *
 	 **/
-	function get_graph_data($arr_fieldname, $herd_code, $num_dates, $date_field, $block_url, $arr_categories = NULL){
-		$data = $this->get_graph_dataset($herd_code, $num_dates, $date_field, $block_url);
+	function get_graph_data($arr_fieldname, $arr_filters, $num_dates, $date_field, $block_url, $arr_categories = NULL){
+		$data = $this->get_graph_dataset($arr_filters, $num_dates, $date_field, $block_url);
 		if(isset($arr_categories) && is_array($arr_categories)){
 			$return_val = $this->set_row_to_series($data, $arr_fieldname, $arr_categories);
 		}
@@ -980,15 +980,12 @@ class Report_model extends CI_Model {
 	 * @access public
 	 *
 	 **/
-	function get_graph_dataset($herd_code, $num_dates, $date_field, $block_url){
+	function get_graph_dataset($arr_filters, $num_dates, $date_field, $block_url){
 		if(isset($date_field) && isset($num_dates)){
-			$from_date = $this->get_start_date($date_field, $num_dates, 'MM-dd-yyyy');
-			$arr_to_date = $this->get_recent_dates($date_field, 1, 'MM-dd-yyyy');
-			$data = $this->search($herd_code, $block_url, array('herd_code'=>$herd_code, 'pstring'=>$this->session->userdata('pstring'), $date_field . '_dbfrom' => $from_date, $date_field . '_dbto' => $arr_to_date[0]), array($date_field . ''), array('ASC'), $num_dates);
+			$arr_filters[$date_field . '_dbfrom'] = $this->get_start_date($date_field, $num_dates, 'MM-dd-yyyy');
+			$arr_filters[$date_field . '_dbto'] = $this->get_recent_dates($date_field, 1, 'MM-dd-yyyy');
 		}
-		else{
-			$data = $this->search($herd_code, $block_url, array('herd_code'=>$herd_code, 'pstring'=>$this->session->userdata('pstring')), array($date_field), array('ASC'), $num_dates);
-		}
+		$data = $this->search($arr_filters['herd_code'], $block_url, $arr_filters, array($date_field), array('ASC'), $num_dates);
 		return $data;
 	}
 	
