@@ -30,7 +30,7 @@ abstract class parent_report extends CI_Controller {
 	protected $arr_sort_by = array();
 	protected $arr_sort_order = array();
 	protected $pstring;
-	protected $breed;
+	protected $breed_code;
 	protected $herd_code;
 	protected $product_name;
 	protected $report_path;
@@ -217,12 +217,12 @@ abstract class parent_report extends CI_Controller {
 		$class = $this->router->fetch_class();
 		
 		if ($class == 'genetic_summary') {
-			$this->breed = $this->session->userdata('breed');
-			if(!isset($this->breed) || empty($this->breed)){
-				$tmp_breed = $this->{$this->primary_model}->get_current_breed();
-				if(isset($tmp_breed)) {
-					$this->breed = $tmp_breed[0];
-					$this->session->set_userdata('breed', $this->breed);
+			$this->breed_code = $this->session->userdata('breed_code');
+			if(!isset($this->breed_code) || empty($this->breed_code)){
+				$tmp_breed_code = $this->{$this->primary_model}->get_current_breed_code();
+				if(isset($tmp_breed_code)) {
+					$this->breed_code = $tmp_breed_code;
+					$this->session->set_userdata('breed_code', $this->breed_code);
 				} else {
 					echo 'No breed found for this herd';
 					die();
@@ -262,7 +262,7 @@ abstract class parent_report extends CI_Controller {
 		$this->filters->set_filters(
 				$this->session->userdata('herd_code'),
 				$this->pstring,
-				$this->breed,
+				$this->breed_code,
 				$recent_test_date,
 				$this->filter_model,
 				$this->section_id,
@@ -510,8 +510,8 @@ abstract class parent_report extends CI_Controller {
 		if($this->bool_is_summary && (substr($this->page,0,3)!= 'mun')){
 			if($class == 'genetic_summary') {
 				$arr_nav_data['arr_links'] = $this->{$this->primary_model}->arr_breeds;
-				$arr_nav_data['link_selected'] = $this->arr_filter_criteria['breed'][0];
-				$arr_nav_data['curr_base_filter'] = $this->breed;
+				$arr_nav_data['link_selected'] = $this->arr_filter_criteria['breed_code'][0];
+				$arr_nav_data['curr_base_filter'] = $this->breed_code;
 			} else {
 				$arr_nav_data['arr_links'] = $this->{$this->primary_model}->arr_pstring;
 				$arr_nav_data['link_selected'] = $this->arr_filter_criteria['pstring'][0];
@@ -586,6 +586,14 @@ abstract class parent_report extends CI_Controller {
 			else{
 				$this->pstring = $this->session->userdata('pstring');
 			}
+			
+			if(isset($arr_params['breed_code']) && (!empty($arr_params['breed_code'][0]))){
+				$this->breed_code = $arr_params['breed_code'][0];
+				$this->session->set_userdata('breed_code', $this->breed_code);
+			} else {
+				$this->breed_code = $this->session->userdata('breed_code');
+			}
+			
 			//prep data for filter library
 			$this->load->model('filter_model');
 			
@@ -597,7 +605,7 @@ abstract class parent_report extends CI_Controller {
 			$this->filters->set_filters(
 					$this->session->userdata('herd_code'),
 					$this->pstring,
-					$this->breed,
+					$this->breed_code,
 					$recent_test_date,
 					$this->filter_model,
 					$this->section_id,
