@@ -3,7 +3,7 @@
 //var var_arr_graph_colors = ['#F15928', '#585C5F', '#08A04A', '#006C70', '#98E8F9']; //dpn?
 //var var_arr_graph_colors = ['#00838C', '#939E77', '#B03500', '#BA91A8', '#97C4A4']; 
 //var var_arr_graph_colors = ['#D54C18', '#48495B', '#264071', '#9CA294'];
-var var_arr_graph_colors = ['#E4B577', '#75C4E4', '#B6B6A5', '#E07F8D', '#97C4A4']; 
+var var_arr_graph_colors = ['#E4B577', '#75C4E4', '#B6B6A5', '#E07F8D', '#97C4A4', '#EF5C29']; 
 
 //get current base url--used only on this page
 if (!window.location.origin) window.location.origin = window.location.protocol+"//"+window.location.host;
@@ -21,7 +21,7 @@ var global_options = {
 			fontWeight: 'bold'
 		}
 	},
-	colors: [var_arr_graph_colors[0], var_arr_graph_colors[1], var_arr_graph_colors[2], var_arr_graph_colors[3], var_arr_graph_colors[4]],
+	colors: [var_arr_graph_colors[0], var_arr_graph_colors[1], var_arr_graph_colors[2], var_arr_graph_colors[3], var_arr_graph_colors[4], var_arr_graph_colors[5]],
 	credits: {
 		href: window.location.origin + '/' + server_path + '/index.php',
 		text: '© AgSource Cooperative Services'
@@ -31,7 +31,8 @@ var global_options = {
 	},
 	xAxis: [{
 		gridLineColor : '#c0c0c0',
-		categories: null
+		categories: null,
+		type: 'datetime'
 	}],
 	yAxis: [{
 		allowDecimals: false,

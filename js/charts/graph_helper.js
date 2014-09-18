@@ -103,8 +103,17 @@ function load_chart(server_path, div_id, block_index, params){
 	
 	$('#chart-container' + block_index).hide();
 	$('#waiting-icon' + block_index).show();
-	$.get(server_path, '', function(data) { process_chart(div_id, data); })
-		.fail(function(jqXHR, textStatus, errorThrown){console.log(errorThrown);});
+	
+	$.ajax({
+		type: 'GET',
+		url: server_path,
+		dataType: 'json',
+		async: false,
+		success: function(data) { process_chart(div_id, data); },
+		error: function(jqXHR, textStatus, errorThrown){console.log(errorThrown);}
+	});
+/*	$.get(server_path, '', function(data) { process_chart(div_id, data); })
+		.fail(function(jqXHR, textStatus, errorThrown){console.log(errorThrown);}); */
 }
 
 function process_chart(div_id, data_in){
@@ -251,8 +260,7 @@ function process_chart(div_id, data_in){
 			if(typeof pre_render == 'function'){
 				options = pre_render(options, section_data);
 			}
-console.log(JSON.stringify(options));		
-
+console.log(JSON.stringify(options));
 			chart[block_index] = new Highcharts.Chart(options);
 			while(chart[block_index].series.length > count){//(Object.size(chart[block_index].series) > count){
 				chart[block_index].series[count].remove(true);
@@ -362,4 +370,11 @@ function dump(arr,level) {
 	 dumped_text = "===>"+arr+"<===("+typeof(arr)+")";
 	}
 	return dumped_text;
+}
+
+function sleep(miliseconds) {
+    var currentTime = new Date().getTime();
+
+    while (currentTime + miliseconds >= new Date().getTime()) {
+    }
 }

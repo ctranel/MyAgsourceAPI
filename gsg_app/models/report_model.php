@@ -813,7 +813,9 @@ class Report_model extends CI_Model {
 			->where('pstring', $this->session->userdata('pstring'))
 			->where($date_field . ' IS NOT NULL')
 			->order_by($this->primary_table_name . '.' . $date_field, 'desc');
-		if(isset($num_dates) && !empty($num_dates)) $this->{$this->db_group_name}->limit($num_dates);		
+		if(isset($num_dates) && !empty($num_dates)){
+			$this->db->limit($num_dates);		
+		}
 		$result = $this->db->get($this->primary_table_name)->result_array();
 		if(is_array($result) && !empty($result)){
 			return array_flatten($result);
@@ -983,7 +985,7 @@ class Report_model extends CI_Model {
 	function get_graph_dataset($arr_filters, $num_dates, $date_field, $block_url){
 		if(isset($date_field) && isset($num_dates)){
 			$arr_filters[$date_field . '_dbfrom'] = $this->get_start_date($date_field, $num_dates, 'MM-dd-yyyy');
-			$arr_filters[$date_field . '_dbto'] = $this->get_recent_dates($date_field, 1, 'MM-dd-yyyy');
+			$arr_filters[$date_field . '_dbto'] = $this->get_recent_dates($date_field, 1, 'MM-dd-yyyy')[0];
 		}
 		$data = $this->search($arr_filters['herd_code'], $block_url, $arr_filters, array($date_field), array('ASC'), $num_dates);
 		return $data;
