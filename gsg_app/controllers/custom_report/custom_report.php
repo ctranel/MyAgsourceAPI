@@ -147,7 +147,6 @@ class Custom_report extends CI_Controller {
 				die();
 			}
 			else { //display the custom report form
-die('controller');
 				$this->page_header_data['message'] = compose_error(validation_errors());
 				$obj_user = $this->ion_auth_model->user($this->session->userdata('user_id'))->row();
 				$this->data['form_attr'] = array('id'=>'rep-build');
