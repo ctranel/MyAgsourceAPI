@@ -603,11 +603,16 @@ class Report_model extends CI_Model {
 				$k = isset($this->arr_field_table[$k]) && !empty($this->arr_field_table[$k])?$this->arr_field_table[$k] . '.' . $k: $this->primary_table_name . '.' . $k;
 			}
 
-			if($block_url == 'peak_milk_trends' && substr($k,-7)=='pstring' && $v==0){
-				continue;
-			}
-			if($block_url == 'dim_at_1st_breeding' && substr($k,-7)=='pstring' && $v==0){
-				continue;
+			if(($block_url == 'peak_milk_trends' || $block_url == 'dim_at_1st_breeding') && substr($k,-7)=='pstring'){
+				if(is_array($v)){
+					$tmp = array_filter($v);
+					if(empty($tmp)){
+						continue;
+					}
+				}
+				elseif($v == 0){
+					continue;
+				}
 			}
 			
 			if(empty($v) === FALSE || $v === '0'){

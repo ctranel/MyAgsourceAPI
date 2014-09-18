@@ -145,12 +145,17 @@
 		if(typeof options_in.yAxis[1] != 'undefined'){
 			options_in.yAxis[1].title.style.color = var_arr_graph_colors[1];
 		}
+		
+		if(section_data['block'] == 'peak_milk_trends'){
+			
+		}
+			
 		return options_in;
 	}
 	
 	//this function is called in the graph_helper.js file after the JSON data file has loaded.  It can make report specific updates after the data has been loaded (see commented code for example)
 	function post_render(app_data){
-		if(typeof(chart) != 'undefined' && app_data['block'] == 'peak_milk_trends'){
+		if(typeof(chart[app_data['graph_order']]) != 'undefined' && app_data['block'] == 'peak_milk_trendsz'){
 			chart[app_data['graph_order']].addSeries({
 				type: 'spline',
 				color: chart[app_data['graph_order']].series[0].color,
