@@ -167,9 +167,6 @@ function process_chart(div_id, data_in){
 				options.xAxis[cnt].labels.formatter = getAxisLabelFormat(options.xAxis[cnt].type);
 				cnt++;
 			}
-			if(typeof(options.xAxis[0]) !== 'undefined' && typeof(options.xAxis[1]) === 'undefined'){
-				options.xAxis = options.xAxis[0];
-			}
 		}
 		else{
 			alert("No x axis data");
@@ -207,9 +204,6 @@ function process_chart(div_id, data_in){
 				}
 				options.yAxis[cnt].labels.formatter = getAxisLabelFormat(options.yAxis[cnt].type);
 				cnt++;
-			}
-			if(typeof(options.yAxis[0]) !== 'undefined' && typeof(options.yAxis[1]) === 'undefined'){
-				options.yAxis = options.yAxis[0];
 			}
 		}
 		else{
