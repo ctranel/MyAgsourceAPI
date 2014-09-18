@@ -254,7 +254,7 @@ function process_chart(div_id, data_in){
 			if(typeof pre_render == 'function'){
 				options = pre_render(options, section_data);
 			}
-console.log(JSON.stringify(options));
+//console.log(JSON.stringify(options));
 			chart[block_index] = new Highcharts.Chart(options);
 			while(chart[block_index].series.length > count){//(Object.size(chart[block_index].series) > count){
 				chart[block_index].series[count].remove(true);
