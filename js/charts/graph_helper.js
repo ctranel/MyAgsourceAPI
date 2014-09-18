@@ -104,16 +104,8 @@ function load_chart(server_path, div_id, block_index, params){
 	$('#chart-container' + block_index).hide();
 	$('#waiting-icon' + block_index).show();
 	
-	$.ajax({
-		type: 'GET',
-		url: server_path,
-		dataType: 'json',
-		async: false,
-		success: function(data) { process_chart(div_id, data); },
-		error: function(jqXHR, textStatus, errorThrown){console.log(errorThrown);}
-	});
-/*	$.get(server_path, '', function(data) { process_chart(div_id, data); })
-		.fail(function(jqXHR, textStatus, errorThrown){console.log(errorThrown);}); */
+	$.get(server_path, '', function(data) { process_chart(div_id, data); })
+		.fail(function(jqXHR, textStatus, errorThrown){console.log(errorThrown);});
 }
 
 function process_chart(div_id, data_in){
@@ -341,6 +333,8 @@ function getTooltipFormat(chart_type, xaxis_type, um){
 	}
 }
 
+
+//debugging functions
 function dump(arr,level) {
 	var dumped_text = "";
 	if(!level) level = 0;
@@ -364,11 +358,4 @@ function dump(arr,level) {
 	 dumped_text = "===>"+arr+"<===("+typeof(arr)+")";
 	}
 	return dumped_text;
-}
-
-function sleep(miliseconds) {
-    var currentTime = new Date().getTime();
-
-    while (currentTime + miliseconds >= new Date().getTime()) {
-    }
 }
