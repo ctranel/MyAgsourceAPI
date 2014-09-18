@@ -35,7 +35,7 @@ var global_options = {
 		type: 'datetime'
 	}],
 	yAxis: [{
-		allowDecimals: false,
+		allowDecimals: true,
 		type: 'linear'
 	}],
 	legend : {

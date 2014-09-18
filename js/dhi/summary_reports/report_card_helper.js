@@ -20,7 +20,7 @@
 	            dataLabels: {
 	               enabled: true,
 	               align: 'right',
-	               x: -8,
+	               x: -2,
 	               y: 0,
 	               color: '#303030',
 	               formatter:function(){return this.point.val;}
@@ -32,10 +32,9 @@
 	            	overflow: "none",
 	                enabled: true,
 	                align: 'right',
-	                y: -4,//28,
-	                x: 0,
-	                color: '#EF5C29',
-	                formatter:function(){return this.point.val;}
+	                y: -5,//28,
+	                color: '#D75325',
+	                formatter:function(){return this.point.val.toString();}
 	            }
 	        },
 
