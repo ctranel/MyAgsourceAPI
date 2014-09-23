@@ -26,11 +26,11 @@ class Fresh_cow_summary extends parent_report {
 		parent::display($block_in, $display_format);
 	 }
 	 
-	 protected function derive_series($arr_fields, $chart_type){
+	 protected function derive_series($arr_fields, $chart_type, $arr_categories, $cnt_arr_datapoints){
 	 	//@todo: move modified version of this into main object for chart type = boxplot
 	 	
 	 	if($chart_type !== 'boxplot'){
-	 		return parent::derive_series($arr_fields, $chart_type);
+	 		return parent::derive_series($arr_fields, $chart_type, $arr_categories, $cnt_arr_datapoints);
 	 	}
 		$return_val = array();
 	 	$c = 0;
