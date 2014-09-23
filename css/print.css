@@ -14,3 +14,5 @@ a[href]:after {content: none !important;}
 #datafield-popup{display:none;}
 #report-links{display:none;}
 h2.block{font-size: 16px;}
+
+.table-container, .chart-container {page-break-inside:avoid;}
