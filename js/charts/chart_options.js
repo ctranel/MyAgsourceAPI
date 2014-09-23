@@ -41,7 +41,8 @@ var global_options = {
 	legend : {
 		margin: 0,
 		borderRadius: 5,
-		borderWidth: 1
+		borderWidth: 1,
+		reversed: false
 	},
 	tooltip : {},
 	plotOptions: {},
