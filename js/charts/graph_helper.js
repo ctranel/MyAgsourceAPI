@@ -174,7 +174,7 @@ function process_chart(div_id, data_in){
 				if(typeof(options.yAxis[cnt]) === 'undefined'){
 					options.yAxis[cnt] = {};
 				}
-				if(data_in.chart_type != 'bar' && data_in.arr_axes.y[x].opposite === true){
+				if(data_in.chart_type != 'bar' && data_in.arr_axes.y[x].opposite == true){
 					options.yAxis[cnt].opposite = true;
 				}
 				if(typeof(data_in.arr_axes.y[x].text) != 'undefined'){
@@ -246,7 +246,7 @@ function process_chart(div_id, data_in){
 			if(typeof pre_render == 'function'){
 				options = pre_render(options, section_data);
 			}
-//console.log(JSON.stringify(options));
+console.log(JSON.stringify(options));
 			chart[block_index] = new Highcharts.Chart(options);
 			while(chart[block_index].series.length > count){//(Object.size(chart[block_index].series) > count){
 				chart[block_index].series[count].remove(true);
