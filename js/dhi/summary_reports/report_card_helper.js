@@ -38,9 +38,6 @@
 	            }
 	        },
 
-			options_in.yAxis.min = 0;
-			options_in.yAxis.categories = null;
-			options_in.yAxis.max = 100;
 			options_in.yAxis.tickInterval = 10;
 			options_in.yAxis.plotLines = [
 			    {color:'#ff0000',width:4,value:20},
@@ -51,9 +48,6 @@
 			    {color:'rgba(100,204,100,.1)',from:80,to:100}
 			];
 		}
-		//remove odd/even classes so that charts do not appear side-by-side
-//		$('.chart-container').each(function(){
-//			$(this).addClass('chart-only').removeClass('chart-odd').removeClass('chart-even').removeClass('chart-last-odd');
-//		});
+
 		return options_in;
 	}
