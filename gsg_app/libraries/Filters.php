@@ -298,7 +298,9 @@ class Filters{
 					$breed_text = '';
 					if(!empty($v)) {
 						foreach($v as $k1=>$v1){
-							$breed_text .= $this->arr_breeds[$k1]['breed_name'] . ', ';
+							if(isset($this->arr_breeds[$k1]) && !empty($this->arr_breeds[$k1])){
+								$breed_text .= $this->arr_breeds[$k1]['breed_name'] . ', ';
+							}
 						}
 						$breed_text = substr($breed_text, 0, -2);
 					}
