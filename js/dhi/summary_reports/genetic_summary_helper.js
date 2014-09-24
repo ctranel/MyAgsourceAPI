@@ -9,10 +9,19 @@
 		if(pstring_index > 0){
 			options_in.subtitle.text = options_in.subtitle.text.substring(0,pstring_index);
 		}
-		if(section_data['block'] == ''){
-			if(typeof(options_in.xAxis[0].label) === 'undefined'){
-				options_in.xAxis[0].label = {};
-			}
+		if(typeof(options_in.xAxis[0].label) === 'undefined'){
+			options_in.xAxis[0].label = {};
+		}
+
+		if( section_data['block'] == 'inbreeding_trend' ||
+			section_data['block'] == 'net_merit' ||
+			section_data['block'] == 'cheese_merit' ||
+			section_data['block'] == 'scs' ||
+			section_data['block'] == 'dpr' ||
+			section_data['block'] == 'prod_life'
+		){
+			options_in.xAxis[0].labels.formatter = function(){return Highcharts.dateFormat('%Y', this.value);};
+		} else {	
 			options_in.xAxis[0].labels.formatter = function(){return Highcharts.dateFormat('%b %Y', this.value);};
 		}
 		return options_in;
