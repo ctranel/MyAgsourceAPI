@@ -13,7 +13,9 @@ class Prototypes extends parent_report {
 	}
 
 	function index($block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
-	 	redirect(site_url('dhi/site/prototypes/benchmarks'));
+		$redirect_url = set_redirect_url($this->uri->uri_string(), $this->session->flashdata('redirect_url'), $this->as_ion_auth->referrer);
+		$this->session->set_flashdata('redirect_url', $redirect_url);
+		redirect(site_url('dhi/site/prototypes/benchmarks'));
 	}
 	function benchmarks($block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
 	 	$this->product_name = 'Benchmarks Prototype';

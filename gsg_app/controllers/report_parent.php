@@ -87,6 +87,7 @@ abstract class parent_report extends CI_Controller {
 		else {
 			$block = '';
 		}
+		//Load the most specific model that exists
 		if(file_exists(APPPATH . 'models' . FS_SEP . $this->section_path . FS_SEP . $block . '_model.php')){
 			$this->primary_model = $block. '_model';
 			$this->load->model($this->section_path . '/' . $this->primary_model, '', FALSE, $this->section_path);
@@ -224,7 +225,7 @@ abstract class parent_report extends CI_Controller {
 					$this->session->set_userdata('breed_code', $this->breed_code);
 				} else {
 					$this->session->set_flashdata('message', 'No breed found for this herd.');
-					redirect(site_url($this->as_ion_auth->referrer));			
+					redirect(site_url($this->session->flashdata('redirect_url')));			
 				}
 			}
 		}
@@ -362,7 +363,6 @@ abstract class parent_report extends CI_Controller {
 			$prev_display_type = '';
 			$cnt = count($arr_blocks);
 			foreach($arr_blocks as $c => $pb){
-//die(var_dump($pb));
 				if($pb['bench_row'] === 1){
 					$has_benchmarks = true;
 				}
@@ -385,17 +385,13 @@ abstract class parent_report extends CI_Controller {
 					//manage display details
 					$next_pb = next($arr_blocks);
 					$next_display_type = $next_pb['display_type'];
-//echo $display . '-' . $prev_display_type . '-' . $next_pb['display_type'] . "<br>";
 					if($display === 'chart' && $next_pb['display_type'] !== 'chart' && $prev_display_type !== 'chart'){
-//die('shouldnt be herre');
 						$odd_even = 'chart-only';
 					}
 					else{
-//echo $consec_charts % 2;
 						if($consec_charts % 2 == 1) $odd_even = 'chart-even';
 						elseif($consec_charts == ($cnt - 1)) $odd_even = 'chart-last-odd';
 						else $odd_even = 'chart-odd';
-//echo $odd_even;
 					}
 					//set up next iteration
 					$prev_display_type = $pb['display_type'];
@@ -460,7 +456,7 @@ abstract class parent_report extends CI_Controller {
 				array(
 					'title'=>$this->product_name . ' - ' . $this->config->item('site_title'),
 					'description'=>$this->product_name . ' - ' . $this->config->item('site_title'),
-					'message' => $this->{$this->primary_model}->arr_messages,
+					'message' => array($this->session->flashdata('message')) + $this->{$this->primary_model}->arr_messages,
 					'section_nav' => $this->load->view('section_nav', $arr_sec_nav_data, TRUE),
 					'page_heading' => $this->product_name . " for Herd " . $this->herd_code,
 					'arr_head_line' => array(

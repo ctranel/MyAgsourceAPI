@@ -13,6 +13,8 @@ class Herd_summary extends parent_report {
 	}
 
 	 function index($block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
+		$redirect_url = set_redirect_url($this->uri->uri_string(), $this->session->flashdata('redirect_url'), $this->as_ion_auth->referrer);
+		$this->session->set_flashdata('redirect_url', $redirect_url);
 	 	redirect(site_url('dhi/summary_reports/herd_summary/hs_prod'));
 	 }
 	function hs_prod($block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){

@@ -25,7 +25,9 @@ class Supplemental extends CI_Controller {
 	}
 	
     function index(){
-		$msg = 'Direct access to this page is not allowed.';
+		$redirect_url = set_redirect_url($this->uri->uri_string(), $this->session->flashdata('redirect_url'), $this->as_ion_auth->referrer);
+		$this->session->set_flashdata('redirect_url', $redirect_url);
+    	$msg = 'Direct access to this page is not allowed.';
 		$this->load->view('dhi/genetics/quartiles', array('msg'=>$msg));
     }
 
