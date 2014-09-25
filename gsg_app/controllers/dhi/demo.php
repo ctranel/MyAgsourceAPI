@@ -45,6 +45,8 @@ class Demo extends CI_Controller {
 		$this->session->set_userdata('herd_code', $this->herd->getHerdCode());
 		$this->session->set_userdata('pstring', 0);
 		$this->session->set_userdata('arr_pstring', $this->herd_model->get_pstring_array($this->herd->getHerdCode()));
+		$this->session->set_userdata('breed_code', 'HO');
+		$this->session->set_userdata('arr_breeds', $this->herd_model->get_breed_array($this->herd->getHerdCode()));
 		$this->session->set_userdata('herd_enroll_status_id', 4);//hard-code sample herd id, was: $this->herd->getHerdEnrollStatus(), $this->config->item('product_report_code'));
 		$this->session->set_userdata('recent_test_date', $this->herd->getRecentTest());
 		//load new benchmarks
