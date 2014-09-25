@@ -67,7 +67,7 @@ if(ENVIRONMENT == 'production'){
 		$db['default']['dbdriver'] = 'mssql';
 		$db['default']['dbprefix'] = "";
 		$db['default']['pconnect'] = FALSE;
-		$db['default']['db_debug'] = TRUE;
+		$db['default']['db_debug'] = FALSE;
 		$db['default']['cache_on'] = TRUE;
 		$db['default']['cachedir'] = "";
 		$db['default']['char_set'] = 'windows-1252';
@@ -83,7 +83,7 @@ if(ENVIRONMENT == 'production'){
 		$db['vma']['dbdriver'] = 'mssql';
 		$db['vma']['dbprefix'] = "";
 		$db['vma']['pconnect'] = FALSE;
-		$db['vma']['db_debug'] = TRUE;
+		$db['vma']['db_debug'] = FALSE;
 		$db['vma']['cache_on'] = TRUE;
 		$db['vma']['cachedir'] = "";
 		$db['vma']['char_set'] = 'windows-1252';
