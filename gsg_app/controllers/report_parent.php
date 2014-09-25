@@ -215,7 +215,6 @@ abstract class parent_report extends CI_Controller {
 		}
 		
 		$class = $this->router->fetch_class();
-		
 		if ($class == 'genetic_summary') {
 			$this->breed_code = $this->session->userdata('breed_code');
 			if(!isset($this->breed_code) || empty($this->breed_code)){
@@ -224,8 +223,8 @@ abstract class parent_report extends CI_Controller {
 					$this->breed_code = $tmp_breed_code;
 					$this->session->set_userdata('breed_code', $this->breed_code);
 				} else {
-					echo 'No breed found for this herd';
-					die();
+					$this->session->set_flashdata('message', 'No breed found for this herd.');
+					redirect(site_url($this->as_ion_auth->referrer));			
 				}
 			}
 		}
