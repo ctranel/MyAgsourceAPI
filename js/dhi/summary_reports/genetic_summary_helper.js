@@ -6,7 +6,9 @@
 		}
 		
 		if( section_data['block'] == 'pta_pl_dpr'){
-			options_in.yAxis[1].title.style.color = var_arr_graph_colors[1];
+			options_in.colors = ['#FF9168', '#FFB295', '#75C4E4', '#ACDCEF', '#E07F8D', '#97C4A4'];
+			options_in.yAxis[0].title.style.color = options_in.colors[0];
+			options_in.yAxis[1].title.style.color = options_in.colors[2];
 		}
 		
 		var pstring_index = options_in.subtitle.text.indexOf('Pstring');
@@ -25,7 +27,22 @@
 			section_data['block'] == 'prod_life'
 		){
 			options_in.xAxis[0].labels.formatter = function(){return Highcharts.dateFormat('%Y', this.value);};
-		} else {	
+		} else if(section_data['block'] == 'cow_cheese_merit' ||
+				section_data['block'] == 'cow_net_merit' ||
+				section_data['block'] == 'cow_pta_dpr' ||
+				section_data['block'] == 'cow_pta_fatpro' ||
+				section_data['block'] == 'cow_pta_fatpro_pct' ||
+				section_data['block'] == 'cow_pta_milk' ||
+				section_data['block'] == 'cow_pta_pl' ||
+				section_data['block'] == 'cow_pta_scs' ||
+				section_data['block'] == 'pta_cm' ||
+				section_data['block'] == 'pta_pl_dpr' ||
+				section_data['block'] == 'sire_nm' ||
+				section_data['block'] == 'sire_pta_fp_lbs' ||
+				section_data['block'] == 'sire_pta_fp_pct' ||
+				section_data['block'] == 'sire_pta_milk' ||
+				section_data['block'] == 'sire_pta_scs'
+			) {	
 			options_in.xAxis[0].labels.formatter = function(){return Highcharts.dateFormat('%b %Y', this.value);};
 		}
 		return options_in;
