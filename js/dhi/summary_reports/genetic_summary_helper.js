@@ -5,6 +5,10 @@
 			options_in.yAxis[1].title.style.color = var_arr_graph_colors[1];
 		}
 		
+		if( section_data['block'] == 'pta_pl_dpr'){
+			options_in.yAxis[1].title.style.color = var_arr_graph_colors[1];
+		}
+		
 		var pstring_index = options_in.subtitle.text.indexOf('Pstring');
 		if(pstring_index > 0){
 			options_in.subtitle.text = options_in.subtitle.text.substring(0,pstring_index);

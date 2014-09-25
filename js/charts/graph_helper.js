@@ -149,9 +149,11 @@ function process_chart(div_id, data_in){
 						options.xAxis[cnt].labels = {"rotation": -35};//, "align": 'left', "x": -50, "y": 55};
 					}
 					else{
+						options.xAxis[cnt].labels = {};
 //						options.xAxis[cnt].labels = {"rotation": -35, "y": 25};
 					}
 				}
+				
 				options.xAxis[cnt].labels.formatter = getAxisLabelFormat(options.xAxis[cnt].type);
 				//set x axis label
 				if(typeof(options.xAxis[cnt].labels) === 'undefined'){
