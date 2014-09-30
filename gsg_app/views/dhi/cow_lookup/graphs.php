@@ -18,94 +18,103 @@ endif; ?>
 </div>
 
 <script type="text/javascript">
-$('#graph-canvas0').highcharts({
-	chart: {
-		type: 'line'
-	},
-	tooltip: {
-		formatter: function() {
+var options = global_options;
+
+$('.chart-container').css('width', '560px');
+
+options = get_chart_options(options, 'line');
+options.tooltip = {
+		'formatter': function() {
 			return 'DIM =<b>'+ this.x +'</b>  : '+ this.point.series.name + '= <b>' + this.y;
 		}
-	},
-	subtitle: {
-		text: 'Lactation <?php if(isset($lact_num)) echo $lact_num; ?>'
-	},
-	title: {
-		useHTML: false,
-		text: 'Name = <?php if(isset($barn_name)) echo $barn_name; ?>'
-	},
-	yAxis: [
+	};
+options.title = {
+		'useHTML': false,
+		'text': 'Name = <?php if(isset($barn_name)) echo $barn_name; ?>'
+	};
+options.subtitle = {
+		'text': 'Lactation <?php if(isset($lact_num)) echo $lact_num; ?>'
+	};
+options.yAxis = [
 		{
-			title: {
-				text: 'Lbs Milk'
+			'title': {
+				'text': 'Lbs Milk'
 			}
 		},{
-			title: {
-				text: 'Lab Units'
+			'title': {
+				'text': 'Lab Units'
 			},
-			opposite: true
+			'opposite': true
 		}, {
-			title: {
-				text: 'SCC'
+			'title': {
+				'text': 'SCC'
 			},
-			opposite: true
+			'opposite': true
 		}
-	],
-	xAxis: {
-		title: {
-			text: 'Days in Milk',
-			type: 'linear'
+	];
+options.xAxis = {
+		'title': {
+			'text': 'Days in Milk',
+			'type': 'linear'
+		},
+		'labels': {
+			'formatter': function(){return this.value;}
 		}
-	},
-	series: [
-		{
-			name: 'Milk lbs',
-			yAxis: 0,
-			data: <?php echo json_encode($arr_tests['td_milk_lbs']); ?>
-		},{
-			name: 'Fat Corrected Milk',
-			yAxis: 0,
-			data: <?php echo json_encode($arr_tests['fcm_lbs']); ?>
-		},{
-			name: 'Energy Corrected Milk',
-			yAxis: 0,
-			data: <?php echo json_encode($arr_tests['ecm_lbs']); ?>
-		},{
-			name: 'Management Milk',
-			yAxis: 0,
-			data: <?php echo json_encode($arr_tests['mlm_lbs']); ?>
-		},{
-			name: 'Linear SCC',
-			yAxis: 1,
-			data: <?php echo json_encode($arr_tests['linear_score']); ?>
-		},{
-			name: '%Protein',
-			yAxis: 1,
-			data: <?php echo json_encode($arr_tests['pro_pct']); ?>
-		},{
-			name: '% Fat',
-			yAxis: 1,
-			data: <?php echo json_encode($arr_tests['fat_pct']); ?>
-		},{
-			name: 'SNF',
-			yAxis: 1,
-			data: <?php echo json_encode($arr_tests['snf_pct']); ?>
-		},{
-			name: 'MUN',
-			yAxis: 1,
-			data: <?php echo json_encode($arr_tests['mun']); ?>
-		},{
-			name: 'Raw SCC',
-			yAxis: 2,
-			data: <?php echo json_encode($arr_tests['scc_cnt']); ?>
-		}
-	]
-});
+	};
 
+options.series = [
+		{
+			'name': 'Milk lbs',
+			'yAxis': 0,
+			'data': <?php echo json_encode($arr_tests['td_milk_lbs']); ?>
+		},{
+			'name': 'Fat Corrected Milk',
+			'yAxis': 0,
+			'data': <?php echo json_encode($arr_tests['fcm_lbs']); ?>
+		},{
+			'name': 'Energy Corrected Milk',
+			'yAxis': 0,
+			'data': <?php echo json_encode($arr_tests['ecm_lbs']); ?>
+		},{
+			'name': 'Management Milk',
+			'yAxis': 0,
+			'data': <?php echo json_encode($arr_tests['mlm_lbs']); ?>
+		},{
+			'name': 'Linear SCC',
+			'yAxis': 1,
+			'data': <?php echo json_encode($arr_tests['linear_score']); ?>
+		},{
+			'name': '%Protein',
+			'yAxis': 1,
+			'data': <?php echo json_encode($arr_tests['pro_pct']); ?>
+		},{
+			'name': '% Fat',
+			'yAxis': 1,
+			'data': <?php echo json_encode($arr_tests['fat_pct']); ?>
+		},{
+			'name': 'SNF',
+			'yAxis': 1,
+			'data': <?php echo json_encode($arr_tests['snf_pct']); ?>
+		},{
+			'name': 'MUN',
+			'yAxis': 1,
+			'data': <?php echo json_encode($arr_tests['mun']); ?>
+		},{
+			'name': 'Raw SCC',
+			'yAxis': 2,
+			'data': <?php echo json_encode($arr_tests['scc_cnt']); ?>
+		}
+	];
+
+$('#graph-canvas0').highcharts(options);
 var chart = $('#graph-canvas0').highcharts();
-for (i =1;i < 9;i++){
-	if ( chart.series[i].visible)  chart.series[i].hide()
+for (var i =1;i < 9;i++){
+	if ( chart.series[i].visible){
+		chart.series[i].hide();
+	}
 }
+
+$('.chart-container').show();
 </script>
 <script type="text/javascript">
 $(function() {
