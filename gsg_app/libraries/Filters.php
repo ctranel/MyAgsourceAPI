@@ -82,7 +82,7 @@ class Filters{
 	*  @throws: 
 	* -----------------------------------------------------------------
 	*/
-	public function set_filters($sess_herd_code, $sess_pstring, $sess_breed_code, $recent_test_date, $filter_model, $sect_id, $page, $arr_params, $arr_pstring, $arr_breeds){
+	public function set_filters($sess_herd_code, $sess_pstring, $sess_breed_code, $recent_test_date, $filter_model, $sect_id, $page, $arr_params){
 		//get filters from DB for the current page, set other vars
 		$arr_page_filters = $filter_model->get_page_filters($sect_id, $page);
 		$this->arr_pstring = $arr_pstring;

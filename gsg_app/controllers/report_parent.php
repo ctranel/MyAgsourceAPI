@@ -523,7 +523,7 @@ abstract class parent_report extends CI_Controller {
 		}
 		$report_filter_path = 'filters';
 		if(file_exists(APPPATH . 'views' . FS_SEP . $this->section_path . FS_SEP . 'filters.php')){
-			$report_filter_path =  $this->section_path . '/' . $report_filter_path;
+			$report_filter_path =  $this->section_path . '/filters' . $report_filter_path;
 		}
 		$data = array(
 			'page_header' => $this->load->view('page_header', $this->page_header_data, TRUE),
@@ -538,7 +538,6 @@ abstract class parent_report extends CI_Controller {
 		$arr_filter_data = array(
 			'arr_filters' => $this->filters->filter_list(),
 			'filter_selected' => $this->arr_filter_criteria,
-			'arr_pstring' => $this->session->userdata('arr_pstring'),
 		);
 		if(isset($arr_filter_data)){
 			$data['filters'] = $this->load->view($report_filter_path, $arr_filter_data, TRUE);
