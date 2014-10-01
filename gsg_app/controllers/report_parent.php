@@ -1,13 +1,14 @@
 <?php
 //namespace myagsource;
 require_once APPPATH . 'libraries' . FS_SEP . 'db_objects' . FS_SEP . 'db_table.php';
-require_once(APPPATH . 'libraries' . FS_SEP . 'Filters.php');
+require_once(APPPATH . 'libraries' . FS_SEP . 'filters' . FS_SEP . 'Filters.php');
 require_once(APPPATH . 'libraries' . FS_SEP . 'benchmarks_lib.php');
 require_once(APPPATH . 'libraries' . FS_SEP . 'access_log.php');
 
 use \myagsource\db_objects\db_table;
 use \myagsource\settings\Benchmarks_lib;
 use \myagsource\Access_log;
+use \myagsource\report_filters\Filters;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
@@ -257,7 +258,7 @@ abstract class parent_report extends CI_Controller {
 		//FILTERS
 		//load required libraries
 		$this->load->model('filter_model');
-		$this->filters = new myagsource\Filters();
+		$this->filters = new myagsource\report_filters\Filters();
 		$recent_test_date = isset($primary_table) ? $this->{$this->primary_model}->get_recent_dates() : NULL;
 		$this->filters->set_filters(
 				$this->session->userdata('herd_code'),
@@ -592,7 +593,7 @@ abstract class parent_report extends CI_Controller {
 			$this->load->model('filter_model');
 			
 			//load required libraries
-			$this->filters = new myagsource\Filters();
+			$this->filters = new Filters();
 			$primary_table = $this->{$this->primary_model}->get_primary_table_name();
 			$recent_test_date = isset($primary_table) ? $this->{$this->primary_model}->get_recent_dates() : NULL;
 			$this->load->helper('multid_array_helper');
