@@ -1,5 +1,9 @@
+//shameless hack to temporarily fix issue with filter form being displayed
+$('#filters').hide();
 	//this function is called in the graph_helper.js file after the JSON data file has loaded.  It can make report specific updates after the data has been loaded (see commented code for example)
 	function pre_render(options_in, section_data){
+		
+		
 		if(typeof(section_data) !== 'undefined'){
 			if(typeof(section_data['block']) !== 'undefined'){
 				//$('#block-links > ul > li > a').css('text-decoration', 'none');
