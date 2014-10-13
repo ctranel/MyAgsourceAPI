@@ -26,7 +26,6 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 abstract class parent_report extends CI_Controller {
 	protected $section_id;
 	protected $report_form_id;
-	protected $arr_filter_criteria = array(); //data for filtering results, the db_field_name key value of $this->arr_page_filters is a key for this array
 	protected $log_filter_text;
 	protected $arr_sort_by = array();
 	protected $arr_sort_order = array();
@@ -209,7 +208,7 @@ abstract class parent_report extends CI_Controller {
 	}
 
 	function display($arr_block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
-		$this->pstring = $this->session->userdata('pstring');
+/*		$this->pstring = $this->session->userdata('pstring');
 		if(!isset($this->pstring) || empty($this->pstring)){
 			$tmp = $this->{$this->primary_model}->get_current_pstring();
 			$this->pstring = isset($tmp) && isset($tmp['pstring']) ? $tmp['pstring'] . '' : '0';
@@ -230,7 +229,6 @@ abstract class parent_report extends CI_Controller {
 				}
 			}
 		}
-		
 		//Get Tstrings from DB
 		$this->arr_tstring = $this->herd_model->get_tstring_array($this->session->userdata('herd_code'));
 		//get current element from array
@@ -240,6 +238,7 @@ abstract class parent_report extends CI_Controller {
 			$this->tstring = array(0);
 		}
 		$this->session->set_userdata('tstring', $this->tstring);
+*/		
 				
 		//Create block info as array in arr_block_in if not an array
 		if(isset($arr_block_in) && !empty($arr_block_in) && !is_array($arr_block_in)) $arr_block_in = array($arr_block_in);
@@ -258,21 +257,17 @@ abstract class parent_report extends CI_Controller {
 		//FILTERS
 		//load required libraries
 		$this->load->model('filter_model');
-		$this->filters = new myagsource\report_filters\Filters();
+		$this->filters = new Filters($this->filter_model);
 		$recent_test_date = isset($primary_table) ? $this->{$this->primary_model}->get_recent_dates() : NULL;
 		$this->filters->set_filters(
-				$this->session->userdata('herd_code'),
-				$this->pstring,
-				$this->breed_code,
-				$recent_test_date,
-				$this->filter_model,
 				$this->section_id,
 				$this->page,
-				NULL, //filter form submissions never trigger a new page load (i.e., this function is never fired by a form submission)
-				$this->session->userdata('arr_pstring'),
-				$this->session->userdata('arr_breeds')
+				array(
+					'herd_code' =>	$this->session->userdata('herd_code'),
+//					'pstring' => $this->session->userdata('pstring'),
+//					'breed_code' => $this->session->userdata('breed_code')
+				) //filter form submissions never trigger a new page load (i.e., this function is never fired by a form submission)
 		);
-		$this->arr_filter_criteria = $this->filters->criteria();
 		//END FILTERS
 		if ($display_format == 'csv'){
 			$data = array();
@@ -494,26 +489,14 @@ abstract class parent_report extends CI_Controller {
 		$this->benchmarks_lib = new Benchmarks_lib($this->session->userdata('user_id'), $this->input->post('herd_code'), $this->herd_model->header_info($this->herd_code), $this->setting_model);
 		$arr_benchmark_data = $this->benchmarks_lib->getFormData($this->session->userdata('benchmarks')); 
 		$arr_nav_data = array(
-			//if I do not add this empty array, the array in the view somehow populated (should only be populated if code in bool_is_summary block below is executed)
-			'arr_pstring' => array(),
-			'arr_breeds' => array(),
+//if I do not add this empty array, the array in the view somehow populated (should only be populated if code in bool_is_summary block below is executed)
+//			'arr_pstring' => array(),
+//			'arr_breeds' => array(),
 			'section_path' => $this->section_path,
-//			'benchmarks_id' => $this->arr_filter_criteria['benchmarks_id'],
 			'curr_page' => $this->page,
 			'arr_pages' => $this->web_content_model->get_pages_by_criteria(array('section_id' => $this->section_id))->result_array(),
-			'class' => $class
+//			'class' => $class
 		);
-		if($this->bool_is_summary && (substr($this->page,0,3)!= 'mun')){
-			if($class == 'genetic_summary') {
-				$arr_nav_data['arr_links'] = $this->{$this->primary_model}->arr_breeds;
-				$arr_nav_data['link_selected'] = $this->arr_filter_criteria['breed_code'][0];
-				$arr_nav_data['curr_base_filter'] = $this->breed_code;
-			} else {
-				$arr_nav_data['arr_links'] = $this->{$this->primary_model}->arr_pstring;
-				$arr_nav_data['link_selected'] = $this->arr_filter_criteria['pstring'][0];
-				$arr_nav_data['curr_base_filter'] = $this->pstring;
-			}
-		}
 		$this->page_footer_data = array();
 		$report_nav_path = 'report_nav';
 		if(file_exists(APPPATH . 'views' . FS_SEP . $this->section_path . FS_SEP . 'report_nav.php')){
@@ -537,8 +520,8 @@ abstract class parent_report extends CI_Controller {
 		);
 		
 		$arr_filter_data = array(
-			'arr_filters' => $this->filters->filter_list(),
-			'filter_selected' => $this->arr_filter_criteria,
+			//'arr_filters' => $this->filters->filter_list(),
+			'arr_filters' => $this->filters->toArray(),
 		);
 		if(isset($arr_filter_data)){
 			$data['filters'] = $this->load->view($report_filter_path, $arr_filter_data, TRUE);
@@ -573,7 +556,7 @@ abstract class parent_report extends CI_Controller {
 			$arr_params = (array)json_decode(urldecode($json_filter_data));
 			if(isset($arr_params['csrf_test_name']) && $arr_params['csrf_test_name'] != $this->security->get_csrf_hash()) die("I don't recognize your browser session, your session may have expired, or you may have cookies turned off.");
 			unset($arr_params['csrf_test_name']);
-			//ASSUMING ONLY ONE PSTRING WILL BE SELECTED FOR NOW
+			/*ASSUMING ONLY ONE PSTRING WILL BE SELECTED FOR NOW
 			if(isset($arr_params['pstring']) && (!empty($arr_params['pstring'][0]) || $arr_params['pstring'][0] === '0')){
 				$this->pstring = $arr_params['pstring'][0];
 				$this->session->set_userdata('pstring', $this->pstring);
@@ -588,28 +571,20 @@ abstract class parent_report extends CI_Controller {
 			} else {
 				$this->breed_code = $this->session->userdata('breed_code');
 			}
-			
+			*/
 			//prep data for filter library
 			$this->load->model('filter_model');
-			
 			//load required libraries
-			$this->filters = new Filters();
+			$this->filters = new Filters($this->filter_model);
 			$primary_table = $this->{$this->primary_model}->get_primary_table_name();
 			$recent_test_date = isset($primary_table) ? $this->{$this->primary_model}->get_recent_dates() : NULL;
 			$this->load->helper('multid_array_helper');
 			$this->filters->set_filters(
-					$this->session->userdata('herd_code'),
-					$this->pstring,
-					$this->breed_code,
-					$recent_test_date,
-					$this->filter_model,
 					$this->section_id,
 					$page,
-					$arr_params,
-					$this->session->userdata('arr_pstring'),
-					$this->session->userdata('arr_breeds')
+					$arr_params + array('herd_code' => $this->session->userdata('herd_code'))
 			);
-			$this->arr_filter_criteria = $this->filters->criteria();
+//var_dump($arr_params, $this->filters->toArray());			
 		}
 		$this->load->helper('report_chart_helper');
 		if($sort_by != 'null' && $sort_order != 'null') {
@@ -768,7 +743,7 @@ abstract class parent_report extends CI_Controller {
 				}
 			}
 		}
-		$this->json['data'] = $this->{$this->primary_model}->get_graph_data($arr_fieldnames, $this->arr_filter_criteria, $this->max_rows, $x_axis_date_field, $arr_this_block['url_segment'], $tmp_categories);
+		$this->json['data'] = $this->{$this->primary_model}->get_graph_data($arr_fieldnames, $this->filters->criteriaKeyValue(), $this->max_rows, $x_axis_date_field, $arr_this_block['url_segment'], $tmp_categories);
 		$this->json['series'] = $this->derive_series($arr_fields, $this->json['chart_type'], $tmp_categories, count($this->json['data'], COUNT_RECURSIVE));
 	}
 		
@@ -777,7 +752,7 @@ abstract class parent_report extends CI_Controller {
 		$subtitle = 'Herd ' . $this->session->userdata('herd_code');
 		$this->{$this->primary_model}->populate_field_meta_arrays($arr_this_block['id']);
 		$arr_field_list = $this->{$this->primary_model}->get_fieldlist_array();
-		$results = $this->{$this->primary_model}->search($this->session->userdata('herd_code'), $arr_this_block['url_segment'], $this->arr_filter_criteria, $this->arr_sort_by, $this->arr_sort_order, $this->max_rows);
+		$results = $this->{$this->primary_model}->search($this->session->userdata('herd_code'), $arr_this_block['url_segment'], $this->filters->criteriaKeyValue(), $this->arr_sort_by, $this->arr_sort_order, $this->max_rows);
 		if($this->bench_row){
 		//if the data is pivoted, set the pivoted field as the row header, else use the first non-pstring column
 			$row_head_field = NULL;

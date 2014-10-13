@@ -11,10 +11,10 @@
 		 foreach($arr_filters as $f):
 		 	if(strpos($f['type'], 'select multiple') !== false):
 				if(!empty($f['options']) && count($f['options']) > 1):
-					echo form_fieldset($f['name'], array('id' => $f['field_name'] . '-fieldset'));
+					echo form_fieldset($f['label'], array('id' => $f['field_name'] . '-fieldset'));
 						foreach($f['options'] as $o): ?>
 							<span class= "filter-item checkbox">
-								<?php echo form_checkbox($f['field_name'] . '[]', $o['value'], in_array($o['value'], $f['selected_values']) !== FALSE);
+								<?php echo form_checkbox($f['field_name'] . '[]', $o['value'], in_array($o['value'], $f['arr_selected_values']) !== FALSE);
 								echo $o['label']; ?>
 							</span>
 						<?php endforeach;
@@ -22,10 +22,10 @@
 				endif;
 			elseif(strpos($f['type'], 'select') !== false):
 				if(!empty($f['options']) && count($f['options']) > 1):
-					echo form_fieldset($f['name'], array('id' => $f['field_name'] . '-fieldset'));
+					echo form_fieldset($f['label'], array('id' => $f['field_name'] . '-fieldset'));
 						foreach($f['options'] as $o): ?>
 							<span class= "filter-item checkbox">
-								<?php echo form_radio($f['field_name'], $o['value'], in_array($o['value'], $f['selected_values']) !== FALSE);
+								<?php echo form_radio($f['field_name'], $o['value'], in_array($o['value'], $f['arr_selected_values']) !== FALSE);
 								echo $o['label']; ?>
 							</span>
 						<?php endforeach;
@@ -33,16 +33,16 @@
 				endif;
 			elseif(strpos($f['type'], 'date range') !== false):
 				if(!empty($f['options']) && count($f['options']) > 1):
-					echo form_fieldset($f['name'], array('id' => $f['field_name'] . '-fieldset')); ?>
-						Between <?php echo form_input(array('name'=>$f['field_name'] . '_dbfrom', 'value'=>$filter_selected[$f['field_name'] . '_dbfrom'], 'size'=>'10','maxlength'=>'10', 'id'=>'datepickfrom')) ?>
-						and <?php echo form_input(array('name'=>$f['field_name'] . '_dbto', 'value'=>$filter_selected[$f['field_name'] . '_dbto'], 'size'=>'10', 'maxlength'=>'10', 'id'=>'datepickto'));
+					echo form_fieldset($f['label'], array('id' => $f['field_name'] . '-fieldset')); ?>
+						Between <?php echo form_input(array('name'=>$f['field_name'] . "['dbfrom']", 'value'=>$filter_selected[$f['field_name']]['dbfrom'], 'size'=>'10','maxlength'=>'10', 'id'=>'datepickfrom')) ?>
+						and <?php echo form_input(array('name'=>$f['field_name'] . "['dbto']", 'value'=>$filter_selected[$f['field_name']]['dbto'], 'size'=>'10', 'maxlength'=>'10', 'id'=>'datepickto'));
 						echo form_fieldset_close();
 				endif;
 			elseif(strpos($f['type'], 'range') !== false):
 				if(!empty($f['options']) && count($f['options']) > 1):
-					echo form_fieldset($f['name'], array('id' => $f['field_name'] . '-fieldset')); ?>
-						Between <?php echo form_input(array('name'=>$f['field_name'] . '_dbfrom', 'value'=>$filter_selected[$f['field_name'] . '_dbfrom'], 'size'=>'5','maxlength'=>'5')) ?>
-						and <?php echo form_input(array('name'=>$f['field_name'] . '_dbto', 'value'=>$filter_selected[$f['field_name'] . '_dbto'], 'size'=>'5', 'maxlength'=>'5'));
+					echo form_fieldset($f['label'], array('id' => $f['field_name'] . '-fieldset')); ?>
+						Between <?php echo form_input(array('name'=>$f['field_name'] . "['dbfrom']", 'value'=>$filter_selected[$f['field_name']]['dbfrom'], 'size'=>'5','maxlength'=>'5')) ?>
+						and <?php echo form_input(array('name'=>$f['field_name'] . "['dbto']", 'value'=>$filter_selected[$f['field_name']]['dbto'], 'size'=>'5', 'maxlength'=>'5'));
 						echo form_fieldset_close();
 				endif;
 			endif;	

@@ -38,17 +38,15 @@ class Filter_model extends Report_Model {
 						if(!empty($v)) $this->{$this->db_group_name}->where("($k IS NULL OR $k IN ( $text ))");
 						else $this->{$this->db_group_name}->where("$k IS NULL");
 					}
+					elseif(key($v) === 'dbfrom' || key($v) === 'dbto'){
+						$from = is_date_format($arr_filter_criteria[$v['dbfrom']]) ? date_to_mysqldatetime($arr_filter_criteria[$v['dbfrom']]) : $arr_filter_criteria[$v['dbfrom']];
+						$to = is_date_format($arr_filter_criteria[$v['dbto']]) ? date_to_mysqldatetime($arr_filter_criteria[$v['dbto']]) : $arr_filter_criteria[$v['dbto']];
+						$this->{$this->db_group_name}->where($k . " BETWEEN '" . $from . "' AND '" . $to . "'");
+					}
 					else $this->{$this->db_group_name}->where_in($k, $v);
 				}
 				else { //is not an array
-					if(substr($k, -5) == "_dbto"){ //ranges
-						$db_field = substr($k, 0, -5);
-						//overrode this line only--if we add time to user form, this function can be removed.
-						$this->{$this->db_group_name}->where("$db_field BETWEEN '" . date_to_mysqldatetime($arr_filter_criteria[$db_field . '_dbfrom']) . "' AND '" . date_to_mysqldatetime($arr_filter_criteria[$db_field . '_dbto'] . ' 23:59:59') . "'");
-					}
-					elseif(substr($k, -7) != "_dbfrom"){ //default--it skips the opposite end of the range as _dbto
-						$this->{$this->db_group_name}->where($k, $v);
-					}
+					$this->{$this->db_group_name}->where($k, $v);
 				}
 			}
 		}
@@ -63,7 +61,7 @@ class Filter_model extends Report_Model {
 	public function get_page_filters($section_id, $page_url_segment) {
 		$ret_array = array();
 		$results = $this->{$this->db_group_name}
-		->select('pf.*, f.db_field_name')
+		->select('pf.name, pf.type, pf.options_source, pf.default_value, f.db_field_name')
 		->where('p.section_id', $section_id)
 		->where('p.url_segment', $page_url_segment)
 		->join($this->tables['pages'] . ' p', "pf.page_id = p.id")
@@ -73,15 +71,45 @@ class Filter_model extends Report_Model {
 		->result_array();
 		if(isset($results) && is_array($results)){
 			foreach($results as $r){
-				$ret_array[$r['db_field_name']] = array(
-						'db_field_name' => $r['db_field_name']
-						,'name' => $r['name']
-						,'type' => $r['type']
-						,'default_value' => unserialize($r['default_value'])
-				);
+				foreach($r as $k => $v){
+					$ret_array[$r['db_field_name']][$k] = $v;
+				}
+				$ret_array[$r['db_field_name']]['default_value'] = unserialize($r['default_value']);
 			}
 		}
 		return $ret_array;
 	}
 	
+	/**
+	 * getCriteriaOptions
+	 * @return array of criteria options for given filter
+	 * @author ctranel
+	 **/
+	public function getCriteriaOptions($source_table, $herd_code = null) {
+		//$ret_array = array();
+		$arr_fields = $this->{$this->db_group_name}->list_fields($source_table);
+		if(in_array('herd_code', $arr_fields)){
+			if(isset($herd_code) && !empty($herd_code)){
+				$this->{$this->db_group_name}->where('herd_code', $herd_code);
+			}
+			else {
+				return false;
+			}
+		}
+		
+		$results = $this->{$this->db_group_name}
+		->select('value, label, is_default')
+		->order_by('list_order')
+		->get($source_table)
+		->result_array();
+		/*if(isset($results) && is_array($results)){
+			foreach($results as $r){
+				foreach($r as $k => $v){
+					$ret_array[$r['db_field_name']][$k] = $v;
+				}
+				$ret_array[$r['db_field_name']]['default_value'] = unserialize($r['default_value']);
+			}
+		}*/
+		return $results;
+	}
 }

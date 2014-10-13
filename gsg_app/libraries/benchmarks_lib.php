@@ -163,8 +163,8 @@ class Benchmarks_lib extends Session_settings
 	*/
 	public static function parseFormData($form_data){
 		if($form_data['breed'] !== 'HO'){
-			$form_data['herd_size_dbfrom'] = '1';
-			$form_data['herd_size_dbto'] = '100000';
+			$form_data['herd_size']['dbfrom'] = '1';
+			$form_data['herd_size']['dbto'] = '100000';
 		}
 		if($form_data['breed'] !== 'HO' && $form_data['breed'] !== 'JE'){
 			$form_data['metric'] = 'AVG';

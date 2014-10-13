@@ -19,8 +19,8 @@ if(isset($page_header)) echo $page_header; ?>
 			echo form_fieldset_close();
 			
 			echo form_fieldset('Enter Herd Size Range', array('id' => 'herd-size-fieldset', 'class' => $herd_size['class'])); ?>
-				Between <?php echo form_input(array('name'=>'herd_size_dbfrom', 'value'=>$herd_size['dbfrom'], 'size'=>'4', 'maxlength'=>'5', 'id'=>'herd_size_dbfrom')); ?>
-				and <?php echo form_input(array('name'=>'herd_size_dbto', 'value'=>$herd_size['dbto'], 'size'=>'4', 'maxlength'=>'5', 'id'=>'herd_size_dbto'));
+				Between <?php echo form_input(array('name'=>"herd_size['dbfrom']", 'value'=>$herd_size['dbfrom'], 'size'=>'4', 'maxlength'=>'5', 'id'=>'herd_size_dbfrom')); ?>
+				and <?php echo form_input(array('name'=>"herd_size['dbto']", 'value'=>$herd_size['dbto'], 'size'=>'4', 'maxlength'=>'5', 'id'=>'herd_size_dbto'));
 			echo form_fieldset_close(); ?>
 			<input type="hidden" name="make_default" value="0" id="make_default">
 			<div class="submit"><?php echo form_submit('bench_submit', 'Set Benchmarks', 'class="button" id="set"'); ?>&nbsp;&nbsp;&nbsp;<?php echo form_submit('bench_submit', 'Save as Default', 'class="button" id="default"'); ?></div>

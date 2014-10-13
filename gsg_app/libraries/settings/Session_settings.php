@@ -228,13 +228,9 @@ class Session_settings {
 		}
 		foreach($form_data as $k=>$set){
 			//handle range notation
-			if(strpos($k, '_dbto') !== false){
-				continue;
-			}
-			$split = strpos($k, '_dbfrom');
-			if($split !== false){
+			if(key($v) === 'dbfrom' || key($v) === 'dbto'){
 				$obj_key = substr($k, 0, $split);
-				$ret_val[$obj_key] = $set . '|' . $form_data[$obj_key . '_dbto'];
+				$ret_val[$obj_key] = $set['dbfrom'] . '|' . $set['dbto'];
 			}
 			//if it is not a range data type
 			else{
@@ -266,7 +262,6 @@ class Session_settings {
 		}
 		$arr_data = array();
 		
-//var_dump($this->user_id);
 		if(isset($this->user_id) && !empty($this->user_id)){
 			foreach($arr_settings as $k=>$v){
 				$arr_data[] = "SELECT '" . $this->user_id . "' AS user_id, '" . $this->herd_code . "' AS herd_code, '" . $this->arr_settings[$k]->getSettingID() . "' AS setting_id, '" . $v . "' AS value";

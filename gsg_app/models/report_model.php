@@ -472,7 +472,9 @@ class Report_model extends CI_Model {
 				$this->{$this->db_group_name}->join($j['table'], $j['join_text']);
 			}
 		}		
-		if(is_array($arr_filter_criteria) && !empty($arr_filter_criteria)) $this->prep_where_criteria($arr_filter_criteria, $block_url);
+		if(is_array($arr_filter_criteria) && !empty($arr_filter_criteria)){
+			$this->prep_where_criteria($arr_filter_criteria, $block_url);
+		}
 		
 		if(is_array($this->arr_fields)){
 			$arr_select_fields = array_flatten($this->arr_fields);
@@ -531,6 +533,7 @@ class Report_model extends CI_Model {
 	 * @author ctranel
 	 **/
 	protected function prep_select_fields($arr_select_fields){
+		//@todo: add field for date format (null for non-dates), or use date flag if date formats have to be the same
 		if (($key = array_search('test_date', $arr_select_fields)) !== FALSE) {
 			$arr_select_fields[$key] = "FORMAT(" . $this->primary_table_name . ".test_date, 'MM-dd-yy', 'en-US') AS test_date";//MMM-dd-yy
 		}
@@ -597,12 +600,11 @@ class Report_model extends CI_Model {
 				$this->{$this->db_group_name}->where($this->arr_where_field[$x] . $this->arr_where_operator[$x] . $this->arr_where_criteria[$x]);
 			}
 		}
-
 		foreach($arr_filter_criteria as $k => $v){
-			if(strpos($k, '.') === FALSE && strpos($k, 'dbfrom') === FALSE && strpos($k, 'dbto') === FALSE) {
-				$k = isset($this->arr_field_table[$k]) && !empty($this->arr_field_table[$k])?$this->arr_field_table[$k] . '.' . $k: $this->primary_table_name . '.' . $k;
+			if(strpos($k, '.') === FALSE) {
+				$db_field = isset($this->arr_field_table[$k]) && !empty($this->arr_field_table[$k])?$this->arr_field_table[$k] . '.' . $k: $this->primary_table_name . '.' . $k;
 			}
-
+//@todo: find another way to acheive this--without naming specific blocks
 			if(($block_url == 'peak_milk_trends' || $block_url == 'dim_at_1st_breeding') && substr($k,-7)=='pstring'){
 				if(is_array($v)){
 					$tmp = array_filter($v);
@@ -617,30 +619,22 @@ class Report_model extends CI_Model {
 			
 			if(empty($v) === FALSE || $v === '0'){
 				if(is_array($v)){
-					if(strpos($k, 'pstring') !== FALSE){
-						$bool_is_summary = array_search(1, get_elements_by_key('is_summary', $this->arr_blocks)) === FALSE ? FALSE : TRUE;
-						if(!$bool_is_summary) {
-							$v = array_filter($v);
-							if(empty($v)) continue;
+					//if filter is a range
+					if(key($v) === 'dbfrom' || key($v) === 'dbto'){
+						if(isset($arr_filter_criteria[$k]['dbfrom']) && !empty($arr_filter_criteria[$k]['dbfrom']) && isset($arr_filter_criteria[$k]['dbto']) && !empty($arr_filter_criteria[$k]['dbto'])){
+							$from = is_date_format($arr_filter_criteria[$k]['dbfrom']) ? date_to_mysqldatetime($arr_filter_criteria[$k]['dbfrom']) : $arr_filter_criteria[$k]['dbfrom'];
+							$to = is_date_format($arr_filter_criteria[$k]['dbto']) ? date_to_mysqldatetime($arr_filter_criteria[$k]['dbto']) : $arr_filter_criteria[$k]['dbto'];
+							$this->{$this->db_group_name}->where($db_field . " BETWEEN '" . $from . "' AND '" . $to . "'");
 						}
 					}
 					else {
 						$v = array_filter($v, create_function('$a', 'return (!empty($a) || $a === "0");'));
 						if(empty($v)) continue;
+						$this->{$this->db_group_name}->where_in($db_field, $v);
 					}
-					$this->{$this->db_group_name}->where_in($k, $v);
 				}
 				else { //is not an array
-					if(substr($k, -5) == "_dbto"){ //ranges
-						$db_field = substr($k, 0, -5);
-						$from = is_date_format($arr_filter_criteria[$db_field . '_dbfrom']) ? date_to_mysqldatetime($arr_filter_criteria[$db_field . '_dbfrom']) : $arr_filter_criteria[$db_field . '_dbfrom'];
-						$to = is_date_format($arr_filter_criteria[$db_field . '_dbto']) ? date_to_mysqldatetime($arr_filter_criteria[$db_field . '_dbto']) : $arr_filter_criteria[$db_field . '_dbto'];
-						if(strpos($db_field, '.') === FALSE) $db_full_field = isset($this->arr_field_table[$db_field]) && !empty($this->arr_field_table[$db_field])?$this->arr_field_table[$db_field] . '.' . $db_field: $this->primary_table_name . '.' . $db_field;
-						$this->{$this->db_group_name}->where("$db_full_field BETWEEN '" . $from . "' AND '" . $to . "'");
-					}
-					elseif(substr($k, -7) != "_dbfrom"){ //default--it skips the opposite end of the range as _dbto
-						$this->{$this->db_group_name}->where($k, $v);
-					}
+					$this->{$this->db_group_name}->where($db_field, $v);
 				} 
 			}
 		}
@@ -782,8 +776,8 @@ class Report_model extends CI_Model {
 		for($c = 0; $c < $num_fields; $c++){
 			if(empty($arr_filter_criteria[$this->arr_auto_filter_field[$c]])){
 				//handle range fields
-				$dbfield = str_replace('_dbfrom', '', $this->arr_auto_filter_field[$c]);
-				$dbfield = str_replace('_dbto', '', $dbfield);
+				//$dbfield = str_replace('_dbfrom', '', $this->arr_auto_filter_field[$c]);
+				//$dbfield = str_replace('_dbto', '', $dbfield);
 				//end handle range fields
 				
 				$criteria = $this->arr_auto_filter_criteria[$c];
@@ -989,8 +983,8 @@ class Report_model extends CI_Model {
 	 **/
 	function get_graph_dataset($arr_filters, $num_dates, $date_field, $block_url){
 		if(isset($date_field) && isset($num_dates)){
-			$arr_filters[$date_field . '_dbfrom'] = $this->get_start_date($date_field, $num_dates, 'MM-dd-yyyy');
-			$arr_filters[$date_field . '_dbto'] = $this->get_recent_dates($date_field, 1, 'MM-dd-yyyy')[0];
+			$arr_filters[$date_field . ['dbfrom']] = $this->get_start_date($date_field, $num_dates, 'MM-dd-yyyy');
+			$arr_filters[$date_field . ['dbto']] = $this->get_recent_dates($date_field, 1, 'MM-dd-yyyy')[0];
 		}
 		$data = $this->search($arr_filters['herd_code'], $block_url, $arr_filters, array($date_field), array('ASC'), $num_dates);
 		return $data;
