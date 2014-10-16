@@ -31,7 +31,7 @@ class Report_model extends CI_Model {
 	protected $arr_field_links = array();//DB field name is key
 	protected $arr_header_links = array();//DB field name is key
 	public $arr_unit_of_measure;//DB field name is key
-	protected $arr_where_field = array();// CODE set in child classes
+//	protected $arr_where_field = array();// NOT CURRENTLY USED CODE set in child classes
 	protected $arr_where_operator = array();// CODE set in child classes
 	protected $arr_where_criteria = array();// CODE set in child classes
 	protected $arr_group_by_field = array();// CODE set in child classes
@@ -587,6 +587,7 @@ class Report_model extends CI_Model {
 	
 	protected function prep_where_criteria($arr_filter_criteria, $block_url){
 		//incorporate built-in report filters if set
+		/* NOT CURRENTLY USED
 		if(is_array($this->arr_where_field) && !empty($this->arr_where_field)){
 			$tmp_cnt = count($this->arr_where_field);
 			for($x = 0; $x < $tmp_cnt; $x++){
@@ -599,8 +600,9 @@ class Report_model extends CI_Model {
 				}
 				$this->{$this->db_group_name}->where($this->arr_where_field[$x] . $this->arr_where_operator[$x] . $this->arr_where_criteria[$x]);
 			}
-		}
+		} */
 		foreach($arr_filter_criteria as $k => $v){
+			//@todo: the below is only for sql server
 			if(strpos($k, '.') === FALSE) {
 				$db_field = isset($this->arr_field_table[$k]) && !empty($this->arr_field_table[$k])?$this->arr_field_table[$k] . '.' . $k: $this->primary_table_name . '.' . $k;
 			}
@@ -628,7 +630,7 @@ class Report_model extends CI_Model {
 						}
 					}
 					else {
-						$v = array_filter($v, create_function('$a', 'return (!empty($a) || $a === "0");'));
+						$v = array_filter($v, create_function('$a', 'return (!empty($a) || $a === "0" || $a === 0);'));
 						if(empty($v)) continue;
 						$this->{$this->db_group_name}->where_in($db_field, $v);
 					}
@@ -809,7 +811,6 @@ class Report_model extends CI_Model {
 		else $this->db->select($date_field);
 		$this->db
 			->where($this->primary_table_name . '.herd_code', $this->session->userdata('herd_code'))
-			->where('pstring', $this->session->userdata('pstring'))
 			->where($date_field . ' IS NOT NULL')
 			->order_by($this->primary_table_name . '.' . $date_field, 'desc');
 		if(isset($num_dates) && !empty($num_dates)){
@@ -983,8 +984,8 @@ class Report_model extends CI_Model {
 	 **/
 	function get_graph_dataset($arr_filters, $num_dates, $date_field, $block_url){
 		if(isset($date_field) && isset($num_dates)){
-			$arr_filters[$date_field . ['dbfrom']] = $this->get_start_date($date_field, $num_dates, 'MM-dd-yyyy');
-			$arr_filters[$date_field . ['dbto']] = $this->get_recent_dates($date_field, 1, 'MM-dd-yyyy')[0];
+			$arr_filters[$date_field]['dbfrom'] = $this->get_start_date($date_field, $num_dates, 'MM-dd-yyyy');
+			$arr_filters[$date_field]['dbto'] = $this->get_recent_dates($date_field, 1, 'MM-dd-yyyy')[0];
 		}
 		$data = $this->search($arr_filters['herd_code'], $block_url, $arr_filters, array($date_field), array('ASC'), $num_dates);
 		return $data;

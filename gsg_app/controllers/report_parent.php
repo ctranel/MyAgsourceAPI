@@ -208,38 +208,6 @@ abstract class parent_report extends CI_Controller {
 	}
 
 	function display($arr_block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
-/*		$this->pstring = $this->session->userdata('pstring');
-		if(!isset($this->pstring) || empty($this->pstring)){
-			$tmp = $this->{$this->primary_model}->get_current_pstring();
-			$this->pstring = isset($tmp) && isset($tmp['pstring']) ? $tmp['pstring'] . '' : '0';
-			$this->session->set_userdata('pstring', $this->pstring);
-		}
-		
-		$class = $this->router->fetch_class();
-		if ($class == 'genetic_summary') {
-			$this->breed_code = $this->session->userdata('breed_code');
-			if(!isset($this->breed_code) || empty($this->breed_code)){
-				$tmp_breed_code = $this->{$this->primary_model}->get_current_breed_code();
-				if(isset($tmp_breed_code)) {
-					$this->breed_code = $tmp_breed_code;
-					$this->session->set_userdata('breed_code', $this->breed_code);
-				} else {
-					$this->session->set_flashdata('message', 'No breed found for this herd.');
-					redirect(site_url($this->session->flashdata('redirect_url')));			
-				}
-			}
-		}
-		//Get Tstrings from DB
-		$this->arr_tstring = $this->herd_model->get_tstring_array($this->session->userdata('herd_code'));
-		//get current element from array
-		$this->session->set_userdata('arr_tstring', $this->arr_tstring);
-		//If no Tstring, set to default of 0
-		if(!isset($this->tstring) || empty($this->tstring)){
-			$this->tstring = array(0);
-		}
-		$this->session->set_userdata('tstring', $this->tstring);
-*/		
-				
 		//Create block info as array in arr_block_in if not an array
 		if(isset($arr_block_in) && !empty($arr_block_in) && !is_array($arr_block_in)) $arr_block_in = array($arr_block_in);
 		$this->objPage = $this->{$this->primary_model}->arr_blocks[$this->page];
@@ -264,10 +232,11 @@ abstract class parent_report extends CI_Controller {
 				$this->page,
 				array(
 					'herd_code' =>	$this->session->userdata('herd_code'),
-//					'pstring' => $this->session->userdata('pstring'),
-//					'breed_code' => $this->session->userdata('breed_code')
 				) //filter form submissions never trigger a new page load (i.e., this function is never fired by a form submission)
 		);
+//		if($this->filters->criteriaExists('pstring')){
+//			$this->filters->setCriteriaValue('pstring', $this->session->userdata('pstring'));
+//		}
 		//END FILTERS
 		if ($display_format == 'csv'){
 			$data = array();
@@ -429,7 +398,7 @@ abstract class parent_report extends CI_Controller {
 		$this->carabiner->css('chart.css', 'print');
 		$this->carabiner->css('report.css', 'print');
 		$this->carabiner->css($this->section_path . '.css', 'screen');
-		if($this->filters->displayFilters($this->bool_is_summary)){
+		if($this->filters->displayFilters()){
 			//$this->carabiner->css('filters.css', 'screen');
 			$this->carabiner->css('agsource.datepick.css', 'screen');
 			$this->carabiner->css('jquery.datetimeentry.css', 'screen');
@@ -489,13 +458,9 @@ abstract class parent_report extends CI_Controller {
 		$this->benchmarks_lib = new Benchmarks_lib($this->session->userdata('user_id'), $this->input->post('herd_code'), $this->herd_model->header_info($this->herd_code), $this->setting_model);
 		$arr_benchmark_data = $this->benchmarks_lib->getFormData($this->session->userdata('benchmarks')); 
 		$arr_nav_data = array(
-//if I do not add this empty array, the array in the view somehow populated (should only be populated if code in bool_is_summary block below is executed)
-//			'arr_pstring' => array(),
-//			'arr_breeds' => array(),
 			'section_path' => $this->section_path,
 			'curr_page' => $this->page,
 			'arr_pages' => $this->web_content_model->get_pages_by_criteria(array('section_id' => $this->section_id))->result_array(),
-//			'class' => $class
 		);
 		$this->page_footer_data = array();
 		$report_nav_path = 'report_nav';
@@ -556,22 +521,7 @@ abstract class parent_report extends CI_Controller {
 			$arr_params = (array)json_decode(urldecode($json_filter_data));
 			if(isset($arr_params['csrf_test_name']) && $arr_params['csrf_test_name'] != $this->security->get_csrf_hash()) die("I don't recognize your browser session, your session may have expired, or you may have cookies turned off.");
 			unset($arr_params['csrf_test_name']);
-			/*ASSUMING ONLY ONE PSTRING WILL BE SELECTED FOR NOW
-			if(isset($arr_params['pstring']) && (!empty($arr_params['pstring'][0]) || $arr_params['pstring'][0] === '0')){
-				$this->pstring = $arr_params['pstring'][0];
-				$this->session->set_userdata('pstring', $this->pstring);
-			}
-			else{
-				$this->pstring = $this->session->userdata('pstring');
-			}
-			
-			if(isset($arr_params['breed_code']) && (!empty($arr_params['breed_code'][0]))){
-				$this->breed_code = $arr_params['breed_code'][0];
-				$this->session->set_userdata('breed_code', $this->breed_code);
-			} else {
-				$this->breed_code = $this->session->userdata('breed_code');
-			}
-			*/
+
 			//prep data for filter library
 			$this->load->model('filter_model');
 			//load required libraries
@@ -584,7 +534,9 @@ abstract class parent_report extends CI_Controller {
 					$page,
 					$arr_params + array('herd_code' => $this->session->userdata('herd_code'))
 			);
-//var_dump($arr_params, $this->filters->toArray());			
+//			if($this->filters->criteriaExists('pstring')){
+//				$this->filters->setCriteriaValue('pstring', $this->session->userdata('pstring'));
+//			}
 		}
 		$this->load->helper('report_chart_helper');
 		if($sort_by != 'null' && $sort_order != 'null') {
@@ -627,7 +579,7 @@ abstract class parent_report extends CI_Controller {
 		if($first){
 			$this->_record_access(90, $this->objPage['page_id'], 'web', $this->config->item('product_report_code'));
 		}
-		$this->json['section_data'] = $this->get_section_data($block, $this->pstring, $sort_by, $sort_order, $report_count);
+		$this->json['section_data'] = $this->get_section_data($block, $sort_by, $sort_order, $report_count);
 		$return_val = prep_output($this->display, $this->json, $report_count, $file_format);
 		if($return_val) {
 			return $return_val;
@@ -635,10 +587,9 @@ abstract class parent_report extends CI_Controller {
  	   	exit;
 	}
 	
-	protected function get_section_data($block, $pstring, $sort_by, $sort_order, $report_count){
+	protected function get_section_data($block, $sort_by, $sort_order, $report_count){
 		return array(
 			'block' => $block,
-//			'pstring' => $pstring, //pstring is sent with general data, not section data
 			'sort_by' => $sort_by,
 			'sort_order' => $sort_order,
 			'graph_order' => $report_count

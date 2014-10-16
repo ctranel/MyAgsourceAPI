@@ -36,6 +36,9 @@ class Criteria{
 		$this->default_value = $criteria_data['default_value'];
 		$this->options_source = $criteria_data['options_source'];
 		if(isset($criteria_data['arr_selected_values'])){
+			$this->setFilterCriteria($criteria_data['arr_selected_values']);
+/*			
+			
 			if(!is_array($criteria_data['arr_selected_values'])){
 				$criteria_data['arr_selected_values'] = array($criteria_data['arr_selected_values']);
 			}
@@ -49,7 +52,7 @@ class Criteria{
 				}
 			}
 				
-			$this->arr_selected_values = $arr_tmp;
+			$this->arr_selected_values = $arr_tmp; */
 		}
 		//$this->list_order = $criteria_data['list_order'];
 		$this->setOptions($herd_code);
@@ -70,6 +73,22 @@ class Criteria{
 	*/
 	public function getSelectedValue(){
 		return $this->arr_selected_values;
+	}
+
+	/* -----------------------------------------------------------------
+	*  Returns options
+
+	*  Returns array of options
+
+	*  @since: version 1
+	*  @author: ctranel
+	*  @date: Oct 15, 2014
+	*  @return: array 
+	*  @throws: 
+	* -----------------------------------------------------------------
+	*/
+	public function getOptions(){
+		return $this->options;
 	}
 
 	/* -----------------------------------------------------------------
@@ -116,7 +135,30 @@ class Criteria{
 	
 	
 	/* -----------------------------------------------------------------
-	*  setFilterFormCriteria() sets filter criteria based on filter form submission
+	*  Sets selected value
+
+	*  Sets selected value
+
+	*  @since: version 1
+	*  @author: ctranel
+	*  @date: Jun 17, 2014
+	*  @param $value
+	*  @return: void 
+	*  @throws: 
+	* -----------------------------------------------------------------
+	*/
+	public function setSelectedValue($value){
+		if(!isset($value)){
+			return false;
+		}
+		if(!is_array($value)){
+			$value = array($value);
+		}
+		$this->arr_selected_values = $value;
+	}
+
+	/* -----------------------------------------------------------------
+	*  setFilterCriteria() sets filter criteria based on filter form submission
 
 	*  sets filter criteria based on filter form submission
 
@@ -129,17 +171,17 @@ class Criteria{
 	*  @throws: 
 	* -----------------------------------------------------------------
 	*/
-	public function setFilterFormCriteria($page_filter_value){
+	public function setFilterCriteria($page_filter_value){
 		if(!isset($page_filter_value)){
 			return false;
 		}
 		//? if($field_name == 'page') $this->arr_criteria['page'] = $this->arr_pages[$this->$arr_params['page']]['name'];
 		if($this->type === 'range' || $this->type === 'date range'){
-			if(!isset($page_filter_value['dbfrom']) || !isset($page_filter_value['dbto'])){
+			if(!isset($page_filter_value[0]) || !isset($page_filter_value[1])){
 				continue;
 			}
-			$this->arr_selected_values['dbfrom'] = $page_filter_value['dbfrom'];
-			$this->arr_selected_values['dbto'] = $page_filter_value['dbto'];
+			$this->arr_selected_values['dbfrom'] = $page_filter_value[0];
+			$this->arr_selected_values['dbto'] = $page_filter_value[1];
 		}
 		elseif($this->type === 'select multiple'){
 			if(is_array($page_filter_value)){
@@ -214,7 +256,7 @@ class Criteria{
 				}
 			}
 		}
-		if(isset($this->default_value) && !empty($this->default_value)){
+		if(isset($this->default_value)){
 			if(is_array($this->default_value)){
 				if($this->type === 'range' || $this->type === 'date range'){
 					if(!isset($this->default_value)){

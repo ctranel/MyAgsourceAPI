@@ -58,14 +58,20 @@ class Filters{
 	*  @since: version 1
 	*  @author: ctranel
 	*  @date: Jun 17, 2014
-	*  @param: boolean is page a summary page
 	*  @return boolean
 	*  @throws: 
 	* -----------------------------------------------------------------
 	*/
-	public function displayFilters($is_summary){
-		$ret_val = (count($this->arr_criteria) > 0 && !$is_summary);
-		return $ret_val;
+	public function displayFilters(){
+		if(count($this->arr_criteria) == 0){
+			return false;
+		}
+		foreach($this->arr_criteria as $c){
+			if(count($c->getOptions()) > 1) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	/* -----------------------------------------------------------------
@@ -91,9 +97,9 @@ class Filters{
 		$this->setFilterCriteria($arr_page_filter_data, $arr_form_data);
 		
 		// if form was submitted, add/overwrite with form criteria
-		if (is_array($arr_form_data) && !empty($arr_form_data)) {
-			$this->setFilterFormCriteria($arr_form_data);
-		}
+	//	if (is_array($arr_form_data) && !empty($arr_form_data)) {
+	//		$this->setFilterFormCriteria($arr_form_data);
+	//	}
 	}
 
 	/* -----------------------------------------------------------------
@@ -109,7 +115,6 @@ class Filters{
 	*  @return void
 	*  @throws: 
 	* -----------------------------------------------------------------
-	*/
 	protected function setFilterFormCriteria($arr_form_data){
 		if(!isset($arr_page_filter_data)){
 			return false;
@@ -126,10 +131,11 @@ class Filters{
 		foreach($arr_form_data as $k=>$f){ //key is the db field name
 			//? if($k === 'page') $this->arr_criteria['page'] = $this->arr_pages[$this->$arr_params['page']]['name'];
 			if(isset($this->arr_criteria[$k])){
-				$this->arr_criteria[$k]->setFilterFormCriteria($f);
+				$this->arr_criteria[$k]->setFilterCriteria($f);
 			}
 		}
 	}
+	*/
 
 	/* -----------------------------------------------------------------
 	*  setFilterCriteria() sets default filter criteria based on the field-specific values (herd code, test date)
@@ -201,7 +207,7 @@ class Filters{
 	}
 
 	/* -----------------------------------------------------------------
-	*  set_criteria_key_value() sets a key=>value array of field_name=>selected_value
+	*  setCriteriaKeyValue() sets a key=>value array of field_name=>selected_value
 
 	*  Sets a key=>value array of field_name=>selected_value.
 
@@ -212,7 +218,7 @@ class Filters{
 	*  @throws: 
 	* -----------------------------------------------------------------
 	*/
-	public function setCriteriaKeyValue(){
+	protected function setCriteriaKeyValue(){
 		if(!isset($this->arr_criteria)){
 			return false;
 		}
@@ -220,7 +226,51 @@ class Filters{
 			$this->arr_criteria_key_value[$k] = $c->getSelectedValue();
 		}
 	}
+	
+	
 
+
+	/* -----------------------------------------------------------------
+	 *  criteriaExists() checks for the existance of key passed to method
+	
+	*  @since: version 1
+	*  @author: ctranel
+	*  @date: 10/15/2014
+	*  @param string criteria key
+	*  @return boolean
+	*  @throws:
+	* -----------------------------------------------------------------
+	*/
+	public function criteriaExists($key){
+		if(!isset($this->arr_criteria)){
+			return false;
+		}
+		return isset($this->arr_criteria[$key]);
+	}
+	
+
+	/* -----------------------------------------------------------------
+	*  setCriteriaValue() sets a key=>value array of field_name=>selected_value
+
+	*  Sets a key=>value array of field_name=>selected_value.
+
+	*  @since: version 1
+	*  @author: ctranel
+	*  @date: 10/15/2014
+	*  @param string criteria key
+	*  @param value to set
+	*  @return void
+	*  @throws: 
+	* -----------------------------------------------------------------
+	*/
+	public function setCriteriaValue($key, $value){
+		if(!isset($this->arr_criteria)){
+			return false;
+		}
+		$this->arr_criteria[$key]->setSelectedValue($value);
+	}
+	
+	
 	/* -----------------------------------------------------------------
 	*  toArray() returns an array representation of objects
 
