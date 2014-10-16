@@ -37,23 +37,8 @@ class Criteria{
 		$this->options_source = $criteria_data['options_source'];
 		if(isset($criteria_data['arr_selected_values'])){
 			$this->setFilterCriteria($criteria_data['arr_selected_values']);
-/*			
-			
-			if(!is_array($criteria_data['arr_selected_values'])){
-				$criteria_data['arr_selected_values'] = array($criteria_data['arr_selected_values']);
-			}
-			$arr_tmp = array();
-			foreach($criteria_data['arr_selected_values'] as $k=>$v){
-				if(strpos($v, '|')){
-					$arr_tmp += explode('|', $v);
-				}
-				else{
-					$arr_tmp[] = $v;
-				}
-			}
-				
-			$this->arr_selected_values = $arr_tmp; */
 		}
+
 		//$this->list_order = $criteria_data['list_order'];
 		$this->setOptions($herd_code);
 		$this->setDefaults();
@@ -219,9 +204,7 @@ class Criteria{
 	*/
 	protected function setOptions($herd_code){
 		if(isset($this->options_source) && !empty($this->options_source)){
-			//if(strpos($this->type, 'herd') !== false){
 			$this->options = $this->filter_model->getCriteriaOptions($this->options_source, $herd_code);
-			//}
 		}
 	}
 
@@ -265,6 +248,9 @@ class Criteria{
 					if(strpos($this->default_value, '|') !== FALSE){
 						list($this->arr_selected_values['dbfrom'], $this->arr_selected_values['dbto']) = explode('|', $this->default_value);
 					}
+				}
+				else{
+					$this->arr_selected_values = $this->default_value;
 				}
 			}
 			else $this->arr_selected_values = array($this->default_value);
