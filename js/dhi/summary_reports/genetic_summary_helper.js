@@ -11,10 +11,6 @@
 			options_in.yAxis[1].title.style.color = options_in.colors[2];
 		}
 		
-		var pstring_index = options_in.subtitle.text.indexOf('Pstring');
-		if(pstring_index > 0){
-			options_in.subtitle.text = options_in.subtitle.text.substring(0,pstring_index);
-		}
 		if(typeof(options_in.xAxis[0].label) === 'undefined'){
 			options_in.xAxis[0].label = {};
 		}

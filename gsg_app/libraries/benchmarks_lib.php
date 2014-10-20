@@ -27,7 +27,7 @@ class Benchmarks_lib extends Session_settings
 	protected $db_table;
 
 	/**
-	 * table that stores most recent data for all herd/pstring data for deriving benchmark groups
+	 * table that stores most recent data for all data for deriving benchmark groups
 	 * @var string
 	 **/
 	protected $herd_benchmark_pool_table = 'herd.dbo.bench_criteria_summary'; //'vma.dbo.vma_bench_criteria_summary';
@@ -225,9 +225,6 @@ class Benchmarks_lib extends Session_settings
 		foreach($arr_benchmarks as &$b){
 			$cnt = $b['cnt_herds'];
 			unset($b['cnt_herds']);
-			if(isset($b['pstring'])){
-				$b['pstring'] = '';
-			}
 			if($cnt < 3){
 				$keys = array_keys($b);
 				$b = array_fill_keys($keys, 'na');

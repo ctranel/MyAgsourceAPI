@@ -5,7 +5,6 @@ class Herd_overview extends parent_report {
 //@todo how to best structure controllers that are consumed by other controllers?
 	function index($pstring){
 		$this->load->model('dhi/alert_model');
-		$this->session->set_userdata('pstring', $pstring);
 		$bench_data = $this->alert_model->get_benchmarks($this->session->userdata('herd_code'), $pstring);
 		
 		$subtitle = '80th percentile is derived from ' .  $bench_data['breed_code'] . ' herds';

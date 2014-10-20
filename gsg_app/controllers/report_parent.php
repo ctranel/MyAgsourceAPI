@@ -234,9 +234,6 @@ abstract class parent_report extends CI_Controller {
 					'herd_code' =>	$this->session->userdata('herd_code'),
 				) //filter form submissions never trigger a new page load (i.e., this function is never fired by a form submission)
 		);
-//		if($this->filters->criteriaExists('pstring')){
-//			$this->filters->setCriteriaValue('pstring', $this->session->userdata('pstring'));
-//		}
 		//END FILTERS
 		if ($display_format == 'csv'){
 			$data = array();
@@ -467,7 +464,7 @@ abstract class parent_report extends CI_Controller {
 		if(file_exists(APPPATH . 'views' . FS_SEP . $this->section_path . FS_SEP . 'report_nav.php')){
 			$report_nav_path =  $this->section_path . '/' . $report_nav_path;
 		}
-		if(count($arr_nav_data['arr_pages']) < 2 && count($this->session->userdata('arr_pstring')) < 2) {
+		if(count($arr_nav_data['arr_pages']) < 2) {
 			$this->carabiner->css('hide_report_nav.css', 'screen');
 		}
 		$report_filter_path = 'filters';
@@ -532,11 +529,8 @@ abstract class parent_report extends CI_Controller {
 			$this->filters->set_filters(
 					$this->section_id,
 					$page,
-					$arr_params + array('herd_code' => $this->session->userdata('herd_code'))
+					array('herd_code' => $this->session->userdata('herd_code')) + $arr_params
 			);
-//			if($this->filters->criteriaExists('pstring')){
-//				$this->filters->setCriteriaValue('pstring', $this->session->userdata('pstring'));
-//			}
 		}
 		$this->load->helper('report_chart_helper');
 		if($sort_by != 'null' && $sort_order != 'null') {
@@ -671,11 +665,8 @@ abstract class parent_report extends CI_Controller {
 		$tmp_x_axis = current($this->json['arr_axes']['x']);
 		$tmp_categories = isset($tmp_x_axis['categories']) ? $tmp_x_axis['categories'] : null;
 		
-		$arr_pstring = $this->session->userdata('arr_pstring');
 		$this->json['herd_code'] = $this->session->userdata('herd_code');
-		if (!empty($arr_pstring) && count($arr_pstring) > 1){
-			$this->json['pstring'] = $this->session->userdata('pstring');
-		}
+
 		$this->{$this->primary_model}->set_chart_fields($arr_this_block['id']);
 		$arr_fields = $this->{$this->primary_model}->get_fields();
 		if(!is_array($arr_fields) || empty($arr_fields)){
@@ -696,11 +687,13 @@ abstract class parent_report extends CI_Controller {
 		}
 		$this->json['data'] = $this->{$this->primary_model}->get_graph_data($arr_fieldnames, $this->filters->criteriaKeyValue(), $this->max_rows, $x_axis_date_field, $arr_this_block['url_segment'], $tmp_categories);
 		$this->json['series'] = $this->derive_series($arr_fields, $this->json['chart_type'], $tmp_categories, count($this->json['data'], COUNT_RECURSIVE));
+		$this->json['filter_text'] = $this->filters->get_filter_text();
+//die($this->json['filter_text']);
 	}
 		
 	protected function load_table(&$arr_this_block, $report_count){
 		$title = $arr_this_block['description'];
-		$subtitle = 'Herd ' . $this->session->userdata('herd_code');
+		$subtitle = $this->filters->get_filter_text();
 		$this->{$this->primary_model}->populate_field_meta_arrays($arr_this_block['id']);
 		$arr_field_list = $this->{$this->primary_model}->get_fieldlist_array();
 		$results = $this->{$this->primary_model}->search($this->session->userdata('herd_code'), $arr_this_block['url_segment'], $this->filters->criteriaKeyValue(), $this->arr_sort_by, $this->arr_sort_order, $this->max_rows);

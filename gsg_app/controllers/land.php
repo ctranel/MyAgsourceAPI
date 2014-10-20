@@ -1,8 +1,10 @@
 <?php
 require_once(APPPATH.'libraries' . FS_SEP . 'benchmarks_lib.php');
 require_once APPPATH . 'controllers/report_parent.php';
+require_once(APPPATH . 'libraries' . FS_SEP . 'filters' . FS_SEP . 'Filters.php');
 
 use \myagsource\settings\Benchmarks_lib;
+use \myagsource\report_filters\Filters;
 
 defined('BASEPATH') OR exit('No direct script access allowed');
 
@@ -30,7 +32,8 @@ class Land extends parent_report {
 	}
 
 	//dashboard
-	function index($pstring = NULL){
+	function index(){
+/*
 		$arr_pstring = $this->session->userdata('arr_pstring');
 		if(isset($pstring)){
 			$this->session->set_userdata('pstring', $pstring);
@@ -43,6 +46,23 @@ class Land extends parent_report {
 				$this->session->set_userdata('pstring', $pstring);
 			}
 		}
+*/
+		//FILTERS
+		//load required libraries
+		$this->load->model('filter_model');
+		$this->filters = new Filters($this->filter_model);
+		$recent_test_date = isset($primary_table) ? $this->{$this->primary_model}->get_recent_dates() : NULL;
+		$this->filters->set_filters(
+				$this->section_id,
+				$this->page,
+				array(
+						'herd_code' =>	$this->session->userdata('herd_code'),
+				) //filter form submissions never trigger a new page load (i.e., this function is never fired by a form submission)
+		);
+		//		if($this->filters->criteriaExists('pstring')){
+		//			$this->filters->setCriteriaValue('pstring', $this->session->userdata('pstring'));
+		//		}
+		//END FILTERS
 		
 		$this->page_header_data['message'] = $this->session->flashdata('message');
 
@@ -118,6 +138,15 @@ class Land extends parent_report {
 		$this->carabiner->css('expandable.css');
 		$this->carabiner->css('chart.css', 'print');
 		$this->carabiner->css('report.css', 'print');
+		if($this->filters->displayFilters()){
+			//$this->carabiner->css('filters.css', 'screen');
+			$this->carabiner->css('agsource.datepick.css', 'screen');
+			$this->carabiner->css('jquery.datetimeentry.css', 'screen');
+		}
+		else{
+			$this->carabiner->css('hide_filters.css', 'screen');
+		}
+		
 		if(is_array($this->page_header_data)){
 			$this->page_header_data = array_merge($this->page_header_data,
 				array(
@@ -169,14 +198,34 @@ class Land extends parent_report {
 			'title' => 'Resources'
 		);
 
+		//filters	
+		$report_filter_path = 'filters';
+		if(file_exists(APPPATH . 'views' . FS_SEP . $this->section_path . FS_SEP . 'filters.php')){
+			$report_filter_path =  $this->section_path . '/filters' . $report_filter_path;
+		}
+		
+		$arr_filter_data = array(
+				'arr_filters' => $this->filters->toArray(),
+		);
+		if(isset($arr_filter_data)){
+			$this->data['widget']['info'][] = array(
+				'content' => $this->load->view($report_filter_path, $arr_filter_data, TRUE),
+				'title' => 'Filters',
+			);
+		}
+		
+		//herd info
 		require_once APPPATH . 'controllers/dhi/herd_overview.php';
+//@todo: need to get herd overview into $arr_view_blocks for filters to work.  Also need to use session benchmarks 
 		$tmp = new Herd_overview();
-		$arr_content = $tmp->index($pstring);
+		$herd_pstring = $this->filters->criteriaExists('pstring') ? $this->filters->getCriteriaValueByKey('pstring')[0] : 0;
+		$arr_content = $tmp->index($herd_pstring);
 		$this->data['widget']['feature'][] = array(
 			'content' => $arr_content['content'],
 			'title' => $arr_content['title'],
 			'subtitle' => $arr_content['subtitle'],
 		);
+		//end herd info
 		foreach($arr_view_blocks as $k => $b){
 			$this->data['widget']['feature2'][] = array(
 				'content' => $b,
@@ -204,12 +253,12 @@ class Land extends parent_report {
 		}
 
 		//page
-		$nav_data = array(
+/*		$nav_data = array(
 				'arr_pstring' => $arr_pstring
 				,'curr_pstring' => $pstring
 		);
 		$this->data['report_nav'] = $this->load->view('auth/dashboard/report_nav', $nav_data, TRUE);
-		
+*/		
 		$this->load->view('auth/dashboard/main', $this->data);
 	}
 	

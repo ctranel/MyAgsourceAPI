@@ -317,7 +317,6 @@ class Herd_model extends CI_Model {
 	 * @param string herd code
 	 * @return 2d array (pstring & publication name)
 	 * @author ctranel
-	 **/
 	public function get_pstring_array($herd_code, $include_all = TRUE) {
 		$pstring_db = $this->load->database('default', TRUE);
 		$arr_results = $pstring_db->select('pstring, publication_name')
@@ -330,6 +329,7 @@ class Herd_model extends CI_Model {
 		if($include_all) array_unshift($arr_results, array('pstring'=>0, 'publication_name'=>'All PStrings'));
 		return $arr_results;
 	}
+	 **/
 	
 	/**
 	 * get_tstring_array
@@ -337,7 +337,6 @@ class Herd_model extends CI_Model {
 	 * @return array (tstring) - for now using string_summary table.  
 	 * 			FUTURE?: Reports requiring historical tstrings will need to use milking_times table.
 	 * @author Kevin Marshall
-	 **/
 	public function get_tstring_array($herd_code) {
 		$tstring_db = $this->load->database('default', TRUE);
 		$tstring_db->distinct();
@@ -350,13 +349,13 @@ class Herd_model extends CI_Model {
 		return $arr_results;
 	}
 	
+	 **/
 	/**
 	 * get_breed_array
 	 * @param string herd code
 	 * @return array (tstring) - using vma_genetic_summary_breeds
 	 * 			FUTURE?: Reports requiring historical tstrings will need to use milking_times table.
 	 * @author Kevin Marshall
-	 **/
 	public function get_breed_array($herd_code) {
 		$breed_db = $this->load->database('default', TRUE);
 		$breed_db->distinct();
@@ -368,6 +367,7 @@ class Herd_model extends CI_Model {
 	
 		return $arr_results;
 	}
+	 **/
 
 	/**
 	 * herd_is_registered

@@ -176,7 +176,7 @@ class As_ion_auth extends Ion_auth {
 		$this->session->unset_userdata('arr_groups');
 		$this->session->unset_userdata('active_group_id');
 		$this->session->unset_userdata('herd_code');
-		$this->session->unset_userdata('arr_pstring');
+//		$this->session->unset_userdata('arr_pstring');
 		$this->session->unset_userdata('herd_code');
 		$this->session->unset_userdata('herd_code');
 		$this->session->unset_userdata('first_name');
@@ -185,9 +185,9 @@ class As_ion_auth extends Ion_auth {
 		$this->session->unset_userdata('phone');
 		$this->session->unset_userdata('section_id');
 		$this->session->unset_userdata('access_level');
-		$this->session->unset_userdata('pstring');
-		$this->session->unset_userdata('herd_size_code');
-		$this->session->unset_userdata('all_breeds_code');
+//		$this->session->unset_userdata('pstring');
+//		$this->session->unset_userdata('herd_size_code');
+//		$this->session->unset_userdata('all_breeds_code');
 
 		return parent::logout();
 	}

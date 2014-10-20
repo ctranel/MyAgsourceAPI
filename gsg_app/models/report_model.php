@@ -40,16 +40,12 @@ class Report_model extends CI_Model {
 	protected $arr_auto_filter_criteria = array(); //add a criteria if >1000 records are returned with existing criteria
 	protected $arr_auto_filter_alert = array();
 	protected $num_results;
-	public $arr_pstring = array();
-	public $arr_breeds = array();
 	public $arr_blocks = array();
 	public $arr_messages = array();
 	
 	public function __construct($section_path = NULL){
 		parent::__construct();
 		$this->load->model('dhi/herd_model');
-		$this->arr_pstring = $this->session->userdata('arr_pstring');
-		$this->arr_breeds = $this->session->userdata('arr_breeds');
 		$this->tables  = $this->config->item('tables', 'ion_auth');
 
 		$this->db_group_name = 'default';
@@ -103,10 +99,6 @@ class Report_model extends CI_Model {
 	function get_section_id(){
 		return $this->section_id;
 	}
-	function get_current_pstring(){
-		return current($this->arr_pstring);
-	}
-	
 	function get_current_breed_code(){
 		return current($this->arr_breeds);
 	}
@@ -211,9 +203,7 @@ class Report_model extends CI_Model {
 		$arr_field_child = array();
 		$arr_table_ref_cnt = array();
 		$this->arr_group_by_field = $this->get_group_by_fields($block_in);
-		$tmp_arr_pstring = $this->session->userdata('arr_pstring');
-		if(!is_array($tmp_arr_pstring) || empty($tmp_arr_pstring)) $this->{$this->db_group_name}->where('db_field_name != ', 'pstring');
-			$arr_field_data = $this->{$this->db_group_name}
+		$arr_field_data = $this->{$this->db_group_name}
 			->where('block_id', $block_in)
 			->order_by('list_order')
 			->get('users.dbo.v_block_field_data')
@@ -296,7 +286,7 @@ class Report_model extends CI_Model {
 				}
 			}
 		}
-		$this->adjust_fields($this->session->userdata('herd_code'));
+//		$this->adjust_fields($this->session->userdata('herd_code'));
 	}
 	
 	/**
@@ -373,25 +363,6 @@ class Report_model extends CI_Model {
 
 		
 		return array('arr_ref' => $arr_ref, 'arr_fields' => $arr_fields, 'arr_order' => $arr_order);
-	}
-
-	/**
-	 * @method adjust_fields()
-	 * @param string herd code
-	 * @abstract for now, this function removes the pstring column from the arr_fields object variable if the herd does not have pstrings, it could be used for other purposes as well.
-	 * @return void
-	 * @author ctranel
-	 **/
-	protected function adjust_fields($herd_code){
-		//remove pstring column if the herd does not have pstrings
-		$this->arr_pstring = $this->session->userdata('arr_pstring');
-		if (empty($this->arr_pstring) || count($this->arr_pstring) == 1) {
-			if (($key = array_search('pstring', $this->arr_fields)) !== false) {
-				unset($arr_select_fields[$key]);
-				$this->load->helper('multid_array_helper');
-				$this->arr_fields = multid_remove_element($this->arr_fields, 'PString');
-			}
-		}
 	}
 
 	protected function get_join_text($primary_table, $join_table){
@@ -606,7 +577,10 @@ class Report_model extends CI_Model {
 			if(strpos($k, '.') === FALSE) {
 				$db_field = isset($this->arr_field_table[$k]) && !empty($this->arr_field_table[$k])?$this->arr_field_table[$k] . '.' . $k: $this->primary_table_name . '.' . $k;
 			}
-//@todo: find another way to acheive this--without naming specific blocks
+/*
+ * @todo: 	find another way to acheive this--without naming specific blocks.  This handles pstring filters for 
+ * 			cow-level blocks that are on summary pages
+ */
 			if(($block_url == 'peak_milk_trends' || $block_url == 'dim_at_1st_breeding') && substr($k,-7)=='pstring'){
 				if(is_array($v)){
 					$tmp = array_filter($v);
@@ -618,6 +592,7 @@ class Report_model extends CI_Model {
 					continue;
 				}
 			}
+
 			
 			if(empty($v) === FALSE || $v === '0'){
 				if(is_array($v)){
@@ -836,7 +811,7 @@ class Report_model extends CI_Model {
 		$sql = "SELECT FORMAT(a." . $date_field . ", 'MM-dd-yyyy', 'en-US') AS " . $date_field . "
     		FROM (SELECT DISTINCT TOP " . ($num_dates + $num_dates_to_shift) . " " . $date_field . "
                 FROM " . $this->primary_table_name . " 
-                WHERE herd_code = '" . $this->session->userdata('herd_code') . "' AND pstring = '" . $this->session->userdata('pstring') . "' AND " . $date_field . " IS NOT NULL
+                WHERE herd_code = '" . $this->session->userdata('herd_code') . "' AND " . $date_field . " IS NOT NULL
                 ORDER BY " . $date_field . " DESC) a";
         $result = $this->{$this->db_group_name}->query($sql)->result_array();
         if(is_array($result) && !empty($result)) return $result[(count($result) - 1)][$date_field];
@@ -883,7 +858,7 @@ class Report_model extends CI_Model {
 				}
 			}
 		}
-		$this->adjust_fields($this->session->userdata('herd_code'));
+//		$this->adjust_fields($this->session->userdata('herd_code'));
 	}
 	
 	/**

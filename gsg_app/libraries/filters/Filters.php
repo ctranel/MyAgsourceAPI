@@ -2,6 +2,8 @@
 namespace myagsource\report_filters;
 require_once 'CriteriaFactory.php';
 
+use myagsource\report_filters\CriteriaFactory;
+
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /**
@@ -95,47 +97,7 @@ class Filters{
 		$arr_page_filter_data = $this->filter_model->get_page_filters($sect_id, $page);
 		//set default criteria as base
 		$this->setFilterCriteria($arr_page_filter_data, $arr_form_data);
-		
-		// if form was submitted, add/overwrite with form criteria
-	//	if (is_array($arr_form_data) && !empty($arr_form_data)) {
-	//		$this->setFilterFormCriteria($arr_form_data);
-	//	}
 	}
-
-	/* -----------------------------------------------------------------
-	*  setFilterFormCriteria() sets filter criteria based on filter form submission
-
-	*  sets filter criteria based on filter form submission
-
-	*  @since: version 1
-	*  @author: ctranel
-	*  @date: Jun 17, 2014
-	*  @param: array page-level filters
-	*  @param: $arr_params
-	*  @return void
-	*  @throws: 
-	* -----------------------------------------------------------------
-	protected function setFilterFormCriteria($arr_form_data){
-		if(!isset($arr_page_filter_data)){
-			return false;
-		}
-		if(!isset($arr_form_data)){
-			return false;
-		}
-		
-		//if there are no values submitted with form, don't include field in query (remove from array)
-		$arr_form_data = array_filter($arr_form_data, function($val){
-			return ($val !== FALSE && $val !== NULL && $val !== '');
-		});
-
-		foreach($arr_form_data as $k=>$f){ //key is the db field name
-			//? if($k === 'page') $this->arr_criteria['page'] = $this->arr_pages[$this->$arr_params['page']]['name'];
-			if(isset($this->arr_criteria[$k])){
-				$this->arr_criteria[$k]->setFilterCriteria($f);
-			}
-		}
-	}
-	*/
 
 	/* -----------------------------------------------------------------
 	*  setFilterCriteria() sets default filter criteria based on the field-specific values (herd code, test date)
@@ -157,13 +119,6 @@ class Filters{
 		if(!isset($arr_page_filter_data)){
 			return false;
 		}
-		foreach($arr_page_filter_data as $k=>$f){
-			//if there is a form value set for this filter, use that
-			if(isset($arr_form_data[$k]) && !empty($arr_form_data[$k])){
-				$f['arr_selected_values'] = $arr_form_data[$k];
-			}
-			$this->arr_criteria[$k] = CriteriaFactory::createCriteria($this->filter_model, $f, $arr_form_data['herd_code']);
-		}
 		//if there is a value in form data that is not in FilterCriteria, need to set that up
 		$arr_to_create = array_diff_key($arr_form_data, $arr_page_filter_data);
 		if(is_array($arr_to_create) && !empty($arr_to_create)){
@@ -181,6 +136,13 @@ class Filters{
 				);
 				$this->arr_criteria[$k] = CriteriaFactory::createCriteria($this->filter_model, $arr_tmp, $arr_form_data['herd_code']);
 			}
+		}
+		foreach($arr_page_filter_data as $k=>$f){
+			//if there is a form value set for this filter, use that
+			if(isset($arr_form_data[$k]) && !empty($arr_form_data[$k])){
+				$f['arr_selected_values'] = $arr_form_data[$k];
+			}
+			$this->arr_criteria[$k] = CriteriaFactory::createCriteria($this->filter_model, $f, $arr_form_data['herd_code']);
 		}
 	}
 
@@ -204,6 +166,23 @@ class Filters{
 			$this->setCriteriaKeyValue();
 		}
 		return $this->arr_criteria_key_value;
+	}
+
+	/* -----------------------------------------------------------------
+	*  criteriaKeyValue() Returns an key=>value array of field_name=>selected_value
+
+	*  Returns an key=>value array of field_name=>selected_value.  These values are populated with the set filter function
+
+	*  @since: version 1
+	*  @author: ctranel
+	*  @date: 10/17/2014
+	*  @param string criteria key
+	*  @return array field_name=>selected_value
+	*  @throws: 
+	* -----------------------------------------------------------------
+	*/
+	public function getCriteriaValueByKey($key){
+		return $this->arr_criteria[$key]->getSelectedValue();
 	}
 
 	/* -----------------------------------------------------------------
@@ -296,7 +275,9 @@ class Filters{
 
 	/**
 	 * set_filter_text
-	 * @description sets arr_filter_text variable.  Composes filter text property for use in the GSG Library file
+	 * 
+	 * Sets arr_filter_text variable.  Composes filter text property for use in the GSG Library file
+	 * 
 	 * @author ctranel
 	 * @return void
 	 * 
@@ -312,10 +293,15 @@ class Filters{
 			if($k == 'block'); //don't show block filter info because it is specified in heading
 			else{
 				$c->set_filter_text();
-				$this->log_filter_text .= $c->get_filter_text();
+				$txt = $c->get_filter_text();
+				if(!empty($txt)){
+					if(!empty($this->log_filter_text)){
+						$this->log_filter_text .= '; ';
+					}
+					$this->log_filter_text .= $txt;
+				}
 			}
 		}
-		$this->log_filter_text = is_array($arr_filter_text) && !empty($arr_filter_text)?implode('; ', $arr_filter_text):'';
 	}
 	
 	

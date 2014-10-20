@@ -96,13 +96,13 @@ th span.hide-column {cursor: pointer;}
 #report-links {border-top: solid 5px #EF5C29;}
 #report-links a {color:#003C39;}
 #report-links a.current {font-weight: bold;}
-ul.report-nav, ul.pstring-nav {margin: 0; list-style: none; border: none; padding-left: 5px;}
-ul.report-nav, ul.pstring-nav {display:inline; margin: 0; list-style: none; border: none;}
-ul.report-nav li, ul.pstring-nav li {display:inline; padding: 0px 5px; border-left: solid 1px #003C39; margin: 0 0 0 -5px;}
-ul.report-nav li.first, ul.pstring-nav li.first {border-left: none;}
-ul.report-nav li a, ul.pstring-nav li a {text-decoration: none; font: normal .85em helvetica,arial,sans-serif; color:#003C39; white-space: nowrap;}
-ul.report-nav li a:hover, ul.pstring-nav li a:hover {text-decoration: underline;}
-ul.report-nav li a.sel, ul.pstring-nav li a.sel {font-weight: bold;  text-decoration: underline;}
+ul.report-nav {margin: 0; list-style: none; border: none; padding-left: 5px;}
+ul.report-nav {display:inline; margin: 0; list-style: none; border: none;}
+ul.report-nav li {display:inline; padding: 0px 5px; border-left: solid 1px #003C39; margin: 0 0 0 -5px;}
+ul.report-nav li.first {border-left: none;}
+ul.report-nav li a {text-decoration: none; font: normal .85em helvetica,arial,sans-serif; color:#003C39; white-space: nowrap;}
+ul.report-nav li a:hover {text-decoration: underline;}
+ul.report-nav li a.sel {font-weight: bold;  text-decoration: underline;}
 
 .subnav {margin-left: 20px;}
 
