@@ -7,8 +7,12 @@ class Fresh_cow_summary_model extends Report_model {
 
 	/**
 	 * @method get_graph_data()
-	 * @param string pstring
-	 * @param string last summary date
+	 * @param array of field names
+	 * @param string herd code
+	 * @param int number of dates to include
+	 * @param string name of field that represents date/x axis
+	 * @param string block url
+	 * @param array categories
 	 * @return array of benchmark data for the production graph
 	 * @access public
 	 * 

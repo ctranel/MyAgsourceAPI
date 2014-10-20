@@ -18,10 +18,12 @@ head.ready(function() {
 	$(".chart-odd, .chart-even, .chart-last-odd, .chart-only").css("width", (chart_width + 2));
 	$(".highcharts-container, .chart").css("width", chart_width);
 });
+/*
 function updateFilter(event, this_in, divid, field_in, value_in){
 	$('input[name=' + field_in + '][value=' + value_in + ']').attr("checked", true);
 	$('#filter-form').submit();
 }
+*/
 
 
 //to be used when we move to loading pages within a section via ajax.  Will need to have one "block" incrementor, rather than incrementers for charts and tables
@@ -53,11 +55,6 @@ function updatePage(el){
 		updateBlock(div_id, block_name, block_index, sort_field, sort_order, display, first);
 		first = false;
 	});
-
-	$('.pstring-link').css('fontWeight', 'normal');
-	if(typeof(el.style) !== 'undefined'){
-		el.style.fontWeight = 'bold';
-	}
 }
 
 function updateBlock(container_div_id, block_in, block_index, sort_field, sort_order, display, first){
@@ -116,12 +113,10 @@ function process_chart(div_id, data_in){
 	options = get_chart_options(options, data_in.chart_type);
 	options.title = {"text": data_in.description};
 	options.exporting = {"filename": data_in.name};
-	if (typeof(data_in.pstring) === 'undefined' || data_in.pstring === null){
-		options.subtitle = {"text": "Herd: " + data_in.herd_code};
+	
+	if (typeof(data_in.filter_text) !== 'undefined' && data_in.filter_text !== null && data_in.filter_text !== ''){
+		options.subtitle = {"text": data_in.filter_text};
 	} 
-	else {
-		options.subtitle = {"text": "Herd: " + data_in.herd_code + ' Pstring: ' + data_in.pstring};
-	}
 
 	if(typeof(data_in) === 'undefined'){
 		$('#' + div_id).html('<p class-"chart-error">Sorry, the requested data was not able to be retrieved.  Please try again, or contact AgSource for assistance.</p>');

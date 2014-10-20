@@ -259,28 +259,30 @@ class Criteria{
 
 	/**
 	 * set_filter_text
-	 * @description sets arr_filter_text variable.  Composes filter text property
+	 * 
+	 * Sets arr_filter_text variable.  Composes filter text property
+	 * 
 	 * @author ctranel
 	 * @return void
 	 * 
 	 **/
 	public function set_filter_text(){
 		$this->log_filter_text = '';
-		if(is_array($this->arr_selected_values) && !empty($this->arr_selected_values)){
-			//@todo: filter null string out when criteria is set
-			if(($tmp_key = array_search('NULL', $this->arr_selected_values)) !== FALSE){
-				unset($this->arr_selected_values[$tmp_key]);
+		$val = array_filter($this->arr_selected_values);
+		if(is_array($val) && !empty($val)){
+			if(($tmp_key = array_search('NULL', $val)) !== FALSE){
+				unset($val[$tmp_key]);
 			}
 			//if it is a range
-			elseif(key($this->arr_selected_values) === 'dbfrom' || key($this->arr_selected_values) === 'dbto'){
-				$this->log_filter_text = $this->label . ': Between ' . $this->arr_selected_values['dbfrom'] . ' and ' . $this->arr_selected_values['dbto'];
+			elseif(key($val) === 'dbfrom' || key($val) === 'dbto'){
+				$this->log_filter_text = $this->label . ': Between ' . $val['dbfrom'] . ' and ' . $val['dbto'];
 			}
 			else{
-				$this->log_filter_text = $this->label . ': ' . implode(', ', $this->arr_selected_values);
+				$this->log_filter_text = $this->label . ': ' . implode(', ', $val);
 			}
 		}
-		elseif(!empty($this->arr_selected_values)){
-			$arr_filter_text[] = $this->label . ': ' . $this->arr_selected_values;
+		elseif(!empty($val)){
+			$arr_filter_text[] = $this->label . ': ' . $val;
 		}
 	}
 }
