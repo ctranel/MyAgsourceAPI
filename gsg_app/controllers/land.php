@@ -33,20 +33,6 @@ class Land extends parent_report {
 
 	//dashboard
 	function index(){
-/*
-		$arr_pstring = $this->session->userdata('arr_pstring');
-		if(isset($pstring)){
-			$this->session->set_userdata('pstring', $pstring);
-		}
-		else {
-			$pstring = $this->session->userdata('pstring');
-			if(!isset($this->pstring) || empty($this->pstring)){
-				$tmp = current($arr_pstring);
-				$pstring = isset($tmp) && isset($tmp['pstring']) ? $tmp['pstring'] . '' : '0';
-				$this->session->set_userdata('pstring', $pstring);
-			}
-		}
-*/
 		//FILTERS
 		//load required libraries
 		$this->load->model('filter_model');
@@ -59,9 +45,6 @@ class Land extends parent_report {
 						'herd_code' =>	$this->session->userdata('herd_code'),
 				) //filter form submissions never trigger a new page load (i.e., this function is never fired by a form submission)
 		);
-		//		if($this->filters->criteriaExists('pstring')){
-		//			$this->filters->setCriteriaValue('pstring', $this->session->userdata('pstring'));
-		//		}
 		//END FILTERS
 		
 		$this->page_header_data['message'] = $this->session->flashdata('message');
@@ -207,10 +190,12 @@ class Land extends parent_report {
 		$arr_filter_data = array(
 				'arr_filters' => $this->filters->toArray(),
 		);
+
 		if(isset($arr_filter_data)){
 			$this->data['widget']['info'][] = array(
 				'content' => $this->load->view($report_filter_path, $arr_filter_data, TRUE),
 				'title' => 'Filters',
+				'id' => 'filters',
 			);
 		}
 		
