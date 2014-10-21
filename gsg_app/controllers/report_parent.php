@@ -486,10 +486,16 @@ abstract class parent_report extends CI_Controller {
 			'arr_filters' => $this->filters->toArray(),
 		);
 		if(isset($arr_filter_data)){
-			$data['filters'] = $this->load->view($report_filter_path, $arr_filter_data, TRUE);
+			$collapse_data['content'] = $this->load->view($report_filter_path, $arr_filter_data, TRUE);
+			$collapse_data['title'] = 'Set Filters';
+			$collapse_data['id'] = 'filters';
+			$data['filters'] = $this->load->view('collapsible', $collapse_data, TRUE);
 		}
 		if(isset($arr_benchmark_data)){
-			$data['benchmarks'] = $this->load->view('set_benchmarks', $arr_benchmark_data, TRUE);
+			$collapse_data['content'] = $this->load->view('set_benchmarks', $arr_benchmark_data, TRUE);
+			$collapse_data['title'] = 'Set Benchmarks';
+			$collapse_data['id'] = 'bench-div';
+			$data['benchmarks'] = $this->load->view('collapsible', $collapse_data, TRUE);
 		}
 		if((is_array($arr_nav_data['arr_pages']) && count($arr_nav_data['arr_pages']) > 1) || 
 				(isset($arr_nav_data['arr_links']) && is_array($arr_nav_data['arr_links']) && count($arr_nav_data['arr_links']) > 1)) {
