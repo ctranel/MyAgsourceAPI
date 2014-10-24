@@ -120,16 +120,15 @@ class Benchmarks_lib extends Session_settings
 	 * @author ctranel
 	 **/
 	private function get_default_herd_size_range($herd_size){
-		//We can set this, but it will currently only be used for Holstein herds
-		if($herd_size){
-			foreach($this->arr_herd_size_groups as $k=>$v){
-				if($v['floor'] <= $herd_size && $v['ceiling'] >= $herd_size){
-					$herd_size = $v['floor'] . '|' . $v['ceiling'];
-				}
-			}
-			return $herd_size;
+		if(!isset($herd_size)){
+			return NULL;
 		}
-		else return NULL;
+		foreach($this->arr_herd_size_groups as $k=>$v){
+			if($v['floor'] <= $herd_size && $v['ceiling'] >= $herd_size){
+				$herd_size = array('dbfrom' => $v['floor'], 'dbto' => $v['ceiling']);
+			}
+		}
+		return $herd_size;
 	}
 	
 	/**
@@ -192,10 +191,9 @@ class Benchmarks_lib extends Session_settings
 		$bench_settings = $this->getSettingKeyValues($session_values);
 
 		$avg_fields = $benchmark_model->get_benchmark_fields($this->db_table->full_table_name(), $arr_fields_to_exclude);
-		
 		//make sure we have something to pass for all session vars
 		$sess_herd_size = isset($session_values['herd_size']) ? $session_values['herd_size'] : null;
-		list($herd_size_floor, $herd_size_ceiling) = explode('|', $this->arr_settings['herd_size']->getCurrValue($sess_herd_size));
+		$sess_herd_size = $this->arr_settings['herd_size']->getCurrValue($sess_herd_size);
 		$sess_criteria = isset($session_values['criteria']) ? $session_values['criteria'] : null;
 		$sess_metric = isset($session_values['metric']) ? $session_values['metric'] : null;
 		$sess_breed = isset($session_values['breed']) ? $session_values['breed'] : null;
@@ -206,8 +204,8 @@ class Benchmarks_lib extends Session_settings
 			$this->arr_criteria_table[$this->arr_settings['criteria']->getCurrValue($sess_criteria)],
 			$this->herd_benchmark_pool_table,
 			$this->arr_settings['metric']->getCurrValue($sess_metric),
-			$herd_size_floor,
-			$herd_size_ceiling,
+			$sess_herd_size['dbfrom'],
+			$sess_herd_size['dbto'],
 			$this->arr_settings['breed']->getCurrValue($sess_breed),
 			$arr_group_by
 		);

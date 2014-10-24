@@ -31,9 +31,9 @@ if (!empty($report_nav)) echo $report_nav; ?>
 	</div>
 </div>
 <div class="row">
-	<div id="d-feature" class="col-sm-6">
-		<?php if(isset($widget['feature'])): 
-			foreach($widget['feature'] as $w): ?>
+	<?php if(isset($widget['feature'])): 
+		foreach($widget['feature'] as $w): ?>
+			<div id="d-feature" class="col-sm-6">
 				<div id="<?php echo isset($w['id']) ? $w['id'] : str_replace(' ', '-', $w['title']); ?>" class="box">
 					<h2><?php echo $w['title']; ?></h2>
 					<?php if(isset($w['subtitle'])): ?>
@@ -41,22 +41,9 @@ if (!empty($report_nav)) echo $report_nav; ?>
 					<?php endif; ?>
 					<div class="widget-content"><?php echo $w['content']; ?></div>
 				</div>
-			<?php endforeach;
-		endif; ?>
-	</div>
-	<div id="d-feature1" class="col-sm-6">
-		<?php if(isset($widget['feature2'])): 
-			foreach($widget['feature2'] as $w): ?>
-				<div id="<?php echo isset($w['id']) ? $w['id'] : str_replace(' ', '-', $w['title']); ?>" class="box">
-					<h2><?php echo $w['title']; ?></h2>
-					<?php if(isset($w['subtitle'])): ?>
-						<h3><?php echo $w['subtitle']; ?></h3>
-					<?php endif; ?>
-					<div class="widget-content"><?php echo $w['content']; ?></div>
-				</div>
-			<?php endforeach;
-		endif; ?>
-	</div>
+			</div>
+		<?php endforeach;
+	endif; ?>
 </div>
 
 
