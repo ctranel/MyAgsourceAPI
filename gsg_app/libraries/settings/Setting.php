@@ -186,8 +186,8 @@ class Setting {
 	*/
 	public function getDisplayText($session_value){
 		if($this->data_type === 'range'){
-			list($from, $to) = explode('|', $this->getCurrValue($session_value));
-			return 'between ' . $from . ' and ' . $to;
+			$range = $this->getCurrValue($session_value);
+			return 'between ' . $range['dbfrom'] . ' and ' . $range['dbto'];
 		}
 		elseif($this->data_type === 'array' || $this->data_type === 'data_lookup_arr'){
 			return implode(', ', $this->getCurrValue($session_value));
@@ -281,9 +281,10 @@ class Setting {
 			return $ret_val;
 		}
 		if($this->data_type === 'range'){
-			list($from, $to) = explode('|', $this->getCurrValue($session_value));
-			$ret_val['dbfrom'] = $from;
-			$ret_val['dbto'] = $to;
+			//list($from, $to) = explode('|', $this->getCurrValue($session_value));
+			//$ret_val['dbfrom'] = $from;
+			//$ret_val['dbto'] = $to;
+			$ret_val = $this->getCurrValue($session_value);
 			$ret_val['class'] = $this->grouping;
 			return $ret_val;
 		}

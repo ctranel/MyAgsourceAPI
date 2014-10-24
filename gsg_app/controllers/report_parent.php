@@ -548,7 +548,7 @@ abstract class parent_report extends CI_Controller {
 			$this->arr_sort_by = $tmp['arr_sort_by'];
 			$this->arr_sort_order = $tmp['arr_sort_order'];
 		}
-
+		
 		$this->page = $page;
 		$this->json = NULL;
 		$this->display = $output;
@@ -694,7 +694,6 @@ abstract class parent_report extends CI_Controller {
 		$this->json['data'] = $this->{$this->primary_model}->get_graph_data($arr_fieldnames, $this->filters->criteriaKeyValue(), $this->max_rows, $x_axis_date_field, $arr_this_block['url_segment'], $tmp_categories);
 		$this->json['series'] = $this->derive_series($arr_fields, $this->json['chart_type'], $tmp_categories, count($this->json['data'], COUNT_RECURSIVE));
 		$this->json['filter_text'] = $this->filters->get_filter_text();
-//die($this->json['filter_text']);
 	}
 		
 	protected function load_table(&$arr_this_block, $report_count){

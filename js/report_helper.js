@@ -24,6 +24,37 @@ if($('#filter-form')){ //if there is a filter form (only on pages with one table
 	});
 }
 
+
+function assocFormToObject(objForm){
+	var elements = objForm.elements;
+	var obj_return = {};
+	var el_len = elements.length
+	
+	for(var i=0; i<el_len; i++){
+		var e = elements[i];
+		if((e.type === 'text' || e.type === 'hidden' || e.type.indexOf('select') >= 0) && typeof(e.value !== 'undefined')){
+			if(e.name.indexOf('[') >= 0){
+				var name = e.name.substring(0, e.name.indexOf("['"));
+				var idx = e.name.substring(e.name.indexOf("['") + 2, e.name.indexOf("']"));
+				if(typeof(obj_return[name]) === 'undefined'){
+					obj_return[name] = {};
+				} 
+				obj_return[name][idx] = e.value;
+			}
+			else {
+				obj_return[e.name] = e.value;
+			}
+		}
+	}
+	return obj_return;
+	
+/*	
+	$(objForm).each(function(){
+		console.log(dump($(this).attr('name')));
+	});
+*/
+}
+
 if($('#benchmark-form')){ //if there is a filter form (only on pages with one table)
 	$('#default').click(function(ev){
 		$('#make_default').val('1');
@@ -35,7 +66,11 @@ if($('#benchmark-form')){ //if there is a filter form (only on pages with one ta
 	
 	$('#benchmark-form').submit(function(ev){
 		ev.preventDefault();
-		params = encodeURIComponent(JSON.stringify($(this).serializeObject()));
+		params = assocFormToObject(document.getElementById('benchmark-form'));
+		params = encodeURIComponent(JSON.stringify(params));
+//		params = encodeURIComponent(JSON.stringify($(this).serializeObject()));
+console.log(dump(params));
+//console.log(dump($.extend({}, params)));
 		$.post(site_url + 'benchmark/ajax_set/' + params)
 			.done(function(){
 				updatePage(this);

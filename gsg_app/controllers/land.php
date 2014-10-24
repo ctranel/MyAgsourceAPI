@@ -192,27 +192,26 @@ class Land extends parent_report {
 		);
 
 		if(isset($arr_filter_data)){
-			$this->data['widget']['info'][] = array(
+			$this->data['widget']['herd'][] = array(
 				'content' => $this->load->view($report_filter_path, $arr_filter_data, TRUE),
 				'title' => 'Filters',
 				'id' => 'filters',
 			);
 		}
 		
-		//herd info
-		require_once APPPATH . 'controllers/dhi/herd_overview.php';
-//@todo: need to get herd overview into $arr_view_blocks for filters to work.  Also need to use session benchmarks 
-		$tmp = new Herd_overview();
-		$herd_pstring = $this->filters->criteriaExists('pstring') ? $this->filters->getCriteriaValueByKey('pstring')[0] : 0;
-		$arr_content = $tmp->index($herd_pstring);
-		$this->data['widget']['feature'][] = array(
-			'content' => $arr_content['content'],
-			'title' => $arr_content['title'],
-			'subtitle' => $arr_content['subtitle'],
-		);
-		//end herd info
+		$this->load->model('setting_model');
+		$this->benchmarks_lib = new Benchmarks_lib($this->session->userdata('user_id'), $this->input->post('herd_code'), $this->herd_model->header_info($this->herd_code), $this->setting_model);
+		$arr_benchmark_data = $this->benchmarks_lib->getFormData($this->session->userdata('benchmarks')); 
+		if(isset($arr_benchmark_data)){
+			$this->data['widget']['info'][] = array(
+				'content' => $this->load->view('set_benchmarks', $arr_benchmark_data, TRUE),
+				'title' => 'Benchmarks',
+				'id' => 'benhmarks',
+			);
+		}
+		
 		foreach($arr_view_blocks as $k => $b){
-			$this->data['widget']['feature2'][] = array(
+			$this->data['widget']['feature'][] = array(
 				'content' => $b,
 				'title' => $k,
 			);
