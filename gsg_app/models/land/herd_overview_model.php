@@ -29,11 +29,12 @@ class Herd_overview_model extends Report_model {
 							array_slice($this->arr_fields, 2, null, true);
 		if(isset($new_dataset) && is_array($new_dataset)){
 			foreach($new_dataset as $k => $r){
-				if(isset($r['Prev Test']) && isset($r['Curr Test']))
+				if(isset($r['Prev Test']) && isset($r['Curr Test'])){
 					$trend = $this->get_trend_symbol($r['Prev Test'], $r['Curr Test'], in_array($k, $this->arr_high_is_bad));
 					$new_dataset[$k] = 	array_slice($r, 0, 3, true) +
 										array('Trend' => $trend) +
 										array_slice($r, 3, null, true);
+				}
 			}
 		}
 		//add trend column in new dataset
