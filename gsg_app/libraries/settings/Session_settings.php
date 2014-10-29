@@ -267,15 +267,14 @@ var_dump($form_data, $ret_val);die;
 		}
 		$arr_data = array();
 		
-		if(isset($this->user_id) && !empty($this->user_id)){
-			foreach($arr_settings as $k=>$v){
-				$arr_data[] = "SELECT '" . $this->user_id . "' AS user_id, '" . $this->herd_code . "' AS herd_code, '" . $this->arr_settings[$k]->getSettingID() . "' AS setting_id, '" . $v . "' AS value";
+		$user_id = isset($this->user) ? $this->user : null;
+		
+		foreach($arr_settings as $k=>$v){
+			if(is_array($v)){
+				$v = implode('|', $v);
 			}
-		}
-		else{
-			foreach($arr_settings as $k=>$v){
-				$arr_data[] = "SELECT null AS user_id, '" . $this->herd_code . "' AS herd_code, '" . $this->arr_settings[$k]->getSettingID() . "' AS setting_id, '" . $v . "' AS value";
-			}
+			
+			$arr_data[] = "SELECT '" . $this->user_id . "' AS user_id, '" . $this->herd_code . "' AS herd_code, '" . $this->arr_settings[$k]->getSettingID() . "' AS setting_id, '" . $v . "' AS value";
 		}
 		$this->setting_model->mergeUserHerdSettings($arr_data);
 	}

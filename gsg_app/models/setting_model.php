@@ -45,7 +45,6 @@ class Setting_model extends CI_Model {
 		->where("(uhs.herd_code = '" . $herd_code . "' OR uhs.herd_code IS NULL)")
 		->get('users.dbo.set_settings s')
 		->result_array();
-		
 		return $results;
 	}
 	
