@@ -62,7 +62,7 @@
 	* -----------------------------------------------------------------*/
 	function getLinks($content_type_id, $content_id) {
 		$ret = $this->db
-		->select('a_href, a_title, a_rel, a_class')
+		->select('id, a_href, a_title, a_rel, a_class')
 		->where('content_type_id', $content_type_id)
 		->where('content_id', $content_id)
 		->get('users.dbo.supp_links')
@@ -94,4 +94,26 @@
 		}
 		return 'Comment ' . $comment_id . ' not found';
 	}
-}
+ 	
+	/* -----------------------------------------------------------------
+	 *  getLinkParams
+	
+	*  Retrieves comments from database based
+	
+	*  @since: 1.0
+	*  @author: ctranel
+	*  @date: Oct 28, 2014
+	*  @param: int supplemental_link_id
+	*  @return: array of data or null
+	*  @throws:
+	* -----------------------------------------------------------------*/
+	function getLinkParams($supplemental_link_id) {
+		$ret = $this->db
+		->select('p.param_value_field_id, p.param_value, f.db_field_name')
+		->join('users.dbo.db_fields f', 'p.param_value_field_id = f.id')
+		->where('sl_id', $supplemental_link_id)
+		->get('users.dbo.supp_link_params p')
+		->result_array();
+		return $ret;
+	}
+ }

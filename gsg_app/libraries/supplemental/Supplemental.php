@@ -1,6 +1,12 @@
 <?php
 namespace myagsource\supplemental;
 
+require_once(APPPATH . 'libraries' . FS_SEP . 'supplemental' . FS_SEP . 'SupplementalLink.php');
+require_once(APPPATH . 'libraries' . FS_SEP . 'supplemental' . FS_SEP . 'SupplementalComment.php');
+
+use myagsource\supplemental\SupplementalLink;
+use myagsource\supplemental\SupplementalComment;
+
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /**
 * Contains properties and methods specific supplemental data links for various sections of the website.
@@ -41,7 +47,7 @@ class Supplemental
 	 * @return void
 	 * @author ctranel
 	 **/
-	public function __construct(SplObjectStorage $supplemental_links, SplObjectStorage $supplemental_comments)
+	public function __construct(\SplObjectStorage $supplemental_links, \SplObjectStorage $supplemental_comments)
 	{
 		$this->supplemental_links = $supplemental_links;
 		$this->supplemental_comments = $supplemental_comments;
@@ -68,13 +74,12 @@ class Supplemental
 	 *  @return: Supplemental object
 	 *  @throws: 
 	 * -----------------------------------------------------------------*/
-	public static function getPageSupplemental($page_id, $supplemental_datasource) {
+	public static function getPageSupplemental($page_id, $supplemental_datasource, $site_url) {
 		$links = $supplemental_datasource->getLinks(2, $page_id);
-		$supplemental_links = SupplementalLink::datasetToObjects($links);
+		$supplemental_links = SupplementalLink::datasetToObjects($site_url, $links, $supplemental_datasource);
 	
 		$comments = $supplemental_datasource->getComments(2, $page_id);
 		$supplemental_comments = SupplementalComment::datasetToObjects($comments);
-				
 		$supp = new Supplemental($supplemental_links, $supplemental_comments);
 		return $supp;
 	}

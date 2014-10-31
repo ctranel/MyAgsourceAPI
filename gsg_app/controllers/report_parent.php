@@ -495,9 +495,8 @@ abstract class parent_report extends CI_Controller {
 		}
 
 		$this->load->model('supplemental_model');
-		$page_supp = Supplemental::getPageSupplemental($this->objPage['page_id'], $this->supplemental_model);
+		$page_supp = Supplemental::getPageSupplemental($this->objPage['page_id'], $this->supplemental_model, site_url());
 		$data['page_supplemental'] = $page_supp->supplementalLinks();
-		
 		
 		
 		if(isset($arr_benchmark_data)){

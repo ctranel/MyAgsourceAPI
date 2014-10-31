@@ -59,11 +59,12 @@ class SupplementalComment
 	 *  @throws: 
 	 * -----------------------------------------------------------------*/
 	 public static function datasetToObjects($dataset) {
-		$ret = new SplObjectStorage();
+		$ret = new \SplObjectStorage();
 	 	if(isset($dataset) && is_array($dataset)){
 			foreach($dataset as $r){
 				$ret->attach(new SupplementalComment($r['comment']));
 			}
 		}
-	}
+		return $ret;
+	 }
 }

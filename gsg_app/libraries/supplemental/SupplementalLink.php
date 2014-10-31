@@ -1,6 +1,10 @@
 <?php
 namespace myagsource\supplemental;
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+
+require_once(APPPATH . 'libraries' . FS_SEP . 'supplemental' . FS_SEP . 'SupplementalLinkParam.php');
+
+
 /**
 * Contains properties and methods specific supplemental data links for various sections of the website.
 * 
@@ -19,6 +23,12 @@ class SupplementalLink
 	 * @var int
 	 **/
 	protected $id;
+
+	/**
+	 * link site_url
+	 * @var string
+	 **/
+	protected $site_url;
 
 	/**
 	 * link href
@@ -48,7 +58,7 @@ class SupplementalLink
 	 * collection of supplemental_link_param objects
 	 * @var array
 	 **/
-	protected $arr_params;
+	protected $params;
 
 	/**
 	 * __construct
@@ -61,12 +71,13 @@ class SupplementalLink
 	 * @return void
 	 * @author ctranel
 	 **/
-	public function __construct($href, $rel, $title, $class, $arr_params)
-	{
+	public function __construct($site_url, $href, $rel, $title, $class, \SplObjectStorage $params){
+		$this->site_url = $site_url;
 		$this->href = $href;
 		$this->rel = $rel;
 		$this->title = $title;
 		$this->a_class = $class;
+		$this->params = $params;
 	}
 	
 	/* -----------------------------------------------------------------
@@ -143,7 +154,7 @@ class SupplementalLink
 	 public function anchorTag() {
 		$ret = '<a';
 		if(isset($this->href) && !empty($this->href)){
-			$ret .= ' href="' . $this->href . '"';
+			$ret .= ' href="' . $this->site_url . $this->href . '"';
 		}
 	 	if(isset($this->a_class) && !empty($this->a_class)){
 			$ret .= ' class="' . $this->a_class . '"';
@@ -163,7 +174,7 @@ class SupplementalLink
 	/* -----------------------------------------------------------------
 	 *  Factory function, takes a dataset and returns supplemental link objects
 
-	 *  Factory function that takes a dataset array and returns an array of 
+	 *  Factory function that takes a dataset array and returns object storage of 
 	 *  supplemental link objects
 
 	 *  @since: version
@@ -173,18 +184,22 @@ class SupplementalLink
 	 *  @return: array of Supplemental_link objects
 	 *  @throws: 
 	 * -----------------------------------------------------------------*/
-	 public static function datasetToObjects($dataset) {
-		$ret = new SplObjectStorage();
+	 public static function datasetToObjects($site_url, $dataset, $supplemental_datasource) {
+	 	$ret = new \SplObjectStorage();
 		if(isset($dataset) && is_array($dataset)){
 			foreach($dataset as $r){
+				$param_data = $supplemental_datasource->getLinkParams($r['id']);
+				$params = SupplementalLinkParam::datasetToObjects($param_data);
 				$ret->attach(new SupplementalLink(
+					$site_url,
 					$r['a_href'],
-					$r['a_title'],
 					$r['a_rel'],
+					$r['a_title'],
 					$r['a_class'],
-					$arr_params
+					$params
 				));
 			}
 		}
+		return $ret;
 	}
 }
