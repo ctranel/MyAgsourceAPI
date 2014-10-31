@@ -402,7 +402,7 @@ class Report_model extends CI_Model {
 	 * @return array
 	 * @author ctranel
 	 */
-	public function get_field_link_params($supp_id){
+	protected function get_field_link_params($supp_id){
 		$arr_return = array();
 		$arr_link_params = $this->{$this->db_group_name}
 		->select('l.param_name, f.db_field_name, l.param_value')

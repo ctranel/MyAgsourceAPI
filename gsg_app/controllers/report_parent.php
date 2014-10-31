@@ -4,11 +4,13 @@ require_once APPPATH . 'libraries' . FS_SEP . 'db_objects' . FS_SEP . 'db_table.
 require_once(APPPATH . 'libraries' . FS_SEP . 'filters' . FS_SEP . 'Filters.php');
 require_once(APPPATH . 'libraries' . FS_SEP . 'benchmarks_lib.php');
 require_once(APPPATH . 'libraries' . FS_SEP . 'access_log.php');
+require_once(APPPATH . 'libraries' . FS_SEP . 'supplemental' . FS_SEP . 'Supplemental.php');
 
 use \myagsource\db_objects\db_table;
 use \myagsource\settings\Benchmarks_lib;
 use \myagsource\Access_log;
 use \myagsource\report_filters\Filters;
+use \myagsource\supplemental\Supplemental;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
@@ -491,6 +493,12 @@ abstract class parent_report extends CI_Controller {
 			$collapse_data['id'] = 'filters';
 			$data['filters'] = $this->load->view('collapsible', $collapse_data, TRUE);
 		}
+
+		$this->load->model('supplemental_model');
+		$page_supp = Supplemental::getPageSupplemental($this->objPage['page_id'], $this->supplemental_model, site_url());
+		$data['page_supplemental'] = $page_supp->supplementalLinks();
+		
+		
 		if(isset($arr_benchmark_data)){
 			$collapse_data['content'] = $this->load->view('set_benchmarks', $arr_benchmark_data, TRUE);
 			$collapse_data['title'] = 'Set Benchmarks';
