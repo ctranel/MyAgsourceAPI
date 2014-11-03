@@ -55,7 +55,7 @@ class Benchmark extends CI_Controller {
 		}
 		
 		//HANDLE DATA
-		$arr_params = (array)json_decode(urldecode($ser_form_data));
+		$arr_params = json_decode(urldecode($ser_form_data), true);
 		//verify csrf
 		if(isset($arr_params['csrf_test_name']) && $arr_params['csrf_test_name'] != $this->security->get_csrf_hash()) die("I don't recognize your browser session, your session may have expired, or you may have cookies turned off.");
 		unset($arr_params['csrf_test_name']);

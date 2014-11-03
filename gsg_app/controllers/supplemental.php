@@ -29,9 +29,8 @@ class Supplemental extends CI_Controller {
     }
 
     function ajax_tip($comment_id) {
-    	$this->load->model('supp_comment_model');
-    	$tip = $this->supp_comment_model->getComment($comment_id);
-//echo $tip;
+    	$this->load->model('supplemental_model');
+    	$tip = $this->supplemental_model->getComment($comment_id);
     	$this->load->view('tip', array('tip' => $tip));
     }
     

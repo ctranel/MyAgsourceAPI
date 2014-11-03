@@ -222,23 +222,28 @@ class Session_settings {
 	* -----------------------------------------------------------------
 	*/
 	public static function parseFormData($form_data){
-		$ret_val = array();
+		return $form_data;
+/*		$ret_val = array();
 		if(!isset($form_data) || !is_array($form_data)){
 			return false;
 		}
 		foreach($form_data as $k=>$set){
-			//handle range notation
-			if(key($v) === 'dbfrom' || key($v) === 'dbto'){
-				$obj_key = substr($k, 0, $split);
-				$ret_val[$obj_key] = $set['dbfrom'] . '|' . $set['dbto'];
+			if(is_array($set)){
+				//handle range notation
+				if(key($set) === 'dbfrom' || key($set) === 'dbto'){
+					$obj_key = substr($k, 0, $split);
+die($obj_key);
+					$ret_val[$obj_key] = $set['dbfrom'] . '|' . $set['dbto'];
+				}
 			}
 			//if it is not a range data type
 			else{
 				$ret_val[$k] = $set;
-			}
+//			}
 			//$this->arr_settings[$k]->parseFormData($set);
 		}
-		return $ret_val;
+var_dump($form_data, $ret_val);die;
+		return $ret_val; */
 	}
 	
 	/* -----------------------------------------------------------------
@@ -262,15 +267,14 @@ class Session_settings {
 		}
 		$arr_data = array();
 		
-		if(isset($this->user_id) && !empty($this->user_id)){
-			foreach($arr_settings as $k=>$v){
-				$arr_data[] = "SELECT '" . $this->user_id . "' AS user_id, '" . $this->herd_code . "' AS herd_code, '" . $this->arr_settings[$k]->getSettingID() . "' AS setting_id, '" . $v . "' AS value";
+		$user_id = isset($this->user) ? $this->user : null;
+		
+		foreach($arr_settings as $k=>$v){
+			if(is_array($v)){
+				$v = implode('|', $v);
 			}
-		}
-		else{
-			foreach($arr_settings as $k=>$v){
-				$arr_data[] = "SELECT null AS user_id, '" . $this->herd_code . "' AS herd_code, '" . $this->arr_settings[$k]->getSettingID() . "' AS setting_id, '" . $v . "' AS value";
-			}
+			
+			$arr_data[] = "SELECT '" . $this->user_id . "' AS user_id, '" . $this->herd_code . "' AS herd_code, '" . $this->arr_settings[$k]->getSettingID() . "' AS setting_id, '" . $v . "' AS value";
 		}
 		$this->setting_model->mergeUserHerdSettings($arr_data);
 	}
