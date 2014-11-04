@@ -59,7 +59,7 @@ endif; ?>
 			either via the uservoice or email links provided above.</p>
 		<p> In the meantime, if you would like to view the website as it
 			is intended to look for comparison, the browsers most compatibile
-			with the site as of 9/2/2014 are:
+			with the site as of 11/3/2014 are:
 			<ul><li><strong>Firefox</strong></li>
 			<li><strong>Chrome 33 and above</strong></li></ul></p>
 		<p> We will never require you to change browsers if it is within
@@ -67,7 +67,7 @@ endif; ?>
 			control and those things will be listed above in our Known Issues
 			section. The browser(s) with the least known issues will be recommended
 			here.</p>
-		<p>Thanks for your understanding.</p>
+		<p> Thanks for your understanding.</p>
 </div>
 <?php if(isset($page_footer)): 
 	echo $page_footer;

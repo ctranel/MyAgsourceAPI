@@ -92,18 +92,53 @@ class Setting {
 		$this->data_type = $arr_setting_data['type'];
 		$this->name = $arr_setting_data['name'];
 		$this->description = $arr_setting_data['description'];
+		//set value
+		//handle ranges
+		if($this->data_type === 'range'){
+			if(strpos($arr_setting_data['value'], '|') !== false){
+				$tmp = [];
+				list($tmp['dbfrom'], $tmp['dbto']) = explode('|', $arr_setting_data['value']);
+				$arr_setting_data['value'] = $tmp;
+			}
+			else{
+				$arr_setting_data['value'] = [];
+			}
+		}
+				//if type is array and value is not an array, wrap it in an array
 		if(($this->data_type === 'array' || $this->data_type === 'data_lookup_arr') && isset($arr_setting_data['value']) && !is_array($arr_setting_data['value'])){
-			$this->value = array($arr_setting_data['value']);
+			if(strpos($arr_setting_data['value'], '|')){
+				$arr_setting_data['value'] = explode('|', $arr_setting_data['value']);
+			}
+			else{
+				$arr_setting_data['value'] = [$arr_setting_data['value']];
+			}
 		}
-		else{
-			$this->value = $arr_setting_data['value'];
+		$this->value = $arr_setting_data['value'];
+		
+		
+		//set default value
+		//handle ranges
+		if($this->data_type === 'range'){
+			if(strpos($arr_setting_data['default_value'], '|') !== false){
+				$tmp = [];
+				list($tmp['dbfrom'], $tmp['dbto']) = explode('|', $arr_setting_data['default_value']);
+				$arr_setting_data['default_value'] = $tmp;
+			}
+			else{
+				$arr_setting_data['default_value'] = [];
+			}
 		}
+		//if type is array and default_value is not an array, wrap it in an array
 		if(($this->data_type === 'array' || $this->data_type === 'data_lookup_arr') && isset($arr_setting_data['default_value']) && !is_array($arr_setting_data['default_value'])){
-			$this->default_value = array($arr_setting_data['default_value']);
+			if(strpos($arr_setting_data['default_value'], '|') !== false){
+				$arr_setting_data['default_value'] = explode('|', $arr_setting_data['default_value']);
+			}
+			else{
+				$arr_setting_data['default_value'] = [$arr_setting_data['default_value']];
+			}
 		}
-		else{
-			$this->default_value = $arr_setting_data['default_value'];
-		}
+		$this->default_value = $arr_setting_data['default_value'];
+		
 		if($this->data_type === 'data_lookup' || $this->data_type === 'data_lookup_arr'){
 			$this->loadLookupOptions();
 		}
@@ -124,13 +159,22 @@ class Setting {
 	public function getCurrValue($session_value = null){
 		//if a string is sent for array type, insert string into array
 		if(($this->data_type === 'array' || $this->data_type === 'data_lookup_arr') && isset($session_value) && !is_array($session_value)){
-			$session_value = array($session_value);
+			$session_value = [$session_value];
 		}
-		
-		if(isset($session_value)){
+		if(strpos($this->data_type, 'range') !== false || $this->data_type === 'array' || $this->data_type === 'data_lookup_arr'){
+			 if(isset($session_value) && is_array($session_value) && !empty($session_value)){
+				return $session_value;
+			 }
+		}
+		elseif(isset($session_value)){
 			return $session_value;
 		}
-		if(isset($this->value)){
+		if(strpos($this->data_type, 'range') !== false || $this->data_type === 'array' || $this->data_type === 'data_lookup_arr'){
+			if(isset($this->value) && is_array($this->value) && !empty($this->value)){
+				return $this->value;
+			}
+		}
+		elseif(isset($this->value)){
 			return $this->value;
 		}
 		return $this->default_value;
@@ -280,16 +324,10 @@ class Setting {
 			$ret_val['class'] = $this->grouping;
 			return $ret_val;
 		}
-		if($this->data_type === 'range'){
-			//list($from, $to) = explode('|', $this->getCurrValue($session_value));
-			//$ret_val['dbfrom'] = $from;
-			//$ret_val['dbto'] = $to;
+//		if($this->data_type === 'range'){
 			$ret_val = $this->getCurrValue($session_value);
 			$ret_val['class'] = $this->grouping;
 			return $ret_val;
-		}
-//		if($this->data_type === 'array'){
-//			return $this->getCurrValue($session_value);
 //		}
 		/*
 		 * @todo: add remaining data types
