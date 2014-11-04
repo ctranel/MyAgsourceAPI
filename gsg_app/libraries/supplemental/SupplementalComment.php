@@ -2,6 +2,11 @@
 namespace myagsource\supplemental;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+
+require_once(APPPATH . 'libraries' . FS_SEP . 'MyaObjectStorage.php');
+use \myagsource\MyaObjectStorage;
+
+
 /**
 * Contains properties and methods specific supplemental data comments for various sections of the website.
 * 
@@ -12,7 +17,7 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 *
 */
 
-class SupplementalComment
+class SupplementalComment implements \JsonSerializable
 {
 	/**
 	 * link href
@@ -44,6 +49,26 @@ class SupplementalComment
 	 public function comment() {
 		return $this->comment;
 	}
+
+	/**
+	 * (non-PHPdoc)
+	 *
+	 * @see JsonSerializable::jsonSerialize()
+	 *
+	 */
+	public function jsonSerialize() {
+		$ret = array();
+		foreach($this as $key => $value) {
+			if(is_object($value)){
+				$ret[$key] = $value->jsonSerialize();
+			}
+			else{
+				$ret[$key] = $value;
+			}
+				
+		}
+		return $ret;
+	}
 	
 	/* -----------------------------------------------------------------
 	 *  Factory function, takes a dataset and returns supplemental comment objects
@@ -59,7 +84,7 @@ class SupplementalComment
 	 *  @throws: 
 	 * -----------------------------------------------------------------*/
 	 public static function datasetToObjects($dataset) {
-		$ret = new \SplObjectStorage();
+		$ret = new MyaObjectStorage();
 	 	if(isset($dataset) && is_array($dataset)){
 			foreach($dataset as $r){
 				$ret->attach(new SupplementalComment($r['comment']));

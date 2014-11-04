@@ -1,6 +1,11 @@
 <?php
 namespace myagsource\supplemental;
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+
+require_once(APPPATH . 'libraries' . FS_SEP . 'MyaObjectStorage.php');
+use \myagsource\MyaObjectStorage;
+
+
 /**
 * Contains properties and methods specific supplemental data links for various sections of the website.
 * 
@@ -12,7 +17,7 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 *
 */
 
-class SupplementalLinkParam
+class SupplementalLinkParam implements \JsonSerializable
 {
 	/**
 	 * link id
@@ -49,7 +54,7 @@ class SupplementalLinkParam
 	 * @return void
 	 * @author ctranel
 	 **/
-	public function __construct($name, $value_db_field_name, $value, $supplemental_data_source){
+	public function __construct($name, $value_db_field_name, $value){
 		$this->name = $name;
 		$this->value_db_field_name = $value_db_field_name;
 		$this->value = $value;
@@ -99,6 +104,26 @@ class SupplementalLinkParam
 	 public function value() {
 		return $this->value;
 	}
+
+	/**
+	 * (non-PHPdoc)
+	 *
+	 * @see JsonSerializable::jsonSerialize()
+	 *
+	 */
+	public function jsonSerialize() {
+		$ret = array();
+		foreach($this as $key => $value) {
+			if(is_object($value)){
+				$ret[$key] = $value->jsonSerialize();
+			}
+			else{
+				$ret[$key] = $value;
+			}
+				
+		}
+		return $ret;
+	}
 	
 	/* -----------------------------------------------------------------
 	 *  Factory function, takes a dataset and returns supplemental link param objects
@@ -114,7 +139,7 @@ class SupplementalLinkParam
 	 *  @throws: 
 	 * -----------------------------------------------------------------*/
 	 public static function datasetToObjects($dataset) {
-	 	$ret = new \SplObjectStorage();
+	 	$ret = new MyaObjectStorage();
 		if(isset($dataset) && is_array($dataset)){
 			foreach($dataset as $r){
 				$ret->attach(new SupplementalLinkParam(

@@ -3,6 +3,9 @@ namespace myagsource\supplemental;
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 require_once(APPPATH . 'libraries' . FS_SEP . 'supplemental' . FS_SEP . 'SupplementalLinkParam.php');
+require_once(APPPATH . 'libraries' . FS_SEP . 'MyaObjectStorage.php');
+use \myagsource\MyaObjectStorage;
+
 
 
 /**
@@ -16,7 +19,7 @@ require_once(APPPATH . 'libraries' . FS_SEP . 'supplemental' . FS_SEP . 'Supplem
 *
 */
 
-class SupplementalLink
+class SupplementalLink implements \JsonSerializable
 {
 	/**
 	 * link id
@@ -71,7 +74,7 @@ class SupplementalLink
 	 * @return void
 	 * @author ctranel
 	 **/
-	public function __construct($site_url, $href, $rel, $title, $class, \SplObjectStorage $params){
+	public function __construct($site_url, $href, $rel, $title, $class, \myagsource\iArrayAccessJson $params){
 		$this->site_url = $site_url;
 		$this->href = $href;
 		$this->rel = $rel;
@@ -171,6 +174,26 @@ class SupplementalLink
 		return $ret;
 	 }
 	
+	/**
+	 * (non-PHPdoc)
+	 *
+	 * @see JsonSerializable::jsonSerialize()
+	 *
+	 */
+	public function jsonSerialize() {
+		$ret = array();
+		foreach($this as $key => $value) {
+			if(is_object($value)){
+				$ret[$key] = $value->jsonSerialize();
+			}
+			else{
+				$ret[$key] = $value;
+			}
+			
+		}
+		return $ret;
+	}
+
 	/* -----------------------------------------------------------------
 	 *  Factory function, takes a dataset and returns supplemental link objects
 
@@ -184,8 +207,8 @@ class SupplementalLink
 	 *  @return: array of Supplemental_link objects
 	 *  @throws: 
 	 * -----------------------------------------------------------------*/
-	 public static function datasetToObjects($site_url, $dataset, $supplemental_datasource) {
-	 	$ret = new \SplObjectStorage();
+	 public static function datasetToObjects($site_url, $dataset, \supplemental_model $supplemental_datasource) {
+	 	$ret = new MyaObjectStorage();
 		if(isset($dataset) && is_array($dataset)){
 			foreach($dataset as $r){
 				$param_data = $supplemental_datasource->getLinkParams($r['id']);

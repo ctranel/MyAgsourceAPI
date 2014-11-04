@@ -20,6 +20,21 @@
 		<?php echo $table_benchmark_text; ?>
 		</h3>
 	<?php endif; ?>	
+	<?php if (!empty($table_benchmark_text)): ?>
+		<h3 class="block">
+		<?php echo $table_benchmark_text; ?>
+		</h3>
+	<?php endif;	
+	if (isset($supplemental) && is_object($supplemental)): ?>
+		<h3 id="page-supplemental" class="page-supplemental">
+	<?php 
+		foreach($supplemental as $s):
+			echo $s->anchorTag();
+		endforeach;
+	?>
+		</h3>
+	<?php
+	endif; ?>
 	<table id="<?php echo $table_id; ?>" class="tbl">
 		<?php if (!empty($table_header)): ?>
 				<thead> <?php echo $table_header; ?> </thead>

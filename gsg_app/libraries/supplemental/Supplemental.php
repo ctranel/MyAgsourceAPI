@@ -4,8 +4,10 @@ namespace myagsource\supplemental;
 require_once(APPPATH . 'libraries' . FS_SEP . 'supplemental' . FS_SEP . 'SupplementalLink.php');
 require_once(APPPATH . 'libraries' . FS_SEP . 'supplemental' . FS_SEP . 'SupplementalComment.php');
 
-use myagsource\supplemental\SupplementalLink;
-use myagsource\supplemental\SupplementalComment;
+use \myagsource\supplemental\SupplementalLink;
+use \myagsource\supplemental\SupplementalComment;
+use \myagsource;
+use \myagsource\MyaObjectStorage;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /**
@@ -29,13 +31,13 @@ class Supplemental
 
 	/**
 	 * supplemental link objects
-	 * @var SplObjectStorage of Supplemental_link object
+	 * @var MyaObjectStorage of Supplemental_link object
 	 **/
 	protected $supplemental_links;
 
 	/**
 	 * supplemental comment objects
-	 * @var SplObjectStorage of Supplemental_comment objects
+	 * @var MyaObjectStorage of Supplemental_comment objects
 	 **/
 	protected $supplemental_comments;
 
@@ -47,7 +49,7 @@ class Supplemental
 	 * @return void
 	 * @author ctranel
 	 **/
-	public function __construct(\SplObjectStorage $supplemental_links, \SplObjectStorage $supplemental_comments)
+	public function __construct(\myagsource\iArrayAccessJson $supplemental_links, \myagsource\MyaObjectStorage $supplemental_comments)
 	{
 		$this->supplemental_links = $supplemental_links;
 		$this->supplemental_comments = $supplemental_comments;
@@ -74,12 +76,36 @@ class Supplemental
 	 *  @return: Supplemental object
 	 *  @throws: 
 	 * -----------------------------------------------------------------*/
-	public static function getPageSupplemental($page_id, $supplemental_datasource, $site_url) {
+	public static function getPageSupplemental($page_id, \supplemental_model $supplemental_datasource, $site_url) {
 		$links = $supplemental_datasource->getLinks(2, $page_id);
 		$supplemental_links = SupplementalLink::datasetToObjects($site_url, $links, $supplemental_datasource);
 	
 		$comments = $supplemental_datasource->getComments(2, $page_id);
 		$supplemental_comments = SupplementalComment::datasetToObjects($comments);
+		$supp = new Supplemental($supplemental_links, $supplemental_comments);
+		return $supp;
+	}
+
+	/* -----------------------------------------------------------------
+	 *  Factory for supplemental objects for blocks
+	
+	*  Factory for supplemental objects for blocks
+	
+	*  @since: version
+	*  @author: ctranel
+	*  @date: Oct 28, 2014
+	*  @param: int
+	*  @param: object supplemental_datasource
+	*  @return: Supplemental object
+	*  @throws:
+	* -----------------------------------------------------------------*/
+	public static function getBlockSupplemental($block_id, \supplemental_model $supplemental_datasource, $site_url) {
+		$links = $supplemental_datasource->getLinks(1, $block_id);
+		$supplemental_links = SupplementalLink::datasetToObjects($site_url, $links, $supplemental_datasource);
+	
+		$comments = $supplemental_datasource->getComments(1, $block_id);
+		$supplemental_comments = SupplementalComment::datasetToObjects($comments);
+		
 		$supp = new Supplemental($supplemental_links, $supplemental_comments);
 		return $supp;
 	}

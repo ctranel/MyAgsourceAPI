@@ -546,6 +546,12 @@ abstract class parent_report extends CI_Controller {
 					array('herd_code' => $this->session->userdata('herd_code')) + $arr_params
 			);
 		}
+		//supplemental data
+		$this->load->model('supplemental_model');
+		$block_supp = Supplemental::getBlockSupplemental($this->objPage['blocks'][$block]['id'], $this->supplemental_model, site_url());
+		$data['block_supplemental'] = $block_supp->supplementalLinks();
+		//end supplemental
+		
 		$this->load->helper('report_chart_helper');
 		if($sort_by != 'null' && $sort_order != 'null') {
 			$this->arr_sort_by = explode('|', $sort_by);
@@ -559,6 +565,7 @@ abstract class parent_report extends CI_Controller {
 		
 		$this->page = $page;
 		$this->json = NULL;
+		$this->json['supplemental'] = json_encode($data['block_supplemental'], JSON_UNESCAPED_SLASHES);
 		$this->display = $output;
 		//set parameters for given block
 		
@@ -777,6 +784,7 @@ abstract class parent_report extends CI_Controller {
 			'report_data' => $results,
 			'table_heading' => $title,
 			'table_sub_heading' => $subtitle,
+//			'supplemental' => ,
 			'arr_numeric_fields' => $this->{$this->primary_model}->get_numeric_fields(),
 			'arr_decimal_places' => $this->{$this->primary_model}->get_decimal_places(),
 			'arr_field_links' => $this->{$this->primary_model}->get_field_links(),
