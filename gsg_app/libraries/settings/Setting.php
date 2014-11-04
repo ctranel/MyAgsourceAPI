@@ -161,11 +161,20 @@ class Setting {
 		if(($this->data_type === 'array' || $this->data_type === 'data_lookup_arr') && isset($session_value) && !is_array($session_value)){
 			$session_value = [$session_value];
 		}
-		
-		if(isset($session_value)){
+		if(strpos($this->data_type, 'range') !== false || $this->data_type === 'array' || $this->data_type === 'data_lookup_arr'){
+			 if(isset($session_value) && is_array($session_value) && !empty($session_value)){
+				return $session_value;
+			 }
+		}
+		elseif(isset($session_value)){
 			return $session_value;
 		}
-		if(isset($this->value)){
+		if(strpos($this->data_type, 'range') !== false || $this->data_type === 'array' || $this->data_type === 'data_lookup_arr'){
+			if(isset($this->value) && is_array($this->value) && !empty($this->value)){
+				return $this->value;
+			}
+		}
+		elseif(isset($this->value)){
 			return $this->value;
 		}
 		return $this->default_value;
