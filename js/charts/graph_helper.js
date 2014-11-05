@@ -114,9 +114,18 @@ function process_chart(div_id, data_in){
 	options.title = {"text": data_in.description};
 	options.exporting = {"filename": data_in.name};
 	
+	//subtitle
+	var subtitle = '';
 	if (typeof(data_in.filter_text) !== 'undefined' && data_in.filter_text !== null && data_in.filter_text !== ''){
-		options.subtitle = {"text": data_in.filter_text};
-	} 
+		subtitle += data_in.filter_text;
+	}
+	if (typeof(data_in.supplemental) !== 'undefined' && data_in.supplemental !== null && data_in.supplemental !== ''){
+		subtitle += '<div class="supplemental-link">' + data_in.supplemental + '</div>';
+	}
+	if(subtitle !== ''){
+		options.subtitle = {"text": subtitle, "useHTML": true};
+	}
+	//end subtitle
 
 	if(typeof(data_in) === 'undefined'){
 		$('#' + div_id).html('<p class-"chart-error">Sorry, the requested data was not able to be retrieved.  Please try again, or contact AgSource for assistance.</p>');
@@ -255,6 +264,8 @@ function process_chart(div_id, data_in){
 		if(typeof(section_data) == "object" && typeof post_render == 'function'){
 			post_render(section_data);
 		}
+		//attach events to new blocks
+		attachDataFieldEvents();
 	}
 	$('#waiting-icon' + block_index).hide();
 	$('#chart-container' + block_index).show();

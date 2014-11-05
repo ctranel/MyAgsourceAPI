@@ -176,7 +176,7 @@ function attachDataFieldEvents(){
 	    hide: false
 	});
 	//$('.qtip').attr('style','');
-*/$('.ajax-popup').magnificPopup({
+*/	$('.ajax-popup').magnificPopup({
 		type:'ajax'
 	});
 	

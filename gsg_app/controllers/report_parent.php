@@ -57,6 +57,8 @@ abstract class parent_report extends CI_Controller {
 	protected $avg_row;
 	protected $pivot_db_field;
 	protected $bool_is_summary;
+	protected $supplemental;
+
 	/**
 	 * Benchmark settings
 	 * 
@@ -496,9 +498,7 @@ abstract class parent_report extends CI_Controller {
 
 		$this->load->model('supplemental_model');
 		$page_supp = Supplemental::getPageSupplemental($this->objPage['page_id'], $this->supplemental_model, site_url());
-		$data['page_supplemental'] = $page_supp->supplementalLinks();
-		
-		
+		$data['page_supplemental'] = $page_supp->getContent();
 		if(isset($arr_benchmark_data)){
 			$collapse_data['content'] = $this->load->view('set_benchmarks', $arr_benchmark_data, TRUE);
 			$collapse_data['title'] = 'Set Benchmarks';
@@ -549,9 +549,10 @@ abstract class parent_report extends CI_Controller {
 		//supplemental data
 		$this->load->model('supplemental_model');
 		$block_supp = Supplemental::getBlockSupplemental($this->objPage['blocks'][$block]['id'], $this->supplemental_model, site_url());
-		$data['block_supplemental'] = $block_supp->supplementalLinks();
+		$this->supplemental = $block_supp->getContent();
+var_dump($this->supplemental);
 		//end supplemental
-		
+
 		$this->load->helper('report_chart_helper');
 		if($sort_by != 'null' && $sort_order != 'null') {
 			$this->arr_sort_by = explode('|', $sort_by);
@@ -565,7 +566,8 @@ abstract class parent_report extends CI_Controller {
 		
 		$this->page = $page;
 		$this->json = NULL;
-		$this->json['supplemental'] = json_encode($data['block_supplemental'], JSON_UNESCAPED_SLASHES);
+		
+		$this->json['supplemental'] = $this->supplemental;
 		$this->display = $output;
 		//set parameters for given block
 		
@@ -601,7 +603,7 @@ abstract class parent_report extends CI_Controller {
 		}
  	   	exit;
 	}
-	
+
 	protected function get_section_data($block, $sort_by, $sort_order, $report_count){
 		return array(
 			'block' => $block,
@@ -681,6 +683,7 @@ abstract class parent_report extends CI_Controller {
 		$this->json['name'] = $arr_this_block['name'];
 		$this->json['description'] = $arr_this_block['description'];
 		$this->json['chart_type'] = $arr_this_block['chart_type'];
+//@todo: add supplemental links and comments
 
 		$this->json['arr_axes'] = $arr_axes;
 		$tmp_x_axis = current($this->json['arr_axes']['x']);
@@ -784,14 +787,19 @@ abstract class parent_report extends CI_Controller {
 			'report_data' => $results,
 			'table_heading' => $title,
 			'table_sub_heading' => $subtitle,
-//			'supplemental' => ,
 			'arr_numeric_fields' => $this->{$this->primary_model}->get_numeric_fields(),
 			'arr_decimal_places' => $this->{$this->primary_model}->get_decimal_places(),
 			'arr_field_links' => $this->{$this->primary_model}->get_field_links(),
 		);
+		
+		if(isset($this->supplemental) && !empty($this->supplemental)){
+			$this->report_data['supplemental'] = $this->supplemental;
+		}
+		
 		if(isset($bench_text)){
 			$this->report_data['table_benchmark_text'] = $bench_text;
 		}
+
 		if(isset($this->report_data) && is_array($this->report_data)) {
 			$this->html = $this->load->view('report_table.php', $this->report_data, TRUE);
 		}

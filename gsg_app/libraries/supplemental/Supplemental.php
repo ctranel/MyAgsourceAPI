@@ -6,8 +6,7 @@ require_once(APPPATH . 'libraries' . FS_SEP . 'supplemental' . FS_SEP . 'Supplem
 
 use \myagsource\supplemental\SupplementalLink;
 use \myagsource\supplemental\SupplementalComment;
-use \myagsource;
-use \myagsource\MyaObjectStorage;
+//use \myagsource\MyaObjectStorage;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /**
@@ -31,13 +30,13 @@ class Supplemental
 
 	/**
 	 * supplemental link objects
-	 * @var MyaObjectStorage of Supplemental_link object
+	 * @var SplObjectStorage of Supplemental_link object
 	 **/
 	protected $supplemental_links;
 
 	/**
 	 * supplemental comment objects
-	 * @var MyaObjectStorage of Supplemental_comment objects
+	 * @var SplObjectStorage of Supplemental_comment objects
 	 **/
 	protected $supplemental_comments;
 
@@ -49,7 +48,7 @@ class Supplemental
 	 * @return void
 	 * @author ctranel
 	 **/
-	public function __construct(\myagsource\iArrayAccessJson $supplemental_links, \myagsource\MyaObjectStorage $supplemental_comments)
+	public function __construct(\SplObjectStorage $supplemental_links, \SplObjectStorage $supplemental_comments)
 	{
 		$this->supplemental_links = $supplemental_links;
 		$this->supplemental_comments = $supplemental_comments;
@@ -61,6 +60,35 @@ class Supplemental
 	
 	public function supplementalComments(){
 		return $this->supplemental_comments;
+	}
+	
+	/* -----------------------------------------------------------------
+	 *  Factory for supplemental objects for blocks
+	
+	*  Factory for supplemental objects for blocks
+	
+	*  @since: version
+	*  @author: ctranel
+	*  @date: Oct 28, 2014
+	*  @param: int
+	*  @param: object supplemental_datasource
+	*  @return: Supplemental object
+	*  @throws:
+	* -----------------------------------------------------------------*/
+	
+	public function getContent(){
+		$arr_supplemental = [];
+		if (isset($this->supplemental_links) && is_object($this->supplemental_links)){
+			foreach($this->supplemental_links as $s){
+				$arr_supplemental[] = $s->anchorTag();
+			}
+		}
+		if (isset($this->supplemental_comments) && is_object($this->supplemental_comments)){
+			foreach($this->supplemental_comments as $s){
+				$arr_supplemental[] = $s->comment();
+			}
+		}
+		return $arr_supplemental;
 	}
 	
 	/* -----------------------------------------------------------------

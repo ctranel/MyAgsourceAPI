@@ -19,22 +19,16 @@
 		<h3 class="block">
 		<?php echo $table_benchmark_text; ?>
 		</h3>
-	<?php endif; ?>	
-	<?php if (!empty($table_benchmark_text)): ?>
-		<h3 class="block">
-		<?php echo $table_benchmark_text; ?>
-		</h3>
 	<?php endif;	
-	if (isset($supplemental) && is_object($supplemental)): ?>
-		<h3 id="page-supplemental" class="page-supplemental">
+	if (isset($supplemental) && is_array($supplemental)): ?>
 	<?php 
-		foreach($supplemental as $s):
-			echo $s->anchorTag();
-		endforeach;
+		foreach($supplemental as $s): ?>
+			<h3 class="block block-supplemental"><?php echo $s; ?></h3>
+	<?php endforeach;
 	?>
-		</h3>
 	<?php
-	endif; ?>
+	endif;
+	?>
 	<table id="<?php echo $table_id; ?>" class="tbl">
 		<?php if (!empty($table_header)): ?>
 				<thead> <?php echo $table_header; ?> </thead>

@@ -109,9 +109,10 @@
 	* -----------------------------------------------------------------*/
 	function getLinkParams($supplemental_link_id) {
 		$ret = $this->db
-		->select('p.param_value_field_id, p.param_value, f.db_field_name')
-		->join('users.dbo.db_fields f', 'p.param_value_field_id = f.id')
+		->select('p.param_name AS name, p.param_value AS value, f.db_field_name AS value_db_field_name')
+		->join('users.dbo.db_fields f', 'p.param_value_field_id = f.id', 'left')
 		->where('sl_id', $supplemental_link_id)
+		->order_by('p.list_order', 'ASC')
 		->get('users.dbo.supp_link_params p')
 		->result_array();
 		return $ret;

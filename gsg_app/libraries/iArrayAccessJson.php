@@ -8,6 +8,11 @@ namespace myagsource;
  *        
  */
 interface iArrayAccessJson extends \ArrayAccess, \JsonSerializable {
+	
+	function toArray();
+	
+	//public static function datasetToObjects($dataset);
+	
 }
 
 ?>

@@ -3,8 +3,8 @@ namespace myagsource\supplemental;
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 require_once(APPPATH . 'libraries' . FS_SEP . 'supplemental' . FS_SEP . 'SupplementalLinkParam.php');
-require_once(APPPATH . 'libraries' . FS_SEP . 'MyaObjectStorage.php');
-use \myagsource\MyaObjectStorage;
+//require_once(APPPATH . 'libraries' . FS_SEP . 'MyaObjectStorage.php');
+//use \myagsource\MyaObjectStorage;
 
 
 
@@ -19,7 +19,7 @@ use \myagsource\MyaObjectStorage;
 *
 */
 
-class SupplementalLink implements \JsonSerializable
+class SupplementalLink extends \SplObjectStorage
 {
 	/**
 	 * link id
@@ -74,8 +74,9 @@ class SupplementalLink implements \JsonSerializable
 	 * @return void
 	 * @author ctranel
 	 **/
-	public function __construct($site_url, $href, $rel, $title, $class, \myagsource\iArrayAccessJson $params){
+	public function __construct($site_url, $id, $href, $rel, $title, $class, \SplObjectStorage $params){
 		$this->site_url = $site_url;
+		$this->id = $id;
 		$this->href = $href;
 		$this->rel = $rel;
 		$this->title = $title;
@@ -156,8 +157,24 @@ class SupplementalLink implements \JsonSerializable
 	 * -----------------------------------------------------------------*/
 	 public function anchorTag() {
 		$ret = '<a';
+		$param_text = '';
 		if(isset($this->href) && !empty($this->href)){
-			$ret .= ' href="' . $this->site_url . $this->href . '"';
+			$external = (strpos($this->href, $this->site_url) === false && strpos($this->href, 'http') !== false);
+			foreach($this->params as $p){
+				if($external){
+					$param_text .= $param_text === '' ? '?' : '&';
+					$param_text .= $p->name() . '=' . $p->value();
+				}
+				else{
+					$param_text .= '/' . $p->value();
+				}
+			}
+			if(strpos($this->href, 'http') === false){
+				$ret .= ' href="' . $this->site_url . $this->href . $param_text . '"';
+			}
+			else{
+				$ret .= ' href="' . $this->href . $param_text . '"';
+			}
 		}
 	 	if(isset($this->a_class) && !empty($this->a_class)){
 			$ret .= ' class="' . $this->a_class . '"';
@@ -173,26 +190,6 @@ class SupplementalLink implements \JsonSerializable
 		$ret .= '</a>';
 		return $ret;
 	 }
-	
-	/**
-	 * (non-PHPdoc)
-	 *
-	 * @see JsonSerializable::jsonSerialize()
-	 *
-	 */
-	public function jsonSerialize() {
-		$ret = array();
-		foreach($this as $key => $value) {
-			if(is_object($value)){
-				$ret[$key] = $value->jsonSerialize();
-			}
-			else{
-				$ret[$key] = $value;
-			}
-			
-		}
-		return $ret;
-	}
 
 	/* -----------------------------------------------------------------
 	 *  Factory function, takes a dataset and returns supplemental link objects
@@ -208,13 +205,14 @@ class SupplementalLink implements \JsonSerializable
 	 *  @throws: 
 	 * -----------------------------------------------------------------*/
 	 public static function datasetToObjects($site_url, $dataset, \supplemental_model $supplemental_datasource) {
-	 	$ret = new MyaObjectStorage();
+	 	$ret = new \SplObjectStorage();
 		if(isset($dataset) && is_array($dataset)){
 			foreach($dataset as $r){
 				$param_data = $supplemental_datasource->getLinkParams($r['id']);
 				$params = SupplementalLinkParam::datasetToObjects($param_data);
 				$ret->attach(new SupplementalLink(
 					$site_url,
+					$r['id'],
 					$r['a_href'],
 					$r['a_rel'],
 					$r['a_title'],
