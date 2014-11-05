@@ -32,41 +32,13 @@ foreach($structure as $row): ?>
 				$th['text'] = anchor($submit_url, $th['text'], $extra);
 			endif;
 			$th['text'] .= $after_text;
-		//Column tips
-			if(isset($arr_header_links[$th['field_name']])):
-				$tip_text = '<div class="tip">';
-				$link = $arr_header_links[$th['field_name']]['href'];
-				$params = '';
-				$site_params = '';
-				if(isset($arr_header_links[$th['field_name']]['comment_id']) && !empty($arr_header_links[$th['field_name']]['comment_id'])){
-					$arr_header_links[$th['field_name']]['params']['comment_id']['value'] = $arr_header_links[$th['field_name']]['comment_id'];
-				}
-				$t_class = !empty($arr_header_links[$th['field_name']]['class']) ? ' class="' . $arr_header_links[$th['field_name']]['class'] . '"' : '';
-				$rel = !empty($arr_header_links[$th['field_name']]['rel']) ? ' rel="' . $arr_header_links[$th['field_name']]['rel'] . '"' : '';
-				$title = !empty($arr_header_links[$th['field_name']]['title']) ? ' title="' . $arr_header_links[$th['field_name']]['title'] . '"' : '';
-				if(is_array($arr_header_links[$th['field_name']]['params']) && !empty($arr_header_links[$th['field_name']]['params'])):
-					foreach($arr_header_links[$th['field_name']]['params'] as $k => $v):
-						if(isset($cr[$v['field']])):
-							$params .= "$k=" . urlencode($cr[$v['field']]) . "&";
-							$site_params .= "/" . urlencode($cr[$v['field']]);
-						else:
-							$params .= "$k=" . urlencode($v['value']) . "&";
-							$site_params .= "/" . urlencode($v['value']);
-						endif;
-						$params = substr($params, 0, -1);
-					endforeach;
-				endif;
-				if(substr($link, 0, 1) == '#'):
-					$tip_text .= anchor($link, 'tip', $rel . $title . $t_class);
-				elseif((strpos($link, 'http') === FALSE && !empty($link)) || strpos($link, 'myagsource.com') !== FALSE):
-					$tip_text .= anchor(site_url($link . $site_params), 'tip', $rel . $title . $t_class);
-				elseif(!empty($link)):
-					$tip_text .= anchor(site_url($link . '?' . $params), 'tip', $rel . $title . $t_class);
-				endif;
-				$tip_text .= '</div>';
-				$th['text'] = $tip_text . $th['text'];
-			endif; //isset: arr_header_links
-		//End column tips
+			//Column tips
+			if(isset($arr_header_links[$th['field_name']]) && is_array($arr_header_links[$th['field_name']]) && !empty($arr_header_links[$th['field_name']])):
+				foreach($arr_header_links[$th['field_name']] as $t):
+					$th['text'] = '<div class="tip">' . $t . '</div>' . $th['text'];
+				endforeach;
+			endif;
+			//End column tips
 		endif;//isset($th['field_name'])
 		?> class = "<?php echo $class ?>"><?php
 		echo $th['text'];

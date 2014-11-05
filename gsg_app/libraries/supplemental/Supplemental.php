@@ -137,4 +137,28 @@ class Supplemental
 		$supp = new Supplemental($supplemental_links, $supplemental_comments);
 		return $supp;
 	}
+	
+	/* -----------------------------------------------------------------
+	 *  Factory for supplemental objects for blocks
+	
+	*  Factory for supplemental objects for blocks
+	
+	*  @since: version
+	*  @author: ctranel
+	*  @date: Nov 5, 2014
+	*  @param: int
+	*  @param: object supplemental_datasource
+	*  @return: Supplemental object
+	*  @throws:
+	* -----------------------------------------------------------------*/
+	public static function getColHeaderSupplemental($field_id, \supplemental_model $supplemental_datasource, $site_url) {
+		$links = $supplemental_datasource->getLinks(4, $field_id);
+		$supplemental_links = SupplementalLink::datasetToObjects($site_url, $links, $supplemental_datasource);
+	
+		$comments = $supplemental_datasource->getComments(1, $field_id);
+		$supplemental_comments = SupplementalComment::datasetToObjects($comments);
+	
+		$supp = new Supplemental($supplemental_links, $supplemental_comments);
+		return $supp;
+	}
 }

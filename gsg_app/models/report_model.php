@@ -1,4 +1,9 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+
+require_once(APPPATH . 'libraries' . FS_SEP . 'supplemental' . FS_SEP . 'Supplemental.php');
+
+use \myagsource\supplemental\Supplemental;
+
 /* -----------------------------------------------------------------
 *  @description: Base data access for database-driven report generation
 *  @author: ctranel
@@ -231,17 +236,11 @@ class Report_model extends CI_Model {
 				if(!array_filter($this->arr_field_links[$fn])){
 					unset($this->arr_field_links[$fn]);
 				}
-				$this->arr_header_links[$fn] = array(//comment_id
-					'href' => $fd['head_a_href']
-					,'rel' => $fd['head_a_rel']
-					,'title' => $fd['head_a_title']
-					,'class' => $fd['head_a_class']
-					,'comment_id' => $fd['head_comment_id']
-					,'params' => $this->get_field_link_params($fd['head_supp_id'])
-				);
-				if(!array_filter($this->arr_header_links[$fn])){
-					unset($this->arr_header_links[$fn]);
-				}
+				//supplemental data
+				$this->load->model('supplemental_model');
+				$block_supp = Supplemental::getColHeaderSupplemental($fd['bsf_id'], $this->supplemental_model, site_url());
+				$this->arr_header_links[$fn] = $block_supp->getContent();
+				//end supplemental
 				$this->arr_pdf_widths[$fn] = $fd['pdf_width'];
 				$this->arr_aggregates[] = $fd['aggregate'];
 				$this->arr_decimal_points[$fn] = $fd['decimal_points'];
@@ -420,6 +419,35 @@ class Report_model extends CI_Model {
 		
 		foreach($arr_link_params as $p){
 			$arr_return[$p['param_name']] = array('field' => $p['db_field_name'], 'value' => $p['param_value']);
+		}
+		return $arr_return;
+	}
+	
+	/*
+	 * return an array with link parameter field name as the key and the db field name from which to pull the value
+	 * 
+	 * @method get_field_link_params()
+	 * @param int block select field string
+	 * @return array
+	 * @author ctranel
+	 */
+	protected function get_header_link_params($supp_id){
+		$arr_return = array();
+		$arr_link_params = $this->{$this->db_group_name}
+		->select('l.param_name, l.param_value')
+		->from('users.dbo.supp_link_params l')
+		->where(array('l.sl_id'=>$supp_id))
+		->order_by('l.list_order', 'ASC')
+		->get()
+		->result_array();
+		
+		if(!is_array($arr_link_params) || empty($arr_link_params)){
+			return $arr_return;
+		}
+		
+		
+		foreach($arr_link_params as $p){
+			$arr_return[$p['param_name']] = $p['param_value'];
 		}
 		return $arr_return;
 	}

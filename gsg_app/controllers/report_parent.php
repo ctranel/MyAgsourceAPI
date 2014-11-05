@@ -550,7 +550,6 @@ abstract class parent_report extends CI_Controller {
 		$this->load->model('supplemental_model');
 		$block_supp = Supplemental::getBlockSupplemental($this->objPage['blocks'][$block]['id'], $this->supplemental_model, site_url());
 		$this->supplemental = $block_supp->getContent();
-var_dump($this->supplemental);
 		//end supplemental
 
 		$this->load->helper('report_chart_helper');
@@ -683,7 +682,6 @@ var_dump($this->supplemental);
 		$this->json['name'] = $arr_this_block['name'];
 		$this->json['description'] = $arr_this_block['description'];
 		$this->json['chart_type'] = $arr_this_block['chart_type'];
-//@todo: add supplemental links and comments
 
 		$this->json['arr_axes'] = $arr_axes;
 		$tmp_x_axis = current($this->json['arr_axes']['x']);
@@ -775,7 +773,6 @@ var_dump($this->supplemental);
 		);
 		$tmp2 = $this->{$this->primary_model}->get_table_header_data();
 		$table_header_data = array_merge($tmp, $tmp2);
-
 		if(isset($this->benchmarks_lib)){
 			$bench_text = $this->benchmarks_lib->get_bench_text($this->session->userdata('benchmarks'));
 		}
