@@ -27,7 +27,8 @@
  	/* -----------------------------------------------------------------
 	 *  getComments
 
-	 *  Retrieves comments from database based
+	 *  Retrieves comments from database where this is not a corresponding link 
+	 *  (i.e., show one or the other, and links have precendence)
 
 	 *  @since: 1.0
 	 *  @author: ctranel
@@ -39,10 +40,12 @@
 	 * -----------------------------------------------------------------*/
 	function getComments($content_type_id, $content_id) {
 		$ret = $this->db
-			->select('comment')
-			->where('content_type_id', $content_type_id)
-			->where('content_id', $content_id)
-			->get('users.dbo.supp_comments')
+			->select('sc.comment')
+			->where('sc.content_type_id', $content_type_id)
+			->where('sc.content_id', $content_id)
+			->join('users.dbo.supp_links sl', 'sl.content_type_id = sc.content_type_id AND sl.content_id = sc.content_id', 'left')
+			->where('sl.content_type_id IS NULL')
+			->get('users.dbo.supp_comments sc')
 			->result_array();
 		return $ret;
 	}
