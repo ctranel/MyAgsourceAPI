@@ -145,6 +145,21 @@ class SupplementalLink extends \SplObjectStorage
 	}
 	
 	/* -----------------------------------------------------------------
+	 *  returns params
+
+	 *  returns params
+
+	 *  @since: version
+	 *  @author: ctranel
+	 *  @date: Oct 28, 2014
+	 *  @return: SplObjectStorage
+	 *  @throws: 
+	 * -----------------------------------------------------------------*/
+	 public function params() {
+		return $this->params;
+	}
+	
+	/* -----------------------------------------------------------------
 	 *  returns full anchor tag text
 
 	 *  returns full anchor tag text
@@ -161,13 +176,7 @@ class SupplementalLink extends \SplObjectStorage
 		if(isset($this->href) && !empty($this->href)){
 			$external = (strpos($this->href, $this->site_url) === false && strpos($this->href, 'http') !== false);
 			foreach($this->params as $p){
-				if($external){
-					$param_text .= $param_text === '' ? '?' : '&';
-					$param_text .= $p->name() . '=' . $p->value();
-				}
-				else{
-					$param_text .= '/' . $p->value();
-				}
+				$param_text .= $p->urlText($external, $param_text === '');
 			}
 			if(strpos($this->href, 'http') === false){
 				$ret .= ' href="' . $this->site_url . $this->href . $param_text . '"';

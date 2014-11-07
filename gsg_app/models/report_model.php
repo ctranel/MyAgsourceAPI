@@ -226,21 +226,24 @@ class Report_model extends CI_Model {
 				$header_data['arr_order'][$fd['name']] = $fd['list_order'];
 				$arr_field_child[$fd['block_header_group_id']][$fd['name']] = $fn; //used to create arr_fields nested array
 				$this->arr_field_sort[$fn] = $fd['default_sort_order'];
-				$this->arr_field_links[$fn] = array( //iWebContent->getSupplementalLink($fd['supp_id'], $fd['a_href'], $fd['a_rel'], $fd['a_title'], $fd['a_class'])
-					'href' => $fd['a_href']
-					,'rel' => $fd['a_rel']
-					,'title' => $fd['a_title']
-					,'class' => $fd['a_class']
-					,'params' => $this->get_field_link_params($fd['supp_id'])
-				);
-				if(!array_filter($this->arr_field_links[$fn])){
-					unset($this->arr_field_links[$fn]);
-				}
+
 				//supplemental data
 				$this->load->model('supplemental_model');
+				//column data
+				$block_supp = Supplemental::getColDataSupplemental($fd['bsf_id'], $this->supplemental_model, site_url());
+				$this->arr_field_links[$fn] = $block_supp->getContent();
+				foreach($block_supp->supplementalLinks() as $s){
+					foreach($s->params() as $p){
+						if(!in_array($p->value_db_field_name(), $this->arr_db_field_list)){
+							$this->arr_db_field_list[] = $p->value_db_field_name();			
+						}
+					}
+				}
+				//column header
 				$block_supp = Supplemental::getColHeaderSupplemental($fd['bsf_id'], $this->supplemental_model, site_url());
 				$this->arr_header_links[$fn] = $block_supp->getContent();
 				//end supplemental
+				
 				$this->arr_pdf_widths[$fn] = $fd['pdf_width'];
 				$this->arr_aggregates[] = $fd['aggregate'];
 				$this->arr_decimal_points[$fn] = $fd['decimal_points'];
@@ -393,65 +396,6 @@ class Report_model extends CI_Model {
 		else return FALSE;
 	}
 	
-	/*
-	 * return an array with link parameter field name as the key and the db field name from which to pull the value
-	 * 
-	 * @method get_field_link_params()
-	 * @param int block select field string
-	 * @return array
-	 * @author ctranel
-	 */
-	protected function get_field_link_params($supp_id){
-		$arr_return = array();
-		$arr_link_params = $this->{$this->db_group_name}
-		->select('l.param_name, f.db_field_name, l.param_value')
-		->from('users.dbo.supp_link_params l')
-		->join('users.dbo.db_fields f', 'l.param_value_field_id = f.id', 'LEFT')
-		->where(array('l.sl_id'=>$supp_id))
-		->order_by('l.list_order', 'ASC')
-		->get()
-		->result_array();
-		
-		if(!is_array($arr_link_params) || empty($arr_link_params)){
-			return $arr_return;
-		}
-		
-		
-		foreach($arr_link_params as $p){
-			$arr_return[$p['param_name']] = array('field' => $p['db_field_name'], 'value' => $p['param_value']);
-		}
-		return $arr_return;
-	}
-	
-	/*
-	 * return an array with link parameter field name as the key and the db field name from which to pull the value
-	 * 
-	 * @method get_field_link_params()
-	 * @param int block select field string
-	 * @return array
-	 * @author ctranel
-	 */
-	protected function get_header_link_params($supp_id){
-		$arr_return = array();
-		$arr_link_params = $this->{$this->db_group_name}
-		->select('l.param_name, l.param_value')
-		->from('users.dbo.supp_link_params l')
-		->where(array('l.sl_id'=>$supp_id))
-		->order_by('l.list_order', 'ASC')
-		->get()
-		->result_array();
-		
-		if(!is_array($arr_link_params) || empty($arr_link_params)){
-			return $arr_return;
-		}
-		
-		
-		foreach($arr_link_params as $p){
-			$arr_return[$p['param_name']] = $p['param_value'];
-		}
-		return $arr_return;
-	}
-	
 	/**
 	 * @method search()
 	 * @param string herd code
@@ -531,47 +475,38 @@ class Report_model extends CI_Model {
 	 * @return array of sql-prepped select fields
 	 * @author ctranel
 	 **/
-	protected function prep_select_fields($arr_select_fields){
+	protected function prep_select_fields(){
+		$arr_select_fields = [];
 		//@todo: add field for date format (null for non-dates), or use date flag if date formats have to be the same
-		if (($key = array_search('test_date', $arr_select_fields)) !== FALSE) {
+		if (($key = array_search('test_date', $this->arr_db_field_list)) !== FALSE) {
 			$arr_select_fields[$key] = "FORMAT(" . $this->primary_table_name . ".test_date, 'MM-dd-yy', 'en-US') AS test_date";//MMM-dd-yy
 		}
-		if (($key = array_search('calving_date', $arr_select_fields)) !== FALSE) {
+		if (($key = array_search('calving_date', $this->arr_db_field_list)) !== FALSE) {
 			$arr_select_fields[$key] = "FORMAT(" . $this->primary_table_name . ".calving_date, 'MM-dd-yy', 'en-US') AS calving_date";//MMM-dd-yy
 		}
-		if (($key = array_search('fresh_month', $arr_select_fields)) !== FALSE) {
+		if (($key = array_search('fresh_month', $this->arr_db_field_list)) !== FALSE) {
 			$arr_select_fields[$key] = "FORMAT(" . $this->primary_table_name . ".fresh_month, 'MM-dd-yy', 'en-US') AS fresh_month";//MMM-dd-yy
 		}
-		if (($key = array_search('cycle_date', $arr_select_fields)) !== FALSE) {
+		if (($key = array_search('cycle_date', $this->arr_db_field_list)) !== FALSE) {
 			$arr_select_fields[$key] = "FORMAT(" . $this->primary_table_name . ".cycle_date, 'MM-dd-yy', 'en-US') AS cycle_date";//MMM-dd-yy
 		}
-		if (($key = array_search('summary_date', $arr_select_fields)) !== FALSE) {
+		if (($key = array_search('summary_date', $this->arr_db_field_list)) !== FALSE) {
 			$arr_select_fields[$key] = "FORMAT(" . $this->primary_table_name . ".summary_date, 'MM-dd-yy', 'en-US') AS summary_date";//MMM-dd-yy
 		}
-		if (($key = array_search('peak_dim', $arr_select_fields)) !== FALSE) {
+		if (($key = array_search('peak_dim', $this->arr_db_field_list)) !== FALSE) {
 			$arr_select_fields[$key] = "FORMAT(" . $this->primary_table_name . ".peak_dim, 'MM-dd-yy', 'en-US') AS peak_dim";//MMM-dd-yy
 		}
-		if (($key = array_search('birth_year', $arr_select_fields)) !== FALSE) {
+		if (($key = array_search('birth_year', $this->arr_db_field_list)) !== FALSE) {
 			$arr_select_fields[$key] = "FORMAT(" . $this->primary_table_name . ".birth_year, 'MM-dd-yy', 'en-US') AS birth_year";//MMM-dd-yy
 		}
 
-		foreach($arr_select_fields as $k => $v){
+		foreach($this->arr_db_field_list as $k => $v){
 			if(!empty($this->arr_aggregates[$k])){
 				$new_name = strtolower($this->arr_aggregates[$k]) . '_' . $v;
 				$arr_select_fields[$k] = $this->arr_aggregates[$k] . '(' . $this->primary_table_name . '.' . $v . ') AS ' . $new_name;
 				$this->arr_db_field_list[$k] = $new_name;
 				//$arr_select_fields[$k] = $new_name;
 			} 
-		}
-		//also need to add fields whose values will be used in links
-		foreach($this->arr_field_links as $k => $v){
-			if(isset($v['params']) && !empty($v['params'])){
-				foreach($v['params'] as $field => $param){
-					if(isset($param['field']) && !empty($param['field'])){
-						$arr_select_fields[$field] = $param['field'];
-					}
-				}
-			}
 		}
 		return($arr_select_fields);
 	}

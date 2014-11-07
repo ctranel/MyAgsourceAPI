@@ -64,14 +64,26 @@
 							elseif(in_array($tmp_key, $arr_numeric_fields) && is_numeric($value) && $tmp_key != $value){
 								$value = number_format($value, $arr_decimal_places[$tmp_key]);
 							}
-							if(isset($arr_field_links[$field_name])){
-								$link = $arr_field_links[$field_name]['href'];
-								$class = !empty($arr_field_links[$field_name]['class']) ? ' class="' . $arr_field_links[$field_name]['class'] . '"' : '';
-								$rel = !empty($arr_field_links[$field_name]['rel']) ? ' rel="' . $arr_field_links[$field_name]['rel'] . '"' : '';
-								$title = !empty($arr_field_links[$field_name]['title']) ? ' title="' . $arr_field_links[$field_name]['title'] . '"' : '';
-								
-								$link = prep_href($link, $arr_field_links[$field_name]['params'], $cr);
-								$value = anchor($link, $value, $rel . $title . $class);
+							if(isset($arr_field_links[$field_name]) && !empty($arr_field_links[$field_name])){
+								//if there is a field name place-holder in the link, replace it with field value
+								$value = current($arr_field_links[$field_name]);
+								preg_match_all('~\{(.*?)\}~', $value, $tmp);
+								$arr_param_fields = $tmp[1];
+								if(isset($arr_param_fields) && is_array($arr_param_fields) && !empty($arr_param_fields)){
+									foreach($arr_param_fields as $p){
+										if(isset($cr[$p])){
+											$value = str_replace('{' . $p . '}', $cr[$p], $value);
+										}
+									}
+								}
+								//replace anchor tag content with field value
+								//@todo: this should be a function with parameter values of $value and $cr[$field_name]
+								$doc = DOMDocument::loadXML($value);
+								$tag = $doc->getElementsByTagName('a')->item(0);
+								$newText = new DOMText($cr[$field_name]);
+								$tag->removeChild($tag->firstChild);
+								$tag->appendChild($newText);
+								$value = $doc->saveXML();
 							}
 							?><td><?php echo $value; ?></td><?php
 						endforeach;

@@ -108,6 +108,35 @@ class SupplementalLinkParam extends \SplObjectStorage
 	}
 	
 	/* -----------------------------------------------------------------
+	 *  returns url text for parameter
+
+	 *  returns url text for parameter
+
+	 *  @since: version
+	 *  @author: ctranel
+	 *  @date: Oct 28, 2014
+	 *  @param bool is external link (uses '?' before param and '&' between k => v pairs)
+	 *  @param bool is first param (needed for external links)
+	 *  @return: string
+	 *  @throws: 
+	 * -----------------------------------------------------------------*/
+	 public function urlText($external, $is_first_param) {
+ 		$param_text = '';
+ 		$value = $this->value;
+ 		if(isset($this->value_db_field_name) && !empty($this->value_db_field_name)){
+ 			$value = '{' . $this->value_db_field_name . '}';
+ 		}
+	 	if($external){
+			$param_text .= $is_first_param ? '?' : '&';
+			$param_text .= $this->name. '=' . $value;
+		}
+		else{
+			$param_text .= '/' . $value;
+		}
+		return $param_text;
+	}
+	
+	/* -----------------------------------------------------------------
 	 *  Factory function, takes a dataset and returns an object storage of Supplemental_link objects
 	 *  @author: ctranel
 	 *  @date: Oct 28, 2014

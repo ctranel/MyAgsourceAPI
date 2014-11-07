@@ -70,9 +70,7 @@ class Supplemental
 	*  @since: version
 	*  @author: ctranel
 	*  @date: Oct 28, 2014
-	*  @param: int
-	*  @param: object supplemental_datasource
-	*  @return: Supplemental object
+	*  @return: Array of strings
 	*  @throws:
 	* -----------------------------------------------------------------*/
 	
@@ -101,6 +99,7 @@ class Supplemental
 	 *  @date: Oct 28, 2014
 	 *  @param: int
 	 *  @param: object supplemental_datasource
+	 *  @param: string site url
 	 *  @return: Supplemental object
 	 *  @throws: 
 	 * -----------------------------------------------------------------*/
@@ -124,6 +123,7 @@ class Supplemental
 	*  @date: Oct 28, 2014
 	*  @param: int
 	*  @param: object supplemental_datasource
+	*  @param: string site url
 	*  @return: Supplemental object
 	*  @throws:
 	* -----------------------------------------------------------------*/
@@ -139,15 +139,16 @@ class Supplemental
 	}
 	
 	/* -----------------------------------------------------------------
-	 *  Factory for supplemental objects for blocks
+	 *  Factory for supplemental objects for column headers
 	
-	*  Factory for supplemental objects for blocks
+	*  Factory for supplemental objects for column headers
 	
 	*  @since: version
 	*  @author: ctranel
 	*  @date: Nov 5, 2014
 	*  @param: int
 	*  @param: object supplemental_datasource
+	*  @param: string site url
 	*  @return: Supplemental object
 	*  @throws:
 	* -----------------------------------------------------------------*/
@@ -155,7 +156,32 @@ class Supplemental
 		$links = $supplemental_datasource->getLinks(4, $field_id);
 		$supplemental_links = SupplementalLink::datasetToObjects($site_url, $links, $supplemental_datasource);
 	
-		$comments = $supplemental_datasource->getComments(1, $field_id);
+		$comments = $supplemental_datasource->getComments(4, $field_id);
+		$supplemental_comments = SupplementalComment::datasetToObjects($comments);
+	
+		$supp = new Supplemental($supplemental_links, $supplemental_comments);
+		return $supp;
+	}
+
+	/* -----------------------------------------------------------------
+	 *  Factory for supplemental objects for column data
+	
+	*  Factory for supplemental objects for column data
+	
+	*  @since: version
+	*  @author: ctranel
+	*  @date: Nov 6, 2014
+	*  @param: int
+	*  @param: object supplemental_datasource
+	*  @param: string site url
+	*  @return: Supplemental object
+	*  @throws:
+	* -----------------------------------------------------------------*/
+	public static function getColDataSupplemental($field_id, \supplemental_model $supplemental_datasource, $site_url) {
+		$links = $supplemental_datasource->getLinks(5, $field_id);
+		$supplemental_links = SupplementalLink::datasetToObjects($site_url, $links, $supplemental_datasource);
+	
+		$comments = $supplemental_datasource->getComments(5, $field_id);
 		$supplemental_comments = SupplementalComment::datasetToObjects($comments);
 	
 		$supp = new Supplemental($supplemental_links, $supplemental_comments);
