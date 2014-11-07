@@ -18,7 +18,7 @@ sub {color: #003E3F; font-size: 80%; font-family: "Arial Narrow","Arial","Verdan
 
 .chart-container .supplemental-link {text-align: center; margin-top:-5px;}
 .chart-container .supplemental-link a {text-decoration: underline;}
-.highcharts-subtitle {top: 27px !important;}
+.highcharts-subtitle {margin-top: -13px !important;}
 
 /* report table */
 #main-report {border-collapse:collapse; clear:both; margin: 0 auto; max-width: 100%;}

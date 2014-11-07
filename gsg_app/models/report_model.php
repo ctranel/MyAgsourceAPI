@@ -419,7 +419,7 @@ class Report_model extends CI_Model {
 		}
 		
 		if(is_array($this->arr_fields)){
-			$arr_select_fields = $this->prep_select_fields(array_flatten($this->arr_fields));
+			$arr_select_fields = $this->prep_select_fields();
 			//convert dates
 			if(isset($this->arr_date_fields) && !empty($this->arr_date_fields)){
 				foreach($this->arr_date_fields as $d){
@@ -795,6 +795,7 @@ class Report_model extends CI_Model {
 			foreach($arr_field_data as $fd){
 				$fn = $fd['db_field_name'];
 				$this->arr_fields[$fd['name']] = $fn;
+				$this->arr_db_field_list[] = $fn;
 				$arr_table_ref_cnt[$fd['table_name']] = isset($arr_table_ref_cnt[$fd['table_name']]) ? ($arr_table_ref_cnt[$fd['table_name']] + 1) : 1;
 				$this->arr_field_sort[$fn] = $fd['default_sort_order'];
 				$this->arr_decimal_points[$fn] = $fd['decimal_points'];
@@ -820,6 +821,7 @@ class Report_model extends CI_Model {
 				}
 			}
 		}
+		var_dump($this->arr_fields,$this->arr_db_field_list); die();
 	}
 	
 	/**
@@ -950,6 +952,7 @@ class Report_model extends CI_Model {
 				}
 			}
 			elseif(isset($data[$x][$date_field]) && !empty($data[$x][$date_field])){
+die($date_field);
 				$arr_d = explode('-', $data[$x][$date_field]);
 				foreach($arr_fields as $k=>$f){
 					$tmp_data = is_numeric($data[$x][$f]) ? (float)$data[$x][$f] : $data[$x][$f];
