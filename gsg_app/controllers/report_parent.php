@@ -718,7 +718,6 @@ abstract class parent_report extends CI_Controller {
 		$this->{$this->primary_model}->populate_field_meta_arrays($arr_this_block['id']);
 		$arr_field_list = $this->{$this->primary_model}->get_fieldlist_array();
 		$results = $this->{$this->primary_model}->search($this->session->userdata('herd_code'), $arr_this_block['url_segment'], $this->filters->criteriaKeyValue(), $this->arr_sort_by, $this->arr_sort_order, $this->max_rows);
-//var_dump($results[0]); die;
 		if($this->bench_row){
 		//if the data is pivoted, set the pivoted field as the row header, else use the first non-pstring column
 			$row_head_field = NULL;

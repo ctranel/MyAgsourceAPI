@@ -3,14 +3,7 @@ require_once APPPATH . 'models/report_model.php';
 class Transitioncowindex extends Report_model {
 	public function __construct(){
 		parent::__construct();
-/*		$this->arr_unsortable_columns[] = 'total';
-	    $this->arr_numeric_fields[] = 'total';
-		$this->arr_fields['Total'] = 'total';
-		$this->arr_field_sort['total'];
-		$this->arr_field_table['total'] = $this->primary_table_name;
-		$this->arr_pdf_widths['total'] = '11';
-		$this->adjust_fields($this->session->userdata('herd_code'));
-*/	}
+	}
 	
 	/*  
 	 * @method pivot() overrides report_model

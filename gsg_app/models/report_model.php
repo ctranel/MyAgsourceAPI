@@ -78,7 +78,7 @@ class Report_model extends CI_Model {
 		return $this->arr_field_links;
 	}
 	function get_fieldlist_array(){
-		return $this->arr_db_field_list;
+		return array_flatten($this->arr_fields);
 	}
 	function get_pdf_widths(){
 		return $this->arr_pdf_widths;
@@ -288,7 +288,6 @@ class Report_model extends CI_Model {
 				}
 			}
 		}
-//		$this->adjust_fields($this->session->userdata('herd_code'));
 	}
 	
 	/**
@@ -420,8 +419,7 @@ class Report_model extends CI_Model {
 		}
 		
 		if(is_array($this->arr_fields)){
-			$arr_select_fields = array_flatten($this->arr_fields);
-			$arr_select_fields = $this->prep_select_fields($arr_select_fields);
+			$arr_select_fields = $this->prep_select_fields(array_flatten($this->arr_fields));
 			//convert dates
 			if(isset($this->arr_date_fields) && !empty($this->arr_date_fields)){
 				foreach($this->arr_date_fields as $d){
@@ -476,7 +474,7 @@ class Report_model extends CI_Model {
 	 * @author ctranel
 	 **/
 	protected function prep_select_fields(){
-		$arr_select_fields = [];
+		$arr_select_fields = $this->arr_db_field_list;
 		//@todo: add field for date format (null for non-dates), or use date flag if date formats have to be the same
 		if (($key = array_search('test_date', $this->arr_db_field_list)) !== FALSE) {
 			$arr_select_fields[$key] = "FORMAT(" . $this->primary_table_name . ".test_date, 'MM-dd-yy', 'en-US') AS test_date";//MMM-dd-yy
@@ -485,7 +483,7 @@ class Report_model extends CI_Model {
 			$arr_select_fields[$key] = "FORMAT(" . $this->primary_table_name . ".calving_date, 'MM-dd-yy', 'en-US') AS calving_date";//MMM-dd-yy
 		}
 		if (($key = array_search('fresh_month', $this->arr_db_field_list)) !== FALSE) {
-			$arr_select_fields[$key] = "FORMAT(" . $this->primary_table_name . ".fresh_month, 'MM-dd-yy', 'en-US') AS fresh_month";//MMM-dd-yy
+			$arr_select_fields[$key] = "FORMAT(" . $this->primary_table_name . ".fresh_month, 'MMM-yy', 'en-US') AS fresh_month";//MMM-dd-yy
 		}
 		if (($key = array_search('cycle_date', $this->arr_db_field_list)) !== FALSE) {
 			$arr_select_fields[$key] = "FORMAT(" . $this->primary_table_name . ".cycle_date, 'MM-dd-yy', 'en-US') AS cycle_date";//MMM-dd-yy
@@ -500,13 +498,13 @@ class Report_model extends CI_Model {
 			$arr_select_fields[$key] = "FORMAT(" . $this->primary_table_name . ".birth_year, 'MM-dd-yy', 'en-US') AS birth_year";//MMM-dd-yy
 		}
 
+		//@todo: change indexing for arr_aggregates (to DB field name), don't rely on order
 		foreach($this->arr_db_field_list as $k => $v){
 			if(!empty($this->arr_aggregates[$k])){
 				$new_name = strtolower($this->arr_aggregates[$k]) . '_' . $v;
 				$arr_select_fields[$k] = $this->arr_aggregates[$k] . '(' . $this->primary_table_name . '.' . $v . ') AS ' . $new_name;
 				$this->arr_db_field_list[$k] = $new_name;
-				//$arr_select_fields[$k] = $new_name;
-			} 
+			}
 		}
 		return($arr_select_fields);
 	}
@@ -705,6 +703,7 @@ class Report_model extends CI_Model {
 				}
 			}
 		}
+		//the following line is needed--didn't finish researching, but fresh cow summary tables break when it is removed
 		$this->arr_db_field_list = $this->arr_fields;
 		return $new_dataset;
 	}
@@ -821,7 +820,6 @@ class Report_model extends CI_Model {
 				}
 			}
 		}
-//		$this->adjust_fields($this->session->userdata('herd_code'));
 	}
 	
 	/**

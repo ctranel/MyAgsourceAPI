@@ -42,7 +42,7 @@
 				 * $field_label is used when the data is pivoted.  In those cases, the db_field does not come along with the data, so the label of the
 				 * first column is used to look up is_numeric and decimal values
 				 */				
-				$field_label = current($cr);
+			$field_label = current($cr);
 				?><tr class="<?php echo $row_class; ?>"><?php
 					if(is_array($fields)):
 						//@todo: pull this logic out of view?

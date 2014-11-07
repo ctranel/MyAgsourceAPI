@@ -5,15 +5,6 @@ class Numbersoldordied_model extends Report_model {
 		parent::__construct($section_path);
 	}
 	
-	//Overriding parent function to allow for a percentage row that includes values that can't be made by simply calculating the average (current month is incomplete and so is excluded in average)
-		
-	function get_fieldlist_array(){
-		$arr_total = array('Total'=>'total');
-		$arr_percent = array('Percent'=>'percent');
-		$this->arr_db_field_list = array_merge($this->arr_db_field_list,$arr_total,$arr_percent);
-		return $this->arr_db_field_list;
-	}
-	
 	//Overriding parent function to add total and percent columns
 	function get_table_header_data(){
 		$this->load->library('table_header');
@@ -69,38 +60,5 @@ class Numbersoldordied_model extends Report_model {
 		$new_dataset['l4_died_60_dim_cnt']['percent'] = $l4_died_pct;
 
 		return $new_dataset;
-	}
-
-	/**
-	 * @method prep_select_fields()
-	 * @param arr_fields: copy of fields array to be formatted into SQL
-	 * @return array of sql-prepped select fields
-	 * @author ctranel
-	 **/
-	protected function prep_select_fields($arr_select_fields){
-		if (($key = array_search('test_date', $arr_select_fields)) !== FALSE) {
-			$arr_select_fields[$key] = "FORMAT(" . $this->primary_table_name . ".test_date, 'MM-dd-yy', 'en-US') AS test_date";//MMM-dd-yy
-		}
-		if (($key = array_search('calving_date', $arr_select_fields)) !== FALSE) {
-			$arr_select_fields[$key] = "FORMAT(" . $this->primary_table_name . ".calving_date, 'MM-dd-yy', 'en-US') AS calving_date";//MMM-dd-yy
-		}
-		if (($key = array_search('fresh_month', $arr_select_fields)) !== FALSE) {
-			$arr_select_fields[$key] = "FORMAT(" . $this->primary_table_name . ".fresh_month, 'MMM-yy', 'en-US') AS fresh_month";//MMM-dd-yy
-		}
-		if (($key = array_search('cycle_date', $arr_select_fields)) !== FALSE) {
-			$arr_select_fields[$key] = "FORMAT(" . $this->primary_table_name . ".cycle_date, 'MM-dd-yy', 'en-US') AS cycle_date";//MMM-dd-yy
-		}
-		if (($key = array_search('summary_date', $arr_select_fields)) !== FALSE) {
-			$arr_select_fields[$key] = "FORMAT(" . $this->primary_table_name . ".summary_date, 'MM-dd-yy', 'en-US') AS summary_date";//MMM-dd-yy
-		}
-		foreach($arr_select_fields as $k => $v){
-			if(!empty($this->arr_aggregates[$k])){
-				$new_name = strtolower($this->arr_aggregates[$k]) . '_' . $v;
-				$arr_select_fields[$k] = $this->arr_aggregates[$k] . '(' . $this->primary_table_name . '.' . $v . ') AS ' . $new_name;
-				$this->arr_db_field_list[$k] = $new_name;
-				//$arr_select_fields[$k] = $new_name;
-			}
-		}
-		return($arr_select_fields);
 	}
 }
