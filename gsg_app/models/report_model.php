@@ -114,6 +114,7 @@ class Report_model extends CI_Model {
 	
 	function add_field($arr_field_in){
 		$this->arr_fields[] = $arr_field_in;
+		$this->arr_db_field_list[] = current($arr_field_in);
 	}
 	function add_sort_field($key, $value = 'ASC'){
 		$this->arr_field_sort[$key] = $value;
@@ -821,7 +822,6 @@ class Report_model extends CI_Model {
 				}
 			}
 		}
-		var_dump($this->arr_fields,$this->arr_db_field_list); die();
 	}
 	
 	/**
@@ -952,11 +952,10 @@ class Report_model extends CI_Model {
 				}
 			}
 			elseif(isset($data[$x][$date_field]) && !empty($data[$x][$date_field])){
-die($date_field);
 				$arr_d = explode('-', $data[$x][$date_field]);
 				foreach($arr_fields as $k=>$f){
 					$tmp_data = is_numeric($data[$x][$f]) ? (float)$data[$x][$f] : $data[$x][$f];
-					$arr_return[$k][] = array((mktime(0, 0, 0, $arr_d[0], $arr_d[1],$arr_d[2]) * 1000), $tmp_data);
+					$arr_return[$k][] = [(mktime(0, 0, 0, $arr_d[0], $arr_d[1],$arr_d[2]) * 1000), $tmp_data];
 				}
 			}
 		}
@@ -974,14 +973,21 @@ die($date_field);
 	 **/
 	protected function set_boxplot_data($data, $date_field = 'test_date', $num_boxplot_series = 1, $adjustment = 200000000){
 		$row_count = 0;
-		$arr_series = array();
+		$arr_series = [];
 		foreach ($data as $d){ //foreach row
 			//set a variable so we can pair date with each data point
 			if(!isset($d[$date_field])) continue;
 			$arr_d = explode('-', $d[$date_field]);
 			unset($d[$date_field]); //remove date so we can loop through the remaining data points
+			//the date is formated in the database search ('Mon-yr'), so we need to accommodate that
+			if(count($arr_d) == 2){
+				$arr_month = [];
+				$this_date =strtotime($arr_d[0] . ' 15, 20' . $arr_d[1]) * 1000;
+			}
 			//the date is formated in the database search ('m-d-y'), so we need to accommodate that in the mktime function
-			$this_date = mktime(0, 0, 0, $arr_d[0], $arr_d[1],'20' . $arr_d[2]) * 1000;
+			elseif(count($arr_d) == 3){
+				$this_date = mktime(0, 0, 0, $arr_d[0], $arr_d[1],'20' . $arr_d[2]) * 1000;
+			}
 			$num_series = count($d)/3;
 			$field_count = 1;
 			$series_count = 0;
