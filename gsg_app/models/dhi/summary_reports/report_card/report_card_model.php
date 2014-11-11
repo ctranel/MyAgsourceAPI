@@ -27,16 +27,16 @@ class Report_card_model extends Report_model {
 	 * @return array of sql-prepped select fields
 	 * @author ctranel
 	 **/
-	protected function prep_select_fields($arr_select_fields){
+	protected function prep_select_fields(){
 		if(!$this->is_historical){
-			foreach($arr_select_fields as $sf){
-				$arr_select_fields[] = str_replace('_pct', '', $sf);
-				$arr_select_fields[] = str_replace('_pct', '_10_pct', $sf);
-				$arr_select_fields[] = str_replace('_pct', '_50_pct', $sf);
-				$arr_select_fields[] = str_replace('_pct', '_90_pct', $sf);
+			foreach($this->arr_db_field_list as $sf){
+				$this->arr_db_field_list[] = str_replace('_pct', '', $sf);
+				$this->arr_db_field_list[] = str_replace('_pct', '_10_pct', $sf);
+				$this->arr_db_field_list[] = str_replace('_pct', '_50_pct', $sf);
+				$this->arr_db_field_list[] = str_replace('_pct', '_90_pct', $sf);
 			}
 		}
-		return parent::prep_select_fields($arr_select_fields);
+		return parent::prep_select_fields();
 	}
 	
 	/**
