@@ -392,6 +392,7 @@ abstract class parent_report extends CI_Controller {
 		$this->carabiner->css('chart.css');
 		$this->carabiner->css('boxes.css');
 		$this->carabiner->css('https://cdn.jsdelivr.net/qtip2/2.2.0/jquery.qtip.min.css', 'screen');
+		$this->carabiner->css('tooltip.css');
 		$this->carabiner->css('popup.css');
 		$this->carabiner->css('tabs.css');
 		$this->carabiner->css('report.css');
