@@ -1,8 +1,9 @@
 @CHARSET "UTF-8";
 /* tooltip styles */
-.tip-link {font-size: .8em;}
+.tip-link {font-size: .8em;} */
 a.tooltip {text-decoration: underline;}
 a.tooltip:hover {cursor:pointer;}
+.tip a.qtip-ajax {font-size: .85em;}
 
 .qtip-content {font-size: 11.5px; line-height: 13px;}
 .qtip-content table {border-collapse: collapse;}
