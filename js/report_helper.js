@@ -25,10 +25,12 @@ if($('#filter-form')){ //if there is a filter form (only on pages with one table
 }
 
 
+
+
 function assocFormToObject(objForm){
 	var elements = objForm.elements;
 	var obj_return = {};
-	var el_len = elements.length
+	var el_len = elements.length;
 	
 	for(var i=0; i<el_len; i++){
 		var e = elements[i];
@@ -55,6 +57,53 @@ function assocFormToObject(objForm){
 */
 }
 
+//fixed header
+function createFixedHeader(full_table_id){
+	//clone each table header
+	//$('.tbl').each(function(){
+	var $full_table = $('#' + full_table_id);
+	var $fh_table = $("#fh-" + $full_table.attr('id'));
+	var $header = $full_table.find("thead:first").clone();
+	$fh_table.append($header);
+	$fh_table.width($full_table.width());
+	$fh_table.find('th').each(function(index){
+	    var index2 = index;
+	    $(this).css('width', function(index){
+	    	return ($full_table.find("th:eq(" + index2 + ")").css('width'));
+	    });
+	});
+	$fh_table.hide();//css('display', 'none');
+	
+	//});
+		
+	$(window).bind("scroll", function() {
+		var pageOffsetTop = $(this).scrollTop();
+		$('.tbl').each(function(){
+	    	if(!$('#fh-' + $(this).attr('id')).length){
+	    		return;
+	    	}
+			var tableOffsetTop = $(this).offset().top;
+			var tableOffsetBottom = tableOffsetTop + $(this).height();
+	    	$fixedHeader = $('#fh-' + $(this).attr('id'));
+	    	//if the header is above the top of the window but the bottom is not
+		    if (pageOffsetTop >= tableOffsetTop && pageOffsetTop <= (tableOffsetBottom - $fixedHeader.height())) {
+		    	if($fixedHeader.is(":hidden")){
+		    		$fixedHeader.show();
+		    	}
+		    	//set horizontal position if there is scrolling
+		    	$fixedHeader.offset({left: $(this).offset().left});
+		    }
+		    //if top of table is within window or the bottom of the table is above the top of the window
+		    else if ((pageOffsetTop < tableOffsetTop || pageOffsetTop > (tableOffsetBottom - $fixedHeader.height())) && !$fixedHeader.is(":hidden")) {
+		        $fixedHeader.hide();
+		    }
+	    });
+	});
+	
+	//$(window).scroll();
+}
+
+//Benchmarks
 if($('#benchmark-form')){ //if there is a filter form (only on pages with one table)
 	$('#default').click(function(ev){
 		$('#make_default').val('1');
@@ -68,9 +117,6 @@ if($('#benchmark-form')){ //if there is a filter form (only on pages with one ta
 		ev.preventDefault();
 		params = assocFormToObject(document.getElementById('benchmark-form'));
 		params = encodeURIComponent(JSON.stringify(params));
-//		params = encodeURIComponent(JSON.stringify($(this).serializeObject()));
-console.log(dump(params));
-//console.log(dump($.extend({}, params)));
 		$.post(site_url + 'benchmark/ajax_set/' + params)
 			.done(function(){
 				updatePage(this);
@@ -211,8 +257,8 @@ function attachDataFieldEvents(){
 }
 
 Object.size = function(obj) {
-    var size = 0, key;
-    for (key in obj) {
+    var size = 0;
+    for (var key in obj) {
         if (obj.hasOwnProperty(key)) size++;
     }
     return size;

@@ -98,3 +98,6 @@
 			endif; 
 		?></tbody>
 	</table>
+	<?php if(count($report_data) > 20): ?>
+		<table id="fh-<?php echo $table_id; ?>" class="fixed-header"></table>
+	<?php endif; ?>

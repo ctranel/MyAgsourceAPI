@@ -293,7 +293,12 @@ function process_table(div_id, block_index, table_data){
 		if(typeof(table_data.section_data) == "object" && typeof post_render == 'function'){
 			post_render(table_data.section_data);
 		}
-		//attach events to new data fields
+		//@todo: after we convert tables to use JSON, we should only call this if count > ?
+		//without setTimeout, the fixed header is not hidden when page loads
+		setTimeout(function(){
+			createFixedHeader($('#table-wrapper' + block_index).find('table').attr('id'));
+		}, 0);
+		//attach events to new data fields and table headers (needs to be below fixed header)
 		attachDataFieldEvents();
 	}
 

@@ -83,6 +83,7 @@ th span.hide-column {cursor: pointer;}
 .sort_asc:after {content: "▲";}
 .sort_desc:after {content: "▼";}
 
+.fixed-header {position: fixed; top: 30px; display:none; background-color:white;}
 /* end table headings */
 
 
