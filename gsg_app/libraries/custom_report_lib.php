@@ -225,12 +225,11 @@ echo "group_by <br>";
 	
 	//yaxes
 	protected function yaxes(){
-		$arr_yaxes_vals = $this->input->post('yaxis_label');
+		$arr_yaxes_vals = array_filter($this->input->post('yaxis_label'));
 		$arr_yaxes_min = $this->input->post('yaxis_min');
 		$arr_yaxes_max = $this->input->post('yaxis_max');
 		$arr_yaxes_vals = $this->input->post('yaxis_label');
-		$arr_yaxes_opposite = $this->input->post('yaxes_opposite');
-		if(isset($arr_yaxes_vals) && is_array($arr_yaxes_vals)){
+		if(isset($arr_yaxes_vals) && is_array($arr_yaxes_vals) && !empty($arr_yaxes_vals)){
 			$arr_yaxes_data = array();
 			foreach($arr_yaxes_vals as $k=>$v){
 				if($k >= 0){
@@ -246,13 +245,16 @@ echo "group_by <br>";
 					);
 				}
 			}
-			return $this->custom_report_model->add_yaxes($arr_yaxes_data);
+				return $this->custom_report_model->add_yaxes($arr_yaxes_data);
 		}
 		return false;
 	}
 	
 	//xaxis
 	protected function xaxis(){
+		if(empty($this->input->post('xaxis_field')) && empty($this->input->post('xaxis_label'))){
+			return false;
+		}
 		$arr_xaxis_data[] = array(
 			'block_id' => $this->block_id
 			,'x_or_y' => 'x'

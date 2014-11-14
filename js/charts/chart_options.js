@@ -74,6 +74,9 @@ function get_chart_options(options_json, chart_type){
 		case 'bar':
 			return get_bar_options(options_json);
 			break;
+		case 'pie':
+			return get_pie_options(options_json);
+			break;
 		case 'boxplot':
 			return get_boxplot_options(options_json);
 			break;
@@ -139,6 +142,19 @@ function get_boxplot_options(options_json){
         lineWidth: 8,
         medianColor: null
 	};
+	return options_json;
+}
+
+function get_pie_options(options_json){
+	options_json.chart.type = 'pie';
+	options_json.plotOptions.pie = {
+        allowPointSelect: true,
+		dataLabels: {
+			enabled: true,
+			format: '<b>{point.name}</b>: {point.pecentage:/1f}%',
+			color: '#c0c0c0'
+		}
+    };
 	return options_json;
 }
 

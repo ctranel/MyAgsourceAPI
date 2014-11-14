@@ -843,6 +843,10 @@ class Report_model extends CI_Model {
 			->order_by('c.list_order', 'asc');
 		$result = $this->{$this->db_group_name}->get()->result_array();
 		
+		if(count($result) < 1){
+			return false;
+		}
+		
 		$arr_keep_keys = array('min' => '', 'max' => '', 'opposite' => '', 'data_type' => '', 'db_field_name' => '', 'field_name' => '', 'text' => '');
 		if(is_array($result) && !empty($result)){
 			foreach($result as $a){
@@ -903,7 +907,10 @@ class Report_model extends CI_Model {
 	function get_graph_data($arr_fieldname, $arr_filters, $num_dates, $date_field, $block_url, $arr_categories = NULL){
 		$data = $this->get_graph_dataset($arr_filters, $num_dates, $date_field, $block_url);
 		if(isset($arr_categories) && is_array($arr_categories)){
-			$return_val = $this->set_row_to_series($data, $arr_fieldname, $arr_categories);
+			return $this->set_row_to_series($data, $arr_fieldname, $arr_categories);
+		}
+		if(!isset($date_field)){//not a category or trend chart (e.g., pie chart)
+			return array_values($data);
 		}
 		else{
 			$return_val = $this->set_longitudinal_data($data, $date_field);
