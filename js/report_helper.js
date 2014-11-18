@@ -62,17 +62,20 @@ function createFixedHeader(full_table_id){
 	//clone each table header
 	//$('.tbl').each(function(){
 	var $full_table = $('#' + full_table_id);
-	var $fh_table = $("#fh-" + $full_table.attr('id'));
+	var $fh_table = $("#fh-" + full_table_id);
 	var $header = $full_table.find("thead:first").clone();
-	$fh_table.append($header);
-	$fh_table.width($full_table.width());
+
+    $fh_table.append($header);
+//    $fh_table.css('width', $full_table.css('width'));
+//	$fh_table.css('tableLayout', 'fixed');
+    //find each th of fixed header and set width equal to that of full table
 	$fh_table.find('th').each(function(index){
 	    var index2 = index;
 	    $(this).css('width', function(index){
 	    	return ($full_table.find("th:eq(" + index2 + ")").css('width'));
 	    });
 	});
-	$fh_table.hide();//css('display', 'none');
+	$fh_table.hide();
 	
 	//});
 		
@@ -85,8 +88,9 @@ function createFixedHeader(full_table_id){
 			var tableOffsetTop = $(this).offset().top;
 			var tableOffsetBottom = tableOffsetTop + $(this).height();
 	    	$fixedHeader = $('#fh-' + $(this).attr('id'));
+	    	$fixedHeader.css('width', $full_table.css('width'));
 	    	//if the header is above the top of the window but the bottom is not
-		    if (pageOffsetTop >= tableOffsetTop && pageOffsetTop <= (tableOffsetBottom - $fixedHeader.height())) {
+            if (pageOffsetTop >= tableOffsetTop && pageOffsetTop <= (tableOffsetBottom - $fixedHeader.height())) {
 		    	if($fixedHeader.is(":hidden")){
 		    		$fixedHeader.show();
 		    	}
@@ -96,7 +100,7 @@ function createFixedHeader(full_table_id){
 		    //if top of table is within window or the bottom of the table is above the top of the window
 		    else if ((pageOffsetTop < tableOffsetTop || pageOffsetTop > (tableOffsetBottom - $fixedHeader.height())) && !$fixedHeader.is(":hidden")) {
 		        $fixedHeader.hide();
-		    }
+            }
 	    });
 	});
 	

@@ -11,7 +11,7 @@
     <meta name="description" content="<?php if(isset($description)) echo $description; ?>">
     <meta name="keywords" content="<?php echo $this->config->item('product_name'); ?> - <?php echo $this->config->item('cust_serv_company'); ?>" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-	<link rel="stylesheet" href='https://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css'>
+ 	<link rel="stylesheet" href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css'>
 	<link rel="icon" type="image/png" href="https://myagsource.com/favicon.ico">
 <?php
 	    $this->carabiner->css('corporate.css', 'screen');
@@ -26,10 +26,10 @@
 			echo $hl . "\r\n";
 		endforeach;
 	endif; ?>
-	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/headjs/0.99/head.min.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/headjs/1.0.3/head.min.js"></script>
 	<script type="text/javascript">
 		head.js(
-			{jquery: "https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"},
+			{jquery: "https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"},
 			{bootstrap: "https://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"},
 			{sectionhelper: "<?php echo $this->config->item('base_url_assets'); ?>js/as_section_helper.js"},
 			{formhelper: "<?php echo $this->config->item('base_url_assets'); ?>js/form_helper.js"}
