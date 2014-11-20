@@ -111,6 +111,7 @@ function process_chart(div_id, data_in){
 
 	var um = undefined;
 	options = get_chart_options(options, data_in.chart_type);
+
 	options.title = {"text": data_in.description};
 	options.exporting = {"filename": data_in.name};
 	
@@ -133,86 +134,99 @@ function process_chart(div_id, data_in){
 	if(typeof(data_in) === 'string'){
 		$('#' + div_id).html('<p class-"chart-error">' + data_in + '</p>');
 	}
+
 	if(typeof(data_in) === 'object'){
-		var x_len = Object.size(data_in.arr_axes.x);
-		if(x_len > 0){
-			if(typeof(options.xAxis) === 'undefined'){
-				options.xAxis = {};
-			}
-			var cnt = 0;
-			for(var c in data_in.arr_axes.x){
-				if(typeof(options.xAxis[cnt]) === 'undefined'){
-					options.xAxis[cnt] = {};
-				}
-				options.xAxis[cnt].categories = typeof(data_in.arr_axes.x[c].categories) !== "undefined" ? data_in.arr_axes.x[c].categories : null;
-				options.xAxis[cnt].type = data_in.arr_axes.x[c].data_type;
+		if(typeof(data_in.arr_axes) !== 'undefined'){
+			var x_len = Object.size(data_in.arr_axes.x);
 
-				if(data_in.chart_type != 'bar'){
-					options.xAxis[cnt].title = {"text": data_in.arr_axes.x[c].text};
-					if(data_in.arr_axes.x[c].data_type == 'datetime'){
-						options.xAxis[cnt].labels = {"rotation": -35};//, "align": 'left', "x": -50, "y": 55};
+			if(x_len > 0){
+				if(typeof(options.xAxis) === 'undefined'){
+					options.xAxis = {};
+				}
+				var cnt = 0;
+				for(var c in data_in.arr_axes.x){
+					if(typeof(options.xAxis[cnt]) === 'undefined'){
+						options.xAxis[cnt] = {};
 					}
-					else{
-//						options.xAxis[cnt].labels = {"rotation": -35, "y": 25};
+					options.xAxis[cnt].categories = typeof(data_in.arr_axes.x[c].categories) !== "undefined" ? data_in.arr_axes.x[c].categories : null;
+					options.xAxis[cnt].type = data_in.arr_axes.x[c].data_type;
+	
+					if(data_in.chart_type != 'bar'){
+						options.xAxis[cnt].title = {"text": data_in.arr_axes.x[c].text};
+						if(data_in.arr_axes.x[c].data_type == 'datetime'){
+							options.xAxis[cnt].labels = {"rotation": -35};//, "align": 'left', "x": -50, "y": 55};
+						}
+						else{
+	//						options.xAxis[cnt].labels = {"rotation": -35, "y": 25};
+						}
 					}
+					
+					if(typeof(options.xAxis[cnt].labels) === 'undefined'){
+						options.xAxis[cnt].labels = {};
+					}
+					
+					options.xAxis[cnt].labels.formatter = getAxisLabelFormat(options.xAxis[cnt].type);
+					//set x axis label
+					if(typeof(options.xAxis[cnt].labels) === 'undefined'){
+						options.xAxis[cnt].labels = {};
+					}
+					cnt++;
 				}
-				
-				if(typeof(options.xAxis[cnt].labels) === 'undefined'){
-					options.xAxis[cnt].labels = {};
+			}
+			else{
+				alert("No x axis data");
+			}
+	
+			var y_len = Object.size(data_in.arr_axes.y);
+			if(y_len > 0){
+				if(typeof(options.yAxis) === 'undefined'){
+					options.yAxis = {};
 				}
-				
-				options.xAxis[cnt].labels.formatter = getAxisLabelFormat(options.xAxis[cnt].type);
-				//set x axis label
-				if(typeof(options.xAxis[cnt].labels) === 'undefined'){
-					options.xAxis[cnt].labels = {};
+				var cnt = 0;
+				for(var x in data_in.arr_axes.y){
+					if(typeof(options.yAxis[cnt]) === 'undefined'){
+						options.yAxis[cnt] = {};
+					}
+					if(data_in.chart_type != 'bar' && data_in.arr_axes.y[x].opposite == true){
+						options.yAxis[cnt].opposite = true;
+					}
+					if(typeof(data_in.arr_axes.y[x].text) != 'undefined'){
+						options.yAxis[cnt].title = {"text": data_in.arr_axes.y[x].text};
+						//placeholder to allow color changes pre and post render
+						options.yAxis[cnt].title.style = {"color": ''};
+					}
+					if(typeof(data_in.arr_axes.y[x].data_type) != 'undefined'){
+						options.yAxis[cnt].type = data_in.arr_axes.y[x].data_type;
+					}
+					if(typeof(data_in.arr_axes.y[x].max) != 'undefined'){
+						options.yAxis[cnt].max = data_in.arr_axes.y[x].max;
+					}
+					if(typeof(data_in.arr_axes.y[x].min) != 'undefined'){
+						options.yAxis[cnt].min = data_in.arr_axes.y[x].min;
+					}
+					if(typeof(data_in.arr_axes.y[x].labels) === 'undefined'){
+						options.yAxis[cnt].labels = {};
+					}
+					options.yAxis[cnt].labels.formatter = getAxisLabelFormat(options.yAxis[cnt].type);
+					cnt++;
 				}
-				cnt++;
+			}
+			else{
+				alert('No yAxis data');
 			}
 		}
-		else{
-			alert("No x axis data");
-		}
-
-		var y_len = Object.size(data_in.arr_axes.y);
-		if(y_len > 0){
-			if(typeof(options.yAxis) === 'undefined'){
-				options.yAxis = {};
-			}
-			var cnt = 0;
-			for(var x in data_in.arr_axes.y){
-				if(typeof(options.yAxis[cnt]) === 'undefined'){
-					options.yAxis[cnt] = {};
-				}
-				if(data_in.chart_type != 'bar' && data_in.arr_axes.y[x].opposite == true){
-					options.yAxis[cnt].opposite = true;
-				}
-				if(typeof(data_in.arr_axes.y[x].text) != 'undefined'){
-					options.yAxis[cnt].title = {"text": data_in.arr_axes.y[x].text};
-					//placeholder to allow color changes pre and post render
-					options.yAxis[cnt].title.style = {"color": ''};
-				}
-				if(typeof(data_in.arr_axes.y[x].data_type) != 'undefined'){
-					options.yAxis[cnt].type = data_in.arr_axes.y[x].data_type;
-				}
-				if(typeof(data_in.arr_axes.y[x].max) != 'undefined'){
-					options.yAxis[cnt].max = data_in.arr_axes.y[x].max;
-				}
-				if(typeof(data_in.arr_axes.y[x].min) != 'undefined'){
-					options.yAxis[cnt].min = data_in.arr_axes.y[x].min;
-				}
-				if(typeof(data_in.arr_axes.y[x].labels) === 'undefined'){
-					options.yAxis[cnt].labels = {};
-				}
-				options.yAxis[cnt].labels.formatter = getAxisLabelFormat(options.yAxis[cnt].type);
-				cnt++;
-			}
-		}
-		else{
-			alert('No yAxis data');
+		else if(data_in.chart_type !== 'pie') {
+			alert('No Axis Data');
 		}
 		//end set axis labels
 		if(typeof(data_in.series) !== 'undefined'){
-			options.series = data_in.series;
+			if(data_in.chart_type === 'pie'){
+				//use the info from the second series
+				options.series[0] = data_in.series[1];
+			}
+			else{
+				options.series = data_in.series;
+			}
 		}
 		if(typeof(data_in.section_data) !== 'undefined'){
 			section_data = data_in.section_data;
@@ -232,6 +246,23 @@ function process_chart(div_id, data_in){
 		else{
 			//add data to object
 			var tmpData = data_in.data;
+			//if type is chart we need to change the structure of the data
+			if(data_in.chart_type === 'pie'){
+				var inner_count = 0;
+				var new_data = [];
+				new_data[0] = [];
+				for(var x in tmpData){
+					new_data[0][inner_count] = [];
+					var new_count = 0;
+					for(i in tmpData[x]){
+						new_data[0][inner_count][new_count] = tmpData[x][i];
+						new_count++;
+					}
+					inner_count++;
+				}
+				tmpData = new_data;
+			}
+			
 			var count = 0;
 			for(var x in tmpData){
 				if(typeof options.series[count] === 'undefined'){
@@ -243,13 +274,14 @@ function process_chart(div_id, data_in){
 				options.series[count].data = tmpData[x];
 				count++;
 			}
-			
 			//set tooltip format
-			if(typeof(data_in.tooltip) === 'undefined'){
+			if(typeof(options.tooltip) === 'undefined'){//typeof(data_in.tooltip) === 'undefined' && 
 				options.tooltip = {};
 			}
+			if(typeof(options.tooltip.pointFormat) === 'undefined' && typeof(options.tooltip.formatter) === 'undefined'){
 			//@todo: line below will break if there is ever a chart with multiple x axes
-			options.tooltip.formatter = getTooltipFormat(options.chart.type, options.xAxis.type, um);
+				options.tooltip.formatter = getTooltipFormat(options.chart.type, options.xAxis.type, um);
+			}
 			
 			options.chart.renderTo = div_id;
 			if(typeof pre_render == 'function'){
@@ -349,6 +381,9 @@ function getTooltipFormat(chart_type, xaxis_type, um){
 	}
 }
 
+function customFormatGtLt(pointName) {
+    return pointName.replace(/</gm, '&lt;').replace(/>/gm, '&gt;').replace(/<=/gm, '&le;').replace(/>=/gm, '&ge;');
+}
 
 //debugging functions
 function dump(arr,level) {

@@ -683,10 +683,15 @@ abstract class parent_report extends CI_Controller {
 		$this->json['name'] = $arr_this_block['name'];
 		$this->json['description'] = $arr_this_block['description'];
 		$this->json['chart_type'] = $arr_this_block['chart_type'];
-
-		$this->json['arr_axes'] = $arr_axes;
-		$tmp_x_axis = current($this->json['arr_axes']['x']);
-		$tmp_categories = isset($tmp_x_axis['categories']) ? $tmp_x_axis['categories'] : null;
+		
+		$tmp_categories = null;
+		if(isset($arr_axes) && !empty($arr_axes)){
+			$this->json['arr_axes'] = $arr_axes;
+			$tmp_x_axis = current($this->json['arr_axes']['x']);
+			if(isset($tmp_x_axis['categories'])){
+				$tmp_categories = $tmp_x_axis['categories'];
+			}
+		}
 		
 		$this->json['herd_code'] = $this->session->userdata('herd_code');
 
