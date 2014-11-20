@@ -151,9 +151,13 @@ function get_pie_options(options_json){
         allowPointSelect: true,
 		dataLabels: {
 			enabled: true,
-			format: '<b>{point.name}</b>: {point.pecentage:/1f}%',
+			formatter: function(){return '<b>' + customFormatGtLt(this.point.name) + '</b>: ' + this.point.y + ' animals';},
 			color: '#c0c0c0'
 		}
+    };
+	options_json.tooltip = {
+        pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>',
+        useHTML:true
     };
 	return options_json;
 }

@@ -332,7 +332,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 			->join($this->tables['users_associations'] . ' ua', 'u.id = ua.user_id')
 			->join($this->tables['regions'] . ' r', 'ua.assoc_acct_num = r.account_num')
 			->where('u.id', $id)
-			->where('u.status', 1)
+			->where('u.active', 1)
 			->where('r.status_active', 1)
 			->get($this->tables['users'] . ' u')
 			->result_array();
