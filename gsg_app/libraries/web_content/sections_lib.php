@@ -23,11 +23,11 @@ class Sections_lib
 	protected $section_id;
 
 	/**
-	 * date field used in benchmarks (will always be test date?)
+	 * section name
 	 * @var string
 	 **/
 	protected $section_name;
-
+	
 
 	/**
 	 * __construct
