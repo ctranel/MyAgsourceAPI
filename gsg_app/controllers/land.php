@@ -228,21 +228,6 @@ class Land extends parent_report {
 			}
 		}
 		
-		$product_data = Array('sections' => $this->as_ion_auth->get_promo_sections());
-		if(isset($product_data['sections']) && !empty($product_data['sections'])){
-			$this->data['widget']['info'][] = array(
-				'content' => $this->load->view('auth/dashboard/other_products', $product_data, TRUE),
-				'title' => 'Other Products'
-			);
-		}
-
-		//page
-/*		$nav_data = array(
-				'arr_pstring' => $arr_pstring
-				,'curr_pstring' => $pstring
-		);
-		$this->data['report_nav'] = $this->load->view('auth/dashboard/report_nav', $nav_data, TRUE);
-*/		
 		$this->load->view('auth/dashboard/main', $this->data);
 	}
 	

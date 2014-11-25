@@ -59,7 +59,7 @@ class SupplementalLink extends \SplObjectStorage
 
 	/**
 	 * collection of supplemental_link_param objects
-	 * @var array
+	 * @var SplObjectStorage
 	 **/
 	protected $params;
 

@@ -450,53 +450,6 @@ class As_ion_auth extends Ion_auth {
 		else return FALSE;
 	}
 
-	/**
-	 * @method subscribed_section
-	 *
-	 * @param int section id
-	 * @return boolean - true if the user is signed up for the specified section
-	 * @author ctranel
-	 **/
-	public function subscribed_section($section_id){
-		return TRUE;
-		$tmp_array = $this->arr_user_sections;
-		if(isset($tmp_array) && is_array($tmp_array)){
-			$this->load->helper('multid_array_helper');
-			$tmp_arr_sections = array_extract_value_recursive('id', $tmp_array);
-			return in_array($section_id, $tmp_arr_sections);
-		}
-		else return false;
-	}
-
-
-	/**
-	 * @method get_promo_sections
-	 *
-	 * @param int user id
-	 * @return array
-	 * @author ctranel
-	 **/
-	public function get_promo_sections($user_id = FALSE){
-		if (!$user_id){
-			$user_id = $this->session->userdata('user_id');
-		}
-
-		$arr_subscribed_sections = $this->arr_user_sections;
-		// handle DM
-		//$this->load->model('dhi/dm_model');
-		//if($credentials = $this->dm_model->get_credentials()) $arr_subscribed_sections[] = array('name'=>'AgSourceDM');
-		if(!is_array($arr_subscribed_sections)) return array();
-
-		$this->load->helper('multid_array_helper');
-		$arr_subscribed_sections = array_extract_value_recursive('name', $arr_subscribed_sections);
-		$arr_all_sections = $this->web_content_model->get_sections_by_herd();
-		$arr_all_sections = array_extract_value_recursive('name', $arr_all_sections);
-		//$arr_subscribed_sections[] = 'My Account';
-		//$arr_subscribed_sections[] = 'Alert';
-
-		return array_diff($arr_all_sections, $arr_subscribed_sections);
-	}
-
 /**
 	 * @method record_section_inquiry()
 	 * @param array of section names
@@ -580,63 +533,8 @@ class As_ion_auth extends Ion_auth {
 		else {
 			$tmp_array = $this->web_content_model->get_subscribed_super_sections_array($group_id, $user_id, $herd_code);
 		}
-/*	for now, consultant have access to all super sections
- * 
-		if(!$this->has_permission("View Non-owned Herds") && $this->has_permission("View non-own w permission") && !$this->ion_auth_model->user_owns_herd($herd_code) && !empty($herd_code)){
-			if(is_array($tmp_array) && !empty($tmp_array)){
-				$arr_return = array();
-				foreach($tmp_array as $k => $v){
-					if($this->ion_auth_model->consultant_has_access($user_id, $herd_code, $v['id'])){
-						$arr_return[] = $v;
-					}
-				}
-				return $arr_return;
-			}
-			return FALSE;
-		}
- */
-		return $tmp_array;
-	}
-
-	/**
-	 * @method get_sections_array()
-	 * @param int group id
-	 * @param int user id
-	 * @param string herd code
-	 * @param array section scopes to include
-	 * @return array 1d (key=>value) array of web sections for specified user or herd
-	 * @access public
-	 *
-	 **/
-	public function get_sections_array($group_id, $user_id, $herd_code, $arr_super_section_id = array(), $arr_scope = NULL){
-		if(isset($arr_scope) && is_array($arr_scope)){
-			$tmp_array = array();
-			foreach($arr_scope as $s){
-				switch ($s) {
-					case 'subscription':
-						$a = $this->web_content_model->get_subscribed_sections_array($group_id, $user_id, $arr_super_section_id, $herd_code);
-						if(!empty($a)) $tmp_array = array_merge($tmp_array, $a);
-						break;
-					case 'unmanaged':
-						$a = $this->web_content_model->get_unmanaged_sections_array($group_id, $user_id, $herd_code);
-						if(!empty($a)) $tmp_array = array_merge($tmp_array, $a);
-						break;
-//					case 'admin':
-//						if($this->is_admin){
-//							$a = $this->web_content_model->get_child_sections_by_scope($s, $super_section_id);
-//							if(!empty($a)) $tmp_array = array_merge($tmp_array, $a);
-//						}
-//						break;
-					default: //public, account, user-specific
-						$a = $this->web_content_model->get_child_sections_by_scope($s, $arr_super_section_id);
-						if(!empty($a)) $tmp_array = array_merge($tmp_array, $a);
-						break;
-				}
-			}
-		}
-		else {
-			$tmp_array = $this->web_content_model->get_subscribed_sections_array($group_id, $user_id, $arr_super_section_id, $herd_code);
-		}
+/* 	for now, consultant have access to all super sections
+ 
 		if(!$this->has_permission("View Non-owned Herds") && $this->has_permission("View non-own w permission") && !$this->ion_auth_model->user_owns_herd($herd_code) && !empty($herd_code)){
 			if(is_array($tmp_array) && !empty($tmp_array)){
 				$arr_return = array();
@@ -650,7 +548,7 @@ class As_ion_auth extends Ion_auth {
 			return FALSE;
 		}
 
-		else return $tmp_array;
+ */		return $tmp_array;
 	}
 
 	/**
