@@ -44,7 +44,8 @@
 */
 	// admin_email and site_title are also set in ion_auth.php
 	$config['product_name']         = "MyAgSource";
-	$config['product_report_code']  = "AMYA-500";
+	//@todo: need to convert this to pull from DB
+	$config['product_report_code']  = ["AMYA-500", 'APAG-505'];
 	$config['trial_length']  		= "90";
 	$config['trial_warning']  		= "60";
 	$config['default_herd']			= "35999909";

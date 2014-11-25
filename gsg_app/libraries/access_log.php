@@ -64,7 +64,7 @@ class Access_log
 			'report_page_id' => $report_page_id,
 			'access_time' => date('Y-m-d H:i:s')
 		);
-		if ($product_code) $tmp_array['report_code'] = $product_code;
+		if ($product_code) $tmp_array['report_code'] = $product_code[0];
 		if ($report_page_id) $tmp_array['report_page_id'] = $report_page_id;
 		if ($sort) $tmp_array['sort_text'] = $sort;
 		if ($filters) $tmp_array['filter_text'] = $filters;

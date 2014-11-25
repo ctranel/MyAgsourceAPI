@@ -127,6 +127,11 @@ class Herd
 	 *
 	 **/
 	public function getHerdEnrollStatus($report_code = NULL){
+		if(isset($report_code)){
+			if(!is_array($report_code)){
+				$report_code = array($report_code);
+			}
+		}
 		$herd_output = $this->herd_model->get_herd_output($this->herd_code, $report_code);
 		if(!$herd_output || count($herd_output) == 0){
 			$return_val = 1;
@@ -159,6 +164,11 @@ class Herd
 	* -----------------------------------------------------------------
 	*/
 	public function getTrialDays($access_log, $user_id, $herd_code, $report_code){
+		if(isset($report_code)){
+			if(!is_array($report_code)){
+				$report_code = array($report_code);
+			}
+		}
 		$initial_access = $access_log->getInitialAccessDate($user_id, $herd_code, $report_code);
 		if(empty($initial_access)){
 			return 0;
