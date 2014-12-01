@@ -1,5 +1,5 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
-class Web_content_model extends CI_Model {
+class Section_model extends CI_Model {
 	public function __construct(){
 		parent::__construct();
 		$this->db_group_name = 'default';
@@ -21,37 +21,52 @@ class Web_content_model extends CI_Model {
 		return $this->db->get()->result_array();
 	}
 	
-		/**
-	 * get_sections_by_user
+
+	/**
+	 * getByCriteria
 	 *
 	 * @return array of section data for given user
 	 * @author ctranel
 	 **/
+	public function getByCriteria($where, $join = null){
+		$this->db
+		->select($this->tables['sections'] . '.id, ' . $this->tables['sections'] . '.parent_id')
+		->where($where);
+		return $this->get_sections();
+	}
+	
+	
+	
+	/**
+	 * get_sections_by_user
+	 *
+	 * @return array of section data for given user
+	 * @author ctranel
 	public function get_sections_by_user($user_id){
 		$this->db
 		->select($this->tables['sections'] . '.id, ' . $this->tables['sections'] . '.name, ' . $this->tables['sections'] . '.path')
 		->where("(" . $this->tables['sections'] . '.user_id IS NULL OR ' . $this->tables['sections'] . '.user_id = ' . $user_id . ")");
 		return $this->get_sections();
 	}
+	 **/
 
 	/**
 	 * get_sections_by_herd
 	 *
 	 * @return array of section data for given herd
 	 * @author ctranel
-	 **/
 	public function get_sections_by_herd(){
 		$this->db
 		->where($this->tables['sections'] . '.scope_id', 2); // 2 = subscription
 		return $this->get_sections();
 	}
+	 **/
 
 	/**
 	 * @method get_sections_by_scope array
 	 * @param string scope
 	 * @return array of section data for given user
 	 * @author ctranel
-	 **/
 	public function get_sections_by_scope($scope) {
 		$this->db
 		->select($this->tables['sections'] . '.*')
@@ -59,6 +74,7 @@ class Web_content_model extends CI_Model {
 		->where($this->tables['lookup_scopes'] . '.name', $scope);
 		return $this->get_sections();
 	}
+	 **/
 	
 	/**
 	 * @method get_section_id_by_path()
@@ -66,7 +82,6 @@ class Web_content_model extends CI_Model {
 	 * @return int id of section
 	 * @access public
 	 *
-	 **/
 	public function get_section_id_by_path($section_path){
 		$arr_res = $this->db
 			->select('id')
@@ -78,6 +93,7 @@ class Web_content_model extends CI_Model {
 		}
 		return FALSE;
 	}
+	 **/
 
 	/**
 	 * @method get_sections_select_data()
@@ -85,11 +101,11 @@ class Web_content_model extends CI_Model {
 	 * @access public
 	 *
 	 **/
-	public function get_sections_select_data($super_section_id){
+	public function get_select_data($parent_section_id){
 		$arr_return = array();
 		$this->{$this->db_group_name}
 		->select('id, name')
-		->where($this->tables['sections'] . '.super_section_id', $super_section_id);
+		->where($this->tables['sections'] . '.super_section_id', $parent_section_id);
 		$tmp = $this->get_sections();
 		if(is_array($tmp)){
 			$arr_return[0] = 'Select one';
@@ -98,23 +114,6 @@ class Web_content_model extends CI_Model {
 			}
 		}
 		return $arr_return;
-	}
-	
-	/**
-	 * @method get_unmanaged_sections_array
-	 * @param int $group_id
-	 * @param int $user_id
-	 * @param string $herd_code
-	 * @return array of section data for given user
-	 * @author ctranel
-	 **/
-	public function get_unmanaged_sections_array() {
-		//$this->load->model('dhi/dm_model');
-		if(false){//$credentials = $this->dm_model->get_credentials()) {
-			$this->db->where($this->tables['sections'] . '.id', 6);
-			return $this->get_sections();
-		}
-		else return array();
 	}
 	
 	/**

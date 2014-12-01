@@ -1,6 +1,7 @@
 <?php 
 
 use \myagsource\Access_log;
+use \myagsource\web_content;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
@@ -13,6 +14,8 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 require_once APPPATH . 'libraries/Ion_auth.php';
 require_once APPPATH . 'libraries/access_log.php';
+require_once APPPATH . 'libraries/web_content/Sections.php';
+
 class As_ion_auth extends Ion_auth {
 
 	/**
@@ -35,13 +38,6 @@ class As_ion_auth extends Ion_auth {
 	 * @var string
 	 **/
 	public $referrer;
-
-	/**
-	 * super_section_id
-	 *
-	 * @var string
-	 **/
-	public $super_section_id;
 
 	/**
 	 * arr_groups
@@ -85,16 +81,36 @@ class As_ion_auth extends Ion_auth {
 		parent::__construct();
 //		$this->load->model('access_log_model');
 //		$this->access_log = new Access_log($this->access_log_model);
-		$this->load->model('web_content_model');
+		$this->load->model('web_content/section_model');
 		$this->load->model('dhi/region_model');
 		$this->load->helper('url');
+		//$section_model = new \web_content\section_model();
+		$sections = new \myagsource\web_content\Sections($this->section_model);
+		
+		if($this->logged_in()){
+			$this->arr_task_permissions = $this->ion_auth_model->get_task_permissions();
+			$tmp = $this->session->userdata('herd_code');
+			$arr_scope = array('subscription','public','unmanaged');
+			if($this->is_admin) $arr_scope[] = 'admin';
+			$this->arr_user_super_sections = $this->get_super_sections_array($this->session->userdata('active_group_id'), $this->session->userdata('user_id'), $this->session->userdata('herd_code'), $arr_scope);
+			$this->arr_user_sections = $this->get_sections_array($this->session->userdata('active_group_id'), $this->session->userdata('user_id'), $this->session->userdata('herd_code'), array($super_section_id), $arr_scope);
+		}
+		elseif($this->session->userdata('herd_code') == $this->config->item('default_herd')) {
+			$arr_scope = array('subscription','public','unmanaged');
+			//the first parameter is group id--use producer (2) if no one is logged in, second param is user id. 
+			$this->arr_user_super_sections = $this->get_super_sections_array(2, $this->session->userdata('user_id'), $this->session->userdata('herd_code'), $arr_scope);
+			$this->arr_user_sections = $this->get_sections_array(2, $this->session->userdata('user_id'), $this->session->userdata('herd_code'), array($super_section_id), $arr_scope);
+		}
+		
+		
 
 		//set supersection if there is one
 		$section_path = $this->router->fetch_class(); //this should match the name of this file (minus ".php".  Also used as base for css and js file names and model directory name
 		$control_dir = $this->router->fetch_directory();
 		//all sections must have directories in the main controller directory
 		if($control_dir != $section_path){
-			$this->super_section_id = $this->web_content_model->get_super_section_id_by_path($control_dir);
+			$root_section = $sections->getByPath($control_dir);
+			$root_section->setChildren($this->session->userdata('user_id'), $this->session->userdata('herd_code'), $root_section, $arr_scope, $this->has_permission('View Non-owned Herds'), $this->has_permission('View non-own w permission'));
 		} 
 
 		//reliably set the referrer, used when determining whether to set the redirect variable on pages like select herd
@@ -104,27 +120,11 @@ class As_ion_auth extends Ion_auth {
 		
 		$this->is_admin = $this->is_admin();
 		$this->is_manager = $this->is_manager();
-		if($this->logged_in()){
-			$this->arr_task_permissions = $this->ion_auth_model->get_task_permissions();
-			$tmp = $this->session->userdata('herd_code');
-			$arr_scope = array('subscription','public','unmanaged');
-			if($this->is_admin) $arr_scope[] = 'admin';
-			$this->arr_user_super_sections = $this->get_super_sections_array($this->session->userdata('active_group_id'), $this->session->userdata('user_id'), $this->session->userdata('herd_code'), $arr_scope);
-			$this->arr_user_sections = $this->get_sections_array($this->session->userdata('active_group_id'), $this->session->userdata('user_id'), $this->session->userdata('herd_code'), array($this->super_section_id), $arr_scope);
-		}
-		elseif($this->session->userdata('herd_code') == $this->config->item('default_herd')) {
-			$arr_scope = array('subscription','public','unmanaged');
-			//the first parameter is group id--use producer (2) if no one is logged in, second param is user id. 
-			$this->arr_user_super_sections = $this->get_super_sections_array(2, $this->session->userdata('user_id'), $this->session->userdata('herd_code'), $arr_scope);
-			$this->arr_user_sections = $this->get_sections_array(2, $this->session->userdata('user_id'), $this->session->userdata('herd_code'), array($this->super_section_id), $arr_scope);
-		}
+		
+		
+		$child_sections = $root_section->children();
 	}
 	
-	//accessor
-	public function get_super_section_id(){
-		return $this->super_section_id;
-	}
-
 	//overridden functions below
 	/**
 	 * @method register

@@ -14,6 +14,9 @@ class Site {
 	function __construct() {
 	}
 	
+	public static function getTopLevelSections(\sections_model $datasource){
+		
+	}
 	
 }
 

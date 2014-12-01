@@ -1,4 +1,7 @@
-<?php  use myagsource\web_content\iWebContent;
+<?php
+namespace myagsource\web_content;
+
+use myagsource\web_content\iWebContent;
 /**
 * Name:  Sections
 *
@@ -88,20 +91,6 @@ class Section //implements iWebContent
 		
 	}
 	
-	protected function datasetToObject(Array $dataset, \sections_model $datasource){
-		$ret = new \SplObjectStorage();
-		if(isset($dataset) && is_array($dataset)){
-			foreach($dataset as $r){
-				$data = $datasource->getLinkParams($r['id']);
-				$ret->attach(new Section(
-					$datasource,
-					,
-					
-				);
-			}
-		}
-	}
-	
 	/**
 	 * @method setChildren()
 	 * @param int user id
@@ -115,37 +104,37 @@ class Section //implements iWebContent
 	 *
 	 **/
 	public function setChildren($user_id, $herd_code, $parent_section_id, array $arr_scope, $view_non_own, $view_non_own_w_permission ){//Array $array){ //array directly from data source
-			$tmp_array = array();
-			foreach($arr_scope as $s){
-				switch ($s) {
-					case 'subscription':
-						$a = $this->web_content_model->get_subscribed_sections_array($user_id, $parent_section_id, $herd_code,$view_non_own);
-						if(!empty($a)) $tmp_array = array_merge($tmp_array, $a);
-						break;
-					case 'unmanaged':
-						$a = $this->web_content_model->get_unmanaged_sections_array();
-						if(!empty($a)) $tmp_array = array_merge($tmp_array, $a);
-						break;
-//					case 'admin':
-//						if($this->is_admin){
-//							$a = $this->web_content_model->get_child_sections_by_scope($s, $super_section_id);
-//							if(!empty($a)) $tmp_array = array_merge($tmp_array, $a);
-//						}
-//						break;
-					default: //public, account, user-specific
-						$a = $this->web_content_model->get_child_sections_by_scope($s, $arr_super_section_id);
-						if(!empty($a)) $tmp_array = array_merge($tmp_array, $a);
-						break;
-				}
+		$tmp_array = array();
+		foreach($arr_scope as $s){
+			switch ($s) {
+				case 'subscription':
+					$a = $this->web_content_model->get_subscribed_sections_array($user_id, $parent_section_id, $herd_code,$view_non_own);
+					if(!empty($a)) $tmp_array = array_merge($tmp_array, $a);
+					break;
+				case 'unmanaged':
+					$a = $this->web_content_model->get_unmanaged_sections_array();
+					if(!empty($a)) $tmp_array = array_merge($tmp_array, $a);
+					break;
+//				case 'admin':
+//					if($this->is_admin){
+//						$a = $this->web_content_model->get_child_sections_by_scope($s, $super_section_id);
+//						if(!empty($a)) $tmp_array = array_merge($tmp_array, $a);
+//					}
+//					break;
+				default: //public, account, user-specific
+					$a = $this->web_content_model->get_child_sections_by_scope($s, $arr_super_section_id);
+					if(!empty($a)) $tmp_array = array_merge($tmp_array, $a);
+					break;
 			}
 		}
 
 		if(!$view_non_own && $view_non_own_w_permission && !$this->ion_auth_model->user_owns_herd($herd_code) && !empty($herd_code)){
 			if(is_array($tmp_array) && !empty($tmp_array)){
-				$arr_return = array();
+				$this->child_sections = new \SplObjectStorage();
 				foreach($tmp_array as $k => $v){
 					if($this->ion_auth_model->consultant_has_access($user_id, $herd_code, $v['id'])){
-						$arr_return[] = $v;
+						
+						$this->child_sections = $v;
 					}
 				}
 				return $arr_return;
@@ -155,7 +144,9 @@ class Section //implements iWebContent
 
 		else return $tmp_array;
 	}
-	public function children(){}
+	public function children(){
+		return $this->child_sections;
+	}
 	public function childrenList(){
 	}
 	
@@ -170,7 +161,6 @@ class Section //implements iWebContent
 	public function getChildrenByUser(){}
 	public function getChildrenByPath(){}
 		
-
 	/**
 	 * @method subscribed_section
 	 *
