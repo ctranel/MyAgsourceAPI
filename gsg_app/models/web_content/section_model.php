@@ -14,10 +14,10 @@ class Section_model extends CI_Model {
 	 **/
 	public function get_sections() {
 		$this->db
-			->where($this->tables['sections'] . '.active', 1)
-			->order_by('super_section_id', 'asc')
-			->order_by('list_order', 'asc')
-			->from($this->tables['sections']);
+			->where('s.active', 1)
+			->order_by('s.super_section_id', 'asc')
+			->order_by('s.list_order', 'asc')
+			->from($this->tables['sections'] . ' s');
 		return $this->db->get()->result_array();
 	}
 	
@@ -30,7 +30,7 @@ class Section_model extends CI_Model {
 	 **/
 	public function getByCriteria($where, $join = null){
 		$this->db
-		->select($this->tables['sections'] . '.id, ' . $this->tables['sections'] . '.parent_id')
+		->select('s.id, s.parent_id')
 		->where($where);
 		return $this->get_sections();
 	}
@@ -42,25 +42,27 @@ class Section_model extends CI_Model {
 	 *
 	 * @return array of section data for given user
 	 * @author ctranel
+	 **/
 	public function get_sections_by_user($user_id){
 		$this->db
-		->select($this->tables['sections'] . '.id, ' . $this->tables['sections'] . '.name, ' . $this->tables['sections'] . '.path')
-		->where("(" . $this->tables['sections'] . '.user_id IS NULL OR ' . $this->tables['sections'] . '.user_id = ' . $user_id . ")");
+		->select('s.id, s.name, s.path')
+		->where("(s.user_id IS NULL OR s.user_id = '" . $user_id . ")");
 		return $this->get_sections();
 	}
-	 **/
 
 	/**
 	 * get_sections_by_herd
 	 *
 	 * @return array of section data for given herd
 	 * @author ctranel
-	public function get_sections_by_herd(){
+	 **/
+	public function get_sections_by_herd($herd_code){
 		$this->db
+		->join('users.dbo.sections_reports sr', 's.id = sr.section_id')
+		->join('herd.dbo.herd_output ho', "sr.report_code = ho.report_code AND ho.end_date IS NOT NULL AND ho.medium_type_code = 'w'")
 		->where($this->tables['sections'] . '.scope_id', 2); // 2 = subscription
 		return $this->get_sections();
 	}
-	 **/
 
 	/**
 	 * @method get_sections_by_scope array
@@ -100,7 +102,6 @@ class Section_model extends CI_Model {
 	 * @return int id of super section
 	 * @access public
 	 *
-	 **/
 	public function get_select_data($parent_section_id){
 		$arr_return = array();
 		$this->{$this->db_group_name}
@@ -115,6 +116,7 @@ class Section_model extends CI_Model {
 		}
 		return $arr_return;
 	}
+	 **/
 	
 	/**
 	 * @method get_subscribed_sections_array
@@ -167,7 +169,6 @@ class Section_model extends CI_Model {
 	 * @param array scope options to include
 	 * @return 1d array (id=>name)
 	 * @author ctranel
-	 **/
 	public function get_keyed_section_array($arr_scope = NULL) {
 		$this->db
 		->select($this->tables['sections'] . '.id, ' . $this->tables['sections'] . '.name AS name')
@@ -185,6 +186,7 @@ class Section_model extends CI_Model {
 		}
 		else return false;
 	}
+	 **/
 
 /***  PAGES *****************************************************/
 	
@@ -258,132 +260,4 @@ class Section_model extends CI_Model {
 	}
 	 **/
 	
-/***  BLOCKS *****************************************************/
-	/**
-	 * @method get_blocks
-	 * @return array of block data
-	 * @author ctranel
-	 **/
-	public function get_blocks() {
-		$this->db
-			->select('name,[description],url_segment,display_type_id')
-			->where($this->tables['blocks'] . '.active', 1)
-			->order_by('list_order', 'asc')
-			->from($this->tables['blocks']);
-		return $this->db->get()->result_array();
-	}
-	
-	/**
-	 * get_blocks
-	 * @return array of section data
-	 * @author ctranel
-	private function get_blocks() {
-		return $this->{$this->db_group_name}
-			->where($this->tables['blocks'] . '.active', 1)
-			->get($this->tables['blocks']);
-	}
-	 **/
-	
-	/**
-	 * @method get_blocks_by_section array
-	 * @param int section
-	 * @return array of block for given section
-	 * @author ctranel
-	public function get_blocks_by_section($section, $display = NULL) {
-		$this->db
-			->join($this->tables['pages_blocks'], $this->tables['blocks'] . '.id = ' . $this->tables['pages_blocks'] . '.block_id', 'left')
-			->join($this->tables['pages'], $this->tables['pages_blocks'] . '.page_id = ' . $this->tables['pages'] . '.id', 'left')
-			->join($this->tables['lookup_display_types'], $this->tables['blocks'] . '.display_type_id = ' . $this->tables['lookup_display_types'] . '.id', 'left')
-			->where($this->tables['pages'] . '.section_id', $section);
-		if(isset($display)) $this->db->where($this->tables['lookup_display_types'] . '.name', $display);
-		return $this->get_blocks();
-	}
-	 **/
-
-	/**
-	 * get_block_display_types
-	 * @return array of section data
-	 * @author ctranel
-	 **/
-	public function get_block_display_types() {
-		return $this->{$this->db_group_name}
-			//->where($this->tables['lookup_display_types'] . '.active', 1)
-			->get($this->tables['lookup_display_types']);
-	}
-	
-	/**
-	 * get_block_links
-	 * @param int section id
-	 * @return array of block info keyed by url_segment
-	 * @author ctranel
-	 **/
-	public function get_block_links($section_id = NULL) {
-		$arr_return = array();
-		if(isset($section_id)) $this->{$this->db_group_name}->where('p.section_id', $section_id);
-		$result = $this->{$this->db_group_name}
-		->select("p.id AS page_id, b.id, p.section_id, b.url_segment, b.name, ct.name AS chart_type, b.description, p.url_segment AS page, p.name AS page_name, CASE WHEN dt.name LIKE '%chart' THEN 'chart' ELSE dt.name END AS display_type,s.path AS section_path, b.max_rows, b.cnt_row, b.sum_row, b.avg_row, b.bench_row, pf.db_field_name AS pivot_db_field, b.is_summary")
-		->join($this->tables['pages'] . ' AS p', 'p.section_id = s.id', 'left')
-		->join($this->tables['pages_blocks'] . ' AS pb', 'p.id = pb.page_id', 'left')
-		->join($this->tables['blocks'] . ' AS b', 'pb.block_id = b.id', 'left')
-		->join($this->tables['lookup_display_types'] . ' AS dt', 'b.display_type_id = dt.id', 'left')
-		->join('users.dbo.lookup_chart_types AS ct', 'b.chart_type_id = ct.id', 'left')
-		->join('users.dbo.db_fields AS pf', 'pf.id = b.pivot_db_field', 'left')
-		//->where($this->tables['blocks'] . '.display IS NOT NULL')
-		->where('b.url_segment IS NOT NULL')
-		->order_by('s.list_order', 'asc')
-		->order_by('p.list_order', 'asc')
-		->order_by('pb.list_order', 'asc')
-		->get($this->tables['sections'] . ' AS s')->result_array();
-		if(is_array($result) && !empty($result)){
-			foreach($result as $r){
-				$arr_return[$r['page']]['page_id'] = $r['page_id'];
-				$arr_return[$r['page']]['name'] = $r['page_name'];
-				if(empty($r['url_segment']) === FALSE){
-					$arr_return[$r['page']]['blocks'][$r['url_segment']] = array(
-						'id'=>$r['id'],
-						'section_id'=>$r['section_id'],
-						'name'=>$r['name'],
-						'description'=>$r['description'],
-						'url_segment'=>$r['url_segment'],
-						'section_path'=>$r['section_path'],
-						'display_type'=>$r['display_type'],
-						'chart_type'=>$r['chart_type'],
-						'max_rows'=>$r['max_rows'],
-						'cnt_row'=>$r['cnt_row'],
-						'sum_row'=>$r['sum_row'],
-						'avg_row'=>$r['avg_row'],
-						'bench_row'=>$r['bench_row'],
-						'is_summary'=>$r['is_summary'],
-						'pivot_db_field'=>$r['pivot_db_field']
-					);
-				} 
-				else	{
-					$arr_return[$r['page']]['blocks'][$r['url_segment']] = array(
-						'id'=>$r['id'],
-						'section_id'=>$r['section_id'],
-						'name'=>$r['name'],
-						'description'=>$r['description'],
-						'url_segment'=>$r['url_segment'],
-						'is_summary'=>$r['is_summary'],
-						'section_path'=>$r['section_path']
-					);
-				}
- 			}
- 			return $arr_return;
-		}
-		else return FALSE;
-	}
-	
-/***  CHART *****************************************************/
-	
-	/**
-	 * get_chart_display_types
-	 * @return array of section data
-	 * @author ctranel
-	 **/
-	public function get_chart_display_types() {
-		return $this->{$this->db_group_name}
-			//->where($this->tables['lookup_chart_types'] . '.active', 1)
-			->get($this->tables['lookup_chart_types']);
-	}
 }

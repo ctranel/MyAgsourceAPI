@@ -88,35 +88,28 @@ class As_ion_auth extends Ion_auth {
 		$sections = new \myagsource\web_content\Sections($this->section_model);
 		
 		if($this->logged_in()){
+			//set supersection if there is one
+			$section_path = $this->router->fetch_class(); //this should match the name of this file (minus ".php".  Also used as base for css and js file names and model directory name
+			$control_dir = $this->router->fetch_directory();
+			//all sections must have directories in the main controller directory
+			if($control_dir != $section_path){
+				$root_section = $sections->getByPath($control_dir);
+				$root_section->setChildren($this->session->userdata('user_id'), $this->session->userdata('herd_code'), $root_section, $arr_scope, $this->has_permission('View Non-owned Herds'), $this->has_permission('View non-own w permission'));
+			} 
+	
 			$this->arr_task_permissions = $this->ion_auth_model->get_task_permissions();
-			$tmp = $this->session->userdata('herd_code');
 			$arr_scope = array('subscription','public','unmanaged');
 			if($this->is_admin) $arr_scope[] = 'admin';
 			$this->arr_user_super_sections = $this->get_super_sections_array($this->session->userdata('active_group_id'), $this->session->userdata('user_id'), $this->session->userdata('herd_code'), $arr_scope);
 			$this->arr_user_sections = $this->get_sections_array($this->session->userdata('active_group_id'), $this->session->userdata('user_id'), $this->session->userdata('herd_code'), array($super_section_id), $arr_scope);
 		}
-		elseif($this->session->userdata('herd_code') == $this->config->item('default_herd')) {
-			$arr_scope = array('subscription','public','unmanaged');
-			//the first parameter is group id--use producer (2) if no one is logged in, second param is user id. 
-			$this->arr_user_super_sections = $this->get_super_sections_array(2, $this->session->userdata('user_id'), $this->session->userdata('herd_code'), $arr_scope);
-			$this->arr_user_sections = $this->get_sections_array(2, $this->session->userdata('user_id'), $this->session->userdata('herd_code'), array($super_section_id), $arr_scope);
-		}
-		
-		
-
-		//set supersection if there is one
-		$section_path = $this->router->fetch_class(); //this should match the name of this file (minus ".php".  Also used as base for css and js file names and model directory name
-		$control_dir = $this->router->fetch_directory();
-		//all sections must have directories in the main controller directory
-		if($control_dir != $section_path){
-			$root_section = $sections->getByPath($control_dir);
-			$root_section->setChildren($this->session->userdata('user_id'), $this->session->userdata('herd_code'), $root_section, $arr_scope, $this->has_permission('View Non-owned Herds'), $this->has_permission('View non-own w permission'));
-		} 
 
 		//reliably set the referrer, used when determining whether to set the redirect variable on pages like select herd
 		$this->referrer = $this->session->userdata('referrer');
 		$tmp_uri= $this->uri->uri_string();
-		if($this->session->userdata('referrer') != $tmp_uri && strpos($tmp_uri, 'ajax') === FALSE) $this->session->set_userdata('referrer', $tmp_uri);
+		if($this->session->userdata('referrer') != $tmp_uri && strpos($tmp_uri, 'ajax') === FALSE){
+			$this->session->set_userdata('referrer', $tmp_uri);
+		}
 		
 		$this->is_admin = $this->is_admin();
 		$this->is_manager = $this->is_manager();

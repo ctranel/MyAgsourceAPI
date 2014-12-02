@@ -107,20 +107,27 @@ class Section //implements iWebContent
 		$tmp_array = array();
 		foreach($arr_scope as $s){
 			switch ($s) {
+				/* 
+				 * subscription is different in that it fetches content by herd data (i.e. herd output) for users that 
+				 * have permission only for subscribed content.  All other scopes are strictly users-based
+				 */
 				case 'subscription':
 					$a = $this->web_content_model->get_subscribed_sections_array($user_id, $parent_section_id, $herd_code,$view_non_own);
 					if(!empty($a)) $tmp_array = array_merge($tmp_array, $a);
 					break;
+/* 				not currently used
 				case 'unmanaged':
 					$a = $this->web_content_model->get_unmanaged_sections_array();
 					if(!empty($a)) $tmp_array = array_merge($tmp_array, $a);
 					break;
-//				case 'admin':
-//					if($this->is_admin){
-//						$a = $this->web_content_model->get_child_sections_by_scope($s, $super_section_id);
-//						if(!empty($a)) $tmp_array = array_merge($tmp_array, $a);
-//					}
-//					break;
+*//*
+				case 'admin':
+					if($this->is_admin){
+						$a = $this->web_content_model->get_child_sections_by_scope($s, $super_section_id);
+						if(!empty($a)) $tmp_array = array_merge($tmp_array, $a);
+					}
+					break;
+*/
 				default: //public, account, user-specific
 					$a = $this->web_content_model->get_child_sections_by_scope($s, $arr_super_section_id);
 					if(!empty($a)) $tmp_array = array_merge($tmp_array, $a);
