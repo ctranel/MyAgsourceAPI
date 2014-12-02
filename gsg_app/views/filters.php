@@ -9,7 +9,7 @@
 				echo form_fieldset($f['label'], array('id' => $f['field_name'] . '-fieldset'));
 					foreach($f['options'] as $o): ?>
 						<span class= "filter-item checkbox">
-							<?php echo form_checkbox($f['field_name'] . '[]', $o['value'], in_array($o['value'], $f['arr_selected_values']) !== FALSE);
+						<?php echo form_checkbox($f['field_name'] . '[]', $o['value'], in_array($o['value'], $f['arr_selected_values']) !== FALSE);
 							echo $o['label']; ?>
 						</span>
 					<?php endforeach;
@@ -29,9 +29,11 @@
 		elseif(strpos($f['type'], 'range') !== false):
 			$input_array_from = array('name'=>$f['field_name'] . "[]", 'size'=>'5','maxlength'=>'5');
 			$input_array_to = array('name'=>$f['field_name'] . "[]", 'size'=>'5', 'maxlength'=>'5');
-			if(strpos($f['type'], 'date')):
-				$input_array_from['id'] = 'datepickfrom';
-				$input_array_to['id'] = 'datepickto';
+			if(strpos($f['type'], 'date') !== false):
+				$input_array_from['class'] = 'hasDatepicker';
+				$input_array_to['class'] = 'hasDatepicker';
+				$input_array_from['size'] = '10'; 
+				$input_array_to['size'] = '10'; 
 			endif;
 			if(isset($f['arr_selected_values']['dbfrom'])):
 				$input_array_from['value'] = $f['arr_selected_values']['dbfrom'];

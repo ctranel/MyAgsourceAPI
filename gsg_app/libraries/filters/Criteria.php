@@ -163,7 +163,7 @@ class Criteria{
 		//? if($field_name == 'page') $this->arr_criteria['page'] = $this->arr_pages[$this->$arr_params['page']]['name'];
 		if($this->type === 'range' || $this->type === 'date range'){
 			if(!isset($page_filter_value[0]) || !isset($page_filter_value[1])){
-				continue;
+				return;
 			}
 			$this->arr_selected_values['dbfrom'] = $page_filter_value[0];
 			$this->arr_selected_values['dbto'] = $page_filter_value[1];
