@@ -635,6 +635,9 @@ SELECT DISTINCT id, name, list_order FROM cteAnchor ORDER BY list_order;";
 	 * @author ctranel
 	 **/
 	public function user_owns_herd($herd_code) {
+		if(!isset($herd_code) || empty($herd_code)){
+			return false;
+		}
 		$results = $this->db
 		->select('id')
 		->from('users')
@@ -1113,7 +1116,7 @@ SELECT DISTINCT id, name, list_order FROM cteAnchor ORDER BY list_order;";
 	}
 
 	/**
-	 * @method consultant_has_access
+	 * @method userHasPermission
 	 *
 	 * @param int consultant id
 	 * @param string herd code
@@ -1121,7 +1124,7 @@ SELECT DISTINCT id, name, list_order FROM cteAnchor ORDER BY list_order;";
 	 * @return bool
 	 * @author ctranel
 	 **/
-	public function consultant_has_access($sg_user_id, $herd_code, $section_id){
+	public function userHasPermission($sg_user_id, $herd_code, $section_id){
 		$results = $this->db
 		->select('sg_user_id')
 		->from($this->tables['consultants_herds'] . ' ch')
@@ -1136,4 +1139,28 @@ SELECT DISTINCT id, name, list_order FROM cteAnchor ORDER BY list_order;";
 		if($results > 0) return TRUE;
 		else return FALSE;
 	}
+	
+	/**
+	 * @method permissionGrantedSections
+	 *
+	 * @param int consultant id
+	 * @param string herd code
+	 * @return bool
+	 * @author ctranel
+	 **/
+	public function permissionGrantedSections($sg_user_id, $herd_code){
+		$results = $this->db
+		->select('chs.section_id')
+		->from($this->tables['consultants_herds'] . ' ch')
+		->join($this->tables['serv_grps_herds_sections'] . ' chs', 'ch.id = chs.service_groups_herds_id')
+		->where('ch.sg_user_id = ' . $sg_user_id)
+		->where('ch.herd_code', $herd_code)
+		->where('(ch.exp_date IS NULL OR ch.exp_date > GETDATE())')
+		->where('ch.request_status_id', 1)
+		->get()
+		->result_array();
+		 $ret = array_flatten($results);
+		return $ret;
+	}
+	
 }

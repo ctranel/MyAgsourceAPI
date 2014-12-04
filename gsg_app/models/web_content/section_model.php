@@ -15,9 +15,10 @@ class Section_model extends CI_Model {
 	public function get_sections() {
 		$this->db
 			->where('s.active', 1)
-			->order_by('s.super_section_id', 'asc')
+			->order_by('s.parent_id', 'asc')
 			->order_by('s.list_order', 'asc')
-			->from($this->tables['sections'] . ' s');
+			->from($this->tables['sections'] . ' s')
+			->join('users.dbo.lookup_scopes ls', 's.scope_id = ls.id', 'inner');
 		return $this->db->get()->result_array();
 	}
 	
@@ -25,12 +26,12 @@ class Section_model extends CI_Model {
 	/**
 	 * getByCriteria
 	 *
-	 * @return array of section data for given user
+	 * @return array of data for given user
 	 * @author ctranel
 	 **/
 	public function getByCriteria($where, $join = null){
 		$this->db
-		->select('s.id, s.parent_id')
+		->select('s.id, s.parent_id, s.name, s.description, ls.name AS scope, s.path')
 		->where($where);
 		return $this->get_sections();
 	}
@@ -38,25 +39,25 @@ class Section_model extends CI_Model {
 	
 	
 	/**
-	 * get_sections_by_user
+	 * getSectionsByUser
 	 *
-	 * @return array of section data for given user
+	 * @return array of data for given user
 	 * @author ctranel
 	 **/
-	public function get_sections_by_user($user_id){
+	public function getSectionsByUser($user_id){
 		$this->db
 		->select('s.id, s.name, s.path')
-		->where("(s.user_id IS NULL OR s.user_id = '" . $user_id . ")");
+		->where("(s.user_id IS NULL OR s.user_id = '" . $user_id . "')");
 		return $this->get_sections();
 	}
 
 	/**
-	 * get_sections_by_herd
+	 * getSectionsByHerd
 	 *
 	 * @return array of section data for given herd
 	 * @author ctranel
 	 **/
-	public function get_sections_by_herd($herd_code){
+	public function getSectionsByHerd($herd_code){
 		$this->db
 		->join('users.dbo.sections_reports sr', 's.id = sr.section_id')
 		->join('herd.dbo.herd_output ho', "sr.report_code = ho.report_code AND ho.end_date IS NOT NULL AND ho.medium_type_code = 'w'")
@@ -106,7 +107,7 @@ class Section_model extends CI_Model {
 		$arr_return = array();
 		$this->{$this->db_group_name}
 		->select('id, name')
-		->where($this->tables['sections'] . '.super_section_id', $parent_section_id);
+		->where($this->tables['sections'] . '.parent_id', $parent_section_id);
 		$tmp = $this->get_sections();
 		if(is_array($tmp)){
 			$arr_return[0] = 'Select one';
@@ -119,7 +120,7 @@ class Section_model extends CI_Model {
 	 **/
 	
 	/**
-	 * @method get_subscribed_sections_array
+	 * @method getSubscribedSectionsArray
 	 * @param int $user_id
 	 * @param int $parent_section_id
 	 * @param string $herd_code
@@ -127,24 +128,25 @@ class Section_model extends CI_Model {
 	 * @return array of section data for given user
 	 * @author ctranel
 	 **/
-	public function get_subscribed_sections_array($user_id, $parent_section_id, $herd_code, $view_non_own) {
-		$tmp_arr_sections = array();
+	public function getSubscribedSectionsArray($user_id, $parent_section_id, $herd_code, $view_non_own) {
+		$tmp_arr_sections = [];
 		$this->db
-		->where($this->tables['sections'] . '.active', 1)
-		->where($this->tables['sections'] . '.scope_id', 2) // 2 = subscription
-		->where_in($this->tables['sections'] . '.super_section_id', $parent_section_id);
+		->join('users.dbo.sections_reports sr', '')
+		->where('s.active', 1)
+		->where('s.scope_id', 2) // 2 = subscription
+		->where_in('s.parent_id', $parent_section_id);
 		//if($this->has_permission("View Unsubscribed Herds")){ //if the logged in user has permission to view reports to which the herd is not subscribed
-		if(!$view_non_own){
-			if(isset($herd_code) && !empty($herd_code)){
-				$tmp_arr_sections = $this->get_sections_by_herd($herd_code);
-			}
-		}
-		else{
+		if($view_non_own){
 			if(!isset($user_id) || !$user_id){
 				$user_id = $this->session->userdata('user_id');
 			}
 			if(isset($user_id) && !empty($user_id)){
-				$tmp_arr_sections = $this->get_sections_by_user($user_id);
+				$tmp_arr_sections = $this->getSectionsByUser($user_id);
+			}
+		}
+		else{
+			if(isset($herd_code) && !empty($herd_code)){
+				$tmp_arr_sections = $this->getSectionsByHerd($herd_code);
 			}
 		}
 		return $tmp_arr_sections;
@@ -158,7 +160,8 @@ class Section_model extends CI_Model {
 	 * @author ctranel
 	 **/
 	public function herd_is_subscribed($section_id, $herd_code) {
-		//$this->db->where($this->tables['sections'] . '.id', $section_id);
+		//join to sections _reports then to herd_output
+		$this->db->where('s.id', $section_id);
 		//return $this->get_sections();
 		return TRUE;
 	}

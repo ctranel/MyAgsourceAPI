@@ -88,20 +88,27 @@ class As_ion_auth extends Ion_auth {
 		$sections = new \myagsource\web_content\Sections($this->section_model);
 		
 		if($this->logged_in()){
+			$this->arr_task_permissions = $this->ion_auth_model->get_task_permissions();
+			$arr_scope = array('subscription','public','unmanaged');
+			if($this->is_admin) $arr_scope[] = 'admin';
 			//set supersection if there is one
 			$section_path = $this->router->fetch_class(); //this should match the name of this file (minus ".php".  Also used as base for css and js file names and model directory name
 			$control_dir = $this->router->fetch_directory();
 			//all sections must have directories in the main controller directory
 			if($control_dir != $section_path){
-				$root_section = $sections->getByPath($control_dir);
-				$root_section->setChildren($this->session->userdata('user_id'), $this->session->userdata('herd_code'), $root_section, $arr_scope, $this->has_permission('View Non-owned Herds'), $this->has_permission('View non-own w permission'));
+				$root_section = $sections->getByPath($control_dir . '/');
+				$root_section->setChildren($this->session->userdata('user_id'), $this->session->userdata('herd_code'), $arr_scope, $this->has_permission('View Non-owned Herds'), $this->has_permission('View non-own w permission'));
 			} 
+			
+			$sections_with_permission = [];
+			if(!$this->has_permission('View Non-owned Herds') && $this->has_permission('View non-own w permission')){
+				$sections_with_permission = $this->ion_auth_model->sectionsWithPermission($this->session->userdata('user_id'), $this->session->userdata('herd_code'));
+			}
 	
-			$this->arr_task_permissions = $this->ion_auth_model->get_task_permissions();
-			$arr_scope = array('subscription','public','unmanaged');
-			if($this->is_admin) $arr_scope[] = 'admin';
-			$this->arr_user_super_sections = $this->get_super_sections_array($this->session->userdata('active_group_id'), $this->session->userdata('user_id'), $this->session->userdata('herd_code'), $arr_scope);
-			$this->arr_user_sections = $this->get_sections_array($this->session->userdata('active_group_id'), $this->session->userdata('user_id'), $this->session->userdata('herd_code'), array($super_section_id), $arr_scope);
+			$dhi_section = $sections->getByPath('dhi/');
+			$dhi_section->setChildren($this->session->userdata('user_id'), $this->session->userdata('herd_code'), $arr_scope, $this->has_permission('View Non-owned Herds'), $this->has_permission('View non-own w permission'));
+			$this->arr_user_super_sections = $dhi_section->children();
+			$this->arr_user_sections = $root_section->children();
 		}
 
 		//reliably set the referrer, used when determining whether to set the redirect variable on pages like select herd
@@ -532,7 +539,7 @@ class As_ion_auth extends Ion_auth {
 			if(is_array($tmp_array) && !empty($tmp_array)){
 				$arr_return = array();
 				foreach($tmp_array as $k => $v){
-					if($this->ion_auth_model->consultant_has_access($user_id, $herd_code, $v['id'])){
+					if($this->ion_auth_model->userHasPermission($user_id, $herd_code, $v['id'])){
 						$arr_return[] = $v;
 					}
 				}
