@@ -92,7 +92,7 @@ if(ENVIRONMENT == 'production'){
 		$db['vma']['autoinit'] = TRUE;
 		$db['vma']['stricton'] = FALSE;
 }
-elseif(ENVIRONMENT == 'test'){
+elseif(ENVIRONMENT == 'testing'){
 	$db['default']['hostname'] = '173.229.1.155\DEV' ;
 	$db['default']['username'] = 'webuser';
 	$db['default']['password'] = 'm1$AgS_R0';
