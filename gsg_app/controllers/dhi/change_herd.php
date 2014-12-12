@@ -4,10 +4,12 @@
 require_once(APPPATH . 'libraries' . FS_SEP .'dhi' . FS_SEP . 'herd.php');
 require_once(APPPATH.'libraries' . FS_SEP . 'access_log.php');
 require_once(APPPATH.'libraries' . FS_SEP . 'benchmarks_lib.php');
+require_once(APPPATH.'libraries' . FS_SEP.'dhi' . FS_SEP . 'HerdAccess.php');
 
 use \myagsource\Access_log;
 use \myagsource\dhi\Herd;
 use \myagsource\settings\Benchmarks_lib;
+use \myagsource\dhi\HerdAccess;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 class Change_herd extends CI_Controller {
@@ -16,12 +18,18 @@ class Change_herd extends CI_Controller {
 	 */
 	protected $herd;
 	/* 
+	 * @var HerdAccess object
+	 */
+	protected $herd_access;
+	/* 
 	 * @var Access_log object
 	 */
 	protected $access_log;
 
 	function __construct(){
 		parent::__construct();
+		$this->load->model('herd_model');
+		$this->herd_access = new HerdAccess($this->herd_model);
 		$this->session->keep_flashdata('redirect_url');
 		if(!isset($this->as_ion_auth)){
 			redirect('auth/login', 'refresh');
@@ -41,8 +49,8 @@ class Change_herd extends CI_Controller {
 		$this->load->model('access_log_model');
 		$this->access_log = new Access_log($this->access_log_model);
 				
-		$this->page_header_data['user_sections'] = $this->as_ion_auth->arr_user_super_sections;
-		$this->page_header_data['num_herds'] = $this->as_ion_auth->get_num_viewable_herds($this->session->userdata('user_id'), $this->session->userdata('arr_regions'));
+		$this->page_header_data['user_sections'] = $this->as_ion_auth->top_sections;
+		$this->page_header_data['num_herds'] = $this->herd_access->getNumAccessibleHerds($this->session->userdata('user_id'), $this->as_ion_auth->arr_task_permissions(), $this->session->userdata('arr_regions'));
 		/* Load the profile.php config file if it exists */
 		if (ENVIRONMENT == 'development' || ENVIRONMENT == 'localhost') {
 			$this->config->load('profiler', false, true);
@@ -96,7 +104,7 @@ class Change_herd extends CI_Controller {
 		//$this->form_validation->set_rules('herd_code_fill', 'Type Herd Code');
 
 		if ($this->form_validation->run() == TRUE) { //successful submission
-			$this->herd = new Herd($this->input->post('herd_code'), $this->herd_model);
+			$this->herd = new Herd($this->herd_model, $this->input->post('herd_code'));
 			$herd_enroll_status_id = $this->herd->getHerdEnrollStatus($this->config->item('product_report_code'));
 			if($this->session->userdata('active_group_id') == 2){ //user is a producer
 				if($herd_enroll_status_id == 1){ //herd is signed up at all
@@ -130,7 +138,7 @@ class Change_herd extends CI_Controller {
 			$tmp_arr = $this->as_ion_auth->get_viewable_herds($this->session->userdata('user_id'), $this->session->userdata('arr_regions'));
 			if(is_array($tmp_arr) && !empty($tmp_arr)){
 				if(count($tmp_arr) == 1){
-					$this->herd = new Herd($tmp_arr[0]['herd_code'], $this->herd_model);
+					$this->herd = new Herd($this->herd_model, $tmp_arr[0]['herd_code']);
 					$herd_enroll_status_id = $this->herd->getHerdEnrollStatus($this->config->item('product_report_code'));
 					if($this->session->userdata('active_group_id') == 2){ //user is a producer
 						if($herd_enroll_status_id == 1){ //herd is not enrolled
@@ -238,7 +246,7 @@ class Change_herd extends CI_Controller {
 		}
 
 		if ($this->form_validation->run() == TRUE) { //if validation is successful
-			$this->herd = new Herd($this->input->post('herd_code'), $this->herd_model);
+			$this->herd = new Herd($this->herd_model, $this->input->post('herd_code'));
 			$herd_enroll_status_id = $this->herd->getHerdEnrollStatus($this->config->item('product_report_code'));
 			if($this->session->userdata('active_group_id') == 2){ //user is a producer
 				if($herd_enroll_status_id == 1){ //herd is not enrolled
@@ -302,12 +310,12 @@ class Change_herd extends CI_Controller {
 	public function ajax_herd_enrolled($herd_code){
 		header('Content-type: application/json');
 		$group = $this->session->userdata('active_group_id');
-		if($this->as_ion_auth->has_permission('View non-own w permission') === FALSE) {
+		if($this->as_ion_auth->has_permission('View Assign w permission') === FALSE) {
 			//return a 0 for non-service groups
 			echo json_encode(array('enroll_status' => 0, 'new_test' => false));
 			exit;
 		}
-		$this->herd = new Herd($herd_code, $this->herd_model);
+		$this->herd = new Herd($this->herd_model, $herd_code);
 		$enroll_status = $this->herd->getHerdEnrollStatus($this->config->item('product_report_code'));
 		$recent_test = $this->herd->getRecentTest();
 		$has_accessed = $this->access_log->sgHasAccessedTest($this->session->userdata('sg_acct_num'), $herd_code, $recent_test);
@@ -316,10 +324,10 @@ class Change_herd extends CI_Controller {
 	}
 	
 	protected function set_herd_session_data($herd_enroll_status_id){
-		$this->session->set_userdata('herd_code', $this->herd->getHerdCode());
+		$this->session->set_userdata('herd_code', $this->herd->herdCode());
 //		$this->session->set_userdata('pstring', 0);
-//		$this->session->set_userdata('arr_pstring', $this->herd_model->get_pstring_array($this->herd->getHerdCode()));
-//		$arr_breeds = $this->herd_model->get_breed_array($this->herd->getHerdCode());
+//		$this->session->set_userdata('arr_pstring', $this->herd_model->get_pstring_array($this->herd->herdCode()));
+//		$arr_breeds = $this->herd_model->get_breed_array($this->herd->herdCode());
 //		$this->session->set_userdata('arr_breeds', $arr_breeds);
 //		$this->session->set_userdata('breed_code', $arr_breeds[0]['breed_code']);
 		$this->session->set_userdata('herd_enroll_status_id', $herd_enroll_status_id);

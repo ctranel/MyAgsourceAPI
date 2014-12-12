@@ -39,39 +39,39 @@ class Herd_model extends CI_Model {
 
 
 	/**
-	 * get_herds_by_region
+	 * getHerdsByRegion
 	 *
 	 * @param string region number
 	 * @return array of object herd
 	 * @author ctranel
 	 **/
-	function get_herds_by_region($region_arr_in, $limit = NULL){
+	function getHerdsByRegion($region_arr_in, $limit = NULL){
 		if (!isset($region_arr_in)  || !is_array($region_arr_in) || empty($region_arr_in)) {
 			//return FALSE;
 			return array();
 		}	
 		$this->db->where_in('h.association_num', $region_arr_in);
-		return $this->get_herds($limit);
+		return $this->getHerds($limit);
 	}
 
 	/**
-	 * @method get_herds_by_consultant()
+	 * @method getHerdsByPermissionGranted
 	 * @param int consultant's user id
 	 * @return array of stdClass with all herds for given tech num
 	 * @access public
 	 * @author ctranel
 	 *
 	 **/
-	function get_herds_by_consultant($sg_user_id = FALSE){
+	function getHerdsByPermissionGranted($sg_user_id = FALSE){
 		if(!$sg_user_id) $sg_user_id = $this->session->userdata('user_id');
 		$this->db->join($this->tables['consultants_herds'] . ' ch', 'h.herd_code = ch.herd_code')
 		->where('ch.sg_user_id', $sg_user_id)
 		->where('(ch.exp_date > GETDATE() OR ch.exp_date IS NULL)')
 		->where('request_status_id', 1);
-		return $this->get_herds();
+		return $this->getHerds();
 	}
 	/**
-	 * @method get_herds_by_user
+	 * @method getHerdsByUser
 	 *
 	 * @param int user id
 	 * @return simple array of herd codes
@@ -81,20 +81,20 @@ class Herd_model extends CI_Model {
 	 *           excluding herds that are expired for this user
 	 *           and also excluding herds that are not active.
 	 **/
-	public function get_herds_by_user($user_id, $limit = FALSE){
+	public function getHerdsByUser($user_id, $limit = FALSE){
 		
 		if(!$user_id) $user_id = $this->session->userdata('user_id');
 		$this->db->join($this->tables['users_herds'] . ' uh', 'h.herd_code = uh.herd_code')
 		->where('uh.user_id', $user_id)
 		->where ('uh.status',1);
 //		->where(' (' . $this->tables['users_herds'] . '.expire_date >'. now() . ' OR  ' . $this->tables['users_herds'] . '.expire_date IS NULL) ');
-		return $this->get_herds($limit,NULL);
+		return $this->getHerds($limit,NULL);
 		
 		
 	}
 
 	/**
-	 * get_herds_by_criteria
+	 * getHerdsByCriteria
 	 *
 	 * @param array criteria (field=>value pairs)
 	 * @param int limit
@@ -103,10 +103,10 @@ class Herd_model extends CI_Model {
 	 * @return object herd
 	 * @author ctranel
 	 **/
-	public function get_herds_by_criteria($criteria=NULL, $limit=NULL, $offset=NULL, $order_by=NULL)
+	public function getHerdsByCriteria($criteria=NULL, $limit=NULL, $offset=NULL, $order_by=NULL)
 	{
 		$this->db->where($criteria);
-		return $this->get_herds($limit, $offset, $order_by);
+		return $this->getHerds($limit, $offset, $order_by);
 	}
 
 	/**
@@ -136,7 +136,7 @@ class Herd_model extends CI_Model {
 	}
 
 	/**
-	 * @method get_herds()
+	 * @method getHerds()
 	 * @param int limit
 	 * @param int offset
 	 * @param string sort by field
@@ -144,7 +144,7 @@ class Herd_model extends CI_Model {
 	 * @access public
 	 * @author ctranel
 	 **/
-	public function get_herds($limit=NULL, $offset=NULL, $order_by='herd_owner')
+	public function getHerds($limit=NULL, $offset=NULL, $order_by='herd_owner')
 	{
 		$this->db
 		->join('address.dbo.email e', 'h.herd_code = e.account_num', 'left')
@@ -170,13 +170,13 @@ class Herd_model extends CI_Model {
 	public function get_herd($herd_code)
 	{
 		$this->db->where('h.herd_code', $herd_code);
-		$arr_return = $this->get_herds(1,0);
+		$arr_return = $this->getHerds(1,0);
 		if(isset($arr_return[0])) return $arr_return[0];
 		else return FALSE;
 	}
 
 	/**
-	 * @method get_herd_codes()
+	 * @method getHerdCodes()
 	 * @param int limit
 	 * @param int offset
 	 * @param string sort by field
@@ -184,7 +184,7 @@ class Herd_model extends CI_Model {
 	 * @access public
 	 * @author ctranel
 	 **/
-	public function get_herd_codes($limit=NULL, $offset=NULL)
+	public function getHerdCodes($limit=NULL, $offset=NULL)
 	{
 		$this->db
 		->select('h.[herd_code]')
@@ -199,38 +199,38 @@ class Herd_model extends CI_Model {
 	}
 
 	/**
-	 * get_herd_codes_by_region
+	 * getHerdCodesByRegion
 	 *
 	 * @param string region number
 	 * @return array of object herd
 	 * @author ctranel
 	 **/
-	function get_herd_codes_by_region($region_arr_in, $limit = NULL){
+	function getHerdCodesByRegion($region_arr_in, $limit = NULL){
 		if (!isset($region_arr_in) || !is_array($region_arr_in) || empty($region_arr_in)) {
 			return FALSE;
 		}	
 		$this->db->where_in('association_num', $region_arr_in);
-		return $this->get_herd_codes($limit);
+		return $this->getHerdCodes($limit);
 	}
 
 	/**
-	 * @method get_herd_codes_by_consultant()
+	 * @method getHerdCodesByPermissionGranted
 	 * @param int consultant's user id
 	 * @return array of stdClass with all herds for given tech num
 	 * @access public
 	 *
 	 **/
-	function get_herd_codes_by_consultant($sg_user_id = FALSE){
+	function getHerdCodesByPermissionGranted($sg_user_id = FALSE){
 		if(!$sg_user_id) $sg_user_id = $this->session->userdata('user_id');
 		$this->db->join($this->tables['consultants_herds'] . ' ch', 'h.herd_code = ch.herd_code')
 		->where('ch.sg_user_id', $sg_user_id)
 		->where('(ch.exp_date > GETDATE() OR ch.exp_date IS NULL)')
 		->where('request_status_id', 1);
-		return $this->get_herd_codes();
+		return $this->getHerdCodes();
 	}
 
 	/**
-	 * @method get_herd_codes_by_user
+	 * @method getHerdCodesByUser
 	 *
 	 * @param int user id
 	 * @return simple array of herd codes
@@ -240,16 +240,15 @@ class Herd_model extends CI_Model {
 	 *           excluding herds that are expired for this user
 	 *           and also excluding herds that are not active.
 	 **/
-	public function get_herd_codes_by_user($user_id, $limit = FALSE){
-		
-		if(!$user_id) $user_id = $this->session->userdata('user_id');
+	public function getHerdCodesByUser($user_id, $limit = FALSE){
+		if(!$user_id){
+			return false;
+		}
 		$this->db->join($this->tables['users_herds'] . ' uh', 'h.herd_code = uh.herd_code')
 		->where('uh.user_id', $user_id)
 		->where ('uh.status',1);
 //		->where(' (' . $this->tables['users_herds'] . '.expire_date >'. now() . ' OR  ' . $this->tables['users_herds'] . '.expire_date IS NULL) ');
-		return $this->get_herd_codes($limit,NULL);
-		
-		
+		return $this->getHerdCodes($limit,NULL);
 	}
 
 	/**
@@ -312,62 +311,6 @@ class Herd_model extends CI_Model {
 		}
 		return $arr_return;
 	}
-	/**
-	 * get_pstring_array
-	 * @param string herd code
-	 * @return 2d array (pstring & publication name)
-	 * @author ctranel
-	public function get_pstring_array($herd_code, $include_all = TRUE) {
-		$pstring_db = $this->load->database('default', TRUE);
-		$arr_results = $pstring_db->select('pstring, publication_name')
-		->where('herd_code', $herd_code)
-		->where('pstring_active',1)
-		->order_by('pstring', 'asc')
-		->get('herd.dbo.pstring_definition')
-		->result_array();
-		
-		if($include_all) array_unshift($arr_results, array('pstring'=>0, 'publication_name'=>'All PStrings'));
-		return $arr_results;
-	}
-	 **/
-	
-	/**
-	 * get_tstring_array
-	 * @param string herd code
-	 * @return array (tstring) - for now using string_summary table.  
-	 * 			FUTURE?: Reports requiring historical tstrings will need to use milking_times table.
-	 * @author Kevin Marshall
-	public function get_tstring_array($herd_code) {
-		$tstring_db = $this->load->database('default', TRUE);
-		$tstring_db->distinct();
-		$arr_results = $tstring_db->select('tstring')
-		->where('herd_code', $herd_code)
-		->order_by('tstring', 'asc')
-		->get('rpm.dbo.report_cow_id_1')
-		->result_array();
-
-		return $arr_results;
-	}
-	
-	 **/
-	/**
-	 * get_breed_array
-	 * @param string herd code
-	 * @return array (tstring) - using vma_genetic_summary_breeds
-	 * 			FUTURE?: Reports requiring historical tstrings will need to use milking_times table.
-	 * @author Kevin Marshall
-	public function get_breed_array($herd_code) {
-		$breed_db = $this->load->database('default', TRUE);
-		$breed_db->distinct();
-		$arr_results = $breed_db->select('breed_code, breed_name')
-		->where('herd_code', $herd_code)
-		->order_by('breed_code', 'asc')
-		->get('vma.dbo.vma_Genetic_Summary_Breeds')
-		->result_array();
-	
-		return $arr_results;
-	}
-	 **/
 
 	/**
 	 * herd_is_registered

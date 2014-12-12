@@ -70,7 +70,7 @@ class Herd
 	 * @return void
 	 * @author Chris
 	 **/
-	public function __construct($herd_code, $herd_model) {
+	public function __construct($herd_model, $herd_code) {
 		$this->herd_code = $herd_code;
 		$this->herd_model = $herd_model;
 	}
@@ -91,12 +91,12 @@ class Herd
 	 **/
 	
 	/**
-	 * @method getHerdCode()
+	 * @method herdCode()
 	 * @return string herd_code
 	 * @access public
 	 *
 	 **/
-	public function getHerdCode(){
+	public function herdCode(){
 		return $this->herd_code;
 	}
 

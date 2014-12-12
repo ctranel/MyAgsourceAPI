@@ -19,8 +19,8 @@ class Land extends parent_report {
 			$this->session->keep_flashdata('redirect_url');
 			redirect(site_url('auth/login'));
 		}
-		$this->page_header_data['user_sections'] = $this->as_ion_auth->arr_user_super_sections;
-		$this->page_header_data['num_herds'] = $this->as_ion_auth->get_num_viewable_herds($this->session->userdata('user_id'), $this->session->userdata('arr_regions'));
+		$this->page_header_data['user_sections'] = $this->as_ion_auth->top_sections;
+		$this->page_header_data['num_herds'] = $this->herd_access->getNumAccessibleHerds($this->session->userdata('user_id'), $this->as_ion_auth->arr_task_permissions(), $this->session->userdata('arr_regions'));
 		$this->load->library('form_validation');
 		/* Load the profile.php config file if it exists */
 		if (ENVIRONMENT == 'development' || ENVIRONMENT == 'localhost') {

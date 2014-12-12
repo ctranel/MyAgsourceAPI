@@ -2,6 +2,7 @@
 namespace myagsource\web_content;
 
 use myagsource\web_content\iWebContent;
+use myagsource\dhi\Herd;
 /**
 * Name:  Sections
 *
@@ -90,6 +91,14 @@ class Section //implements iWebContent
 		$this->path = $path;
 		$this->id = $id;
 	}
+	
+	public function path(){
+		return $this->path;
+	}
+
+	public function name(){
+		return $this->name;
+	}
 
 	public function childKeyValuePairs(){
 		
@@ -98,69 +107,76 @@ class Section //implements iWebContent
 	/**
 	 * @method setChildren()
 	 * @param int user id
-	 * @param string herd code
-	 * @param array section scopes to include
-	 * @param boolean has permission to view non-owned herds
-	 * @param boolean has permission to view non-owned herds only with owners explicit permission
+	 * @param Herd herd
+	 * @param array task permissions
 	 * @return void
 	 * @access public
-	 *
-	 *
-	 *need users_owns_herd, 
 	 **/
-	public function setChildren($user_id, $herd_code, array $arr_scope, $view_non_own, $view_non_own_w_permission ){//Array $array){ //array directly from data source
+	//if we allow producers to select which sections to allow, we will need to pass that array to this section as well
+	public function setChildren($user_id, Herd $herd, $arr_task_permissions){ 
 		$tmp_array = [];
+		if(in_array('View All Content', $arr_task_permissions)){
+			$criteria = ['parent_id' => $this->id];
+			$tmp_array = $this->datasource->getByCriteria($criteria);
+		}
+		/* 
+		 * subscription is different in that it fetches content by herd data (i.e. herd output) for users that 
+		 * have permission only for subscribed content.  All other scopes are strictly users-based
+		 */
+		else{
+			if(in_array('View Subscriptions', $arr_task_permissions)){
+				$tmp_array = array_merge($tmp_array, $this->datasource->getSubscribedSections($user_id, $this->id, $herd->herdCode()));
+			}
+			if(in_array('View Account', $arr_task_permissions)){
+				$criteria = ['ls.name' => 'View Account', 'parent_id' => $this->id];
+				$tmp_array = array_merge($tmp_array, $this->datasource->getByCriteria($criteria));
+			}
+			if(in_array('View Admin', $arr_task_permissions)){
+				$criteria = ['ls.name' => 'View Admin', 'parent_id' => $this->id];
+				$tmp_array = array_merge($tmp_array, $this->datasource->getByCriteria($criteria));
+			}
+		}
+		
+		if(is_array($tmp_array) && !empty($tmp_array)){
+			$this->child_sections = new \SplObjectStorage();
+			foreach($tmp_array as $k => $v){
+				$this->child_sections->attach(new Section($this->datasource, $v['id'], $v['parent_id'], $v['name'], $v['description'], $v['scope'], $v['path']));
+			}
+		}
+/*		
 		foreach($arr_scope as $s){
 			switch ($s) {
-				/* 
-				 * subscription is different in that it fetches content by herd data (i.e. herd output) for users that 
-				 * have permission only for subscribed content.  All other scopes are strictly users-based
-				 */
 				case 'subscription':
-					$a = $this->datasource->getSubscribedSectionsArray($user_id, $this->id, $herd_code, $view_non_own);
+					$a = $this->datasource->getSubscribedSections($user_id, $this->id, $herd->herdCode(), $view_non_own);
 					if(!empty($a)) $tmp_array = array_merge($tmp_array, $a);
 					break;
-/* 				not currently used
+ 				not currently used
 				case 'unmanaged':
 					$a = $this->datasource->get_unmanaged_sections_array();
 					if(!empty($a)) $tmp_array = array_merge($tmp_array, $a);
 					break;
-*//*
+
 				case 'admin':
 					if($this->is_admin){
 						$a = $this->datasource->get_child_sections_by_scope($s, $super_id);
 						if(!empty($a)) $tmp_array = array_merge($tmp_array, $a);
 					}
 					break;
-*/
+
 				default: //public, account, user-specific
-/*
- * @todo: remove database-specific reference (ls.name)
- */					$criteria = ['ls.name' => $s, 'parent_id' => $this->id];
+					$criteria = ['ls.name' => $s, 'parent_id' => $this->id];
 					$a = $this->datasource->getByCriteria($criteria);
 					if(!empty($a)) $tmp_array = array_merge($tmp_array, $a);
 					break;
 			}
 		}
-
-		if(!$view_non_own && $view_non_own_w_permission && TRUE && !empty($herd_code)){
-			if(is_array($tmp_array) && !empty($tmp_array)){
-				$this->child_sections = new \SplObjectStorage();
-				foreach($tmp_array as $k => $v){
-					//if($this->ion_auth_model->userHasPermission($user_id, $herd_code, $v['id'])){
-						$this->child_sections.attach(new Section($this->datasource, $v['id'], $v['parent_id'], $v['name'], $v['description'], $v['scope'], $v['path']));
-					//}
-				}
-				return $arr_return;
-			}
-			return FALSE;
-		}
-
-		else return $tmp_array;
+*/
 	}
+	
 	public function children(){
 		return $this->child_sections;
 	}
+	
 	public function childrenList(){
 	}
 	

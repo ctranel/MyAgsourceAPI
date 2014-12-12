@@ -1,9 +1,16 @@
 <?php 
+if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+
+require_once APPPATH . 'libraries/dhi/herd.php';
+require_once APPPATH . 'libraries/Ion_auth.php';
+require_once APPPATH . 'libraries/access_log.php';
+require_once APPPATH . 'libraries/web_content/Sections.php';
+require_once(APPPATH . 'libraries' . FS_SEP . 'dhi' . FS_SEP . 'HerdAccess.php');
 
 use \myagsource\Access_log;
-use \myagsource\web_content;
-
-if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+use \myagsource\web_content\Sections;
+use \myagsource\dhi\Herd;
+use \myagsource\dhi\HerdAccess;
 
 /**
 * Name:  AS Ion Auth
@@ -12,19 +19,7 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 * Requirements: PHP5.3 or above
 */
 
-require_once APPPATH . 'libraries/Ion_auth.php';
-require_once APPPATH . 'libraries/access_log.php';
-require_once APPPATH . 'libraries/web_content/Sections.php';
-
 class As_ion_auth extends Ion_auth {
-
-	/**
-	 * is_manager
-	 *
-	 * @var boolean
-	 **/
-	public $is_manager;
-
 	/**
 	 * is_admin
 	 *
@@ -51,14 +46,14 @@ class As_ion_auth extends Ion_auth {
 	 *
 	 * @var array
 	 **/
-	public $arr_task_permissions;
+	protected $arr_task_permissions;
 
 	/**
-	 * arr_user_super_sections
+	 * top_sections
 	 *
-	 * @var array
+	 * @var SplObjectStorage
 	 **/
-	public $arr_user_super_sections;
+	public $top_sections;
 
 	/**
 	 * arr_user_sections
@@ -74,41 +69,55 @@ class As_ion_auth extends Ion_auth {
 	 **/
 	public $gsg_access;
 	
+	/**
+	 * herd_access
+	 *
+	 * @var HerdAccess
+	 **/
+	protected $herd_access; //object
+
 	public function __construct(){
+		//@todo: get most of this into a controller
 		//if (!$this->logged_in() && get_cookie('identity') && get_cookie('remember_code')){
-			//$this->arr_task_permissions = $this->ion_auth_model->get_task_permissions('3');
+			//$this->arr_task_permissions = $this->ion_auth_model->getTaskPermissions('3');
 		//}
 		parent::__construct();
 //		$this->load->model('access_log_model');
 //		$this->access_log = new Access_log($this->access_log_model);
 		$this->load->model('web_content/section_model');
 		$this->load->model('dhi/region_model');
+		$this->load->model('dhi/herd_model');
 		$this->load->helper('url');
 		//$section_model = new \web_content\section_model();
-		$sections = new \myagsource\web_content\Sections($this->section_model);
+		$this->herd_access = new HerdAccess($this->herd_model);
+		$sections = new Sections($this->section_model);
+		$herd = new Herd($this->herd_model, $this->session->userdata('herd_code'));
 		
 		if($this->logged_in()){
-			$this->arr_task_permissions = $this->ion_auth_model->get_task_permissions();
-			$arr_scope = array('subscription','public','unmanaged');
-			if($this->is_admin) $arr_scope[] = 'admin';
+			$this->arr_task_permissions = $this->ion_auth_model->getTaskPermissions();
+
 			//set supersection if there is one
 			$section_path = $this->router->fetch_class(); //this should match the name of this file (minus ".php".  Also used as base for css and js file names and model directory name
 			$control_dir = $this->router->fetch_directory();
 			//all sections must have directories in the main controller directory
-			if($control_dir != $section_path){
-				$root_section = $sections->getByPath($control_dir . '/');
-				$root_section->setChildren($this->session->userdata('user_id'), $this->session->userdata('herd_code'), $arr_scope, $this->has_permission('View Non-owned Herds'), $this->has_permission('View non-own w permission'));
+			if($control_dir != $section_path && !empty($control_dir)){
+				$root_section = $sections->getByPath($control_dir);
+				$root_section->setChildren($this->session->userdata('user_id'), $herd, $this->arr_task_permissions);
 			} 
 			
+			/* will be used if we allow producers to specify consultant access by section
 			$sections_with_permission = [];
-			if(!$this->has_permission('View Non-owned Herds') && $this->has_permission('View non-own w permission')){
+			if($this->has_permission('View Assign w permission')){
 				$sections_with_permission = $this->ion_auth_model->sectionsWithPermission($this->session->userdata('user_id'), $this->session->userdata('herd_code'));
 			}
+			*/
 	
 			$dhi_section = $sections->getByPath('dhi/');
-			$dhi_section->setChildren($this->session->userdata('user_id'), $this->session->userdata('herd_code'), $arr_scope, $this->has_permission('View Non-owned Herds'), $this->has_permission('View non-own w permission'));
-			$this->arr_user_super_sections = $dhi_section->children();
-			$this->arr_user_sections = $root_section->children();
+			$dhi_section->setChildren($this->session->userdata('user_id'), $herd, $this->arr_task_permissions);
+			$this->top_sections = $dhi_section->children();
+			if(isset($root_section)){
+				$this->arr_user_sections = $root_section->children();
+			}
 		}
 
 		//reliably set the referrer, used when determining whether to set the redirect variable on pages like select herd
@@ -119,10 +128,10 @@ class As_ion_auth extends Ion_auth {
 		}
 		
 		$this->is_admin = $this->is_admin();
-		$this->is_manager = $this->is_manager();
-		
-		
-		$child_sections = $root_section->children();
+	}
+	
+	public function arr_task_permissions(){
+		return $this->arr_task_permissions;
 	}
 	
 	//overridden functions below
@@ -203,16 +212,6 @@ class As_ion_auth extends Ion_auth {
 	}
 
 	/**
-	 * @method is_manager
-	 *
-	 * @return bool
-	 * @author ctranel
-	 **/
-	public function is_manager() {
-		return $this->session->userdata('active_group_id') === $this->config->item('manager_group', 'ion_auth');
-	}
-
-	/**
 	 * @method is_editable_user()
 	 * @param int user id
 	 * @return boolean
@@ -274,7 +273,7 @@ class As_ion_auth extends Ion_auth {
 		$arr_return_user = array();
 		$arr_return_permission = array();
 		if($this->has_permission('View All Herds')){
-			return $this->herd_model->get_herds();
+			return $this->herd_model->getHerds();
 		}
 		
 		if($this->has_permission('View Herds In Region')){
@@ -286,67 +285,17 @@ class As_ion_auth extends Ion_auth {
 			foreach($arr_regions AS $k => $v){
 				$arr_region_nums[] = substr($k, -3);
 			}
-			$arr_return_reg = $this->herd_model->get_herds_by_region($arr_region_nums, $limit_in);
+			$arr_return_reg = $this->herd_model->getHerdsByRegion($arr_region_nums, $limit_in);
 		}
 		if($this->has_permission('View Assigned Herds')){
-			$arr_return_user = $this->herd_model->get_herds_by_user($user_id, $limit_in);
+			$arr_return_user = $this->herd_model->getHerdsByUser($user_id, $limit_in);
 		}
-		if($this->has_permission('View non-own w permission')){
-			$arr_return_permission = $this->herd_model->get_herds_by_consultant($user_id, $limit_in);
+		if($this->has_permission('View Assign w permission')){
+			$arr_return_permission = $this->herd_model->getHerdsByPermissionGranted($user_id, $limit_in);
 		}
 		return array_merge($arr_return_reg, $arr_return_user, $arr_return_permission);
 	}
 
-	/**
-	 * @method get_viewable_herd_codes()
-	 * @param int user_id
-	 * @param int region_num (need to accept array?)
-	 * @return mixed array of herds or boolean
-	 * @access public
-	 *
-	 **/
-	public function get_viewable_herd_codes($user_id, $arr_regions = false, $limit_in = NULL){
-		$arr_return_reg = array();
-		$arr_return_user = array();
-		$arr_return_permission = array();
-		
-		if($this->has_permission('View All Herds')){
-			return $this->herd_model->get_herd_codes(null, null, $limit_in);
-		}
-		if($this->has_permission('View Herds In Region')){
-			if(!isset($arr_regions) || !is_array($arr_regions)){
-				return FALSE;
-			}
-			//extract region number from account number
-			$arr_region_nums = array();
-			foreach($arr_regions AS $k => $v){
-				$arr_region_nums[] = substr($k, -3);
-			}
-			$tmp = $this->herd_model->get_herd_codes_by_region($arr_region_nums, $limit_in);
-			if(isset($tmp) && is_array($tmp)) $arr_return_reg = $tmp;
-			unset($tmp);
-		}
-		if($this->has_permission('View Assigned Herds')){
-			$arr_return_user = $this->herd_model->get_herd_codes_by_user($user_id, $limit_in);
-		}
-		if($this->has_permission('View non-own w permission')){
-			$arr_return_permission = $this->herd_model->get_herd_codes_by_consultant($limit_in);
-		}
-		return array_merge($arr_return_reg, $arr_return_user, $arr_return_permission);
-	}
-	
-	/**
-	 * @method get_num_viewable_herds()
-	 * @param int user_id
-	 * @param array of region acct_num=>name
-	 * @return mixed array of herds or boolean
-	 * @access public
-	 *
-	 **/
-	public function get_num_viewable_herds($user_id, $arr_regions = false){
-		return count($this->get_viewable_herd_codes($user_id, $arr_regions));
-	}
-	
 	
 
 	/**
@@ -498,57 +447,6 @@ class As_ion_auth extends Ion_auth {
 		$new_array = $prepend_select ? array(''=>'Select one') : array();
 		if(is_array($array_in)) array_walk($array_in, create_function ('$value, $key, $obj', '$obj["obj_in"][$value[$obj["value_in"]]] = $value[$obj["text_in"]];'), array('obj_in' => &$new_array, 'value_in' => $value_in, 'text_in' => $text_in));
 		return $new_array;
-	}
-
-	/**
-	 * @method get_super_sections_array()
-	 * @param int group id
-	 * @param int user id
-	 * @param string herd code
-	 * @param array section scopes to include
-	 * @return array 1d (key=>value) array of web sections for specified user or herd
-	 * @access public
-	 *
-	 **/
-	public function get_super_sections_array($group_id, $user_id, $herd_code, $arr_scope = NULL){
-		if(isset($arr_scope) && is_array($arr_scope)){
-			$tmp_array = array();
-			foreach($arr_scope as $s){
-				switch ($s) {
-					case 'subscription':
-						$a = $this->web_content_model->get_subscribed_super_sections_array($group_id, $user_id, $herd_code);
-						if(!empty($a)) $tmp_array = array_merge($tmp_array, $a);
-						break;
-					case 'unmanaged':
-						$a = $this->web_content_model->get_unmanaged_super_sections_array($group_id, $user_id, $herd_code);
-						if(!empty($a)) $tmp_array = array_merge($tmp_array, $a);
-					break;
-					default:
-						$a = $this->web_content_model->get_super_sections_by_scope($s);
-						if(!empty($a)) $tmp_array = array_merge($tmp_array, $a);
-					break;
-				}
-			}
-		}
-		else {
-			$tmp_array = $this->web_content_model->get_subscribed_super_sections_array($group_id, $user_id, $herd_code);
-		}
-/* 	for now, consultant have access to all super sections
- 
-		if(!$this->has_permission("View Non-owned Herds") && $this->has_permission("View non-own w permission") && !$this->ion_auth_model->user_owns_herd($herd_code) && !empty($herd_code)){
-			if(is_array($tmp_array) && !empty($tmp_array)){
-				$arr_return = array();
-				foreach($tmp_array as $k => $v){
-					if($this->ion_auth_model->userHasPermission($user_id, $herd_code, $v['id'])){
-						$arr_return[] = $v;
-					}
-				}
-				return $arr_return;
-			}
-			return FALSE;
-		}
-
- */		return $tmp_array;
 	}
 
 	/**

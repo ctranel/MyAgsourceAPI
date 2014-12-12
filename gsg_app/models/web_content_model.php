@@ -132,7 +132,6 @@ class Web_content_model extends CI_Model {
 			->where($this->tables['super_sections'] . '.scope_id', 2); // 2 = subscription
 			//if($this->has_permission("View Unsubscribed Herds")){ //if the logged in user has permission to view reports to which the herd is not subscribed
 			if($group_id == 2){ //if this is a producer
-			//if(!$this->has_permission("View Non-owned Herds")){
 				if(isset($herd_code) && !empty($herd_code)){
 					$tmp_arr_sections = $this->get_super_sections_by_herd($herd_code);
 				}

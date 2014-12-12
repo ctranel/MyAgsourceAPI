@@ -5,12 +5,14 @@ require_once(APPPATH . 'libraries' . FS_SEP . 'filters' . FS_SEP . 'Filters.php'
 require_once(APPPATH . 'libraries' . FS_SEP . 'benchmarks_lib.php');
 require_once(APPPATH . 'libraries' . FS_SEP . 'access_log.php');
 require_once(APPPATH . 'libraries' . FS_SEP . 'supplemental' . FS_SEP . 'Supplemental.php');
+require_once(APPPATH . 'libraries' . FS_SEP . 'dhi' . FS_SEP . 'HerdAccess.php');
 
 use \myagsource\db_objects\db_table;
 use \myagsource\settings\Benchmarks_lib;
 use \myagsource\Access_log;
 use \myagsource\report_filters\Filters;
 use \myagsource\supplemental\Supplemental;
+use \myagsource\dhi\HerdAccess;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
@@ -26,6 +28,7 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
  */
 
 abstract class parent_report extends CI_Controller {
+	protected $herd_access; //object
 	protected $section_id;
 	protected $report_form_id;
 	protected $log_filter_text;
@@ -68,6 +71,9 @@ abstract class parent_report extends CI_Controller {
 	
 	function __construct(){
 		parent::__construct();
+		$this->load->model('herd_model');
+		$this->herd_access = new HerdAccess($this->herd_model);
+		
 		$class_dir = $this->router->fetch_directory(); //this should match the name of this file (minus ".php".  Also used as base for css and js file names and model directory name
 		$class = $this->router->fetch_class();
 		$method = $this->router->fetch_method();
@@ -78,8 +84,8 @@ abstract class parent_report extends CI_Controller {
 		$this->primary_model = $this->page . '_model';
 		$this->report_form_id = 'report_criteria';//filter-form';
 		$this->herd_code = strlen($this->session->userdata('herd_code')) == 8?$this->session->userdata('herd_code'):NULL;
-		$this->page_header_data['user_sections'] = $this->as_ion_auth->arr_user_super_sections;
-		$this->page_header_data['num_herds'] = $this->as_ion_auth->get_num_viewable_herds($this->session->userdata('user_id'), $this->session->userdata('arr_regions'));
+		$this->page_header_data['user_sections'] = $this->as_ion_auth->top_sections;
+		$this->page_header_data['num_herds'] = $this->herd_access->getNumAccessibleHerds($this->session->userdata('user_id'), $this->as_ion_auth->arr_task_permissions(), $this->session->userdata('arr_regions'));
 		
 		//load most specific model available.  Must load model before setting section_id
 		$path = uri_string();
@@ -164,9 +170,10 @@ abstract class parent_report extends CI_Controller {
 		//if section scope is public, pass unsubscribed test
 		//@todo: build display_hierarchy/report_organization, etc interface with get_scope function (with classes for super_sections, sections, etc)
 		$pass_unsubscribed_test = true; //$this->as_ion_auth->get_scope('sections', $this->section_id) == 'pubic';
-		$pass_unsubscribed_test = $this->as_ion_auth->has_permission("View Unsubscribed Herds") || $this->web_content_model->herd_is_subscribed($this->section_id, $this->herd_code);
+		//@todo: redo access tests
+		$pass_unsubscribed_test = $this->as_ion_auth->has_permission("View All Content") || $this->web_content_model->herd_is_subscribed($this->section_id, $this->herd_code);
 		$pass_view_nonowned_test = $this->as_ion_auth->has_permission("View All Herds") || $this->session->userdata('herd_code') == $this->config->item('default_herd');
-		if(!$pass_view_nonowned_test) $pass_view_nonowned_test = in_array($this->herd_code, $this->as_ion_auth->get_viewable_herd_codes($this->session->userdata('user_id'), $this->session->userdata('arr_regions')));//$this->as_ion_auth->has_permission("View Non-owned Herds") || $this->ion_auth_model->user_owns_herd($this->herd_code);
+		if(!$pass_view_nonowned_test) $pass_view_nonowned_test = in_array($this->herd_code, $this->herd_access->getAccessibleHerdCodes($this->session->userdata('user_id'), $this->as_ion_auth->arr_task_permissions(), $this->session->userdata('arr_regions')));
 		if($pass_unsubscribed_test && $pass_view_nonowned_test) return TRUE;
 		elseif(!$pass_unsubscribed_test && !$pass_view_nonowned_test) {
 			if($method == 'ajax_report') {
@@ -216,7 +223,7 @@ abstract class parent_report extends CI_Controller {
 		if(isset($arr_block_in) && !empty($arr_block_in) && !is_array($arr_block_in)) $arr_block_in = array($arr_block_in);
 		$this->objPage = $this->{$this->primary_model}->arr_blocks[$this->page];
 		$arr_blocks = $this->objPage['blocks'];
-
+		
 		//Determine if any report blocks have is_summary flag - will determine if tstring needs to be loaded and filters shown
 		$this->load->helper('multid_array_helper');
 		$this->bool_is_summary = array_search(1, get_elements_by_key('is_summary', $arr_blocks)) === FALSE ? FALSE : TRUE;

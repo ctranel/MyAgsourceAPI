@@ -1,6 +1,9 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 
 require_once APPPATH . 'controllers/ionauth.php';
+require_once(APPPATH . 'libraries' . FS_SEP . 'dhi' . FS_SEP . 'HerdAccess.php');
+
+use myagsource\dhi\HerdAccess;
 
 class Custom_report extends CI_Controller {
 	protected $page_header_data;
@@ -8,13 +11,11 @@ class Custom_report extends CI_Controller {
 	function __construct()
 	{
 		parent::__construct();
-//		if(isset($this->as_ion_auth)){
-//			$this->as_ion_auth->is_admin = $this->as_ion_auth->is_admin();
-//			$this->as_ion_auth->is_manager = $this->as_ion_auth->is_manager();
-//		}
+		$this->load->model('herd_model');
+		$herd_access = new HerdAccess($this->herd_model);
 
-		$this->page_header_data['user_sections'] = $this->as_ion_auth->arr_user_super_sections;
-		$this->page_header_data['num_herds'] = $this->as_ion_auth->get_num_viewable_herds($this->session->userdata('user_id'), $this->session->userdata('arr_regions'));
+		$this->page_header_data['user_sections'] = $this->as_ion_auth->top_sections;
+		$this->page_header_data['num_herds'] = $herd_access->getNumAccessibleHerds($this->session->userdata('user_id'), $this->as_ion_auth->arr_task_permissions(), $this->session->userdata('arr_regions'));
 		
 		//load necessary files
 		$this->load->model('custom_report_model');

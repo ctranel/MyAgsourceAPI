@@ -623,7 +623,7 @@ SELECT DISTINCT id, name, list_order FROM cteAnchor ORDER BY list_order;";
 	 *
 	 **/
 	public function has_permission($task_name){
-		$tmp_array = $this->get_task_permissions();
+		$tmp_array = $this->getTaskPermissions();
 		if(is_array($tmp_array) !== FALSE) return in_array($task_name, $tmp_array);
 		else return FALSE;
 	}
@@ -651,17 +651,16 @@ SELECT DISTINCT id, name, list_order FROM cteAnchor ORDER BY list_order;";
 	}
 
 	/**
-	 * @method get_task_permissions
+	 * @method getTaskPermissions
 	 *
 	 * @param int section id FOR FUTURE USE
 	 * @return array tasks for which  the group of logged in user has permissions
 	 * @author ctranel
 	 **/
-	public function get_task_permissions($section_id = ''){
+	public function getTaskPermissions($section_id = ''){
 		$this->load->helper('multid_array_helper');
 		$results = $this->db->select('name, description')
 		->join($this->tables['groups_tasks'] . ' gt', 't.id = gt.task_id', 'left')
-		//->where_in('group_id', array_keys($this->session->userdata('arr_groups')))
 		->where('group_id', $this->session->userdata('active_group_id'))
 		//->where('section_id', $section_id)
 		//->where('permission', '1')
@@ -847,50 +846,6 @@ SELECT DISTINCT id, name, list_order FROM cteAnchor ORDER BY list_order;";
 			->where(array('request_status_id' => 1))
 			->get($this->tables['consultants_herds'])->result_array();
 		if(!empty($result)) return $result[0];
-		else return FALSE;
-	}
-
-	/**
-	 * @method get_herds_by_consult
-	 *
-	 * @param int consultant user id
-	 * @return array of herd records, keyed by consultant status
-	 * @author ctranel
-	 **/
-	public function get_herds_by_consult($sg_user_id){
-		$result = $this->db
-		->select('ch.*, h.herd_owner, lus.name AS request_status')
-		->from($this->tables['consultants_herds'] . ' ch')
-		->join($this->tables['herds'] . ' h', 'ch.herd_code = h.herd_code')
-		->join('users.dbo.lookup_sg_request_status lus', 'ch.request_status_id = lus.id')
-		->where('(ch.exp_date IS NULL OR ch.exp_date > GETDATE())')
-		->where('sg_user_id', $sg_user_id)
-		->get()
-		->result_array();
-		if(!empty($result)){
-//			$arr_return = array();
-			foreach($result as $r){
-				if(empty($r['request_status'])) $r['request_status'] = 'open';
-				$arr_return[$r['request_status']][] = $r;
-			}
-		}
-		$result = $this->db
-		->select('ch.*, h.herd_owner')
-		->from($this->tables['consultants_herds'] . ' ch')
-		->join($this->tables['herds'] . ' h', 'ch.herd_code = h.herd_code')
-		->join('users.dbo.lookup_sg_request_status lus', 'ch.request_status_id = lus.id')
-		->where("((ch.exp_date IS NOT NULL AND ch.exp_date <= GETDATE()) AND lus.name IN('open', 'grant'))")
-		->where('sg_user_id', $sg_user_id)
-		->get()
-		->result_array();
-		if(!empty($result)){
-//			$arr_return = array();
-			foreach($result as $r){
-				$arr_return['expired'][] = $r;
-			}
-		}
-
-		if(isset($arr_return)) return $arr_return;
 		else return FALSE;
 	}
 

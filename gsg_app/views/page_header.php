@@ -53,17 +53,18 @@
 		<ul class="nav navbar-nav">
 		<?php
 			//@todo MOVE THIS BLOCK TO THE CONTROLLERS OR MAYBE A LIBRARY?
-			if(isset($user_sections) && is_array($user_sections)):
+//var_dump($user_sections);
+			if(isset($user_sections) && is_a($user_sections, 'SplObjectStorage')):
 				$first = TRUE;
 				foreach($user_sections as $a):
 					$class_name = $first?'first':'';
 					$first = FALSE;
 					$path = $this->router->fetch_directory();// . $this->router->fetch_class();
-					if(substr($a['path'], 0, strrpos( $a['path'], '/')) . '/' === $path):
+					if(substr($a->path(), 0, strrpos( $a->path(), '/')) . '/' === $path):
 						$class_name .= ' current'; 
 					endif;
-					$href = $url . $a['path']; ?>
-					<li<?php if(!empty($class_name)) echo ' class="' . $class_name . '"'; ?>><?php echo anchor($href, $a['name']);?></li>
+					$href = $url . $a->path(); ?>
+					<li<?php if(!empty($class_name)) echo ' class="' . $class_name . '"'; ?>><?php echo anchor($href, $a->name());?></li>
 				<?php endforeach;
 			endif; ?>
 
@@ -89,7 +90,7 @@
 				<li><?php echo anchor('auth/logout', 'Log Out'); ?></li>
 				<li><?php echo anchor('', 'Home/Account'); ?></li>
 				<li><?php echo anchor('help', 'Help'); ?></li>
-				<?php if($this->as_ion_auth->has_permission("View non-own w permission")): ?>
+				<?php if($this->as_ion_auth->has_permission("View Assign w permission")): ?>
 					<li><?php echo anchor('auth/service_grp_manage_herds', 'Manage Herd Access'); ?></li>
 					<li><?php echo anchor('auth/service_grp_request', 'Request Herd Access'); ?></li>
 				<?php endif; ?>
@@ -121,9 +122,9 @@
 				if(false): ?>
 					<li class="sectionnav"><a class="dropdown-toggle" data-toggle="dropdown" name="section-nav">Select Report</a><br />
 						<ul class="dropdown-menu" role="menu">
-							<?php $arr_tmp = $user_sections;
-							if(isset($arr_tmp) && is_array($arr_tmp)):
-								foreach($arr_tmp as $a): ?>
+							<?php
+							if(isset($user_sections) && is_a($user_sections, 'SplObjectStorage')):
+								foreach($user_sections as $a): ?>
 									<li role="presentation"><?php echo anchor($url . $a['path'], $a['name']);?></li>
 								<?php endforeach;
 							endif; ?>

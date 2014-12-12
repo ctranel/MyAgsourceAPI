@@ -1,6 +1,8 @@
 <?php 
+require_once(APPPATH . 'libraries' . FS_SEP . 'dhi' . FS_SEP . 'HerdAccess.php');
 
 use \myagsource\Access_log;
+use myagsource\dhi\HerdAccess;
 
 defined('BASEPATH') OR exit('No direct script access allowed');
 
@@ -13,11 +15,13 @@ class Auth extends Ionauth {
 	function __construct()
 	{
 		parent::__construct();
+		$this->load->model('herd_model');
+		$herd_access = new HerdAccess($this->herd_model);
 		$this->session->keep_flashdata('redirect_url');
 		$this->redirect_url = set_redirect_url($this->uri->uri_string(), $this->session->flashdata('redirect_url'), $this->as_ion_auth->referrer);
 		$this->session->set_flashdata('redirect_url', $this->redirect_url);
-		$this->page_header_data['user_sections'] = $this->as_ion_auth->arr_user_super_sections;
-		$this->page_header_data['num_herds'] = $this->as_ion_auth->get_num_viewable_herds($this->session->userdata('user_id'), $this->session->userdata('arr_regions'));
+		$this->page_header_data['user_sections'] = $this->as_ion_auth->top_sections;
+		$this->page_header_data['num_herds'] = $herd_access->getNumAccessibleHerds($this->session->userdata('user_id'), $this->as_ion_auth->arr_task_permissions(), $this->session->userdata('arr_regions'));
 		
 		//load necessary files
 		$this->load->library('form_validation');
@@ -171,7 +175,7 @@ class Auth extends Ionauth {
 			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
        		redirect(site_url('auth/login'));
 		}
-		if($this->as_ion_auth->has_permission('View non-own w permission') !== TRUE) {
+		if($this->as_ion_auth->has_permission('View Assign w permission') !== TRUE) {
 			$this->session->keep_flashdata('redirect_url');
 			$this->session->set_flashdata('message', 'You do not have permission to view non-owned herds.');
 			redirect('auth');
@@ -225,7 +229,8 @@ class Auth extends Ionauth {
 			$this->page_header_data['message'] = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
 		}
 
-		$herds_by_status = $this->ion_auth_model->get_herds_by_consult($this->session->userdata('user_id'));
+		$this->load->model('dhi/herd_model');
+		$herds_by_status = $this->herd_model->getHerdsByPermissionGranted($this->session->userdata('user_id'));
 		if(isset($herds_by_status['open']) && is_array($herds_by_status['open'])){
 
 			$section_data['content'] = $this->_set_consult_herd_section($herds_by_status['open'], 'open', array('Resend Request Email'));
@@ -486,7 +491,7 @@ class Auth extends Ionauth {
 			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
        		redirect(site_url('auth/login'));
 		}
-		if(!$this->as_ion_auth->has_permission('View non-own w permission')) {
+		if(!$this->as_ion_auth->has_permission('View Assign w permission')) {
 			$this->session->keep_flashdata('redirect_url');
 			$this->session->set_flashdata('message', 'You do not have permission to request the data of a herd you do not own.');
 			redirect('auth');
