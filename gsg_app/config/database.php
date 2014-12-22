@@ -93,7 +93,7 @@ if(ENVIRONMENT == 'production'){
 		$db['vma']['stricton'] = FALSE;
 }
 elseif(ENVIRONMENT == 'qa'){
-	$db['default']['hostname'] = 'testdare.verona.crinet\MYAGSQA' ;
+	$db['default']['hostname'] = 'testdare.verona.crinet\\MYAGSQA' ;
 	$db['default']['username'] = 'webuser';
 	$db['default']['password'] = 'm1$Ags_qa';
 	$db['default']['database'] = "users";
@@ -109,7 +109,7 @@ elseif(ENVIRONMENT == 'qa'){
 	$db['default']['autoinit'] = TRUE;
 	$db['default']['stricton'] = FALSE;
 		//views database
-		$db['vma']['hostname'] = 'testdare.verona.crinet\MYAGSQA' ;
+		$db['vma']['hostname'] = 'testdare.verona.crinet\\MYAGSQA' ;
 		$db['vma']['username'] = 'webuser';
 		$db['vma']['password'] = 'm1$Ags_qa';
 		$db['vma']['database'] = "vma";
