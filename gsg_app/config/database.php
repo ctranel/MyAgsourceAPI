@@ -100,7 +100,7 @@ elseif(ENVIRONMENT == 'qa'){
 	$db['default']['dbdriver'] = 'mssql';
 	$db['default']['dbprefix'] = "";
 	$db['default']['pconnect'] = FALSE;
-	$db['default']['db_debug'] = FALSE;
+	$db['default']['db_debug'] = TRUE;
 	$db['default']['cache_on'] = TRUE;
 	$db['default']['cachedir'] = "";
 	$db['default']['char_set'] = 'windows-1252';
