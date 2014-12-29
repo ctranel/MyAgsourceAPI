@@ -430,33 +430,6 @@ class Web_content_model extends CI_Model {
 	}
 	
 	/**
-	 * get_blocks
-	 * @return array of section data
-	 * @author ctranel
-	private function get_blocks() {
-		return $this->{$this->db_group_name}
-			->where($this->tables['blocks'] . '.active', 1)
-			->get($this->tables['blocks']);
-	}
-	 **/
-	
-	/**
-	 * @method get_blocks_by_section array
-	 * @param int section
-	 * @return array of block for given section
-	 * @author ctranel
-	public function get_blocks_by_section($section, $display = NULL) {
-		$this->db
-			->join($this->tables['pages_blocks'], $this->tables['blocks'] . '.id = ' . $this->tables['pages_blocks'] . '.block_id', 'left')
-			->join($this->tables['pages'], $this->tables['pages_blocks'] . '.page_id = ' . $this->tables['pages'] . '.id', 'left')
-			->join($this->tables['lookup_display_types'], $this->tables['blocks'] . '.display_type_id = ' . $this->tables['lookup_display_types'] . '.id', 'left')
-			->where($this->tables['pages'] . '.section_id', $section);
-		if(isset($display)) $this->db->where($this->tables['lookup_display_types'] . '.name', $display);
-		return $this->get_blocks();
-	}
-	 **/
-
-	/**
 	 * get_block_display_types
 	 * @return array of section data
 	 * @author ctranel
@@ -474,10 +447,16 @@ class Web_content_model extends CI_Model {
 	 * @author ctranel
 	 **/
 	public function get_block_links($section_id = NULL) {
+die('here');
 		$arr_return = array();
-		if(isset($section_id)) $this->{$this->db_group_name}->where('p.section_id', $section_id);
+		if(isset($section_id)) $this->{$this->db_group_name}->where('p.section_id = ' . ' || s.parent_id = '  . $section_id);
 		$result = $this->{$this->db_group_name}
-		->select("p.id AS page_id, b.id, p.section_id, b.url_segment, b.name, ct.name AS chart_type, b.description, p.url_segment AS page, p.name AS page_name, CASE WHEN dt.name LIKE '%chart' THEN 'chart' ELSE dt.name END AS display_type,s.path AS section_path, b.max_rows, b.cnt_row, b.sum_row, b.avg_row, b.bench_row, pf.db_field_name AS pivot_db_field, b.is_summary")
+		//section
+		->select("s.zid AS section_id, s.name AS section_name, s.description AS section_description, s.scope_id AS section_scope, s.active AS section_active, s.parent_id AS section_parent_id, s.user_id AS section_user_id, s.path AS section_path")
+		//page
+		->select("p.id AS page_id, p.section_id, p.url_segment AS page, p.name AS page_name, p.description AS page_description, p.scope_id AS page_scope, p.active AS page_active")
+		//block
+		->select("b.id, b.url_segment, b.name, ct.name AS chart_type, b.description, CASE WHEN dt.name LIKE '%chart' THEN 'chart' ELSE dt.name END AS display_type, b.max_rows, b.cnt_row, b.sum_row, b.avg_row, b.bench_row, pf.db_field_name AS pivot_db_field, b.is_summary")
 		->join($this->tables['pages'] . ' AS p', 'p.section_id = s.id', 'left')
 		->join($this->tables['pages_blocks'] . ' AS pb', 'p.id = pb.page_id', 'left')
 		->join($this->tables['blocks'] . ' AS b', 'pb.block_id = b.id', 'left')
@@ -490,6 +469,7 @@ class Web_content_model extends CI_Model {
 		->order_by('p.list_order', 'asc')
 		->order_by('pb.list_order', 'asc')
 		->get($this->tables['sections'] . ' AS s')->result_array();
+
 		if(is_array($result) && !empty($result)){
 			foreach($result as $r){
 				$arr_return[$r['page']]['page_id'] = $r['page_id'];
@@ -525,6 +505,7 @@ class Web_content_model extends CI_Model {
 					);
 				}
  			}
+var_dump($arr_return);
  			return $arr_return;
 		}
 		else return FALSE;

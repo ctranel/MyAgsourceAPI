@@ -1,8 +1,14 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-require_once(APPPATH . 'libraries' . FS_SEP . 'supplemental' . FS_SEP . 'Supplemental.php');
+require_once(APPPATH . 'libraries/supplemental/Supplemental.php');
+require_once(APPPATH . 'libraries/Site/WebContent/Sections.php');
+require_once(APPPATH . 'libraries/Site/WebContent/Pages.php');
+require_once(APPPATH . 'libraries/Site/WebContent/Blocks.php');
 
 use \myagsource\supplemental\Supplemental;
+use \myagsource\Site\WebContent\Sections;
+use \myagsource\Site\WebContent\Pages;
+use \myagsource\Site\WebContent\Blocks;
 
 /* -----------------------------------------------------------------
 *  @description: Base data access for database-driven report generation
@@ -10,7 +16,22 @@ use \myagsource\supplemental\Supplemental;
 *  -----------------------------------------------------------------
 */
 class Report_model extends CI_Model {
-	protected $section_id;
+	/**
+	 * section
+	 * @var Section
+	 **/
+	protected $sections;
+	
+	/**
+	 * pages
+	 * 
+	 * page repository
+	 * @var Pages
+	 **/
+	protected $pages;
+	
+	
+	
 	public $arr_tables;
 	protected $test_date;
 	protected $arr_field_table;//DB field name is key
@@ -50,13 +71,20 @@ class Report_model extends CI_Model {
 	
 	public function __construct($section_path = NULL){
 		parent::__construct();
-		$this->load->model('dhi/herd_model');
+		$this->load->model('web_content/section_model');
+		$this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
+		$this->load->model('web_content/block_model');
+		$this->blocks = new Blocks($this->block_model);
+		$this->pages = new Pages($this->page_model, $this->blocks);
+		$this->sections = new Sections($this->section_model, $this->pages);
 		$this->tables  = $this->config->item('tables', 'ion_auth');
 
 		$this->db_group_name = 'default';
 		$this->{$this->db_group_name} = $this->load->database($this->db_group_name, TRUE);
+//@todo: fix line below, why is path coming in as 'land' and not 'dhi/'?  redirect?
+		$section_path = str_replace('land', 'dhi/', $section_path);
 		if(isset($section_path)){
-			$this->section_id = $this->web_content_model->get_section_id_by_path($section_path);
+			$this->section = $this->sections->getByPath($section_path);
 		}
 		if(isset($this->section_id)){
 			$this->arr_blocks = $this->web_content_model->get_block_links($this->section_id);
@@ -101,8 +129,8 @@ class Report_model extends CI_Model {
 	function get_num_results(){
 		return $this->num_results;
 	}
-	function get_section_id(){
-		return $this->section_id;
+	function getSection(){
+		return $this->section;
 	}
 	function get_current_breed_code(){
 		return current($this->arr_breeds);

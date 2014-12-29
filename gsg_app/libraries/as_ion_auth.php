@@ -4,11 +4,15 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 require_once APPPATH . 'libraries/dhi/herd.php';
 require_once APPPATH . 'libraries/Ion_auth.php';
 require_once APPPATH . 'libraries/access_log.php';
-require_once APPPATH . 'libraries/web_content/Sections.php';
-require_once(APPPATH . 'libraries' . FS_SEP . 'dhi' . FS_SEP . 'HerdAccess.php');
+require_once APPPATH . 'libraries/Site/WebContent/Sections.php';
+require_once APPPATH . 'libraries/Site/WebContent/Pages.php';
+require_once APPPATH . 'libraries/Site/WebContent/Blocks.php';
+require_once(APPPATH . 'libraries/dhi/HerdAccess.php');
 
 use \myagsource\Access_log;
-use \myagsource\web_content\Sections;
+use \myagsource\Site\WebContent\Sections;
+use \myagsource\Site\WebContent\Pages;
+use \myagsource\Site\WebContent\Blocks;
 use \myagsource\dhi\Herd;
 use \myagsource\dhi\HerdAccess;
 
@@ -85,12 +89,16 @@ class As_ion_auth extends Ion_auth {
 //		$this->load->model('access_log_model');
 //		$this->access_log = new Access_log($this->access_log_model);
 		$this->load->model('web_content/section_model');
+		$this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
+		$this->load->model('web_content/block_model');
 		$this->load->model('dhi/region_model');
 		$this->load->model('dhi/herd_model');
 		$this->load->helper('url');
-		//$section_model = new \web_content\section_model();
+		
 		$this->herd_access = new HerdAccess($this->herd_model);
-		$sections = new Sections($this->section_model);
+		$blocks = new Blocks($this->block_model);
+		$pages = new Pages($this->page_model, $blocks);
+		$sections = new Sections($this->section_model, $pages);
 		$herd = new Herd($this->herd_model, $this->session->userdata('herd_code'));
 		
 		if($this->logged_in()){
@@ -101,8 +109,8 @@ class As_ion_auth extends Ion_auth {
 			$control_dir = $this->router->fetch_directory();
 			//all sections must have directories in the main controller directory
 			if($control_dir != $section_path && !empty($control_dir)){
-				$root_section = $sections->getByPath($control_dir);
-				$root_section->setChildren($this->session->userdata('user_id'), $herd, $this->arr_task_permissions);
+				$active_section = $sections->getByPath($control_dir);
+				$sections->loadChildren($active_section, $pages, $this->session->userdata('user_id'), $herd, $this->arr_task_permissions);
 			} 
 			
 			/* will be used if we allow producers to specify consultant access by section
@@ -113,10 +121,10 @@ class As_ion_auth extends Ion_auth {
 			*/
 	
 			$dhi_section = $sections->getByPath('dhi/');
-			$dhi_section->setChildren($this->session->userdata('user_id'), $herd, $this->arr_task_permissions);
+			$sections->loadChildren($dhi_section, $pages, $this->session->userdata('user_id'), $herd, $this->arr_task_permissions);
 			$this->top_sections = $dhi_section->children();
-			if(isset($root_section)){
-				$this->arr_user_sections = $root_section->children();
+			if(isset($active_section)){
+				$this->arr_user_sections = $active_section->children();
 			}
 		}
 

@@ -39,10 +39,10 @@ class Land extends parent_report {
 		$this->filters = new Filters($this->filter_model);
 		$recent_test_date = isset($primary_table) ? $this->{$this->primary_model}->get_recent_dates() : NULL;
 		$this->filters->set_filters(
-				$this->section_id,
-				$this->page,
+				$this->section->id(),
+				$this->page->path(),
 				array(
-						'herd_code' =>	$this->session->userdata('herd_code'),
+					'herd_code' =>	$this->session->userdata('herd_code'),
 				) //filter form submissions never trigger a new page load (i.e., this function is never fired by a form submission)
 		);
 		//END FILTERS
@@ -50,7 +50,7 @@ class Land extends parent_report {
 		$this->page_header_data['message'] = $this->session->flashdata('message');
 
 		//get web content generated reports
-		$this->objPage = $this->{$this->primary_model}->arr_blocks[$this->page];
+		$this->objPage = $this->{$this->primary_model}->arr_blocks[$this->page->path()];
 		$arr_blocks = $this->objPage['blocks'];
 
 		//set js lines and load views for each block to be displayed on page

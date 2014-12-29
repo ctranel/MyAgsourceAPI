@@ -1,6 +1,6 @@
 <?php
 
-namespace myagsource\web_content;
+namespace myagsource\Site;
 
 /**
  *
@@ -8,9 +8,14 @@ namespace myagsource\web_content;
  *        
  */
 interface iWebContent {
-	public function childKeyValuePairs(){}
-	public function setChildren(Array $array){} //array directly from data source
-	public function children(){}
+//	public function childKeyValuePairs();
+	public function id();
+	public function path();
+	public function name();
+	public function children();
+	public function loadChildren(\SplObjectStorage $children);
+/*	public function loadChildren(iWebContent $section, iWebContent $pages, $user_id, $herd, $arr_task_permissions);
+
 	public function childrenList(){}
 	public function hasChildren(){}
 //	public function setParentObj(){}
@@ -21,10 +26,7 @@ interface iWebContent {
 	public function getChildrenByHerd(){}
 	public function getChildrenByUser(){}
 	public function getChildrenByPath(){}
-	
-	
-	
-	
+*/
 }
 
 ?>

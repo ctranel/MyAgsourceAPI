@@ -92,9 +92,9 @@ class Filters{
 	*  @throws: 
 	* -----------------------------------------------------------------
 	*/
-	public function set_filters($sect_id, $page, $arr_form_data = null){
+	public function set_filters($sect_id, $page_path, $arr_form_data = null){
 		//get filters from DB for the current page, set other vars
-		$arr_page_filter_data = $this->filter_model->get_page_filters($sect_id, $page);
+		$arr_page_filter_data = $this->filter_model->get_page_filters($sect_id, $page_path);
 		//set default criteria as base
 		$this->setFilterCriteria($arr_page_filter_data, $arr_form_data);
 	}
