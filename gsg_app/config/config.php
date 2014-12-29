@@ -21,7 +21,7 @@
 			$config['base_url']	= "http://localhost/MyAgSource/";
 			$config['base_url_assets']	= "http://localhost/MyAgSource/";
 		break;
-		case 'testing':
+		case 'qa':
 			$config['base_url']	= "http://feweb.verona.crinet/";
 			$config['base_url_assets']	= "http://feweb.verona.crinet/";
 		break;
@@ -68,7 +68,7 @@
 			$config['cust_serv_email']		= "ghartmann@agsource.com"; //custom CDT
 			$config['cust_serv_phone']		= "1-800-236-4995"; //custom CDT
 			break;
-		case 'testing':
+		case 'qa':
 			$config['admin_email']          = "ghartmann@agsource.com"; 	// Admin Email, admin@example.com
 			$config['cust_serv_email']		= "ghartmann@agsource.com"; //custom CDT
 			$config['cust_serv_phone']		= "1-800-236-4995"; //custom CDT
@@ -101,7 +101,7 @@
 		case 'localhost':
 			$config['index_page'] = "index.php/";
 		break;
-		case 'testing':
+		case 'qa':
 			$config['index_page'] = "";
 		break;
 		case 'production':
@@ -271,7 +271,7 @@ $config['directory_trigger']	= 'd'; // experimental not currently in use
 		case 'localhost':
 			$config['log_threshold'] = 4;
 			break;
-		case 'testing':
+		case 'qa':
 			$config['log_threshold'] = 4;
 			break;
 		case 'production':
@@ -298,7 +298,7 @@ $config['directory_trigger']	= 'd'; // experimental not currently in use
 		case 'localhost':
 			$config['log_path'] = 'C:\\MyAgSource\\logs\\';
 			break;
-		case 'testing':
+		case 'qa':
 			$config['log_path'] = 'logs/';
 			break;
 		case 'production':
@@ -437,7 +437,7 @@ $config['csrf_expire'] = 7200;
 		case 'localhost':
 			$config['compress_output'] = FALSE;
 		break;
-		case 'testing':
+		case 'qa':
 			$config['compress_output'] = FALSE;
 		break;
 		case 'production':
