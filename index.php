@@ -8,14 +8,15 @@
  * current environment. Setting the environment also influences
  * things like logging and error reporting.
  *
- * This can be set to anything, but default usage is:
+ * This can be set to anything, but current usage is:
  *
- *     development
- *     testing
- *     production
+ *     development 	- default developer machine
+ *     localhost	- Chris's VM
+ *     qa			- currently feweb.verona.crinet
+ *     production	- myagsource.com
  *
- * NOTE: If you change these, also change the error_reporting() code below
- *
+ * NOTE: If you change these, also change the error_reporting() code below,
+ *		 then check config.php as well as database.php
  */
 	switch ($_SERVER['HTTP_HOST'])
 	{
