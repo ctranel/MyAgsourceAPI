@@ -55,7 +55,7 @@ p {padding: 0 0 5px;}
 .header-link {width:233px; height:45px;}
 
 /* new styles */
-.container {margin:0 auto 0; display:table; border-left: solid 2px #E8E8E8; border-right: solid 2px #E8E8E8; border-bottom: solid 2px #E8E8E8; padding:0;}
+.container {margin:0 auto 30px; display:table; border-left: solid 2px #E8E8E8; border-right: solid 2px #E8E8E8; border-bottom: solid 2px #E8E8E8; padding:0;}
 
 a.button, .button {
 	background-color: #00958E;

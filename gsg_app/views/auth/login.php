@@ -1,7 +1,8 @@
 <?php if(isset($page_header) !== false) echo $page_header; ?>
 <div class='mainInfo'>
 	<?php if(isset($page_heading) !== false) echo heading($page_heading); ?>
-
+	
+	<div id="infoMessage">MyAgsource will be down for maintenance from 4:00 to 4:30 on January 5, 2015.  We apologize for any inconvenience.</div>
 	<div class="row">
 		<div class="col-sm-6">
 			<div class="box login">
@@ -35,7 +36,7 @@
 			<div class="box login">
 				<h2>Laboratories</h2>
 				<h3>Soil, Water, Plant Tissue, Manure and Media</h3>
-				<form action="http://mylabresults.agsource.com//User/Login?loginModel=AgSource.NET.ViewModels.Shared.LoginModel" class="home" method="post">
+				<form action="https://mylabresults.agsource.com/User/Login?loginModel=AgSource.NET.ViewModels.Shared.LoginModel" class="home" method="post">
 				    <p>
 				    	<label for="txtEmail">Email</label>
 				        <input id="UserName" name="UserName" type="text" value="" />
