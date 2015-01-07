@@ -23,5 +23,5 @@ div{background: none transparent scroll repeat 0% 0%}
 
 .widget-content fieldset legend {font-size: 1.1em; font-weight: bold; margin: 5px;}
 .widget-content fieldset .checkbox, .widget-content fieldset .radio {margin: -2px 0 0 0; display: inline-block;}
-.widget-content fieldset .checkbox input[type="checkbox"], input[type="radio"] {margin: 2px 0 0 -14px;}
+.widget-content fieldset .checkbox input[type="checkbox"], input[type="radio"] {position: static; margin: 2px 0 0 5px;}
 .widget-content fieldset fieldset {width:97%; margin: 1px 0 0 1%;}
