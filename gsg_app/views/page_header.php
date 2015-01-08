@@ -32,7 +32,8 @@
 			{jquery: "https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"},
 			{bootstrap: "https://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"},
 			{sectionhelper: "<?php echo $this->config->item('base_url_assets'); ?>js/as_section_helper.js"},
-			{formhelper: "<?php echo $this->config->item('base_url_assets'); ?>js/form_helper.js"}
+			{formhelper: "<?php echo $this->config->item('base_url_assets'); ?>js/form_helper.js"},
+			{navhelper: "<?php echo $this->config->item('base_url_assets'); ?>js/nav.js"}
 			<?php
 				if(!empty($arr_headjs_line) && is_array($arr_headjs_line) !== FALSE):
 					$c = count($arr_headjs_line);
@@ -49,7 +50,7 @@
 <?php $url = site_url(); ?>
 <div class="navbar-background"></div>
 <div class="container" id="container">
-	<nav class="navbar navbar-inverse" role="navigation">
+	<nav class="navbar navbar-inverse" id="top-nav" role="navigation">
 		<ul class="nav navbar-nav">
 		<?php
 			//@todo MOVE THIS BLOCK TO THE CONTROLLERS OR MAYBE A LIBRARY?

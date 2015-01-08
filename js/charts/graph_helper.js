@@ -74,6 +74,7 @@ function updateBlock(container_div_id, block_in, block_index, sort_field, sort_o
 			load_chart(base_url + '/ajax_report/' + encodeURIComponent(page) + '/' + encodeURIComponent(block_in) + '/' + display + '/' + encodeURIComponent(sort_field) + '/' + sort_order + '/web/null/' + block_index + '/' + params + '/' + first + '/' + cache_bust, container_div_id, block_index, params);
 			break;
 	}
+	setFixedNav();
 	return false;
 }
 
@@ -332,6 +333,7 @@ function process_table(div_id, block_index, table_data){
 		}, 0);
 		//attach events to new data fields and table headers (needs to be below fixed header)
 		attachDataFieldEvents();
+		setFixedNav();
 	}
 
 	$('#waiting-icon' + block_index).hide();

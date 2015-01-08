@@ -138,8 +138,9 @@ ul#session-nav {float:right;}
 /* super section nav */
 .navbar-background {height: 31px; width: 100%; border-top: solid 5px #EF5C29; background-color: #222; position: fixed; z-index: 1000;}
 /* override bootstrap styles for top nav and dropdowns */
-.navbar-inverse {border: none; min-height: 25px; border-radius:0; border-top: solid 5px #EF5C29; position: fixed; z-index: 1001;}
-.navbar-inverse li {border-left: solid 1px #666;}
+.navbar-inverse {border: none; min-height: 25px; border-radius:0; border-top: solid 5px #EF5C29; position: fixed; z-index: 1001; white-space: nowrap;}
+.navbar-inverse ul {display: inline-block;}
+.navbar-inverse li {border-left: solid 1px #666; display: inline-block;}
 .navbar-inverse li.first {border-left: none;}
 .navbar-inverse .navbar-nav>li>a {color: #E8E8E8;}
 .navbar-inverse li.current {background-color: #666; border-topz: solid 2px #EF5C29;}
@@ -147,6 +148,12 @@ ul#session-nav {float:right;}
 .nav li a {padding: 3px 8px; text-decoration: none;}
 .dropdown-menu {background-color: transparent; box-shadow: none;}
 .navbar-nav {margin: 0;}
+@media (min-width: 10px){
+	.navbar-nav>li {float: none;}
+}
+@media (min-width: 768px){
+	.navbar-nav>li {float: none;}
+}
 
 /* forms */
 label, fieldset legend {color:#003C39;}
