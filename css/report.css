@@ -84,8 +84,8 @@ th span.hide-column {cursor: pointer;}
 .sort_desc:after {content: "▼";}
 
 .fixed-header {position: fixed; top: 30px; display:none; background-color:white; border-collapse: collapse;}
-.fixed-header thead, .fixed-header tr, .fixed-header th {box-sizing: content-box !important;}
-/* end table headings */
+/* .fixed-header thead, .fixed-header tr, .fixed-header th {box-sizing: content-box !important;}
+end table headings */
 
 
 /* header herd info */
