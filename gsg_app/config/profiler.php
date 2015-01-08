@@ -11,7 +11,7 @@
 |
 */
 
-$config['enable_profiler']          = 0;
+$config['enable_profiler']          = 1;
 $config['show_uri_string']          = 1;
 $config['show_controller_info']     = 1;
 $config['show_memory_usage']        = 1;
