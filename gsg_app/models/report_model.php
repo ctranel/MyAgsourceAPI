@@ -571,7 +571,7 @@ class Report_model extends CI_Model {
  * @todo: 	find another way to acheive this--without naming specific blocks.  This handles pstring filters for 
  * 			cow-level blocks that are on summary pages
  */
-			if(($block_url == 'peak_milk_trends' || $block_url == 'dim_at_1st_breeding') && substr($k,-7)=='pstring'){
+			if(($block_url == 'peak_milk_trends' || $block_url == 'dim_at_1st_breeding' || $block_url == 'bulk_tank_contribution') && substr($k,-7)=='pstring'){
 				if(is_array($v)){
 					$tmp = array_filter($v);
 					if(empty($tmp)){
