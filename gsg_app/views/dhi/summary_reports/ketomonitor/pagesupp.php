@@ -6,6 +6,8 @@ if(!isset($fresh) && empty($fresh) && !isset($tested) && empty($tested) && !isse
 <?php 
 } else {
 
+	echo '<strong>KetoMonitor Statistics</strong><br/>';
+	
 	if(isset($fresh) && !empty($fresh)) {	
 			echo $fresh.'<br/>';
 	}
