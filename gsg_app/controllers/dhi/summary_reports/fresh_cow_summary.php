@@ -59,4 +59,12 @@ class Fresh_cow_summary extends parent_report {
 	 	}
 	 	return $return_val;
 	 }
+	 
+	 function ajax_fc_supp() {
+	 
+	 	$tip = $this->fresh_cow_summary_model->getFCPageTip($this->session->userdata('herd_code'));
+	 	$this->load->view('dhi/summary_reports/fresh_cow_summary/pagesupp', $tip);
+	 
+	 }
+	 
 }
