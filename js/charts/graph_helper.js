@@ -288,10 +288,9 @@ function process_chart(div_id, data_in){
 			if(typeof pre_render == 'function'){
 				options = pre_render(options, section_data);
 			}
-//console.log(JSON.stringify(options));
 			chart[block_index] = new Highcharts.Chart(options);
-			while(chart[block_index].series.length > count){//(Object.size(chart[block_index].series) > count){
-				chart[block_index].series[count].remove(true);
+			while(chart[block_index].series.length > options.series.length){//(Object.size(chart[block_index].series) > count){
+				chart[block_index].series[chart[block_index].series.length].remove(true);
 			}
 		}
 		if(typeof(section_data) == "object" && typeof post_render == 'function'){
