@@ -31,7 +31,7 @@ class Supplemental extends CI_Controller {
     function ajax_tip($comment_id) {
     	$this->load->model('supplemental_model');
     	$tip = $this->supplemental_model->getComment($comment_id);
-    	$this->load->view('tip', array('tip' => $tip));
+    	$this->load->view('tip', ['tip' => $tip]);
     }
     
     function ajax_overlay() {

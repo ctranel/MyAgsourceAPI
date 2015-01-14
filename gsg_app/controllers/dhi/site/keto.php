@@ -26,5 +26,13 @@ class Keto extends parent_report {
 	 	$this->product_name = 'Cow List';
 	 	parent::display($block_in, $display_format);
 	}
+	
+	function ajax_keto_supp() {
+
+//		echo $this->page;
+		$tip = $this->keto_model->getKetoPageTip($this->session->userdata('herd_code'));
+		$this->load->view('dhi/summary_reports/ketomonitor/pagesupp', $tip);
+		
+	}
 
 }
