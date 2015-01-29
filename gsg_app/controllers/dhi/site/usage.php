@@ -21,4 +21,10 @@ class Usage extends parent_report {
 	 	$this->product_name = 'Usage Statistics';
 	 	parent::display($block_in, $display_format);
 	}
+
+	function caroltest($block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
+		$this->product_name = 'Test Report for Carol';
+		parent::display($block_in, $display_format);
+	}	
+	
 }

@@ -43,12 +43,12 @@ require_once APPPATH . 'models/report_model.php';
 	function getTestedCowCount($herd_code) {
 		$statement = '% of fresh cows were tested 5 - 20 DIM';
 		$resultset = $this->db
-			->select('between_5_20_DIM')
+			->select('dim_5_20_pct')
 			->where('herd_code', $herd_code)
 			->get('vma.dbo.vma_Keto_Summary_Aggregates')
 			->result_array();
 		if(isset($resultset[0]) && !empty($resultset[0])) {
-			return $resultset[0]['between_5_20_DIM'].$statement;
+			return $resultset[0]['dim_5_20_pct'].$statement;
 		}
 		return 'Count of tested cows not found';
 	}
@@ -56,12 +56,12 @@ require_once APPPATH . 'models/report_model.php';
 	function getTestedCowCountEarly($herd_code) {
 		$statement = '% of fresh cows were tested 5 - 11 DIM';
 		$resultset = $this->db
-		->select('between_5_11_DIM')
+		->select('dim_5_11_pct')
 		->where('herd_code', $herd_code)
 		->get('vma.dbo.vma_Keto_Summary_Aggregates')
 		->result_array();
 		if(isset($resultset[0]) && !empty($resultset[0])) {
-			return $resultset[0]['between_5_11_DIM'].$statement;
+			return $resultset[0]['dim_5_11_pct'].$statement;
 		}
 		return 'Count of cows tested early not found';
 	}
