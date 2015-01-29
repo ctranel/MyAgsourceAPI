@@ -4,7 +4,7 @@ body {background: none !important; border: solid 1px #929496; width: 100%;}
 .downloads-container {display:none;}
 #inter-section-nav {display:none;}
 #session-nav {display:none;}
-#filters, #benchmarks {display:none;}
+#filters, #benchmarks, #bench-div {display:none;}
 #disclaimer {display:none;}
 /* #header {display: list-item; list-style-image: url("http://agsource.crinet.com/images/AgSource-Cooperative-Services/img-header-lft.gif"); list-style-position: inside; margin:0;} */
 #header {display: none;}
