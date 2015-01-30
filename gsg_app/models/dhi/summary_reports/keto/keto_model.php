@@ -81,9 +81,24 @@ require_once APPPATH . 'models/report_model.php';
 		return 'Test day composite category not found';
 
 	}
+
+	function getTestDate($herd_code) {
+		$statement = 'Test date for KetoMonitor values was ';
+		$resultset = $this->db
+		->select('test_date')
+		->where('herd_code', $herd_code)
+		->get('vma.dbo.vma_Keto_Summary_Aggregates')
+		->result_array();
+		if(isset($resultset[0]) && !empty($resultset[0])) {
+			return $statement.$resultset[0]['test_date'];
+		}
+		return 'KetoMonitor test date not found.';
+	}
+	
 	
 	function getKetoPageTip($herd_code) {
 		$page_tip = array();
+		$page_tip['test_date'] = $this->getTestDate($herd_code);
 		$page_tip['fresh'] = $this->getFreshCowCount($herd_code);
 		$page_tip['tested'] = $this->getTestedCowCount($herd_code);
 		$page_tip['testedearly'] = $this->getTestedCowCountEarly($herd_code);
