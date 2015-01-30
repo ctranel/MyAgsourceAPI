@@ -34,7 +34,7 @@ require_once APPPATH . 'models/report_model.php';
 			->where('herd_code', $herd_code)
 			->get('vma.dbo.vma_Keto_Summary_Aggregates')
 			->result_array();
-		if(isset($resultset[0]) && !empty($resultset[0])){
+		if(isset($resultset[0]['count_fresh']) && !empty($resultset[0]['count_fresh'])){
 			return $statement.$resultset[0]['count_fresh'];
 		}
 		return 'Count of fresh cows not found';
@@ -47,7 +47,7 @@ require_once APPPATH . 'models/report_model.php';
 			->where('herd_code', $herd_code)
 			->get('vma.dbo.vma_Keto_Summary_Aggregates')
 			->result_array();
-		if(isset($resultset[0]) && !empty($resultset[0])) {
+		if(isset($resultset[0]['dim_5_20_pct']) && !empty($resultset[0]['dim_5_20_pct'])) {
 			return $resultset[0]['dim_5_20_pct'].$statement;
 		}
 		return 'Count of tested cows not found';
@@ -60,7 +60,7 @@ require_once APPPATH . 'models/report_model.php';
 		->where('herd_code', $herd_code)
 		->get('vma.dbo.vma_Keto_Summary_Aggregates')
 		->result_array();
-		if(isset($resultset[0]) && !empty($resultset[0])) {
+		if(isset($resultset[0]['dim_5_11_pct']) && !empty($resultset[0]['dim_5_11_pct'])) {
 			return $resultset[0]['dim_5_11_pct'].$statement;
 		}
 		return 'Count of cows tested early not found';
@@ -74,7 +74,7 @@ require_once APPPATH . 'models/report_model.php';
 		->where('herd_code', $herd_code)
 		->get('vma.dbo.vma_Keto_Summary_Aggregates')
 		->result_array();
-		if(isset($resultset[0]) && !empty($resultset[0])) {
+		if(isset($resultset[0]['summary_category']) && !empty($resultset[0]['summary_category'])) {
 			if ($resultset[0]['summary_category'] > 1) $statement2.= 's';
 			return $statement.$resultset[0]['summary_category'].$statement2;
 		}
@@ -89,7 +89,7 @@ require_once APPPATH . 'models/report_model.php';
 		->where('herd_code', $herd_code)
 		->get('vma.dbo.vma_Keto_Summary_Aggregates')
 		->result_array();
-		if(isset($resultset[0]) && !empty($resultset[0])) {
+		if(isset($resultset[0]['test_date']) && !empty($resultset[0]['test_date'])) {
 			return $statement.$resultset[0]['test_date'];
 		}
 		return 'KetoMonitor test date not found.';
