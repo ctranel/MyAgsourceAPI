@@ -36,14 +36,14 @@ class Fresh_cow_summary extends parent_report {
 	 	}
 		$return_val = array();
 	 	$c = 0;
-	 	$arr_chart_type = $this->{$this->primary_model}->get_chart_type_array();
-	 	$arr_axis_index = $this->{$this->primary_model}->get_axis_index_array();
+	 	$arr_chart_type = $this->{$this->primary_model_name}->get_chart_type_array();
+	 	$arr_axis_index = $this->{$this->primary_model_name}->get_axis_index_array();
 	 	foreach($arr_fields as $k=>$f){
 	 		//for the median field, create 1 series for the boxplot and 1 for the trend line ("$c + 1" is the trend line)
 	 		if(strpos($f, 'median') !== FALSE){
 	 			$return_val[$c]['name'] = trim(str_replace('50th Pct.', '', $k));
 	 			$return_val[$c + 1]['name'] = $k;
-//	 			if(isset($this->{$this->primary_model}->arr_unit_of_measure[$f]) && !empty($this->{$this->primary_model}->arr_unit_of_measure[$f])) $um = $this->{$this->primary_model}->arr_unit_of_measure[$f];
+//	 			if(isset($this->{$this->primary_model_name}->arr_unit_of_measure[$f]) && !empty($this->{$this->primary_model_name}->arr_unit_of_measure[$f])) $um = $this->{$this->primary_model_name}->arr_unit_of_measure[$f];
 		 		if(isset($arr_axis_index[$f]) && !empty($arr_axis_index[$f])) {
 		 			$return_val[$c]['yAxis'] = $arr_axis_index[$f];
 		 			$return_val[$c + 1]['yAxis'] = $arr_axis_index[$f];

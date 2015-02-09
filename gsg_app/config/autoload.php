@@ -109,7 +109,7 @@ $autoload['language'] = array();
 |
 */
 
-$autoload['model'] = array('dhi/herd_model', 'web_content_model');//,'dm_model');
+$autoload['model'] = array('dhi/herd_model');//,'dm_model');
 
 
 

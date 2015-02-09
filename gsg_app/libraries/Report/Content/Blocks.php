@@ -1,18 +1,20 @@
 <?php
-namespace myagsource\Site\WebContent;
 
-require_once(APPPATH . 'libraries/Site/WebContent/Page.php');
-require_once(APPPATH . 'libraries/Site/iWebContentRepository.php');
-require_once(APPPATH . 'libraries/Site/iWebContent.php');
+namespace myagsource\Report\Content;
+
+require_once(APPPATH . 'libraries/Report/Content/TableBlock.php');
+require_once(APPPATH . 'libraries/Report/Content/ChartBlock.php');
+//require_once(APPPATH . 'libraries/Report/iReportContentRepository.php');
+require_once(APPPATH . 'libraries/Report/iBlock.php');
 require_once(APPPATH . 'libraries/dhi/herd.php');
 
-use \myagsource\Site\iWebContentRepository;
-use \myagsource\Site\iWebContent;
-use \myagsource\Site\WebContent\Page;
+use \myagsource\Report\Content\TableBlock;
+use \myagsource\Report\Content\ChartBlock;
+use \myagsource\Report\iBlock;
 use \myagsource\dhi\Herd;
 
 /**
- * A repository? for page objects
+ * A repository? for report block objects
  * 
  * 
  * @name Pages
@@ -20,21 +22,15 @@ use \myagsource\dhi\Herd;
  * 
  *        
  */
-class Pages implements iWebContentRepository {
+class Blocks {// implements iReportContentRepository {
 	/**
-	 * datasource_pages
-	 * @var page_model
+	 * datasource_blocks
+	 * @var block_model
 	 **/
-	protected $datasource_pages;
+	protected $datasource_blocks;
 
-	/**
-	 * $blocks
-	 * @var Blocks
-	 **/
-	protected $Blocks;
-
-	function __construct(\Page_model $datasource_pages, Blocks $blocks) {
-		$this->datasource_pages = $datasource_pages;
+	function __construct(\Block_model $datasource_blocks) {
+		$this->datasource_blocks = $datasource_blocks;
 	}
 	
 	/*
@@ -45,28 +41,48 @@ class Pages implements iWebContentRepository {
 	 * @returns Page
 	 */
 	public function getByPath($path){
+		$block = null;
 		$criteria = ['path' => $path];
-		$results = $this->datasource_pages->getByCriteria($criteria);
+		$results = $this->datasource_blocks->getByCriteria($criteria);
 		if(empty($results)){
 			return false;
 		}
-		return new Page($results[0]['id'], $results[0]['section_id'], $results[0]['name'], $results[0]['description'], $results[0]['scope_id'], $results[0]['active'], $results[0]['path']);
+		if($results[0]['display_type'] === 'table'){
+			$block = new TableBlock($results[0]['id'], $results[0]['page_id'], $results[0]['name'], $results[0]['description'], $results[0]['scope'], $results[0]['active'], $results[0]['path'], $results[0]['max_rows'], $results[0]['cnt_row'], 
+			$results[0]['sum_row'], $results[0]['avg_row'], $results[0]['bench_row'], $results[0]['is_summary'], $results[0]['display_type']);
+		}
+		else{
+			$block = new ChartBlock($results[0]['id'], $results[0]['page_id'], $results[0]['name'], $results[0]['description'], $results[0]['scope'], $results[0]['active'], $results[0]['path'], $results[0]['max_rows'], $results[0]['cnt_row'], 
+			$results[0]['sum_row'], $results[0]['avg_row'], $results[0]['bench_row'], $results[0]['is_summary'], $results[0]['display_type']);
+		}
+		return $block;
 	}
 
 	/*
 	 * getBySection
 	 * 
-	 * @param int section_id
+	 * @param int page_id
 	 * @author ctranel
-	 * @returns Page
+	 * @returns SplObjectStorage of Blocks
 	 */
-	public function getBySection($section_id){
-		$criteria = ['section_id' => $section_id];
-		$results = $this->datasource->getByCriteria($criteria);
+	public function getByPage($page_id){
+		$blocks = new \SplObjectStorage();
+		
+		$criteria = ['page_id' => $page_id];
+//		$join = [['table' => 'pages_blocks pb', 'condition' => 'b.id = pb.block_id AND pb.page_id = ' . $page_id]];
+		$results = $this->datasource_blocks->getByCriteria($criteria);
 		if(empty($results)){
 			return false;
 		}
-		return new Page($results[0]['id'], $results[0]['section_id'], $results[0]['name'], $results[0]['description'], $results[0]['scope_id'], $results[0]['active'], $results[0]['path']);
+		foreach($results as $r){
+			if($r['display_type'] === 'table'){
+				$blocks->attach(new TableBlock($r['id'], $r['page_id'], $r['name'], $r['description'], $r['scope'], $r['active'], $r['path']));
+			}
+			else{
+				$blocks->attach(new ChartBlock($r['id'], $r['page_id'], $r['name'], $r['description'], $r['scope'], $r['active'], $r['path']));
+			}
+		}
+		return $blocks;
 	}
 
 	/**

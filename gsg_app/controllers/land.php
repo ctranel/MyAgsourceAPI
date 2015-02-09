@@ -37,7 +37,7 @@ class Land extends parent_report {
 		//load required libraries
 		$this->load->model('filter_model');
 		$this->filters = new Filters($this->filter_model);
-		$recent_test_date = isset($primary_table) ? $this->{$this->primary_model}->get_recent_dates() : NULL;
+		$recent_test_date = isset($primary_table) ? $this->{$this->primary_model_name}->get_recent_dates() : NULL;
 		$this->filters->set_filters(
 				$this->section->id(),
 				$this->page->path(),
@@ -50,9 +50,10 @@ class Land extends parent_report {
 		$this->page_header_data['message'] = $this->session->flashdata('message');
 
 		//get web content generated reports
-		$this->objPage = $this->{$this->primary_model}->arr_blocks[$this->page->path()];
-		$arr_blocks = $this->objPage['blocks'];
-
+		//$this->objPage = $this->{$this->primary_model_name}->arr_blocks[$this->page->path()];
+		//$arr_blocks = $this->objPage['blocks'];
+		$arr_blocks = $this->blocks->getByPage($this->page->id());
+		
 		//set js lines and load views for each block to be displayed on page
 		$arr_block_in = NULL;
 		$tmp_js = '';
@@ -62,47 +63,47 @@ class Land extends parent_report {
 			$x = 0;
 			$cnt = count($arr_blocks);
 			foreach($arr_blocks as $c => $pb){
-				if($pb['bench_row'] === 1){
-					$has_benchmarks = true;
-				}
+				//if($pb['bench_row'] === 1){
+//					$has_benchmarks = $pb->displayBenchRow();
+				//}
 		
-				$display = $pb['display_type'];
+				$display = 'table';//$pb->display_type();
 				//load view for placeholder for block display
-				if(isset($sort_by) && isset($sort_order)){
+/*				if(isset($sort_by) && isset($sort_order)){
 					$this->arr_sort_by = array_values(explode('|', $sort_by));
 					$this->arr_sort_order = array_values(explode('|', $sort_order));
 				}
 				else {
-					$tmp = $this->{$this->primary_model}->get_default_sort($pb['url_segment']);
+					$tmp = $this->{$this->primary_model_name}->get_default_sort($pb['path']);
 					$this->arr_sort_by = $tmp['arr_sort_by'];
 					$this->arr_sort_order = $tmp['arr_sort_order'];
 					$sort_by = implode('|', $this->arr_sort_by);
 					$sort_order = implode('|', $this->arr_sort_order);
 				}
-				if($arr_block_in == NULL || in_array($pb['url_segment'], $arr_block_in)){
-					$this->{$this->primary_model}->populate_field_meta_arrays($pb['id']);
-					if($cnt == 1) $odd_even = 'chart-only';
-					elseif($x % 2 == 1) $odd_even = 'chart-even';
-					elseif($x == ($cnt - 1)) $odd_even = 'chart-last-odd';
-					else $odd_even = 'chart-odd';
+*/				if($arr_block_in == NULL || in_array($pb['path'], $arr_block_in)){
+//					$this->{$this->primary_model_name}->populate_field_meta_arrays($pb['id']);
+					//if($cnt == 1) $odd_even = 'chart-only';
+					//elseif($x % 2 == 1) $odd_even = 'chart-even';
+					//elseif($x == ($cnt - 1)) $odd_even = 'chart-last-odd';
+					//else $odd_even = 'chart-odd';
 					if($display == 'table') $cnt = 0;
 					$arr_blk_data = array(
 							'block_num' => $x,
-							'link_url' => site_url($this->section_path) . '/' . $this->page . '/' . $pb['url_segment'],
+							'link_url' => site_url($this->section_path) . '/' . $this->page->path() . '/' . $pb->path(),
 							'form_id' => $this->report_form_id,
-							'odd_even' => $odd_even,
-							'block' => $pb['url_segment'],
-							'sort_by' => urlencode($sort_by),
-							'sort_order' => urlencode($sort_order),
+							//'odd_even' => $odd_even,
+							'block' => $pb->path(),
+							//'sort_by' => urlencode($sort_by),
+							//'sort_order' => urlencode($sort_order),
 							'skip_heading' => true,
 					);
-					$arr_view_blocks[$pb['name']] = $this->load->view($display, $arr_blk_data, TRUE);
+					$arr_view_blocks[$pb->name()] = $this->load->view($display, $arr_blk_data, TRUE);
 					//add js line to populate the block after the page loads
 					$tmp_container_div = $display == 'chart' ? 'graph-canvas' . $x : 'table-canvas' . $x;
-					$tmp_js .= "updateBlock(\"$tmp_container_div\", \"" . $pb['url_segment'] . "\", \"$x\", \"null\", \"null\", \"$display\",\"false\");\n";//, \"" . $this->{$this->primary_model}->arr_blocks[$this->page]['display'][$display][$block]['description'] . "\", \"" . $bench_text . "\");\n";
+					$tmp_js .= "updateBlock(\"$tmp_container_div\", \"" . $pb->path() . "\", \"$x\", \"null\", \"null\", \"$display\",\"false\");\n";//, \"" . $this->{$this->primary_model_name}->arr_blocks[$this->page]['display'][$display][$block]['description'] . "\", \"" . $bench_text . "\");\n";
 					$tmp_js .= "if ($( '#datepickfrom' ).length > 0) $( '#datepickfrom' ).datepick({dateFormat: 'mm-dd-yyyy'});";
 					$tmp_js .= "if ($( '#datepickto' ).length > 0) $( '#datepickto' ).datepick({dateFormat: 'mm-dd-yyyy'});";
-					$tmp_block = $pb['url_segment'];
+					$tmp_block = $pb->path();
 					$x++;
 				}
 			}
@@ -137,8 +138,8 @@ class Land extends parent_report {
 					'description'=>'Dashboard for ' . $this->config->item("product_name"),
 					'arr_head_line' => array(
 							'<script type="text/javascript">',
-							'	var page = "' . $this->page . '";',
-							'	var base_url = "' . site_url($this->section_path) . '";',
+							'	var page = "' . $this->page->path() . '";',
+							'	var base_url = "' . $this->section_path . '";',
 							'	var site_url = "' . site_url() . '";',
 							'	var herd_code = "' . $this->session->userdata('herd_code') . '";',
 							'	var block = "' . $tmp_block	. '"',
@@ -228,6 +229,14 @@ class Land extends parent_report {
 			}
 		}
 		
+/*		$product_data = Array('sections' => $this->as_ion_auth->get_promo_sections());
+		if(isset($product_data['sections']) && !empty($product_data['sections'])){
+			$this->data['widget']['info'][] = array(
+				'content' => $this->load->view('auth/dashboard/other_products', $product_data, TRUE),
+				'title' => 'Other Products'
+			);
+		}
+*/
 		$this->load->view('auth/dashboard/main', $this->data);
 	}
 	

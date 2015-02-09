@@ -3,7 +3,7 @@ require_once APPPATH . 'controllers/report_parent.php';
 class Fresh_Cow_List extends parent_report {
 	function __construct(){
 //		$this->section_path = 'herd_summary'; //this should match the name of this file (minus ".php".  Also used as base for css and js file names and model directory name
-//		$this->primary_model = 'herd_summary_model';
+//		$this->primary_model_name = 'herd_summary_model';
 		parent::__construct();
 		/* Load the profile.php config file if it exists
 		$this->config->load('profiler', false, true);

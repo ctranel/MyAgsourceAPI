@@ -77,17 +77,17 @@ class Report_model extends CI_Model {
 		$this->blocks = new Blocks($this->block_model);
 		$this->pages = new Pages($this->page_model, $this->blocks);
 		$this->sections = new Sections($this->section_model, $this->pages);
-		$this->tables  = $this->config->item('tables', 'ion_auth');
+		$this->tables = $this->config->item('tables', 'ion_auth');
 
 		$this->db_group_name = 'default';
 		$this->{$this->db_group_name} = $this->load->database($this->db_group_name, TRUE);
 //@todo: fix line below, why is path coming in as 'land' and not 'dhi/'?  redirect?
-		$section_path = str_replace('land', 'dhi/', $section_path);
+		//$section_path = str_replace('land', 'dhi/', $section_path);
 		if(isset($section_path)){
 			$this->section = $this->sections->getByPath($section_path);
 		}
 		if(isset($this->section_id)){
-			$this->arr_blocks = $this->web_content_model->get_block_links($this->section_id);
+//			$this->arr_blocks = $this->web_content_model->get_block_links($this->section_id);
 		}
 	}
 	function get_primary_table_name(){
@@ -158,12 +158,12 @@ class Report_model extends CI_Model {
 	 * @return returns multi-dimensional array, arr_sort_by and arr_sort_order
 	 * @author ctranel
 	 **/
-	function get_default_sort($block_url_segment){
+	function get_default_sort($block_path){
 		$arr_ret = array();
 		$arr_res = $this->{$this->db_group_name}
 //			->distinct()
 			->select('users.dbo.db_fields.db_field_name, users.dbo.blocks_sort_by.sort_order')
-			->where($this->tables['blocks'] . '.url_segment', $block_url_segment)
+			->where($this->tables['blocks'] . '.path', $block_path)
 			->join('users.dbo.blocks_sort_by', $this->tables['blocks'] . '.id = users.dbo.blocks_sort_by.block_id' , 'left')
 			->join('users.dbo.db_fields', 'users.dbo.blocks_sort_by.field_id = users.dbo.db_fields.id' , 'left')
 			->order_by('users.dbo.blocks_sort_by.list_order', 'asc')
@@ -773,8 +773,12 @@ class Report_model extends CI_Model {
 	 * @author ctranel
 	 **/
 	public function get_recent_dates($date_field = 'test_date', $num_dates = 1, $date_format = 'MMM-yy') {
-		if($date_format) $this->db->select("FORMAT(" . $date_field . ", '" . $date_format . "', 'en-US') AS " . $date_field, FALSE);
-		else $this->db->select($date_field);
+		if($date_format){
+			$this->db->select("FORMAT(" . $date_field . ", '" . $date_format . "', 'en-US') AS " . $date_field, FALSE);
+		}
+		else{
+			$this->db->select($date_field);
+		}
 		$this->db
 			->where($this->primary_table_name . '.herd_code', $this->session->userdata('herd_code'))
 			->where($date_field . ' IS NOT NULL')

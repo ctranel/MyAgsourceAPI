@@ -58,12 +58,12 @@ class Filter_model extends Report_Model {
 	 * @return array of filter data for given page
 	 * @author ctranel
 	 **/
-	public function get_page_filters($section_id, $page_url_segment) {
+	public function get_page_filters($section_id, $page_path) {
 		$ret_array = array();
 		$results = $this->{$this->db_group_name}
 		->select('pf.name, pf.type, pf.options_source, pf.default_value, pf.db_field_name')
 		->where('p.section_id', $section_id)
-		->where('p.url_segment', $page_url_segment)
+		->where('p.path', $page_path)
 		->join($this->tables['pages'] . ' p', "pf.page_id = p.id")
 		->order_by('pf.list_order')
 		->get('users.dbo.page_filters pf')

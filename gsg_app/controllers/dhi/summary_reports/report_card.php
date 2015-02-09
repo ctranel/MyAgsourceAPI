@@ -35,10 +35,10 @@ class Report_card extends parent_report {
 	 */
 	 public function ajax_report($page, $block, $output, $sort_by = 'null', $sort_order = 'null', $file_format = 'web', $test_date = FALSE, $report_count=0, $json_filter_data = NULL, $first=FALSE, $cache_buster = NULL) {//, $herd_size_code = FALSE, $all_breeds_code = FALSE
 		if(strpos($page, '_long') === FALSE){
-		 	$this->{$this->primary_model}->historical(false);
+		 	$this->{$this->primary_model_name}->historical(false);
 		}
 		else{
-		 	$this->{$this->primary_model}->historical(true);
+		 	$this->{$this->primary_model_name}->historical(true);
 		}
 		parent::ajax_report($page, $block, $output, $sort_by, $sort_order, $file_format, $test_date, $report_count, $json_filter_data, $first);
 	 }

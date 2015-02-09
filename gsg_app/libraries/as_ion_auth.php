@@ -103,7 +103,7 @@ class As_ion_auth extends Ion_auth {
 		
 		if($this->logged_in()){
 			$this->arr_task_permissions = $this->ion_auth_model->getTaskPermissions();
-
+			//retrieve navigation data
 			//set supersection if there is one
 			$section_path = $this->router->fetch_class(); //this should match the name of this file (minus ".php".  Also used as base for css and js file names and model directory name
 			$control_dir = $this->router->fetch_directory();

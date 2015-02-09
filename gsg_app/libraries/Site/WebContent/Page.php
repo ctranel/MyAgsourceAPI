@@ -17,6 +17,7 @@ use myagsource\dhi\Herd;
 * Description:  Contains properties and methods specific to displaying sections of the website.
 *
 * @todo: this library will be the basis for pages, blocks, etc, and will eventually have an abstract and/or interface to reflect the commonalities
+* @todo: add filters?
 *
 */
 
