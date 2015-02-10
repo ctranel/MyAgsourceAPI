@@ -252,7 +252,9 @@ echo "group_by <br>";
 	
 	//xaxis
 	protected function xaxis(){
-		if(empty($this->input->post('xaxis_field')) && empty($this->input->post('xaxis_label'))){
+		$xaxis_field = $this->input->post('xaxis_field');
+		$xaxis_label = $this->input->post('xaxis_label');
+		if(empty($xaxis_field) && empty($xaxis_label)){
 			return false;
 		}
 		$arr_xaxis_data[] = array(

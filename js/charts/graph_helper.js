@@ -74,6 +74,7 @@ function updateBlock(container_div_id, block_in, block_index, sort_field, sort_o
 			load_chart(site_url + 'report_block/ajax_report/' + encodeURIComponent(base_url.replace(/\//g, '|')) + '/' + encodeURIComponent(block_in) + '/' + display + '/' + encodeURIComponent(sort_field) + '/' + sort_order + '/web/null/' + block_index + '/' + params + '/' + first + '/' + cache_bust, container_div_id, block_index, params);
 			break;
 	}
+	setFixedNav();
 	return false;
 }
 
@@ -287,10 +288,9 @@ function process_chart(div_id, data_in){
 			if(typeof pre_render == 'function'){
 				options = pre_render(options, section_data);
 			}
-//console.log(JSON.stringify(options));
 			chart[block_index] = new Highcharts.Chart(options);
-			while(chart[block_index].series.length > count){//(Object.size(chart[block_index].series) > count){
-				chart[block_index].series[count].remove(true);
+			while(chart[block_index].series.length > options.series.length){//(Object.size(chart[block_index].series) > count){
+				chart[block_index].series[chart[block_index].series.length].remove(true);
 			}
 		}
 		if(typeof(section_data) == "object" && typeof post_render == 'function'){
@@ -332,6 +332,7 @@ function process_table(div_id, block_index, table_data){
 		}, 0);
 		//attach events to new data fields and table headers (needs to be below fixed header)
 		attachDataFieldEvents();
+		setFixedNav();
 	}
 
 	$('#waiting-icon' + block_index).hide();

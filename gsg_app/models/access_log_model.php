@@ -69,7 +69,10 @@ class Access_log_model extends Report_Model {
 			$this->db->where('herd_code', $herd_code);
 		}
 		if(isset($report_code) && !empty($report_code)){
-			$this->db->where('report_code', $report_code);
+			if(!is_array($report_code)){
+				$report_code = array($report_code);
+			}
+			$this->db->where_in('report_code', $report_code);
 		}
 		
 		$results = $this->db

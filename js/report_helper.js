@@ -24,6 +24,12 @@ if($('#filter-form')){ //if there is a filter form (only on pages with one table
 	});
 }
 
+head.ready(function() {
+	if ($('.hasDatepicker').length > 0){
+		$('.hasDatepicker').datepick({dateFormat: 'mm-dd-yyyy'});
+	}
+});
+
 
 
 
