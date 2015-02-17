@@ -1,10 +1,11 @@
 <?php
 
-namespace libraries\Report\Content;
+namespace myagsource\Report\Content;
 
 //require_once APPPATH . 'libraries/Site/iWebContentRepository.php';
+require_once APPPATH . 'libraries/Report/Content/BlockField.php';
 
-use myagsource\Report\Content\BlockField;
+use \myagsource\Report\Content\BlockField;
 
 /**
  * Name:  TableField
@@ -24,28 +25,28 @@ class TableField extends BlockField {
 	protected $header_group_id;
 
 	/**
-	 * a_href
-	 * @var string
+	 * link
+	 * @var Link
 	 **/
-	protected $a_href;
+	protected $link;
 
 	/**
 	 * a_title
 	 * @var string
-	 **/
 	protected $a_title;
+	 **/
 
 	/**
 	 * a_rel
 	 * @var string
-	 **/
 	protected $a_rel;
+	 **/
 
 	/**
 	 * a_class
 	 * @var string
-	 **/
 	protected $a_class;
+	 **/
 
 	/**
 	 */

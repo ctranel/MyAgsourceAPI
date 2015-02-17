@@ -1,5 +1,5 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
-class Block_model extends CI_Model {
+class report_block_model extends CI_Model {
 	public function __construct(){
 		parent::__construct();
 		$this->db_group_name = 'default';
@@ -55,11 +55,47 @@ class Block_model extends CI_Model {
 	}
 	
 	/**
+	 * @method getSortData()
+	 * @param int block id
+	 * @return returns multi-dimensional array, arr_sort_by field data and arr_sort_order
+	 * @author ctranel
+	 **/
+	public function getSortData($block_id){
+		return $this->{$this->db_group_name}
+			->select("f.id AS db_field_id, f.db_table_id, f.db_field_name
+				, f.name, f.description, f.pdf_width, f.default_sort_order, f.data_type, f.is_timespan_field as is_timespan
+				, f.is_natural_sort, is_fk_field AS is_foreign_key, f.is_nullable, f.decimal_points AS decimal_scale, f.unit_of_measure, f.data_type as datatype, f.max_length, s.sort_order")
+			->join('users.dbo.blocks_sort_by s', 'b.id = s.block_id AND b.id = ' . $block_id, 'inner')
+			->join('users.dbo.db_fields f', 's.field_id = f.id' , 'inner')
+//			->join('users.dbo.db_tables t', 'f.db_table_id = t.id', 'inner')
+//			->join('users.dbo.db_databases d', 't.database_id = d.id' , 'inner')
+			->order_by('s.list_order', 'asc')
+			->get($this->tables['blocks'] . ' b')
+			->result_array();
+	}
+	
+	/**
+	 * @method getFieldData()
+	 * @param string block url segment
+	 * @return returns multi-dimensional array, one row for each field
+	 * @author ctranel
+	 **/
+	public function getFieldData($block_id){
+		return $this->{$this->db_group_name}
+			->select("bsf_id AS id, db_field_id, table_name, db_field_name, name, description, pdf_width, default_sort_order, data_type as datatype, max_length, 
+					decimal_points AS decimal_scale, unit_of_measure, is_timespan_field as is_timespan, is_fk_field AS is_foreign_key, is_nullable, is_natural_sort,
+					display AS displayed, a_href, a_rel, a_title, a_class, head_a_href, head_a_rel, head_a_title, head_a_class, head_supp_id, head_comment")
+			->where('block_id', $block_id)
+			->order_by('list_order')
+			->get('users.dbo.v_block_field_data')
+			->result_array();
+	}
+	
+	/**
 	 * get_block_links
 	 * @param int section id
 	 * @return array of block info keyed by path
 	 * @author ctranel
-	 **/
 	public function getCompleteData() {
 		$arr_return = array();
 		if(isset($section_id)) $this->{$this->db_group_name}->where('p.section_id', $section_id);
@@ -116,6 +152,7 @@ class Block_model extends CI_Model {
 		}
 		else return FALSE;
 	}
+	 **/
 	
 /***  CHART *****************************************************/
 	

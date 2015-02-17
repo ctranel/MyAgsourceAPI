@@ -2,9 +2,14 @@
 
 namespace myagsource\Report\Content;
 
+require_once APPPATH . 'libraries/Datasource/DbObjects/DbField.php';
 require_once APPPATH . 'libraries/Report/Content/Block.php';
+require_once APPPATH . 'libraries/Report/Content/ChartField.php';
 
-use myagsource\Report\Content\Block;
+//use \myagsource\Datasource\DbObjects\DbTable;
+use \myagsource\Datasource\DbObjects\DbField;
+use \myagsource\Report\Content\Block;
+use \myagsource\Report\Content\ChartField;
 
 /**
  * Name:  ChartBlock
@@ -37,9 +42,12 @@ class ChartBlock extends Block {
 		
 	/**
 	 */
-	function __construct() {
+	function __construct($block_datasource, $id, $page_id, $name, $description, $scope, $active, $path, $max_rows, $cnt_row, 
+			$sum_row, $avg_row, $bench_row, $is_summary, $display_type) {
+		parent::__construct($block_datasource, $id, $page_id, $name, $description, $scope, $active, $path, $max_rows, $cnt_row, 
+			$sum_row, $avg_row, $bench_row, $is_summary, $display_type);
 	}
-	
+		
 	/**
 	 * (non-PHPdoc)
 	 *
@@ -47,6 +55,29 @@ class ChartBlock extends Block {
 	 *
 	 */
 	public function children() {
+	}
+	
+	/**
+	 * setReportFields
+	 * 
+	 * Sets the datafields property of datafields that are to be included in the block
+	 * 
+	 * @method setReportFields()
+	 * @return void
+	 * @access public
+	 **/
+	public function setReportFields(\myagsource\Supplemental\SupplementalFactory $supp_factory = null){
+		$this->report_fields = new \SplObjectStorage();
+			
+		$arr_ret = array();
+		$arr_res = $this->datasource->getFieldData($this->id);
+		if(is_array($arr_res)){
+			foreach($arr_res as $s){
+				$datafield = new DbField($s['db_field_id'], $s['table_name'], $s['db_field_name'], $s['name'], $s['description'], $s['pdf_width'], $s['default_sort_order'],
+						 $s['datatype'], $s['max_length'], $s['decimal_scale'], $s['unit_of_measure'], $s['is_timespan'], $s['is_foreign_key'], $s['is_nullable'], $s['is_natural_sort']);
+				$this->report_fields->attach(new ChartField($s['id'], $s['name'], $datafield, $s['displayed']));
+			}
+		}
 	}
 	
 	public function loadData(&$arr_this_block, $report_count){

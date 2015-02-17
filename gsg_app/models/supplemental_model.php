@@ -47,7 +47,10 @@
 			->where('sl.content_type_id IS NULL')
 			->get('users.dbo.supp_comments sc')
 			->result_array();
-		return $ret;
+		if(is_array($ret) && !empty($ret)){
+			return $ret[0];
+		}
+		return false;
 	}
 	
 	/* -----------------------------------------------------------------
@@ -70,7 +73,10 @@
 		->where('content_id', $content_id)
 		->get('users.dbo.supp_links')
 		->result_array();
-		return $ret;
+		if(is_array($ret) && !empty($ret)){
+			return $ret[0];
+		}
+		return false;
 	}
 	
 	

@@ -1,9 +1,9 @@
 <?php
-namespace myagsource\supplemental;
+namespace myagsource\Supplemental\Content;
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-require_once(APPPATH . 'libraries' . FS_SEP . 'supplemental' . FS_SEP . 'SupplementalLinkParam.php');
-//require_once(APPPATH . 'libraries' . FS_SEP . 'MyaObjectStorage.php');
+require_once(APPPATH . 'libraries/Supplemental/Content/SupplementalLinkParam.php');
+//require_once(APPPATH . 'libraries/MyaObjectStorage.php');
 //use \myagsource\MyaObjectStorage;
 
 
@@ -74,7 +74,7 @@ class SupplementalLink extends \SplObjectStorage
 	 * @return void
 	 * @author ctranel
 	 **/
-	public function __construct($site_url, $id, $href, $rel, $title, $class, \SplObjectStorage $params){
+	public function __construct($site_url, $id, $href, $rel, $title, $class, \SplObjectStorage $params = null){
 		$this->site_url = $site_url;
 		$this->id = $id;
 		$this->href = $href;
@@ -231,5 +231,22 @@ class SupplementalLink extends \SplObjectStorage
 			}
 		}
 		return $ret;
+	}
+
+	/* -----------------------------------------------------------------
+	 *  Factory function, takes a dataset and returns supplemental link objects
+
+	 *  Factory function that takes a dataset array and returns object storage of 
+	 *  supplemental link objects
+
+	 *  @author: ctranel
+	 *  @date: Feb 17, 2015
+	 *  @param: supplemental_model $datasource
+	 *  @return: void
+	 *  @throws: 
+	 * -----------------------------------------------------------------*/
+	 public function setParams(\supplemental_model $datasource) {
+		$param_data = $datasource->getLinkParams($this->id);
+		$params = SupplementalLinkParam::datasetToObjects($param_data);
 	}
 }

@@ -1,5 +1,5 @@
 <?php
-namespace libraries\Report\Content;
+namespace myagsource\Report\Content;
 
 /**
  * Name:  YAxis

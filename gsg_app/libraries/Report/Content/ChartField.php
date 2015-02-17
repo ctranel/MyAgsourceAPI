@@ -1,10 +1,11 @@
 <?php
 
-namespace libraries\Report\Content;
+namespace myagsource\Report\Content;
 
 //require_once APPPATH . 'libraries/Site/iWebContentRepository.php';
+require_once APPPATH . 'libraries/Report/Content/BlockField.php';
 
-use myagsource\Report\Content\BlockField;
+use \myagsource\Report\Content\BlockField;
 
 /**
  * Name:  ChartField

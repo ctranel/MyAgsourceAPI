@@ -1,5 +1,5 @@
 <?php
-namespace libraries\Report\Content;
+namespace myagsource\Report\Content;
 
 /**
  * Name:  BlockField
@@ -20,7 +20,7 @@ abstract class BlockField {
 	
 	/**
 	 * db_field
-	 * @var DbField
+	 * @var iDataField
 	 **/
 	protected $db_field;
 
@@ -31,15 +31,15 @@ abstract class BlockField {
 	protected $name;
 		
 	/**
-	 * display
+	 * displayed
 	 * @var boolean
 	 **/
-	protected $display;
+	protected $displayed;
 	
 	
 	/**
 	 */
-	function __construct() {
+	function __construct($id, $name, iDataField $data_field, $displayed) {
 	}
 }
 

@@ -1,11 +1,11 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-require_once(APPPATH . 'libraries/supplemental/Supplemental.php');
+require_once(APPPATH . 'libraries/Supplemental/Content/SupplementalFactory.php');
 require_once(APPPATH . 'libraries/Site/WebContent/Sections.php');
 require_once(APPPATH . 'libraries/Site/WebContent/Pages.php');
 require_once(APPPATH . 'libraries/Site/WebContent/Blocks.php');
 
-use \myagsource\supplemental\Supplemental;
+use \myagsource\Supplemental\Content\SupplementalFactory;
 use \myagsource\Site\WebContent\Sections;
 use \myagsource\Site\WebContent\Pages;
 use \myagsource\Site\WebContent\Blocks;
@@ -157,7 +157,6 @@ class Report_model extends CI_Model {
 	 * @param string block url segment
 	 * @return returns multi-dimensional array, arr_sort_by and arr_sort_order
 	 * @author ctranel
-	 **/
 	function get_default_sort($block_path){
 		$arr_ret = array();
 		$arr_res = $this->{$this->db_group_name}
@@ -177,6 +176,7 @@ class Report_model extends CI_Model {
 		}
 		return $arr_ret;
 	}
+	 **/
 	
 	/**
 	 * @method get_group_by_fields()
@@ -231,7 +231,6 @@ class Report_model extends CI_Model {
 	 * @abstract populates report-specific object variable arrays (from DB)
 	 * @return void
 	 * @author ctranel
-	 **/
 	public function populate_field_meta_arrays($block_in){
 		$arr_numeric_types = array('bigint','decimal','int','money','smallmoney','numeric','smallint','tinyint','float','real');
 		$arr_field_child = array();
@@ -256,11 +255,12 @@ class Report_model extends CI_Model {
 				$arr_field_child[$fd['block_header_group_id']][$fd['name']] = $fn; //used to create arr_fields nested array
 				$this->arr_field_sort[$fn] = $fd['default_sort_order'];
 
-				//supplemental data
+//SUPPLEMENTAL DATA
 				$this->load->model('supplemental_model');
 				//column data
 				$block_supp = Supplemental::getColDataSupplemental($fd['bsf_id'], $this->supplemental_model, site_url());
 				$this->arr_field_links[$fn] = $block_supp->getContent();
+				//add fields included in the supplemental parameters to the field list used for composing select queries (not displayed)
 				foreach($block_supp->supplementalLinks() as $s){
 					foreach($s->params() as $p){
 						if(!in_array($p->value_db_field_name(), $this->arr_db_field_list)){
@@ -271,7 +271,7 @@ class Report_model extends CI_Model {
 				//column header
 				$block_supp = Supplemental::getColHeaderSupplemental($fd['bsf_id'], $this->supplemental_model, site_url());
 				$this->arr_header_links[$fn] = $block_supp->getContent();
-				//end supplemental
+//END SUPPLEMENTAL DATA
 				
 				$this->arr_pdf_widths[$fn] = $fd['pdf_width'];
 				$this->arr_aggregates[] = $fd['aggregate'];
@@ -295,21 +295,6 @@ class Report_model extends CI_Model {
 		 }
 		 else($this->arr_fields = $arr_field_child);
 
-/*		KEEPING THIS AROUND IN CASE THE NEED FOR THE 'arr_order' FUNCTIONALITY ARISES
-		if(is_array($arr_field_child) && !empty($arr_field_child)){
-			foreach($arr_field_child as $k=>$fc){
-				// individually insert each field that does not have a parent
-				if(empty($k)){
-					foreach($fc as $k1=>$fc1){
-						$tmp = isset($header_data['arr_ref'][$k1]) ? $header_data['arr_ref'][$k1] : NULL;
-						set_element_by_key($this->arr_fields, $tmp, array($k1 => $fc1), $header_data['arr_order']);
-					} 
-				}
-				else{
-					set_element_by_key($this->arr_fields, $header_data['arr_ref'][$k], $fc, $header_data['arr_order']);
-				}
-			}
-		} */
 		if(is_array($arr_table_ref_cnt) && count($arr_table_ref_cnt) >  1){
 			foreach($arr_table_ref_cnt as $t => $cnt){
 				if($t != $this->primary_table_name){
@@ -318,6 +303,7 @@ class Report_model extends CI_Model {
 			}
 		}
 	}
+	 **/
 	
 	/**
 	 * @method get_select_field_structure()

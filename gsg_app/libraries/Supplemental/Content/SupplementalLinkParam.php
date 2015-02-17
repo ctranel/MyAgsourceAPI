@@ -1,5 +1,5 @@
 <?php
-namespace myagsource\supplemental;
+namespace myagsource\Supplemental\Content;
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 //require_once(APPPATH . 'libraries' . FS_SEP . 'MyaObjectStorage.php');

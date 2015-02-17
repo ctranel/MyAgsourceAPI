@@ -1,54 +1,47 @@
 <?php
-namespace myagsource\db_objects;
+namespace myagsource\Datasource\DbObjects;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+
 /* -----------------------------------------------------------------
- *  Library for db tables
+ *  Library for db column
  *
- *  Library for db tables
+ *  Library for db column
  *
  *  @category: 
  *  @package: 
  *  @author: ctranel
- *  @date: May 19, 2014
+ *  @date: June 10, 2014
  *  @version: 1.0
  * -----------------------------------------------------------------
  */
  
- class db_table {
- 	/**
-	 * database name
+ class db_column {
+  	/**
+	 * column_name
 	 * @var string
 	 **/
-	protected $database_name;
-
- 	/**
-	 * schema name
-	 * @var string
-	 **/
-	protected $schema_name;
-
+	protected $column_name;
+	
 	/**
-	 * table name
+	 * data_type
 	 * @var string
 	 **/
-	protected $table_name;
+	protected $data_type;
 
  	/**
-	 * db_table_model
-	 * @var object
+	 * char_length
+	 * @var int
 	 **/
-	protected $db_table_model;
+	protected $char_length;
 	
  	/**
-	 * arr_fields
-	 * @var array of field objects
+	 * precision
+	 * @var int
 	 **/
-	protected $arr_fields;
+	protected $precision;
 	
-	public function __construct($full_table_name, $db_table_model){
-		list($this->database_name, $this->schema_name, $this->table_name) = explode('.', $full_table_name);
-		$this->db_table_model = $db_table_model;
+	public function __construct(){
 	}
 
 	/**
@@ -63,11 +56,6 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 	*  @throws:
 	 **/
 	public function field_exists($col_name){
-		//require_once APPPATH . 'helpers/multid_array_helper.php';
-		if(!isset($this->arr_fields)){
-			$this->arr_fields = $this->db_table_model->get_columns($this->database_name, $this->table_name);
-		}
-		return (bool)array_search_recursive($col_name, $this->arr_fields);
 	}
 	
 	/* -----------------------------------------------------------------
@@ -83,13 +71,13 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 	*  @return: bool / string
 	*  @throws:
 	* -----------------------------------------------------------------*/
-	function full_table_name($value = null) {
+	function table_name($value = null) {
 		if(isset($value)){
-			list($this->database_name, $this->schema_name, $this->table_name) = explode('.', $full_table_name);
+			$this->table_name = $value;
 			return true;
 		}
 		if(isset($this->table_name)){
-			return $this->database_name . '.' . $this->schema_name . '.' . $this->table_name;
+			return $this->table_name;
 		}
 		return false;
 	}

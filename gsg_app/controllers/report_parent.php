@@ -3,7 +3,7 @@
 require_once(APPPATH . 'libraries/filters/Filters.php');
 require_once(APPPATH . 'libraries/benchmarks_lib.php');
 require_once(APPPATH . 'libraries/access_log.php');
-require_once(APPPATH . 'libraries/supplemental/Supplemental.php');
+require_once(APPPATH . 'libraries/Supplemental/Content/SupplementalFactory.php');
 require_once(APPPATH . 'libraries/dhi/HerdAccess.php');
 require_once(APPPATH . 'libraries/dhi/herd.php');
 require_once(APPPATH . 'libraries/Site/WebContent/Sections.php');
@@ -13,7 +13,7 @@ require_once(APPPATH . 'libraries/Site/WebContent/Blocks.php');
 use \myagsource\settings\Benchmarks_lib;
 use \myagsource\Access_log;
 use \myagsource\report_filters\Filters;
-use \myagsource\supplemental\Supplemental;
+use \myagsource\Supplemental\Content\SupplementalFactory;
 use \myagsource\dhi\HerdAccess;
 use \myagsource\dhi\Herd;
 use \myagsource\Site\WebContent\Sections;

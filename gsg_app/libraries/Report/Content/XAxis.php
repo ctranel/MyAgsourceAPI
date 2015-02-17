@@ -1,5 +1,5 @@
 <?php
-namespace libraries\Report\Content;
+namespace myagsource\Report\Content;
 
 /**
  * Name:  XAxis
@@ -20,7 +20,7 @@ class XAxis {
 	
 	/**
 	 * db_field
-	 * @var DbField
+	 * @var iDataField
 	 **/
 	protected $db_field;
 

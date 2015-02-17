@@ -2,19 +2,22 @@
 //namespace myagsource;
 require_once(APPPATH . 'libraries/filters/Filters.php');
 require_once(APPPATH . 'libraries/benchmarks_lib.php');
-require_once(APPPATH . 'libraries/supplemental/Supplemental.php');
+require_once(APPPATH . 'libraries/Supplemental/Content/SupplementalFactory.php');
 require_once(APPPATH . 'libraries/dhi/HerdAccess.php');
 require_once(APPPATH . 'libraries/dhi/herd.php');
 require_once(APPPATH . 'libraries/Report/Content/Blocks.php');
+require_once(APPPATH . 'libraries/Site/WebContent/Blocks.php');
+require_once(APPPATH . 'libraries/Site/WebContent/Pages.php');
 require_once(APPPATH . 'libraries/Site/WebContent/Sections.php');
 
 use \myagsource\settings\Benchmarks_lib;
 use \myagsource\report_filters\Filters;
-use \myagsource\supplemental\Supplemental;
+use \myagsource\Supplemental\Content\SupplementalFactory;
 use \myagsource\dhi\HerdAccess;
 use \myagsource\dhi\Herd;
 use \myagsource\Site\WebContent\Sections;
-//use \myagsource\Site\WebContent\Pages;
+use \myagsource\Site\WebContent\Pages;
+use \myagsource\Site\WebContent\Blocks as WebBlocks;
 use \myagsource\Report\Content\Blocks;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
@@ -88,10 +91,9 @@ class report_block extends CI_Controller {
 	function __construct(){
 		parent::__construct();
 		$this->load->model('herd_model');
-		$this->load->model('web_content/section_model');
-//		$this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
-		$this->load->model('web_content/block_model');
-		$this->blocks = new Blocks($this->block_model);
+		$this->load->model('supplemental_model');
+		$this->load->model('ReportContent/report_block_model');
+		$this->blocks = new Blocks($this->report_block_model, new SupplementalFactory($this->supplemental_model, site_url()));
 //		$this->pages = new Pages($this->page_model, $this->blocks);
 //		$sections = new Sections($this->section_model, $this->pages);
 
@@ -192,13 +194,7 @@ class report_block extends CI_Controller {
 		$path_page_segment = $arr_path[count($arr_path) - 1];
 		$tmp_path = $page_path . $block_name;
 		
-		
-//		$arr_path = explode('/', $page_path);
-//var_dump($arr_path);		
-		
 		$this->herd_code = strlen($this->session->userdata('herd_code')) == 8?$this->session->userdata('herd_code'):NULL;
-//		$this->page_header_data['user_sections'] = $this->as_ion_auth->top_sections;
-//		$this->page_header_data['num_herds'] = $this->herd_access->getNumAccessibleHerds($this->session->userdata('user_id'), $this->as_ion_auth->arr_task_permissions(), $this->session->userdata('arr_regions'));
 		
 		//Load the most specific model that exists
 		while(strpos($tmp_path, '/') !== false){
@@ -216,13 +212,37 @@ class report_block extends CI_Controller {
 			$this->load->model('report_model', '', FALSE, $this->section_path);
 		}
 
+		
+		
+		//SUPPLEMENTAL DATA
+//set keyed array with all supplemental data for the block (bsf_id as key supplemental, with df_field id for params)?
+//All supp data is also included in block field data view.
+		$this->load->model('supplemental_model');
+		$supp_factory = new SupplementalFactory($this->supplemental_model, site_url());
+		//column data
+		//$block_supp = Supplemental::getColDataSupplemental($fd['bsf_id'], $this->supplemental_model, site_url());
+		
+		
+		//$this->arr_field_links[$fn] = $block_supp->getContent();
+		//add fields included in the supplemental parameters to the field list used for composing select queries (not displayed)
+//		foreach($block_supp->supplementalLinks() as $s){
+//			foreach($s->params() as $p){
+//				if(!in_array($p->value_db_field_name(), $this->arr_db_field_list)){
+//					$this->arr_db_field_list[] = $p->value_db_field_name();
+//				}
+//			}
+//		}
+		//column header
+		//$block_supp = Supplemental::getColHeaderSupplemental($fd['bsf_id'], $this->supplemental_model, site_url());
+		//$this->arr_header_links[$fn] = $block_supp->getContent();
+		//END SUPPLEMENTAL DATA
+				
 		//verify user has permission to view content for given herd
 		if($this->authorize()) {
 			$this->load->library('reports');
 			$this->reports->herd_code = $this->herd_code;
 		}
 		
-		$first = ($first === 'true');
 		//$this->page = $this->pages->getByPath(urldecode($page_name));
 
 		$block = $this->blocks->getByPath(urldecode($block_name));
@@ -236,12 +256,12 @@ class report_block extends CI_Controller {
 			$this->arr_sort_order = explode('|', $sort_order);
 		}
 		else {
-			$this->arr_sort_by = $block->default_sort_field();
-			$this->arr_sort_order = $block->default_sort_order();
+			$this->arr_sort_by = $block->sortFieldNames();
+			$this->arr_sort_order = $block->sortOrders();
 		}
 		
 		if(isset($json_filter_data)){
-			$section = $this->getSection($arr_path);
+			$section = $this->getSection($this->section_path);
 			$arr_params = (array)json_decode(urldecode($json_filter_data));
 			if(isset($arr_params['csrf_test_name']) && $arr_params['csrf_test_name'] != $this->security->get_csrf_hash()) die("I don't recognize your browser session, your session may have expired, or you may have cookies turned off.");
 			unset($arr_params['csrf_test_name']);
@@ -253,26 +273,25 @@ class report_block extends CI_Controller {
 			$primary_table = $this->{$this->primary_model_name}->get_primary_table_name();
 			$this->load->helper('multid_array_helper');
 			$this->filters->set_filters(
-					$this->section->id(),
+					$section->id(),
 					$path_page_segment,
 					array('herd_code' => $this->session->userdata('herd_code')) + $arr_params
 			);
 		}
-		//supplemental data
+		// block-level supplemental data
 		$this->load->model('supplemental_model');
-		$block_supp = Supplemental::getBlockSupplemental($block->id(), $this->supplemental_model, site_url());
+		$block_supp = $supp_factory->getBlockSupplemental($block->id(), $this->supplemental_model, site_url());
 		$this->supplemental = $block_supp->getContent();
 		//end supplemental
 
-		$this->json = NULL;
+		$this->json = $block->loadData($report_count);
 		
-		$this->json['supplemental'] = $this->supplemental;
+		//$this->json['supplemental'] = $this->supplemental;
 		$this->display = $output;
 		//set parameters for given block
 		
-		$block->loadData($report_count, $file_format);
-
 		//common functionality
+		$first = ($first === 'true');
 		if($file_format == 'csv'){
 			if($first){
 				$this->_record_access(90, 'csv', $this->config->item('product_report_code'));
@@ -312,10 +331,15 @@ class report_block extends CI_Controller {
 
 	protected function getSection($arr_path){
 		//get section
-		unset($arr_path[count($arr_path) - 1]);
-		$section_path = implode('/', $arr_path);
-		$sections = new Sections();
-		$section = $sections->getByPath($section_path);
+		//unset($arr_path[count($arr_path) - 1]);
+		$this->load->model('web_content/section_model');
+		$this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
+		$this->load->model('web_content/block_model', 'WebBlockModel');
+		$web_blocks = new WebBlocks($this->WebBlockModel);
+		$pages = new Pages($this->page_model, $web_blocks);
+		//$section_path = implode('/', $arr_path);
+		$sections = new Sections($this->section_model, $pages);
+		$section = $sections->getByPath($this->section_path);
 		return $section;
 	}
 /*		

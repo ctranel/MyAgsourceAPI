@@ -2,10 +2,14 @@
 
 namespace myagsource\Report\Content;
 
-require_once APPPATH . 'libraries/db_objects/DbTable.php';
+//require_once APPPATH . 'libraries/Datasource/DbObjects/DbTable.php';
+require_once APPPATH . 'libraries/Datasource/DbObjects/DbField.php';
+require_once APPPATH . 'libraries/Report/Content/TableField.php';
 require_once APPPATH . 'libraries/Report/Content/Block.php';
 
-use \myagsource\db_objects\DbTable;
+//use \myagsource\Datasource\DbObjects\DbTable;
+use \myagsource\Datasource\DbObjects\DbField;
+use \myagsource\Report\Content\TableField;
 use \myagsource\Report\Content\Block;
 
 /**
@@ -22,7 +26,57 @@ class TableBlock extends Block {
 	
 	/**
 	 */
-	function __construct() {
+	function __construct($block_datasource, $id, $page_id, $name, $description, $scope, $active, $path, $max_rows, $cnt_row, 
+			$sum_row, $avg_row, $bench_row, $is_summary, $display_type, \myagsource\Supplemental\Content\SupplementalFactory $supp_factory = null) {
+		parent::__construct($block_datasource, $id, $page_id, $name, $description, $scope, $active, $path, $max_rows, $cnt_row, 
+			$sum_row, $avg_row, $bench_row, $is_summary, $display_type, $supp_factory);
+	}
+	
+	/**
+	 * setReportFields
+	 * 
+	 * Sets the datafields property of datafields that are to be included in the block
+	 * 
+	 * @method setReportFields()
+	 * @return void
+	 * @access public
+	 **/
+	public function setReportFields(\myagsource\Supplemental\Content\SupplementalFactory $supp_factory = null){
+		$this->report_fields = new \SplObjectStorage();
+			
+		$arr_ret = array();
+		$arr_res = $this->datasource->getFieldData($this->id);
+		if(is_array($arr_res)){
+			$header_supp = null;
+			$data_supp = null;
+			foreach($arr_res as $s){
+				if(isset($supp_factory)){
+					$header_supp = $supp_factory->getColHeaderSupplemental($s['id'], $s['head_a_href'], $s['head_a_rel'], $s['head_a_title'], $s['head_a_class'], $s['head_comment']);
+					$data_supp = $supp_factory->getColDataSupplemental($s['id'], $s['a_href'], $s['a_rel'], $s['a_title'], $s['a_class']);
+				}
+				$datafield = new DbField($s['db_field_id'], $s['table_name'], $s['db_field_name'], $s['name'], $s['description'], $s['pdf_width'], $s['default_sort_order'],
+						 $s['datatype'], $s['max_length'], $s['decimal_scale'], $s['unit_of_measure'], $s['is_timespan'], $s['is_foreign_key'], $s['is_nullable'], $s['is_natural_sort']);
+				$this->report_fields->attach(new TableField($s['id'], $s['name'], $datafield, $header_supp, $data_supp, $s['displayed']));
+			}
+		}
+		
+
+				
+/*				//column data
+				$block_supp = Supplemental::getColDataSupplemental($fd['bsf_id'], $this->supplemental_model, site_url());
+				$this->arr_field_links[$fn] = $block_supp->getContent();
+				//add fields included in the supplemental parameters to the field list used for composing select queries (not displayed)
+				foreach($block_supp->supplementalLinks() as $s){
+					foreach($s->params() as $p){
+						if(!in_array($p->value_db_field_name(), $this->arr_db_field_list)){
+							$this->arr_db_field_list[] = $p->value_db_field_name();			
+						}
+					}
+				}
+				//column header
+				$block_supp = Supplemental::getColHeaderSupplemental($fd['bsf_id'], $this->supplemental_model, site_url());
+				$this->arr_header_links[$fn] = $block_supp->getContent();
+*/
 	}
 	
 	/**
@@ -32,9 +86,7 @@ class TableBlock extends Block {
 	 *
 	 */
 	protected function loadData($report_count){
-		$title = $arr_this_block['description'];
-		$subtitle = $this->filters->get_filter_text();
-		$this->{$this->primary_model_name}->populate_field_meta_arrays($arr_this_block['id']);
+		//$this->{$this->primary_model_name}->populate_field_meta_arrays($arr_this_block['id']);
 		$arr_field_list = $this->{$this->primary_model_name}->get_fieldlist_array();
 		$results = $this->{$this->primary_model_name}->search($this->session->userdata('herd_code'), $arr_this_block['path'], $this->filters->criteriaKeyValue(), $this->arr_sort_by, $this->arr_sort_order, $this->max_rows);
 		if($this->bench_row){
