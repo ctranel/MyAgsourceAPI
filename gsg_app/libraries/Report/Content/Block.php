@@ -10,6 +10,8 @@ use \myagsource\Site\iBlock;
 use \myagsource\dhi\Herd;
 use \myagsource\Report\Content\Sort;
 use \myagsource\Datasource\DbObjects\DbField;
+use \myagsource\Supplemental\Content\SupplementalFactory;
+
 /**
 * Name:  Block
 *
@@ -53,12 +55,6 @@ abstract class Block implements iBlock {
 	protected $path;
 	
 	/**
-	 * primary table name
-	 * @var string
-	 **/
-	protected $primary_table_name;
-	
-	/**
 	 * collection of ReportField objects
 	 * @var SplObjectStorage
 	 **/
@@ -92,7 +88,7 @@ abstract class Block implements iBlock {
 	 * iDataField object
 	 * @var iDataField
 	 **/
-	protected $pivot_db_field;
+	protected $pivot_field;
 	
 	/**
 	 * max_rows
@@ -137,6 +133,12 @@ abstract class Block implements iBlock {
 	protected $is_summary;
 	
 	/**
+	 * has_aggregate
+	 * @var boolean
+	 **/
+	protected $has_aggregate;
+	
+	/**
 	 * scope
 	 * @var string
 	 **/
@@ -147,6 +149,20 @@ abstract class Block implements iBlock {
 	 * @var boolean
 	 **/
 	protected $active;
+	
+	//@todo: below should be in BlockData?
+	
+	/**
+	 * primary_table_name
+	 * @var string
+	 **/
+	protected $primary_table_name;
+	
+	/**
+	 * joins
+	 * @var Joins
+	 **/
+	protected $joins;
 	
 	
 /**
@@ -170,7 +186,7 @@ abstract class Block implements iBlock {
 		$this->sum_row = $sum_row;
 		$this->avg_row = $avg_row;
 		$this->bench_row = $bench_row;
-		//$this->pivot_db_field = $pivot_db_field;
+		//$this->pivot_field = $pivot_field;
 		$this->is_summary = $is_summary;
 		//$this->group_by_fields = $group_by_fields;
 		//$this->where_fields = $group_by_fields;
@@ -198,10 +214,56 @@ abstract class Block implements iBlock {
 		return $this->description;
 	}
 
+	public function pivotFieldName(){
+		return $this->pivot_field->dbFieldName();
+	}
+
+	public function primaryTableName(){
+		return $this->primary_table_name;
+	}
+
+	public function joins(){
+		return $this->joins;
+	}
+
 	public function subtitle(){
 		return $this->filters->get_filter_text();
 	}
 
+	public function hasBenchmarks(){
+		return $this->bench_row;
+	}
+
+	public function hasAvgRow(){
+		return $this->avg_row;
+	}
+
+	public function hasSumRow(){
+		return $this->sum_row;
+	}
+	
+	public function ReportFields(){
+		return $this->report_fields;
+	}
+
+	/**
+	 * @method sortText()
+	 * @return string sort text
+	 * @access public
+	* */
+	public function sortText($is_verbose = false){
+		$ret = '';
+		$is_first = true;
+		if(isset($this->sorts) && count($this->sorts) > 0){
+			foreach($this->sorts as $s){
+				$ret .= $is_verbose ? $s->sort_text($is_first) : $s->sort_text_brief($is_first);
+				$is_first = false;
+			}
+		}
+		
+		return $ret;
+	}
+	
 	/**
 	 * @method sortFieldNames()
 	 * @return ordered array of field names
@@ -218,6 +280,111 @@ abstract class Block implements iBlock {
 		return $ret;
 	}
 
+	/**
+	 * @method getFieldTable()
+	 * @param field name
+	 * @return string table name
+	 * @access public
+	 * 
+	 * @todo: change this to return tables for all fields and iterate where it is called?
+	* */
+	public function getFieldTable($field_name){
+		if(isset($this->report_fields) && count($this->report_fields) > 0){
+			foreach($this->report_fields as $f){
+				if($f->dbFieldName() === $field_name){
+					return $f->dbTableName();
+				}
+			}
+		}
+		return null;
+	}
+	
+	
+	/**
+	 * setReportFields
+	 * 
+	 * Sets the datafields property of datafields that are to be included in the block
+	 * 
+	 * @method setReportFields()
+	 * @return void
+	 * @access public
+	 **/
+	public function setReportFields(SupplementalFactory $supp_factory = null){
+		$arr_table_ref_cnt = [];
+		$this->has_aggregate = false;
+		$this->report_fields = new \SplObjectStorage();
+			
+		$arr_ret = array();
+		$arr_res = $this->datasource->getFieldData($this->id);
+		if(is_array($arr_res)){
+			$header_supp = null;
+			$data_supp = null;
+			foreach($arr_res as $s){
+				if(isset($s['aggregate']) && !empty($s['aggregate'])){
+					$this->has_aggregate = true;
+				}
+				if(isset($supp_factory)){
+					$header_supp = $supp_factory->getColHeaderSupplemental($s['id'], $s['head_a_href'], $s['head_a_rel'], $s['head_a_title'], $s['head_a_class'], $s['head_comment']);
+					$data_supp = $supp_factory->getColDataSupplemental($s['id'], $s['a_href'], $s['a_rel'], $s['a_title'], $s['a_class']);
+				}
+				$arr_table_ref_cnt[$s['table_name']] = isset($arr_table_ref_cnt[$s['table_name']]) ? ($arr_table_ref_cnt[$s['table_name']] + 1) : 1;
+				$datafield = new DbField($s['db_field_id'], $s['table_name'], $s['db_field_name'], $s['name'], $s['description'], $s['pdf_width'], $s['default_sort_order'],
+						 $s['datatype'], $s['max_length'], $s['decimal_scale'], $s['unit_of_measure'], $s['is_timespan'], $s['is_foreign_key'], $s['is_nullable'], $s['is_natural_sort']);
+				$this->report_fields->attach(new TableField($s['id'], $s['name'], $datafield, $s['is_displayed'], $s['display_format'], $s['aggregate'], $s['is_sortable'], $header_supp, $data_supp));
+			}
+			$this->primary_table_name = array_search(max($arr_table_ref_cnt), $arr_table_ref_cnt);
+			//set up arr_fields hierarchy
+			if(is_array($arr_table_ref_cnt) && count($arr_table_ref_cnt) >  1){
+				foreach($arr_table_ref_cnt as $t => $cnt){
+					if($t != $this->primary_table_name){
+						$this->joins[] = array('table'=>$t, 'join_text'=>$this->get_join_text($this->primary_table_name, $t));
+					}
+				}
+			}
+		}
+	}
+	
+	/**
+	 * @method getSelectFields()
+	 * 
+	 * Retrieves fields designated as select, supplemental params (if set), 
+	 * 
+	 * @return string table name
+	 * @access public
+	 * */
+	public function getSelectFields(){
+		$ret = [];
+		if(isset($this->report_fields) && count($this->report_fields) > 0){
+			foreach($this->report_fields as $f){
+				$ret[] = $f->selectFieldText();
+			}
+		}
+		//@todo: supplemental params
+		
+		
+		return $ret;
+	}
+	
+	/**
+	 * @method getGroupBy()
+	 * //@param SplObjectStorage of GroupBy objects
+	 * @return void
+	 * @access public
+	* */
+	public function getGroupBy(){
+		$ret = [];
+		
+		//@todo: pull in group by fields from database
+		if($this->has_aggregate && isset($this->report_fields) && count($this->report_fields) > 0){
+			foreach($this->report_fields as $f){
+				if(!$f->isAggregate()){
+					$ret[] = $f->dbFieldName();
+				}
+			}
+		}
+		return $ret;
+	}
+	
 	/**
 	 * sortOrders
 	 * 
@@ -252,8 +419,8 @@ abstract class Block implements iBlock {
 	 * @return void
 	 * @access public
 	* */
-	protected function setPivot(iDataField $pivot_db_field){
-		$this->db_pivot_field = $pivot_db_field;
+	protected function setPivot(iDataField $pivot_field){
+		$this->pivot_field = $pivot_field;
 	}
 	
 	/**
@@ -283,7 +450,7 @@ abstract class Block implements iBlock {
 	 * @return void
 	 * @access public
 	* */
-	protected function setGroupBy(\SplObjectStorage $group_by){
+	protected function setGroupBy(){
 		$this->group_by = $group_by;
 	}
 	
@@ -293,15 +460,14 @@ abstract class Block implements iBlock {
 	 * @param string file_format
 	 * @return void
 	 * @access public
-	* */
-	protected function loadData($report_count, $file_format){
+	protected function loadData($report_count){
 		$arr_this_block = get_element_by_key($block, $this->{$this->primary_model_name}->arr_blocks);
 		$this->max_rows = $arr_this_block['max_rows'];
 		$this->cnt_row = $arr_this_block['cnt_row'];
 		$this->sum_row = $arr_this_block['sum_row'];
 		$this->avg_row = $arr_this_block['avg_row'];
 		$this->bench_row = $arr_this_block['bench_row'];
-		$this->pivot_db_field = isset($arr_this_block['pivot_db_field']) ? $arr_this_block['pivot_db_field'] : NULL;
+		$this->pivot_field = isset($arr_this_block['pivot_field']) ? $arr_this_block['pivot_field'] : NULL;
 		if($this->display == 'table' || $this->display == 'array'){
 			$this->load_table($arr_this_block, $report_count);
 		}
@@ -309,16 +475,17 @@ abstract class Block implements iBlock {
 			$this->load_chart($arr_this_block, $report_count);
 		}
 	}
+	* */
 	
 	/**
 	 * @method loadChildren()
 	 * @param \SplObjectStorage children
 	 * @return void
 	 * @access public
-	* */
 	public function loadChildren(\SplObjectStorage $children){
 		$this->children = $children;
 	}
+	* */
 	
 	/*
 	 * getCompleteData

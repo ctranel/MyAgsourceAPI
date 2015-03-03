@@ -6,7 +6,7 @@ require_once(APPPATH . 'libraries/Report/Content/TableBlock.php');
 require_once(APPPATH . 'libraries/Report/Content/ChartBlock.php');
 //require_once(APPPATH . 'libraries/Report/iReportContentRepository.php');
 require_once(APPPATH . 'libraries/Report/iBlock.php');
-require_once(APPPATH . 'libraries/dhi/herd.php');
+require_once(APPPATH . 'libraries/dhi/Herd.php');
 
 use \myagsource\Report\Content\TableBlock;
 use \myagsource\Report\Content\ChartBlock;

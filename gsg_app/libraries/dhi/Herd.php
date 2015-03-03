@@ -3,7 +3,6 @@ namespace myagsource\dhi;
 
 use \DateTime;
 
-if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /**
 * Name:  Herd 
 *
@@ -71,6 +70,9 @@ class Herd
 	 * @author Chris
 	 **/
 	public function __construct($herd_model, $herd_code) {
+		if(empty($herd_code) || strlen($herd_code) != 8){
+			return false;
+		}
 		$this->herd_code = $herd_code;
 		$this->herd_model = $herd_model;
 	}

@@ -1,7 +1,7 @@
 <?php 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-require_once APPPATH . 'libraries/dhi/herd.php';
+require_once APPPATH . 'libraries/dhi/Herd.php';
 require_once APPPATH . 'libraries/Ion_auth.php';
 require_once APPPATH . 'libraries/access_log.php';
 require_once APPPATH . 'libraries/Site/WebContent/Sections.php';

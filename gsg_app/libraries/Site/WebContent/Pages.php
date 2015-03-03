@@ -4,7 +4,7 @@ namespace myagsource\Site\WebContent;
 require_once(APPPATH . 'libraries/Site/WebContent/Page.php');
 require_once(APPPATH . 'libraries/Site/iWebContentRepository.php');
 require_once(APPPATH . 'libraries/Site/iWebContent.php');
-require_once(APPPATH . 'libraries/dhi/herd.php');
+require_once(APPPATH . 'libraries/dhi/Herd.php');
 
 use \myagsource\Site\iWebContentRepository;
 use \myagsource\Site\iWebContent;

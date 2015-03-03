@@ -75,13 +75,13 @@ class ChartBlock extends Block {
 			foreach($arr_res as $s){
 				$datafield = new DbField($s['db_field_id'], $s['table_name'], $s['db_field_name'], $s['name'], $s['description'], $s['pdf_width'], $s['default_sort_order'],
 						 $s['datatype'], $s['max_length'], $s['decimal_scale'], $s['unit_of_measure'], $s['is_timespan'], $s['is_foreign_key'], $s['is_nullable'], $s['is_natural_sort']);
-				$this->report_fields->attach(new ChartField($s['id'], $s['name'], $datafield, $s['displayed']));
+				$this->report_fields->attach(new ChartField($s['id'], $s['name'], $datafield, $s['is_displayed']));
 			}
 		}
 	}
 	
-	public function loadData(&$arr_this_block, $report_count){
-		$arr_axes = $this->{$this->primary_model_name}->get_chart_axes($arr_this_block['id']);
+	public function loadData($report_count){
+		$arr_axes = $report_datasource->get_chart_axes($arr_this_block['id']);
 		$x_axis_date_field = NULL;
 	
 		$this->json['name'] = $arr_this_block['name'];
@@ -99,8 +99,8 @@ class ChartBlock extends Block {
 	
 		$this->json['herd_code'] = $this->session->userdata('herd_code');
 	
-		$this->{$this->primary_model_name}->set_chart_fields($arr_this_block['id']);
-		$arr_fields = $this->{$this->primary_model_name}->get_fields();
+		$report_datasource->set_chart_fields($arr_this_block['id']);
+		$arr_fields = $report_datasource->get_fields();
 		if(!is_array($arr_fields) || empty($arr_fields)){
 			return false;
 		}
@@ -113,11 +113,11 @@ class ChartBlock extends Block {
 					$x_axis_date_field = $a['db_field_name'];
 				}
 				if(isset($a['db_field_name']) && !empty($a['db_field_name'])){
-					$this->{$this->primary_model_name}->add_field(array('Date' => $a['db_field_name']));
+					$report_datasource->add_field(array('Date' => $a['db_field_name']));
 				}
 			}
 		}
-		$this->json['data'] = $this->{$this->primary_model_name}->get_graph_data($arr_fieldnames, $this->filters->criteriaKeyValue(), $this->max_rows, $x_axis_date_field, $arr_this_block['path'], $tmp_categories);
+		$this->json['data'] = $report_datasource->get_graph_data($arr_fieldnames, $this->filters->criteriaKeyValue(), $this->max_rows, $x_axis_date_field, $arr_this_block['path'], $tmp_categories);
 		$this->json['series'] = $this->derive_series($arr_fields, $this->json['chart_type'], $tmp_categories, count($this->json['data'], COUNT_RECURSIVE));
 		$this->json['filter_text'] = $this->filters->get_filter_text();
 	}

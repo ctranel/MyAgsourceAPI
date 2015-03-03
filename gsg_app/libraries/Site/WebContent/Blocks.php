@@ -5,7 +5,7 @@ namespace myagsource\Site\WebContent;
 require_once(APPPATH . 'libraries/Site/WebContent/Block.php');
 require_once(APPPATH . 'libraries/Site/iWebContentRepository.php');
 require_once(APPPATH . 'libraries/Site/iWebContent.php');
-require_once(APPPATH . 'libraries/dhi/herd.php');
+require_once(APPPATH . 'libraries/dhi/Herd.php');
 
 use \myagsource\Site\WebContent\Block;
 use \myagsource\Site\iWebContentRepository;

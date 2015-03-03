@@ -1,4 +1,44 @@
 <?php
+namespace myagsource\Report\Content;
+
+/**
+* Name:  Report Function Library File
+*
+* Author: ctranel
+*		  ctranel@agsource.com
+*
+
+*
+* Created:  3.18.2011
+*
+* Description:  Library for rendering reports
+*
+* Requirements: PHP5 or above
+*
+*/
+
+class Csv{
+	//protected $arr_filters;
+	public $arr_sort_by;
+	public $arr_sort_order;
+	public $herd_code;
+	
+	public function __construct(){
+	}
+	
+	/**
+	 * create_csv - creates PDF version of report.
+	 * @param array of data for report.
+	 * @param string herd code
+	 * @return void
+	 * @author ctranel
+	 **/
+	function create_csv($data, $herd_code){
+		$delimiter = ",";
+		$newline = "\r\n";
+		echo $this->csv_from_result($data, $delimiter, $newline);
+	}
+	
 	/**
 	 * Generate CSV from a array or query result object
 	 *
@@ -9,7 +49,7 @@
 	 * @param	string	The enclosure - double quote by default
 	 * @return	string
 	 */
-	function csv_from_result($data, $delim = ",", $newline = "\n", $enclosure = '"', $header_override = FALSE) {
+	protected function csv_from_result($data, $delim = ",", $newline = "\n", $enclosure = '"', $header_override = FALSE) {
 		// Next blast through the result array and build out the rows
 		if(is_object($data) && method_exists($data, 'list_fields')) $data = $data->result_array();
 		if(is_array($data) && !empty($data)){
@@ -20,9 +60,9 @@
 			$active_el = current($data);
 			$out = '';
 			$print_header_next = TRUE;
-			
+				
 			while(count($arr_tmp) < 2 && $i < $cnt){
-//echo "\n" . count($data) . ' - ' . $cnt . ' - ' . $i . "\n";
+				//echo "\n" . count($data) . ' - ' . $cnt . ' - ' . $i . "\n";
 				$arr_tmp = $active_el;
 				$i++;
 				$active_el = next($data);
@@ -56,7 +96,7 @@
 			return false;
 		}
 	}
-
+	
 	// --------------------------------------------------------------------
 	
 	/**
@@ -69,7 +109,7 @@
 	 * @param	string	The newline character
 	 * @return	string
 	 */
-	function _write_header($row, $enclosure, $delim, $newline){
+	protected function _write_header($row, $enclosure, $delim, $newline){
 		$out = '';
 		foreach ($row as $name=>$value) {
 			if(stripos($name, 'isnull') === FALSE){
@@ -87,3 +127,5 @@
 		$out .= $newline;
 		return $out;
 	}
+	
+}

@@ -1,16 +1,18 @@
 <?php
 //namespace myagsource;
 require_once(APPPATH . 'libraries/filters/Filters.php');
-require_once(APPPATH . 'libraries/benchmarks_lib.php');
+require_once(APPPATH . 'libraries/Benchmarks/Benchmarks.php');
 require_once(APPPATH . 'libraries/access_log.php');
 require_once(APPPATH . 'libraries/Supplemental/Content/SupplementalFactory.php');
 require_once(APPPATH . 'libraries/dhi/HerdAccess.php');
-require_once(APPPATH . 'libraries/dhi/herd.php');
+require_once(APPPATH . 'libraries/dhi/Herd.php');
 require_once(APPPATH . 'libraries/Site/WebContent/Sections.php');
 require_once(APPPATH . 'libraries/Site/WebContent/Pages.php');
 require_once(APPPATH . 'libraries/Site/WebContent/Blocks.php');
+require_once(APPPATH . 'libraries/Report/Content/Csv.php');
+require_once(APPPATH . 'libraries/Report/Content/Pdf.php');
 
-use \myagsource\settings\Benchmarks_lib;
+use \myagsource\Benchmarks\Benchmarks;
 use \myagsource\Access_log;
 use \myagsource\report_filters\Filters;
 use \myagsource\Supplemental\Content\SupplementalFactory;
@@ -19,6 +21,8 @@ use \myagsource\dhi\Herd;
 use \myagsource\Site\WebContent\Sections;
 use \myagsource\Site\WebContent\Pages;
 use \myagsource\Site\WebContent\Blocks;
+use \myagsource\Report\Content\Csv;
+use \myagsource\Report\Content\Pdf;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
@@ -68,10 +72,17 @@ abstract class parent_report extends CI_Controller {
 	 **/
 	protected $blocks;
 	
+	/**
+	 * herd
+	 * 
+	 * Herd object
+	 * @var Herd
+	 **/
+	protected $herd;
+
 	protected $report_form_id;
 	protected $arr_sort_by = array();
 	protected $arr_sort_order = array();
-	protected $herd_code;
 	protected $product_name;
 	protected $report_path;
 	protected $primary_model_name;
@@ -99,24 +110,37 @@ abstract class parent_report extends CI_Controller {
 		$this->pages = new Pages($this->page_model, $this->blocks);
 		$sections = new Sections($this->section_model, $this->pages);
 		$this->herd_access = new HerdAccess($this->herd_model);
-		$herd = new Herd($this->herd_model, $this->session->userdata('herd_code'));
+		$this->herd = new Herd($this->herd_model, $this->session->userdata('herd_code'));
 		
 		$class_dir = $this->router->fetch_directory(); //this should match the name of this file (minus ".php".  Also used as base for css and js file names and model directory name
 		$class = $this->router->fetch_class();
 		$method = $this->router->fetch_method();
 		$this->section_path = $class_dir . $class . '/';
 
+		if(!$this->authorize($method)) {
+			if($this->session->flashdata('message')){
+				$this->session->keep_flashdata('message');
+			}
+			if(strpos($method, 'ajax') === false){
+				$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
+			}
+			redirect(site_url('auth/login'));
+		} 
+		
+		if($this->herd->herdCode() == ''){
+			$this->session->keep_flashdata('redirect_url');
+			redirect(site_url('dhi/change_herd/select'));			
+		}
+
 		//load most specific model available.  Must load model before setting section
 		$path = uri_string();
 		$arr_path = explode('/',$path);
 		$page_name = $method;
 		$block_name = '';
-		
 		$this->page = $this->pages->getByPath($page_name);
 		$this->report_path = $this->section_path . $this->page->path();
 		$this->primary_model_name = $this->page->path() . '_model';
 		$this->report_form_id = 'report_criteria';//filter-form';
-		$this->herd_code = strlen($this->session->userdata('herd_code')) == 8?$this->session->userdata('herd_code'):NULL;
 		$this->page_header_data['user_sections'] = $this->as_ion_auth->top_sections;
 		$this->page_header_data['num_herds'] = $this->herd_access->getNumAccessibleHerds($this->session->userdata('user_id'), $this->as_ion_auth->arr_task_permissions(), $this->session->userdata('arr_regions'));
 		
@@ -137,22 +161,8 @@ abstract class parent_report extends CI_Controller {
 //@todo: fix line below, why is path coming in as 'land' and not 'dhi/'?  redirect?
 //		$this->section_path = str_replace('land', 'dhi', $this->section_path);
 		$this->section = $sections->getByPath($this->section_path);
-		$sections->loadChildren($this->section, $this->pages, $this->session->userdata('user_id'), $herd, $this->ion_auth_model->getTaskPermissions());
+		$sections->loadChildren($this->section, $this->pages, $this->session->userdata('user_id'), $this->herd, $this->ion_auth_model->getTaskPermissions());
 		
-		if($this->authorize($method)) {
-			$this->load->library('reports');
-			$this->reports->herd_code = $this->herd_code;
-		} 
-//		else {  //redirect to login if not logged in or session is expired
-//			if($this->session->flashdata('message')) $this->session->keep_flashdata('message');
-//			if($method != 'ajax_report') $this->session->set_flashdata('redirect_url', $this->uri->uri_string());
-//			redirect(site_url('auth/login'));
-//		}
-		
-		if($this->session->userdata('herd_code') == ''){ // || $this->session->userdata('herd_code') == '35990571'
-			$this->session->keep_flashdata('redirect_url');
-			redirect(site_url('dhi/change_herd/select'));			
-		}
 		/* Load the profile.php config file if it exists*/
 		if (ENVIRONMENT == 'development' || ENVIRONMENT == 'localhost') {
 			$this->config->load('profiler', false, true);
@@ -166,11 +176,11 @@ abstract class parent_report extends CI_Controller {
 		if(!isset($this->as_ion_auth)){
 	       	return FALSE;
 		}
-		if(!$this->as_ion_auth->logged_in() && $this->herd_code != $this->config->item('default_herd')) {
+		if(!$this->as_ion_auth->logged_in() && $this->herd->herdCode() != $this->config->item('default_herd')) {
 	       	$this->session->set_flashdata('message', "Please log in.");
 			return FALSE;
 		}
-		if(!isset($this->herd_code)){
+		if(!$this->herd->herdCode()){
 			$this->session->set_flashdata('message',  $this->session->flashdata('message') . "Please select a herd and try again.");
 			if($this->session->flashdata('message')) $this->session->keep_flashdata('message');
 			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
@@ -181,26 +191,26 @@ abstract class parent_report extends CI_Controller {
 		//@todo: build display_hierarchy/report_organization, etc interface with get_scope function (with classes for super_sections, sections, etc)
 		$pass_unsubscribed_test = true; //$this->as_ion_auth->get_scope('sections', $this->section->id()) == 'pubic';
 		//@todo: redo access tests
-//		$pass_unsubscribed_test = $this->as_ion_auth->has_permission("View All Content") || $this->web_content_model->herd_is_subscribed($this->section->id(), $this->herd_code);
-		$pass_view_nonowned_test = $this->as_ion_auth->has_permission("View All Herds") || $this->session->userdata('herd_code') == $this->config->item('default_herd');
-		if(!$pass_view_nonowned_test) $pass_view_nonowned_test = in_array($this->herd_code, $this->herd_access->getAccessibleHerdCodes($this->session->userdata('user_id'), $this->as_ion_auth->arr_task_permissions(), $this->session->userdata('arr_regions')));
+//		$pass_unsubscribed_test = $this->as_ion_auth->has_permission("View All Content") || $this->web_content_model->herd_is_subscribed($this->section->id(), $this->herd->herdCode());
+		$pass_view_nonowned_test = $this->as_ion_auth->has_permission("View All Herds");
+		if(!$pass_view_nonowned_test) $pass_view_nonowned_test = in_array($this->herd->herdCode(), $this->herd_access->getAccessibleHerdCodes($this->session->userdata('user_id'), $this->as_ion_auth->arr_task_permissions(), $this->session->userdata('arr_regions')));
 		if($pass_unsubscribed_test && $pass_view_nonowned_test) return TRUE;
 		elseif(!$pass_unsubscribed_test && !$pass_view_nonowned_test) {
-			$this->session->set_flashdata('message', 'Herd ' . $this->herd_code . ' is not subscribed to the ' . $this->product_name . ', nor do you have permission to view this report for herd ' . $this->herd_code . '.  Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' if you have questions or concerns.');
+			$this->session->set_flashdata('message', 'Herd ' . $this->herd->herdCode() . ' is not subscribed to the ' . $this->product_name . ', nor do you have permission to view this report for herd ' . $this->herd->herdCode() . '.  Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' if you have questions or concerns.');
  			if($this->session->flashdata('message')) $this->session->keep_flashdata('message');
 			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
 			redirect(site_url('dhi/change_herd/select'));
 			exit;
 		}
 		elseif(!$pass_unsubscribed_test) {
-			$this->session->set_flashdata('message', 'Herd ' . $this->herd_code . ' is not subscribed to the ' . $this->product_name . '.  Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' if you have questions or concerns.');
+			$this->session->set_flashdata('message', 'Herd ' . $this->herd->herdCode() . ' is not subscribed to the ' . $this->product_name . '.  Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' if you have questions or concerns.');
  			if($this->session->flashdata('message')) $this->session->keep_flashdata('message');
 			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
 			redirect(site_url());
 			exit;
 		}
 		elseif(!$pass_view_nonowned_test) {
-			$this->session->set_flashdata('message', 'You do not have permission to view the ' . $this->product_name . ' for herd ' . $this->herd_code . '.  Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' if you have questions or concerns.');
+			$this->session->set_flashdata('message', 'You do not have permission to view the ' . $this->product_name . ' for herd ' . $this->herd->herdCode() . '.  Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' if you have questions or concerns.');
  			if($this->session->flashdata('message')) $this->session->keep_flashdata('message');
 			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
 			redirect(site_url('dhi/change_herd/select'));
@@ -215,7 +225,7 @@ abstract class parent_report extends CI_Controller {
 
 	function display($arr_block_in, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
 		//Check for valid herd_code
-		if(empty($this->herd_code) || strlen($this->herd_code) != 8){
+		if(!$this->herd){
 			$this->session->set_flashdata('message', 'Please select a valid herd.');
 			redirect(site_url($this->report_path));
 		}
@@ -234,11 +244,12 @@ abstract class parent_report extends CI_Controller {
 				$this->section->id(),
 				$this->page->path(),
 				array(
-					'herd_code' =>	$this->session->userdata('herd_code'),
+					'herd_code' =>	$this->herd->herdCode(),
 				) //filter form submissions never trigger a new page load (i.e., this function is never fired by a form submission)
 		);
 		//END FILTERS
 		if ($display_format == 'csv'){
+			$csv = new Csv();
 			$data = array();
 			if(isset($arr_blocks) && is_array($arr_blocks)){
 				foreach($arr_blocks as $pb){
@@ -265,7 +276,12 @@ abstract class parent_report extends CI_Controller {
 				}
 			}
 			if(is_array($data) && !empty($data)){
-				$this->reports->create_csv($data);
+				$this->config->set_item('compress_output', FALSE);
+				
+				$filename = $this->herd->herdCode() . '-' . date('mdy-His') . '.csv';
+				header('Content-type: application/excel');
+				header('Content-disposition: attachment; filename=' . $filename);
+				$csv->create_csv($data);
 				$this->_record_access(90, 'csv', $this->config->item('product_report_code'));
 			}
 			else {
@@ -274,9 +290,11 @@ abstract class parent_report extends CI_Controller {
 			exit;
 		}
 		elseif ($display_format == 'pdf' && !is_null($arr_block_in)) {
-			$this->load->library('table_header');
+			$ci_pdf = new Ci_pdf();
+			$pdf = new Pdf($ci_pdf);
+			$table_header = new TableHeader();
 			$data = array();
-			$herd_data = $this->herd_model->header_info($this->session->userdata('herd_code'));
+			$herd_data = $this->herd_model->header_info($this->herd->herdCode());
 			$i = 0;
 
 			if(isset($arr_blocks) && is_array($arr_blocks)){
@@ -316,7 +334,7 @@ abstract class parent_report extends CI_Controller {
 
 		// render page
 		//get_herd_data
-		$herd_data = $this->herd_model->header_info($this->session->userdata('herd_code'));
+		$herd_data = $this->herd_model->header_info($this->herd->herdCode());
 
 		//set js lines and load views for each block to be displayed on page
 		$tmp_js = '';
@@ -402,13 +420,13 @@ abstract class parent_report extends CI_Controller {
 					'description'=>$this->product_name . ' - ' . $this->config->item('site_title'),
 					'message' => array($this->session->flashdata('message')) + $this->{$this->primary_model_name}->arr_messages,
 					'section_nav' => $this->load->view('section_nav', $arr_sec_nav_data, TRUE),
-					'page_heading' => $this->product_name . " for Herd " . $this->herd_code,
+					'page_heading' => $this->product_name . " for Herd " . $this->herd->herdCode(),
 					'arr_head_line' => array(
 						'<script type="text/javascript">',
 						'	var page = "' . $this->page->path() . '";',
 						'	var base_url = "' . $this->section_path . '";',
 						'	var site_url = "' . site_url() . '";',
-						'	var herd_code = "' . $this->session->userdata('herd_code') . '";',
+						'	var herd_code = "' . $this->herd->herdCode() . '";',
 						'	var block = "' . $arr_blocks->current()->name()	. '"',
 						'</script>'
 					),
@@ -434,8 +452,10 @@ abstract class parent_report extends CI_Controller {
 		}
 		unset($this->{$this->primary_model_name}->arr_messages); //clear message var once it is displayed
 		$this->load->model('setting_model');
-		$this->benchmarks_lib = new Benchmarks_lib($this->session->userdata('user_id'), $this->input->post('herd_code'), $this->herd_model->header_info($this->herd_code), $this->setting_model);
-		$arr_benchmark_data = $this->benchmarks_lib->getFormData($this->session->userdata('benchmarks')); 
+		$this->load->model('benchmark_model');
+		
+		$this->benchmarks = new Benchmarks($this->session->userdata('user_id'), $this->input->post('herd_code'), $this->herd_model->header_info($this->herd->herdCode()), $this->setting_model, $this->benchmark_model);
+		$arr_benchmark_data = $this->benchmarks->getFormData($this->session->userdata('benchmarks')); 
 		$arr_nav_data = array(
 			'section_path' => $this->section_path,
 			'curr_page' => $this->page->path(),
@@ -455,7 +475,7 @@ abstract class parent_report extends CI_Controller {
 		}
 		$data = array(
 			'page_header' => $this->load->view('page_header', $this->page_header_data, TRUE),
-			'herd_code' => $this->session->userdata('herd_code'),
+			'herd_code' => $this->herd->herdCode(),
 			'herd_data' => $this->load->view('dhi/herd_info', $herd_data, TRUE),
 			'page_footer' => $this->load->view('page_footer', $this->page_footer_data, TRUE),
 			'blocks' => $arr_view_blocks,

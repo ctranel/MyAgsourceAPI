@@ -1,5 +1,4 @@
 <?php
-require_once(APPPATH.'libraries' . FS_SEP . 'benchmarks_lib.php');
 require_once APPPATH . 'controllers/report_parent.php';
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');

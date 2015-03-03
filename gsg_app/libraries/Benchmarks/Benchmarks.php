@@ -1,8 +1,8 @@
 <?php
-namespace myagsource\settings;
-require_once APPPATH . 'libraries' . FS_SEP . 'settings' . FS_SEP . 'Session_settings.php';
+namespace myagsource\Benchmarks;
+require_once APPPATH . 'libraries/Settings/SessionSettings.php';
 
-use myagsource\settings\Session_settings;
+use myagsource\Settings\SessionSettings;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /**
@@ -18,13 +18,19 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 *
 */
 
-class Benchmarks_lib extends Session_settings
+class Benchmarks extends SessionSettings
 {
 	/**
 	 * table object used in benchmarks
 	 * @var object db_table
 	 **/
 	protected $db_table;
+
+	/**
+	 * benchmark datasource
+	 * @var object benchmark_model
+	 **/
+	protected $benchmark_model;
 
 	/**
 	 * table that stores most recent data for all data for deriving benchmark groups
@@ -45,14 +51,23 @@ class Benchmarks_lib extends Session_settings
 	protected $arr_criteria_table;
 	
 	/**
+	 * session_data 
+	 * @var array
+	 **/
+	protected $session_data;
+	
+	/**
 	 * __construct
 	 *
 	 * @return void
 	 * @author ctranel
 	 **/
-	public function __construct($user_id, $herd_code, $herd_info, $setting_model)
+	public function __construct($user_id, $herd_code, $herd_info, \setting_model $setting_model, \Benchmark_model $benchmark_model, $session_benchmarks)
 	{
 		parent::__construct($user_id, $herd_code, $setting_model, 'benchmarks');
+		
+		$this->benchmark_model = $benchmark_model;
+		$this->session_data = $session_benchmarks;
 		
 		$this->arr_herd_size_groups = array(
 			1 => array('floor' => 1, 'ceiling' => 124),
@@ -137,13 +152,13 @@ class Benchmarks_lib extends Session_settings
 	 * @return string
 	 * @author ctranel
 	 **/
-	public function get_bench_text($sess_benchmarks){
-		if(!isset($sess_benchmarks) || $sess_benchmarks === FALSE){
+	public function get_bench_text(){
+		if(!isset($this->session_data) || $this->session_data === FALSE){
 			return "Benchmark session not set";
 		}
-		$bench_text = 'Benchmark herds determined by ' . $this->arr_settings['criteria']->getDisplayText($sess_benchmarks['criteria']);
-		$bench_text .= ' for ' . $this->arr_settings['breed']->getDisplayText($sess_benchmarks['breed']);
-		$bench_text .= ' herds ' . $this->arr_settings['herd_size']->getDisplayText($sess_benchmarks['herd_size']) . ' animals';
+		$bench_text = 'Benchmark herds determined by ' . $this->arr_settings['criteria']->getDisplayText($this->session_data['criteria']);
+		$bench_text .= ' for ' . $this->arr_settings['breed']->getDisplayText($this->session_data['breed']);
+		$bench_text .= ' herds ' . $this->arr_settings['herd_size']->getDisplayText($this->session_data['herd_size']) . ' animals';
 		return $bench_text;
 	}
 
@@ -176,29 +191,28 @@ class Benchmarks_lib extends Session_settings
 	 * @description retrieves row(s) of benchmark data into an array
 	 * @param object database table
 	 * @param array session benchmarks
-	 * @param object benchmark model
 	 * @param string row_head_field - the db field name of the column into which benchmark header text is inserted
 	 * @param array of strings db field names to exclude
 	 * @param array of strings arr_group_by (db field names)
 	 * @return array
 	 * @author ctranel
 	 **/
-	function addBenchmarkRow($db_table, $session_values, &$benchmark_model, $row_head_field, $arr_fields_to_exclude = array('herd_code', 'pstring', 'lact_group_code', 'ls_type_code', 'sol_group_code'), $arr_group_by){
+	function addBenchmarkRow($db_table, $row_head_field, $arr_fields_to_exclude = ['herd_code', 'pstring', 'lact_group_code', 'ls_type_code', 'sol_group_code'], $arr_group_by){
 		if(isset($db_table)){
 			$this->db_table = $db_table;
 		}
 		
-		$bench_settings = $this->getSettingKeyValues($session_values);
+		$bench_settings = $this->getSettingKeyValues($this->session_data);
 
-		$avg_fields = $benchmark_model->get_benchmark_fields($this->db_table->full_table_name(), $arr_fields_to_exclude);
+		$avg_fields = $this->benchmark_model->get_benchmark_fields($this->db_table->full_table_name(), $arr_fields_to_exclude);
 		//make sure we have something to pass for all session vars
-		$sess_herd_size = isset($session_values['herd_size']) ? $session_values['herd_size'] : null;
+		$sess_herd_size = isset($this->session_data['herd_size']) ? $this->session_data['herd_size'] : null;
 		$sess_herd_size = $this->arr_settings['herd_size']->getCurrValue($sess_herd_size);
-		$sess_criteria = isset($session_values['criteria']) ? $session_values['criteria'] : null;
-		$sess_metric = isset($session_values['metric']) ? $session_values['metric'] : null;
-		$sess_breed = isset($session_values['breed']) ? $session_values['breed'] : null;
+		$sess_criteria = isset($this->session_data['criteria']) ? $this->session_data['criteria'] : null;
+		$sess_metric = isset($this->session_data['metric']) ? $this->session_data['metric'] : null;
+		$sess_breed = isset($this->session_data['breed']) ? $this->session_data['breed'] : null;
 		
-		$bench_sql = $benchmark_model->build_benchmark_query(
+		$bench_sql = $this->benchmark_model->build_benchmark_query(
 			$this->db_table,
 			$avg_fields,
 			$this->arr_criteria_table[$this->arr_settings['criteria']->getCurrValue($sess_criteria)],
@@ -209,7 +223,7 @@ class Benchmarks_lib extends Session_settings
 			$this->arr_settings['breed']->getCurrValue($sess_breed),
 			$arr_group_by
 		);
-		$arr_benchmarks = $benchmark_model->getBenchmarkData($bench_sql);
+		$arr_benchmarks = $this->benchmark_model->getBenchmarkData($bench_sql);
 
 		$tmp_metric = $this->arr_settings['metric']->getLookupOptions();
 		$bench_head_text = ucwords(strtolower($tmp_metric[$this->arr_settings['metric']->getCurrValue($sess_metric)]));

@@ -16,371 +16,29 @@ use \myagsource\Site\WebContent\Blocks;
 *  -----------------------------------------------------------------
 */
 class Report_model extends CI_Model {
-	/**
-	 * section
-	 * @var Section
-	 **/
-	protected $sections;
-	
-	/**
-	 * pages
-	 * 
-	 * page repository
-	 * @var Pages
-	 **/
-	protected $pages;
-	
-	
-	
-	public $arr_tables;
-	protected $test_date;
-	protected $arr_field_table;//DB field name is key
-	protected $arr_joins = array(); //DB 2 dimensional: 'table' and 'join_text'  TO BE REPLACED BY USING db_table_id FIELD AND is_fk_field IN DB_FIELD TABLE
-	protected $primary_table_name;
- 	public $date_field;
- 	protected $herd_code;
-	protected $arr_fields = array(); //DB list of fields structured to mimic the header, field label is key
-	protected $arr_db_field_list = array(); //DB list of fields in flat array, numeric key
-	protected $arr_unsortable_columns = array(); //CODE list of fields
-	protected $arr_natural_sort_fields = array(); //DB list of fields
-	protected $arr_date_fields = array(); //DB list of fields
-	protected $arr_datetime_fields = array(); //DB list of fields
-	protected $arr_timespan_fields = array(); //DB list of fields
-	protected $arr_numeric_fields = array(); //DB list of fields
-	protected $arr_field_sort = array(); //DB field name is key, default sort order
-	protected $arr_pdf_widths = array(); //DB field name is key
-	protected $arr_aggregates = array(); //numeric key, must be in same order as $arr_select_fields (array_flatten($this->arr_fields), only located in search function)
-	protected $arr_chart_type = array(); //numeric key, must be in same order as $arr_select_fields (array_flatten($this->arr_fields), only located in search function)
-	protected $arr_axis_index = array(); //numeric key, must be in same order as $arr_select_fields (array_flatten($this->arr_fields), only located in search function)
-	protected $arr_bool_display = array(); //numeric key, must be in same order as $arr_select_fields (array_flatten($this->arr_fields), only located in search function)
-	protected $arr_decimal_points = array();//DB field name is key
-	protected $arr_field_links = array();//DB field name is key
-	protected $arr_header_links = array();//DB field name is key
-	public $arr_unit_of_measure;//DB field name is key
-//	protected $arr_where_field = array();// NOT CURRENTLY USED CODE set in child classes
-	protected $arr_where_operator = array();// CODE set in child classes
-	protected $arr_where_criteria = array();// CODE set in child classes
-	protected $arr_group_by_field = array();// CODE set in child classes
-	protected $arr_auto_filter_field = array(); //add a criteria if >1000 records are returned with existing criteria
-	protected $arr_auto_filter_operator = array(); //add a criteria if >1000 records are returned with existing criteria
-	protected $arr_auto_filter_criteria = array(); //add a criteria if >1000 records are returned with existing criteria
-	protected $arr_auto_filter_alert = array();
-	protected $num_results;
-	public $arr_blocks = array();
 	public $arr_messages = array();
 	
-	public function __construct($section_path = NULL){
+	public function __construct(){
 		parent::__construct();
-		$this->load->model('web_content/section_model');
-		$this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
-		$this->load->model('web_content/block_model');
-		$this->blocks = new Blocks($this->block_model);
-		$this->pages = new Pages($this->page_model, $this->blocks);
-		$this->sections = new Sections($this->section_model, $this->pages);
-		$this->tables = $this->config->item('tables', 'ion_auth');
-
-		$this->db_group_name = 'default';
-		$this->{$this->db_group_name} = $this->load->database($this->db_group_name, TRUE);
-//@todo: fix line below, why is path coming in as 'land' and not 'dhi/'?  redirect?
-		//$section_path = str_replace('land', 'dhi/', $section_path);
-		if(isset($section_path)){
-			$this->section = $this->sections->getByPath($section_path);
-		}
-		if(isset($this->section_id)){
-//			$this->arr_blocks = $this->web_content_model->get_block_links($this->section_id);
-		}
 	}
-	function get_primary_table_name(){
-		return $this->primary_table_name;
-	}
-	function get_fields(){
-		return $this->arr_fields;
-	}
-	function get_decimal_places(){
-		return $this->arr_decimal_points;
-	}
-	function get_numeric_fields(){
-		return $this->arr_numeric_fields;
-	}
-	function get_field_links(){
-		return $this->arr_field_links;
-	}
-	function get_fieldlist_array(){
-		return array_flatten($this->arr_fields);
-	}
-	function get_pdf_widths(){
-		return $this->arr_pdf_widths;
-	}
-	function get_field_sort(){
-		return $this->arr_field_sort;
-	}
-	function get_field_table(){
-		return $this->arr_field_table;
-	}
-	function get_unsortable_columns(){
-		return $this->arr_unsortable_columns;
-	}
-	function get_chart_type_array(){
-		return $this->arr_chart_type;
-	}
-	function get_axis_index_array(){
-		return $this->arr_axis_index;
-	}
-	function get_num_results(){
-		return $this->num_results;
-	}
-	function getSection(){
-		return $this->section;
-	}
-	function get_current_breed_code(){
-		return current($this->arr_breeds);
-	}
-	
-	function set_primary_table($table_name){
-		$this->primary_table_name = $table_name;
-	}
-	
-	function add_field($arr_field_in){
-		$this->arr_fields[] = $arr_field_in;
-		$this->arr_db_field_list[] = current($arr_field_in);
-	}
-	function add_sort_field($key, $value = 'ASC'){
-		$this->arr_field_sort[$key] = $value;
-	}
-	
-	function add_unsortable_column($column){
-		$this->arr_unsortable_columns[] = $column;
-	}
-
-	/**
-	 * @method get_default_sort()
-	 * @param string block url segment
-	 * @return returns multi-dimensional array, arr_sort_by and arr_sort_order
-	 * @author ctranel
-	function get_default_sort($block_path){
-		$arr_ret = array();
-		$arr_res = $this->{$this->db_group_name}
-//			->distinct()
-			->select('users.dbo.db_fields.db_field_name, users.dbo.blocks_sort_by.sort_order')
-			->where($this->tables['blocks'] . '.path', $block_path)
-			->join('users.dbo.blocks_sort_by', $this->tables['blocks'] . '.id = users.dbo.blocks_sort_by.block_id' , 'left')
-			->join('users.dbo.db_fields', 'users.dbo.blocks_sort_by.field_id = users.dbo.db_fields.id' , 'left')
-			->order_by('users.dbo.blocks_sort_by.list_order', 'asc')
-			->get($this->tables['blocks'])
-			->result_array();
-		if(is_array($arr_res)){
-			foreach($arr_res as $s){
-				$arr_ret['arr_sort_by'][] = $s['db_field_name'];
-				$arr_ret['arr_sort_order'][] = $s['sort_order'];
-			}
-		}
-		return $arr_ret;
-	}
-	 **/
-	
-	/**
-	 * @method get_group_by_fields()
-	 * @param int id of current block
-	 * @return array: ordered list of group by fields
-	 * @author ctranel
-	 **/
-	function get_group_by_fields($block_id){
-		$arr_ret = array();
-		$arr_res = $this->{$this->db_group_name}
-			->select('users.dbo.db_fields.db_field_name')
-			->where($this->tables['blocks'] . '.id', $block_id)
-			->join('users.dbo.blocks_group_by', $this->tables['blocks'] . '.id = users.dbo.blocks_group_by.block_id' , 'left')
-			->join('users.dbo.db_fields', 'users.dbo.blocks_group_by.field_id = users.dbo.db_fields.id' , 'left')
-			->order_by('users.dbo.blocks_group_by.list_order', 'asc')
-			->get($this->tables['blocks'])
-			->result_array();
-		if(is_array($arr_res)){
-			foreach($arr_res as $s){
-				if(isset($s['db_field_name'])){
-					$arr_ret[] = $s['db_field_name'];
-				}
-			}
-		}
-		if(empty($arr_ret)){
-			return FALSE;
-		}
-		return $arr_ret;
-	}
-	
 	/**
 	 * @method get_table_header_data()
 	 * @return multi-dimensional array of header data ('arr_unsortable_columns', 'arr_field_sort', 'arr_header_data')
 	 * @author ctranel
 	 **/
 	function get_table_header_data(){
+echo 'x';
 		$this->load->library('table_header');
+echo 'x';
 		$table_header_data = array(
 			'arr_unsortable_columns' => $this->arr_unsortable_columns,
 			'arr_field_sort' => $this->arr_field_sort,
 			'arr_header_data' => $this->arr_fields,
-			'arr_header_links' => $this->arr_header_links, //supplemental
+			'arr_header_links' => $this->arr_header_links,
 		);
 		$table_header_data['structure'] = $this->table_header->get_table_header_array($table_header_data['arr_header_data']);
 		$table_header_data['num_columns'] = $this->table_header->get_column_count();
 		return $table_header_data;
-	}
-
-	/**
-	 * @method populate_field_meta_arrays()
-	 * @param int id of current block
-	 * @abstract populates report-specific object variable arrays (from DB)
-	 * @return void
-	 * @author ctranel
-	public function populate_field_meta_arrays($block_in){
-		$arr_numeric_types = array('bigint','decimal','int','money','smallmoney','numeric','smallint','tinyint','float','real');
-		$arr_field_child = array();
-		$arr_table_ref_cnt = array();
-		$this->arr_group_by_field = $this->get_group_by_fields($block_in);
-		$arr_field_data = $this->{$this->db_group_name}
-			->where('block_id', $block_in)
-			->order_by('list_order')
-			->get('users.dbo.v_block_field_data')
-			->result_array();
-		$header_data = $this->get_select_field_structure($block_in);
-		if(is_array($arr_field_data) && !empty($arr_field_data)){
-			foreach($arr_field_data as $fd){
-				//skip over fields that are not set to display--these fields will not be available in views
-				if(empty($fd['display'])) {
-					continue;
-				}
-				$fn = $fd['db_field_name'];
-				$this->arr_db_field_list[] = $fn;
-				$arr_table_ref_cnt[$fd['table_name']] = isset($arr_table_ref_cnt[$fd['table_name']]) ? ($arr_table_ref_cnt[$fd['table_name']] + 1) : 1;
-				$header_data['arr_order'][$fd['name']] = $fd['list_order'];
-				$arr_field_child[$fd['block_header_group_id']][$fd['name']] = $fn; //used to create arr_fields nested array
-				$this->arr_field_sort[$fn] = $fd['default_sort_order'];
-
-//SUPPLEMENTAL DATA
-				$this->load->model('supplemental_model');
-				//column data
-				$block_supp = Supplemental::getColDataSupplemental($fd['bsf_id'], $this->supplemental_model, site_url());
-				$this->arr_field_links[$fn] = $block_supp->getContent();
-				//add fields included in the supplemental parameters to the field list used for composing select queries (not displayed)
-				foreach($block_supp->supplementalLinks() as $s){
-					foreach($s->params() as $p){
-						if(!in_array($p->value_db_field_name(), $this->arr_db_field_list)){
-							$this->arr_db_field_list[] = $p->value_db_field_name();			
-						}
-					}
-				}
-				//column header
-				$block_supp = Supplemental::getColHeaderSupplemental($fd['bsf_id'], $this->supplemental_model, site_url());
-				$this->arr_header_links[$fn] = $block_supp->getContent();
-//END SUPPLEMENTAL DATA
-				
-				$this->arr_pdf_widths[$fn] = $fd['pdf_width'];
-				$this->arr_aggregates[] = $fd['aggregate'];
-				$this->arr_decimal_points[$fn] = $fd['decimal_points'];
-				$this->arr_field_table[$fn] = $fd['table_name'];
-				if(strpos($fd['data_type'], 'date') !== FALSE && strpos($fn, 'time') !== FALSE) $this->arr_datetime_fields[] = $fn;
-				elseif(strpos($fd['data_type'], 'date') !== FALSE) $this->arr_date_fields[] = $fn;
-				if($fd['is_nullable'] === FALSE) $arr_notnull_fields[] = $fn;
-				if(in_array($fd['data_type'], $arr_numeric_types)) $this->arr_numeric_fields[] = $fn;
-				if($fd['is_natural_sort']) $this->arr_natural_sort_fields[] = $fn;
-			}
-		}
-		$this->primary_table_name = array_search(max($arr_table_ref_cnt), $arr_table_ref_cnt);
-		//set up arr_fields hierarchy
-		$this->arr_fields = $header_data['arr_fields'];
-		//add actual field names to header hierarchy
-		 $tmp = key($arr_field_child);
-		 if(!empty($tmp)){
-		 	$this->load->helper('multid_array_helper');
-		 	$this->arr_fields = merge_arrays_on_value_key_match($this->arr_fields, $arr_field_child);
-		 }
-		 else($this->arr_fields = $arr_field_child);
-
-		if(is_array($arr_table_ref_cnt) && count($arr_table_ref_cnt) >  1){
-			foreach($arr_table_ref_cnt as $t => $cnt){
-				if($t != $this->primary_table_name){
-					$this->arr_joins[] = array('table'=>$t, 'join_text'=>$this->get_join_text($this->primary_table_name, $t));
-				}
-			}
-		}
-	}
-	 **/
-	
-	/**
-	 * get_select_field_structure()
-	 * 
-	 * returns block (i.e., table) header structure which provides a skeleton for the organization of fields in the arr_fields object variable
-	 * 				also
-	 * 
-	 * @param int id of current block
-	 * @return array: ref = lookup array for ids, arr_fields = skeleton structure for db_fields
-	 * @author ctranel
-	 **/
-	protected function get_select_field_structure($block_in){
-		$arr_fields = array();
-		$arr_ref = array();
-		$arr_order = array();
-		
-		$grouping_sql = "WITH cteAnchor AS (
-					 SELECT bh.id, bh.[text], bh.parent_id, bh.list_order
-					 FROM users.dbo.block_header_groups bh
-					 	LEFT JOIN users.dbo.blocks_select_fields bs ON bh.id = bs.block_header_group_id
-					 WHERE block_id = " . $block_in . "
-				), cteRecursive AS (
-					SELECT id, [text], parent_id, list_order
-					  FROM cteAnchor
-					 UNION all 
-					 SELECT t.id, t.[text], t.parent_id, t.list_order
-					 FROM users.dbo.block_header_groups t
-					 join cteRecursive r ON r.parent_id = t.id
-				)
-				SELECT DISTINCT * FROM cteRecursive ORDER BY parent_id, list_order;";
-
-		$arr_groupings = $this->{$this->db_group_name}->query($grouping_sql)->result_array();
-			
-		if(!is_array($arr_groupings) || empty($arr_groupings)){
-			$arr_groupings = $this->{$this->db_group_name}
-				->query("SELECT 1 AS id, bf.header_text AS text, NULL AS parent_id, bf.list_order
-				FROM users.dbo.blocks_select_fields bf
-					LEFT JOIN users.dbo.db_fields f ON bf.field_id = f.id
-				WHERE bf.block_id = " . $block_in
-			)->result_array();
-		}
-
-		//KLM - Added logic to convert header text to date text from herd_model function get_test_dates_7_short
-		if(is_array($arr_groupings) && !empty($arr_groupings)){
-			$arr_dates = $this->herd_model->get_test_dates_7_short($this->session->userdata('herd_code'));
-			foreach($arr_groupings as &$ag){
-				$arr_ref[$ag['id']] = (string)$ag['text'];
-				$arr_order[(string)$ag['text']] = $ag['list_order'];
-				$c = 0;
-				if(isset($arr_dates) && is_array($arr_dates)){
-					foreach($arr_dates[0] as $key => $value){
-						if ($key == $ag['text']) {
-							if ($value == '0-0') {
-								$value='No Test (-'.$c.')';
-							}
-							$ag['text'] = $value;
-							break;
-						}
-						$c++;
-					}
-				}
-			}
-			unset($ag);
-		
-			foreach($arr_groupings as $h){
-				$h['text'] = (string)$h['text'];
-				if($h['parent_id'] == NULL) {
-					$arr_fields[$h['text']] = $h['id'];
-				}
-				else{
-					set_element_by_key($arr_fields, $arr_ref[$h['parent_id']], array((string)$h['text'] => $h['id']));
-				}
-			}
-		}
-
-		
-		return array('arr_ref' => $arr_ref, 'arr_fields' => $arr_fields, 'arr_order' => $arr_order);
 	}
 
 	protected function get_join_text($primary_table, $join_table){
@@ -420,6 +78,7 @@ class Report_model extends CI_Model {
 	 * @param array sort order
 	 * @return array results of search
 	 * @author ctranel
+	 **/
 	function search($herd_code, $block_url, $arr_filter_criteria, $arr_sort_by = array(''), $arr_sort_order = array(''), $limit = NULL) {
 		$this->load->helper('multid_array_helper');
 		$this->herd_code = $herd_code;
@@ -457,7 +116,7 @@ class Report_model extends CI_Model {
 		/*now that the where clauses are set, let's see how many rows would be returned with that criteria.
 		 *If over 1000 and a filter has not yet been set for quartiles, add the 1st quartile as a filter.
 		 *Then we can add the select and sort data to the query.
-		 **
+		 **/
 		$this->{$this->db_group_name}->stop_cache();
 		if(isset($limit) === FALSE){
 			$this->{$this->db_group_name}->select('COUNT(*) AS c');
@@ -482,13 +141,13 @@ class Report_model extends CI_Model {
 		//$ret['arr_unsortable_columns'] = $this->arr_unsortable_columns;
 		return $ret;
 	}
-	 **/
 	
 	/**
 	 * @method prep_select_fields()
 	 * @param arr_fields: copy of fields array to be formatted into SQL
 	 * @return array of sql-prepped select fields
 	 * @author ctranel
+	 **/
 	protected function prep_select_fields(){
 		$arr_select_fields = $this->arr_db_field_list;
 		//@todo: add field for date format (null for non-dates), or use date flag if date formats have to be the same
@@ -524,7 +183,6 @@ class Report_model extends CI_Model {
 		}
 		return($arr_select_fields);
 	}
-	 **/
 	
 
 	/** function prep_where_criteria
@@ -532,6 +190,7 @@ class Report_model extends CI_Model {
 	 * translates filter criteria into sql format
 	 * @param $arr_filter_criteria
 	 * @return void
+	 */
 	
 	protected function prep_where_criteria($arr_filter_criteria, $block_url){
 		//incorporate built-in report filters if set
@@ -548,13 +207,16 @@ class Report_model extends CI_Model {
 				}
 				$this->{$this->db_group_name}->where($this->arr_where_field[$x] . $this->arr_where_operator[$x] . $this->arr_where_criteria[$x]);
 			}
-		}
+		} */
 		foreach($arr_filter_criteria as $k => $v){
 			//@todo: the below is only for sql server
 			if(strpos($k, '.') === FALSE) {
 				$db_field = isset($this->arr_field_table[$k]) && !empty($this->arr_field_table[$k])?$this->arr_field_table[$k] . '.' . $k: $this->primary_table_name . '.' . $k;
 			}
-
+/*
+ * @todo: 	find another way to acheive this--without naming specific blocks.  This handles pstring filters for 
+ * 			cow-level blocks that are on summary pages
+ */
 			if(($block_url == 'peak_milk_trends' || $block_url == 'dim_at_1st_breeding' || $block_url == 'bulk_tank_contribution') && substr($k,-7)=='pstring'){
 				if(is_array($v)){
 					$tmp = array_filter($v);
@@ -590,11 +252,11 @@ class Report_model extends CI_Model {
 			}
 		}
 	}
-	 */
 	
 	/*  
 	 * @method prep_group_by()
 	 * @author ctranel
+	 */
 	protected function prep_group_by(){
 		$arr_len = is_array($this->arr_group_by_field)?count($this->arr_group_by_field):0;
 		for($c=0; $c<$arr_len; $c++) {
@@ -604,13 +266,13 @@ class Report_model extends CI_Model {
 			}
 		}
 	}
-	 */
 	
 	/*  
 	 * @method prep_sort()
 	 * @param array fields to sort by
 	 * @param array sort order--corresponds to first parameter
 	 * @author ctranel
+	 */
 	protected function prep_sort($arr_sort_by, $arr_sort_order){
 		$arr_len = is_array($arr_sort_by)?count($arr_sort_by):0;
 		for($c=0; $c<$arr_len; $c++) {
@@ -627,7 +289,6 @@ class Report_model extends CI_Model {
 			}
 		}
 	}
-	 */
 	
 	/*  
 	 * @method pivot()

@@ -1,16 +1,19 @@
 <?php
 //namespace myagsource;
 require_once(APPPATH . 'libraries/filters/Filters.php');
-require_once(APPPATH . 'libraries/benchmarks_lib.php');
+require_once(APPPATH . 'libraries/Benchmarks/Benchmarks.php');
 require_once(APPPATH . 'libraries/Supplemental/Content/SupplementalFactory.php');
 require_once(APPPATH . 'libraries/dhi/HerdAccess.php');
-require_once(APPPATH . 'libraries/dhi/herd.php');
+require_once(APPPATH . 'libraries/dhi/Herd.php');
 require_once(APPPATH . 'libraries/Report/Content/Blocks.php');
 require_once(APPPATH . 'libraries/Site/WebContent/Blocks.php');
 require_once(APPPATH . 'libraries/Site/WebContent/Pages.php');
 require_once(APPPATH . 'libraries/Site/WebContent/Sections.php');
+require_once(APPPATH . 'libraries/Datasource/DbObjects/DbTable.php');
+require_once(APPPATH . 'libraries/Report/Content/BlockData.php');
+require_once(APPPATH . 'libraries/Report/Content/TableHeader.php');
 
-use \myagsource\settings\Benchmarks_lib;
+use \myagsource\Benchmarks\Benchmarks;
 use \myagsource\report_filters\Filters;
 use \myagsource\Supplemental\Content\SupplementalFactory;
 use \myagsource\dhi\HerdAccess;
@@ -19,6 +22,9 @@ use \myagsource\Site\WebContent\Sections;
 use \myagsource\Site\WebContent\Pages;
 use \myagsource\Site\WebContent\Blocks as WebBlocks;
 use \myagsource\Report\Content\Blocks;
+use \myagsource\Report\Content\BlockData;
+use \myagsource\Report\Content\TableHeader;
+use \myagsource\Datasource\DbObjects\DbTable;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
@@ -68,9 +74,16 @@ class report_block extends CI_Controller {
 	 **/
 	protected $blocks;
 	
+	/**
+	 * herd
+	 * 
+	 * Herd object
+	 * @var Herd
+	 **/
+	protected $herd;
+	
 	protected $arr_sort_by = [];
 	protected $arr_sort_order = [];
-	protected $herd_code;
 	protected $product_name;
 	protected $primary_model_name;
 	protected $section_path; //The path to the site section; set in constructor to point to the controller name
@@ -91,22 +104,42 @@ class report_block extends CI_Controller {
 	function __construct(){
 		parent::__construct();
 		$this->load->model('herd_model');
+		
+		// report content
 		$this->load->model('supplemental_model');
 		$this->load->model('ReportContent/report_block_model');
 		$this->blocks = new Blocks($this->report_block_model, new SupplementalFactory($this->supplemental_model, site_url()));
-//		$this->pages = new Pages($this->page_model, $this->blocks);
+
+		//web content
+		$this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
+		$this->load->model('web_content/block_model');
+		$this->web_blocks = new WebBlocks($this->block_model);
+		$this->pages = new Pages($this->page_model, $this->web_blocks);
 //		$sections = new Sections($this->section_model, $this->pages);
 
 		
 		$this->herd_access = new HerdAccess($this->herd_model);
-		$herd = new Herd($this->herd_model, $this->session->userdata('herd_code'));
-		
+		$this->herd = new Herd($this->herd_model, $this->session->userdata('herd_code'));
 //		$class_dir = $this->router->fetch_directory(); //this should match the name of this file (minus ".php".  Also used as base for css and js file names and model directory name
 //		$class = $this->router->fetch_class();
-//		$method = $this->router->fetch_method();
-
+		$method = $this->router->fetch_method();
 //		$this->section_path = $class_dir . $class;
-//var_dump($this->section_path);
+
+		// info used for links within datasets (table header sorts, etc)
+		$path = uri_string();
+		$arr_path = explode('/',$path);
+		$method_index = array_search($method, $arr_path);
+		$page_path = $arr_path[$method_index + 1];
+
+		$page_path = str_replace('|', '/', urldecode($page_path));
+		$arr_path = array_filter(explode('/', $page_path));
+		$path_page_segment = $arr_path[count($arr_path) - 1];
+		
+		$this->page = $this->pages->getByPath($path_page_segment);
+		$this->report_path = $this->section_path . $this->page->path();
+		$this->report_form_id = 'report_criteria';//filter-form';
+		
+
 		
 		//load most specific model available.  Must load model before setting section
 //		$path = uri_string();
@@ -117,16 +150,12 @@ class report_block extends CI_Controller {
 /*		$this->section_path = str_replace('land', 'dhi/', $this->section_path);
 		$this->section = $sections->getByPath($this->section_path);
 		$sections->loadChildren($this->section, $this->pages, $this->session->userdata('user_id'), $herd, $this->ion_auth_model->getTaskPermissions());
-		if($this->authorize($method)) {
-			$this->load->library('reports');
-			$this->reports->herd_code = $this->herd_code;
+*/
+		if(!$this->authorize($method)) {
+			if($this->session->flashdata('message')) $this->session->keep_flashdata('message');
+			if($method != 'ajax_report') $this->session->set_flashdata('redirect_url', $this->uri->uri_string());
+			redirect(site_url('auth/login'));
 		}
-*/		
-//		else {  //redirect to login if not logged in or session is expired
-//			if($this->session->flashdata('message')) $this->session->keep_flashdata('message');
-//			if($method != 'ajax_report') $this->session->set_flashdata('redirect_url', $this->uri->uri_string());
-//			redirect(site_url('auth/login'));
-//		}
 		
 		if($this->session->userdata('herd_code') == ''){ // || $this->session->userdata('herd_code') == '35990571'
 			$this->session->keep_flashdata('redirect_url');
@@ -146,11 +175,11 @@ class report_block extends CI_Controller {
 			echo "Your session has expired, please log in and try again..";
 			exit;
 		}
-		if(!$this->as_ion_auth->logged_in() && $this->herd_code != $this->config->item('default_herd')) {
+		if(!$this->as_ion_auth->logged_in()) {
 			echo "Your session has expired, please log in and try again...";
 			exit;
 		}
-		if(!isset($this->herd_code)){
+		if(!isset($this->herd)){
 			echo 'Either your session expired, or you have not yet chosen a herd.  Please select a herd and try again.';
   			exit;
 		}
@@ -158,24 +187,24 @@ class report_block extends CI_Controller {
 		//@todo: build display_hierarchy/report_organization, etc interface with get_scope function (with classes for super_sections, sections, etc)
 		$pass_unsubscribed_test = true; //$this->as_ion_auth->get_scope('sections', $this->section->id()) == 'pubic';
 		//@todo: redo access tests
-//		$pass_unsubscribed_test = $this->as_ion_auth->has_permission("View All Content") || $this->web_content_model->herd_is_subscribed($this->section->id(), $this->herd_code);
+//		$pass_unsubscribed_test = $this->as_ion_auth->has_permission("View All Content") || $this->web_content_model->herd_is_subscribed($this->section->id(), $this->herd->herdCode());
 		$pass_view_nonowned_test = $this->as_ion_auth->has_permission("View All Herds") || $this->session->userdata('herd_code') == $this->config->item('default_herd');
 		if(!$pass_view_nonowned_test){
-			$pass_view_nonowned_test = in_array($this->herd_code, $this->herd_access->getAccessibleHerdCodes($this->session->userdata('user_id'), $this->as_ion_auth->arr_task_permissions(), $this->session->userdata('arr_regions')));
+			$pass_view_nonowned_test = in_array($this->herd->herdCode(), $this->herd_access->getAccessibleHerdCodes($this->session->userdata('user_id'), $this->as_ion_auth->arr_task_permissions(), $this->session->userdata('arr_regions')));
 		}
 		if($pass_unsubscribed_test && $pass_view_nonowned_test){
 			return TRUE;
 		}
 		elseif(!$pass_unsubscribed_test && !$pass_view_nonowned_test) {
-			echo 'Herd ' . $this->herd_code . ' is not subscribed to the ' . $this->product_name . ', nor do you have permission to view this report for herd ' . $this->herd_code . '.  Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' if you have questions or concerns.';
+			echo 'Herd ' . $this->herd->herdCode() . ' is not subscribed to the ' . $this->product_name . ', nor do you have permission to view this report for herd ' . $this->herd->herdCode() . '.  Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' if you have questions or concerns.';
 			exit;
 		}
 		elseif(!$pass_unsubscribed_test) {
-			echo 'Herd ' . $this->herd_code . ' is not subscribed to the ' . $this->product_name . '.  Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' if you have questions or concerns.';
+			echo 'Herd ' . $this->herd->herdCode() . ' is not subscribed to the ' . $this->product_name . '.  Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' if you have questions or concerns.';
 			exit;
 		}
 		elseif(!$pass_view_nonowned_test) {
-			echo 'You do not have permission to view the ' . $this->product_name . ' for herd ' . $this->herd_code . '.  Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' if you have questions or concerns.';
+			echo 'You do not have permission to view the ' . $this->product_name . ' for herd ' . $this->herd->herdCode() . '.  Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' if you have questions or concerns.';
 			exit;
 		}
 		return FALSE;
@@ -183,18 +212,30 @@ class report_block extends CI_Controller {
 	
 	/*
 	 * ajax_report: Called via AJAX to populate graphs
-	 * @param string block: name of the block for which to retreive data
-	 * @param string output: method of output (chart, table, etc)
+	 * @param string page path
+	 * @param string block name
+	 * @param string output
+	 * @param string sort by
+	 * @param string sort order
 	 * @param boolean/string file_format: return the value of function (TRUE), or echo it (FALSE).  Defaults to FALSE
+	 * @param string test date
+	 * @param int report count
+	 * @param string serialized filter data
+	 * @param boolean first
 	 * @param string cache_buster: text to make page appear as a different page so that new data is retrieved
+	 * @todo: can I delete the last 2 params?
+	 * @todo: use post rather than get
 	 */
 	public function ajax_report($page_path, $block_name, $output, $sort_by = 'null', $sort_order = 'null', $file_format = 'web', $test_date = FALSE, $report_count=0, $json_filter_data = NULL, $first=FALSE, $cache_buster = NULL) {//, $herd_size_code = FALSE, $all_breeds_code = FALSE
+		//verify user has permission to view content for given herd
+		if(!$this->authorize()) {
+			die('not authorized');
+		}
+		
 		$page_path = str_replace('|', '/', urldecode($page_path));
 		$arr_path = array_filter(explode('/', $page_path));
 		$path_page_segment = $arr_path[count($arr_path) - 1];
 		$tmp_path = $page_path . $block_name;
-		
-		$this->herd_code = strlen($this->session->userdata('herd_code')) == 8?$this->session->userdata('herd_code'):NULL;
 		
 		//Load the most specific model that exists
 		while(strpos($tmp_path, '/') !== false){
@@ -205,20 +246,20 @@ class report_block extends CI_Controller {
 			}
 			$tmp_path = substr($tmp_path, 0, strripos($tmp_path, '/'));
 		}
-
 		//if no specific models found, go with the general report model
 		if(!isset($this->primary_model_name)){
 			$this->primary_model_name = 'report_model';
 			$this->load->model('report_model', '', FALSE, $this->section_path);
 		}
+		//End load model
 
 		
 		
 		//SUPPLEMENTAL DATA
-//set keyed array with all supplemental data for the block (bsf_id as key supplemental, with df_field id for params)?
-//All supp data is also included in block field data view.
 		$this->load->model('supplemental_model');
 		$supp_factory = new SupplementalFactory($this->supplemental_model, site_url());
+//set keyed array with all supplemental data for the block (bsf_id as key supplemental, with df_field id for params)?
+//All supp data is also included in block field data view.
 		//column data
 		//$block_supp = Supplemental::getColDataSupplemental($fd['bsf_id'], $this->supplemental_model, site_url());
 		
@@ -237,15 +278,10 @@ class report_block extends CI_Controller {
 		//$this->arr_header_links[$fn] = $block_supp->getContent();
 		//END SUPPLEMENTAL DATA
 				
-		//verify user has permission to view content for given herd
-		if($this->authorize()) {
-			$this->load->library('reports');
-			$this->reports->herd_code = $this->herd_code;
-		}
-		
 		//$this->page = $this->pages->getByPath(urldecode($page_name));
 
 		$block = $this->blocks->getByPath(urldecode($block_name));
+		$block->setReportFields($supp_factory);
 		$sort_by = urldecode($sort_by);
 		//$this->objPage = $this->{$this->primary_model_name}->arr_blocks[$this->page->path()];
 				
@@ -263,19 +299,41 @@ class report_block extends CI_Controller {
 		if(isset($json_filter_data)){
 			$section = $this->getSection($this->section_path);
 			$arr_params = (array)json_decode(urldecode($json_filter_data));
-			if(isset($arr_params['csrf_test_name']) && $arr_params['csrf_test_name'] != $this->security->get_csrf_hash()) die("I don't recognize your browser session, your session may have expired, or you may have cookies turned off.");
+			if(isset($arr_params['csrf_test_name']) && $arr_params['csrf_test_name'] != $this->security->get_csrf_hash()){
+				die("I don't recognize your browser session, your session may have expired, or you may have cookies turned off.");
+			}
 			unset($arr_params['csrf_test_name']);
 
+			/*
+			 * MANUALLY ADJUST FILTERS FOR PSTRINGS
+			 * @todo: 	find another way to acheive this--without naming specific blocks.  This handles pstring filters for
+			* 			cow-level blocks that are on summary pages
+			*/
+			foreach($arr_params as $k => $v){
+				if(($block->path() == 'peak_milk_trends' || $block->path() == 'dim_at_1st_breeding' || $block->path() == 'bulk_tank_contribution') && substr($k,-7)=='pstring'){
+					if(is_array($v)){
+						$tmp = array_filter($v);
+						if(empty($tmp)){
+							unset($arr_params[$k]);
+						}
+					}
+					elseif($v == 0){
+						unset($arr_params[$k]);
+					}
+				}
+			}
+		
+		
 			//prep data for filter library
 			$this->load->model('filter_model');
 			//load required libraries
 			$this->filters = new Filters($this->filter_model);
-			$primary_table = $this->{$this->primary_model_name}->get_primary_table_name();
+//			$primary_table = $this->{$this->primary_model_name}->get_primary_table_name();
 			$this->load->helper('multid_array_helper');
 			$this->filters->set_filters(
 					$section->id(),
 					$path_page_segment,
-					array('herd_code' => $this->session->userdata('herd_code')) + $arr_params
+					['herd_code' => $this->session->userdata('herd_code')] + $arr_params
 			);
 		}
 		// block-level supplemental data
@@ -284,45 +342,108 @@ class report_block extends CI_Controller {
 		$this->supplemental = $block_supp->getContent();
 		//end supplemental
 
-		$this->json = $block->loadData($report_count);
+		// benchmarks
+		$this->load->model('setting_model');
+		$herd_info = $this->herd_model->header_info($this->herd->herdCode());
+		$this->load->model('benchmark_model');
+		$this->benchmarks = new Benchmarks($this->session->userdata('user_id'), $this->input->post('herd_code'), $herd_info, $this->setting_model, $this->benchmark_model, $this->session->userdata('benchmarks'));
+		// end benchmarks
+		
+
+		
+		// report data
+		$this->load->model('ReportContent/report_data_model');
+		$this->load->model('Datasource/db_table_model');
+		$db_table = new DbTable($block->primaryTableName(), $this->db_table_model);
+		$block_data = new BlockData($block, $this->report_data_model, $this->benchmarks, $db_table);
+		$results = $block_data->loadData($report_count, ['herd_code' => '35690638']);
+		// end report data
+		
 		
 		//$this->json['supplemental'] = $this->supplemental;
-		$this->display = $output;
 		//set parameters for given block
 		
 		//common functionality
-		$first = ($first === 'true');
+		//$first = ($first === 'true');
 		if($file_format == 'csv'){
-			if($first){
-				$this->_record_access(90, 'csv', $this->config->item('product_report_code'));
-			}
-			return $this->report_data['report_data'];
+		//	if($first){
+		//		$this->_record_access(90, 'csv', $this->config->item('product_report_code'));
+		//	}
+			return $results;
 		}
 		elseif($file_format == 'pdf'){
-			if($first){
-				$this->_record_access(90, 'pdf', $this->config->item('product_report_code'));
-			}
-			if($this->display == 'html'){
+		//	if($first){
+		//		$this->_record_access(90, 'pdf', $this->config->item('product_report_code'));
+		//	}
+			if($output == 'html'){
 				return $this->html;
 			}
 			else {
-				return $this->report_data['report_data'];
+				return $results;
 			}
 		}
-		if($this->display == 'table'){
+		if($output == 'table'){
+			$header_groups = $this->report_block_model->getHeaderGroups($block->id());
+			$table_header = new TableHeader($block->ReportFields());
+			
+			//@todo: pull this only when needed?
+			$arr_dates = $this->herd_model->get_test_dates_7_short($this->session->userdata('herd_code'));
+			
+			$tmp = $table_header->getTableHeaderData($header_groups, $arr_dates);
+			$tmp2 = [
+				'form_id' => $this->report_form_id,
+				'report_path' => $block->path(),
+				'arr_sort_by' => $this->arr_sort_by,
+				'arr_sort_order' => $this->arr_sort_order,
+				'block' => $block->path(),
+				'report_count' => $report_count
+			];
+			$table_header_data = array_merge($tmp, $tmp2);
+			
+			
 			$this->json['html'] = $this->html;
 		}
 
-		if($first){
-			$this->_record_access(90, 'web', $this->config->item('product_report_code'));
+		if(isset($this->benchmarks)){
+			$bench_text = $this->benchmarks->get_bench_text();
 		}
+		$this->report_data = [
+//			'table_header' => $this->load->view('table_header', $table_header_data, TRUE),
+			'num_columns' => $table_header_data['num_columns'],
+			'table_id' => $block->path(),
+			'fields' => $arr_field_list,
+			'report_data' => $results,
+			'table_heading' => $title,
+			'table_sub_heading' => $subtitle,
+			'arr_numeric_fields' => $this->report_datasource->get_numeric_fields(),
+			'arr_decimal_places' => $this->report_datasource->get_decimal_places(),
+			'arr_field_links' => $this->report_datasource->get_field_links(),
+		];
+		
+		if(isset($this->supplemental) && !empty($this->supplemental)){
+			$this->report_data['supplemental'] = $this->supplemental;
+		}
+		
+		if(isset($bench_text)){
+			$this->report_data['table_benchmark_text'] = $bench_text;
+		}
+
+		if(isset($this->report_data) && is_array($this->report_data)) {
+			$this->html = $this->load->view('report_table.php', $this->report_data, TRUE);
+		}
+		else {
+			$this->html = '<p class="message">No data found.</p>';
+		}
+//		if($first){
+//			$this->_record_access(90, 'web', $this->config->item('product_report_code'));
+//		}
 		$this->json['section_data'] = [
 			'block' => $block_name,
 			'sort_by' => $sort_by,
 			'sort_order' => $sort_order,
 			'graph_order' => $report_count
 		];
-		$return_val = prep_output($this->display, $this->json, $report_count, $file_format);
+		$return_val = prep_output($output, $this->json, $report_count, $file_format);
 		if($return_val) {
 			return $return_val;
 		}

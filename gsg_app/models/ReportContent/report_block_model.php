@@ -83,14 +83,54 @@ class report_block_model extends CI_Model {
 	public function getFieldData($block_id){
 		return $this->{$this->db_group_name}
 			->select("bsf_id AS id, db_field_id, table_name, db_field_name, name, description, pdf_width, default_sort_order, data_type as datatype, max_length, 
-					decimal_points AS decimal_scale, unit_of_measure, is_timespan_field as is_timespan, is_fk_field AS is_foreign_key, is_nullable, is_natural_sort,
-					display AS displayed, a_href, a_rel, a_title, a_class, head_a_href, head_a_rel, head_a_title, head_a_class, head_supp_id, head_comment")
+					decimal_points AS decimal_scale, unit_of_measure, is_timespan_field as is_timespan, is_fk_field AS is_foreign_key, is_nullable, is_sortable, is_natural_sort,
+					is_displayed, a_href, a_rel, a_title, a_class, head_a_href, head_a_rel, head_a_title, head_a_class, head_supp_id, head_comment, aggregate,
+					display_format")
 			->where('block_id', $block_id)
 			->order_by('list_order')
 			->get('users.dbo.v_block_field_data')
 			->result_array();
 	}
 	
+	/**
+	 * get_select_field_structure()
+	 * 
+	 * returns block (i.e., table) header structure which provides a skeleton for the organization of fields in the arr_fields object variable
+	 * 				also
+	 * 
+	 * @param int id of current block
+	 * @return array: ref = lookup array for ids, arr_fields = skeleton structure for db_fields
+	 * @author ctranel
+	 **/
+	public function getHeaderGroups($block_in){
+		$grouping_sql = "WITH cteAnchor AS (
+					 SELECT bh.id, bh.[text], bh.parent_id, bh.list_order
+					 FROM users.dbo.block_header_groups bh
+					 	LEFT JOIN users.dbo.blocks_select_fields bs ON bh.id = bs.block_header_group_id
+					 WHERE block_id = " . $block_in . "
+				), cteRecursive AS (
+					SELECT id, [text], parent_id, list_order
+					  FROM cteAnchor
+					 UNION all 
+					 SELECT t.id, t.[text], t.parent_id, t.list_order
+					 FROM users.dbo.block_header_groups t
+					 join cteRecursive r ON r.parent_id = t.id
+				)
+				SELECT DISTINCT * FROM cteRecursive ORDER BY parent_id, list_order;";
+
+		$arr_groupings = $this->{$this->db_group_name}->query($grouping_sql)->result_array();
+			
+		if(!is_array($arr_groupings) || empty($arr_groupings)){
+			$arr_groupings = $this->{$this->db_group_name}
+				->query("SELECT 1 AS id, bf.header_text AS text, NULL AS parent_id, bf.list_order
+				FROM users.dbo.blocks_select_fields bf
+					LEFT JOIN users.dbo.db_fields f ON bf.field_id = f.id
+				WHERE bf.block_id = " . $block_in
+			)->result_array();
+		}
+		return $arr_groupings;
+	}
+
 	/**
 	 * get_block_links
 	 * @param int section id

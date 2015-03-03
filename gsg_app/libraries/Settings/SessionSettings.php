@@ -17,7 +17,7 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 *
 */
 
-class Session_settings {
+class SessionSettings {
 	/**
 	 * @var int
 	 */

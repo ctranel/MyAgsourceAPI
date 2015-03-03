@@ -1,7 +1,7 @@
 <?php
-require_once(APPPATH.'libraries' . FS_SEP . 'benchmarks_lib.php');
+require_once(APPPATH . 'libraries/Benchmarks/Benchmarks.php');
 
-use \myagsource\settings\Benchmarks_lib;
+use \myagsource\Benchmarks\Benchmarks;
 
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
@@ -67,13 +67,14 @@ class Benchmark extends CI_Controller {
 		$formatted_form_data = Benchmarks_lib::parseFormData($arr_params);
 
 		//set session benchmarks
-		//$benchmarks_lib->setSessionValues($formatted_form_data);
+		//$benchmarks->setSessionValues($formatted_form_data);
 		$this->session->set_userdata('benchmarks', $formatted_form_data);
 		
 		//if set default, write to database
 		if($make_default){
-			$benchmarks_lib = new Benchmarks_lib($this->session->userdata('user_id'), $this->session->userdata('herd_code'), $this->herd_model->header_info($this->session->userdata('herd_code')), $this->setting_model);
-			$benchmarks_lib->save_as_default($formatted_form_data);
+			$this->load->model('benchmark_model');
+			$benchmarks = new Benchmarks($this->session->userdata('user_id'), $this->session->userdata('herd_code'), $this->herd_model->header_info($this->session->userdata('herd_code')), $this->setting_model, $this->benchmark_model);
+			$benchmarks->save_as_default($formatted_form_data);
 		}
 			
 		$this->session->keep_flashdata('redirect_url');

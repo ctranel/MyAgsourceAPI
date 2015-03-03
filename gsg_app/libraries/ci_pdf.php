@@ -6,6 +6,7 @@ if(!defined('K_TCPDF_EXTERNAL_CONFIG')) {
 }
 	
 # include TCPDF
+//@todo: should actually be app url (not path)
 require(APPPATH.'config/tcpdf'.EXT);
 require_once($tcpdf['base_directory'].'/tcpdf.php');
 
@@ -19,7 +20,7 @@ require_once($tcpdf['base_directory'].'/tcpdf.php');
  * @version 1.0
  * @package tcpdf_ci
  ***********************************************************/
-class pdf extends TCPDF {
+class Ci_pdf extends TCPDF {
 	
 	
 	/**

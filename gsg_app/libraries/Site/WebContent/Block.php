@@ -109,11 +109,9 @@ class Block implements iWebContent {
 	/**
 	 * @method loadData()
 	 * @param int report_count
-	 * @param string file_format
 	 * @return void
 	 * @access public
-	* */
-	protected function loadData($report_count, $file_format){
+	protected function loadData($report_count){
 		$arr_this_block = get_element_by_key($block, $this->{$this->primary_model_name}->arr_blocks);
 		$this->max_rows = $arr_this_block['max_rows'];
 		$this->cnt_row = $arr_this_block['cnt_row'];
@@ -128,6 +126,7 @@ class Block implements iWebContent {
 			$this->load_chart($arr_this_block, $report_count);
 		}
 	}
+	* */
 	
 	/**
 	 * @method loadChildren()

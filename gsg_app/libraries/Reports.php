@@ -1,4 +1,8 @@
-<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php
+namespace myagsource\Report\Content;
+
+require_once APPPATH . 'libraries/Ci_pdf.php';
+
 /**
 * Name:  Report Function Library File
 *
@@ -24,58 +28,6 @@ class Reports{
 	public $herd_code;
 	
 	public function __construct(){
-		$this->ci =& get_instance();
-	}
-	
-	/**
-	 * get_herd_info - retrieves herd data (for use in report headers)
-	 * @return array of herd data
-	 * @author ctranel
-	 **/
-	public function get_herd_info($herd_code_in = FALSE){
-		if(!$herd_code_in) $herd_code_in = $this->herd_code;
-		return $this->ci->herd_model->header_info($herd_code_in);
-	}
-
-	/**
-	 * sort_text - sets text description of sort fields and order.
-	 * @return string description of sort fields and order
-	 * @author ctranel
-	 **/
-	public function sort_text($arr_sort_by, $arr_sort_order){
-		if(is_array($arr_sort_by) && !empty($arr_sort_by)){
-			$count = count($arr_sort_by);
-			for($x = 0; $x < $count; $x++){
-				$intro = $x == 0 ? 'Sorted by ': 'then ';
-				$sort_order_text = $arr_sort_order[$x] == "DESC"?'descending':'ascending';
-				$this->sort_text = $intro . ucwords(str_replace('_', ' ', $arr_sort_by[$x])) . ' in ' . $sort_order_text . ' order';
-			}
-			return $this->sort_text;
-		}
-		else {
-			$this->sort_text = '';
-			return false;
-		}
-	}
-	
-	/**
-	 * sort_text_brief - returns brief text description of sort fields and order.  Does not set object property
-	 * @return string description of sort fields and order
-	 * @author ctranel
-	 **/
-	public function sort_text_brief($arr_sort_by, $arr_sort_order){
-		if(is_array($arr_sort_by) && !empty($arr_sort_by)){
-			$count = count($arr_sort_by);
-			$ret_val = NULL;
-			for($x = 0; $x < $count; $x++){
-				$sort_order_text = $arr_sort_order[$x] == "DESC"?'descending':'ascending';
-				$ret_val = ucwords(str_replace('_', ' ', $arr_sort_by[$x])) . ', ' . $arr_sort_order[$x];
-			}
-			return $ret_val;
-		}
-		else {
-			return false;
-		}
 	}
 	
 	/**
@@ -115,7 +67,7 @@ class Reports{
 				$this->ci->pdf->arr_filter_text = $arr_filter_text;
 				$this->ci->pdf->arr_herd_data = $herd_data;
 				$this->ci->pdf->consultant = $objUser->first_name . ' ' . $objUser->last_name;
-				//$this->ci->pdf->bench_text = $this->ci->benchmarks_lib->get_bench_text();
+				//$this->ci->pdf->bench_text = $benchmarks->get_bench_text();
 				$this->ci->pdf->page_title = $product_name;
 				$this->ci->pdf->table_title = $b['title'];
 				if($first_table) $this->ci->pdf->AddPage();

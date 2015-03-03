@@ -19,7 +19,7 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
  * -----------------------------------------------------------------
  */
  
- class db_table implements iDataTable {
+ class DbTable implements iDataTable {
  	/**
 	 * database name
 	 * @var string

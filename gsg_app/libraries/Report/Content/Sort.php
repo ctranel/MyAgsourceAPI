@@ -61,7 +61,7 @@ class Sort implements iSort {
 	* -----------------------------------------------------------------
 	\*/
 	public function fieldName(){
-		return $this->datafield->name();
+		return $this->datafield->dbFieldName();
 	}
 
 	/* -----------------------------------------------------------------
@@ -77,6 +77,28 @@ class Sort implements iSort {
 	\*/
 	public function order(){
 		return $this->order;
+	}
+
+	/**
+	 * sort_text - sets text description of sort fields and order.
+	 * @return string description of sort fields and order
+	 * @author ctranel
+	 **/
+	public function sort_text($is_first){
+		$intro = $is_first ? 'Sorted by ': 'then ';
+		$sort_order_text = $this->order == "DESC"?'descending':'ascending';
+		$this->sort_text = $intro . ucwords(str_replace('_', ' ', $this->datafield->dbFieldName())) . ' in ' . $sort_order_text . ' order';
+	}
+	
+	/**
+	 * sort_text_brief - returns brief text description of sort fields and order.  Does not set object property
+	 * @return string description of sort fields and order
+	 * @author ctranel
+	 **/
+	public function sort_text_brief($is_first){
+		$intro = $is_first ? 'Sorted by ': 'then ';
+		$sort_order_text = $this->order == "DESC"?'descending':'ascending';
+		$this->sort_text = $intro . ucwords(str_replace('_', ' ', $this->datafield->dbFieldName())) . ', ' . $sort_order_text;
 	}
 }
 

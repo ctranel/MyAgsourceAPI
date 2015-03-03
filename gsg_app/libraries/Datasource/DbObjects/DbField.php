@@ -127,6 +127,14 @@ class DbField implements iDataField {
 		$this->is_nullable = $is_nullable;
 		$this->is_natural_sort = $is_natural_sort;
 	}
+	
+	public function dbFieldName(){
+		return $this->db_field_name;
+	}
+
+	public function dbTableName(){
+		return $this->db_table;
+	}
 }
 
 ?>

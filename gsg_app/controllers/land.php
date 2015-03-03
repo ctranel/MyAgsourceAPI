@@ -1,9 +1,9 @@
 <?php
-require_once(APPPATH.'libraries' . FS_SEP . 'benchmarks_lib.php');
+require_once(APPPATH . 'libraries/Benchmarks/Benchmarks.php');
 require_once APPPATH . 'controllers/report_parent.php';
-require_once(APPPATH . 'libraries' . FS_SEP . 'filters' . FS_SEP . 'Filters.php');
+require_once(APPPATH . 'libraries/filters/Filters.php');
 
-use \myagsource\settings\Benchmarks_lib;
+use \myagsource\Benchmarks\Benchmarks;
 use \myagsource\report_filters\Filters;
 
 defined('BASEPATH') OR exit('No direct script access allowed');
@@ -201,8 +201,9 @@ class Land extends parent_report {
 		}
 		
 		$this->load->model('setting_model');
-		$this->benchmarks_lib = new Benchmarks_lib($this->session->userdata('user_id'), $this->input->post('herd_code'), $this->herd_model->header_info($this->herd_code), $this->setting_model);
-		$arr_benchmark_data = $this->benchmarks_lib->getFormData($this->session->userdata('benchmarks')); 
+		$this->load->model('benchmark_model');
+		$this->benchmarks = new Benchmarks($this->session->userdata('user_id'), $this->input->post('herd_code'), $this->herd_model->header_info($this->herd->herdCode()), $this->setting_model, $this->benchmark_model, $this->session->userdata('benchmarks'));
+		$arr_benchmark_data = $this->benchmarks->getFormData($this->session->userdata('benchmarks')); 
 		if(isset($arr_benchmark_data)){
 			$this->data['widget']['info'][] = array(
 				'content' => $this->load->view('set_benchmarks', $arr_benchmark_data, TRUE),

@@ -36,8 +36,7 @@
 	 * 
 	 * ADD TRAILING SLASH!
 	 ***********************************************************/
-	$thisci =& get_instance();
-	$tcpdf['app_base_url'] = $thisci->config->item('base_url');
+	$tcpdf['app_base_url'] = APPPATH;
 	$tcpdf['base_url'] = $tcpdf['app_base_url'] . 'third_party/tcpdf/';
 	
 	

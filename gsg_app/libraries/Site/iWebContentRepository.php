@@ -2,7 +2,7 @@
 
 namespace myagsource\Site;
 
-require_once(APPPATH . 'libraries/dhi/herd.php');
+require_once(APPPATH . 'libraries/dhi/Herd.php');
 
 use myagsource\dhi\Herd;
 /**
