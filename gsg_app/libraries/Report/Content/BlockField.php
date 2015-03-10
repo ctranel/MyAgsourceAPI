@@ -86,11 +86,11 @@ abstract class BlockField {
 		$this->data_supp = $data_supp;
 	}
 	
-	/* debugging  */
+	/* debugging
 	public function id() {
 		return $this->id;
 	}
-
+  */
 	public function dbFieldName() {
 		return $this->data_field->dbFieldName();
 	}

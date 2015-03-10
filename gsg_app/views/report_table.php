@@ -48,6 +48,9 @@
 					if($fields):
 						//@todo: pull this logic out of view?
 						foreach($fields as $f)://$field_display => $field_name):
+							if(!$f->isDisplayed()){
+								continue;
+							}
 							$field_name = $f->dbFieldName();
 							if(is_array($cr) && array_key_exists($field_name, $cr)){
 								$value = $cr[$field_name];
@@ -69,12 +72,11 @@
 							}
 							
 							$supplemental = $f->dataSupplemental();
-														
 							if(isset($supplemental)){
 							//if(isset($arr_field_links[$field_name]) && !empty($arr_field_links[$field_name])){
-								//if there is a field name place-holder in the link, replace it with field value
-var_dump($supplemental);
-								$value = current($arr_field_links[$field_name]);
+								//supplemental comments are not currently an option, only supplemental links
+								$orig_val = $value;
+								$value = $supplemental['links'][0];
 								preg_match_all('~\{(.*?)\}~', $value, $tmp);
 								$arr_param_fields = $tmp[1];
 								if(isset($arr_param_fields) && is_array($arr_param_fields) && !empty($arr_param_fields)){
@@ -85,7 +87,7 @@ var_dump($supplemental);
 									}
 								}
 								//replace anchor tag content with field value
-								//@todo: this should be a function with parameter values of $value and $cr[$field_name]
+								//@todo: this should be a function with parameter values of $value and $field_name
 								$doc = DOMDocument::loadXML($value);
 								$tag = $doc->getElementsByTagName('a')->item(0);
 								$newText = new DOMText($cr[$field_name]);
@@ -107,5 +109,5 @@ var_dump($supplemental);
 		?></tbody>
 	</table>
 	<?php if(count($report_data) > 20): ?>
-		<table id="fh-<?php echo $table_id; ?>" class="fixed-header"></table>
+		<table id="fh-<?php echo $block->path(); ?>" class="fixed-header"></table>
 	<?php endif; ?>

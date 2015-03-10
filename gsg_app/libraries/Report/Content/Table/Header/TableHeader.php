@@ -115,10 +115,10 @@ class TableHeader {
 	protected function setTableHeaderGroups($arr_dates = null){
 //var_dump($arr_dates);
 		if(is_array($this->header_groups) && !empty($this->header_groups)){
-			foreach($this->header_groups as &$ag){
-				$c = 0;
 		//@todo: KLM block should not be in this class--controller?
 		//KLM - Added logic to convert header text to date text from herd_model function get_test_dates_7_short
+			foreach($this->header_groups as &$ag){
+				$c = 0;
 				if(isset($arr_dates) && is_array($arr_dates)){
 					foreach($arr_dates[0] as $key => $value){
 						if ($key == $ag['text']) {
@@ -131,9 +131,9 @@ class TableHeader {
 						$c++;
 					}
 				}
-		//end KLM	
 			}
 			unset($ag);
+		//end KLM	
 			foreach($this->header_groups as $h){
 				//if it is a top level element
 				if($h['parent_id'] == NULL) {

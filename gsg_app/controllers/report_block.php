@@ -417,11 +417,6 @@ class report_block extends CI_Controller {
 			'num_columns' => $table_header->columnCount(),
 			'block' => $block,
 			'report_data' => $results,
-//			'table_id' => $block->path(),
-//			'fields' => $block->reportFields(),//$arr_field_list,
-//			'table_heading' => $block->title(),
-//			'table_sub_heading' => $block->subtitle(),
-//			'arr_field_links' => $this->report_datasource->get_field_links(),
 		];
 		
 		if(isset($this->supplemental) && !empty($this->supplemental)){
@@ -433,12 +428,12 @@ class report_block extends CI_Controller {
 		}
 
 		if(isset($this->report_data) && is_array($this->report_data)) {
-			$this->html = $this->load->view('report_table.php', $this->report_data, TRUE);
-print($this->html);
+			$this->json['html'] = $this->load->view('report_table.php', $this->report_data, TRUE);
 		}
 		else {
-			$this->html = '<p class="message">No data found.</p>';
+			$this->json['html'] = '<p class="message">No data found.</p>';
 		}
+print($this->json['html']);
 //		if($first){
 //			$this->_record_access(90, 'web', $this->config->item('product_report_code'));
 //		}

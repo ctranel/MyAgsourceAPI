@@ -50,9 +50,9 @@ class TableBlock extends Block {
 		$arr_ret = array();
 		$arr_res = $this->datasource->getFieldData($this->id);
 		if(is_array($arr_res)){
-			$header_supp = null;
-			$data_supp = null;
 			foreach($arr_res as $s){
+				$header_supp = null;
+				$data_supp = null;
 				if(isset($s['aggregate']) && !empty($s['aggregate'])){
 					$this->has_aggregate = true;
 				}
