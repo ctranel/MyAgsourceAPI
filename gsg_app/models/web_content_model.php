@@ -505,7 +505,6 @@ die('here');
 					);
 				}
  			}
-var_dump($arr_return);
  			return $arr_return;
 		}
 		else return FALSE;

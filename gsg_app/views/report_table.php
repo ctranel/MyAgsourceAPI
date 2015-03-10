@@ -7,12 +7,12 @@
 	
 	if (!empty($table_heading)): ?>
 		<h2 class="block">
-			<?php echo $table_heading; ?>
+			<?php echo $block->title(); ?>
 		</h2>
 	<?php endif; ?>	
 	<?php if (!empty($table_sub_heading)): ?>
 		<h3 class="block">
-			<?php echo $table_sub_heading; ?>
+			<?php echo 'subtitle here';//$block->subtitle(); ?>
 		</h3>
 	<?php endif; ?>	
 	<?php if (!empty($table_benchmark_text)): ?>
@@ -29,24 +29,26 @@
 	<?php
 	endif;
 	?>
-	<table id="<?php echo $table_id; ?>" class="tbl">
+	<table id="<?php echo $block->path(); ?>" class="tbl">
 		<?php if (!empty($table_header)): ?>
 				<thead> <?php echo $table_header; ?> </thead>
 		<?php endif;
 		 ?><tbody>
 			<?php $c = 1;
 			if(!empty($report_data) && is_array($report_data)):
+				$fields = $block->reportFields();
 				foreach($report_data as $cr):
 				$row_class = $c % 2 == 1?'odd':'even';
 				/*
 				 * $field_label is used when the data is pivoted.  In those cases, the db_field does not come along with the data, so the label of the
 				 * first column is used to look up is_numeric and decimal values
 				 */				
-			$field_label = current($cr);
+				$field_label = current($cr);
 				?><tr class="<?php echo $row_class; ?>"><?php
-					if(is_array($fields)):
+					if($fields):
 						//@todo: pull this logic out of view?
-						foreach($fields as $field_display => $field_name):
+						foreach($fields as $f)://$field_display => $field_name):
+							$field_name = $f->dbFieldName();
 							if(is_array($cr) && array_key_exists($field_name, $cr)){
 								$value = $cr[$field_name];
 							}
@@ -58,14 +60,20 @@
 							}
 							//if data is from a pivot, use $field_label else $field_name
 							$tmp_key = isset($arr_decimal_places[$field_label]) ? $field_label : $field_name;
-							if($field_name == 'control_num' || $field_name == 'list_order_num'){
-								$value = number_format($value,$arr_decimal_places[$tmp_key],'.','');
+							//@todo: remove references to specific field names
+							//if($field_name == 'control_num' || $field_name == 'list_order_num'){
+							//	$value = number_format($value,$arr_decimal_places[$tmp_key],'.','');
+							//}
+							if($f->isNumeric() && $tmp_key != $value){
+								$value = number_format($value, $f->decimalScale());
 							}
-							elseif(in_array($tmp_key, $arr_numeric_fields) && is_numeric($value) && $tmp_key != $value){
-								$value = number_format($value, $arr_decimal_places[$tmp_key]);
-							}
-							if(isset($arr_field_links[$field_name]) && !empty($arr_field_links[$field_name])){
+							
+							$supplemental = $f->dataSupplemental();
+														
+							if(isset($supplemental)){
+							//if(isset($arr_field_links[$field_name]) && !empty($arr_field_links[$field_name])){
 								//if there is a field name place-holder in the link, replace it with field value
+var_dump($supplemental);
 								$value = current($arr_field_links[$field_name]);
 								preg_match_all('~\{(.*?)\}~', $value, $tmp);
 								$arr_param_fields = $tmp[1];

@@ -2,14 +2,14 @@
 
 namespace myagsource\Report\Content;
 
-require_once(APPPATH . 'libraries/Report/Content/TableBlock.php');
-require_once(APPPATH . 'libraries/Report/Content/ChartBlock.php');
+require_once(APPPATH . 'libraries/Report/Content/Table/TableBlock.php');
+require_once(APPPATH . 'libraries/Report/Content/Chart/ChartBlock.php');
 //require_once(APPPATH . 'libraries/Report/iReportContentRepository.php');
 require_once(APPPATH . 'libraries/Report/iBlock.php');
 require_once(APPPATH . 'libraries/dhi/Herd.php');
 
-use \myagsource\Report\Content\TableBlock;
-use \myagsource\Report\Content\ChartBlock;
+use \myagsource\Report\Content\Table\TableBlock;
+use \myagsource\Report\Content\Chart\ChartBlock;
 use \myagsource\Report\iBlock;
 use \myagsource\dhi\Herd;
 use myagsource\Supplemental\Content\SupplementalFactory;

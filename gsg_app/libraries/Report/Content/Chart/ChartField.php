@@ -1,6 +1,6 @@
 <?php
 
-namespace myagsource\Report\Content;
+namespace myagsource\Report\Content\Chart;
 
 //require_once APPPATH . 'libraries/Site/iWebContentRepository.php';
 require_once APPPATH . 'libraries/Report/Content/BlockField.php';

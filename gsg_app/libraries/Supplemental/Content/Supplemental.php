@@ -72,12 +72,12 @@ class Supplemental
 		$arr_supplemental = [];
 		if (isset($this->links) && is_object($this->links)){
 			foreach($this->links as $s){
-				$arr_supplemental[] = $s->anchorTag();
+				$arr_supplemental['links'][] = $s->anchorTag();
 			}
 		}
 		if (isset($this->comments) && is_object($this->comments)){
 			foreach($this->comments as $s){
-				$arr_supplemental[] = $s->comment();
+				$arr_supplemental['comments'][] = $s->comment();
 			}
 		}
 		return $arr_supplemental;

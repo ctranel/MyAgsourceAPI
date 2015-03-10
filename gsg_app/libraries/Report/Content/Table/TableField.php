@@ -1,6 +1,6 @@
 <?php
 
-namespace myagsource\Report\Content;
+namespace myagsource\Report\Content\Table;
 
 //require_once APPPATH . 'libraries/Site/iWebContentRepository.php';
 require_once APPPATH . 'libraries/Report/Content/BlockField.php';
@@ -52,8 +52,13 @@ class TableField extends BlockField {
 
 	/**
 	 */
-	function __construct($id, $name, DbField $data_field, $is_displayed, $display_format, $aggregate, $is_sortable, $header_supp, $data_supp) {
+	function __construct($id, $name, DbField $data_field, $is_displayed, $display_format, $aggregate, $is_sortable, $header_supp, $data_supp, $header_group_id) {
 		parent::__construct($id, $name, $data_field, $is_displayed, $display_format, $aggregate, $is_sortable, $header_supp, $data_supp);
+		$this->header_group_id = $header_group_id;
+	}
+	
+	public function headerGroupId(){
+		return $this->header_group_id;
 	}
 
 }

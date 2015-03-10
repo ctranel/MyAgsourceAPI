@@ -4,6 +4,7 @@ namespace myagsource\Report\Content;
 require_once APPPATH . 'libraries/Datasource/DbObjects/DbField.php';
 
 use \myagsource\Datasource\DbObjects\DbField;
+use myagsource\Supplemental\Content\Supplemental;
 
 /**
  * Name:  BlockField
@@ -58,6 +59,18 @@ abstract class BlockField {
 	 **/
 	protected $is_displayed;
 	
+	/**
+	 * header_supp
+	 * @var Supplemental
+	 **/
+	protected $header_supp;
+	
+	/**
+	 * data_supp
+	 * @var Supplemental
+	 **/
+	protected $data_supp;
+	
 	
 	/**
 	 */
@@ -69,14 +82,37 @@ abstract class BlockField {
 		$this->display_format = $display_format;
 		$this->aggregate = $aggregate;
 		$this->is_sortable = $is_sortable;
+		$this->header_supp = $header_supp;
+		$this->data_supp = $data_supp;
 	}
 	
+	/* debugging  */
+	public function id() {
+		return $this->id;
+	}
+
 	public function dbFieldName() {
 		return $this->data_field->dbFieldName();
 	}
 
+	public function displayName() {
+		return $this->name;
+	}
+
+	public function decimalScale() {
+		return $this->data_field->decimalScale();
+	}
+
 	public function isSortable() {
 		return $this->is_sortable;
+	}
+
+	public function isDisplayed() {
+		return $this->is_displayed;
+	}
+
+	public function isNumeric() {
+		return $this->data_field->isNumeric();
 	}
 
 	public function isAggregate() {
@@ -85,6 +121,16 @@ abstract class BlockField {
 
 	public function dbTableName() {
 		return $this->data_field->dbTableName();
+	}
+	
+	public function pdfWidth() {
+		return $this->data_field->pdfWidth();
+	}
+
+	public function dataSupplemental() {
+		if(isset($this->data_supp)){
+			return $this->data_supp->getContent();
+		}
 	}
 
 	public function selectFieldText() {

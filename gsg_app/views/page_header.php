@@ -54,7 +54,6 @@
 		<ul class="nav navbar-nav">
 		<?php
 			//@todo MOVE THIS BLOCK TO THE CONTROLLERS OR MAYBE A LIBRARY?
-//var_dump($user_sections);
 			if(isset($user_sections) && is_a($user_sections, 'SplObjectStorage')):
 				$first = TRUE;
 				foreach($user_sections as $a):

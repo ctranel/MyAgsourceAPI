@@ -6,11 +6,12 @@ require_once APPPATH . 'libraries/Report/Content/Sort.php';
 require_once APPPATH . 'libraries/Datasource/DbObjects/DbField.php';
 //require_once APPPATH . 'libraries/Site/iWebContentRepository.php';
 
-use \myagsource\Site\iBlock;
+use \myagsource\Report\iBlock;
 use \myagsource\dhi\Herd;
 use \myagsource\Report\Content\Sort;
 use \myagsource\Datasource\DbObjects\DbField;
 use \myagsource\Supplemental\Content\SupplementalFactory;
+use myagsource\Datasource\iDataField;
 
 /**
 * Name:  Block
@@ -172,7 +173,7 @@ abstract class Block implements iBlock {
 	 * @author ctranel
 	 **/
 	public function __construct($block_datasource, $id, $page_id, $name, $description, $scope, $active, $path, $max_rows, $cnt_row, 
-			$sum_row, $avg_row, $bench_row, $is_summary, $display_type, \myagsource\Supplemental\Content\SupplementalFactory $supp_factory = null) {
+			$sum_row, $avg_row, $bench_row, $is_summary, $display_type, SupplementalFactory $supp_factory = null) {
 		$this->datasource = $block_datasource;
 		$this->id = $id;
 		$this->page_id = $page_id;
@@ -222,6 +223,10 @@ abstract class Block implements iBlock {
 		return $this->primary_table_name;
 	}
 
+	public function sorts(){
+		return $this->sorts;
+	}
+
 	public function joins(){
 		return $this->joins;
 	}
@@ -242,7 +247,7 @@ abstract class Block implements iBlock {
 		return $this->sum_row;
 	}
 	
-	public function ReportFields(){
+	public function reportFields(){
 		return $this->report_fields;
 	}
 
@@ -265,10 +270,59 @@ abstract class Block implements iBlock {
 	}
 	
 	/**
+	 * @method resetSort()
+	 * @return void
+	 * @access public
+	* */
+	public function resetSort(){
+		$this->sorts->removeAll($this->sorts);
+	}
+	
+	/**
+	 * @method addSort()
+	 * @param SplObjectStorage of Sort objects
+	 * @return void
+	 * @access public
+	* */
+	public function addSort(Sort $sort){
+		$this->sorts->attach($sort);
+	}
+	
+	/**
+	 * @method addSortField()
+	 * @param iDataField sort field
+	 * @param string sort order
+	 * @return void
+	 * @access public
+	* */
+	public function addSortField(iDataField $datafield, $sort_order){
+		$this->sorts->attach(new Sort($datafield, $sort_order));
+	}
+	
+	/**
+	 * @method setDefaultSort()
+	 * @return void
+	 * @author ctranel
+	 **/
+	public function setDefaultSort(){
+		$this->default_sorts = new \SplObjectStorage();
+		
+		$arr_ret = array();
+		$arr_res = $this->datasource->getSortData($this->id);
+		if(is_array($arr_res)){
+			foreach($arr_res as $s){
+				$datafield = new DbField($s['db_field_id'], $s['db_table_id'], $s['db_field_name'], $s['name'], $s['description'], $s['pdf_width'], $s['default_sort_order'],
+						 $s['datatype'], $s['max_length'], $s['decimal_scale'], $s['unit_of_measure'], $s['is_timespan'], $s['is_foreign_key'], $s['is_nullable'], $s['is_natural_sort']);
+				$this->default_sorts->attach(new Sort($datafield, $s['sort_order']));
+			}
+			$this->sorts = $this->default_sorts;
+		}
+	}
+	
+	/**
 	 * @method sortFieldNames()
 	 * @return ordered array of field names
 	 * @access public
-	* */
 	public function sortFieldNames(){
 		$ret = [];
 		if(isset($this->sorts) && count($this->sorts) > 0){
@@ -279,7 +333,25 @@ abstract class Block implements iBlock {
 		
 		return $ret;
 	}
-
+	* */
+	/**
+	 * sortOrders
+	 *
+	 * @method sortOrders()
+	 * @return ordered array of sort orders
+	 * @access public
+	 public function sortOrders(){
+	 $ret = [];
+	 if(isset($this->sorts) && count($this->sorts) > 0){
+	 foreach($this->sorts as $s){
+	 $ret[] = $s->order();
+	 }
+	 }
+	
+	 return $ret;
+	 }
+	 * */
+	
 	/**
 	 * @method getFieldTable()
 	 * @param field name
@@ -308,7 +380,6 @@ abstract class Block implements iBlock {
 	 * @method setReportFields()
 	 * @return void
 	 * @access public
-	 **/
 	public function setReportFields(SupplementalFactory $supp_factory = null){
 		$arr_table_ref_cnt = [];
 		$this->has_aggregate = false;
@@ -324,8 +395,12 @@ abstract class Block implements iBlock {
 					$this->has_aggregate = true;
 				}
 				if(isset($supp_factory)){
-					$header_supp = $supp_factory->getColHeaderSupplemental($s['id'], $s['head_a_href'], $s['head_a_rel'], $s['head_a_title'], $s['head_a_class'], $s['head_comment']);
-					$data_supp = $supp_factory->getColDataSupplemental($s['id'], $s['a_href'], $s['a_rel'], $s['a_title'], $s['a_class']);
+					if(isset($s['head_a_href']) || isset($s['head_a_rel']) || isset($s['head_a_title']) || isset($s['head_a_class']) || isset($s['head_comment'])){
+						$header_supp = $supp_factory->getColHeaderSupplemental($s['head_supp_id'], $s['head_a_href'], $s['head_a_rel'], $s['head_a_title'], $s['head_a_class'], $s['head_comment']);
+					}
+					if(isset($s['a_href']) || isset($s['a_rel']) || isset($s['a_title']) || isset($s['a_class'])){
+						$data_supp = $supp_factory->getColDataSupplemental($s['supp_id'], $s['a_href'], $s['a_rel'], $s['a_title'], $s['a_class']);
+					}
 				}
 				$arr_table_ref_cnt[$s['table_name']] = isset($arr_table_ref_cnt[$s['table_name']]) ? ($arr_table_ref_cnt[$s['table_name']] + 1) : 1;
 				$datafield = new DbField($s['db_field_id'], $s['table_name'], $s['db_field_name'], $s['name'], $s['description'], $s['pdf_width'], $s['default_sort_order'],
@@ -343,6 +418,7 @@ abstract class Block implements iBlock {
 			}
 		}
 	}
+	 **/
 	
 	/**
 	 * @method getSelectFields()
@@ -385,24 +461,6 @@ abstract class Block implements iBlock {
 		return $ret;
 	}
 	
-	/**
-	 * sortOrders
-	 * 
-	 * @method sortOrders()
-	 * @return ordered array of sort orders
-	 * @access public
-	* */
-	public function sortOrders(){
-		$ret = [];
-		if(isset($this->sorts) && count($this->sorts) > 0){
-			foreach($this->sorts as $s){
-				$ret[] = $s->order();
-			}
-		}
-		
-		return $ret;
-	}
-
 	public function defaultSort(){
 		return $this->default_sort;
 	}
@@ -421,27 +479,6 @@ abstract class Block implements iBlock {
 	* */
 	protected function setPivot(iDataField $pivot_field){
 		$this->pivot_field = $pivot_field;
-	}
-	
-	/**
-	 * @method setDefaultSort()
-	 * @param SplObjectStorage of Sort objects
-	 * @return void
-	 * @author ctranel
-	 **/
-	public function setDefaultSort(){
-		$this->default_sorts = new \SplObjectStorage();
-		
-		$arr_ret = array();
-		$arr_res = $this->datasource->getSortData($this->id);
-		if(is_array($arr_res)){
-			foreach($arr_res as $s){
-				$datafield = new DbField($s['db_field_id'], $s['db_table_id'], $s['db_field_name'], $s['name'], $s['description'], $s['pdf_width'], $s['default_sort_order'],
-						 $s['datatype'], $s['max_length'], $s['decimal_scale'], $s['unit_of_measure'], $s['is_timespan'], $s['is_foreign_key'], $s['is_nullable'], $s['is_natural_sort']);
-				$this->default_sorts->attach(new Sort($datafield, $s['sort_order']));
-			}
-			$this->sorts = $this->default_sorts;
-		}
 	}
 	
 	/**

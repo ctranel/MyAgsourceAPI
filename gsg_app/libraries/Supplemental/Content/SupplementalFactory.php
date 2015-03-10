@@ -111,13 +111,13 @@ class SupplementalFactory
 	*  @return: Supplemental object
 	*  @throws:
 	* -----------------------------------------------------------------*/
-	public function getColHeaderSupplemental($field_id, $href, $rel, $title, $class, $comment) {
+	public function getColHeaderSupplemental($supp_id, $href, $rel, $title, $class, $comment) {
 		$supplemental_links = new \SplObjectStorage();
 		$supplemental_comments = new \SplObjectStorage();
 		
 		// Links
 		//$links = $this->datasource->getLinks(4, $field_id);
-		$tmp = new SupplementalLink($this->site_url, $field_id, $href, $rel, $title, $class);
+		$tmp = new SupplementalLink($this->site_url, $supp_id, $href, $rel, $title, $class);
 		$tmp->setParams($this->datasource);
 		$supplemental_links->attach($tmp);
 		// Comments
@@ -146,13 +146,13 @@ class SupplementalFactory
 	*  @return: Supplemental object
 	*  @throws:
 	* -----------------------------------------------------------------*/
-	public function getColDataSupplemental($field_id, $href, $rel, $title, $class) {
+	public function getColDataSupplemental($supp_id, $href, $rel, $title, $class) {
 		$supplemental_links = new \SplObjectStorage();
 		$supplemental_comments = new \SplObjectStorage();
 		
 		// Links
 		//$links = $this->datasource->getLinks(4, $field_id);
-		$tmp = new SupplementalLink($this->site_url, $field_id, $href, $rel, $title, $class);
+		$tmp = new SupplementalLink($this->site_url, $supp_id, $href, $rel, $title, $class);
 		$tmp->setParams($this->datasource);
 		$supplemental_links->attach($tmp);
 

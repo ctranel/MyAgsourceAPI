@@ -367,58 +367,6 @@ if ( ! function_exists('array_extract_value_recursive')) {
 	}
 }
 
-if ( ! function_exists('set_element_by_key')) {
-	/**
-	 * @description Sets value for first match of $key in mulitdimensional array
-	 *
-	 * @param array into which value will be inserted
-	 * @param key
-	 * @param mixed value to be inserted
-	 * @return void
-	 * @author ctranel
-	 */
-    function set_element_by_key(&$input, $key_in, $new_val_in, $arr_order = NULL){
-    	if (!is_array($input)){
-            return false;
-        }
-        $cnt = 0;
-		$arr_copy = $input;
-        foreach ($arr_copy AS $key => $value){
-        	$key = (string)$key;
-        	if (is_array($input[$key])){
-        	   	if (!empty($new_val_in) && !empty($key_in)){
-                    if($key == $key_in){
-                   		$input[$key] = $input[$key] + $new_val_in;
-                    }
-                }
-                set_element_by_key($input[$key], $key_in, $new_val_in, $arr_order);
-            }
-            else{
-            	$saved_value = $value;
-            	if (!empty($new_val_in)){
-	                if (!empty($key_in)){
-	                    if($key == $key_in) $value = $new_val_in;
-	                }
-	                elseif (is_array($input)){
-				    //root level $input does not have a key, and cannot have list order.  if key_in is empty, traverse array and insert in appropriate slot
-	                	if(isset($arr_order) && is_array($arr_order) && $arr_order[key($new_val_in)] == ($arr_order[$key] - 1)){
-	                		array_insert($input, $cnt, $new_val_in);
-	                    }
-	                    elseif($arr_order[key($new_val_in)] == count($arr_order) && $arr_order[key($new_val_in)] == $arr_order[$key]){
-	                    	$input[$key] = $new_val_in[$key];
-	                    }
-	                }
-	                if ($value != $saved_value){
-	                    $input[$key] = $value;
-	                }
-            	}
-            }
-            $cnt++;
-        }
-        return true;
-    }
-}
-
 if ( ! function_exists('merge_arrays_on_value_key_match')) {
 	/**
 	 * @description Returns an array in which values of param2 are inserted into param1 where the key of param2 

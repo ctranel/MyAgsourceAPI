@@ -175,14 +175,16 @@ class SupplementalLink extends \SplObjectStorage
 		$param_text = '';
 		if(isset($this->href) && !empty($this->href)){
 			$external = (strpos($this->href, $this->site_url) === false && strpos($this->href, 'http') !== false);
-			foreach($this->params as $p){
-				$param_text .= $p->urlText($external, $param_text === '');
-			}
-			if(strpos($this->href, 'http') === false){
-				$ret .= ' href="' . $this->site_url . $this->href . $param_text . '"';
-			}
-			else{
-				$ret .= ' href="' . $this->href . $param_text . '"';
+			if(isset($this->params)){
+				foreach($this->params as $p){
+					$param_text .= $p->urlText($external, $param_text === '');
+				}
+				if(strpos($this->href, 'http') === false){
+					$ret .= ' href="' . $this->site_url . $this->href . $param_text . '"';
+				}
+				else{
+					$ret .= ' href="' . $this->href . $param_text . '"';
+				}
 			}
 		}
 	 	if(isset($this->a_class) && !empty($this->a_class)){
@@ -218,7 +220,7 @@ class SupplementalLink extends \SplObjectStorage
 		if(isset($dataset) && is_array($dataset)){
 			foreach($dataset as $r){
 				$param_data = $supplemental_datasource->getLinkParams($r['id']);
-				$params = SupplementalLinkParam::datasetToObjects($param_data);
+				$this->params = SupplementalLinkParam::datasetToObjects($param_data);
 				$ret->attach(new SupplementalLink(
 					$site_url,
 					$r['id'],
@@ -247,6 +249,6 @@ class SupplementalLink extends \SplObjectStorage
 	 * -----------------------------------------------------------------*/
 	 public function setParams(\supplemental_model $datasource) {
 		$param_data = $datasource->getLinkParams($this->id);
-		$params = SupplementalLinkParam::datasetToObjects($param_data);
+		$this->params = SupplementalLinkParam::datasetToObjects($param_data);
 	}
 }

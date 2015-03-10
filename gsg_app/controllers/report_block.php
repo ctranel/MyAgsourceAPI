@@ -11,7 +11,7 @@ require_once(APPPATH . 'libraries/Site/WebContent/Pages.php');
 require_once(APPPATH . 'libraries/Site/WebContent/Sections.php');
 require_once(APPPATH . 'libraries/Datasource/DbObjects/DbTable.php');
 require_once(APPPATH . 'libraries/Report/Content/BlockData.php');
-require_once(APPPATH . 'libraries/Report/Content/TableHeader.php');
+require_once(APPPATH . 'libraries/Report/Content/Table/Header/TableHeader.php');
 
 use \myagsource\Benchmarks\Benchmarks;
 use \myagsource\report_filters\Filters;
@@ -23,8 +23,9 @@ use \myagsource\Site\WebContent\Pages;
 use \myagsource\Site\WebContent\Blocks as WebBlocks;
 use \myagsource\Report\Content\Blocks;
 use \myagsource\Report\Content\BlockData;
-use \myagsource\Report\Content\TableHeader;
+use \myagsource\Report\Content\Table\Header\TableHeader;
 use \myagsource\Datasource\DbObjects\DbTable;
+use myagsource\Report\Content\Sort;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
@@ -82,8 +83,8 @@ class report_block extends CI_Controller {
 	 **/
 	protected $herd;
 	
-	protected $arr_sort_by = [];
-	protected $arr_sort_order = [];
+//	protected $arr_sort_by = [];
+//	protected $arr_sort_order = [];
 	protected $product_name;
 	protected $primary_model_name;
 	protected $section_path; //The path to the site section; set in constructor to point to the controller name
@@ -138,7 +139,6 @@ class report_block extends CI_Controller {
 		$this->page = $this->pages->getByPath($path_page_segment);
 		$this->report_path = $this->section_path . $this->page->path();
 		$this->report_form_id = 'report_criteria';//filter-form';
-		
 
 		
 		//load most specific model available.  Must load model before setting section
@@ -287,13 +287,18 @@ class report_block extends CI_Controller {
 				
 		//set sort order
 		$this->load->helper('report_chart_helper');
-		if($sort_by != 'null' && $sort_order != 'null') {
-			$this->arr_sort_by = explode('|', $sort_by);
-			$this->arr_sort_order = explode('|', $sort_order);
-		}
-		else {
-			$this->arr_sort_by = $block->sortFieldNames();
-			$this->arr_sort_order = $block->sortOrders();
+		if($sort_by != 'null' && $sort_order != 'null' && !empty($sort_by) && !empty($sort_order)) {
+			$arr_sort_by = explode('|', $sort_by);
+			$arr_sort_order = explode('|', $sort_order);
+			if(isset($arr_sort_order) && is_array($arr_sort_order)){
+				$block->resetSort();
+				foreach($arr_sort_order as $k=>$s){
+					$s = $this->datasource->getField($block->id(), $arr_sort_by[$k]);
+					$datafield = new DbField($s['db_field_id'], $s['table_name'], $s['db_field_name'], $s['name'], $s['description'], $s['pdf_width'], $s['default_sort_order'],
+						 $s['datatype'], $s['max_length'], $s['decimal_scale'], $s['unit_of_measure'], $s['is_timespan'], $s['is_foreign_key'], $s['is_nullable'], $s['is_natural_sort']);
+					$block->addSort($datafield, $arr_sort_order[$k]);
+				}
+			}
 		}
 		
 		if(isset($json_filter_data)){
@@ -384,21 +389,21 @@ class report_block extends CI_Controller {
 		}
 		if($output == 'table'){
 			$header_groups = $this->report_block_model->getHeaderGroups($block->id());
-			$table_header = new TableHeader($block->ReportFields());
+			$table_header = new TableHeader($block, $header_groups);
 			
 			//@todo: pull this only when needed?
 			$arr_dates = $this->herd_model->get_test_dates_7_short($this->session->userdata('herd_code'));
 			
-			$tmp = $table_header->getTableHeaderData($header_groups, $arr_dates);
-			$tmp2 = [
+//			$tmp = $table_header->getTableHeaderStructure($arr_dates);
+			$table_header_data = [
+				'structure' => $table_header->getTableHeaderStructure($arr_dates),
 				'form_id' => $this->report_form_id,
 				'report_path' => $block->path(),
-				'arr_sort_by' => $this->arr_sort_by,
-				'arr_sort_order' => $this->arr_sort_order,
+				'sorts' => $block->sorts(),
 				'block' => $block->path(),
 				'report_count' => $report_count
 			];
-			$table_header_data = array_merge($tmp, $tmp2);
+//			$table_header_data = array_merge($tmp, $tmp2);
 			
 			
 			$this->json['html'] = $this->html;
@@ -408,16 +413,15 @@ class report_block extends CI_Controller {
 			$bench_text = $this->benchmarks->get_bench_text();
 		}
 		$this->report_data = [
-//			'table_header' => $this->load->view('table_header', $table_header_data, TRUE),
-			'num_columns' => $table_header_data['num_columns'],
-			'table_id' => $block->path(),
-			'fields' => $arr_field_list,
+			'table_header' => $this->load->view('table_header', $table_header_data, TRUE),
+			'num_columns' => $table_header->columnCount(),
+			'block' => $block,
 			'report_data' => $results,
-			'table_heading' => $title,
-			'table_sub_heading' => $subtitle,
-			'arr_numeric_fields' => $this->report_datasource->get_numeric_fields(),
-			'arr_decimal_places' => $this->report_datasource->get_decimal_places(),
-			'arr_field_links' => $this->report_datasource->get_field_links(),
+//			'table_id' => $block->path(),
+//			'fields' => $block->reportFields(),//$arr_field_list,
+//			'table_heading' => $block->title(),
+//			'table_sub_heading' => $block->subtitle(),
+//			'arr_field_links' => $this->report_datasource->get_field_links(),
 		];
 		
 		if(isset($this->supplemental) && !empty($this->supplemental)){
@@ -430,6 +434,7 @@ class report_block extends CI_Controller {
 
 		if(isset($this->report_data) && is_array($this->report_data)) {
 			$this->html = $this->load->view('report_table.php', $this->report_data, TRUE);
+print($this->html);
 		}
 		else {
 			$this->html = '<p class="message">No data found.</p>';

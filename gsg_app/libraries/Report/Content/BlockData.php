@@ -4,12 +4,12 @@ namespace myagsource\Report\Content;
 
 require_once APPPATH . 'libraries/Datasource/DbObjects/DbTable.php';
 require_once APPPATH . 'libraries/Datasource/DbObjects/DbField.php';
-require_once APPPATH . 'libraries/Report/Content/TableField.php';
+require_once APPPATH . 'libraries/Report/Content/Table/TableField.php';
 require_once APPPATH . 'libraries/Report/Content/Block.php';
 
 use \myagsource\Datasource\DbObjects\DbField;
 use \myagsource\Datasource\DbObjects\DbTable;
-use \myagsource\Report\Content\TableField;
+use \myagsource\Report\Content\Table\TableField;
 use \myagsource\Report\Content\Block;
 use \myagsource\Benchmarks\Benchmarks;
 

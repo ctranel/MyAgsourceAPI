@@ -135,6 +135,19 @@ class DbField implements iDataField {
 	public function dbTableName(){
 		return $this->db_table;
 	}
+
+	public function decimalScale(){
+		return $this->decimal_scale;
+	}
+
+	public function pdfWidth(){
+		return $this->pdf_width;
+	}
+
+	public function isNumeric(){
+		//@todo: database neutral
+		return (strpos($this->datatype, 'int') !== false) || (strpos($this->datatype, 'money') !== false) || (strpos($this->datatype, 'decimal') !== false) || $this->datatype === 'float' || $this->datatype === 'numeric' || $this->datatype === 'real';
+	}
 }
 
 ?>

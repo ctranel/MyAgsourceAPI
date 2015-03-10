@@ -232,7 +232,6 @@ class SessionSettings {
 				//handle range notation
 				if(key($set) === 'dbfrom' || key($set) === 'dbto'){
 					$obj_key = substr($k, 0, $split);
-die($obj_key);
 					$ret_val[$obj_key] = $set['dbfrom'] . '|' . $set['dbto'];
 				}
 			}
@@ -242,7 +241,6 @@ die($obj_key);
 //			}
 			//$this->arr_settings[$k]->parseFormData($set);
 		}
-var_dump($form_data, $ret_val);die;
 		return $ret_val; */
 	}
 	
