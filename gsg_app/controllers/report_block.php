@@ -387,37 +387,35 @@ class report_block extends CI_Controller {
 				return $results;
 			}
 		}
+
+		if(isset($this->benchmarks)){
+			$bench_text = $this->benchmarks->get_bench_text();
+		}
+
 		if($output == 'table'){
 			$header_groups = $this->report_block_model->getHeaderGroups($block->id());
-			$table_header = new TableHeader($block, $header_groups);
-			
 			//@todo: pull this only when needed?
 			$arr_dates = $this->herd_model->get_test_dates_7_short($this->session->userdata('herd_code'));
+			$header_groups = $this->adjustHeaderGroups($header_groups, $arr_dates);
+
+			$table_header = new TableHeader($block, $header_groups);
 			
-//			$tmp = $table_header->getTableHeaderStructure($arr_dates);
 			$table_header_data = [
-				'structure' => $table_header->getTableHeaderStructure($arr_dates),
+				'structure' => $table_header->getTableHeaderStructure(),
 				'form_id' => $this->report_form_id,
 				'report_path' => $block->path(),
 				'sorts' => $block->sorts(),
 				'block' => $block->path(),
 				'report_count' => $report_count
 			];
-//			$table_header_data = array_merge($tmp, $tmp2);
-			
 			
 			$this->json['html'] = $this->html;
+			$this->report_data['table_header'] = $this->load->view('table_header', $table_header_data, TRUE);
+			$this->report_data['num_columns'] = $table_header->columnCount();
 		}
 
-		if(isset($this->benchmarks)){
-			$bench_text = $this->benchmarks->get_bench_text();
-		}
-		$this->report_data = [
-			'table_header' => $this->load->view('table_header', $table_header_data, TRUE),
-			'num_columns' => $table_header->columnCount(),
-			'block' => $block,
-			'report_data' => $results,
-		];
+		$this->report_data['block'] = $block;
+		$this->report_data['report_data'] = $results;
 		
 		if(isset($this->supplemental) && !empty($this->supplemental)){
 			$this->report_data['supplemental'] = $this->supplemental;
@@ -462,6 +460,31 @@ print($this->json['html']);
 		$sections = new Sections($this->section_model, $pages);
 		$section = $sections->getByPath($this->section_path);
 		return $section;
+	}
+	
+	protected function adjustHeaderGroups($header_groups, $dates){
+		//@todo: KLM block should not be in this class--controller?
+		//KLM - Added logic to convert header text to date text from herd_model function get_test_dates_7_short
+		foreach($header_groups as $hk => $hv){
+			$c = 0;
+			if(isset($dates) && is_array($dates)){
+				foreach($dates[0] as $key => $value){
+//var_dump($header_groups);
+					if ($key == $hv['text']) {
+						if ($value == '0-0') {
+							$value='No Test (-'.$c.')';
+						}
+//var_dump($header_groups[$hk]);
+						$header_groups[$hk]['text'] = $value;
+						break;
+					}
+					$c++;
+				}
+			}
+		}
+//var_dump($header_groups);
+		return $header_groups;
+		//end KLM
 	}
 /*		
 	protected function _record_access($event_id, $format, $product_code = null){

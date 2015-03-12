@@ -1,10 +1,6 @@
 <?php
 namespace myagsource\Report\Content\Table\Header;
 
-//require_once(APPPATH . 'libraries/Report/Content/Table/Header/TableHeaderRow.php');
-
-
-//use \myagsource\Report\Content\Table\Header\TableHeaderRow;
 use myagsource\Supplemental\iSupplemental;
 use myagsource\Report\iBlock;
 /**
@@ -17,6 +13,8 @@ use myagsource\Report\iBlock;
 * Description:  Logic and service functions to support multi-level table headers.
 *
 * Requirements: PHP5 or above
+* 
+* @todo: this class works, but needs to be cleaned up and have arrays converted into objects
 *
 */
 
@@ -67,14 +65,6 @@ class TableHeader {
 	 **/
 	protected $rows;
 	
-	
-	//protected $arr_header_data;
-	//protected $depth;
-	//protected $rowspan;
-	//protected $tot_levels;
-	//protected $arr_pdf_widths;
-	//protected $columns;
-	
 	public function __construct(iBlock $block, $header_groups){//, iSupplemental $supplemental = null){
 		$this->header_group_fields = [];
 		$this->block = $block;
@@ -95,10 +85,10 @@ class TableHeader {
 	 * 		colspan, rowspan and level (to be used to create class names in view) *
 	 *  @access public
 	 **/
-	public function getTableHeaderStructure($arr_dates = null){
+	public function getTableHeaderStructure(){
 		$depth = 0;
 		$rowspan = 1;
-		$this->setTableHeaderGroups($arr_dates);
+		$this->setTableHeaderGroups();
 		
 		$tot_levels = array_depth($this->header_group_fields);
 		$this->header_structure = []; //return value
@@ -111,50 +101,31 @@ class TableHeader {
 	 * @method setTableHeaderStructure()
 	 * @return multi-dimensional array of header data ('arr_unsortable_columns', 'arr_field_sort', 'arr_header_data')
 	 * @author ctranel
+	 * 
+	 * @todo: pass objects instead of arrays in objects
 	 **/
-	protected function setTableHeaderGroups($arr_dates = null){
-//var_dump($arr_dates);
+	protected function setTableHeaderGroups(){
 		if(is_array($this->header_groups) && !empty($this->header_groups)){
-		//@todo: KLM block should not be in this class--controller?
-		//KLM - Added logic to convert header text to date text from herd_model function get_test_dates_7_short
-			foreach($this->header_groups as &$ag){
-				$c = 0;
-				if(isset($arr_dates) && is_array($arr_dates)){
-					foreach($arr_dates[0] as $key => $value){
-						if ($key == $ag['text']) {
-							if ($value == '0-0') {
-								$value='No Test (-'.$c.')';
-							}
-							$ag['text'] = $value;
-							break;
-						}
-						$c++;
-					}
-				}
-			}
-			unset($ag);
-		//end KLM	
 			foreach($this->header_groups as $h){
 				//if it is a top level element
 				if($h['parent_id'] == NULL) {
-					$this->header_group_fields[$h['id']] = ['id' => $h['id'], 'parent_id' => $h['parent_id'], 'text' => $h['text'], 'children' => null, 'pdf_width' => 0];
+					//new TableHeaderCell($v['id'], $v['parent_id'], $v['text'], $num_leaves, $rowspan);
+					$this->header_group_fields[] = ['id' => $h['id'], 'parent_id' => $h['parent_id'], 'text' => $h['text'], 'children' => null, 'pdf_width' => 0];
 				}
 				//else it is inserted into the parent array
 				else{
-					$this->addChildByKey($this->header_group_fields, $h['parent_id'], ['children' => [['id' => $h['id'], 'parent_id' => $h['parent_id'], 'text' => $h['text'], 'pdf_width' => 0]]]);
+					$this->nest($this->header_group_fields, ['id' => $h['id'], 'parent_id' => $h['parent_id'], 'text' => $h['text'], 'pdf_width' => 0]);
 				}
 			}
-			
+
+			//add leaves (columns) to structure
 			$fields = $this->block->reportFields();
 			foreach($fields as $f){
 				if($f->isDisplayed()){
-					$this->addChildByKey($this->header_group_fields, $f->headerGroupId(), ['children' => ['id' => null, 'parent_id' => $f->headerGroupId(), 'text' => $f->displayName(), 'pdf_width' => $f->pdfWidth(), 'is_sortable' => $f->isSortable(), 'is_displayed' => $f->isDisplayed()]]);
+					$this->addLeaf($this->header_group_fields, $f->headerGroupId(), ['children' => ['id' => null, 'parent_id' => $f->headerGroupId(), 'text' => $f->displayName(), 'pdf_width' => $f->pdfWidth(), 'is_sortable' => $f->isSortable(), 'is_displayed' => $f->isDisplayed()]]);
 				}
 			}
 		}
-
-		
-		//$this->structure = $this->getTableHeaderStructure($this->header_group_fields);
 	}
 	
 	/** 
@@ -218,9 +189,9 @@ class TableHeader {
 	}
 	
 	/**
-	 * addChildByKey
+	 * nest
 	 *
-	 * @description Sets value for first match of $key in mulitdimensional array
+	 * recursively that inserts new value into multi-level array using 'id' and 'parent_id' elements of arrays to be inserted
 	 *
 	 * @param array into which value will be inserted
 	 * @param array key into which child array should be added
@@ -228,14 +199,50 @@ class TableHeader {
 	 * @return void
 	 * @author ctranel
 	 */
-	protected function addChildByKey(&$input, $key_in, $new_val_in, $arr_order = NULL){
+	protected function nest(&$array, $new_val_in){
+		if (!is_array($array) || !isset($new_val_in) || !is_array($new_val_in)){
+			return false;
+		}
+		//iterate through flat array to find spot in 
+		foreach($array as $k => &$v){
+			//we don't want to interate through leaf arrays
+			if(!isset($v['id'])){
+				continue;
+			}
+			//add child if a match is found
+			if($v['id'] === $new_val_in['parent_id']){
+				if(!isset($v['children']) || !is_array($v['children'])){
+					$v['children'] = [];
+				}
+				$v['children'][] = $new_val_in;
+				return;
+			}
+			//if it is not found, and the current node is an array, make recursive call
+			elseif(isset($v['children']) && is_array($v['children'])){
+				$this->nest($v, $new_val_in);
+			}
+		}
+	}
+	
+	/**
+	 * addLeaf
+	 *
+	 * inserts leaf at appropriate point in nested array
+	 *
+	 * @param array into which value will be inserted
+	 * @param array key into which child array should be added
+	 * @param array value to be inserted
+	 * @return void
+	 * @author ctranel
+	 */
+	protected function addLeaf(&$input, $key_in, $new_val_in, $arr_order = NULL){
 		if (!is_array($input)){
 			return false;
 		}
 		$cnt = 0;
 		$arr_copy = $input;
 		foreach ($arr_copy AS $key =>$value){
-			//$key = $value['id'];
+			//if the array into which $new_val_in is being inserted already has children
 			if (isset($input[$key]['children']) && is_array($input[$key]['children'])) {
 				foreach($input[$key]['children'] as &$c){
 					if (!empty($new_val_in) && !empty($key_in)){
@@ -243,29 +250,38 @@ class TableHeader {
 							$c['children'][] = $new_val_in['children'];
 						}
 					}
-					$this->addChildByKey($input[$key], $key_in, $new_val_in, $arr_order);
+//					$this->addLeaf($input[$key], $key_in, $new_val_in, $arr_order);
 				}
 			}
+			//if the array into which $new_val_in is being inserted does not yet have children
 			else {
 				$saved_value = $value;
 				if (!empty($new_val_in)){
 					if (!empty($key_in)){
 						if($key == $key_in) $value = $new_val_in;
 					}
+/*
 					elseif (is_array($input)){
 						//root level $input does not have a key, and cannot have list order.  if key_in is empty, traverse array and insert in appropriate slot
 						if(isset($arr_order) && is_array($arr_order) && $arr_order[key($new_val_in)] == ($arr_order[$key] - 1)){
+die('4');
+							echo $key . ' - ' . $key_in . "1\n\n";
 							array_insert($input['children'], $cnt, $new_val_in['children']);
 						}
 						elseif($arr_order[key($new_val_in)] == count($arr_order) && $arr_order[key($new_val_in)] == $arr_order[$key]){
+die('5');
+							echo $key . ' - ' . $key_in . "2\n\n";
 							$input[$key]['children'] = $new_val_in[$key]['children'];
 							return true;
 						}
 					}
 					if ($value != $saved_value){
+die('6');
+						echo $key . ' - ' . $key_in . "3\n\n";
 						$input[$key]['children'] = $value['children'];
 						return true;
 					}
+ */
 				}
 			}
 			$cnt++;
