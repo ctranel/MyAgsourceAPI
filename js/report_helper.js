@@ -37,20 +37,21 @@ function assocFormToObject(objForm){
 	var elements = objForm.elements;
 	var obj_return = {};
 	var el_len = elements.length;
-	
 	for(var i=0; i<el_len; i++){
 		var e = elements[i];
-		if((e.type === 'text' || e.type === 'hidden' || e.type.indexOf('select') >= 0) && typeof(e.value !== 'undefined')){
-			if(e.name.indexOf('[') >= 0){
-				var name = e.name.substring(0, e.name.indexOf("['"));
-				var idx = e.name.substring(e.name.indexOf("['") + 2, e.name.indexOf("']"));
-				if(typeof(obj_return[name]) === 'undefined'){
-					obj_return[name] = {};
-				} 
-				obj_return[name][idx] = e.value;
-			}
-			else {
-				obj_return[e.name] = e.value;
+		if(typeof(e.type) !== 'undefined'){
+			if((e.type === 'text' || e.type === 'hidden' || e.type.indexOf('select') >= 0) && typeof(e.value !== 'undefined')){
+				if(e.name.indexOf('[') >= 0){
+					var name = e.name.substring(0, e.name.indexOf("['"));
+					var idx = e.name.substring(e.name.indexOf("['") + 2, e.name.indexOf("']"));
+					if(typeof(obj_return[name]) === 'undefined'){
+						obj_return[name] = {};
+					} 
+					obj_return[name][idx] = e.value;
+				}
+				else {
+					obj_return[e.name] = e.value;
+				}
 			}
 		}
 	}

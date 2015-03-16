@@ -176,10 +176,9 @@ class Land extends parent_report {
 			'title' => 'Herd Data'
 		);
 
-		$resource_data = Array('email' => $this->session->userdata('email'), 'name' => $this->session->userdata('first_name') . ' ' . $this->session->userdata('last_name'));
-		$this->data['widget']['info'][] = array(
-			'content' => $this->load->view('auth/dashboard/resources', $resource_data, TRUE),
-			'title' => 'Resources'
+		$this->data['widget']['herd'][] = array(
+			'content' => $this->load->view('auth/dashboard/message', null, true),
+			'title' => 'Message'
 		);
 
 		//filters	
@@ -192,28 +191,35 @@ class Land extends parent_report {
 				'arr_filters' => $this->filters->toArray(),
 		);
 
-		if(isset($arr_filter_data)){
-			$this->data['widget']['herd'][] = array(
-				'content' => $this->load->view($report_filter_path, $arr_filter_data, TRUE),
-				'title' => 'Filters',
-				'id' => 'filters',
-			);
-		}
-		
 		$this->load->model('setting_model');
 		$this->load->model('benchmark_model');
 		$this->benchmarks = new Benchmarks($this->session->userdata('user_id'), $this->input->post('herd_code'), $this->herd_model->header_info($this->herd->herdCode()), $this->setting_model, $this->benchmark_model, $this->session->userdata('benchmarks'));
 		$arr_benchmark_data = $this->benchmarks->getFormData($this->session->userdata('benchmarks')); 
 		if(isset($arr_benchmark_data)){
-			$this->data['widget']['info'][] = array(
+			$this->data['widget']['herd'][] = array(
 				'content' => $this->load->view('set_benchmarks', $arr_benchmark_data, TRUE),
 				'title' => 'Benchmarks',
 				'id' => 'benhmarks',
 			);
 		}
 		
+		if(isset($arr_filter_data) && is_array($arr_filter_data)){
+			foreach($arr_filter_data['arr_filters'] as $f){
+				//if there is a filter that has multiple possible options, display form
+				if(isset($f['options']) && is_array($f['options']) && count($f['options']) > 1){
+					$this->data['widget']['herd'][] = array(
+						'content' => $this->load->view($report_filter_path, $arr_filter_data, TRUE),
+						'title' => 'Filters',
+						'id' => 'filters',
+					);
+					break;
+				}
+			}
+		}
+		
 		foreach($arr_view_blocks as $k => $b){
-			$this->data['widget']['feature'][] = array(
+			$col = $k === 'Herd Overview' ? 'feature' : 'info';
+			$this->data['widget'][$col][] = array(
 				'content' => $b,
 				'title' => $k,
 			);
@@ -223,7 +229,7 @@ class Land extends parent_report {
 		if($this->as_ion_auth->has_permission('Update SG Access')){
 			$consultants_by_status = $this->ion_auth_model->get_consultants_by_herd($this->session->userdata('herd_code'));
 			if(isset($consultants_by_status['open']) && is_array($consultants_by_status['open'])){
-				$this->data['widget']['feature'][] = array(
+				$this->data['widget']['herd'][] = array(
 					'content' => $this->_set_consult_section($consultants_by_status['open'], 'open', array('Grant Access', 'Deny Access')),
 					'title' => 'Open Consultant Requests'
 				);
@@ -232,7 +238,7 @@ class Land extends parent_report {
 		
 /*		$product_data = Array('sections' => $this->as_ion_auth->get_promo_sections());
 		if(isset($product_data['sections']) && !empty($product_data['sections'])){
-			$this->data['widget']['info'][] = array(
+			$this->data['widget']['herd'][] = array(
 				'content' => $this->load->view('auth/dashboard/other_products', $product_data, TRUE),
 				'title' => 'Other Products'
 			);

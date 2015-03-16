@@ -37,6 +37,7 @@ class Fresh_cow_summary_model extends Report_model {
 		->result_array();
 		if(isset($resultset[0]) && !empty($resultset[0])) {
 			if ($resultset[0]['herd_size_code'] > 1) $statement2.= 's';
+			$statement2.= '.  Sold counts do not include animals sold for dairy.';
 			$page_tip['numbertests'] = $statement.$resultset[0]['herd_size_code'].$statement2;
 		}
 		else {

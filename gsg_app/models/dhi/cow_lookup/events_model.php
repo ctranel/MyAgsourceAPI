@@ -38,7 +38,7 @@ class Events_model extends CI_Model {
 		}
 		
 		$arr_ret = $this->{$this->db_group_name}
-			->select("event_date AS ev_date, FORMAT(event_date, 'd') AS event_date, short_desc, (CASE WHEN srv_sire_naab IS NULL THEN srv_sire_name ELSE srv_sire_naab END) as event_data, srv_sire_naab")
+			->select("event_date AS ev_date, FORMAT(event_date, 'd') AS event_date, short_desc, (CASE WHEN srv_sire_name IS NULL THEN srv_sire_naab ELSE CONCAT([srv_sire_naab],' - ',[srv_sire_name]) END) as event_data, srv_sire_naab")
 			->where('herd_code', $herd_code)
 			->where('serial_num', $serial_num)
 			->order_by('ev_date', 'desc')
