@@ -1,11 +1,13 @@
 <?php
 namespace myagsource\Supplemental\Content;
 
+require_once(APPPATH . 'libraries/Supplemental/iSupplemental.php');
 require_once(APPPATH . 'libraries/Supplemental/Content/SupplementalLink.php');
 require_once(APPPATH . 'libraries/Supplemental/Content/SupplementalComment.php');
 
 use \myagsource\Supplemental\Content\SupplementalLink;
 use \myagsource\Supplemental\Content\SupplementalComment;
+use \myagsource\Supplemental\iSupplemental;
 //use \myagsource\MyaObjectStorage;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
@@ -20,7 +22,7 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 *
 */
 
-class Supplemental
+class Supplemental implements iSupplemental
 {
 	/**
 	 * supplemental link objects

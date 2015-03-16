@@ -274,6 +274,7 @@ class Ci_pdf extends TCPDF {
 				foreach($row as $f=>$col) {
 					$ln = $ct < $num_cols?'L':'R';
 					$align = $ct == 0?'R':'C';
+// @todo: pdf width
 					if (strpos($f,'isnull') === FALSE && $f != 'count') $this->Cell($this->arr_pdf_width[$f], $this->_config['cell_height'], $col, $border, $ln, $align,$fill);
 					$ct++;
 				}
@@ -318,7 +319,7 @@ class Ci_pdf extends TCPDF {
 					if(isset($arr_colspan_queue[$row_count - 1][0]['start_index'])){
 						if ($arr_colspan_queue[$row_count - 1][0]['start_index'] <= $queue_index) {
 							$tmp_array = array_shift($arr_colspan_queue[$row_count - 1]);
-							$this->Cell($tmp_array['width'], ($this->_config['cell_height'] * $th['rowspan']), '', 0, 0, 'C', FALSE, 0);
+							$this->Cell($tmp_array['width'], ($this->_config['cell_height'] * $th->rowspan()), '', 0, 0, 'C', FALSE, 0);
 							$queue_index = $tmp_array['end_index'] + 1;
 						}
 					}
@@ -326,7 +327,7 @@ class Ci_pdf extends TCPDF {
 					$this->SetFont($this->_config['page_font'], 'B');
 					list($d1, $d2, $d3) = $this->gsg_header_fill_color;
 					list($l1, $l2, $l3) = $this->gsg_fill_color;
-					if ($th['colspan'] > '1') {
+					if ($th->colspan() > '1') {
 						$this->SetFillColor($l1, $l2, $l3);
 						$this->SetTextColor($d1, $d2, $d3);
 					}
@@ -334,11 +335,12 @@ class Ci_pdf extends TCPDF {
 						$this->SetFillColor($d1, $d2, $d3);
 						$this->SetTextColor($l1, $l2, $l3);
 					}
-					$w = isset($th['pdf_width'])?$th['pdf_width']:$this->arr_pdf_width[$th['field_name']];
-					$this->MultiCell($w, ($this->_config['cell_height'] * $th['rowspan']), $this->unhtmlentities($th['text']), $border, 'C', TRUE, 0, NULL, NULL, TRUE, 0, FALSE, FALSE, ($this->_config['cell_height'] * $th['rowspan']), 'B', TRUE);
+
+					$w = $th->pdfWidth();
+					$this->MultiCell($w, ($this->_config['cell_height'] * $th->rowspan()), $this->unhtmlentities($th->text()), $border, 'C', TRUE, 0, NULL, NULL, TRUE, 0, FALSE, FALSE, ($this->_config['cell_height'] * $th->rowspan()), 'B', TRUE);
 					//write horizontal spacing for nested headings
 					//if this cell is part of a block that spans >1 row
-					if ($th['rowspan'] == $max_rowspan){
+					if ($th->rowspan() == $max_rowspan){
 						if (!$queue_active) {
 							$queue_active = TRUE;
 							$arr_colspan_queue[$row_count][$block_increment]['start_index'] = $queue_index;
@@ -354,7 +356,7 @@ class Ci_pdf extends TCPDF {
 						$queue_active = FALSE;
 					}
 					$col_index ++;
-					$queue_index += $th['colspan'];
+					$queue_index += $th->colspan();
 				}
 				$this->Ln($this->_config['cell_height']);
 				$row_count++;

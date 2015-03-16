@@ -119,6 +119,10 @@ abstract class BlockField {
 		return (isset($this->aggregate) && !empty($this->aggregate));
 	}
 
+	public function defaultSortOrder() {
+		return $this->data_field->defaultSortOrder();
+	}
+	
 	public function dbTableName() {
 		return $this->data_field->dbTableName();
 	}
@@ -131,6 +135,16 @@ abstract class BlockField {
 		if(isset($this->data_supp)){
 			return $this->data_supp->getContent();
 		}
+	}
+
+	public function headerSupplemental() {
+		if(isset($this->header_supp)){
+			return $this->header_supp;
+		}
+	}
+
+	public function sort() {
+		return null;
 	}
 
 	public function selectFieldText() {

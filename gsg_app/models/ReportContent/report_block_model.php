@@ -121,25 +121,34 @@ class report_block_model extends CI_Model {
 	 * @param int id of current block
 	 * @return array: ref = lookup array for ids, arr_fields = skeleton structure for db_fields
 	 * @author ctranel
+	 * 
+	 * @todo: add supplemental data
 	 **/
 	public function getHeaderGroups($block_in){
 		$grouping_sql = "WITH cteAnchor AS (
-					 SELECT bh.id, bh.[text], bh.parent_id, bh.list_order
+					 SELECT bs.block_id, bh.id, bh.[text], bh.parent_id, bh.list_order
 					 FROM users.dbo.block_header_groups bh
 					 	LEFT JOIN users.dbo.blocks_select_fields bs ON bh.id = bs.block_header_group_id
-					 WHERE block_id = " . $block_in . "
+					 WHERE block_id = ".$block_in."
 				), cteRecursive AS (
-					SELECT id, [text], parent_id, list_order
+					SELECT block_id, id, [text], parent_id, list_order
 					  FROM cteAnchor
 					 UNION all 
-					 SELECT t.id, t.[text], t.parent_id, t.list_order
+					 SELECT r.block_id, t.id, t.[text], t.parent_id, t.list_order
 					 FROM users.dbo.block_header_groups t
 					 join cteRecursive r ON r.parent_id = t.id
 				)
-				SELECT DISTINCT * FROM cteRecursive ORDER BY parent_id, list_order;";
+SELECT h.*, hl.content_id AS header_group_id, hl.a_href, hl.a_title, hl.a_rel, hl.a_class, hc.comment FROM (
+				SELECT DISTINCT * FROM cteRecursive
+				
+) h
+				LEFT JOIN dbo.supp_links hl ON h.id = hl.content_id AND hl.content_type_id = 7
+				LEFT JOIN dbo.supp_comments hc ON h.id = hc.content_id AND hc.content_type_id = 7
+
+				ORDER BY parent_id, list_order";
 
 		$arr_groupings = $this->{$this->db_group_name}->query($grouping_sql)->result_array();
-			
+
 		if(!is_array($arr_groupings) || empty($arr_groupings)){
 			$arr_groupings = $this->{$this->db_group_name}
 				->query("SELECT 1 AS id, bf.header_text AS text, NULL AS parent_id, bf.list_order

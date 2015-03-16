@@ -8,7 +8,9 @@ namespace myagsource\Supplemental;
  *        
  */
 interface iSupplemental {
-	function getLink();
+	function supplementalLinks();
+	function supplementalComments();
+	function getContent();
 }
 
 ?>

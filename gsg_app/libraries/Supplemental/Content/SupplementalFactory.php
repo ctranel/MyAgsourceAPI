@@ -95,6 +95,46 @@ class SupplementalFactory
 	}
 	
 	/* -----------------------------------------------------------------
+	 *  getHeaderGrpSupplemental
+	
+	*  Factory for supplemental objects for table headers
+	
+	*  @since: version
+	*  @author: ctranel
+	*  @date: March 13, 12015
+	*  @param: int field id
+	*  @param: string href (anchor tag property)
+	*  @param: string rel (anchor tag property)
+	*  @param: string title (anchor tag property)
+	*  @param: string class (anchor tag property)
+	*  @param: string comment to be displayed
+	*  @return: Supplemental object
+	*  @throws:
+	* -----------------------------------------------------------------*/
+	public function getHeaderGrpSupplemental($supp_id, $href, $rel, $title, $class, $comment) {
+		if(!isset($supp_id)){
+			return null;
+		}
+
+		$supplemental_links = new \SplObjectStorage();
+		$supplemental_comments = new \SplObjectStorage();
+		
+		// Links
+		//$links = $this->datasource->getLinks(4, $field_id);
+		$tmp = new SupplementalLink($this->site_url, $supp_id, $href, $rel, $title, $class);
+		$tmp->setParams($this->datasource);
+		$supplemental_links->attach($tmp);
+		// Comments
+		//$comments = $this->datasource->getComments(4, $field_id);
+		//$supplemental_comments = SupplementalComment::datasetToObjects($comment);
+		$supplemental_comments->attach(new SupplementalComment($comment));
+
+		//Create and return object
+		$supp = new Supplemental($supplemental_links, $supplemental_comments);
+		return $supp;
+	}
+
+	/* -----------------------------------------------------------------
 	 *  Factory for supplemental objects for column headers
 	
 	*  Factory for supplemental objects for column headers

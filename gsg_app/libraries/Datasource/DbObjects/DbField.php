@@ -144,6 +144,10 @@ class DbField implements iDataField {
 		return $this->pdf_width;
 	}
 
+	public function defaultSortOrder(){
+		return $this->default_sort_order;
+	}
+
 	public function isNumeric(){
 		//@todo: database neutral
 		return (strpos($this->datatype, 'int') !== false) || (strpos($this->datatype, 'money') !== false) || (strpos($this->datatype, 'decimal') !== false) || $this->datatype === 'float' || $this->datatype === 'numeric' || $this->datatype === 'real';

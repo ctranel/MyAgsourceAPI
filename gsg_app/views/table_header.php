@@ -2,10 +2,12 @@
 //if sort info is not set, set it to an array with one empty element
 if(!isset($arr_sort_by)) $arr_sort_by = array('');
 if(!isset($arr_sort_order)) $arr_sort_order = array('');
+var_dump($sorts);
 
 foreach($structure as $row): ?>
 <tr>
 	<?php foreach($row as $k => $th):
+		/* sort
 		$sort_by = $arr_sort_by[0];
 		$sort_order = $arr_sort_order[0];
 		if(!empty($arr_field_sort) && !empty($th['field_name']) && !empty($arr_field_sort[$th['field_name']])):
@@ -15,33 +17,37 @@ foreach($structure as $row): ?>
 		else:
 			$link_sort_order = 'DESC';
 		endif;
-		$th_id = isset($th['field_name'])?$th['field_name']:str_replace(' ', '_', strtolower($th['text']));
-		$class = ($th['colspan'] > '1') ? 'cat-heading' : 'subcat-heading';
+		*/
+		//html properties
+		$th_id = str_replace(' ', '_', strtolower($th->text()));
+		$class = ($th->colspan() > '1') ? 'cat-heading' : 'subcat-heading';
 		$class .= " $th_id";
-		 ?><th id="<?php echo $th_id; ?>" colspan="<?php echo $th['colspan']; ?>" rowspan="<?php echo $th['rowspan']; ?>"<?php 
-		if (isset($th['field_name'])):
-			$after_text = '';
+		 ?><th id="<?php echo $th_id; ?>" colspan="<?php echo $th->colspan(); ?>" rowspan="<?php echo $th->rowspan(); ?>"<?php 
+		$inner_html = $th->text();
+		$after_text = '';
+//echo $th->defaultSortOrder();
+/*		if (isset($th['field_name'])):
 			if ($sort_by == $th['field_name']):
 				$after_text = $sort_order=='ASC'?"▲":"▼";
 			endif;
- 			//$extra = array('rel'=>$th['text'], 'id'=>$th['field_name'] . '_tip');
+ 			//$extra = array('rel'=>$th->text(), 'id'=>$th['field_name'] . '_tip');
 			if (is_array($arr_unsortable_columns) && !in_array($th['field_name'], $arr_unsortable_columns)):
 				$submit_url = '#';
 				$extra = Array('onclick'=>"return updateBlock('table-canvas" . $report_count . "', '$block', $report_count, '". $th['field_name'] . "', '$link_sort_order', 'table', true);");
 
-				$th['text'] = anchor($submit_url, $th['text'], $extra);
+				$inner_html = anchor($submit_url, $th->text(), $extra);
 			endif;
-			$th['text'] .= $after_text;
-			//Column tips
-			if(isset($arr_header_links[$th['field_name']]) && is_array($arr_header_links[$th['field_name']]) && !empty($arr_header_links[$th['field_name']])):
-				foreach($arr_header_links[$th['field_name']] as $t):
-					$th['text'] = '<div class="tip">' . $t . '</div>' . $th['text'];
-				endforeach;
-			endif;
-			//End column tips
+			$inner_html .= $after_text;
 		endif;//isset($th['field_name'])
+*/
+		//Supplemental
+		$supplemental = $th->supplementalLink();
+		if(isset($supplemental)):
+			$inner_html = '<div class="tip">' . $supplemental . '</div>' . $th->text();
+		endif;
+
 		?> class = "<?php echo $class ?>"><?php
-		echo $th['text'];
+		echo $inner_html;
 		?></th><?php
 	endforeach;
 ?></tr><?php

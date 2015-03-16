@@ -398,7 +398,7 @@ class report_block extends CI_Controller {
 			$arr_dates = $this->herd_model->get_test_dates_7_short($this->session->userdata('herd_code'));
 			$header_groups = $this->adjustHeaderGroups($header_groups, $arr_dates);
 
-			$table_header = new TableHeader($block, $header_groups);
+			$table_header = new TableHeader($block, $header_groups, new SupplementalFactory($this->supplemental_model, site_url()));
 			
 			$table_header_data = [
 				'structure' => $table_header->getTableHeaderStructure(),
@@ -431,7 +431,7 @@ class report_block extends CI_Controller {
 		else {
 			$this->json['html'] = '<p class="message">No data found.</p>';
 		}
-print($this->json['html']);
+//print($this->json['html']);
 //		if($first){
 //			$this->_record_access(90, 'web', $this->config->item('product_report_code'));
 //		}
