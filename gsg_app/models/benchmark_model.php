@@ -85,7 +85,7 @@ class Benchmark_model extends CI_Model {
 			$where .= ' pstring = 0';// . $pstring;
 		}
 		//include additional key fields
-		if(isset($arr_group_by) && is_array($arr_group_by)){
+		if(isset($arr_group_by) && is_array($arr_group_by) && count($arr_group_by) > 0){
 			$group_by = " GROUP BY " . $arr_group_by[0];
 			$order_by = " ORDER BY " . $arr_group_by[0];
 			$addl_select_fields = $arr_group_by[0] . ',';

@@ -109,7 +109,8 @@ class report_block extends CI_Controller {
 		// report content
 		$this->load->model('supplemental_model');
 		$this->load->model('ReportContent/report_block_model');
-		$this->blocks = new Blocks($this->report_block_model, new SupplementalFactory($this->supplemental_model, site_url()));
+		$this->load->model('Datasource/db_field_model');
+		$this->blocks = new Blocks($this->report_block_model, $this->db_field_model, new SupplementalFactory($this->supplemental_model, site_url()));
 
 		//web content
 		$this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
@@ -127,6 +128,7 @@ class report_block extends CI_Controller {
 //		$this->section_path = $class_dir . $class;
 
 		// info used for links within datasets (table header sorts, etc)
+/*
 		$path = uri_string();
 		$arr_path = explode('/',$path);
 		$method_index = array_search($method, $arr_path);
@@ -135,10 +137,15 @@ class report_block extends CI_Controller {
 		$page_path = str_replace('|', '/', urldecode($page_path));
 		$arr_path = array_filter(explode('/', $page_path));
 		$path_page_segment = $arr_path[count($arr_path) - 1];
+		//handle index pages (e.g., dhi/prod/test_day/index)
 		
-		$this->page = $this->pages->getByPath($path_page_segment);
+		
+		$this->page = $this->pages->getByPath($path_page_segment, $this->session->userdata('section_id'));
+		if(!$this->page){
+			die('Report not found');
+		}
 		$this->report_path = $this->section_path . $this->page->path();
-		$this->report_form_id = 'report_criteria';//filter-form';
+*/		$this->report_form_id = 'report_criteria';//filter-form';
 
 		
 		//load most specific model available.  Must load model before setting section
@@ -226,15 +233,15 @@ class report_block extends CI_Controller {
 	 * @todo: can I delete the last 2 params?
 	 * @todo: use post rather than get
 	 */
-	public function ajax_report($page_path, $block_name, $output, $sort_by = 'null', $sort_order = 'null', $file_format = 'web', $test_date = FALSE, $report_count=0, $json_filter_data = NULL, $first=FALSE, $cache_buster = NULL) {//, $herd_size_code = FALSE, $all_breeds_code = FALSE
+	public function ajax_report($page_path, $block_name, $sort_by = 'null', $sort_order = 'null', $file_format = 'web', $test_date = FALSE, $report_count=0, $json_filter_data = NULL, $first=FALSE, $cache_buster = NULL) {//, $herd_size_code = FALSE, $all_breeds_code = FALSE
 		//verify user has permission to view content for given herd
 		if(!$this->authorize()) {
 			die('not authorized');
 		}
 		
 		$page_path = str_replace('|', '/', urldecode($page_path));
-		$arr_path = array_filter(explode('/', $page_path));
-		$path_page_segment = $arr_path[count($arr_path) - 1];
+		$this->section_path = substr($page_path, 0, (strrpos($page_path, '/') + 1));
+		$path_page_segment = substr($page_path, (strrpos($page_path, '/') + 1));
 		$tmp_path = $page_path . $block_name;
 		
 		//Load the most specific model that exists
@@ -258,30 +265,12 @@ class report_block extends CI_Controller {
 		//SUPPLEMENTAL DATA
 		$this->load->model('supplemental_model');
 		$supp_factory = new SupplementalFactory($this->supplemental_model, site_url());
-//set keyed array with all supplemental data for the block (bsf_id as key supplemental, with df_field id for params)?
-//All supp data is also included in block field data view.
-		//column data
-		//$block_supp = Supplemental::getColDataSupplemental($fd['bsf_id'], $this->supplemental_model, site_url());
-		
-		
-		//$this->arr_field_links[$fn] = $block_supp->getContent();
-		//add fields included in the supplemental parameters to the field list used for composing select queries (not displayed)
-//		foreach($block_supp->supplementalLinks() as $s){
-//			foreach($s->params() as $p){
-//				if(!in_array($p->value_db_field_name(), $this->arr_db_field_list)){
-//					$this->arr_db_field_list[] = $p->value_db_field_name();
-//				}
-//			}
-//		}
-		//column header
-		//$block_supp = Supplemental::getColHeaderSupplemental($fd['bsf_id'], $this->supplemental_model, site_url());
-		//$this->arr_header_links[$fn] = $block_supp->getContent();
-		//END SUPPLEMENTAL DATA
 				
-		//$this->page = $this->pages->getByPath(urldecode($page_name));
-
+		//$this->page = $this->pages->getByPath(urldecode($page_name), $this->session->userdata('section_id'));
 		$block = $this->blocks->getByPath(urldecode($block_name));
+		$output = $block->displayType();
 		$block->setReportFields($supp_factory);
+		
 		$sort_by = urldecode($sort_by);
 		//$this->objPage = $this->{$this->primary_model_name}->arr_blocks[$this->page->path()];
 				
@@ -293,7 +282,7 @@ class report_block extends CI_Controller {
 			if(isset($arr_sort_order) && is_array($arr_sort_order)){
 				$block->resetSort();
 				foreach($arr_sort_order as $k=>$s){
-					$s = $this->datasource->getField($block->id(), $arr_sort_by[$k]);
+					$s = $this->datasource->getFieldByName($block->id(), $arr_sort_by[$k]);
 					$datafield = new DbField($s['db_field_id'], $s['table_name'], $s['db_field_name'], $s['name'], $s['description'], $s['pdf_width'], $s['default_sort_order'],
 						 $s['datatype'], $s['max_length'], $s['decimal_scale'], $s['unit_of_measure'], $s['is_timespan'], $s['is_foreign_key'], $s['is_nullable'], $s['is_natural_sort']);
 					$block->addSort($datafield, $arr_sort_order[$k]);
@@ -302,7 +291,7 @@ class report_block extends CI_Controller {
 		}
 		
 		if(isset($json_filter_data)){
-			$section = $this->getSection($this->section_path);
+			$section = $this->getSection();
 			$arr_params = (array)json_decode(urldecode($json_filter_data));
 			if(isset($arr_params['csrf_test_name']) && $arr_params['csrf_test_name'] != $this->security->get_csrf_hash()){
 				die("I don't recognize your browser session, your session may have expired, or you may have cookies turned off.");
@@ -332,15 +321,17 @@ class report_block extends CI_Controller {
 			//prep data for filter library
 			$this->load->model('filter_model');
 			//load required libraries
-			$this->filters = new Filters($this->filter_model);
+			$filters = new Filters($this->filter_model);
 //			$primary_table = $this->{$this->primary_model_name}->get_primary_table_name();
 			$this->load->helper('multid_array_helper');
-			$this->filters->set_filters(
+			$filters->setCriteria(
 					$section->id(),
 					$path_page_segment,
 					['herd_code' => $this->session->userdata('herd_code')] + $arr_params
 			);
 		}
+		$block->setFilters($filters);
+		
 		// block-level supplemental data
 		$this->load->model('supplemental_model');
 		$block_supp = $supp_factory->getBlockSupplemental($block->id(), $this->supplemental_model, site_url());
@@ -361,7 +352,7 @@ class report_block extends CI_Controller {
 		$this->load->model('Datasource/db_table_model');
 		$db_table = new DbTable($block->primaryTableName(), $this->db_table_model);
 		$block_data = new BlockData($block, $this->report_data_model, $this->benchmarks, $db_table);
-		$results = $block_data->loadData($report_count, ['herd_code' => '35690638']);
+		$results = $block_data->loadData($report_count, $filters->criteriaKeyValue());
 		// end report data
 		
 		
@@ -369,37 +360,39 @@ class report_block extends CI_Controller {
 		//set parameters for given block
 		
 		//common functionality
-		//$first = ($first === 'true');
+		/*
+		$first = ($first === 'true');
 		if($file_format == 'csv'){
-		//	if($first){
-		//		$this->_record_access(90, 'csv', $this->config->item('product_report_code'));
-		//	}
+			if($first){
+				$this->_record_access(90, 'csv', $this->config->item('product_report_code'));
+			}
 			return $results;
 		}
 		elseif($file_format == 'pdf'){
-		//	if($first){
-		//		$this->_record_access(90, 'pdf', $this->config->item('product_report_code'));
-		//	}
-			if($output == 'html'){
-				return $this->html;
+			if($first){
+				$this->_record_access(90, 'pdf', $this->config->item('product_report_code'));
 			}
-			else {
-				return $results;
-			}
+			return $results;
+		}
+		*/
+		if($file_format == 'pdf' || $file_format == 'csv'){
+			$output = 'array';
+			return $results;			
 		}
 
 		if(isset($this->benchmarks)){
 			$bench_text = $this->benchmarks->get_bench_text();
 		}
 
-		if($output == 'table'){
+		if($block->displayType() == 'table'){
+			//@todo: move model call to library???
 			$header_groups = $this->report_block_model->getHeaderGroups($block->id());
 			//@todo: pull this only when needed?
 			$arr_dates = $this->herd_model->get_test_dates_7_short($this->session->userdata('herd_code'));
 			$header_groups = $this->adjustHeaderGroups($header_groups, $arr_dates);
 
 			$table_header = new TableHeader($block, $header_groups, new SupplementalFactory($this->supplemental_model, site_url()));
-			
+		
 			$table_header_data = [
 				'structure' => $table_header->getTableHeaderStructure(),
 				'form_id' => $this->report_form_id,
@@ -448,15 +441,12 @@ class report_block extends CI_Controller {
  	   	exit;
 	}
 
-	protected function getSection($arr_path){
-		//get section
-		//unset($arr_path[count($arr_path) - 1]);
+	protected function getSection(){
 		$this->load->model('web_content/section_model');
 		$this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
 		$this->load->model('web_content/block_model', 'WebBlockModel');
 		$web_blocks = new WebBlocks($this->WebBlockModel);
 		$pages = new Pages($this->page_model, $web_blocks);
-		//$section_path = implode('/', $arr_path);
 		$sections = new Sections($this->section_model, $pages);
 		$section = $sections->getByPath($this->section_path);
 		return $section;
@@ -469,12 +459,10 @@ class report_block extends CI_Controller {
 			$c = 0;
 			if(isset($dates) && is_array($dates)){
 				foreach($dates[0] as $key => $value){
-//var_dump($header_groups);
 					if ($key == $hv['text']) {
 						if ($value == '0-0') {
 							$value='No Test (-'.$c.')';
 						}
-//var_dump($header_groups[$hk]);
 						$header_groups[$hk]['text'] = $value;
 						break;
 					}
@@ -482,7 +470,6 @@ class report_block extends CI_Controller {
 				}
 			}
 		}
-//var_dump($header_groups);
 		return $header_groups;
 		//end KLM
 	}

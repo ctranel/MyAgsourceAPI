@@ -73,7 +73,7 @@ class Benchmark extends CI_Controller {
 		//if set default, write to database
 		if($make_default){
 			$this->load->model('benchmark_model');
-			$benchmarks = new Benchmarks($this->session->userdata('user_id'), $this->session->userdata('herd_code'), $this->herd_model->header_info($this->session->userdata('herd_code')), $this->setting_model, $this->benchmark_model);
+			$benchmarks = new Benchmarks($this->session->userdata('user_id'), $this->session->userdata('herd_code'), $this->herd_model->header_info($this->session->userdata('herd_code')), $this->setting_model, $this->benchmark_model, $this->session->userdata('benchmarks'));
 			$benchmarks->save_as_default($formatted_form_data);
 		}
 			

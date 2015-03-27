@@ -23,25 +23,25 @@ class DbField implements iDataField {
 	protected $id;
 	
 	/**
-	 * label_text
-	 * @var iDatasourceTable
+	 * db_table_name
+	 * @var int
 	 **/
-	protected $db_table;
+	protected $db_table_name;
 	
 	/**
-	 * min
+	 * db field name
 	 * @var int
 	 **/
 	protected $db_field_name;
 	
 	/**
-	 * block name
+	 * field name
 	 * @var string
 	 **/
 	protected $name;
 	
 	/**
-	 * block description
+	 * field description
 	 * @var string
 	 **/
 	protected $description;
@@ -109,10 +109,10 @@ class DbField implements iDataField {
 	
 	/**
 	 */
-	function __construct($id, $db_table, $db_field_name, $name, $description, $pdf_width, $default_sort_order,
+	function __construct($id, $db_table_name, $db_field_name, $name, $description, $pdf_width, $default_sort_order,
 			$datatype, $max_length, $decimal_scale, $unit_of_measure, $is_timespan, $is_foreign_key, $is_nullable, $is_natural_sort) {
 		$this->id =  $id;
-		$this->db_table = $db_table;
+		$this->db_table_name = $db_table_name;
 		$this->db_field_name = $db_field_name;
 		$this->name = $name;
 		$this->description = $description;
@@ -133,7 +133,7 @@ class DbField implements iDataField {
 	}
 
 	public function dbTableName(){
-		return $this->db_table;
+		return $this->db_table_name;
 	}
 
 	public function decimalScale(){

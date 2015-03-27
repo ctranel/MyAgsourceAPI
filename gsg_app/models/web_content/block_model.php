@@ -2,8 +2,6 @@
 class Block_model extends CI_Model {
 	public function __construct(){
 		parent::__construct();
-		$this->db_group_name = 'default';
-		$this->{$this->db_group_name} = $this->load->database($this->db_group_name, TRUE);
 		$this->tables = $this->config->item('tables', 'ion_auth');
 	}
 
@@ -16,9 +14,9 @@ class Block_model extends CI_Model {
 		$this->db
 			->select('b.id, pb.page_id, b.name,b.[description],b.path,dt.name AS display_type,s.name AS scope,b.chart_type_id,b.max_rows,b.cnt_row,b.sum_row,b.avg_row,b.pivot_db_field,b.bench_row,b.is_summary,b.active')
 			->where('b.active', 1)
-			->join('lookup_display_types dt', 'b.display_type_id = dt.id', 'inner')
-			->join('lookup_scopes s', 'b.scope_id = s.id', 'inner')
-			->join('pages_blocks pb', 'b.id = pb.block_id', 'inner')
+			->join('users.dbo.lookup_display_types dt', 'b.display_type_id = dt.id', 'inner')
+			->join('users.dbo.lookup_scopes s', 'b.scope_id = s.id', 'inner')
+			->join('users.dbo.pages_blocks pb', 'b.id = pb.block_id', 'inner')
 			->order_by('list_order', 'asc')
 			->from($this->tables['blocks'] . ' b');
 		return $this->db->get()->result_array();
@@ -49,7 +47,7 @@ class Block_model extends CI_Model {
 	 * @author ctranel
 	 **/
 	public function get_block_display_types() {
-		return $this->{$this->db_group_name}
+		return $this->db
 			//->where($this->tables['lookup_display_types'] . '.active', 1)
 			->get($this->tables['lookup_display_types']);
 	}
@@ -62,8 +60,8 @@ class Block_model extends CI_Model {
 	 **/
 	public function getCompleteData() {
 		$arr_return = array();
-		if(isset($section_id)) $this->{$this->db_group_name}->where('p.section_id', $section_id);
-		$result = $this->{$this->db_group_name}
+		if(isset($section_id)) $this->db->where('p.section_id', $section_id);
+		$result = $this->db
 		->select("p.id AS page_id, b.id, p.section_id, b.path, b.name, ct.name AS chart_type, b.description, p.path AS page, p.name AS page_name, CASE WHEN dt.name LIKE '%chart' THEN 'chart' ELSE dt.name END AS display_type,s.path AS section_path, b.max_rows, b.cnt_row, b.sum_row, b.avg_row, b.bench_row, pf.db_field_name AS pivot_db_field, b.is_summary")
 		->join($this->tables['pages'] . ' AS p', 'p.section_id = s.id', 'left')
 		->join($this->tables['pages_blocks'] . ' AS pb', 'p.id = pb.page_id', 'left')
@@ -125,7 +123,7 @@ class Block_model extends CI_Model {
 	 * @author ctranel
 	 **/
 	public function get_chart_display_types() {
-		return $this->{$this->db_group_name}
+		return $this->db
 			//->where($this->tables['lookup_chart_types'] . '.active', 1)
 			->get($this->tables['lookup_chart_types']);
 	}

@@ -1,18 +1,20 @@
 <?php
 
 function prep_output($output, $graph, $report_count, $file_format = NULL){
-	if ($output == 'ajax') $this->load->view('data', $graph);
-	elseif ($output == 'html') {
-		if($file_format = 'pdf') return $graph['html'];
+	//if ($output == 'ajax') $this->load->view('data', $graph);
+	if ($output == 'html') {
+		if($file_format = 'pdf'){
+			return $graph['html'];
+		}
 		else {
 			echo $graph['html'];
 			exit;
 		}
 	}
-	elseif ($output == 'array'){
+	if ($output == 'array'){
 		return $graph['data'];
 	}
-    elseif ($output == 'chart' || $output == 'table') {
+    if ($output == 'chart' || $output == 'table') {
     	//Set the Javascript header 
     	header("Content-type: application/json"); //being sent as json
     	if($output == 'table'){
@@ -25,9 +27,11 @@ function prep_output($output, $graph, $report_count, $file_format = NULL){
     	else {
 			echo $return_val;
     	}
+    	return;
     }
  
-    else // load the default view
-        var_dump($graph);
+   // shouldn't get here
+   var_dump($graph);
+   return false;
     	//$this->load->view('default', $graph);
 }

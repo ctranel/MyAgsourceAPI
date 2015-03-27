@@ -115,6 +115,7 @@ abstract class parent_report extends CI_Controller {
 		$class_dir = $this->router->fetch_directory(); //this should match the name of this file (minus ".php".  Also used as base for css and js file names and model directory name
 		$class = $this->router->fetch_class();
 		$method = $this->router->fetch_method();
+
 		$this->section_path = $class_dir . $class . '/';
 
 		if(!$this->authorize($method)) {
@@ -132,18 +133,23 @@ abstract class parent_report extends CI_Controller {
 			redirect(site_url('dhi/change_herd/select'));			
 		}
 
-		//load most specific model available.  Must load model before setting section
+		//load sections
+		$this->section = $sections->getByPath($this->section_path);
+		$this->session->set_userdata('section_id', $this->section->id());
+		$sections->loadChildren($this->section, $this->pages, $this->session->userdata('user_id'), $this->herd, $this->ion_auth_model->getTaskPermissions());
+		
 		$path = uri_string();
 		$arr_path = explode('/',$path);
 		$page_name = $method;
 		$block_name = '';
-		$this->page = $this->pages->getByPath($page_name);
+		$this->page = $this->pages->getByPath($page_name, $this->section->id());
 		$this->report_path = $this->section_path . $this->page->path();
 		$this->primary_model_name = $this->page->path() . '_model';
 		$this->report_form_id = 'report_criteria';//filter-form';
 		$this->page_header_data['user_sections'] = $this->as_ion_auth->top_sections;
 		$this->page_header_data['num_herds'] = $this->herd_access->getNumAccessibleHerds($this->session->userdata('user_id'), $this->as_ion_auth->arr_task_permissions(), $this->session->userdata('arr_regions'));
 		
+		//load most specific model available.  Must load model before setting section
 		//Load the most specific model that exists
 		if(file_exists(APPPATH . 'models' . FS_SEP . $this->section_path . $block_name . '_model.php')){
 			$this->primary_model_name = $block_name. '_model';
@@ -157,11 +163,6 @@ abstract class parent_report extends CI_Controller {
 			$this->primary_model_name = 'report_model';
 			$this->load->model('report_model', '', FALSE, $this->section_path);
 		}
-		
-//@todo: fix line below, why is path coming in as 'land' and not 'dhi/'?  redirect?
-//		$this->section_path = str_replace('land', 'dhi', $this->section_path);
-		$this->section = $sections->getByPath($this->section_path);
-		$sections->loadChildren($this->section, $this->pages, $this->session->userdata('user_id'), $this->herd, $this->ion_auth_model->getTaskPermissions());
 		
 		/* Load the profile.php config file if it exists*/
 		if (ENVIRONMENT == 'development' || ENVIRONMENT == 'localhost') {
@@ -234,13 +235,13 @@ abstract class parent_report extends CI_Controller {
 		//$this->page->loadChildren();
 		//$arr_blocks = $this->page->children();
 		
+		//FILTERS
 		//Determine if any report blocks have is_summary flag - will determine if pstring needs to be loaded and filters shown
 		//@todo make pstring 0 work on both cow and summary reports simultaneously
-		//FILTERS
 		//load required libraries
 		$this->load->model('filter_model');
 		$this->filters = new Filters($this->filter_model);
-		$this->filters->set_filters(
+		$this->filters->setCriteria(
 				$this->section->id(),
 				$this->page->path(),
 				array(
@@ -269,7 +270,7 @@ abstract class parent_report extends CI_Controller {
 							$sort_order = implode('|', $this->arr_sort_order);
 						}
 						$this->reports->sort_text($this->arr_sort_by, $this->arr_sort_order);//this function sets text, and could return it if needed
-						$tmp_data = $this->ajax_report(urlencode($this->page->path()), urlencode($pb->path()), 'array', urlencode($sort_by), $sort_order, 'csv', NULL);
+						$tmp_data = $this->ajax_report(urlencode($this->page->path()), urlencode($pb->path()), urlencode($sort_by), $sort_order, 'csv', NULL);
 						$data[] = array('test_date' => $pb['description']);
 						$data = array_merge($data, $tmp_data);
 					}
@@ -292,6 +293,7 @@ abstract class parent_report extends CI_Controller {
 		elseif ($display_format == 'pdf' && !is_null($arr_block_in)) {
 			$ci_pdf = new Ci_pdf();
 			$pdf = new Pdf($ci_pdf);
+			//@todo: parameters
 			$table_header = new TableHeader();
 			$data = array();
 			$herd_data = $this->herd_model->header_info($this->herd->herdCode());
@@ -317,7 +319,7 @@ abstract class parent_report extends CI_Controller {
 						}
 
 						$this->{$this->primary_model_name}->populate_field_meta_arrays($pb['id']);
-						$block[$i]['data'] = $this->ajax_report(urlencode($this->page->path()), urlencode($pb->path()), 'array', urlencode($sort_by), $sort_order, 'pdf', NULL);
+						$block[$i]['data'] = $this->ajax_report(urlencode($this->page->path()), urlencode($pb->path()), urlencode($sort_by), $sort_order, 'pdf', NULL);
 						$tmp_pdf_width = $this->{$this->primary_model_name}->get_pdf_widths(); 
 						$block[$i]['arr_pdf_widths'] = $tmp_pdf_width;
 						$arr_header_data = $this->{$this->primary_model_name}->get_fields(); // was $model
@@ -345,7 +347,6 @@ abstract class parent_report extends CI_Controller {
 			$prev_display_type = '';
 			$cnt = count($arr_blocks);
 			foreach($arr_blocks as $c => $pb){
-				$display = 'chart';//$pb['display_type'];
 				//load view for placeholder for block display
 				$this->arr_sort_by = [];
 				$this->arr_sort_order = [];
@@ -372,10 +373,9 @@ abstract class parent_report extends CI_Controller {
 //						'sort_by' => urlencode($sort_by),
 //						'sort_order' => urlencode($sort_order),
 					);
-					$arr_view_blocks[] = $this->load->view($display, $arr_blk_data, TRUE);
+					$arr_view_blocks[] = $this->load->view($pb->displayType(), $arr_blk_data, TRUE);
 					//add js line to populate the block after the page loads
-					$tmp_container_div = $display == 'chart' ? 'graph-canvas' . $x : 'table-canvas' . $x;
-					$tmp_js .= "updateBlock(\"$tmp_container_div\", \"" . $pb->path() . "\", \"$x\", \"null\", \"null\", \"$display\",\"false\");\n";//, \"" . $this->{$this->primary_model_name}->arr_blocks[$this->page->path()]['display'][$display][$block]['description'] . "\", \"" . $bench_text . "\");\n";
+					$tmp_js .= "updateBlock(\"block-canvas$x\", \"" . $pb->path() . "\", \"$x\", \"null\", \"null\",\"false\");\n";//, \"" . $this->{$this->primary_model_name}->arr_blocks[$this->page->path()]['display'][$display][$block]['description'] . "\", \"" . $bench_text . "\");\n";
 					$tmp_js .= "if ($( '#datepickfrom' ).length > 0) $( '#datepickfrom' ).datepick({dateFormat: 'mm-dd-yyyy'});";
 					$tmp_js .= "if ($( '#datepickto' ).length > 0) $( '#datepickto' ).datepick({dateFormat: 'mm-dd-yyyy'});";
 					$tmp_block = $pb->path();
@@ -414,6 +414,7 @@ abstract class parent_report extends CI_Controller {
 				'section_path' => $this->section_path,
 			);
 			$arr_blocks->rewind();
+
 			$this->page_header_data = array_merge($this->page_header_data,
 				array(
 					'title'=>$this->product_name . ' - ' . $this->config->item('site_title'),
@@ -424,7 +425,7 @@ abstract class parent_report extends CI_Controller {
 					'arr_head_line' => array(
 						'<script type="text/javascript">',
 						'	var page = "' . $this->page->path() . '";',
-						'	var base_url = "' . $this->section_path . '";',
+						'	var page_url = "' . $this->report_path . '";',
 						'	var site_url = "' . site_url() . '";',
 						'	var herd_code = "' . $this->herd->herdCode() . '";',
 						'	var block = "' . $arr_blocks->current()->name()	. '"',
@@ -454,7 +455,7 @@ abstract class parent_report extends CI_Controller {
 		$this->load->model('setting_model');
 		$this->load->model('benchmark_model');
 		
-		$this->benchmarks = new Benchmarks($this->session->userdata('user_id'), $this->input->post('herd_code'), $this->herd_model->header_info($this->herd->herdCode()), $this->setting_model, $this->benchmark_model);
+		$this->benchmarks = new Benchmarks($this->session->userdata('user_id'), $this->input->post('herd_code'), $this->herd_model->header_info($this->herd->herdCode()), $this->setting_model, $this->benchmark_model, $this->session->userdata('benchmarks'));
 		$arr_benchmark_data = $this->benchmarks->getFormData($this->session->userdata('benchmarks')); 
 		$arr_nav_data = array(
 			'section_path' => $this->section_path,
@@ -466,9 +467,9 @@ abstract class parent_report extends CI_Controller {
 		if(file_exists(APPPATH . 'views' . FS_SEP . $this->section_path . FS_SEP . 'report_nav.php')){
 			$report_nav_path =  $this->section_path . '/' . $report_nav_path;
 		}
-		if(count($arr_nav_data['arr_pages']) < 2) {
-			$this->carabiner->css('hide_report_nav.css', 'screen');
-		}
+		//if(count($arr_nav_data['arr_pages']) < 2) {
+		//	$this->carabiner->css('hide_report_nav.css', 'screen');
+		//}
 		$report_filter_path = 'filters';
 		if(file_exists(APPPATH . 'views' . FS_SEP . $this->section_path . FS_SEP . 'filters.php')){
 			$report_filter_path =  $this->section_path . '/filters' . $report_filter_path;
@@ -495,7 +496,8 @@ abstract class parent_report extends CI_Controller {
 		}
 
 		$this->load->model('supplemental_model');
-		$page_supp = Supplemental::getPageSupplemental($this->page->id(), $this->supplemental_model, site_url());
+		$supp_factory = new SupplementalFactory($this->supplemental_model, site_url());
+		$page_supp = $supp_factory->getPageSupplemental($this->page->id(), $this->supplemental_model, site_url());
 		$data['page_supplemental'] = $page_supp->getContent();
 		if(isset($arr_benchmark_data)){
 			$collapse_data['content'] = $this->load->view('set_benchmarks', $arr_benchmark_data, TRUE);
@@ -503,11 +505,12 @@ abstract class parent_report extends CI_Controller {
 			$collapse_data['id'] = 'bench-div';
 			$data['benchmarks'] = $this->load->view('collapsible', $collapse_data, TRUE);
 		}
+/*
 		if((is_array($arr_nav_data['arr_pages']) && count($arr_nav_data['arr_pages']) > 1) || 
 				(isset($arr_nav_data['arr_links']) && is_array($arr_nav_data['arr_links']) && count($arr_nav_data['arr_links']) > 1)) {
 			$data['report_nav'] = $this->load->view($report_nav_path, $arr_nav_data, TRUE);
 		}
-		
+*/		
 		$this->_record_access(90, 'web', $this->config->item('product_report_code'));
 		$this->load->view('report', $data);
 	}
@@ -537,7 +540,7 @@ abstract class parent_report extends CI_Controller {
 			$product_code,
 			$format,
 			$this->page->id(),
-			$this->reports->sort_text_brief($this->arr_sort_by, $this->arr_sort_order),
+			'',//$this->reports->sort_text_brief($this->arr_sort_by, $this->arr_sort_order),
 			$filter_text
 		);
 	}

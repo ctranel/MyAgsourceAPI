@@ -39,13 +39,16 @@ class Blocks implements iWebContentRepository {
 	 * @author ctranel
 	 * @returns Page
 	 */
-	public function getByPath($path){
+	public function getByPath($path, $parent_id = null){
 		$criteria = ['path' => $path];
+		if(isset($parent_id)){
+			$criteria['page_id'] = $parent_id;
+		}
 		$results = $this->datasource_blocks->getByCriteria($criteria);
 		if(empty($results)){
 			return false;
 		}
-		return new Block($results[0]['id'], $results[0]['page_id'], $results[0]['name'], $results[0]['description'], $results[0]['scope'], $results[0]['active'], $results[0]['path']);
+		return new Block($results[0]['id'], $results[0]['page_id'], $results[0]['name'], $results[0]['description'], $results[0]['display_type'], $results[0]['scope'], $results[0]['active'], $results[0]['path']);
 	}
 
 	/*
@@ -57,7 +60,6 @@ class Blocks implements iWebContentRepository {
 	 */
 	public function getByPage($page_id){
 		$blocks = new \SplObjectStorage();
-		
 		$criteria = ['page_id' => $page_id];
 //		$join = [['table' => 'pages_blocks pb', 'condition' => 'b.id = pb.block_id AND pb.page_id = ' . $page_id]];
 		$results = $this->datasource_blocks->getByCriteria($criteria);
@@ -65,7 +67,7 @@ class Blocks implements iWebContentRepository {
 			return false;
 		}
 		foreach($results as $r){
-			$blocks->attach(new Block($r['id'], $r['page_id'], $r['name'], $r['description'], $r['scope'], $r['active'], $r['path']));
+			$blocks->attach(new Block($r['id'], $r['page_id'], $r['name'], $r['description'], $r['display_type'], $r['scope'], $r['active'], $r['path']));
 		}
 		return $blocks;
 	}

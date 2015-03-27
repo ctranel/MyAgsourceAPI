@@ -77,7 +77,7 @@ class Filters{
 	}
 	
 	/* -----------------------------------------------------------------
-	*  set_filters() sets default filter criteria based on the field-specific values (herd code, test date)
+	*  setCriteria() sets default filter criteria based on the field-specific values (herd code, test date)
 	*   and page filters pulled from the database
 
 	*  sets default filter criteria based on the field-specific values (herd code, test date)
@@ -92,7 +92,7 @@ class Filters{
 	*  @throws: 
 	* -----------------------------------------------------------------
 	*/
-	public function set_filters($sect_id, $page_path, $arr_form_data = null){
+	public function setCriteria($sect_id, $page_path, $arr_form_data = null){
 		//get filters from DB for the current page, set other vars
 		$arr_page_filter_data = $this->filter_model->get_page_filters($sect_id, $page_path);
 		//set default criteria as base
@@ -119,12 +119,13 @@ class Filters{
 		if(!isset($arr_page_filter_data)){
 			return false;
 		}
-		//if there is a value in form data that is not in FilterCriteria, need to set that up
+
+		//if there is a value in form data that is not in FilterCriteria (e.g., a value that is set programmatically (herd_code)), need to set that up
 		$arr_to_create = array_diff_key($arr_form_data, $arr_page_filter_data);
 		if(is_array($arr_to_create) && !empty($arr_to_create)){
 			foreach($arr_to_create as $k=>$f){
 				if(!is_array($f)){
-					$f = array($f);
+					$f = [$f];
 				}
 				$arr_tmp = array(
 					'name' => ucwords(str_replace('_', ' ', $k)),
@@ -206,9 +207,6 @@ class Filters{
 		}
 	}
 	
-	
-
-
 	/* -----------------------------------------------------------------
 	 *  criteriaExists() checks for the existance of key passed to method
 	
@@ -227,7 +225,6 @@ class Filters{
 		return isset($this->arr_criteria[$key]);
 	}
 	
-
 	/* -----------------------------------------------------------------
 	*  setCriteriaValue() sets a key=>value array of field_name=>selected_value
 
@@ -248,7 +245,6 @@ class Filters{
 		}
 		$this->arr_criteria[$key]->setSelectedValue($value);
 	}
-	
 	
 	/* -----------------------------------------------------------------
 	*  toArray() returns an array representation of objects
@@ -287,9 +283,11 @@ class Filters{
 		if(!is_array($this->arr_criteria) || empty($this->arr_criteria)){
 			return FALSE;
 		}
-
-		$arr_filter_text = array();
+//var_dump($this->arr_criteria);
+		
+		$arr_filter_text = [];
 		foreach($this->arr_criteria as $k => $c){
+//var_dump($k, $c->set_filter_text());
 			if($k == 'block'); //don't show block filter info because it is specified in heading
 			else{
 				$c->set_filter_text();
@@ -303,6 +301,4 @@ class Filters{
 			}
 		}
 	}
-	
-	
 }

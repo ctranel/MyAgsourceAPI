@@ -56,6 +56,14 @@ class BlockData {
 	 **/
 	protected $db_table;
 	
+	/**
+	 * dataset
+	 *
+	 * dataset
+	 * @var array
+	 **/
+	protected $dataset;
+	
 	
 	/**
 	 * @todo: add filter data
@@ -83,7 +91,6 @@ class BlockData {
 		if($this->block->hasBenchmarks() && isset($this->benchmarks)){
 		//if the data is pivoted, set the pivoted field as the row header, else use the first non-pstring column
 			$row_head_field = $this->getRowHeadField($arr_field_list);
-			
 			$arr_bench_data = $this->benchmarks->addBenchmarkRow(
 				$this->db_table,
 				$row_head_field,
@@ -100,7 +107,7 @@ class BlockData {
 				$results[] = $arr_bench_data[0];
 			}
 		}
-		if(!empty($this->pivot_db_field)){
+		if($this->block->hasPivot()){
 			$results = $this->pivot($results, $this->block->pivotFieldName(), 10, 10, $this->block->hasAvgRow(), $this->block->hasSumRow());
 		}
 		return $results;
@@ -151,7 +158,7 @@ class BlockData {
 	}
 	
 	/*
-	 * @method prep_group_by()
+	* @method prep_group_by()
 	* @author ctranel
 	protected function prep_group_by(){
 		$arr_len = is_array($this->arr_group_by_field)?count($this->arr_group_by_field):0;
@@ -187,77 +194,58 @@ class BlockData {
 		}
 	}
 	
+	/* 
+	 * getRowHeadField
+	 * 
+	 * if the data is pivoted, set the pivoted field as the row header, else use the first non-pstring column
+	 *  
+	 * @method getRowHeadField()
+	 * @param array field list
+	 * @return string field name
+	 * @author ctranel
+	 */
 	protected function getRowHeadField($arr_field_list){
-		$row_head_field = NULL;
 		if(!empty($this->pivot_db_field)){
-			$row_head_field = $this->pivot_db_field;
+			return $this->pivot_db_field;
 		}
 		else{
 			foreach($arr_field_list as $fl){
+				//@todo: remove reference to specific field name
 				if($fl != 'pstring'){
-					$row_head_field = $fl;
-					break;
+					return $fl;
 				}
 			}
 		}
-		
-		return $row_head_field;
+		return;
 	}
 
 	/*  
 	 * @method pivot()
 	 * @param array dataset
-	 * @param string header field
-	 * @param int pdf with of header field
-	 * @param bool add average column
-	 * @param bool add sum column
 	 * @return array pivoted resultset
 	 * @author ctranel
 	 */
-	public function pivot($arr_dataset, $header_field, $header_field_width, $label_column_width, $bool_avg_column = FALSE, $bool_sum_column = FALSE){
+	public function pivot($arr_dataset){
 		$header_text = ' ';
-		$new_dataset = array();
-		//headers not used in pivot tables, so we flatten the array
-		$tmp_keys = array_keys(current($this->arr_fields));
-		$tmp_vals = array_flatten($this->arr_fields);
-		$this->arr_fields = array_combine($tmp_keys, $tmp_vals);
-		foreach($this->arr_fields as $k=>$v){
-			if($v == $header_field){
-				$header_text = $k;
-				$this->arr_unsortable_columns[] = $v;
-			}
-			else {
-				$new_dataset[$v][$header_field] = $k;
-				//also need to add labels as keys to number formatting arrays so that they can be referenced in the view
-				if(in_array($v, $this->arr_numeric_fields)){
-					$this->arr_decimal_points[$k] = $this->arr_decimal_points[$v];
-					$this->arr_numeric_fields[] = $k;
-				}
-			}
+		$header_field = $this->block->pivotFieldName();
+		$header_field_width = 10;
+		$label_column_width = 10;
+		
+		$new_dataset = [];
+
+		if(!isset($arr_dataset) || empty($arr_dataset)){
+			return false;
 		}
-		$this->arr_fields = array($header_text => $header_field); //used for labels in left-most column that are set in foreach loop above
-		$this->arr_field_sort[$header_field] = 'ASC';
-		$this->arr_pdf_widths[$header_field] = $label_column_width;
-		if(!isset($arr_dataset) || empty($arr_dataset)) return FALSE;
-		foreach($arr_dataset as $row){
+		foreach($arr_dataset as $k => $row){
 			foreach($row as $name => $val){
-				if($name == $header_field && isset($val)){
-					$this->arr_fields[$val] = $val;
-					$this->arr_pdf_widths[$val] = $header_field_width;
-					$this->arr_field_sort[$val] = 'ASC';
-					$this->arr_unsortable_columns[] = $val;
-				}
-				elseif(strpos($name, 'isnull') === FALSE && isset($row[$header_field]) && !empty($row[$header_field])) { //2nd part eliminates rows where fresh date is null (FCS)
-					//is this being done in the view now?
-					//if(isset($this->arr_decimal_points[$k])) $val = round($val, $this->arr_decimal_points[$k]);
+				if(strpos($name, 'isnull') === FALSE && isset($row[$header_field]) && !empty($row[$header_field])) { //2nd part eliminates rows where fresh date is null (FCS)
+					$new_dataset[$name][$k] = $val;
 
 					if(isset($new_dataset[$name]['total']) === FALSE && $val !== NULL){
 						$new_dataset[$name]['total'] = 0;
 						$new_dataset[$name]['count'] = 0;
 					} 
 					
-					$new_dataset[$name][$row[$header_field]] = $val;
-
 					if($val !== NULL){
 						$new_dataset[$name]['total'] += $val;
 						$new_dataset[$name]['count'] ++;
@@ -265,35 +253,38 @@ class BlockData {
 				}				
 			}
 		}
-		if($bool_avg_column){
+/*
+		if($this->block->hasAvgRow()){
 			$this->arr_fields['Average'] = 'average';
 			$this->arr_pdf_widths['average'] = $header_field_width;
 			$this->arr_field_sort['average'] = 'ASC';
 			$this->arr_unsortable_columns[] = 'average';
 		}
-		if($bool_sum_column){
+		if($this->block->hasSumRow()){
 			$this->arr_fields['Total'] = 'total';
 			$this->arr_pdf_widths['total'] = $header_field_width;
 			$this->arr_field_sort['total'] = 'ASC';
 			$this->arr_unsortable_columns[] = 'total';
-			}
+		}
+*/
 		foreach($new_dataset as $k=>$a){
 			if(!empty($k)){
 //				if($bool_bench_column){
 //					if($arr_benchmarks[$k] !== NULL) $sum_data['benchmark'] = round($arr_benchmarks[$k], $this->arr_decimal_points[$k]);//strpos($arr_benchmarks[$k], '.') !== FALSE ? trim(trim($arr_benchmarks[$k],'0'), '.') : $arr_benchmarks[$k];
 //					else $sum_data['benchmark'] = NULL;
 //				}
-				if($bool_avg_column){
+				if($this->block->hasAvgRow()){
 					$new_dataset[$k]['average'] = $new_dataset[$k]['total'] / $new_dataset[$name]['count'];
 					if(isset($this->arr_decimal_points[$k])) $new_dataset[$k]['average'] = round($new_dataset[$k]['average'], $this->arr_decimal_points[$k]);
 				}
-				if(($bool_avg_column && !$bool_sum_column) || (!$bool_avg_column && !$bool_sum_column)){ //total column should not be displayed on PDF if it is only used to calculate avg 
+				if(($this->block->hasAvgRow() && !$this->block->hasSumRow()) || (!$this->block->hasAvgRow() && !$this->block->hasSumRow())){ //total column should not be displayed on PDF if it is only used to calculate avg 
 					unset($new_dataset[$k]['total']);
 				}
+				unset($new_dataset[$k]['count']);
 			}
 		}
 		//the following line is needed--didn't finish researching, but fresh cow summary tables break when it is removed
-		$this->arr_db_field_list = $this->arr_fields;
+		//$this->arr_db_field_list = $this->arr_fields;
 		return $new_dataset;
 	}
 	

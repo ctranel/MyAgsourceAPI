@@ -74,7 +74,7 @@
 		->get('users.dbo.supp_links')
 		->result_array();
 		if(is_array($ret) && !empty($ret)){
-			return $ret[0];
+			return $ret;
 		}
 		return false;
 	}

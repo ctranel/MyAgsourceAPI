@@ -27,7 +27,7 @@ class Cow_qtile_model extends CI_Model {
 		->where('test_date', $test_date)
 		->get('vma.dbo.vma_GSG_Cow_Quartile_Averages')
 		->result_array();
-		if(is_array($arr_ret)){
+		if(is_array($arr_ret) && count($arr_ret) > 0){
 			return $arr_ret[0];
 		}
 		return false;

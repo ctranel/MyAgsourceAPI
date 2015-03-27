@@ -8,7 +8,7 @@ use \myagsource\report_filters\Filters;
 
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Land extends parent_report {
+class Index extends parent_report {
 	protected $page_header_data;
 	protected $footer_data;
 	protected $data;
@@ -38,7 +38,7 @@ class Land extends parent_report {
 		$this->load->model('filter_model');
 		$this->filters = new Filters($this->filter_model);
 		$recent_test_date = isset($primary_table) ? $this->{$this->primary_model_name}->get_recent_dates() : NULL;
-		$this->filters->set_filters(
+		$this->filters->setCriteria(
 				$this->section->id(),
 				$this->page->path(),
 				array(
@@ -99,8 +99,7 @@ class Land extends parent_report {
 					);
 					$arr_view_blocks[$pb->name()] = $this->load->view($display, $arr_blk_data, TRUE);
 					//add js line to populate the block after the page loads
-					$tmp_container_div = $display == 'chart' ? 'graph-canvas' . $x : 'table-canvas' . $x;
-					$tmp_js .= "updateBlock(\"$tmp_container_div\", \"" . $pb->path() . "\", \"$x\", \"null\", \"null\", \"$display\",\"false\");\n";//, \"" . $this->{$this->primary_model_name}->arr_blocks[$this->page]['display'][$display][$block]['description'] . "\", \"" . $bench_text . "\");\n";
+					$tmp_js .= "updateBlock(\"block-canvas$x\", \"" . $pb->path() . "\", \"$x\", \"null\", \"null\",\"false\");\n";//, \"" . $this->{$this->primary_model_name}->arr_blocks[$this->page]['display'][$display][$block]['description'] . "\", \"" . $bench_text . "\");\n";
 					$tmp_js .= "if ($( '#datepickfrom' ).length > 0) $( '#datepickfrom' ).datepick({dateFormat: 'mm-dd-yyyy'});";
 					$tmp_js .= "if ($( '#datepickto' ).length > 0) $( '#datepickto' ).datepick({dateFormat: 'mm-dd-yyyy'});";
 					$tmp_block = $pb->path();
@@ -139,7 +138,7 @@ class Land extends parent_report {
 					'arr_head_line' => array(
 							'<script type="text/javascript">',
 							'	var page = "' . $this->page->path() . '";',
-							'	var base_url = "' . $this->section_path . '";',
+							'	var page_url = "' . $this->report_path . '";',
 							'	var site_url = "' . site_url() . '";',
 							'	var herd_code = "' . $this->session->userdata('herd_code') . '";',
 							'	var block = "' . $tmp_block	. '"',
@@ -181,16 +180,6 @@ class Land extends parent_report {
 			'title' => 'Message'
 		);
 
-		//filters	
-		$report_filter_path = 'filters';
-		if(file_exists(APPPATH . 'views' . FS_SEP . $this->section_path . FS_SEP . 'filters.php')){
-			$report_filter_path =  $this->section_path . '/filters' . $report_filter_path;
-		}
-		
-		$arr_filter_data = array(
-				'arr_filters' => $this->filters->toArray(),
-		);
-
 		$this->load->model('setting_model');
 		$this->load->model('benchmark_model');
 		$this->benchmarks = new Benchmarks($this->session->userdata('user_id'), $this->input->post('herd_code'), $this->herd_model->header_info($this->herd->herdCode()), $this->setting_model, $this->benchmark_model, $this->session->userdata('benchmarks'));
@@ -203,18 +192,23 @@ class Land extends parent_report {
 			);
 		}
 		
-		if(isset($arr_filter_data) && is_array($arr_filter_data)){
-			foreach($arr_filter_data['arr_filters'] as $f){
-				//if there is a filter that has multiple possible options, display form
-				if(isset($f['options']) && is_array($f['options']) && count($f['options']) > 1){
-					$this->data['widget']['herd'][] = array(
-						'content' => $this->load->view($report_filter_path, $arr_filter_data, TRUE),
-						'title' => 'Filters',
-						'id' => 'filters',
-					);
-					break;
-				}
-			}
+		//filters	
+		$report_filter_path = 'filters';
+		if(file_exists(APPPATH . 'views' . FS_SEP . $this->section_path . FS_SEP . 'filters.php')){
+			$report_filter_path =  $this->section_path . '/filters' . $report_filter_path;
+		}
+		
+		$arr_filter_data = array(
+				'arr_filters' => $this->filters->toArray(),
+		);
+
+		if($this->filters->displayFilters()){
+			$this->data['widget']['herd'][] = array(
+				'content' => $this->load->view($report_filter_path, $arr_filter_data, TRUE),
+				'title' => 'Filters',
+				'id' => 'filters',
+			);
+			break;
 		}
 		
 		foreach($arr_view_blocks as $k => $b){

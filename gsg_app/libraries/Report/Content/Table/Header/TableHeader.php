@@ -73,6 +73,7 @@ class TableHeader {
 	
 	public function __construct(iBlock $block, $header_groups, $supplemental_factory){
 		$this->header_group_fields = [];
+		$this->header_structure = [];
 		$this->block = $block;
 		$this->header_groups = $header_groups;
 		$this->supplemental_factory = $supplemental_factory;
@@ -92,14 +93,20 @@ class TableHeader {
 	 *  @access public
 	 **/
 	public function getTableHeaderStructure(){
+		//pivoted tables will generate their own header
+		if($this->block->hasPivot()){
+			return;
+		}
+		
 		$depth = 0;
 		$rowspan = 1;
 		$this->setTableHeaderGroups();
 		
 		$tot_levels = array_depth($this->header_group_fields);
-		$this->header_structure = []; //return value
+//var_dump($this->header_group_fields);
 		$this->getHeaderLayer($this->header_group_fields, $depth, $rowspan, $tot_levels, []);
 		ksort($this->header_structure);
+
 		return $this->header_structure;
 	}
 	
@@ -127,16 +134,19 @@ class TableHeader {
 				}
 			}
 
-			//add leaves (columns) to structure
-			$fields = $this->block->reportFields();
-			foreach($fields as $f){
-				if($f->isDisplayed()){
-					$this->addLeaf($this->header_group_fields, $f->headerGroupId(), ['children' => ['id' => null, 'parent_id' => $f->headerGroupId(), 'text' => $f->displayName(), 'pdf_width' => $f->pdfWidth(), 'is_sortable' => $f->isSortable(), 'is_displayed' => $f->isDisplayed(), 'default_sort_order' => $f->defaultSortOrder(), 'supplemental' => $f->headerSupplemental()]]);
-					//$this->addLeaf($this->header_group_fields, $f->headerGroupId(), new TableHeaderCell($h['id'], $h['parent_id'], $h['text']));
-						//['children' => ['id' => null, 'parent_id' => $f->headerGroupId(), 'text' => $f->displayName(), 'pdf_width' => $f->pdfWidth(), 'is_sortable' => $f->isSortable(), 'is_displayed' => $f->isDisplayed()]]);
-				}
+		}
+		//add leaves (columns) to structure
+		$fields = $this->block->reportFields();
+//var_dump($this->header_group_fields);
+		foreach($fields as $f){
+			if($f->isDisplayed()){
+//var_dump($f->dbFieldName(), $f->headerGroupId());
+				$this->addLeaf($this->header_group_fields, $f->headerGroupId(), ['children' => ['id' => null, 'parent_id' => $f->headerGroupId(), 'text' => $f->displayName(), 'pdf_width' => $f->pdfWidth(), 'is_sortable' => $f->isSortable(), 'is_displayed' => $f->isDisplayed(), 'default_sort_order' => $f->defaultSortOrder(), 'supplemental' => $f->headerSupplemental()]]);
+				//$this->addLeaf($this->header_group_fields, $f->headerGroupId(), new TableHeaderCell($h['id'], $h['parent_id'], $h['text']));
+					//['children' => ['id' => null, 'parent_id' => $f->headerGroupId(), 'text' => $f->displayName(), 'pdf_width' => $f->pdfWidth(), 'is_sortable' => $f->isSortable(), 'is_displayed' => $f->isDisplayed()]]);
 			}
 		}
+//		var_dump($this->header_group_fields);
 	}
 	
 	/** 
@@ -151,7 +161,6 @@ class TableHeader {
 	 *  @param array pdf column widths
 	 **/
 	protected function getHeaderLayer($arr_data_in, $curr_depth, $rowspan, $tot_levels, $parent_was_empty = FALSE){
-		//@todo: supplemental links
 		foreach($arr_data_in as $v){
 			$v['text'] = trim($v['text']);
 			if(empty($v['text'])){ //if the header has no text, keep the current depth, but add one to the rowspan
@@ -183,7 +192,6 @@ class TableHeader {
 //@todo: add new class (header leaf) that shares interface with or extends TableHeaderCell (instead of setLeafFields)
 				$tmp = new TableHeaderCell($v['id'], $v['parent_id'], $v['text'], $v['pdf_width'], $v['supplemental']);
 				$tmp->setLeafFields(1, $rowspan, $v['is_sortable'], $v['is_displayed'], $v['default_sort_order'], $v['supplemental']);
-
 				$this->header_structure[($curr_depth - 1)][] = $tmp;
 				$this->columns++;
 			}
@@ -270,56 +278,33 @@ class TableHeader {
 	 * @author ctranel
 	 */
 	protected function addLeaf(&$input, $key_in, $new_val_in, $arr_order = NULL){
-		if (!is_array($input)){
+		if (!is_array($input) || empty($new_val_in)){
 			return false;
 		}
-		$cnt = 0;
-		$arr_copy = $input;
-		foreach ($arr_copy AS $key =>$value){
-			//if the array into which $new_val_in is being inserted already has children
-			if (isset($input[$key]['children']) && is_array($input[$key]['children'])) {
-				foreach($input[$key]['children'] as &$c){
-					if (!empty($new_val_in) && !empty($key_in)){
-						if($c['id'] == $key_in){
-							$c['children'][] = $new_val_in['children'];
-						}
-					}
-//					$this->addLeaf($input[$key], $key_in, $new_val_in, $arr_order);
-				}
-			}
-			//if the array into which $new_val_in is being inserted does not yet have children
-			else {
-				$saved_value = $value;
-				if (!empty($new_val_in)){
-					if (!empty($key_in)){
-						if($key == $key_in) $value = $new_val_in;
-					}
-/*
-					elseif (is_array($input)){
-						//root level $input does not have a key, and cannot have list order.  if key_in is empty, traverse array and insert in appropriate slot
-						if(isset($arr_order) && is_array($arr_order) && $arr_order[key($new_val_in)] == ($arr_order[$key] - 1)){
-die('4');
-							echo $key . ' - ' . $key_in . "1\n\n";
-							array_insert($input['children'], $cnt, $new_val_in['children']);
-						}
-						elseif($arr_order[key($new_val_in)] == count($arr_order) && $arr_order[key($new_val_in)] == $arr_order[$key]){
-die('5');
-							echo $key . ' - ' . $key_in . "2\n\n";
-							$input[$key]['children'] = $new_val_in[$key]['children'];
-							return true;
-						}
-					}
-					if ($value != $saved_value){
-die('6');
-						echo $key . ' - ' . $key_in . "3\n\n";
-						$input[$key]['children'] = $value['children'];
-						return true;
-					}
- */
-				}
-			}
-			$cnt++;
+//		$cnt = 0;
+		//if there are no parent headers (i.e., header groups) and the leaf ($new_val_in) has not parent id set--single level headers
+		if(!isset($input['children']) && !isset($new_val_in['children']['parent_id'])){
+			$input[] = $new_val_in['children'];
+			return;
 		}
-		return true;
+		
+		//if this is a multi-level header
+		foreach ($input AS $key =>$value){
+			//if element is found in first level
+			if($input[$key]['id'] == $key_in){
+				if(!isset($input[$key]['children'])){
+					$input[$key]['children'] = [];
+				}
+				$input[$key]['children'][] = $new_val_in['children'];
+				//$value = $new_val_in;
+				return;
+			}
+			
+			//if the passed input array has children
+			if (isset($input[$key]['children']) && is_array($input[$key]['children'])) {
+				$this->addLeaf($input[$key]['children'], $key_in, $new_val_in);
+			}
+		}
+		return;
 	}
 }

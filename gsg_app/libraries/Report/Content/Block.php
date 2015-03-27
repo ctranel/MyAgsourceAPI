@@ -11,7 +11,8 @@ use \myagsource\dhi\Herd;
 use \myagsource\Report\Content\Sort;
 use \myagsource\Datasource\DbObjects\DbField;
 use \myagsource\Supplemental\Content\SupplementalFactory;
-use myagsource\Datasource\iDataField;
+use \myagsource\Datasource\iDataField;
+use \myagsource\report_filters\Filters;
 
 /**
 * Name:  Block
@@ -152,6 +153,12 @@ abstract class Block implements iBlock {
 	protected $active;
 	
 	//@todo: below should be in BlockData?
+	/**
+	 * filters
+	 * 
+	 * @var Filters
+	 **/
+	protected $filters;
 	
 	/**
 	 * primary_table_name
@@ -187,7 +194,6 @@ abstract class Block implements iBlock {
 		$this->sum_row = $sum_row;
 		$this->avg_row = $avg_row;
 		$this->bench_row = $bench_row;
-		//$this->pivot_field = $pivot_field;
 		$this->is_summary = $is_summary;
 		//$this->group_by_fields = $group_by_fields;
 		//$this->where_fields = $group_by_fields;
@@ -198,6 +204,10 @@ abstract class Block implements iBlock {
 		$this->sorts = $this->setDefaultSort();
 		//@todo: filters
 	}
+	
+	/*
+	 * a slew of getters
+	 */
 	
 	public function id(){
 		return $this->id;
@@ -230,6 +240,10 @@ abstract class Block implements iBlock {
 	public function joins(){
 		return $this->joins;
 	}
+	
+	public function displayType(){
+		return $this->display_type;
+	}
 
 	public function subtitle(){
 		return $this->filters->get_filter_text();
@@ -245,6 +259,10 @@ abstract class Block implements iBlock {
 
 	public function hasSumRow(){
 		return $this->sum_row;
+	}
+	
+	public function hasPivot(){
+		return isset($this->pivot_field);
 	}
 	
 	public function reportFields(){
@@ -307,7 +325,7 @@ abstract class Block implements iBlock {
 	public function setDefaultSort(){
 		$this->default_sorts = new \SplObjectStorage();
 		
-		$arr_ret = array();
+		$arr_ret = [];
 		$arr_res = $this->datasource->getSortData($this->id);
 		if(is_array($arr_res)){
 			foreach($arr_res as $s){
@@ -353,6 +371,16 @@ abstract class Block implements iBlock {
 	 * */
 	
 	/**
+	 * @method setFilters()
+	 * @param Filter object
+	 * @return void
+	 * @access public
+	* */
+	public function setFilters(Filters $filters){
+		$this->filters = $filters;
+	}
+	
+	/**
 	 * @method getFieldTable()
 	 * @param field name
 	 * @return string table name
@@ -371,54 +399,6 @@ abstract class Block implements iBlock {
 		return null;
 	}
 	
-	
-	/**
-	 * setReportFields
-	 * 
-	 * Sets the datafields property of datafields that are to be included in the block
-	 * 
-	 * @method setReportFields()
-	 * @return void
-	 * @access public
-	public function setReportFields(SupplementalFactory $supp_factory = null){
-		$arr_table_ref_cnt = [];
-		$this->has_aggregate = false;
-		$this->report_fields = new \SplObjectStorage();
-			
-		$arr_ret = array();
-		$arr_res = $this->datasource->getFieldData($this->id);
-		if(is_array($arr_res)){
-			$header_supp = null;
-			$data_supp = null;
-			foreach($arr_res as $s){
-				if(isset($s['aggregate']) && !empty($s['aggregate'])){
-					$this->has_aggregate = true;
-				}
-				if(isset($supp_factory)){
-					if(isset($s['head_a_href']) || isset($s['head_a_rel']) || isset($s['head_a_title']) || isset($s['head_a_class']) || isset($s['head_comment'])){
-						$header_supp = $supp_factory->getColHeaderSupplemental($s['head_supp_id'], $s['head_a_href'], $s['head_a_rel'], $s['head_a_title'], $s['head_a_class'], $s['head_comment']);
-					}
-					if(isset($s['a_href']) || isset($s['a_rel']) || isset($s['a_title']) || isset($s['a_class'])){
-						$data_supp = $supp_factory->getColDataSupplemental($s['supp_id'], $s['a_href'], $s['a_rel'], $s['a_title'], $s['a_class']);
-					}
-				}
-				$arr_table_ref_cnt[$s['table_name']] = isset($arr_table_ref_cnt[$s['table_name']]) ? ($arr_table_ref_cnt[$s['table_name']] + 1) : 1;
-				$datafield = new DbField($s['db_field_id'], $s['table_name'], $s['db_field_name'], $s['name'], $s['description'], $s['pdf_width'], $s['default_sort_order'],
-						 $s['datatype'], $s['max_length'], $s['decimal_scale'], $s['unit_of_measure'], $s['is_timespan'], $s['is_foreign_key'], $s['is_nullable'], $s['is_natural_sort']);
-				$this->report_fields->attach(new TableField($s['id'], $s['name'], $datafield, $s['is_displayed'], $s['display_format'], $s['aggregate'], $s['is_sortable'], $header_supp, $data_supp));
-			}
-			$this->primary_table_name = array_search(max($arr_table_ref_cnt), $arr_table_ref_cnt);
-			//set up arr_fields hierarchy
-			if(is_array($arr_table_ref_cnt) && count($arr_table_ref_cnt) >  1){
-				foreach($arr_table_ref_cnt as $t => $cnt){
-					if($t != $this->primary_table_name){
-						$this->joins[] = array('table'=>$t, 'join_text'=>$this->get_join_text($this->primary_table_name, $t));
-					}
-				}
-			}
-		}
-	}
-	 **/
 	
 	/**
 	 * @method getSelectFields()
@@ -469,15 +449,13 @@ abstract class Block implements iBlock {
 		return $this->bench_row;
 	}
 	
-	
-
 	/**
 	 * @method setPivot()
 	 * @param iDataField pivot field
 	 * @return void
 	 * @access public
 	* */
-	protected function setPivot(iDataField $pivot_field){
+	public function setPivot(iDataField $pivot_field){
 		$this->pivot_field = $pivot_field;
 	}
 	
@@ -491,97 +469,6 @@ abstract class Block implements iBlock {
 		$this->group_by = $group_by;
 	}
 	
-	/**
-	 * @method loadData()
-	 * @param int report_count
-	 * @param string file_format
-	 * @return void
-	 * @access public
-	protected function loadData($report_count){
-		$arr_this_block = get_element_by_key($block, $this->{$this->primary_model_name}->arr_blocks);
-		$this->max_rows = $arr_this_block['max_rows'];
-		$this->cnt_row = $arr_this_block['cnt_row'];
-		$this->sum_row = $arr_this_block['sum_row'];
-		$this->avg_row = $arr_this_block['avg_row'];
-		$this->bench_row = $arr_this_block['bench_row'];
-		$this->pivot_field = isset($arr_this_block['pivot_field']) ? $arr_this_block['pivot_field'] : NULL;
-		if($this->display == 'table' || $this->display == 'array'){
-			$this->load_table($arr_this_block, $report_count);
-		}
-		elseif($this->display == 'chart'){
-			$this->load_chart($arr_this_block, $report_count);
-		}
-	}
-	* */
-	
-	/**
-	 * @method loadChildren()
-	 * @param \SplObjectStorage children
-	 * @return void
-	 * @access public
-	public function loadChildren(\SplObjectStorage $children){
-		$this->children = $children;
-	}
-	* */
-	
-	/*
-	 * getCompleteData
-	 * 
-	 * @param int page_id
-	 * @author ctranel
-	 * @returns SplObjectStorage of Blocks
-	public function getCompleteData($page_id){
-		$children = new \SplObjectStorage();
-		
-		$criteria = ['page_id' => $page_id];
-		$join = ['pages_block pb' => 'p.id = pb.page_id'];
-		$results = $this->datasource_blocks->getByCriteria($criteria, $join);
-		if(empty($results)){
-			return false;
-		}
-		return new Page($this->datasource_blocks, $results[0]['id'], $results[0]['parent_id'], $results[0]['name'], $results[0]['description'], $results[0]['scope'], $results[0]['path']);
-	}
-	 */
-	/**
-	 * @method loadChildren()
-	 * @param int user id
-	 * @param Herd herd
-	 * @param array task permissions
-	 * @return void
-	 * @access public
-	//if we allow producers to select which sections to allow, we will need to pass that array to this section as well
-	public function loadChildren($user_id, $herd, $arr_task_permissions){ 
-		$tmp_array = [];
-		if(in_array('View All Content', $arr_task_permissions)){
-			$criteria = ['page_id' => $this->id];
-			$tmp_array = $this->datasource->getByCriteria($criteria);
-		}
-		 
-		//subscription is different in that it fetches content by herd data (i.e. herd output) for users that 
-		//have permission only for subscribed content.  All other scopes are strictly users-based
-		
-		else{
-			if(in_array('View Subscriptions', $arr_task_permissions)){
-				$tmp_array = array_merge($tmp_array, $this->datasource->getSubscribedSections($user_id, $this->id, $herd->herdCode()));
-			}
-			if(in_array('View Account', $arr_task_permissions)){
-				$criteria = ['ls.name' => 'View Account', 'page_id' => $this->id];
-				$tmp_array = array_merge($tmp_array, $this->datasource->getByCriteria($criteria));
-			}
-			if(in_array('View Admin', $arr_task_permissions)){
-				$criteria = ['ls.name' => 'View Admin', 'page_id' => $this->id];
-				$tmp_array = array_merge($tmp_array, $this->datasource->getByCriteria($criteria));
-			}
-		}
-		
-		if(is_array($tmp_array) && !empty($tmp_array)){
-			$this->children = new \SplObjectStorage();
-			foreach($tmp_array as $k => $v){
-				$this->children->attach(new Section($this->datasource_sections, $this->datasource_pages, $this->datasource_blocks, $v['id'], $v['page_id'], $v['name'], $v['description'], $v['scope'], $v['active'], $v['path']));
-			}
-		}
-	}
-	 **/
 }
 
 

@@ -111,7 +111,7 @@ class HerdAccess
 		$arr_return_user = array();
 		$arr_return_permission = array();
 	
-		if(in_array('View All "Herds', $arr_permissions)){
+		if(in_array('View All Herds', $arr_permissions)){
 			return $this->datasource->getHerdCodes(null, null, $limit_in);
 		}
 		if(in_array('View Herds in Region', $arr_permissions)){

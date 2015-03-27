@@ -98,7 +98,7 @@ class TableBlock extends Block {
 			$this->load->model('db_table_model');
 			$this->load->model('setting_model');
 			$herd_info = $this->herd_model->header_info($this->herd_code);
-			$this->benchmarks = new Benchmarks($this->session->userdata('user_id'), $this->input->post('herd_code'), $herd_info, $this->setting_model, $this->session->userdata('benchmarks'));
+			$this->benchmarks = new Benchmarks($this->session->userdata('user_id'), $this->input->post('herd_code'), $herd_info, $this->setting_model, $this->benchmark_model, $this->session->userdata('benchmarks'));
 			$this->db_table = new DbTable($report_datasource->get_primary_table_name(), $this->db_table_model);
 			//$sess_benchmarks = $this->session->userdata('benchmarks');
 
@@ -177,6 +177,7 @@ class TableBlock extends Block {
 		foreach($this->report_fields as $f){
 			$ret[] = $f->dbFieldName();
 		}
+		return $ret;
 	}
 /*	
 	protected function getRowHeadField($arr_field_list){

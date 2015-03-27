@@ -58,7 +58,6 @@
 $active_group = "default";
 $active_record = TRUE;
 $db_server = 'myagsource';
-
 if(ENVIRONMENT == 'production'){
 		$db['default']['hostname'] = '173.229.1.155';
 		$db['default']['username'] = 'webuser';

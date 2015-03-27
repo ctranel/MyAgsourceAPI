@@ -41,8 +41,11 @@ class Sections implements iWebContentRepository {
 	/*
 	 * @returns Section
 	 */
-	public function getByPath($path){
+	public function getByPath($path, $parent_id = null){
 		$criteria = ['path' => $path];
+		if(isset($parent_id)){
+			$criteria['parent_id'] = $parent_id;
+		}
 		$results = $this->datasource_sections->getByCriteria($criteria);
 		if(empty($results)){
 			return false;

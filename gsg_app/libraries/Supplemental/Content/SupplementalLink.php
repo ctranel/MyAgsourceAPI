@@ -215,7 +215,7 @@ class SupplementalLink extends \SplObjectStorage
 	 *  @return: array of Supplemental_link objects
 	 *  @throws: 
 	 * -----------------------------------------------------------------*/
-	 public static function datasetToObjects($site_url, $dataset, \supplemental_model $supplemental_datasource) {
+	 public function datasetToObjects($site_url, $dataset, \supplemental_model $supplemental_datasource) {
 	 	$ret = new \SplObjectStorage();
 		if(isset($dataset) && is_array($dataset)){
 			foreach($dataset as $r){
@@ -228,7 +228,7 @@ class SupplementalLink extends \SplObjectStorage
 					$r['a_rel'],
 					$r['a_title'],
 					$r['a_class'],
-					$params
+					$this->params
 				));
 			}
 		}

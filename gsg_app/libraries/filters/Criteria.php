@@ -282,7 +282,7 @@ class Criteria{
 			}
 		}
 		elseif(!empty($val)){
-			$arr_filter_text[] = $this->label . ': ' . $val;
+			$this->log_filter_text = $this->label . ': ' . $val;
 		}
 	}
 }

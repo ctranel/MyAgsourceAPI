@@ -64,7 +64,7 @@ class Filter_model extends Report_Model {
 		->select('pf.name, pf.type, pf.options_source, pf.default_value, pf.db_field_name')
 		->where('p.section_id', $section_id)
 		->where('p.path', $page_path)
-		->join($this->tables['pages'] . ' p', "pf.page_id = p.id")
+		->join($this->tables['pages'] . ' p', "pf.page_id = p.id", "inner")
 		->order_by('pf.list_order')
 		->get('users.dbo.page_filters pf')
 		->result_array();

@@ -27,12 +27,6 @@ class TableField extends BlockField {
 	protected $header_group_id;
 
 	/**
-	 * link
-	 * @var Link
-	 **/
-	protected $link;
-
-	/**
 	 * a_title
 	 * @var string
 	protected $a_title;

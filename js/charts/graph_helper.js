@@ -33,32 +33,29 @@ function updatePage(el){
 	var block_index;
 	var sort_field;
 	var sort_order;
-	var display;
 	var first = true;
 	$('.chart').each(function(){
 		div_id = $(this).attr('id');
 		block_name = $(this).attr('data-block');
-		block_index = div_id.replace('graph-canvas','');
+		block_index = div_id.replace('block-canvas','');
 		sort_field = null;
 		sort_order = null;
-		display = 'chart';
-		updateBlock(div_id, block_name, block_index, sort_field, sort_order, display, first);
+		updateBlock(div_id, block_name, block_index, sort_field, sort_order, first);
 		first = false;
 	});
 	$('.table-container').each(function(){
 		div_id = $(this).attr('id');
 		block_name = $(this).attr('data-block');
-		block_index = div_id.replace('table-canvas','');
+		block_index = div_id.replace('block-canvas','');
 		sort_field = null;
 		sort_order = null;
-		display = 'table';
-		updateBlock(div_id, block_name, block_index, sort_field, sort_order, display, first);
+		updateBlock(div_id, block_name, block_index, sort_field, sort_order, first);
 		first = false;
 	});
 }
 
-function updateBlock(container_div_id, block_in, block_index, sort_field, sort_order, display, first){
-//load and process ajax data - base_url and page are defined globally in the controller
+function updateBlock(container_div_id, block_in, block_index, sort_field, sort_order, first){
+//load and process ajax data - page_url and page are defined globally in the controller
 	var params = '';
 	var cache_bust = Math.floor(Math.random()*1000);
 	if($("#filter-form")){
@@ -66,44 +63,40 @@ function updateBlock(container_div_id, block_in, block_index, sort_field, sort_o
 	}
 	if(typeof(sort_field) == 'undefined') sort_field = null;
 	if(typeof(sort_order) == 'undefined') sort_order = null;
-	switch(display){
-		case "table": 
-			load_table(site_url + 'report_block/ajax_report/' + encodeURIComponent(base_url.replace(/\//g, '|')) + '/' + encodeURIComponent(block_in) + '/' + display + '/' + encodeURIComponent(sort_field) + '/' + sort_order + '/web/null/' + block_index + '/' + params + '/' + first + '/' + cache_bust, container_div_id, block_index, params);
-			break;
-		case "chart":
-			load_chart(site_url + 'report_block/ajax_report/' + encodeURIComponent(base_url.replace(/\//g, '|')) + '/' + encodeURIComponent(block_in) + '/' + display + '/' + encodeURIComponent(sort_field) + '/' + sort_order + '/web/null/' + block_index + '/' + params + '/' + first + '/' + cache_bust, container_div_id, block_index, params);
-			break;
-	}
+	load_block(site_url + 'report_block/ajax_report/' + encodeURIComponent(page_url.replace(/\//g, '|')) + '/' + encodeURIComponent(block_in) + '/' + encodeURIComponent(sort_field) + '/' + sort_order + '/web/null/' + block_index + '/' + params + '/' + first + '/' + cache_bust, container_div_id, block_index, params);
 	setFixedNav();
 	return false;
 }
 
-function load_table(server_path, div_id, block_index, params){
+function load_block(server_path, div_id, block_index, params){
 	if(!server_path) {
 		alert("No data found.");
 		return false;
 	}
-	if(typeof(div_id) === 'undefined' || !div_id) div_id = 'table-canvas0';
+	if(typeof(div_id) === 'undefined' || !div_id){
+		div_id = 'block-canvas0';
+	}
+
 	$('#table-wrapper' + block_index).find('table').hide();
+	$('#chart-container' + block_index).hide();
+
 	$('#waiting-icon' + block_index).show();
-	$.get(server_path, '', function(data) { process_table(div_id, block_index, data); })
-		.fail(function(){console.log(this.responseText);});
+
+	$.get(server_path, '', function(data) { process_block(div_id, block_index, data); })
+		.fail(function(){console.log(this.responseText);})
+		.fail(function(jqXHR, textStatus, errorThrown){console.log(errorThrown);});
 	//cancel link when called from anchor tag
-	return false;
+	return;
 }
 
-function load_chart(server_path, div_id, block_index, params){
-	if(!server_path) {
-		alert("No data found.");
-		return false;
+function process_block(div_id, block_index, data){
+	//existance of html property indicates table, if undefined, it is a chart
+	if(typeof data.html === 'undefined'){
+		process_chart(div_id, data);
 	}
-	if(typeof(div_id) == 'undefined' || !div_id) div_id = 'graph-canvas0';
-	
-	$('#chart-container' + block_index).hide();
-	$('#waiting-icon' + block_index).show();
-	
-	$.get(server_path, '', function(data) { process_chart(div_id, data); })
-		.fail(function(jqXHR, textStatus, errorThrown){console.log(errorThrown);});
+	else{
+		process_table(div_id, block_index, data);
+	}
 }
 
 function process_chart(div_id, data_in){

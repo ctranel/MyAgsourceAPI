@@ -52,8 +52,8 @@ class Block implements iWebContent {
 	/**
 	 * display_type
 	 * @var string
-	protected $display_type;
 	 **/
+	protected $display_type;
 	
 	/**
 	 * is_summary
@@ -80,10 +80,11 @@ class Block implements iWebContent {
 	 * @return void
 	 * @author ctranel
 	 **/
-	public function __construct($id, $page_id, $name, $description, $scope, $active, $path) {
+	public function __construct($id, $page_id, $name, $description, $display_type, $scope, $active, $path) {
 		$this->page_id = $page_id;
 		$this->name = $name;
 		$this->description = $description;
+		$this->display_type = $display_type;
 		$this->scope = $scope;
 		$this->active = $active;
 		$this->path = $path;
@@ -100,6 +101,10 @@ class Block implements iWebContent {
 
 	public function name(){
 		return $this->name;
+	}
+
+	public function displayType(){
+		return $this->display_type;
 	}
 
 	public function children(){
