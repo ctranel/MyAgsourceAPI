@@ -87,6 +87,13 @@ class TableHeaderCell {
 	protected $pdf_width;
 	
 	/**
+	 * db_field_name
+	 *
+	 * @var string
+	 **/
+	protected $db_field_name;
+	
+	/**
 	 * supplemental
 	 *
 	 * @var iSupplemental
@@ -101,9 +108,10 @@ class TableHeaderCell {
 	protected $children;
 	
 
-	public function __construct($id, $parent_id, $text, $pdf_width, iSupplemental $supplemental = null){
+	public function __construct($id, $parent_id, $db_field_name, $text, $pdf_width, iSupplemental $supplemental = null){
 		$this->id = $id;
 		$this->parent_id = $parent_id;
+		$this->db_field_name = $db_field_name;
 		$this->text = $text;
 		$this->pdf_width = $pdf_width;
 		if(isset($supplemental)){
@@ -119,6 +127,10 @@ class TableHeaderCell {
 		return $this->parent_id;
 	}
 	
+	public function dbFieldName(){
+		return $this->db_field_name;
+	}
+
 	public function text(){
 		return $this->text;
 	}
@@ -136,11 +148,11 @@ class TableHeaderCell {
 	}
 
 	public function isDisplayed(){
-		return $this->is_displayed;
+		return (bool)$this->is_displayed;
 	}
 
 	public function isSortable(){
-		return $this->is_sortable;
+		return (bool)$this->is_sortable;
 	}
 
 	public function pdfWidth(){
@@ -159,7 +171,7 @@ class TableHeaderCell {
 	}
 	
 	public function hasChildren(){
-		return $this->children->count() > 0;
+		return (bool)$this->children->count() > 0;
 	}
 
 	/**

@@ -6,6 +6,7 @@ require_once APPPATH . 'libraries/Report/iBlock.php';
 
 use \myagsource\Report\iSort;
 use \myagsource\Datasource\iDataField;
+use myagsource;
 /**
  * Name:  Sort
  *
@@ -44,7 +45,7 @@ class Sort implements iSort {
 	*  @throws: 
 	* -----------------------------------------------------------------
 	\*/
-	public function __construct(iDataField $datafield, $order) {
+	public function __construct(\myagsource\Datasource\iDataField $datafield, $order) {
 		$this->datafield = $datafield;
 		$this->order = $order;
 	}

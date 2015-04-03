@@ -107,7 +107,9 @@ class report_block_model extends CI_Model {
 			->where('db_field_name', $field_name)
 			->get('users.dbo.v_block_field_data')
 			->result_array();
-		return $ret[0];
+		if(isset($ret) && is_array($ret)){
+			return $ret[0];
+		}
 	}
 	
 	/**

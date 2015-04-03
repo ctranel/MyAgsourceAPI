@@ -121,32 +121,28 @@ class TableHeader {
 		if(is_array($this->header_groups) && !empty($this->header_groups)){
 			foreach($this->header_groups as $h){
 				$header_group_supplemental = $this->supplemental_factory->getHeaderGrpSupplemental($h['header_group_id'], $h['a_href'], $h['a_rel'], $h['a_title'], $h['a_class'], $h['comment']);
-				
 				//if it is a top level element
 				if($h['parent_id'] == NULL) {
 					//$this->header_group_fields[] = new TableHeaderCell($h['id'], $h['parent_id'], $h['text']);//, 'pdf_width' => 0];
-					$this->header_group_fields[] = ['id' => $h['id'], 'parent_id' => $h['parent_id'], 'text' => $h['text'], 'children' => null, 'pdf_width' => 0, 'supplemental' => $header_group_supplemental];
+					$this->header_group_fields[] = ['id' => $h['id'], 'parent_id' => $h['parent_id'], 'db_field_name' => null, 'text' => $h['text'], 'children' => null, 'pdf_width' => 0, 'supplemental' => $header_group_supplemental];
 				}
 				//else it is inserted into the parent array
 				else{
 					//$this->nest($this->header_group_fields, new TableHeaderCell($h['id'], $h['parent_id'], $h['text']));//, 'pdf_width' => 0];
-					$this->nest($this->header_group_fields, ['id' => $h['id'], 'parent_id' => $h['parent_id'], 'text' => $h['text'], 'pdf_width' => 0, 'supplemental' => $header_group_supplemental]);
+					$this->nest($this->header_group_fields, ['id' => $h['id'], 'parent_id' => $h['parent_id'], 'db_field_name' => null, 'text' => $h['text'], 'pdf_width' => 0, 'supplemental' => $header_group_supplemental]);
 				}
 			}
 
 		}
 		//add leaves (columns) to structure
 		$fields = $this->block->reportFields();
-//var_dump($this->header_group_fields);
 		foreach($fields as $f){
 			if($f->isDisplayed()){
-//var_dump($f->dbFieldName(), $f->headerGroupId());
-				$this->addLeaf($this->header_group_fields, $f->headerGroupId(), ['children' => ['id' => null, 'parent_id' => $f->headerGroupId(), 'text' => $f->displayName(), 'pdf_width' => $f->pdfWidth(), 'is_sortable' => $f->isSortable(), 'is_displayed' => $f->isDisplayed(), 'default_sort_order' => $f->defaultSortOrder(), 'supplemental' => $f->headerSupplemental()]]);
+				$this->addLeaf($this->header_group_fields, $f->headerGroupId(), ['children' => ['id' => null, 'parent_id' => $f->headerGroupId(), 'db_field_name' => $f->dbFieldName(), 'text' => $f->displayName(), 'pdf_width' => $f->pdfWidth(), 'is_sortable' => $f->isSortable(), 'is_displayed' => $f->isDisplayed(), 'default_sort_order' => $f->defaultSortOrder(), 'supplemental' => $f->headerSupplemental()]]);
 				//$this->addLeaf($this->header_group_fields, $f->headerGroupId(), new TableHeaderCell($h['id'], $h['parent_id'], $h['text']));
 					//['children' => ['id' => null, 'parent_id' => $f->headerGroupId(), 'text' => $f->displayName(), 'pdf_width' => $f->pdfWidth(), 'is_sortable' => $f->isSortable(), 'is_displayed' => $f->isDisplayed()]]);
 			}
 		}
-//		var_dump($this->header_group_fields);
 	}
 	
 	/** 
@@ -176,7 +172,7 @@ class TableHeader {
 
 				//add data to object array ($this->header_structure)
 				if(!empty($v['text'])){ //if the header has no text, keep the current depth, but add one to the rowspan
-					$tmp = new TableHeaderCell($v['id'], $v['parent_id'], $v['text'], $v['pdf_width'], $v['supplemental']);
+					$tmp = new TableHeaderCell($v['id'], $v['parent_id'], $v['db_field_name'], $v['text'], $v['pdf_width'], $v['supplemental']);
 					$tmp->setSpan($v['num_leaves'], $rowspan);
 					if(isset($v['supplemental'])){
 						$tmp->addSupplemental($v['supplemental']);
@@ -190,7 +186,7 @@ class TableHeader {
 			}
 			else { //add leaf node
 //@todo: add new class (header leaf) that shares interface with or extends TableHeaderCell (instead of setLeafFields)
-				$tmp = new TableHeaderCell($v['id'], $v['parent_id'], $v['text'], $v['pdf_width'], $v['supplemental']);
+				$tmp = new TableHeaderCell($v['id'], $v['parent_id'], $v['db_field_name'], $v['text'], $v['pdf_width'], $v['supplemental']);
 				$tmp->setLeafFields(1, $rowspan, $v['is_sortable'], $v['is_displayed'], $v['default_sort_order'], $v['supplemental']);
 				$this->header_structure[($curr_depth - 1)][] = $tmp;
 				$this->columns++;

@@ -1,15 +1,15 @@
 <?php
 namespace myagsource\Report;
 
-require_once APPPATH . 'libraries/Report/iBlock.php';
+require_once APPPATH . 'libraries/Report/iSort.php';
 
-use \myagsource\Datasource\iDataField;
+//use \myagsource\Datasource\iSort;
 /**
  * Name:  iSort
  *
  * Author: ctranel
  *
- * Created:  02-10-2015
+ * Created:  04-02-2015
  *
  * Description:  Interface for report sorting.
  *
@@ -17,7 +17,7 @@ use \myagsource\Datasource\iDataField;
 interface iSort {
 	/**
 	 */
-	function __construct(iDataField $datafield, $order);
+	function __construct(\myagsource\Datasource\iDataField $datafield, $order);
 	function fieldName();
 	function order();
 	

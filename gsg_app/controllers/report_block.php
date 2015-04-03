@@ -10,6 +10,7 @@ require_once(APPPATH . 'libraries/Site/WebContent/Blocks.php');
 require_once(APPPATH . 'libraries/Site/WebContent/Pages.php');
 require_once(APPPATH . 'libraries/Site/WebContent/Sections.php');
 require_once(APPPATH . 'libraries/Datasource/DbObjects/DbTable.php');
+require_once(APPPATH . 'libraries/Datasource/DbObjects/DbField.php');
 require_once(APPPATH . 'libraries/Report/Content/BlockData.php');
 require_once(APPPATH . 'libraries/Report/Content/Table/Header/TableHeader.php');
 
@@ -25,6 +26,7 @@ use \myagsource\Report\Content\Blocks;
 use \myagsource\Report\Content\BlockData;
 use \myagsource\Report\Content\Table\Header\TableHeader;
 use \myagsource\Datasource\DbObjects\DbTable;
+use \myagsource\Datasource\DbObjects\DbField;
 use myagsource\Report\Content\Sort;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
@@ -281,11 +283,12 @@ class report_block extends CI_Controller {
 			$arr_sort_order = explode('|', $sort_order);
 			if(isset($arr_sort_order) && is_array($arr_sort_order)){
 				$block->resetSort();
+//die(var_dump($arr_sort_order));
 				foreach($arr_sort_order as $k=>$s){
-					$s = $this->datasource->getFieldByName($block->id(), $arr_sort_by[$k]);
-					$datafield = new DbField($s['db_field_id'], $s['table_name'], $s['db_field_name'], $s['name'], $s['description'], $s['pdf_width'], $s['default_sort_order'],
-						 $s['datatype'], $s['max_length'], $s['decimal_scale'], $s['unit_of_measure'], $s['is_timespan'], $s['is_foreign_key'], $s['is_nullable'], $s['is_natural_sort']);
-					$block->addSort($datafield, $arr_sort_order[$k]);
+					$f = $this->report_block_model->getFieldByName($block->id(), $arr_sort_by[$k]);
+					$datafield = new DbField($f['db_field_id'], $f['table_name'], $f['db_field_name'], $f['name'], $f['description'], $f['pdf_width'], $f['default_sort_order'],
+						 $f['datatype'], $f['max_length'], $f['decimal_scale'], $f['unit_of_measure'], $f['is_timespan'], $f['is_foreign_key'], $f['is_nullable'], $f['is_natural_sort']);
+					$block->addSort(new Sort($datafield, $arr_sort_order[$k]));
 				}
 			}
 		}
@@ -396,9 +399,9 @@ class report_block extends CI_Controller {
 			$table_header_data = [
 				'structure' => $table_header->getTableHeaderStructure(),
 				'form_id' => $this->report_form_id,
-				'report_path' => $block->path(),
-				'sorts' => $block->sorts(),
-				'block' => $block->path(),
+//				'report_path' => $block->path(),
+//				'sorts' => $block->sorts(),
+				'block' => $block,
 				'report_count' => $report_count
 			];
 			

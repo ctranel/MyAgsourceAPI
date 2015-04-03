@@ -201,8 +201,8 @@ abstract class Block implements iBlock {
 		
 		//load data for remaining fields
 		$this->report_fields = $this->setReportFields($supp_factory);
-		$this->sorts = $this->setDefaultSort();
-		//@todo: filters
+		$this->setDefaultSort();
+		//@todo: joins
 	}
 	
 	/*
@@ -237,9 +237,11 @@ abstract class Block implements iBlock {
 		return $this->sorts;
 	}
 
+/*
 	public function joins(){
 		return $this->joins;
 	}
+*/
 	
 	public function displayType(){
 		return $this->display_type;
@@ -277,7 +279,7 @@ abstract class Block implements iBlock {
 	public function sortText($is_verbose = false){
 		$ret = '';
 		$is_first = true;
-		if(isset($this->sorts) && count($this->sorts) > 0){
+		if(isset($this->sorts) && $this->sorts->count() > 0){
 			foreach($this->sorts as $s){
 				$ret .= $is_verbose ? $s->sort_text($is_first) : $s->sort_text_brief($is_first);
 				$is_first = false;
@@ -288,12 +290,32 @@ abstract class Block implements iBlock {
 	}
 	
 	/**
+	 * getSortArray()
+	 * 
+	 * returns field-name-keyed array of sort orders
+	 * 
+	 * @return string sort text
+	 * @access public
+	* */
+	public function getSortArray(){
+		$ret = [];
+		if(isset($this->sorts) && count($this->sorts) > 0){
+			foreach($this->sorts as $s){
+				$ret[$s->fieldName()] = $s->order();
+			}
+		}
+		return $ret;
+	}
+	
+	/**
 	 * @method resetSort()
 	 * @return void
 	 * @access public
 	* */
 	public function resetSort(){
-		$this->sorts->removeAll($this->sorts);
+		if(isset($this->sorts) && $this->sorts->count() > 0){
+			$this->sorts->removeAll($this->sorts);
+		}
 	}
 	
 	/**
@@ -312,10 +334,10 @@ abstract class Block implements iBlock {
 	 * @param string sort order
 	 * @return void
 	 * @access public
-	* */
 	public function addSortField(iDataField $datafield, $sort_order){
 		$this->sorts->attach(new Sort($datafield, $sort_order));
 	}
+	* */
 	
 	/**
 	 * @method setDefaultSort()
@@ -324,7 +346,6 @@ abstract class Block implements iBlock {
 	 **/
 	public function setDefaultSort(){
 		$this->default_sorts = new \SplObjectStorage();
-		
 		$arr_ret = [];
 		$arr_res = $this->datasource->getSortData($this->id);
 		if(is_array($arr_res)){
@@ -333,8 +354,8 @@ abstract class Block implements iBlock {
 						 $s['datatype'], $s['max_length'], $s['decimal_scale'], $s['unit_of_measure'], $s['is_timespan'], $s['is_foreign_key'], $s['is_nullable'], $s['is_natural_sort']);
 				$this->default_sorts->attach(new Sort($datafield, $s['sort_order']));
 			}
-			$this->sorts = $this->default_sorts;
 		}
+		$this->sorts = $this->default_sorts;
 	}
 	
 	/**
@@ -468,7 +489,6 @@ abstract class Block implements iBlock {
 	protected function setGroupBy(){
 		$this->group_by = $group_by;
 	}
-	
 }
 
 

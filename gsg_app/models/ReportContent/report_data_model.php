@@ -66,12 +66,15 @@ class Report_data_model extends CI_Model {
 //		$this->herd_code = $arr_filter_criteria['herd_code'];
 		$this->db->start_cache();
 		$this->db->from($block->primaryTableName());
+		/*
+		 * @todo: add joins
 		$joins = $block->joins();
 		if(is_array($joins) && !empty($joins)) {
 			foreach($joins as $j){
 				$this->db->join($j['table'], $j['join_text']);
 			}
 		}		
+		*/
 		if(is_array($arr_filter_criteria) && !empty($arr_filter_criteria)){
 			$this->prep_where_criteria($arr_filter_criteria);
 		}

@@ -24,8 +24,9 @@ interface iBlock {
 	
 	function resetSort();
 	function addSort(Sort $sort);
-	function addSortField(iDataField $datafield, $sort_order);
-	function sorts();
+//	function addSortField(iDataField $datafield, $sort_order);
+//	function sorts();
+//	function joins();
 	function setDefaultSort();
 }
 
