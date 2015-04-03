@@ -1,6 +1,6 @@
 	$(document).ready(function(){
 		var x = 0;
-		while($("#downloads-container" + x + " ul li") && x < 5){
+		while($("#downloads-container" + x + " ul li").length){
 			$("#downloads-container" + x + " ul li").bind("click", function(){
 				window.location = $(this).find("a:first").attr('href');
 			});
