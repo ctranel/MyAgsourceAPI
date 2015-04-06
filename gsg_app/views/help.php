@@ -59,7 +59,7 @@ endif; ?>
 			either via the uservoice or email links provided above.</p>
 		<p> In the meantime, if you would like to view the website as it
 			is intended to look for comparison, the browsers most compatibile
-			with the site as of 03/03/2014 are:
+			with the site as of 04/06/2015 are:
 			<ul><li><strong>Firefox</strong></li>
 			<li><strong>Chrome 33 and above</strong></li></ul></p>
 		<p> We will never require you to change browsers if it is within
