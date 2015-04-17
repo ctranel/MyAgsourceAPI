@@ -131,6 +131,10 @@ abstract class BlockField {
 		return $this->data_field->pdfWidth();
 	}
 
+	public function isNaturalSort() {
+		return $this->data_field->isNaturalSort();
+	}
+
 	public function dataSupplemental() {
 		if(isset($this->data_supp)){
 			return $this->data_supp->getContent();

@@ -420,7 +420,42 @@ abstract class Block implements iBlock {
 		return null;
 	}
 	
+	/**
+	 * @method isNaturalSort()
+	 * @param field name
+	 * @return boolean
+	 * @access public
+	 *
+	 * */
+	public function isNaturalSort($field_name){
+		if(isset($this->report_fields) && count($this->report_fields) > 0){
+			foreach($this->report_fields as $f){
+				if($f->dbFieldName() === $field_name){
+					return $f->isNaturalSort();
+				}
+			}
+		}
+		return null;
+	}
 	
+	/**
+	 * @method isNaturalSort()
+	 * @param field name
+	 * @return boolean
+	 * @access public
+	 *
+	 * */
+	public function isSortable($field_name){
+		if(isset($this->report_fields) && count($this->report_fields) > 0){
+			foreach($this->report_fields as $f){
+				if($f->dbFieldName() === $field_name){
+					return $f->isSortable();
+				}
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * @method getSelectFields()
 	 * 

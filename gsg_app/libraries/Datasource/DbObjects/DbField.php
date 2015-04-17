@@ -148,6 +148,10 @@ class DbField implements iDataField {
 		return $this->default_sort_order;
 	}
 
+	public function isNaturalSort(){
+		return (bool)$this->is_natural_sort;
+	}
+
 	public function isNumeric(){
 		//@todo: database neutral
 		return (strpos($this->datatype, 'int') !== false) || (strpos($this->datatype, 'money') !== false) || (strpos($this->datatype, 'decimal') !== false) || $this->datatype === 'float' || $this->datatype === 'numeric' || $this->datatype === 'real';

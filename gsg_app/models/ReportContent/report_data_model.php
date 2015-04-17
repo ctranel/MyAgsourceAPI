@@ -96,7 +96,7 @@ class Report_data_model extends CI_Model {
 		else $this->db->limit($limit);
 
 		$this->db->group_by($block->getGroupBy());
-//		$this->prep_sort($arr_sort_by, $arr_sort_order); // the prep_sort function adds the sort field to the active record object
+		$this->prep_sort($block); // the prep_sort function adds the sort field to the active record object
 
 		//add select fields to query
 		//set variable to be used in the query
@@ -175,18 +175,18 @@ class Report_data_model extends CI_Model {
 	 * @param array sort order--corresponds to first parameter
 	 * @author ctranel
 	 */
-	protected function prep_sort($arr_sort_by, $arr_sort_order){
-		$arr_len = is_array($arr_sort_by)?count($arr_sort_by):0;
-		for($c=0; $c<$arr_len; $c++) {
-			$sort_order = (strtoupper($arr_sort_order[$c]) == 'DESC') ? 'DESC' : 'ASC';
-			$table = isset($this->arr_field_table[$arr_sort_by[$c]]) && !empty($this->arr_field_table[$arr_sort_by[$c]])?$this->arr_field_table[$arr_sort_by[$c]] . '.':$this->primary_table_name . '.';
-			if((!is_array($this->arr_unsortable_columns) || in_array($arr_sort_by[$c], $this->arr_unsortable_columns) === FALSE) && !empty($arr_sort_by[$c])){
+	protected function prep_sort(Block $block){
+		$sort_array = $block->getSortArray();
+		foreach($sort_array as $f => $o) {
+			$sort_order = (strtoupper($o) === 'DESC') ? 'DESC' : 'ASC';
+			$table = $block->getFieldTable($f);
+			if($block->isSortable($f)){
 				//put the select in an array in case the field includes a function with commas between parameters 
-				if(is_array($this->arr_natural_sort_fields) && in_array($arr_sort_by[$c], $this->arr_natural_sort_fields) !== FALSE){
-					$this->{$this->db_group_name}->order_by('users.dbo.naturalize(' . $table . $arr_sort_by[$c] . ')', $sort_order);
+				if($block->isNaturalSort($f)){
+					$this->db->order_by('users.dbo.naturalize(' . $table . '.' . $f . ')', $sort_order);
 				}
 				else {
-					$this->{$this->db_group_name}->order_by($table . $arr_sort_by[$c], $sort_order);
+					$this->db->order_by($table . '.' . $f, $sort_order);
 				}
 			}
 		}
