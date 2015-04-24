@@ -233,7 +233,6 @@ class report_block extends CI_Controller {
 	 * @param boolean first
 	 * @param string cache_buster: text to make page appear as a different page so that new data is retrieved
 	 * @todo: can I delete the last 2 params?
-	 * @todo: use post rather than get
 	 */
 	public function ajax_report($page_path, $block_name, $sort_by = 'null', $sort_order = 'null', $file_format = 'web', $test_date = FALSE, $report_count=0, $json_filter_data = NULL, $first=FALSE, $cache_buster = NULL) {//, $herd_size_code = FALSE, $all_breeds_code = FALSE
 		//verify user has permission to view content for given herd
@@ -283,7 +282,6 @@ class report_block extends CI_Controller {
 			$arr_sort_order = explode('|', $sort_order);
 			if(isset($arr_sort_order) && is_array($arr_sort_order)){
 				$block->resetSort();
-//die(var_dump($arr_sort_order));
 				foreach($arr_sort_order as $k=>$s){
 					$f = $this->report_block_model->getFieldByName($block->id(), $arr_sort_by[$k]);
 					$datafield = new DbField($f['db_field_id'], $f['table_name'], $f['db_field_name'], $f['name'], $f['description'], $f['pdf_width'], $f['default_sort_order'],
@@ -383,7 +381,7 @@ class report_block extends CI_Controller {
 			return $results;			
 		}
 
-		if(isset($this->benchmarks)){
+		if($block->hasBenchmark()){
 			$bench_text = $this->benchmarks->get_bench_text();
 		}
 

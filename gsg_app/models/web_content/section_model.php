@@ -14,7 +14,7 @@ class Section_model extends CI_Model {
 	 **/
 	public function getSections() {
 		$this->db
-			->select('s.id, s.parent_id, s.name, s.description, ls.name AS scope, s.path, s.active')
+			->select('s.id, s.parent_id, s.name, s.description, ls.name AS scope, s.path, s.active, s.default_page_path')
 			->where('s.active', 1)
 			->order_by('s.parent_id', 'asc')
 			->order_by('s.list_order', 'asc')

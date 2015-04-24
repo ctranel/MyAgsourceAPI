@@ -88,7 +88,7 @@ class BlockData {
 		$criteria_key_value = $this->whereCriteria($criteria_key_value);
 		$select_fields = $this->block->getSelectFields();
 		$results = $this->report_datasource->search($this->block, $select_fields, $criteria_key_value);
-		if($this->block->hasBenchmarks() && isset($this->benchmarks)){
+		if($this->block->hasBenchmark() && isset($this->benchmarks)){
 		//if the data is pivoted, set the pivoted field as the row header, else use the first non-pstring column
 			$row_head_field = $this->getRowHeadField($arr_field_list);
 			$arr_bench_data = $this->benchmarks->addBenchmarkRow(

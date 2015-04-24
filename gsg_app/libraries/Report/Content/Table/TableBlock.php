@@ -169,16 +169,6 @@ class TableBlock extends Block {
 		$this->display = 'table';
 	}
 	*/
-	public function getFieldlistArray(){
-		if(!isset($this->report_fields) || $this->report_fields->count() === 0){
-			return false;
-		}
-		$ret = [];
-		foreach($this->report_fields as $f){
-			$ret[] = $f->dbFieldName();
-		}
-		return $ret;
-	}
 /*	
 	protected function getRowHeadField($arr_field_list){
 		$row_head_field = NULL;

@@ -53,22 +53,21 @@
 		echo '</div>';
 	}
 */
-if(isset($arr_pages) && is_array($arr_pages) && count($arr_pages) > 1): ?>
+if(isset($obj_pages) && is_a($obj_pages, 'SplObjectStorage') && $obj_pages->count() > 0): ?>
 	<div id="block-links">
 		<a class="section-header" id="select-block">Select Report Page:</a>
-		<ul class="report-nav" id="current">
-		<?php
+		<ul class="report-nav" id="current"><?php
 		$first = TRUE;
-			foreach($arr_pages as $e):
+			foreach($obj_pages as $e):
 				if($first):
 					$li_class = 'first';
 					$first = FALSE;
 				else :
 					$li_class = FALSE; 
-				endif; ?>
-				<li<?php if($li_class) echo ' class="first"'; ?>><a href="<?php echo site_url($section_path . '/' . $e['url_segment']); ?>" id="<?php echo $e['url_segment']; ?>"<?php if($e['url_segment'] == $curr_page) echo ' class="current"'; ?>><?php echo $e['name']; ?></a></li>
-			<?php endforeach; ?>
-		</ul>
+				endif; 
+				?><li<?php if($li_class) echo ' class="first"'; ?>><a href="<?php echo site_url($section_path . '/' . $e->path()); ?>" id="<?php echo $e->path(); ?>"<?php if($e->path() === $curr_page) echo ' class="current"'; ?>><?php echo $e->name(); ?></a></li><?php
+			 endforeach; 
+		?></ul>
 	</div>
 <?php
 endif; ?>

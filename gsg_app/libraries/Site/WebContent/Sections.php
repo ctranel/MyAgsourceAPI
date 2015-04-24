@@ -50,7 +50,7 @@ class Sections implements iWebContentRepository {
 		if(empty($results)){
 			return false;
 		}
-		return new Section($results[0]['id'], $results[0]['parent_id'], $results[0]['name'], $results[0]['description'], $results[0]['scope'], $results[0]['active'], $results[0]['path']);
+		return new Section($results[0]['id'], $results[0]['parent_id'], $results[0]['name'], $results[0]['description'], $results[0]['scope'], $results[0]['active'], $results[0]['path'], $results[0]['default_page_path']);
 	}
 
 	/**
@@ -98,14 +98,21 @@ class Sections implements iWebContentRepository {
 		
 		if(is_array($tmp_array) && !empty($tmp_array)){
 			foreach($tmp_array as $k => $v){
-				$children->attach(new Section($v['id'], $v['parent_id'], $v['name'], $v['description'], $v['scope'], $v['active'], $v['path']));
+				$children->attach(new Section($v['id'], $v['parent_id'], $v['name'], $v['description'], $v['scope'], $v['active'], $v['path'], $v['default_page_path']));
 			}
 		}
 		
-		//Get child pages
+		if($children->count() > 0){
+			$section->loadChildren($children);
+		}
 		
-		$section->loadChildren($children);
+		//Load child pages
+		$splPages = $pages->getBySection($section->id());
+		if(is_a($splPages, 'SplObjectStorage')){
+			$section->loadPages($splPages);
+		}
 	}
+	
 	/*
 	 * @returns SplObjectStorage
 	public function getByParent($parent_id){
@@ -114,7 +121,7 @@ class Sections implements iWebContentRepository {
 		
 		$ret = new \SplObjectStorage();
 		foreach($results as $r){
-			$ret->attach(new Section($r['id'], $r['parent_id'], $r['name'], $r['description'], $r['scope'], $r['active'], $r['path']));
+			$ret->attach(new Section($r['id'], $r['parent_id'], $r['name'], $r['description'], $r['scope'], $r['active'], $r['path'], $r['default_page_path']));
 		}
 		return $ret;
 	}

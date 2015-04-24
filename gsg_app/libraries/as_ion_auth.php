@@ -60,11 +60,11 @@ class As_ion_auth extends Ion_auth {
 	public $top_sections;
 
 	/**
-	 * arr_user_sections
+	 * user_sections
 	 *
 	 * @var array
 	 **/
-	public $arr_user_sections;
+	public $user_sections;
 
 	/**
 	 * gsg_access
@@ -124,7 +124,7 @@ class As_ion_auth extends Ion_auth {
 			$sections->loadChildren($dhi_section, $pages, $this->session->userdata('user_id'), $herd, $this->arr_task_permissions);
 			$this->top_sections = $dhi_section->children();
 			if(isset($active_section)){
-				$this->arr_user_sections = $active_section->children();
+				$this->user_sections = $active_section->children();
 			}
 		}
 

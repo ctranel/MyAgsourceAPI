@@ -251,7 +251,7 @@ abstract class Block implements iBlock {
 		return $this->filters->get_filter_text();
 	}
 
-	public function hasBenchmarks(){
+	public function hasBenchmark(){
 		return $this->bench_row;
 	}
 
@@ -271,6 +271,17 @@ abstract class Block implements iBlock {
 		return $this->report_fields;
 	}
 
+	public function getFieldlistArray(){
+		if(!isset($this->report_fields) || $this->report_fields->count() === 0){
+			return false;
+		}
+		$ret = [];
+		foreach($this->report_fields as $f){
+			$ret[] = $f->dbFieldName();
+		}
+		return $ret;
+	}
+	
 	/**
 	 * @method sortText()
 	 * @return string sort text

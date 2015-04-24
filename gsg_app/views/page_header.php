@@ -54,9 +54,9 @@
 		<ul class="nav navbar-nav">
 		<?php
 			//@todo MOVE THIS BLOCK TO THE CONTROLLERS OR MAYBE A LIBRARY?
-			if(isset($user_sections) && is_a($user_sections, 'SplObjectStorage')):
+			if(isset($top_sections) && is_a($top_sections, 'SplObjectStorage')):
 				$first = TRUE;
-				foreach($user_sections as $a):
+				foreach($top_sections as $a):
 					$class_name = $first?'first':'';
 					$first = FALSE;
 					$path = $this->router->fetch_directory();// . $this->router->fetch_class();
@@ -119,15 +119,13 @@
 				echo $section_nav;
 			endif;
 			if(($this->as_ion_auth->logged_in())):
-				if(false): ?>
+				if(false && isset($user_sections) && is_a($user_sections, 'SplObjectStorage') && $user_sections->count() > 0): ?>
 					<li class="sectionnav"><a class="dropdown-toggle" data-toggle="dropdown" name="section-nav">Select Report</a><br />
 						<ul class="dropdown-menu" role="menu">
 							<?php
-							if(isset($user_sections) && is_a($user_sections, 'SplObjectStorage')):
-								foreach($user_sections as $a): ?>
-									<li role="presentation"><?php echo anchor($url . $a['path'], $a['name']);?></li>
-								<?php endforeach;
-							endif; ?>
+							foreach($user_sections as $a): ?>
+								<li role="presentation"><?php echo anchor($url . $a->path(), $a->name());?></li>
+							<?php endforeach; ?>
 						</ul>
 					</li> <!-- close "Select Section" li -->
 				<?php endif;

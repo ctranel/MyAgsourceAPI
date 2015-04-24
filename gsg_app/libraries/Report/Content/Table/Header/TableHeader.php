@@ -103,7 +103,6 @@ class TableHeader {
 		$this->setTableHeaderGroups();
 		
 		$tot_levels = array_depth($this->header_group_fields);
-//var_dump($this->header_group_fields);
 		$this->getHeaderLayer($this->header_group_fields, $depth, $rowspan, $tot_levels, []);
 		ksort($this->header_structure);
 

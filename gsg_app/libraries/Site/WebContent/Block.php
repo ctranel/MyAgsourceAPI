@@ -68,6 +68,12 @@ class Block implements iWebContent {
 	protected $scope;
 	
 	/**
+	 * has_benchmark
+	 * @var boolean
+	 **/
+	protected $has_benchmark;
+	
+	/**
 	 * active
 	 * @var boolean
 	 **/
@@ -80,7 +86,8 @@ class Block implements iWebContent {
 	 * @return void
 	 * @author ctranel
 	 **/
-	public function __construct($id, $page_id, $name, $description, $display_type, $scope, $active, $path) {
+	public function __construct($id, $page_id, $name, $description, $display_type, $scope, $active, $path, $has_benchmark) {
+		$this->id = $id;
 		$this->page_id = $page_id;
 		$this->name = $name;
 		$this->description = $description;
@@ -88,7 +95,7 @@ class Block implements iWebContent {
 		$this->scope = $scope;
 		$this->active = $active;
 		$this->path = $path;
-		$this->id = $id;
+		$this->has_benchmark = $has_benchmark;
 	}
 	
 	public function id(){
@@ -109,6 +116,10 @@ class Block implements iWebContent {
 
 	public function children(){
 		return $this->report_fields;
+	}
+
+	public function hasBenchmark(){
+		return $this->has_benchmark;
 	}
 
 	/**
@@ -161,46 +172,6 @@ class Block implements iWebContent {
 		return new Page($this->datasource_blocks, $results[0]['id'], $results[0]['parent_id'], $results[0]['name'], $results[0]['description'], $results[0]['scope'], $results[0]['path']);
 	}
 	 */
-	/**
-	 * @method loadChildren()
-	 * @param int user id
-	 * @param Herd herd
-	 * @param array task permissions
-	 * @return void
-	 * @access public
-	//if we allow producers to select which sections to allow, we will need to pass that array to this section as well
-	public function loadChildren($user_id, $herd, $arr_task_permissions){ 
-		$tmp_array = [];
-		if(in_array('View All Content', $arr_task_permissions)){
-			$criteria = ['page_id' => $this->id];
-			$tmp_array = $this->datasource->getByCriteria($criteria);
-		}
-		 
-		//subscription is different in that it fetches content by herd data (i.e. herd output) for users that 
-		//have permission only for subscribed content.  All other scopes are strictly users-based
-		
-		else{
-			if(in_array('View Subscriptions', $arr_task_permissions)){
-				$tmp_array = array_merge($tmp_array, $this->datasource->getSubscribedSections($user_id, $this->id, $herd->herdCode()));
-			}
-			if(in_array('View Account', $arr_task_permissions)){
-				$criteria = ['ls.name' => 'View Account', 'page_id' => $this->id];
-				$tmp_array = array_merge($tmp_array, $this->datasource->getByCriteria($criteria));
-			}
-			if(in_array('View Admin', $arr_task_permissions)){
-				$criteria = ['ls.name' => 'View Admin', 'page_id' => $this->id];
-				$tmp_array = array_merge($tmp_array, $this->datasource->getByCriteria($criteria));
-			}
-		}
-		
-		if(is_array($tmp_array) && !empty($tmp_array)){
-			$this->children = new \SplObjectStorage();
-			foreach($tmp_array as $k => $v){
-				$this->children->attach(new Section($this->datasource_sections, $this->datasource_pages, $this->datasource_blocks, $v['id'], $v['page_id'], $v['name'], $v['description'], $v['scope'], $v['active'], $v['path']));
-			}
-		}
-	}
-	 **/
 }
 
 

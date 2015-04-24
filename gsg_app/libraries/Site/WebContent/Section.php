@@ -81,10 +81,22 @@ class Section implements iWebContent
 	protected $path;
 	
 	/**
+	 * section default_page_path
+	 * @var string
+	 **/
+	protected $default_page_path;
+	
+	/**
 	 * collection of iWebContent objects
 	 * @var SplObjectStorage
 	 **/
 	protected $children;
+	
+	/**
+	 * collection of iWebContent objects that are the leafs of the navigation tree
+	 * @var SplObjectStorage
+	 **/
+	protected $pages;
 	
 	/**
 	 * __construct
@@ -92,15 +104,15 @@ class Section implements iWebContent
 	 * @return void
 	 * @author ctranel
 	 **/
-	public function __construct($id, $parent_id, $name, $description, $scope, $active, $path) {
+	public function __construct($id, $parent_id, $name, $description, $scope, $active, $path, $default_page_path) {
 		$this->parent_id = $parent_id;
 		$this->name = $name;
 		$this->description = $description;
 		$this->scope = $scope;
 		$this->active = $active;
 		$this->path = $path;
+		$this->default_page_path = $default_page_path;
 		$this->id = $id;
-//print('here');
 	}
 	
 	public function id(){
@@ -111,12 +123,20 @@ class Section implements iWebContent
 		return $this->path;
 	}
 
+	public function defaultPagePath(){
+		return $this->default_page_path;
+	}
+
 	public function name(){
 		return $this->name;
 	}
 
 	public function children(){
 		return $this->children;
+	}
+	
+	public function pages(){
+		return $this->pages;
 	}
 	
 	/**
@@ -127,6 +147,16 @@ class Section implements iWebContent
 	* */
 	public function loadChildren(\SplObjectStorage $children){
 		$this->children = $children;
+	}
+	
+	/**
+	 * @method loadPages()
+	 * @param \SplObjectStorage pages
+	 * @return void
+	 * @access public
+	 * */
+	public function loadPages(\SplObjectStorage $pages){
+		$this->pages = $pages;
 	}
 	
 	

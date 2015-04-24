@@ -102,6 +102,15 @@ class Page implements iWebContent {
 		return $this->children;
 	}
 		
+	public function hasBenchmark(){
+		foreach($this->children as $c){
+			if($c->hasBenchmark()){
+				return true;
+			}
+		}
+		return false;
+	}
+		
 	/**
 	 * @method loadChildren()
 	 * @param \SplObjectStorage children
@@ -111,47 +120,6 @@ class Page implements iWebContent {
 	public function loadChildren(\SplObjectStorage $children){
 		$this->children = $children;
 	}
-	
-	/**
-	 * @method loadChildren()
-	 * @param int user id
-	 * @param Herd herd
-	 * @param array task permissions
-	 * @return void
-	 * @access public
-	//if we allow producers to select which sections to allow, we will need to pass that array to this section as well
-	public function loadChildren($user_id, $herd, $arr_task_permissions){ 
-		$tmp_array = [];
-		if(in_array('View All Content', $arr_task_permissions)){
-			$criteria = ['section_id' => $this->id];
-			$tmp_array = $this->datasource->getByCriteria($criteria);
-		}
-		 
-		//subscription is different in that it fetches content by herd data (i.e. herd output) for users that 
-		//have permission only for subscribed content.  All other scopes are strictly users-based
-		
-		else{
-			if(in_array('View Subscriptions', $arr_task_permissions)){
-				$tmp_array = array_merge($tmp_array, $this->datasource->getSubscribedSections($user_id, $this->id, $herd->herdCode()));
-			}
-			if(in_array('View Account', $arr_task_permissions)){
-				$criteria = ['ls.name' => 'View Account', 'section_id' => $this->id];
-				$tmp_array = array_merge($tmp_array, $this->datasource->getByCriteria($criteria));
-			}
-			if(in_array('View Admin', $arr_task_permissions)){
-				$criteria = ['ls.name' => 'View Admin', 'section_id' => $this->id];
-				$tmp_array = array_merge($tmp_array, $this->datasource->getByCriteria($criteria));
-			}
-		}
-		
-		if(is_array($tmp_array) && !empty($tmp_array)){
-			$this->children = new \SplObjectStorage();
-			foreach($tmp_array as $k => $v){
-				$this->children->attach(new Section($this->datasource_sections, $this->datasource_pages, $this->datasource_blocks, $v['id'], $v['section_id'], $v['name'], $v['description'], $v['scope'], $v['active'], $v['path']));
-			}
-		}
-	}
-	 **/
 }
 
 

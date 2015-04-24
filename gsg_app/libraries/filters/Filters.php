@@ -283,11 +283,9 @@ class Filters{
 		if(!is_array($this->arr_criteria) || empty($this->arr_criteria)){
 			return FALSE;
 		}
-//var_dump($this->arr_criteria);
 		
 		$arr_filter_text = [];
 		foreach($this->arr_criteria as $k => $c){
-//var_dump($k, $c->set_filter_text());
 			if($k == 'block'); //don't show block filter info because it is specified in heading
 			else{
 				$c->set_filter_text();

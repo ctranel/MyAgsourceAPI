@@ -115,8 +115,17 @@ abstract class parent_report extends CI_Controller {
 		$class_dir = $this->router->fetch_directory(); //this should match the name of this file (minus ".php".  Also used as base for css and js file names and model directory name
 		$class = $this->router->fetch_class();
 		$method = $this->router->fetch_method();
-
 		$this->section_path = $class_dir . $class . '/';
+
+		//load sections
+		$this->section = $sections->getByPath($this->section_path);
+		$this->session->set_userdata('section_id', $this->section->id());
+		$sections->loadChildren($this->section, $this->pages, $this->session->userdata('user_id'), $this->herd, $this->ion_auth_model->getTaskPermissions());
+		$path = uri_string();
+
+		if(strpos($path, $method) === false){
+			$method = $this->section->defaultPagePath();
+		}
 
 		if(!$this->authorize($method)) {
 			if($this->session->flashdata('message')){
@@ -126,19 +135,13 @@ abstract class parent_report extends CI_Controller {
 				$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
 			}
 			redirect(site_url('auth/login'));
-		} 
-		
+		}
+
 		if($this->herd->herdCode() == ''){
 			$this->session->keep_flashdata('redirect_url');
 			redirect(site_url('dhi/change_herd/select'));			
 		}
 
-		//load sections
-		$this->section = $sections->getByPath($this->section_path);
-		$this->session->set_userdata('section_id', $this->section->id());
-		$sections->loadChildren($this->section, $this->pages, $this->session->userdata('user_id'), $this->herd, $this->ion_auth_model->getTaskPermissions());
-		
-		$path = uri_string();
 		$arr_path = explode('/',$path);
 		$page_name = $method;
 		$block_name = '';
@@ -146,16 +149,17 @@ abstract class parent_report extends CI_Controller {
 		$this->report_path = $this->section_path . $this->page->path();
 		$this->primary_model_name = $this->page->path() . '_model';
 		$this->report_form_id = 'report_criteria';//filter-form';
-		$this->page_header_data['user_sections'] = $this->as_ion_auth->top_sections;
+		$this->page_header_data['top_sections'] = $this->as_ion_auth->top_sections;
+		$this->page_header_data['user_sections'] = $this->as_ion_auth->user_sections;
 		$this->page_header_data['num_herds'] = $this->herd_access->getNumAccessibleHerds($this->session->userdata('user_id'), $this->as_ion_auth->arr_task_permissions(), $this->session->userdata('arr_regions'));
 		
 		//load most specific model available.  Must load model before setting section
 		//Load the most specific model that exists
-		if(file_exists(APPPATH . 'models' . FS_SEP . $this->section_path . $block_name . '_model.php')){
+		if(file_exists(APPPATH . 'models/' . $this->section_path . $block_name . '_model.php')){
 			$this->primary_model_name = $block_name. '_model';
 			$this->load->model($this->section_path . $this->primary_model_name, '', FALSE, $this->section_path);
 		}
-		elseif(file_exists(APPPATH . 'models' . FS_SEP . $this->section_path . $class . '_model.php')){
+		elseif(file_exists(APPPATH . 'models/' . $this->section_path . $class . '_model.php')){
 			$this->primary_model_name = $class . '_model';
 			$this->load->model($this->section_path . $this->primary_model_name, '', FALSE, $this->section_path);
 		}
@@ -232,23 +236,17 @@ abstract class parent_report extends CI_Controller {
 		}
 		
 		$arr_blocks = $this->blocks->getByPage($this->page->id());
-		//$this->page->loadChildren();
-		//$arr_blocks = $this->page->children();
+		$this->page->loadChildren($arr_blocks);
 		
 		//FILTERS
 		//Determine if any report blocks have is_summary flag - will determine if pstring needs to be loaded and filters shown
 		//@todo make pstring 0 work on both cow and summary reports simultaneously
-		//load required libraries
 		$this->load->model('filter_model');
 		$this->filters = new Filters($this->filter_model);
-		$this->filters->setCriteria(
-				$this->section->id(),
-				$this->page->path(),
-				array(
-					'herd_code' =>	$this->herd->herdCode(),
-				) //filter form submissions never trigger a new page load (i.e., this function is never fired by a form submission)
-		);
+		//only use default criteria on initial page loads, when filter form is submitted, it reloads each individual block
+		$this->filters->setCriteria($this->section->id(), $this->page->path(), ['herd_code' =>	$this->herd->herdCode()]); //filter form submissions never trigger a new page load (i.e., this function is never fired by a form submission)
 		//END FILTERS
+
 		if ($display_format == 'csv'){
 			$csv = new Csv();
 			$data = array();
@@ -354,24 +352,14 @@ abstract class parent_report extends CI_Controller {
 					$this->arr_sort_by = array_values(explode('|', $sort_by));
 					$this->arr_sort_order = array_values(explode('|', $sort_order));
 				}
-/*				else {
-					$tmp = $this->{$this->primary_model_name}->get_default_sort($pb->path());
-					$this->arr_sort_by = $tmp['arr_sort_by'];
-					$this->arr_sort_order = $tmp['arr_sort_order'];
-					$sort_by = implode('|', $this->arr_sort_by);
-					$sort_order = implode('|', $this->arr_sort_order);
-				}
-*/				if($arr_block_in == NULL || in_array($pb->path(), $arr_block_in)){
+				if($arr_block_in == NULL || in_array($pb->path(), $arr_block_in)){
 //					$this->{$this->primary_model_name}->populate_field_meta_arrays($pb['id']);
 					//set up next iteration
 					$arr_blk_data = array(
 						'block_num' => $x, 
 						'link_url' => site_url($this->section_path) . '/' . $this->page->path() . '/' . $pb->path(), 
 						'form_id' => $this->report_form_id,
-//						'odd_even' => $odd_even,
 						'block' => $pb->path(),
-//						'sort_by' => urlencode($sort_by),
-//						'sort_order' => urlencode($sort_order),
 					);
 					$arr_view_blocks[] = $this->load->view($pb->displayType(), $arr_blk_data, TRUE);
 					//add js line to populate the block after the page loads
@@ -403,20 +391,20 @@ abstract class parent_report extends CI_Controller {
 		else{
 			$this->carabiner->css('hide_filters.css', 'screen');
 		}
-//		if(!$has_benchmarks){
-//			$this->carabiner->css('hide_benchmarks.css', 'screen');
-//		}
+		if(!$this->page->hasBenchmark()){
+			$this->carabiner->css('hide_benchmarks.css', 'screen');
+		}
 		
 		if(is_array($this->page_header_data)){
 			$arr_sec_nav_data = array(
-				'arr_pages' => $this->as_ion_auth->arr_user_sections,
+				'subsections' => $this->as_ion_auth->user_sections,
 				'section_id' => $this->section->id(),
 				'section_path' => $this->section_path,
 			);
 			$arr_blocks->rewind();
 
 			$this->page_header_data = array_merge($this->page_header_data,
-				array(
+				[
 					'title'=>$this->product_name . ' - ' . $this->config->item('site_title'),
 					'description'=>$this->product_name . ' - ' . $this->config->item('site_title'),
 					'message' => array($this->session->flashdata('message')) + $this->{$this->primary_model_name}->arr_messages,
@@ -443,10 +431,10 @@ abstract class parent_report extends CI_Controller {
 						'{tooltip: "https://cdn.jsdelivr.net/qtip2/2.2.0/jquery.qtip.min.js"}',
 						'{datepick: "' . $this->config->item("base_url_assets") . 'js/jquery/jquery.datepick.min.js"}'
 					)
-				)
+				]
 			);
 			//load the report-specific js file if it exists
-			if(file_exists(PROJ_DIR . FS_SEP . 'js' . FS_SEP . str_replace('/', FS_SEP, $this->section_path) . '_helper.js')){
+			if(file_exists(PROJ_DIR . '/' . 'js' . '/' . $this->section_path . '_helper.js')){
 				$this->page_header_data['arr_headjs_line'][] = '{inv_helper: "' . $this->config->item("base_url_assets") . 'js/' . $this->section_path . '_helper.js"}';
 			}
 			$this->page_header_data['arr_headjs_line'][] = 'function(){' . $tmp_js . ';}';
@@ -457,24 +445,26 @@ abstract class parent_report extends CI_Controller {
 		
 		$this->benchmarks = new Benchmarks($this->session->userdata('user_id'), $this->input->post('herd_code'), $this->herd_model->header_info($this->herd->herdCode()), $this->setting_model, $this->benchmark_model, $this->session->userdata('benchmarks'));
 		$arr_benchmark_data = $this->benchmarks->getFormData($this->session->userdata('benchmarks')); 
-		$arr_nav_data = array(
+		$arr_nav_data = [
 			'section_path' => $this->section_path,
 			'curr_page' => $this->page->path(),
-//			'arr_pages' => $this->web_content_model->get_pages_by_criteria(array('section_id' => $this->section->id()))->result_array(),
-		);
-		$this->page_footer_data = array();
+			'obj_pages' => $this->section->pages(),
+		];
+
+		$this->page_footer_data = [];
 		$report_nav_path = 'report_nav';
-		if(file_exists(APPPATH . 'views' . FS_SEP . $this->section_path . FS_SEP . 'report_nav.php')){
+		if(file_exists(APPPATH . 'views/' . $this->section_path . '/report_nav.php')){
 			$report_nav_path =  $this->section_path . '/' . $report_nav_path;
 		}
-		//if(count($arr_nav_data['arr_pages']) < 2) {
+		//if(count($arr_nav_data['obj_pages']) < 2) {
 		//	$this->carabiner->css('hide_report_nav.css', 'screen');
 		//}
 		$report_filter_path = 'filters';
-		if(file_exists(APPPATH . 'views' . FS_SEP . $this->section_path . FS_SEP . 'filters.php')){
+		if(file_exists(APPPATH . 'views/' . $this->section_path . '/filters.php')){
 			$report_filter_path =  $this->section_path . '/filters' . $report_filter_path;
 		}
-		$data = array(
+
+		$data = [
 			'page_header' => $this->load->view('page_header', $this->page_header_data, TRUE),
 			'herd_code' => $this->herd->herdCode(),
 			'herd_data' => $this->load->view('dhi/herd_info', $herd_data, TRUE),
@@ -482,35 +472,37 @@ abstract class parent_report extends CI_Controller {
 			'blocks' => $arr_view_blocks,
 			'print_all' => $this->print_all,
 			'report_path' => $this->report_path
-		);
+		];
 		
-		$arr_filter_data = array(
+		$arr_filter_data = [
 			//'arr_filters' => $this->filters->filter_list(),
 			'arr_filters' => $this->filters->toArray(),
-		);
+		];
+
 		if(isset($arr_filter_data)){
 			$collapse_data['content'] = $this->load->view($report_filter_path, $arr_filter_data, TRUE);
 			$collapse_data['title'] = 'Set Filters';
 			$collapse_data['id'] = 'filters';
 			$data['filters'] = $this->load->view('collapsible', $collapse_data, TRUE);
 		}
-
+		
 		$this->load->model('supplemental_model');
 		$supp_factory = new SupplementalFactory($this->supplemental_model, site_url());
 		$page_supp = $supp_factory->getPageSupplemental($this->page->id(), $this->supplemental_model, site_url());
 		$data['page_supplemental'] = $page_supp->getContent();
+
 		if(isset($arr_benchmark_data)){
 			$collapse_data['content'] = $this->load->view('set_benchmarks', $arr_benchmark_data, TRUE);
 			$collapse_data['title'] = 'Set Benchmarks';
 			$collapse_data['id'] = 'bench-div';
 			$data['benchmarks'] = $this->load->view('collapsible', $collapse_data, TRUE);
 		}
-/*
-		if((is_array($arr_nav_data['arr_pages']) && count($arr_nav_data['arr_pages']) > 1) || 
-				(isset($arr_nav_data['arr_links']) && is_array($arr_nav_data['arr_links']) && count($arr_nav_data['arr_links']) > 1)) {
+
+		if((is_a($arr_nav_data['obj_pages'], 'SplObjectStorage') && $arr_nav_data['obj_pages']->count() > 1) || 
+			(isset($arr_nav_data['arr_links']) && is_array($arr_nav_data['arr_links']) && count($arr_nav_data['arr_links']) > 1)) {
 			$data['report_nav'] = $this->load->view($report_nav_path, $arr_nav_data, TRUE);
 		}
-*/		
+		
 		$this->_record_access(90, 'web', $this->config->item('product_report_code'));
 		$this->load->view('report', $data);
 	}

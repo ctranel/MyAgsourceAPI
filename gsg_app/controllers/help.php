@@ -49,13 +49,9 @@ class Help extends CI_Controller{
 		$arr_scope = array('subscription','public','unmanaged');
 		//$this->super_section_id = $this->web_content_model->get_super_section_id_by_path($this->router->fetch_directory());
 		//$this->top_sections = $this->as_ion_auth->get_super_sections_array($this->session->userdata('active_group_id'), $this->session->userdata('user_id'), $this->session->userdata('herd_code'), $arr_scope);
-		//$this->arr_user_sections = $this->as_ion_auth->get_sections_array($this->session->userdata('active_group_id'), $this->session->userdata('user_id'), $this->session->userdata('herd_code'), array($this->super_section_id), $arr_scope);
+		//$this->user_sections = $this->as_ion_auth->get_sections_array($this->session->userdata('active_group_id'), $this->session->userdata('user_id'), $this->session->userdata('herd_code'), array($this->super_section_id), $arr_scope);
 		
 		if(is_array($this->page_header_data)){
-/*			$arr_sec_nav_data = array(
-					'arr_pages' => $this->arr_user_sections,
-					'section_id' => $this->section_id
-			);*/
 			$this->page_header_data = array_merge($this->page_header_data,
 					array(
 							'title'=>$this->product_name . ' - ' . $this->config->item('site_title'),

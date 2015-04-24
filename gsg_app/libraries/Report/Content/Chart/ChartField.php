@@ -4,8 +4,10 @@ namespace myagsource\Report\Content\Chart;
 
 //require_once APPPATH . 'libraries/Site/iWebContentRepository.php';
 require_once APPPATH . 'libraries/Report/Content/BlockField.php';
+require_once APPPATH . 'libraries/Datasource/DbObjects/DbField.php';
 
 use \myagsource\Report\Content\BlockField;
+use \myagsource\Datasource\DbObjects\DbField;
 
 /**
  * Name:  ChartField
@@ -32,11 +34,10 @@ class ChartField extends BlockField {
 
 	/**
 	 */
-	function __construct() {
+	public function __construct($id, $name, DbField $data_field, $is_displayed, $display_format, $aggregate, $is_sortable, $header_supp, $data_supp) {
+		parent::__construct($id, $name, $data_field, $is_displayed, $display_format, $aggregate, $is_sortable, $header_supp, $data_supp);
 	}
 
 }
-
-
 
 ?>

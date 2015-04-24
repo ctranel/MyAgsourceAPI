@@ -76,7 +76,6 @@ class Blocks {// implements iReportContentRepository {
 				$r['sum_row'], $r['avg_row'], $r['bench_row'], $r['is_summary'], $r['display_type'], $this->supplemental_factory);
 			if(isset($r['pivot_db_field'])){
 				$p = $this->datasource_dbfield->getFieldData($r['pivot_db_field']);
-//var_dump($p);
 				$pivot_field = new DbField($p['id'], $p['db_table'], $p['db_field_name'], $p['name'], $p['description'], $p['pdf_width'], $p['default_sort_order'], $p['datatype'], $p['max_length'], $p['decimal_scale'], $p['unit_of_measure'], $p['is_timespan'], $p['is_foreign_key'], $p['is_nullable'], $p['is_natural_sort']);
 				$block->setPivot($pivot_field);
 			}
