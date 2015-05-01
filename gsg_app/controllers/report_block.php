@@ -11,7 +11,8 @@ require_once(APPPATH . 'libraries/Site/WebContent/Pages.php');
 require_once(APPPATH . 'libraries/Site/WebContent/Sections.php');
 require_once(APPPATH . 'libraries/Datasource/DbObjects/DbTable.php');
 require_once(APPPATH . 'libraries/Datasource/DbObjects/DbField.php');
-require_once(APPPATH . 'libraries/Report/Content/BlockData.php');
+require_once(APPPATH . 'libraries/Report/Content/Chart/ChartData.php');
+require_once(APPPATH . 'libraries/Report/Content/Table/TableData.php');
 require_once(APPPATH . 'libraries/Report/Content/Table/Header/TableHeader.php');
 
 use \myagsource\Benchmarks\Benchmarks;
@@ -23,11 +24,12 @@ use \myagsource\Site\WebContent\Sections;
 use \myagsource\Site\WebContent\Pages;
 use \myagsource\Site\WebContent\Blocks as WebBlocks;
 use \myagsource\Report\Content\Blocks;
-use \myagsource\Report\Content\BlockData;
+use \myagsource\Report\Content\Chart\ChartData;
 use \myagsource\Report\Content\Table\Header\TableHeader;
 use \myagsource\Datasource\DbObjects\DbTable;
 use \myagsource\Datasource\DbObjects\DbField;
 use myagsource\Report\Content\Sort;
+use myagsource\Report\Content\Table\TableData;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
@@ -78,6 +80,14 @@ class report_block extends CI_Controller {
 	protected $blocks;
 	
 	/**
+	 * supp_factory
+	 * 
+	 * Supplemental factory
+	 * @var \myagsource\Supplemental\Content\SupplementalFactory
+	 **/
+	protected $supp_factory;
+	
+	/**
 	 * herd
 	 * 
 	 * Herd object
@@ -88,7 +98,6 @@ class report_block extends CI_Controller {
 //	protected $arr_sort_by = [];
 //	protected $arr_sort_order = [];
 	protected $product_name;
-	protected $primary_model_name;
 	protected $section_path; //The path to the site section; set in constructor to point to the controller name
 //	protected $page_header_data;
 	protected $report_data;
@@ -112,7 +121,8 @@ class report_block extends CI_Controller {
 		$this->load->model('supplemental_model');
 		$this->load->model('ReportContent/report_block_model');
 		$this->load->model('Datasource/db_field_model');
-		$this->blocks = new Blocks($this->report_block_model, $this->db_field_model, new SupplementalFactory($this->supplemental_model, site_url()));
+		$this->supp_factory = new SupplementalFactory($this->supplemental_model, site_url());
+		$this->blocks = new Blocks($this->report_block_model, $this->db_field_model, $this->supp_factory);
 
 		//web content
 		$this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
@@ -170,13 +180,13 @@ class report_block extends CI_Controller {
 			$this->session->keep_flashdata('redirect_url');
 			redirect(site_url('dhi/change_herd/select'));			
 		}
-		/* Load the profile.php config file if it exists*/
+		/* Load the profile.php config file if it exists
 		if (ENVIRONMENT == 'development' || ENVIRONMENT == 'localhost') {
 			$this->config->load('profiler', false, true);
 			if ($this->config->config['enable_profiler']) {
 				$this->output->enable_profiler(TRUE);
 			} 
-		}
+		}*/
 	}
 
 	protected function authorize(){
@@ -245,7 +255,7 @@ class report_block extends CI_Controller {
 		$path_page_segment = substr($page_path, (strrpos($page_path, '/') + 1));
 		$tmp_path = $page_path . $block_name;
 		
-		//Load the most specific model that exists
+		/*Load the most specific model that exists
 		while(strpos($tmp_path, '/') !== false){
 			if(file_exists(APPPATH . 'models/' . $tmp_path . '_model.php')){
 				$this->primary_model_name = substr($tmp_path, strripos($tmp_path, '/')) . '_model';
@@ -260,23 +270,18 @@ class report_block extends CI_Controller {
 			$this->load->model('report_model', '', FALSE, $this->section_path);
 		}
 		//End load model
-
+		*/
 		
+		//LOAD SUPPLEMENTAL FACTORY (needs to be set before setting block report fields)
+//		$this->load->model('supplemental_model');
+//		$supp_factory = new SupplementalFactory($this->supplemental_model, site_url());
+		//END SUPPLEMENTAL FACTORY
 		
-		//SUPPLEMENTAL DATA
-		$this->load->model('supplemental_model');
-		$supp_factory = new SupplementalFactory($this->supplemental_model, site_url());
-				
-		//$this->page = $this->pages->getByPath(urldecode($page_name), $this->session->userdata('section_id'));
 		$block = $this->blocks->getByPath(urldecode($block_name));
 		$output = $block->displayType();
-		$block->setReportFields($supp_factory);
 		
+		//SORT
 		$sort_by = urldecode($sort_by);
-		//$this->objPage = $this->{$this->primary_model_name}->arr_blocks[$this->page->path()];
-				
-		//set sort order
-		$this->load->helper('report_chart_helper');
 		if($sort_by != 'null' && $sort_order != 'null' && !empty($sort_by) && !empty($sort_order)) {
 			$arr_sort_by = explode('|', $sort_by);
 			$arr_sort_order = explode('|', $sort_order);
@@ -290,7 +295,9 @@ class report_block extends CI_Controller {
 				}
 			}
 		}
+		//END SORT
 		
+		//FILTERS
 		if(isset($json_filter_data)){
 			$section = $this->getSection();
 			$arr_params = (array)json_decode(urldecode($json_filter_data));
@@ -323,7 +330,6 @@ class report_block extends CI_Controller {
 			$this->load->model('filter_model');
 			//load required libraries
 			$filters = new Filters($this->filter_model);
-//			$primary_table = $this->{$this->primary_model_name}->get_primary_table_name();
 			$this->load->helper('multid_array_helper');
 			$filters->setCriteria(
 					$section->id(),
@@ -332,10 +338,10 @@ class report_block extends CI_Controller {
 			);
 		}
 		$block->setFilters($filters);
+		//END FILTERS
 		
 		// block-level supplemental data
-		$this->load->model('supplemental_model');
-		$block_supp = $supp_factory->getBlockSupplemental($block->id(), $this->supplemental_model, site_url());
+		$block_supp = $this->supp_factory->getBlockSupplemental($block->id(), $this->supplemental_model, site_url());
 		$this->supplemental = $block_supp->getContent();
 		//end supplemental
 
@@ -346,47 +352,50 @@ class report_block extends CI_Controller {
 		$this->benchmarks = new Benchmarks($this->session->userdata('user_id'), $this->input->post('herd_code'), $herd_info, $this->setting_model, $this->benchmark_model, $this->session->userdata('benchmarks'));
 		// end benchmarks
 		
-
-		
 		// report data
 		$this->load->model('ReportContent/report_data_model');
 		$this->load->model('Datasource/db_table_model');
 		$db_table = new DbTable($block->primaryTableName(), $this->db_table_model);
-		$block_data = new BlockData($block, $this->report_data_model, $this->benchmarks, $db_table);
-		$results = $block_data->loadData($report_count, $filters->criteriaKeyValue());
+		//$block_data = new BlockDataFactory($block, $this->report_data_model, $this->benchmarks, $db_table);
+
+		if($block->displayType() == 'table'){
+			$block_data_handler = new TableData($block, $this->report_data_model, $this->benchmarks, $db_table);
+		}
+		
+		if($block->displayType() == 'trend chart' || $block->displayType() == 'compare chart'){
+			$block_data_handler = new ChartData($block, $this->report_data_model);
+		}
+
+		$results = $block_data_handler->getData($filters->criteriaKeyValue());//$report_count, 
 		// end report data
 		
-		
-		//$this->json['supplemental'] = $this->supplemental;
-		//set parameters for given block
-		
-		//common functionality
 		/*
 		$first = ($first === 'true');
-		if($file_format == 'csv'){
+		if($file_format == 'csv' || $file_format == 'pdf'){
 			if($first){
-				$this->_record_access(90, 'csv', $this->config->item('product_report_code'));
-			}
-			return $results;
-		}
-		elseif($file_format == 'pdf'){
-			if($first){
-				$this->_record_access(90, 'pdf', $this->config->item('product_report_code'));
+				$this->_record_access(90, $file_format, $this->config->item('product_report_code'));
 			}
 			return $results;
 		}
 		*/
-		if($file_format == 'pdf' || $file_format == 'csv'){
-			$output = 'array';
-			return $results;			
-		}
 
+		//Gather meta-data into $this->report_data
+		$this->report_data = $block->getOutputData();
+		$this->report_data['herd_code'] = $this->session->userdata('herd_code');
 		if($block->hasBenchmark()){
-			$bench_text = $this->benchmarks->get_bench_text();
+			$this->report_data['benchmark_text'] = $this->benchmarks->get_bench_text();
 		}
 
+		//$this->report_data['block'] = $block;
+		$this->report_data['data'] = $results;
+		
+		if(isset($this->supplemental) && !empty($this->supplemental)){
+			$this->report_data['supplemental'] = $this->supplemental;
+		}
+		
+		//table
 		if($block->displayType() == 'table'){
-			//@todo: move model call to library???
+			//header
 			$header_groups = $this->report_block_model->getHeaderGroups($block->id());
 			//@todo: pull this only when needed?
 			$arr_dates = $this->herd_model->get_test_dates_7_short($this->session->userdata('herd_code'));
@@ -397,49 +406,38 @@ class report_block extends CI_Controller {
 			$table_header_data = [
 				'structure' => $table_header->getTableHeaderStructure(),
 				'form_id' => $this->report_form_id,
-//				'report_path' => $block->path(),
-//				'sorts' => $block->sorts(),
 				'block' => $block,
 				'report_count' => $report_count
 			];
 			
-			$this->json['html'] = $this->html;
 			$this->report_data['table_header'] = $this->load->view('table_header', $table_header_data, TRUE);
+
+			//finish table
 			$this->report_data['num_columns'] = $table_header->columnCount();
+			/*
+			 * @todo: when we have a javascript framework in place, we will send table data via json too.
+			 * for now, we need to send the html for the table instead of the data
+			 */
+			if(isset($this->report_data['data']) && is_array($this->report_data['data'])) {
+				$this->report_data['html'] = $this->load->view('report_table.php', $this->report_data, TRUE);
+				unset($this->report_data['data']);
+			}
+			else {
+				$this->report_data['html'] = '<p class="message">No data found.</p>';
+			}
 		}
+		//end table
 
-		$this->report_data['block'] = $block;
-		$this->report_data['report_data'] = $results;
-		
-		if(isset($this->supplemental) && !empty($this->supplemental)){
-			$this->report_data['supplemental'] = $this->supplemental;
-		}
-		
-		if(isset($bench_text)){
-			$this->report_data['table_benchmark_text'] = $bench_text;
-		}
-
-		if(isset($this->report_data) && is_array($this->report_data)) {
-			$this->json['html'] = $this->load->view('report_table.php', $this->report_data, TRUE);
-		}
-		else {
-			$this->json['html'] = '<p class="message">No data found.</p>';
-		}
-//print($this->json['html']);
-//		if($first){
-//			$this->_record_access(90, 'web', $this->config->item('product_report_code'));
-//		}
-		$this->json['section_data'] = [
-			'block' => $block_name,
-			'sort_by' => $sort_by,
-			'sort_order' => $sort_order,
-			'graph_order' => $report_count
-		];
-		$return_val = prep_output($output, $this->json, $report_count, $file_format);
+//var_dump($this->report_data); die;
+		$return_val = json_encode($this->report_data);//, JSON_HEX_QUOT | JSON_HEX_TAG); //json_encode_jsfunc
+//		$return_val = $block->getOutputData();//prep_output($output, $this->json, $report_count, $file_format);
+    	
+		//@todo: base header on accept property of request header 
+		header("Content-type: application/json"); //being sent as json
+		echo $return_val;
 		if($return_val) {
 			return $return_val;
 		}
- 	   	exit;
 	}
 
 	protected function getSection(){
@@ -454,25 +452,24 @@ class report_block extends CI_Controller {
 	}
 	
 	protected function adjustHeaderGroups($header_groups, $dates){
-		//@todo: KLM block should not be in this class--controller?
-		//KLM - Added logic to convert header text to date text from herd_model function get_test_dates_7_short
-		foreach($header_groups as $hk => $hv){
-			$c = 0;
-			if(isset($dates) && is_array($dates)){
-				foreach($dates[0] as $key => $value){
-					if ($key == $hv['text']) {
-						if ($value == '0-0') {
-							$value='No Test (-'.$c.')';
+		if(isset($header_groups) && is_array($header_groups)){
+			foreach($header_groups as $hk => $hv){
+				$c = 0;
+				if(isset($dates) && is_array($dates)){
+					foreach($dates[0] as $key => $value){
+						if ($key == $hv['text']) {
+							if ($value == '0-0') {
+								$value='No Test (-'.$c.')';
+							}
+							$header_groups[$hk]['text'] = $value;
+							break;
 						}
-						$header_groups[$hk]['text'] = $value;
-						break;
+						$c++;
 					}
-					$c++;
 				}
 			}
 		}
 		return $header_groups;
-		//end KLM
 	}
 /*		
 	protected function _record_access($event_id, $format, $product_code = null){

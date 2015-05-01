@@ -1,5 +1,7 @@
 <?php
-namespace myagsource\Report\Content;
+namespace myagsource\Report\Content\Chart;
+
+use \myagsource\Datasource\DbObjects\DbField;
 
 /**
  * Name:  YAxis
@@ -12,12 +14,6 @@ namespace myagsource\Report\Content;
  *
  */
 class YAxis {
-	/**
-	 * label_text
-	 * @var string
-	 **/
-	protected $label_text;
-	
 	/**
 	 * min
 	 * @var int
@@ -36,10 +32,40 @@ class YAxis {
 	 **/
 	protected $opposite;
 	
+	/**
+	 * label_text
+	 * @var string
+	 **/
+	protected $label_text;
+	
 	
 	/**
 	 */
-	function __construct() {
+	function __construct($min, $max, $opposite, $text, iDataField $datafield = null) {
+		$this->min = $min;
+		$this->max = $max;
+		$this->opposite = $opposite;
+		$this->datafield = $datafield;
+		$this->label_text = $text;
+	}
+
+	/**
+	 * @method getOutputData
+	 * @return array of output data for block
+	 * @access public
+	 *
+	 **/
+	public function getOutputData(){
+		$dbfield_type = $this->datafield instanceof iDataField ? $this->datafield->dataType() : null;
+		$dbfield_name = $this->datafield instanceof iDataField ? $this->datafield->dbFieldName() : null;
+		return [
+			'min' => $this->min,
+			'max' => $this->max,
+			'opposite' => $this->opposite,
+			'data_type' => $dbfield_type,
+			'db_field_name' => $dbfield_name,
+			'text' => $this->label_text,
+		];
 	}
 }
 

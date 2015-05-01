@@ -42,24 +42,13 @@ class Block_model extends CI_Model {
 	}
 	
 	/**
-	 * get_block_display_types
-	 * @return array of section data
-	 * @author ctranel
-	 **/
-	public function get_block_display_types() {
-		return $this->db
-			//->where($this->tables['lookup_display_types'] . '.active', 1)
-			->get($this->tables['lookup_display_types']);
-	}
-	
-	/**
 	 * get_block_links
 	 * @param int section id
 	 * @return array of block info keyed by path
 	 * @author ctranel
 	 **/
 	public function getCompleteData() {
-		$arr_return = array();
+		$arr_return = [];
 		if(isset($section_id)) $this->db->where('p.section_id', $section_id);
 		$result = $this->db
 		->select("p.id AS page_id, b.id, p.section_id, b.path, b.name, ct.name AS chart_type, b.description, p.path AS page, p.name AS page_name, CASE WHEN dt.name LIKE '%chart' THEN 'chart' ELSE dt.name END AS display_type,s.path AS section_path, b.max_rows, b.cnt_row, b.sum_row, b.avg_row, b.bench_row, pf.db_field_name AS pivot_db_field, b.is_summary")
@@ -75,6 +64,7 @@ class Block_model extends CI_Model {
 		->order_by('p.list_order', 'asc')
 		->order_by('pb.list_order', 'asc')
 		->get($this->tables['sections'] . ' AS s')->result_array();
+//@todo: remove code below from model file
 		if(is_array($result) && !empty($result)){
 			foreach($result as $r){
 				$arr_return[$r['page']]['page_id'] = $r['page_id'];
@@ -113,18 +103,5 @@ class Block_model extends CI_Model {
  			return $arr_return;
 		}
 		else return FALSE;
-	}
-	
-/***  CHART *****************************************************/
-	
-	/**
-	 * get_chart_display_types
-	 * @return array of section data
-	 * @author ctranel
-	 **/
-	public function get_chart_display_types() {
-		return $this->db
-			//->where($this->tables['lookup_chart_types'] . '.active', 1)
-			->get($this->tables['lookup_chart_types']);
 	}
 }

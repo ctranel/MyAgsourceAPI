@@ -1,9 +1,9 @@
 	//this function is called in the graph_helper.js file after the JSON data file has loaded, but before chart is rendered.
 	//It can make report specific updates after the data has been loaded
-	function pre_render(options_in, section_data){
+	function pre_render(options_in, client_data){
 		
-		if(typeof(section_data) !== 'undefined'){
-			if(section_data['block'] === 'overall_keto_prev'){
+		if(typeof(client_data) !== 'undefined'){
+			if(client_data['block'] === 'overall_keto_prev'){
 				options_in.colors[2] = '#F2EF27';
 				options_in.colors[3] = '#F21D21';
 				options_in.plotOptions.line = {marker: {enabled: false}};
@@ -18,7 +18,7 @@
 				options_in.series.push({name: '15% Target', type: 'line', data:[]});
 			}
 			
-			if(section_data['block'] === 'overall_early_prev_graph'){
+			if(client_data['block'] === 'overall_early_prev_graph'){
 				options_in.colors[2] = '#F21D21';
 				options_in.series.push({name: '10% Target', type: 'line', data:[]});
 				options_in.yAxis.plotLines = [

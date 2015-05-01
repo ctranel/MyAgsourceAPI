@@ -1,7 +1,7 @@
 	//this function is called in the graph_helper.js file after the JSON data file has loaded.  It can make report specific updates after the data has been loaded (see commented code for example)
-	function post_render(section_data){
-		if(typeof(section_data) === 'undefined' || typeof(section_data['block']) === 'undefined') return false;
-		if(typeof(chart) != 'undefined' && section_data['block'] == 'test_day_results'){
+	function post_render(client_data){
+		if(typeof(client_data) === 'undefined' || typeof(client_data['block']) === 'undefined') return false;
+		if(typeof(chart) != 'undefined' && client_data['block'] == 'test_day_results'){
 			$('th[id^="scc_cnt"]').each(function(){
 				$('#test_day_results').find("tr td:nth-child(" + ($(this).index() + 1) + ")").each(function(){
 					if(parseInt($(this).html().replace(/,/g,'')) >= 200){

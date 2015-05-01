@@ -146,7 +146,7 @@
 			options_in.yAxis[1].title.style.color = var_arr_graph_colors[1];
 		}
 		
-		if(section_data['block'] == 'peak_milk_trends'){
+		if(client_data['block'] == 'peak_milk_trends'){
 			
 		}
 			

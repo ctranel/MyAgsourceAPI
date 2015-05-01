@@ -17,7 +17,7 @@ interface iBlock {
 //	function childKeyValuePairs();
 	function id();
 	function path();
-	function name();
+	function title();
 	
 	function reportFields();
 	function setReportFields();

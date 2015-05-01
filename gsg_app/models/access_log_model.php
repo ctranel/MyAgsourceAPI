@@ -1,6 +1,6 @@
 <?php
-require_once APPPATH . 'models/report_model.php';
-class Access_log_model extends Report_Model {
+//require_once APPPATH . 'models/report_model.php';
+class Access_log_model extends CI_Model {
 	public function __construct(){
 		parent::__construct();
 		$this->db_group_name = 'default';

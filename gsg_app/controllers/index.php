@@ -37,7 +37,7 @@ class Index extends parent_report {
 		//load required libraries
 		$this->load->model('filter_model');
 		$this->filters = new Filters($this->filter_model);
-		$recent_test_date = isset($primary_table) ? $this->{$this->primary_model_name}->get_recent_dates() : NULL;
+		$recent_test_date = isset($primary_table) ? $this->{$this->primary_model_name}->getRecentDates() : NULL;
 		$this->filters->setCriteria(
 				$this->section->id(),
 				$this->page->path(),

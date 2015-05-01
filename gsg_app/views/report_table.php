@@ -17,9 +17,9 @@
 			<?php echo $subtitle; ?>
 		</h3>
 	<?php endif; ?>	
-	<?php if (!empty($table_benchmark_text)): ?>
+	<?php if (!empty($benchmark_text)): ?>
 		<h3 class="block">
-		<?php echo $table_benchmark_text; ?>
+		<?php echo $benchmark_text; ?>
 		</h3>
 	<?php endif;	
 	if (isset($supplemental['links']) && is_array($supplemental['links'])):
@@ -38,7 +38,7 @@
 				<thead> <?php echo $table_header; ?> </thead>
 		<?php elseif($block->hasPivot()): ?>
 			<thead><th class="subcat-heading">Metric</th> <?php
-			foreach($report_data[$block->pivotFieldName()] as $c): ?>
+			foreach($data[$block->pivotFieldName()] as $c): ?>
 				<th class="subcat-heading">
 					<?php echo $c; ?>
 				</th><?php
@@ -47,7 +47,7 @@
 		<?php endif;
 		 ?><tbody>
 			<?php $c = 1;
-			if(!empty($report_data) && is_array($report_data)):
+			if(!empty($data) && is_array($data)):
 			$fields = $block->reportFields();
 				if($fields):
 					if($block->hasPivot()):
@@ -60,13 +60,13 @@
 							?><td><?php 
 								echo $f->displayName();
 							?></td><?php 
-							foreach($report_data[$f->dbFieldName()] as $k => $v):
+							foreach($data[$f->dbFieldName()] as $k => $v):
 								displayCell($f, $v);
 							endforeach;
 							$c++;
 						endforeach;
 					else:
-						foreach($report_data as $cr):
+						foreach($data as $cr):
 							$row_class = $c % 2 == 1?'odd':'even';
 							?><tr class="<?php echo $row_class; ?>"><?php
 							//@todo: pull this logic out of view?
@@ -98,7 +98,7 @@
 			endif; 
 		?></tbody>
 	</table>
-	<?php if(count($report_data) > 20): ?>
+	<?php if(count($data) > 20): ?>
 		<table id="fh-<?php echo $block->path(); ?>" class="fixed-header"></table>
 	<?php endif; 
 	

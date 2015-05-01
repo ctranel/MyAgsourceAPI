@@ -509,17 +509,4 @@ die('here');
 		}
 		else return FALSE;
 	}
-	
-/***  CHART *****************************************************/
-	
-	/**
-	 * get_chart_display_types
-	 * @return array of section data
-	 * @author ctranel
-	 **/
-	public function get_chart_display_types() {
-		return $this->{$this->db_group_name}
-			//->where($this->tables['lookup_chart_types'] . '.active', 1)
-			->get($this->tables['lookup_chart_types']);
-	}
 }

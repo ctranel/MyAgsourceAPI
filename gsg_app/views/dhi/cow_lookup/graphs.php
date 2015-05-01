@@ -13,7 +13,7 @@ endif; ?>
 <div class="chart-container odd">
 	<?php if(isset($before_chart)) echo $before_chart ?>
 	<div class="jqPlot jqplot-target" id="chart1"></div>
-	<a name="chart1"><div id="graph-canvas0" data-block="cow_lookup" class="chart"></div></a>
+	<a name="chart1"><div id="block-canvas0" data-block="cow_lookup" class="chart"></div></a>
 	<?php if(isset($after_chart)) echo $after_chart ?>
 </div>
 
@@ -106,8 +106,8 @@ options.series = [
 		}
 	];
 
-$('#graph-canvas0').highcharts(options);
-var chart = $('#graph-canvas0').highcharts();
+$('#block-canvas0').highcharts(options);
+var chart = $('#block-canvas0').highcharts();
 for (var i =1;i < 9;i++){
 	if ( chart.series[i].visible){
 		chart.series[i].hide();

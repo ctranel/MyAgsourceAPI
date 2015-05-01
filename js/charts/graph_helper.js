@@ -147,7 +147,7 @@ function process_chart(div_id, data_in){
 	
 					if(data_in.chart_type != 'bar'){
 						options.xAxis[cnt].title = {"text": data_in.arr_axes.x[c].text};
-						if(data_in.arr_axes.x[c].data_type == 'datetime'){
+						if(data_in.arr_axes.x[c].data_type.indexOf('date') >= 0){
 							options.xAxis[cnt].labels = {"rotation": -35};//, "align": 'left', "x": -50, "y": 55};
 						}
 						else{
@@ -222,8 +222,8 @@ function process_chart(div_id, data_in){
 				options.series = data_in.series;
 			}
 		}
-		if(typeof(data_in.section_data) !== 'undefined'){
-			section_data = data_in.section_data;
+		if(typeof(data_in.client_data) !== 'undefined'){
+			client_data = data_in.client_data;
 		}
 		if(typeof(data_in.data) === 'undefined' || data_in.data == false){
 			var block_header = '<h2 class="block">'+options.title.text+'</h2>';
@@ -231,11 +231,11 @@ function process_chart(div_id, data_in){
 			block_header += '<p class-"chart-error">Sorry, there is no current data available for this item.  Please contact <a href="mailto:custserv@myagsource.com">customer service</a> if you believe this is in error.</p>';
 				$('#' + div_id).html(block_header);
 		}
-		else if(typeof(section_data.redirect) !== 'undefined'){
-			if(section_data.redirect == 'login') window.location.href = window.location.protocol + window.location.host + window.location.path;
+		else if(typeof(client_data.redirect) !== 'undefined'){
+			if(client_data.redirect == 'login') window.location.href = window.location.protocol + window.location.host + window.location.path;
 		}
-		else if(typeof(section_data.error) !== 'undefined'){
-			$('#' + div_id).html('<p class-"chart-error">' + section_data.error + '</p>');
+		else if(typeof(client_data.error) !== 'undefined'){
+			$('#' + div_id).html('<p class-"chart-error">' + client_data.error + '</p>');
 		}
 		else{
 			//add data to object
@@ -276,18 +276,17 @@ function process_chart(div_id, data_in){
 			//@todo: line below will break if there is ever a chart with multiple x axes
 				options.tooltip.formatter = getTooltipFormat(options.chart.type, options.xAxis.type, um);
 			}
-			
 			options.chart.renderTo = div_id;
 			if(typeof pre_render == 'function'){
-				options = pre_render(options, section_data);
+				options = pre_render(options, client_data);
 			}
 			chart[block_index] = new Highcharts.Chart(options);
 			while(chart[block_index].series.length > options.series.length){//(Object.size(chart[block_index].series) > count){
 				chart[block_index].series[chart[block_index].series.length].remove(true);
 			}
 		}
-		if(typeof(section_data) == "object" && typeof post_render == 'function'){
-			post_render(section_data);
+		if(typeof(client_data) == "object" && typeof post_render == 'function'){
+			post_render(client_data);
 		}
 		//attach events to new blocks
 		attachDataFieldEvents();
@@ -308,15 +307,15 @@ function process_table(div_id, block_index, table_data){
 			pre_render_table(div_id, table_data);
 		}
 		if(typeof table_data.html === 'undefined' || table_data.html == false){
-			$('#' + div_id).html('<p class-"chart-error">Sorry, there is no data available for the ' + table_data.section_data.block + ' report.  Please try again, or contact AgSource for assistance.</p>');
+			$('#' + div_id).html('<p class-"chart-error">Sorry, there is no data available for the ' + table_data.client_data.block + ' report.  Please try again, or contact AgSource for assistance.</p>');
 			$('#waiting-icon' + block_index).hide();
 			return false;
 		}
 		else{
 			$('#' + div_id).html(table_data.html);
 		}
-		if(typeof(table_data.section_data) == "object" && typeof post_render == 'function'){
-			post_render(table_data.section_data);
+		if(typeof(table_data.client_data) == "object" && typeof post_render == 'function'){
+			post_render(table_data.client_data);
 		}
 		//@todo: after we convert tables to use JSON, we should only call this if count > ?
 		//without setTimeout, the fixed header is not hidden when page loads
@@ -333,7 +332,7 @@ function process_table(div_id, block_index, table_data){
 }
 
 function getAxisLabelFormat(axis_type){
-	if(axis_type === "datetime"){
+	if(axis_type !== null && axis_type.indexOf('date') >= 0){
 		return function(){return Highcharts.dateFormat('%b %e, %Y', this.value);};
 	}
 	else{

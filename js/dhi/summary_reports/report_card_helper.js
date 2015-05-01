@@ -1,8 +1,8 @@
 	// this function allows you to change chart options immediately before chart is rendered
-	function pre_render(options_in, section_data){
+	function pre_render(options_in, client_data){
 		//if there is a second yAxis, change the color
 		if(typeof options_in.yAxis != 'undefined') {
-			if(section_data.block.substring(0, 7) !== 'rc_long'){
+			if(client_data.block.substring(0, 7) !== 'rc_long'){
 				var tmpdata = Array();
 				tmpdata[0] = options_in.series[0].data;
 				tmpdata[1] = options_in.series[1].data;

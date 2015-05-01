@@ -4,12 +4,16 @@ namespace myagsource\Report\Content\Chart;
 
 require_once APPPATH . 'libraries/Datasource/DbObjects/DbField.php';
 require_once APPPATH . 'libraries/Report/Content/Chart/ChartField.php';
+require_once APPPATH . 'libraries/Report/Content/Chart/XAxis.php';
+require_once APPPATH . 'libraries/Report/Content/Chart/YAxis.php';
 require_once APPPATH . 'libraries/Report/Content/Block.php';
 
 use \myagsource\Datasource\DbObjects\DbField;
 use \myagsource\Report\Content\Chart\ChartField;
 use \myagsource\Report\Content\Block;
 use \myagsource\Supplemental\Content\SupplementalFactory;
+use \myagsource\Report\Content\Chart\XAxis;
+use \myagsource\Report\Content\Chart\YAxis;
 
 /**
  * Name:  ChartBlock
@@ -29,6 +33,12 @@ class ChartBlock extends Block {
 	protected $chart_type;
 	
 	/**
+	 * array of category field names
+	 * @var array
+	 **/
+	protected $categories;
+	
+	/**
 	 * collection of XAxis objects
 	 * @var SplObjectStorage
 	 **/
@@ -43,20 +53,22 @@ class ChartBlock extends Block {
 	/**
 	 */
 	function __construct($block_datasource, $id, $page_id, $name, $description, $scope, $active, $path, $max_rows, $cnt_row, 
-			$sum_row, $avg_row, $bench_row, $is_summary, $display_type) {
+			$sum_row, $avg_row, $bench_row, $is_summary, $display_type, $chart_type, SupplementalFactory $supp_factory) {
 		parent::__construct($block_datasource, $id, $page_id, $name, $description, $scope, $active, $path, $max_rows, $cnt_row, 
-			$sum_row, $avg_row, $bench_row, $is_summary, $display_type);
+			$sum_row, $avg_row, $bench_row, $is_summary, $display_type, $supp_factory);
+		
+		$this->setReportFields();
+		
+		$this->chart_type = $chart_type;
+		$this->x_axes = new \SplObjectStorage();
+		$this->y_axes = new \SplObjectStorage();
+		$this->setChartAxes();
 	}
 		
-	/**
-	 * (non-PHPdoc)
-	 *
-	 * @see \myagsource\Site\iWebContent::children()
-	 *
-	 */
-	public function children() {
+	public function xAxes(){
+		return $this->x_axes;
 	}
-	
+
 	/**
 	 * setReportFields
 	 * 
@@ -66,8 +78,8 @@ class ChartBlock extends Block {
 	 * @return void
 	 * @access public
 	 **/
-	public function setReportFields(SupplementalFactory $supp_factory = null){
-			$arr_table_ref_cnt = [];
+	public function setReportFields(){
+		$arr_table_ref_cnt = [];
 		$this->has_aggregate = false;
 		$this->report_fields = new \SplObjectStorage();
 			
@@ -104,6 +116,109 @@ class ChartBlock extends Block {
 			}
 		}
 	}
+
+	/**
+	 * @method setChartAxes - retrieve data for categories, axes, etc.
+	 * @param int block id
+	 * @return void
+	 * @access protected
+	 *
+	 **/
+	protected function setChartAxes(){
+		$data = $this->datasource->getChartAxes($this->id);
+		if(!is_array($data) || empty($data) || count($data) < 1){
+			return false;
+		}
+		
+		$this->categories = [];
+		foreach($data as $a){
+			$datafield = null;
+			if(isset($a['db_field_id']) && !empty($a['db_field_id'])){
+				$datafield = new DbField($a['db_field_id'], $a['table_name'], $a['db_field_name'], $a['name'], $a['description'], $a['pdf_width'], $a['default_sort_order'],
+					$a['datatype'], $a['max_length'], $a['decimal_scale'], $a['unit_of_measure'], $a['is_timespan'], $a['is_foreign_key'], $a['is_nullable'], $a['is_natural_sort']);
+				//add fields as a report field so it is included in the select statement
+				$display_format = $a['data_type'] === 'datetime' ? 'MM-dd-yy' : null;
+				$this->report_fields->attach(new ChartField($a['id'], $a['name'], $datafield, false, $display_format, null, 0));
+				
+			}
+			if($a['x_or_y'] === 'x'){
+				//if($a['data_type'] === 'datetime' || $a['data_type'] === 'date'){
+				//	$this->xaxis_field = $datafield;
+				//}
+				if(isset($a['category']) && !empty($a['category'])){
+					$this->categories[] = $a['category'];
+				}
+				$this->x_axes->attach(new XAxis($a['min'], $a['max'], $a['opposite'], $datafield, $a['data_type'], $a['text'], $a['category']));
+			}
+			if($a['x_or_y'] === 'y'){
+				$this->y_axes->attach(new YAxis($a['min'], $a['max'], $a['opposite'], $a['text'], $datafield));
+			}
+		}
+	}
+
+	/**
+	 * @method getAxesOutput
+	 * @return array of output data for block
+	 * @access protected
+	 *
+	 **/
+	protected function getAxesOutput(){
+		$tmp = [];
+		$cnt = 0;
+		foreach($this->x_axes as $a){
+			if($cnt === 0 || $a->category() === null){
+				$tmp[$cnt] = $a->getOutputData();
+			}
+			if($cnt === 0 && $a->category() !== null){
+				$tmp[$cnt]['categories'] = $this->categories;
+			}
+			$cnt++;
+		}
+		$ret['x'] = $tmp;
+	
+		$tmp = [];
+		$cnt = 0;
+		foreach($this->y_axes as $a){
+			$tmp[$cnt] = $a->getOutputData();
+			$cnt++;
+		}
+		$ret['y'] = $tmp;
+		return $ret;
+	}
+	
+	/**
+	 * @method getOutputData
+	 * @return array of output data for block
+	 * @access public
+	 *
+	 **/
+	public function getOutputData(){
+		$ret = parent::getOutputData();
+		$ret['chart_type'] = $this->chart_type;
+		$ret['arr_axes'] = $this->getAxesOutput();
+		$ret['series'] = $this->getSeriesOutput();
+		return $ret;
+	}
+
+	/**
+	 * @method getSeriesOutput
+	 * @return array of output data for block
+	 * @access protected
+	 *
+	 **/
+	protected function getSeriesOutput(){
+		$ret = [];
+		foreach($this->report_fields as $f){
+			if($f->isDisplayed()){
+				$ret[] = [
+					'name' => $f->displayName(),
+					'um' => $f->unitOfMeasure(),
+				];
+			}
+		}
+		return $ret;
+	}
+
 /*	
 	public function loadData($report_count){
 		$arr_axes = $report_datasource->get_chart_axes($arr_this_block['id']);
@@ -122,7 +237,6 @@ class ChartBlock extends Block {
 			}
 		}
 	
-		$this->json['herd_code'] = $this->session->userdata('herd_code');
 	
 		$report_datasource->set_chart_fields($arr_this_block['id']);
 		$arr_fields = $report_datasource->get_fields();
@@ -146,17 +260,7 @@ class ChartBlock extends Block {
 		$this->json['series'] = $this->derive_series($arr_fields, $this->json['chart_type'], $tmp_categories, count($this->json['data'], COUNT_RECURSIVE));
 		$this->json['filter_text'] = $this->filters->get_filter_text();
 	}
-*/	
-	protected function derive_field_array($arr_fields){
-		$return_val = array();
-		$c = 0;
-			
-		foreach($arr_fields as $k=>$f){
-			$return_val[$c] = $f;
-			$c++;
-		}
-		return $return_val;
-	}
+
 	
 	protected function derive_series($arr_fields, $chart_type, $arr_categories, $cnt_arr_datapoints){
 		//as of 9/11/2014, in order to get labels correct, we need to change the header text in blocks_select_fields for the first {number of series'} fields
@@ -193,8 +297,7 @@ class ChartBlock extends Block {
 		}
 		return $return_val;
 	}
+	
+*/	
 }
-
-
-
 ?>

@@ -40,15 +40,15 @@ class Report_card_model extends Report_model {
 	}
 	
 	/**
-	 * @method set_row_to_series - used when each row from a set of database results corresponds with a series of data.
+	 * @method setRowToSeries - used when each row from a set of database results corresponds with a series of data.
 	 * @param array of field name base text (for percentages, add '_pct')
 	 * @return array of data for the graph
 	 * @access protected
 	 *
 	 **/
-	protected function set_row_to_series($data, $arr_fieldname_base, $arr_categories){
+	protected function setRowToSeries($data, $arr_fieldname_base, $arr_categories){
 		if($this->is_historical){
-			return parent::set_row_to_series($data, $arr_fieldname_base, $arr_categories);
+			return parent::setRowToSeries($data, $arr_fieldname_base, $arr_categories);
 		}
 		if(is_array($data) && !empty($data)){
 			foreach($data as $k=>$row){

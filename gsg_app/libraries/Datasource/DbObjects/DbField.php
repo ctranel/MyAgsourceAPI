@@ -135,6 +135,14 @@ class DbField implements iDataField {
 	public function dbTableName(){
 		return $this->db_table_name;
 	}
+	
+	public function unitOfMeasure(){
+		return $this->unit_of_measure;
+	}
+	
+	public function dataType(){
+		return $this->datatype;
+	}
 
 	public function decimalScale(){
 		return $this->decimal_scale;

@@ -1367,68 +1367,6 @@ class Auth extends Ionauth {
 		redirect(site_url($this->redirect_url));
 	}
 	
-	// used with dashboard graph
-	function graph_snapshot($report, $type = NULL) {
-		$this->load->helper('report_chart_helper');
-		$graph['config'] = array(
-			'xAxis' => array(
-				'title' => array(
-					'text' => 'Days in Milk, Current Lactation'
-				)
-			),
-			'yAxis' => array(
-				0 => array(
-					'title' => array(
-						'text' => 'Avg Linear Score'
-					)
-				),
-				1 => array(
-					'title' => array(
-						'text' => 'Net Merit Amt'
-					),
-					'opposite' => "TRUE"
-				)
-			),
-			'series' => array(
-				0 => array(
-					'name' => 'Avg Linear Score',
-					'yAxis' => '0'
-				),
-				1=> array(
-					'name' => 'Net Merit Amt',
-					'yAxis' => '1'
-				)
-			),
-			'title' => array(
-				'text' => 'Lactation Graph 3'
-			),
-			'subtitle' => array(
-				'text' => 'Avg Linear Score and Net Merit'
-			),
-		);
-		$this->load->library('chart');
-		$graph['data'] = $this->chart->get_sample_graph_data('35991623', 'M');
-
-		$return_val = prep_output($output, $graph, $report_count, $return_output);
-		if($return_val) return $return_val;
-
-/*	    if ($type == 'ajax') // load inline view for call from ajax
-	        $this->load->view('data', $graph);
-
-	    else if ($type == 'chart') {
-			// Set the JSON header
-			header("Content-type: text/javascript");
-			$graph['config']['chart']['renderTo'] = '';
-			$return_val = 'process_chart(' . json_encode($graph) . ');';
-	    	echo $return_val;
-	    	//echo $this->cow_heifer . ' - ' . $this->herd_code . ' - ' . $this->animal_model;
-	    	exit;
-	    }
-
-	    else // load the default view
-	        var_dump($graph);
-	    	//$this->load->view('default', $graph);
-*/	}
 	protected function _record_access($event_id){
 		if($this->session->userdata('user_id') === FALSE){
 			return FALSE;

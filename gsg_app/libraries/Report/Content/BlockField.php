@@ -123,6 +123,10 @@ abstract class BlockField {
 		return $this->data_field->defaultSortOrder();
 	}
 	
+	public function unitOfMeasure() {
+		return $this->data_field->unitOfMeasure();
+	}
+	
 	public function dbTableName() {
 		return $this->data_field->dbTableName();
 	}

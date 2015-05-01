@@ -22,7 +22,7 @@ class Fresh_cow_summary_model extends Report_model {
 	function get_graph_data($arr_fieldname_base, $herd_code, $num_dates = 12, $date_field, $block_url, $categories = NULL){
 		$data = $this->get_graph_dataset($herd_code, $num_dates, $date_field, $block_url);
 		$num_boxplots = (count($arr_fieldname_base) / 3);
-		$return_val = $this->set_boxplot_data($data, 'fresh_month', $num_boxplots);
+		$return_val = $this->setBoxplotData($data, 'fresh_month', $num_boxplots);
 		return $return_val;
 	}
 	

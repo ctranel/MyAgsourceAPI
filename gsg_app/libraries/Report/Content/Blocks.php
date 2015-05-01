@@ -82,7 +82,7 @@ class Blocks {// implements iReportContentRepository {
 		}
 		else{
 			$block = new ChartBlock($this->datasource_blocks, $r['id'], $r['page_id'], $r['name'], $r['description'], $r['scope'], $r['active'], $r['path'], $r['max_rows'], $r['cnt_row'], 
-				$r['sum_row'], $r['avg_row'], $r['bench_row'], $r['is_summary'], $r['display_type'], $this->supplemental_factory);
+				$r['sum_row'], $r['avg_row'], $r['bench_row'], $r['is_summary'], $r['display_type'], $r['chart_type'], $this->supplemental_factory);
 		}
 		return $block;
 	}
@@ -113,7 +113,7 @@ class Blocks {// implements iReportContentRepository {
 				}
 			}
 			else{
-				$blocks->attach(new ChartBlock($this->datasource_blocks, $r['id'], $r['page_id'], $r['name'], $r['description'], $r['scope'], $r['active'], $r['path'], $r['max_rows'], $r['cnt_row'], $r['sum_row'], $r['avg_row'], $r['bench_row'], $r['is_summary'], $r['display_type'], $this->supplemental_factory));
+				$blocks->attach(new ChartBlock($this->datasource_blocks, $r['id'], $r['page_id'], $r['name'], $r['description'], $r['scope'], $r['active'], $r['path'], $r['max_rows'], $r['cnt_row'], $r['sum_row'], $r['avg_row'], $r['bench_row'], $r['is_summary'], $r['display_type'], $r['chart_type'], $this->supplemental_factory));
 			}
 		}
 		return $blocks;

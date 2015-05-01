@@ -85,7 +85,7 @@ abstract class parent_report extends CI_Controller {
 	protected $arr_sort_order = array();
 	protected $product_name;
 	protected $report_path;
-	protected $primary_model_name;
+	//protected $primary_model_name;
 	protected $section_path; //The path to the site section; set in constructor to point to the controller name
 	protected $page_header_data;
 	protected $filters; //filters object
@@ -147,13 +147,15 @@ abstract class parent_report extends CI_Controller {
 		$block_name = '';
 		$this->page = $this->pages->getByPath($page_name, $this->section->id());
 		$this->report_path = $this->section_path . $this->page->path();
-		$this->primary_model_name = $this->page->path() . '_model';
+		//$this->primary_model_name = $this->page->path() . '_model';
 		$this->report_form_id = 'report_criteria';//filter-form';
 		$this->page_header_data['top_sections'] = $this->as_ion_auth->top_sections;
 		$this->page_header_data['user_sections'] = $this->as_ion_auth->user_sections;
 		$this->page_header_data['num_herds'] = $this->herd_access->getNumAccessibleHerds($this->session->userdata('user_id'), $this->as_ion_auth->arr_task_permissions(), $this->session->userdata('arr_regions'));
 		
-		//load most specific model available.  Must load model before setting section
+		/*
+		 * 
+		load most specific model available.  Must load model before setting section
 		//Load the most specific model that exists
 		if(file_exists(APPPATH . 'models/' . $this->section_path . $block_name . '_model.php')){
 			$this->primary_model_name = $block_name. '_model';
@@ -167,7 +169,7 @@ abstract class parent_report extends CI_Controller {
 			$this->primary_model_name = 'report_model';
 			$this->load->model('report_model', '', FALSE, $this->section_path);
 		}
-		
+		 */
 		/* Load the profile.php config file if it exists*/
 		if (ENVIRONMENT == 'development' || ENVIRONMENT == 'localhost') {
 			$this->config->load('profiler', false, true);
@@ -261,7 +263,7 @@ abstract class parent_report extends CI_Controller {
 							$this->arr_sort_order = array_values(explode('|', $sort_order));
 						}
 						else {
-							$tmp = $this->{$this->primary_model_name}->get_default_sort($pb->path());
+							$tmp = $pb->get_default_sort($pb->path());
 							$this->arr_sort_by = $tmp['arr_sort_by'];
 							$this->arr_sort_order = $tmp['arr_sort_order'];
 							$sort_by = implode('|', $this->arr_sort_by);
@@ -309,7 +311,7 @@ abstract class parent_report extends CI_Controller {
 							$this->arr_sort_order = array_values(explode('|', $sort_order));
 						}
 						else {
-							$tmp = $this->{$this->primary_model_name}->get_default_sort($pb->path());
+							$tmp = $pb->get_default_sort($pb->path());
 							$this->arr_sort_by = $tmp['arr_sort_by'];
 							$this->arr_sort_order = $tmp['arr_sort_order'];
 							$sort_by = implode('|', $this->arr_sort_by);
@@ -353,7 +355,6 @@ abstract class parent_report extends CI_Controller {
 					$this->arr_sort_order = array_values(explode('|', $sort_order));
 				}
 				if($arr_block_in == NULL || in_array($pb->path(), $arr_block_in)){
-//					$this->{$this->primary_model_name}->populate_field_meta_arrays($pb['id']);
 					//set up next iteration
 					$arr_blk_data = array(
 						'block_num' => $x, 
@@ -363,7 +364,7 @@ abstract class parent_report extends CI_Controller {
 					);
 					$arr_view_blocks[] = $this->load->view($pb->displayType(), $arr_blk_data, TRUE);
 					//add js line to populate the block after the page loads
-					$tmp_js .= "updateBlock(\"block-canvas$x\", \"" . $pb->path() . "\", \"$x\", \"null\", \"null\",\"false\");\n";//, \"" . $this->{$this->primary_model_name}->arr_blocks[$this->page->path()]['display'][$display][$block]['description'] . "\", \"" . $bench_text . "\");\n";
+					$tmp_js .= "updateBlock(\"block-canvas$x\", \"" . $pb->path() . "\", \"$x\", \"null\", \"null\",\"false\");\n";
 					$tmp_js .= "if ($( '#datepickfrom' ).length > 0) $( '#datepickfrom' ).datepick({dateFormat: 'mm-dd-yyyy'});";
 					$tmp_js .= "if ($( '#datepickto' ).length > 0) $( '#datepickto' ).datepick({dateFormat: 'mm-dd-yyyy'});";
 					$tmp_block = $pb->path();
@@ -407,7 +408,7 @@ abstract class parent_report extends CI_Controller {
 				[
 					'title'=>$this->product_name . ' - ' . $this->config->item('site_title'),
 					'description'=>$this->product_name . ' - ' . $this->config->item('site_title'),
-					'message' => array($this->session->flashdata('message')) + $this->{$this->primary_model_name}->arr_messages,
+					'message' => [$this->session->flashdata('message')],// + $this->{$this->primary_model_name}->arr_messages,
 					'section_nav' => $this->load->view('section_nav', $arr_sec_nav_data, TRUE),
 					'page_heading' => $this->product_name . " for Herd " . $this->herd->herdCode(),
 					'arr_head_line' => array(
@@ -439,7 +440,7 @@ abstract class parent_report extends CI_Controller {
 			}
 			$this->page_header_data['arr_headjs_line'][] = 'function(){' . $tmp_js . ';}';
 		}
-		unset($this->{$this->primary_model_name}->arr_messages); //clear message var once it is displayed
+		//unset($this->{$this->primary_model_name}->arr_messages); //clear message var once it is displayed
 		$this->load->model('setting_model');
 		$this->load->model('benchmark_model');
 		

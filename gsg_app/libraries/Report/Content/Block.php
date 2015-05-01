@@ -200,7 +200,6 @@ abstract class Block implements iBlock {
 		$this->display_type = $display_type;
 		
 		//load data for remaining fields
-		$this->report_fields = $this->setReportFields($supp_factory);
 		$this->setDefaultSort();
 		//@todo: joins
 	}
@@ -217,14 +216,21 @@ abstract class Block implements iBlock {
 		return $this->path;
 	}
 
+	public function title(){
+		return $this->name;
+	}
+	public function maxRows(){
+		return $this->max_rows;
+	}
+/*
 	public function name(){
 		return $this->name;
 	}
 
-	public function title(){
+	public function description(){
 		return $this->description;
 	}
-
+*/
 	public function pivotFieldName(){
 		return $this->pivot_field->dbFieldName();
 	}
@@ -282,6 +288,24 @@ abstract class Block implements iBlock {
 		return $ret;
 	}
 	
+	/**
+	 * @method getOutputData
+	 * @return array of output data for block
+	 * @access public
+	 *
+	 **/
+	public function getOutputData(){
+		return [
+			'name' => $this->name,
+			'description' => $this->name,
+			'filter_text' => $this->filters->get_filter_text(),
+			'client_data' => [
+				'block' => $this->path, //original program included sort_by, sort_order, graph_order but couldn't find anywhere it was used
+			],
+		];
+	}
+
+		
 	/**
 	 * @method sortText()
 	 * @return string sort text
@@ -483,6 +507,9 @@ abstract class Block implements iBlock {
 			}
 		}
 		//@todo: supplemental params
+		//@todo: axes fields
+		
+		//@todo: complementary fields (report card snapshot = ~3-4 fields per item)
 		
 		
 		return $ret;

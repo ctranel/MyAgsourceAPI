@@ -12,11 +12,9 @@
  * -----------------------------------------------------------------
  */
 
-class Filter_model extends Report_Model {
+class Filter_model extends CI_Model {
 	public function __construct(){
 		parent::__construct();
-		$this->db_group_name = 'default';
-		$this->{$this->db_group_name} = $this->load->database($this->db_group_name, TRUE);
 	}
 
 	
@@ -60,11 +58,11 @@ class Filter_model extends Report_Model {
 	 **/
 	public function get_page_filters($section_id, $page_path) {
 		$ret_array = array();
-		$results = $this->{$this->db_group_name}
+		$results = $this->db
 		->select('pf.name, pf.type, pf.options_source, pf.default_value, pf.db_field_name')
 		->where('p.section_id', $section_id)
 		->where('p.path', $page_path)
-		->join($this->tables['pages'] . ' p', "pf.page_id = p.id", "inner")
+		->join('users.dbo.pages p', "pf.page_id = p.id", "inner")
 		->order_by('pf.list_order')
 		->get('users.dbo.page_filters pf')
 		->result_array();
@@ -87,17 +85,17 @@ class Filter_model extends Report_Model {
 	public function getCriteriaOptions($source_table, $herd_code = null) {
 		list($db, $schema, $table) = explode('.', $source_table);
 		$sql = "USE " . $db . "; SELECT column_name FROM information_schema.columns WHERE table_name = '" . trim($table) . "' AND column_name = 'herd_code'";
-		$arr_fields = $this->{$this->db_group_name}->query($sql)->result_array();
+		$arr_fields = $this->db->query($sql)->result_array();
 		if(count($arr_fields) > 0){
 			if(isset($herd_code) && !empty($herd_code)){
-				$this->{$this->db_group_name}->where('herd_code', $herd_code);
+				$this->db->where('herd_code', $herd_code);
 			}
 			else {
 				return false;
 			}
 		}
 		
-		$results = $this->{$this->db_group_name}
+		$results = $this->db
 		->select('value, label, is_default')
 		->order_by('list_order')
 		->get($source_table)
