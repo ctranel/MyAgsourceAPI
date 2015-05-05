@@ -53,6 +53,12 @@ abstract class parent_report extends CI_Controller {
 	protected $section;
 	
 	/**
+	 * section_path
+	 * @var string
+	 **/
+	protected $section_path;
+	
+	/**
 	 * pages
 	 * 
 	 * page repository
@@ -88,7 +94,6 @@ abstract class parent_report extends CI_Controller {
 	protected $product_name;
 	protected $report_path;
 	//protected $primary_model_name;
-	protected $section_path; //The path to the site section; set in constructor to point to the controller name
 	protected $page_header_data;
 	protected $filters; //filters object
 	protected $print_all = FALSE;
@@ -117,10 +122,10 @@ abstract class parent_report extends CI_Controller {
 		$class_dir = $this->router->fetch_directory(); //this should match the name of this file (minus ".php".  Also used as base for css and js file names and model directory name
 		$class = $this->router->fetch_class();
 		$method = $this->router->fetch_method();
-		$this->section_path = $class_dir . $class . '/';
+		$this->section_path = $class_dir . $class;
 
 		//load sections
-		$this->section = $sections->getByPath($this->section_path);
+		$this->section = $sections->getByPath($this->section_path . '/');
 		$this->session->set_userdata('section_id', $this->section->id());
 		$sections->loadChildren($this->section, $this->pages, $this->session->userdata('user_id'), $this->herd, $this->ion_auth_model->getTaskPermissions());
 		$path = uri_string();
@@ -148,7 +153,7 @@ abstract class parent_report extends CI_Controller {
 		$page_name = $method;
 		$block_name = '';
 		$this->page = $this->pages->getByPath($page_name, $this->section->id());
-		$this->report_path = $this->section_path . $this->page->path();
+		$this->report_path = $this->section_path . '/' . $this->page->path();
 		//$this->primary_model_name = $this->page->path() . '_model';
 		$this->report_form_id = 'report_criteria';//filter-form';
 		$this->page_header_data['top_sections'] = $this->as_ion_auth->top_sections;
@@ -347,13 +352,9 @@ abstract class parent_report extends CI_Controller {
 			$x = 0;
 			$consec_charts = 0;
 			$cnt = $arr_blocks->count();
-/*
-			$q = new SplQueue();
-			$q->enqueue($arr_blocks->current());
-			$arr_blocks->next();
-			$q->enqueue($arr_blocks->current());
-			$arr_blocks->next();
-*/			
+			$curr = null;
+			$next = null;
+
 			$arr_blocks->rewind();
 			$curr = $arr_blocks->current();
 			$arr_blocks->next();
@@ -365,7 +366,7 @@ abstract class parent_report extends CI_Controller {
 				if($arr_block_in == NULL || in_array($pb->path(), $arr_block_in)){
 					//set up next iteration
 					$display_type = $curr->displayType();
-					$next_display_type = $next instanceof PageBlock ? $next->displayType() : null;
+					$next_display_type = (isset($next) && $next instanceof PageBlock) ? $next->displayType() : null;
 					if(strpos($display_type, 'chart') !== false && strpos($next_display_type, 'chart') === false && $consec_charts === 0){
 						$odd_even = 'chart-only';
 					}
@@ -402,71 +403,6 @@ abstract class parent_report extends CI_Controller {
 				$arr_blocks->next();
 				$next = $arr_blocks->current();
 			}
-		
-			
-			
-/*		
-var_dump($arr_blocks);
-			foreach($arr_blocks as $c => $pb){
-				//load view for placeholder for block display
-				//when javascript framework is in place, this will be handled on the client
-				$this->arr_sort_by = [];
-				$this->arr_sort_order = [];
-				if(isset($sort_by) && isset($sort_order)){
-					$this->arr_sort_by = array_values(explode('|', $sort_by));
-					$this->arr_sort_order = array_values(explode('|', $sort_order));
-				}
-				if($arr_block_in == NULL || in_array($pb->path(), $arr_block_in)){
-					//set up next iteration
-					$display = $pb->displayType();
-
-					$next_pb = next($arr_blocks);
-					$next_display_type = $next_pb['display_type'];
-					if($display === 'chart' && $next_pb['display_type'] !== 'chart' && $prev_display_type !== 'chart'){
-						$odd_even = 'chart-only';
-					}
-					else{
-						if($consec_charts % 2 == 1) $odd_even = 'chart-even';
-						elseif($consec_charts == ($cnt - 1)) $odd_even = 'chart-last-odd';
-						else $odd_even = 'chart-odd';
-					}
-					//set up next iteration
-					$prev_display_type = $pb['display_type'];
-					if($display === 'table'){
-						$consec_charts = 0;
-					}
-					if($display === 'chart'){
-						$consec_charts++;
-					}
-					$arr_blk_data = array(
-						'block_num' => $x, 
-						'link_url' => site_url($this->section_path) . '/' . $this->page->path() . '/' . $pb->path(), 
-						'form_id' => $this->report_form_id,
-						'block' => $pb->path(),
-						'odd_even' => $odd_even,
-					);
-					$arr_view_blocks[] = $this->load->view($pb->displayType(), $arr_blk_data, TRUE);
-					//add js line to populate the block after the page loads
-					$tmp_js .= "updateBlock(\"block-canvas$x\", \"" . $pb->path() . "\", \"$x\", \"null\", \"null\",\"false\");\n";
-					$tmp_js .= "if ($( '#datepickfrom' ).length > 0) $( '#datepickfrom' ).datepick({dateFormat: 'mm-dd-yyyy'});";
-					$tmp_js .= "if ($( '#datepickto' ).length > 0) $( '#datepickto' ).datepick({dateFormat: 'mm-dd-yyyy'});";
-					$tmp_block = $pb->path();
-					$x++;
-				}
-			}
-*/		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
 		}
 		
 		//set up page header
