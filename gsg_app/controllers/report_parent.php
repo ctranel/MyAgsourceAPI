@@ -21,8 +21,10 @@ use \myagsource\dhi\Herd;
 use \myagsource\Site\WebContent\Sections;
 use \myagsource\Site\WebContent\Pages;
 use \myagsource\Site\WebContent\Blocks;
+use \myagsource\Site\WebContent\Block as PageBlock;
 use \myagsource\Report\Content\Csv;
 use \myagsource\Report\Content\Pdf;
+use \myagsource\Report\iBlock;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
@@ -248,7 +250,7 @@ abstract class parent_report extends CI_Controller {
 		//only use default criteria on initial page loads, when filter form is submitted, it reloads each individual block
 		$this->filters->setCriteria($this->section->id(), $this->page->path(), ['herd_code' =>	$this->herd->herdCode()]); //filter form submissions never trigger a new page load (i.e., this function is never fired by a form submission)
 		//END FILTERS
-
+/*
 		if ($display_format == 'csv'){
 			$csv = new Csv();
 			$data = array();
@@ -333,7 +335,7 @@ abstract class parent_report extends CI_Controller {
 			$this->reports->create_pdf($block, $this->product_name, NULL, $herd_data, 'P');
 			exit;
 		}
-
+*/
 		// render page
 		//get_herd_data
 		$herd_data = $this->herd_model->header_info($this->herd->herdCode());
@@ -344,10 +346,70 @@ abstract class parent_report extends CI_Controller {
 		if(isset($arr_blocks) && !empty($arr_blocks)){
 			$x = 0;
 			$consec_charts = 0;
-			$prev_display_type = '';
-			$cnt = count($arr_blocks);
+			$cnt = $arr_blocks->count();
+/*
+			$q = new SplQueue();
+			$q->enqueue($arr_blocks->current());
+			$arr_blocks->next();
+			$q->enqueue($arr_blocks->current());
+			$arr_blocks->next();
+*/			
+			$arr_blocks->rewind();
+			$curr = $arr_blocks->current();
+			$arr_blocks->next();
+			if($arr_blocks->valid()){
+				$next = $arr_blocks->current();
+			}
+
+			while($curr instanceof PageBlock){
+				if($arr_block_in == NULL || in_array($pb->path(), $arr_block_in)){
+					//set up next iteration
+					$display_type = $curr->displayType();
+					$next_display_type = $next instanceof PageBlock ? $next->displayType() : null;
+					if(strpos($display_type, 'chart') !== false && strpos($next_display_type, 'chart') === false && $consec_charts === 0){
+						$odd_even = 'chart-only';
+					}
+					else{
+						if($consec_charts % 2 == 1) $odd_even = 'chart-even';
+						elseif($x == ($cnt - 1)) $odd_even = 'chart-last-odd';
+						else $odd_even = 'chart-odd';
+					}
+					//set up next iteration
+					if($display_type === 'table'){
+						$consec_charts = 0;
+					}
+					if(strpos($display_type, 'chart') !== false){
+						$consec_charts++;
+					}
+					
+					$arr_blk_data = array(
+							'block_num' => $x,
+							'link_url' => site_url($this->section_path) . '/' . $this->page->path() . '/' . $curr->path(),
+							'form_id' => $this->report_form_id,
+							'block' => $curr->path(),
+							'odd_even' => $odd_even,
+					);
+					$arr_view_blocks[] = $this->load->view($curr->displayType(), $arr_blk_data, TRUE);
+					//add js line to populate the block after the page loads
+					$tmp_js .= "updateBlock(\"block-canvas$x\", \"" . $curr->path() . "\", \"$x\", \"null\", \"null\",\"false\");\n";
+					$tmp_js .= "if ($( '#datepickfrom' ).length > 0) $( '#datepickfrom' ).datepick({dateFormat: 'mm-dd-yyyy'});";
+					$tmp_js .= "if ($( '#datepickto' ).length > 0) $( '#datepickto' ).datepick({dateFormat: 'mm-dd-yyyy'});";
+					$tmp_block = $curr->path();
+					$x++;
+						
+				}
+				$curr = $next;
+				$arr_blocks->next();
+				$next = $arr_blocks->current();
+			}
+		
+			
+			
+/*		
+var_dump($arr_blocks);
 			foreach($arr_blocks as $c => $pb){
 				//load view for placeholder for block display
+				//when javascript framework is in place, this will be handled on the client
 				$this->arr_sort_by = [];
 				$this->arr_sort_order = [];
 				if(isset($sort_by) && isset($sort_order)){
@@ -356,11 +418,32 @@ abstract class parent_report extends CI_Controller {
 				}
 				if($arr_block_in == NULL || in_array($pb->path(), $arr_block_in)){
 					//set up next iteration
+					$display = $pb->displayType();
+
+					$next_pb = next($arr_blocks);
+					$next_display_type = $next_pb['display_type'];
+					if($display === 'chart' && $next_pb['display_type'] !== 'chart' && $prev_display_type !== 'chart'){
+						$odd_even = 'chart-only';
+					}
+					else{
+						if($consec_charts % 2 == 1) $odd_even = 'chart-even';
+						elseif($consec_charts == ($cnt - 1)) $odd_even = 'chart-last-odd';
+						else $odd_even = 'chart-odd';
+					}
+					//set up next iteration
+					$prev_display_type = $pb['display_type'];
+					if($display === 'table'){
+						$consec_charts = 0;
+					}
+					if($display === 'chart'){
+						$consec_charts++;
+					}
 					$arr_blk_data = array(
 						'block_num' => $x, 
 						'link_url' => site_url($this->section_path) . '/' . $this->page->path() . '/' . $pb->path(), 
 						'form_id' => $this->report_form_id,
 						'block' => $pb->path(),
+						'odd_even' => $odd_even,
 					);
 					$arr_view_blocks[] = $this->load->view($pb->displayType(), $arr_blk_data, TRUE);
 					//add js line to populate the block after the page loads
@@ -371,7 +454,21 @@ abstract class parent_report extends CI_Controller {
 					$x++;
 				}
 			}
+*/		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		}
+		
 		//set up page header
 		$this->carabiner->css('chart.css');
 		$this->carabiner->css('boxes.css');

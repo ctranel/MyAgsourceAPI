@@ -83,6 +83,7 @@ class Filter_model extends CI_Model {
 	 * @author ctranel
 	 **/
 	public function getCriteriaOptions($source_table, $herd_code = null) {
+		// if herd code is available in the lookup table, create herd code as a where criteria
 		list($db, $schema, $table) = explode('.', $source_table);
 		$sql = "USE " . $db . "; SELECT column_name FROM information_schema.columns WHERE table_name = '" . trim($table) . "' AND column_name = 'herd_code'";
 		$arr_fields = $this->db->query($sql)->result_array();
@@ -94,7 +95,7 @@ class Filter_model extends CI_Model {
 				return false;
 			}
 		}
-		
+		// run query
 		$results = $this->db
 		->select('value, label, is_default')
 		->order_by('list_order')

@@ -158,13 +158,17 @@ class ChartBlock extends Block {
 
 	/**
 	 * @method getAxesOutput
-	 * @return array of output data for block
+	 * @return array of output data for x and y axis.  null if no axes in chart
 	 * @access protected
 	 *
 	 **/
 	protected function getAxesOutput(){
 		$tmp = [];
+		$ret = [];
 		$cnt = 0;
+		if($this->x_axes->count() === 0 && $this->y_axes->count() === 0){
+			return;
+		}
 		foreach($this->x_axes as $a){
 			if($cnt === 0 || $a->category() === null){
 				$tmp[$cnt] = $a->getOutputData();
@@ -174,7 +178,9 @@ class ChartBlock extends Block {
 			}
 			$cnt++;
 		}
-		$ret['x'] = $tmp;
+		if(!empty($tmp)){
+			$ret['x'] = $tmp;
+		}
 	
 		$tmp = [];
 		$cnt = 0;
@@ -182,7 +188,9 @@ class ChartBlock extends Block {
 			$tmp[$cnt] = $a->getOutputData();
 			$cnt++;
 		}
-		$ret['y'] = $tmp;
+		if(!empty($tmp)){
+			$ret['y'] = $tmp;
+		}
 		return $ret;
 	}
 	
@@ -196,6 +204,9 @@ class ChartBlock extends Block {
 		$ret = parent::getOutputData();
 		$ret['chart_type'] = $this->chart_type;
 		$ret['arr_axes'] = $this->getAxesOutput();
+		if(empty($ret['arr_axes'])){
+			unset($ret['arr_axes']);
+		}
 		$ret['series'] = $this->getSeriesOutput();
 		return $ret;
 	}

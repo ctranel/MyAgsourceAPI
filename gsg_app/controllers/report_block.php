@@ -325,7 +325,6 @@ class report_block extends CI_Controller {
 				}
 			}
 		
-		
 			//prep data for filter library
 			$this->load->model('filter_model');
 			//load required libraries

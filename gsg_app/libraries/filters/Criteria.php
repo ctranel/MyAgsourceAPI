@@ -205,6 +205,7 @@ class Criteria{
 	protected function setOptions($herd_code){
 		if(isset($this->options_source) && !empty($this->options_source)){
 			$this->options = $this->filter_model->getCriteriaOptions($this->options_source, $herd_code);
+//var_dump($this->options);
 		}
 	}
 
