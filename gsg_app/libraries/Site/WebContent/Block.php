@@ -123,28 +123,6 @@ class Block implements iWebContent {
 	}
 
 	/**
-	 * @method loadData()
-	 * @param int report_count
-	 * @return void
-	 * @access public
-	protected function loadData($report_count){
-		$arr_this_block = get_element_by_key($block, $this->{$this->primary_model_name}->arr_blocks);
-		$this->max_rows = $arr_this_block['max_rows'];
-		$this->cnt_row = $arr_this_block['cnt_row'];
-		$this->sum_row = $arr_this_block['sum_row'];
-		$this->avg_row = $arr_this_block['avg_row'];
-		$this->bench_row = $arr_this_block['bench_row'];
-		$this->pivot_db_field = isset($arr_this_block['pivot_db_field']) ? $arr_this_block['pivot_db_field'] : NULL;
-		if($this->display == 'table' || $this->display == 'array'){
-			$this->load_table($arr_this_block, $report_count);
-		}
-		elseif($this->display == 'chart'){
-			$this->load_chart($arr_this_block, $report_count);
-		}
-	}
-	* */
-	
-	/**
 	 * @method loadChildren()
 	 * @param \SplObjectStorage children
 	 * @return void
@@ -154,24 +132,6 @@ class Block implements iWebContent {
 		$this->children = $children;
 	}
 	
-	/*
-	 * getCompleteData
-	 * 
-	 * @param int page_id
-	 * @author ctranel
-	 * @returns SplObjectStorage of Blocks
-	public function getCompleteData($page_id){
-		$children = new \SplObjectStorage();
-		
-		$criteria = ['page_id' => $page_id];
-		$join = ['pages_block pb' => 'p.id = pb.page_id'];
-		$results = $this->datasource_blocks->getByCriteria($criteria, $join);
-		if(empty($results)){
-			return false;
-		}
-		return new Page($this->datasource_blocks, $results[0]['id'], $results[0]['parent_id'], $results[0]['name'], $results[0]['description'], $results[0]['scope'], $results[0]['path']);
-	}
-	 */
 }
 
 

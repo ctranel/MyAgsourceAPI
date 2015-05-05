@@ -3,10 +3,6 @@ namespace myagsource\Supplemental\Content;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-//require_once(APPPATH . 'libraries' . FS_SEP . 'MyaObjectStorage.php');
-//use \myagsource\MyaObjectStorage;
-
-
 /**
 * Contains properties and methods specific supplemental data comments for various sections of the website.
 * 

@@ -64,7 +64,7 @@ $autoload['libraries'] = array('database','as_ion_auth','session','carabiner');
 |	$autoload['helper'] = array('url', 'file');
 */
 
-$autoload['helper'] = array('url','form','html','json','error');
+$autoload['helper'] = array('url','form','html','error');
 
 
 /*

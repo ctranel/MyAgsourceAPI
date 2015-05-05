@@ -8,7 +8,6 @@ require_once(APPPATH . 'libraries/Supplemental/Content/SupplementalComment.php')
 use \myagsource\Supplemental\Content\Supplemental;
 use \myagsource\Supplemental\Content\SupplementalLink;
 use \myagsource\Supplemental\Content\SupplementalComment;
-//use \myagsource\MyaObjectStorage;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /**
