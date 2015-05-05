@@ -208,6 +208,9 @@ class ChartBlock extends Block {
 			unset($ret['arr_axes']);
 		}
 		$ret['series'] = $this->getSeriesOutput();
+		if(empty($ret['series'])){
+			unset($ret['series']);
+		}
 		return $ret;
 	}
 
@@ -218,6 +221,9 @@ class ChartBlock extends Block {
 	 *
 	 **/
 	protected function getSeriesOutput(){
+		if(!empty($this->categories)){
+			return $this->derive_series();//count($this->json['data'], COUNT_RECURSIVE));
+		}
 		$ret = [];
 		foreach($this->report_fields as $f){
 			if($f->isDisplayed()){
@@ -272,34 +278,32 @@ class ChartBlock extends Block {
 		$this->json['filter_text'] = $this->filters->get_filter_text();
 	}
 
+*/	
 	
-	protected function derive_series($arr_fields, $chart_type, $arr_categories, $cnt_arr_datapoints){
+	protected function derive_series(){//$cnt_arr_datapoints){
 		//as of 9/11/2014, in order to get labels correct, we need to change the header text in blocks_select_fields for the first {number of series'} fields
 		//in order for this function to work correctly, the DB view must have all fields in one row, or have series' as columns and categories as row keys.
-		$return_val = array();
+		$return_val = [];
 		$c = 0;
-		$arr_chart_type = $this->{$this->primary_model_name}->get_chart_type_array();
-		$arr_axis_index = $this->{$this->primary_model_name}->get_axis_index_array();
 	
 		//allow for normalized or non-normalized data
-		if((int)($cnt_arr_datapoints / count($arr_fields)) === 1){
-			$num_series = count($arr_fields) / count($arr_categories);
-		}
-		else{
-			$num_series = count($arr_fields);
-		}
+//		if((int)($cnt_arr_datapoints / $this->report_fields->count()) === 1){
+			$num_series = $this->report_fields->count() / count($this->categories);
+//		}
+//		else{
+//			$num_series = $this->report_fields->count();
+//		}
 	
-		foreach($arr_fields as $k=>$f){
-			//these 2 arrays need to have the same numeric index so that the yaxis# can be correctly assigned to series
-			$return_val[$c]['name'] = $k;
-			if(isset($this->{$this->primary_model_name}->arr_unit_of_measure[$f]) && !empty($this->{$this->primary_model_name}->arr_unit_of_measure[$f])){
-				$return_val[$c]['um'] = $this->{$this->primary_model_name}->arr_unit_of_measure[$f];
+		foreach($this->report_fields as $f){
+			$return_val[$c]['name'] = $f->displayName();
+			if($f->unitOfMeasure()){
+				$return_val[$c]['um'] = $f->unitOfMeasure();
 			}
-			if(isset($arr_axis_index[$f]) && !empty($arr_axis_index[$f])){
-				$return_val[$c]['yAxis'] = $arr_axis_index[$f];
+			if($f->axisIndex()){
+				$return_val[$c]['yAxis'] = $f->axisIndex();
 			}
-			if(isset($arr_chart_type[$f]) && !empty($arr_chart_type[$f])){
-				$return_val[$c]['type'] = $arr_chart_type[$f];
+			if($f->chartType()){
+				$return_val[$c]['type'] = $f->chartType();
 			}
 			$c++;
 			if($c >= $num_series){
@@ -308,7 +312,5 @@ class ChartBlock extends Block {
 		}
 		return $return_val;
 	}
-	
-*/	
 }
 ?>

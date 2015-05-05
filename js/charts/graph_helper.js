@@ -147,7 +147,7 @@ function process_chart(div_id, data_in){
 	
 					if(data_in.chart_type != 'bar'){
 						options.xAxis[cnt].title = {"text": data_in.arr_axes.x[c].text};
-						if(data_in.arr_axes.x[c].data_type.indexOf('date') >= 0){
+						if(data_in.arr_axes.x[c].data_type != null && data_in.arr_axes.x[c].data_type.indexOf('date') >= 0){
 							options.xAxis[cnt].labels = {"rotation": -35};//, "align": 'left', "x": -50, "y": 55};
 						}
 						else{
