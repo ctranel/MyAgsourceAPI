@@ -379,7 +379,7 @@ class report_block extends CI_Controller {
 		*/
 
 		//Gather meta-data into $this->report_data
-		$this->report_data = $block->getOutputData();
+		$this->report_data = $block->getOutputData();//count($results, COUNT_RECURSIVE));
 		$this->report_data['herd_code'] = $this->session->userdata('herd_code');
 		if($block->hasBenchmark()){
 			$this->report_data['benchmark_text'] = $this->benchmarks->get_bench_text();

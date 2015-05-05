@@ -196,11 +196,12 @@ class ChartBlock extends Block {
 	
 	/**
 	 * @method getOutputData
+	 * @param int number of datapoints
 	 * @return array of output data for block
 	 * @access public
 	 *
 	 **/
-	public function getOutputData(){
+	public function getOutputData(){//$cnt_datapoints){
 		$ret = parent::getOutputData();
 		$ret['chart_type'] = $this->chart_type;
 		$ret['arr_axes'] = $this->getAxesOutput();
@@ -216,13 +217,14 @@ class ChartBlock extends Block {
 
 	/**
 	 * @method getSeriesOutput
+	 * @param int number of datapoints
 	 * @return array of output data for block
 	 * @access protected
 	 *
 	 **/
-	protected function getSeriesOutput(){
+	protected function getSeriesOutput(){//$cnt_datapoints){
 		if(!empty($this->categories)){
-			return $this->derive_series();//count($this->json['data'], COUNT_RECURSIVE));
+			return $this->deriveSeries();//count($this->json['data'], COUNT_RECURSIVE));
 		}
 		$ret = [];
 		foreach($this->report_fields as $f){
@@ -280,19 +282,27 @@ class ChartBlock extends Block {
 
 */	
 	
-	protected function derive_series(){//$cnt_arr_datapoints){
+	/**
+	 * @method deriveSeries
+	 * @param int number of datapoints
+	 * @return array of output data for block
+	 * @access protected
+	 *
+	 **/
+	protected function deriveSeries(){//$cnt_datapoints){
 		//as of 9/11/2014, in order to get labels correct, we need to change the header text in blocks_select_fields for the first {number of series'} fields
 		//in order for this function to work correctly, the DB view must have all fields in one row, or have series' as columns and categories as row keys.
 		$return_val = [];
 		$c = 0;
 	
-		//allow for normalized or non-normalized data
-//		if((int)($cnt_arr_datapoints / $this->report_fields->count()) === 1){
+
+		//if there is more than one datapoint per category
+		if((int)($this->report_fields->count() / count($this->categories)) > 1){
 			$num_series = $this->report_fields->count() / count($this->categories);
-//		}
-//		else{
-//			$num_series = $this->report_fields->count();
-//		}
+		}
+		else{
+			$num_series = $this->report_fields->count();
+		}
 	
 		foreach($this->report_fields as $f){
 			$return_val[$c]['name'] = $f->displayName();
