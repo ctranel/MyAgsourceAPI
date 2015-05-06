@@ -1,6 +1,6 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 require_once APPPATH . 'controllers/report_parent.php';
-class Progeny extends parent_report {
+class Progeny extends report_parent {
 	function __construct(){
 		parent::__construct();
 		/* Load the profile.php config file if it exists

@@ -39,7 +39,7 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
  * -----------------------------------------------------------------
  */
 
-abstract class parent_report extends CI_Controller {
+abstract class report_parent extends CI_Controller {
 	/**
 	 * herd_access
 	 * @var HerdAccess

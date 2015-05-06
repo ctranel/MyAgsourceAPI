@@ -272,11 +272,6 @@ class report_block extends CI_Controller {
 		//End load model
 		*/
 		
-		//LOAD SUPPLEMENTAL FACTORY (needs to be set before setting block report fields)
-//		$this->load->model('supplemental_model');
-//		$supp_factory = new SupplementalFactory($this->supplemental_model, site_url());
-		//END SUPPLEMENTAL FACTORY
-		
 		$block = $this->blocks->getByPath(urldecode($block_name));
 		$output = $block->displayType();
 		
@@ -427,11 +422,9 @@ class report_block extends CI_Controller {
 		}
 		//end table
 
-//var_dump($this->report_data); die;
-		$return_val = json_encode($this->report_data);//, JSON_HEX_QUOT | JSON_HEX_TAG); //json_encode_jsfunc
-//		$return_val = $block->getOutputData();//prep_output($output, $this->json, $report_count, $file_format);
     	
 		//@todo: base header on accept property of request header 
+		$return_val = json_encode($this->report_data);//, JSON_HEX_QUOT | JSON_HEX_TAG); //json_encode_jsfunc
 		header("Content-type: application/json"); //being sent as json
 		echo $return_val;
 		if($return_val) {

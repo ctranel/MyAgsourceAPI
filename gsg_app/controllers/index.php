@@ -8,7 +8,7 @@ use \myagsource\report_filters\Filters;
 
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Index extends parent_report {
+class Index extends report_parent {
 	protected $page_header_data;
 	protected $footer_data;
 	protected $data;
