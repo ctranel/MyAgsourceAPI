@@ -99,11 +99,11 @@ end table headings */
 /* inter-chart navigation */
 #report-links {border: solid 1px #003C39; margin: 15px auto; padding: 10px; background-color: #E6F4F4; clear: left;}
 #report-links {border-top: solid 5px #EF5C29;}
-#report-links a {color:#003C39;}
+#report-links a {color:#003C39; padding: 0 5px;}
 #report-links a.current {font-weight: bold;}
-ul.report-nav {margin: 0; list-style: none; border: none; padding-left: 5px;}
+ul.report-nav {margin: 0; list-style: none; border: none;}
 ul.report-nav {display:inline; margin: 0; list-style: none; border: none;}
-ul.report-nav li {display:inline; padding: 0px 5px; border-left: solid 1px #003C39; margin: 0 0 0 -5px;}
+ul.report-nav li {display:inline; border-left: solid 1px #003C39;}
 ul.report-nav li.first {border-left: none;}
 ul.report-nav li a {text-decoration: none; font: normal .85em helvetica,arial,sans-serif; color:#003C39; white-space: nowrap;}
 ul.report-nav li a:hover {text-decoration: underline;}
