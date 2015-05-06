@@ -172,6 +172,12 @@ abstract class Block implements iBlock {
 	 **/
 	protected $joins;
 	
+	/**
+	 * joins
+	 * @var Joins
+	 **/
+	protected $supp_factory;
+	
 	
 /**
 	 * __construct
@@ -198,6 +204,7 @@ abstract class Block implements iBlock {
 		//$this->group_by_fields = $group_by_fields;
 		//$this->where_fields = $group_by_fields;
 		$this->display_type = $display_type;
+		$this->supp_factory = $supp_factory;
 		
 		//load data for remaining fields
 		$this->setDefaultSort();
@@ -507,11 +514,7 @@ abstract class Block implements iBlock {
 			}
 		}
 		//@todo: supplemental params
-		//@todo: axes fields
-		
 		//@todo: complementary fields (report card snapshot = ~3-4 fields per item)
-		
-		
 		return $ret;
 	}
 	
