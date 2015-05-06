@@ -101,7 +101,7 @@ end table headings */
 #report-links {border-top: solid 5px #EF5C29;}
 #report-links a {color:#003C39; padding: 0 5px;}
 #report-links a.current {font-weight: bold;}
-ul.report-nav {margin: 0; list-style: none; border: none;}
+ul.report-nav {margin: 0; padding: 0; list-style: none; border: none;}
 ul.report-nav {display:inline; margin: 0; list-style: none; border: none;}
 ul.report-nav li {display:inline; border-left: solid 1px #003C39;}
 ul.report-nav li.first {border-left: none;}
