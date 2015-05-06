@@ -115,7 +115,9 @@ function process_chart(div_id, data_in){
 		subtitle += data_in.filter_text;
 	}
 	if (typeof(data_in.supplemental) !== 'undefined' && data_in.supplemental !== null && data_in.supplemental !== ''){
-		subtitle += '<div class="supplemental-link">' + data_in.supplemental + '</div>';
+		for(var i in data_in.supplemental.links){
+			subtitle += '<div class="supplemental-link">' + data_in.supplemental.links[i] + '</div>';
+		}
 	}
 	if(subtitle !== ''){
 		options.subtitle = {"text": subtitle, "useHTML": true};
