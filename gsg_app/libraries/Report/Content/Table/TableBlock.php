@@ -64,6 +64,7 @@ class TableBlock extends Block {
 					}
 					if(isset($s['supp_id'])){
 						$data_supp = $this->supp_factory->getColDataSupplemental($s['supp_id'], $s['a_href'], $s['a_rel'], $s['a_title'], $s['a_class']);
+						$this->supp_param_fieldnames = array_unique(array_merge($this->supp_param_fieldnames, $data_supp->getLinkParamFields()));
 					}
 				}
 				$arr_table_ref_cnt[$s['table_name']] = isset($arr_table_ref_cnt[$s['table_name']]) ? ($arr_table_ref_cnt[$s['table_name']] + 1) : 1;

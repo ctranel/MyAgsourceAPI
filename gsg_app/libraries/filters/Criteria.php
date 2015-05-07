@@ -65,15 +65,29 @@ class Criteria{
 
 	*  Returns array of options
 
-	*  @since: version 1
 	*  @author: ctranel
 	*  @date: Oct 15, 2014
 	*  @return: array 
 	*  @throws: 
 	* -----------------------------------------------------------------
-	*/
 	public function getOptions(){
 		return $this->options;
+	}
+	*/
+
+	/* -----------------------------------------------------------------
+	*  isDisplayed
+
+	*  Returns boolean
+
+	*  @author: ctranel
+	*  @date: 05-06-2015
+	*  @return: boolean 
+	*  @throws: 
+	* -----------------------------------------------------------------
+	*/
+	public function isDisplayed(){
+		return count($this->options) > 1 || !isset($this->options_source);
 	}
 
 	/* -----------------------------------------------------------------
@@ -81,7 +95,6 @@ class Criteria{
 
 	*  Returns filter text
 
-	*  @since: version 1
 	*  @author: ctranel
 	*  @date: Jun 17, 2014
 	*  @return: string filter text
@@ -205,7 +218,6 @@ class Criteria{
 	protected function setOptions($herd_code){
 		if(isset($this->options_source) && !empty($this->options_source)){
 			$this->options = $this->filter_model->getCriteriaOptions($this->options_source, $herd_code);
-//var_dump($this->options);
 		}
 	}
 

@@ -58,11 +58,10 @@ class Supplemental implements iSupplemental
 	}
 	
 	/* -----------------------------------------------------------------
-	 *  Factory for supplemental objects for blocks
+	 * getContent
 	
 	*  Factory for supplemental objects for blocks
 	
-	*  @since: version
 	*  @author: ctranel
 	*  @date: Oct 28, 2014
 	*  @return: Array of strings
@@ -79,6 +78,35 @@ class Supplemental implements iSupplemental
 		if (isset($this->comments) && is_object($this->comments)){
 			foreach($this->comments as $s){
 				$arr_supplemental['comments'][] = $s->comment();
+			}
+		}
+		return $arr_supplemental;
+	}
+
+	/* -----------------------------------------------------------------
+	 * getContent
+	
+	*  Factory for supplemental objects for blocks
+	
+	*  @author: ctranel
+	*  @date: Oct 28, 2014
+	*  @return: Array of strings
+	*  @throws:
+	* -----------------------------------------------------------------*/
+	
+	public function getLinkParamFields(){
+		$arr_supplemental = [];
+		if(isset($this->links) && is_object($this->links)){
+			foreach($this->links as $s){
+				$params = $s->params();
+				if(isset($params) && $params->count() > 0){
+					foreach($params as $p){
+						$db_field_name = $p->value_db_field_name();
+						if(isset($db_field_name) && !empty($db_field_name)){
+							$arr_supplemental[] = $db_field_name;
+						}
+					}
+				}
 			}
 		}
 		return $arr_supplemental;

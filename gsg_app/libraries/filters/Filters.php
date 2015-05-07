@@ -69,7 +69,7 @@ class Filters{
 			return false;
 		}
 		foreach($this->arr_criteria as $c){
-			if(count($c->getOptions()) > 1) {
+			if($c->isDisplayed()) {
 				return true;
 			}
 		}

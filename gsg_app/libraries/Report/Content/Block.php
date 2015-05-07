@@ -173,11 +173,16 @@ abstract class Block implements iBlock {
 	protected $joins;
 	
 	/**
-	 * joins
-	 * @var Joins
+	 * supp_factory
+	 * @var SupplementalFactory
 	 **/
 	protected $supp_factory;
 	
+	/**
+	 * supp_param_fieldnames
+	 * @var array
+	 **/
+	protected $supp_param_fieldnames;
 	
 /**
 	 * __construct
@@ -205,6 +210,8 @@ abstract class Block implements iBlock {
 		//$this->where_fields = $group_by_fields;
 		$this->display_type = $display_type;
 		$this->supp_factory = $supp_factory;
+		
+		$this->supp_param_fieldnames = [];
 		
 		//load data for remaining fields
 		$this->setDefaultSort();
@@ -513,7 +520,12 @@ abstract class Block implements iBlock {
 				$ret[] = $f->selectFieldText();
 			}
 		}
-		//@todo: supplemental params
+		//supplemental params
+		if(isset($this->supp_param_fieldnames) && count($this->supp_param_fieldnames) > 0){
+			foreach($this->supp_param_fieldnames as $f){
+				$ret[] = $f;
+			}
+		}
 		//@todo: complementary fields (report card snapshot = ~3-4 fields per item)
 		return $ret;
 	}

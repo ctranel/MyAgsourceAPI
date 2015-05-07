@@ -25,8 +25,8 @@ class Events_model extends CI_Model {
 			->join ('rpm.dbo.report_cow_prod_2 p2', 'i.herd_code = p2.herd_code AND i.serial_num = p2.serial_num')
 			->get ('rpm.dbo.report_cow_id_1 i')
 			->result_array();
-		
-		if(is_array($arr_ret)){
+
+		if(is_array($arr_ret) && !empty($arr_ret)){
 			return $arr_ret[0];
 		}
 		return false;
