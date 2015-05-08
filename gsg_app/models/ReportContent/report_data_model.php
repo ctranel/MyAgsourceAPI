@@ -64,8 +64,6 @@ class Report_data_model extends CI_Model {
 	 **/
 	function search(iBlock $block, $select_fields, $arr_filter_criteria){//, $arr_sort_by = array(''), $arr_sort_order = array(''), $limit = NULL) {
 		$this->load->helper('multid_array_helper');
-//		$this->herd_code = $arr_filter_criteria['herd_code'];
-		$this->db->start_cache();
 		$this->db->from($block->primaryTableName());
 		/*
 		 * @todo: add joins
@@ -80,22 +78,6 @@ class Report_data_model extends CI_Model {
 			$this->prep_where_criteria($arr_filter_criteria);
 		}
 
-		/*now that the where clauses are set, let's see how many rows would be returned with that criteria.
-		 *If over 1000 and a filter has not yet been set for quartiles, add the 1st quartile as a filter.
-		 *Then we can add the select and sort data to the query.
-		 **/
-		$this->db->stop_cache();
-		if(isset($limit) === FALSE){
-			$this->db->select('COUNT(*) AS c');
-			$count_result = $this->db->get()->result_array();
-			$this->num_results = $count_result[0]['c'];
-			
-			if($this->num_results > 1000) {// && empty($arr_filter_criteria[$this->arr_auto_filter_field[0]])) {
-				$this->_set_autofilter($arr_filter_criteria);
-			}
-		}
-		else $this->db->limit($limit);
-
 		$this->db->group_by($block->getGroupBy());
 		$this->prep_sort($block); // the prep_sort function adds the sort field to the active record object
 
@@ -109,7 +91,6 @@ class Report_data_model extends CI_Model {
 		$this->db->select($select_fields, FALSE);
 		$ret = $this->db->get()->result_array();
 		$this->num_results = count($ret);
-		$this->db->flush_cache();
 		//$ret['arr_unsortable_columns'] = $this->arr_unsortable_columns;
 		return $ret;
 	}
@@ -193,36 +174,6 @@ class Report_data_model extends CI_Model {
 		}
 	}
 	
-	/*@todo: needs to be brought up to speed with new code
-	protected function _set_autofilter($arr_filter_criteria){
-		$this->arr_messages['filter_alert'] = '';
-		$num_fields = count($this->arr_auto_filter_field);
-		for($c = 0; $c < $num_fields; $c++){
-			if(empty($arr_filter_criteria[$this->arr_auto_filter_field[$c]])){
-				//handle range fields
-				//$dbfield = str_replace('_dbfrom', '', $this->arr_auto_filter_field[$c]);
-				//$dbfield = str_replace('_dbto', '', $dbfield);
-				//end handle range fields
-				
-				$criteria = $this->arr_auto_filter_criteria[$c];
-				if(in_array($dbfield, $this->arr_date_fields) || in_array($dbfield, $this->arr_datetime_fields)) $criteria = date_to_mysqldatetime($criteria);
-				if(in_array($dbfield, $this->arr_numeric_fields) === FALSE) $criteria = "'" . $criteria . "'";
-				
-				$this->db->where($dbfield . $this->arr_auto_filter_operator[$c] . $criteria);
-				$this->arr_messages['filter_alert'] .= $this->arr_auto_filter_alert[$c];
-			}
-		}
-	}
-
-	public function get_auto_filter_criteria(){
-		$arr_return = array();
-		$num_fields = count($this->arr_auto_filter_field);
-		for($c = 0; $c < $num_fields; $c++){
-			$arr_return[] = array('key' => $this->arr_auto_filter_field[$c], 'value' => $this->arr_auto_filter_criteria[$c]);
-		}
-		return $arr_return;
-	}
-	*/
 	/**
 	 * getRecentDates
 	 * @return date string
