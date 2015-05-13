@@ -125,10 +125,10 @@ class report_block extends CI_Controller {
 		$this->blocks = new Blocks($this->report_block_model, $this->db_field_model, $this->supp_factory);
 
 		//web content
-		$this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
-		$this->load->model('web_content/block_model');
-		$this->web_blocks = new WebBlocks($this->block_model);
-		$this->pages = new Pages($this->page_model, $this->web_blocks);
+//		$this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
+//		$this->load->model('web_content/block_model');
+//		$this->web_blocks = new WebBlocks($this->block_model);
+//		$this->pages = new Pages($this->page_model, $this->web_blocks);
 //		$sections = new Sections($this->section_model, $this->pages);
 
 		
@@ -300,25 +300,6 @@ class report_block extends CI_Controller {
 				die("I don't recognize your browser session, your session may have expired, or you may have cookies turned off.");
 			}
 			unset($arr_params['csrf_test_name']);
-
-			/*
-			 * MANUALLY ADJUST FILTERS FOR PSTRINGS
-			 * @todo: 	find another way to acheive this--without naming specific blocks.  This handles pstring filters for
-			* 			cow-level blocks that are on summary pages
-			*/
-			foreach($arr_params as $k => $v){
-				if(($block->path() == 'peak_milk_trends' || $block->path() == 'dim_at_1st_breeding' || $block->path() == 'bulk_tank_contribution') && substr($k,-7)=='pstring'){
-					if(is_array($v)){
-						$tmp = array_filter($v);
-						if(empty($tmp)){
-							unset($arr_params[$k]);
-						}
-					}
-					elseif($v == 0){
-						unset($arr_params[$k]);
-					}
-				}
-			}
 		
 			//prep data for filter library
 			$this->load->model('filter_model');
@@ -330,6 +311,27 @@ class report_block extends CI_Controller {
 					$path_page_segment,
 					['herd_code' => $this->session->userdata('herd_code')] + $arr_params
 			);
+
+			/*
+			 * MANUALLY ADJUST FILTERS FOR PSTRINGS
+			 * @todo: 	Find another way to acheive this--without naming specific blocks. 
+			 *          Determine whether page is a summary page, then whether block matches?
+			 * 
+			 * This handles pstring filters for cow-level blocks that are on summary pages
+			*/
+			foreach($arr_params as $k => $v){
+				if(($block->path() == 'bulk_tank_contribution' || $block->path() == 'peak_milk_trends' || $block->path() == 'dim_at_1st_breeding' || $block->path() == 'bulk_tank_contribution') && substr($k,-7)=='pstring'){
+					if(is_array($v)){
+						$tmp = array_filter($v);
+						if(empty($tmp)){
+							$filters->removeCriteria($k);
+						}
+					}
+					elseif($v == 0){
+						$filters->removeCriteria($k);
+					}
+				}
+			}
 		}
 		$block->setFilters($filters);
 		//END FILTERS

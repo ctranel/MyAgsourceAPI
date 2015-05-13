@@ -213,9 +213,11 @@ class Criteria{
 	*  @param: array page-level filters
 	*  @return void
 	*  @throws: 
+	*  @todo: remove herd_code reference
 	* -----------------------------------------------------------------
 	*/
 	protected function setOptions($herd_code){
+		$this->options_source;
 		if(isset($this->options_source) && !empty($this->options_source)){
 			$this->options = $this->filter_model->getCriteriaOptions($this->options_source, $herd_code);
 		}

@@ -194,10 +194,10 @@ class Index extends report_parent {
 		
 		//filters	
 		$report_filter_path = 'filters';
-		if(file_exists(APPPATH . 'views' . FS_SEP . $this->section_path . FS_SEP . 'filters.php')){
+		if(file_exists(APPPATH . 'views/' . $this->section_path . '/filters.php')){
 			$report_filter_path =  $this->section_path . '/filters' . $report_filter_path;
 		}
-		
+
 		$arr_filter_data = array(
 				'arr_filters' => $this->filters->toArray(),
 		);
@@ -208,7 +208,6 @@ class Index extends report_parent {
 				'title' => 'Filters',
 				'id' => 'filters',
 			);
-			break;
 		}
 		
 		foreach($arr_view_blocks as $k => $b){

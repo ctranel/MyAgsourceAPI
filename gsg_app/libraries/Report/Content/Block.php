@@ -275,6 +275,10 @@ abstract class Block implements iBlock {
 		return $this->bench_row;
 	}
 
+	public function isSummary(){
+		return $this->is_summary;
+	}
+
 	public function hasAvgRow(){
 		return $this->avg_row;
 	}

@@ -83,7 +83,6 @@ class Filters{
 	*  sets default filter criteria based on the field-specific values (herd code, test date)
 	*   and page filters pulled from the database
 
-	*  @since: version 1
 	*  @author: ctranel
 	*  @date: Jun 17, 2014
 	*  @param: array page-level filters
@@ -100,13 +99,33 @@ class Filters{
 	}
 
 	/* -----------------------------------------------------------------
+	*  removeCriteria
+
+	*  removes specified criteria object from filters array
+
+	*  @author: ctranel
+	*  @date: May 13, 2015
+	*  @param: string 
+	*  @return void
+	*  @throws: 
+	* -----------------------------------------------------------------
+	*/
+	public function removeCriteria($criteria_field_name){
+			foreach($this->arr_criteria as $k => $c){
+			if($k === $criteria_field_name) {
+				unset($this->arr_criteria[$k]);
+				return;
+			}
+		}
+	}
+
+	/* -----------------------------------------------------------------
 	*  setFilterCriteria() sets default filter criteria based on the field-specific values (herd code, test date)
 	*   and page filters pulled from the database
 
 	*  sets default filter criteria based on the field-specific values (herd code, test date)
 	*   and page filters pulled from the database
 
-	*  @since: version 1
 	*  @author: ctranel
 	*  @date: Jun 17, 2014
 	*  @param: array page-level filter data

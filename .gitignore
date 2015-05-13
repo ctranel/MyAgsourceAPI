@@ -10,3 +10,8 @@
 /asset_cache
 /phpinfo.php
 /php.ini
+/vendor
+/demo1.html
+/demo2.html
+/demo3.html
+/npm-debug.log
