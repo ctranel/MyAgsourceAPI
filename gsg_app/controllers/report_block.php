@@ -313,14 +313,11 @@ class report_block extends CI_Controller {
 			);
 
 			/*
-			 * MANUALLY ADJUST FILTERS FOR PSTRINGS
-			 * @todo: 	Find another way to acheive this--without naming specific blocks. 
-			 *          Determine whether page is a summary page, then whether block matches?
-			 * 
-			 * This handles pstring filters for cow-level blocks that are on summary pages
+			 * If this is a cow level block, and the filter is set to 0 (pstring), remove filter
+			 * Needed for that contain both cow level and summary reports.
 			*/
 			foreach($arr_params as $k => $v){
-				if(($block->path() == 'bulk_tank_contribution' || $block->path() == 'peak_milk_trends' || $block->path() == 'dim_at_1st_breeding' || $block->path() == 'bulk_tank_contribution') && substr($k,-7)=='pstring'){
+				if(!$block->isSummary()){
 					if(is_array($v)){
 						$tmp = array_filter($v);
 						if(empty($tmp)){
