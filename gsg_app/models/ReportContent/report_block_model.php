@@ -73,8 +73,9 @@ class report_block_model extends CI_Model {
 			->select("bsf_id AS id, db_field_id, table_name, db_field_name, name, description, pdf_width, default_sort_order, data_type as datatype, max_length, 
 					decimal_points AS decimal_scale, unit_of_measure, is_timespan_field as is_timespan, is_fk_field AS is_foreign_key, is_nullable, is_sortable, is_natural_sort,
 					is_displayed, supp_id, a_href, a_rel, a_title, a_class, head_a_href, head_a_rel, head_a_title, head_a_class, head_supp_id, head_comment, aggregate,
-					display_format, block_header_group_id")
+					display_format, block_header_group_id, chart_type, axis_index, trend_type, series_group")
 			->where('block_id', $block_id)
+			->order_by('series_group')
 			->order_by('list_order')
 			->get('users.dbo.v_block_field_data')
 			->result_array();
@@ -92,7 +93,7 @@ class report_block_model extends CI_Model {
 			->select("bsf_id AS id, db_field_id, table_name, db_field_name, name, description, pdf_width, default_sort_order, data_type as datatype, max_length, 
 					decimal_points AS decimal_scale, unit_of_measure, is_timespan_field as is_timespan, is_fk_field AS is_foreign_key, is_nullable, is_sortable, is_natural_sort,
 					is_displayed, supp_id, a_href, a_rel, a_title, a_class, head_a_href, head_a_rel, head_a_title, head_a_class, head_supp_id, head_comment, aggregate,
-					display_format, block_header_group_id")
+					display_format, block_header_group_id, chart_type, axis_index, trend_type, series_group")
 			->where('block_id', $block_id)
 			->where('db_field_name', $field_name)
 			->get('users.dbo.v_block_field_data')

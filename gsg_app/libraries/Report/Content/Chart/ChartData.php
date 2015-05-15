@@ -95,7 +95,7 @@ class ChartData extends BlockData{
 	 *
 	 *@todo: criteria param should be removed when filter data is included in object
 	 **/
-	function getData($criteria_key_value){
+	public function getData($criteria_key_value){
 		if(isset($this->x_axis_dbfield_name) && isset($this->x_axis_dbfield_name)){
 			$criteria_key_value[$this->x_axis_dbfield_name]['dbfrom'] = $this->report_datasource->getStartDate($this->block->primaryTableName(), $this->x_axis_dbfield_name, $this->block->maxRows(), 'MM-dd-yyyy');
 			$criteria_key_value[$this->x_axis_dbfield_name]['dbto'] = $this->report_datasource->getRecentDates($this->block->primaryTableName(), $this->x_axis_dbfield_name, 1, 'MM-dd-yyyy')[0];
@@ -111,9 +111,14 @@ class ChartData extends BlockData{
 			return array_values($this->dataset);
 		}
 		else{
-			$return_val = $this->setLongitudinalData();
+			if($this->block->chartType() === 'boxplot'){
+//var_dump($this->block); die;
+				$num_boxplot_series = (int)($this->block->reportFields()->count() / 3);
+//die((string)$num_boxplot_series);
+				return $this->setBoxplotData(200000000);
+			}
+			return $this->setLongitudinalData();
 		}
-		return $return_val;
 	}
 	
 	/**
@@ -157,59 +162,54 @@ class ChartData extends BlockData{
 	 * @param int number of boxplot series (BOXPLOT SERIES FIELDS MUST ALL BE IMMEDIATELY AFTER THE TEST DATE)
 	 * @return array of data for the graph
 	 * @access protected
+	 * @todo: assumes that boxplots are in groupings of 3
 	 *
 	 **/
-	protected function setBoxplotData($num_boxplot_series = 1, $adjustment = 200000000){
+	protected function setBoxplotData($adjustment = 200000000){
 		$row_count = 0;
 		$arr_series = [];
+		$num_series = $this->block->numSeries();
 		foreach ($this->dataset as $d){ //foreach row
+			//ignore the row if the x axis fields is not set
+			if(!isset($d[$this->x_axis_dbfield_name])){
+				continue;
+			}
 			//set a variable so we can pair date with each data point
-			if(!isset($d[$this->x_axis_dbfield_name])) continue;
 			$arr_d = explode('-', $d[$this->x_axis_dbfield_name]);
 			unset($d[$this->x_axis_dbfield_name]); //remove date so we can loop through the remaining data points
-			//the date is formated in the database search ('Mon-yr'), so we need to accommodate that
+			//if the date is formatted ('Mon-yr')
 			if(count($arr_d) == 2){
 				$arr_month = [];
-				$this_date =strtotime($arr_d[0] . ' 15, 20' . $arr_d[1]) * 1000;
+				$this_date =strtotime($arr_d[0] . ' 15, ' . $arr_d[1]) * 1000;
 			}
-			//the date is formated in the database search ('m-d-y'), so we need to accommodate that in the mktime function
+			//else if the date is formatted ('m-d-y')
 			elseif(count($arr_d) == 3){
-				$this_date = mktime(0, 0, 0, $arr_d[0], $arr_d[1],'20' . $arr_d[2]) * 1000;
+				$this_date = mktime(0, 0, 0, $arr_d[0], $arr_d[1], $arr_d[2]) * 1000;
 			}
-			$num_series = count($d)/3;
+
 			$field_count = 1;
 			$series_count = 0;
 			$offset = $this->getSeriesOffset($num_series, $series_count, $adjustment);
 			$arr_series[$series_count][$row_count] = array($this_date + $offset);
-			$arr_series[$series_count + 1][$row_count] = array($this_date + $offset);
+//			$arr_series[$series_count + 1][$row_count] = array($this_date + $offset);
 			foreach ($d as $f){ //for each field in row
 				$tmp_data = is_numeric($f) ? (float)$f : $f;
-				if($field_count <= ($num_boxplot_series * 3)){// using boxplot chart requires 4 datapoints
+				if($field_count <= ($num_series * 3)){// using boxplot chart requires 4 datapoints
 					$modulus = $field_count%3;
 					$arr_series[$series_count][$row_count][] = $tmp_data;
 					//boxplots require 5 datapoints, need to replicate each end of the box (i.e., blend whiskers into box)
+					//@todo: this should be done on the client (highcharts)
 					if($modulus === 1 || $modulus === 0){
 						$arr_series[$series_count][$row_count][] = $tmp_data;
 					}
-					if($modulus === 2){ //for median, add a datapoint in the trendline series
-						$arr_series[$series_count + 1][$row_count][] = $tmp_data;
-					}
 					if($modulus == 0 && $field_count > 1){
-						$series_count += 2;
-						if(($field_count + 1) <= ($num_boxplot_series * 3)){
+						$series_count ++;
+						if(($field_count + 1) <= ($num_series * 3)){
 							$offset = $this->getSeriesOffset($num_series, $series_count, $adjustment);
 							$arr_series[$series_count][$row_count] = array(($this_date + $offset)); //adjust date so that multiple boxplots are not on top of each other
-							$arr_series[$series_count +1][$row_count] = array(($this_date + $offset)); //adjust date so that multiple boxplots are not on top of each other
 						}
 					}
 				}
-				/*				else { //assumes that non-box series correspond to box series
-				 $offset = $this->getSeriesOffset($num_series, $series_count, $adjustment);
-				$arr_series[$series_count][$row_count] = array(($this_date + $offset), $tmp_data);
-				$arr_series[$series_count + 1][$row_count] = array(($this_date + $offset), $tmp_data);
-				$series_count += 2;
-				}
-				*/				
 				$field_count++;
 			}
 			$row_count++;
@@ -217,7 +217,6 @@ class ChartData extends BlockData{
 		return $arr_series;
 	}
 	
-
 	/**
 	 * @method getSeriesOffset()
 	 * @param int number of series' in the dataset for which the offset is being calculated

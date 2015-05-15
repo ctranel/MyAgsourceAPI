@@ -201,7 +201,8 @@ class Report_data_model extends CI_Model {
 	}
 
     /**
-    * @function get_start_test_date
+    * get_start_test_date
+    * 
     * @param string date_field - db name of the date field used for this trend
     * @param int num_dates - number of test dates to include in report
     * @param string date_format - database string for formatting date

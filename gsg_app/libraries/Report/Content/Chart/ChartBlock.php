@@ -49,6 +49,12 @@ class ChartBlock extends Block {
 	 * @var SplObjectStorage
 	 **/
 	protected $y_axes;
+	
+	/**
+	 * collection of series objects
+	 * @var SplObjectStorage
+	 **/
+	protected $series;
 		
 	/**
 	 */
@@ -67,6 +73,10 @@ class ChartBlock extends Block {
 		
 	public function xAxes(){
 		return $this->x_axes;
+	}
+
+	public function chartType(){
+		return $this->chart_type;
 	}
 
 	/**
@@ -103,7 +113,7 @@ class ChartBlock extends Block {
 				$arr_table_ref_cnt[$s['table_name']] = isset($arr_table_ref_cnt[$s['table_name']]) ? ($arr_table_ref_cnt[$s['table_name']] + 1) : 1;
 				$datafield = new DbField($s['db_field_id'], $s['table_name'], $s['db_field_name'], $s['name'], $s['description'], $s['pdf_width'], $s['default_sort_order'],
 						 $s['datatype'], $s['max_length'], $s['decimal_scale'], $s['unit_of_measure'], $s['is_timespan'], $s['is_foreign_key'], $s['is_nullable'], $s['is_natural_sort']);
-				$this->report_fields->attach(new ChartField($s['id'], $s['name'], $datafield, $s['is_displayed'], $s['display_format'], $s['aggregate'], $s['is_sortable'], $header_supp, $data_supp));
+				$this->report_fields->attach(new ChartField($s['id'], $s['name'], $datafield, $s['is_displayed'], $s['display_format'], $s['aggregate'], $s['is_sortable'], $s['chart_type'], $s['axis_index'], $s['trend_type'], $s['series_group'], $header_supp, $data_supp));
 			}
 			$this->primary_table_name = array_search(max($arr_table_ref_cnt), $arr_table_ref_cnt);
 			//set up arr_fields hierarchy
@@ -138,7 +148,7 @@ class ChartBlock extends Block {
 					$a['datatype'], $a['max_length'], $a['decimal_scale'], $a['unit_of_measure'], $a['is_timespan'], $a['is_foreign_key'], $a['is_nullable'], $a['is_natural_sort']);
 				//add fields as a report field so it is included in the select statement
 				$display_format = $a['data_type'] === 'datetime' ? 'MM-dd-yy' : null;
-				$this->report_fields->attach(new ChartField($a['id'], $a['name'], $datafield, false, $display_format, null, 0));
+				$this->report_fields->attach(new ChartField($a['id'], $a['name'], $datafield, false, $display_format, null, 0, null, null, null, null));
 				
 			}
 			if($a['x_or_y'] === 'x'){
@@ -216,7 +226,10 @@ class ChartBlock extends Block {
 	}
 
 	/**
-	 * @method getSeriesOutput
+	 * getSeriesOutput
+	 * 
+	 * 
+	 * 
 	 * @param int number of datapoints
 	 * @return array of output data for block
 	 * @access protected
@@ -227,15 +240,51 @@ class ChartBlock extends Block {
 			return $this->deriveSeries();//count($this->json['data'], COUNT_RECURSIVE));
 		}
 		$ret = [];
+
+		//boxplots have 3 columns per series, all other chart types are 1:1
 		foreach($this->report_fields as $f){
+			$idx = (int)$f->seriesGroup();
 			if($f->isDisplayed()){
-				$ret[] = [
+				$ret[$idx] = [
 					'name' => $f->displayName(),
 					'um' => $f->unitOfMeasure(),
+					'type' => $f->chartType(),
+					'yAxis' => $f->axisIndex(),
 				];
+				if($f->trendType() !== null){
+					$ret[$idx]['regression'] = true;
+					$ret[$idx]['regressionSettings'] = [
+						'type' => $f->trendType(),
+						'order' => 8,
+					];
+				}
 			}
 		}
 		return $ret;
+	}
+	
+	/**
+	 * @method numSeries
+	 * @return int number of series on chart
+	 * @access protected
+	 *
+	 **/
+	public function numSeries(){
+		$series = [];
+		foreach($this->report_fields as $f){
+			$sg = $f->seriesGroup();
+			if(!isset($sg)){
+				continue;
+			}
+			$idx = array_search($sg, $series, true);
+			if($idx === false){
+				$series[] = $f->seriesGroup();
+			}
+		}
+		if(empty($series)){
+			return $this->report_fields->count();
+		}
+		return count($series);
 	}
 
 /*	

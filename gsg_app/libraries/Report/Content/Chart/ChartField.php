@@ -21,21 +21,37 @@ use \myagsource\Datasource\DbObjects\DbField;
  */
 class ChartField extends BlockField {
 	/**
-	 * axis_index
-	 * @var int
-	 **/
-	protected $axis_index;
-
-	/**
 	 * chart_type
 	 * @var string
 	 **/
 	protected $chart_type;
 
 	/**
+	 * axis_index
+	 * @var int
+	 **/
+	protected $axis_index;
+
+	/**
+	 * trend_type
+	 * @var string
+	 **/
+	protected $trend_type;
+
+	/**
+	 * series_group
+	 * @var int
+	 **/
+	protected $series_group;
+
+	/**
 	 */
-	public function __construct($id, $name, DbField $data_field, $is_displayed, $display_format, $aggregate, $is_sortable, $header_supp = null, $data_supp = null) {
+	public function __construct($id, $name, DbField $data_field, $is_displayed, $display_format, $aggregate, $is_sortable, $chart_type, $axis_index, $trend_type, $series_group, $header_supp = null, $data_supp = null) {
 		parent::__construct($id, $name, $data_field, $is_displayed, $display_format, $aggregate, $is_sortable, $header_supp, $data_supp);
+		$this->chart_type = $chart_type;
+		$this->axis_index = $axis_index;
+		$this->trend_type = $trend_type;
+		$this->series_group = $series_group;
 	}
 	
 	public function chartType(){
@@ -44,6 +60,14 @@ class ChartField extends BlockField {
 
 	public function axisIndex(){
 		return $this->axis_index;
+	}
+
+	public function trendType(){
+		return $this->trend_type;
+	}
+
+	public function seriesGroup(){
+		return $this->series_group;
 	}
 }
 
