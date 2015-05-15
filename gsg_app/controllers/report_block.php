@@ -253,24 +253,6 @@ class report_block extends CI_Controller {
 		$page_path = str_replace('|', '/', urldecode($page_path));
 		$this->section_path = substr($page_path, 0, (strrpos($page_path, '/') + 1));
 		$path_page_segment = substr($page_path, (strrpos($page_path, '/') + 1));
-		$tmp_path = $page_path . $block_name;
-		
-		/*Load the most specific model that exists
-		while(strpos($tmp_path, '/') !== false){
-			if(file_exists(APPPATH . 'models/' . $tmp_path . '_model.php')){
-				$this->primary_model_name = substr($tmp_path, strripos($tmp_path, '/')) . '_model';
-				$this->load->model($tmp_path, '', FALSE, $this->section_path);
-				exit;
-			}
-			$tmp_path = substr($tmp_path, 0, strripos($tmp_path, '/'));
-		}
-		//if no specific models found, go with the general report model
-		if(!isset($this->primary_model_name)){
-			$this->primary_model_name = 'report_model';
-			$this->load->model('report_model', '', FALSE, $this->section_path);
-		}
-		//End load model
-		*/
 		
 		$block = $this->blocks->getByPath(urldecode($block_name));
 		$output = $block->displayType();
@@ -343,21 +325,43 @@ class report_block extends CI_Controller {
 		$herd_info = $this->herd_model->header_info($this->herd->herdCode());
 		$this->load->model('benchmark_model');
 		$this->benchmarks = new Benchmarks($this->session->userdata('user_id'), $this->input->post('herd_code'), $herd_info, $this->setting_model, $this->benchmark_model, $this->session->userdata('benchmarks'));
-		// end benchmarks
-		
+			// end benchmarks
+			
 		// report data
-		$this->load->model('ReportContent/report_data_model');
-		$this->load->model('Datasource/db_table_model');
-		$db_table = new DbTable($block->primaryTableName(), $this->db_table_model);
+		$this->load->model ( 'ReportContent/report_data_model' );
+		$this->load->model ( 'Datasource/db_table_model' );
+		$db_table = new DbTable ( $block->primaryTableName (), $this->db_table_model );
 		//$block_data = new BlockDataFactory($block, $this->report_data_model, $this->benchmarks, $db_table);
 
-		if($block->displayType() == 'table'){
-			$block_data_handler = new TableData($block, $this->report_data_model, $this->benchmarks, $db_table);
+		/*Load the most specific data-handling library that exists */
+		$tmp_path = $page_path . '/' . $block_name;
+		while(strpos($tmp_path, '/') !== false){
+			if(file_exists(APPPATH . 'libraries/' . $tmp_path . '.php')){
+				$this->data_handler_name = ucwords(substr($tmp_path, (strripos($tmp_path, '/') + 1)));
+				require_once APPPATH . 'libraries/' . $tmp_path . '.php';
+				if($block->displayType() == 'table'){
+					$this->data_handler_name = 'myagsource\\Report\\Content\\Table\\' . $this->data_handler_name;
+					$block_data_handler = new $this->data_handler_name($block, $this->report_data_model, $this->benchmarks, $db_table);
+				}
+				
+				if($block->displayType() == 'trend chart' || $block->displayType() == 'compare chart'){
+					$block_data_handler = new $this->data_handler_name($block, $this->report_data_model);
+				}
+			}
+			$tmp_path = substr($tmp_path, 0, strripos($tmp_path, '/'));
 		}
+		//if no specific data-handling library found, go with the general data-handling library 
+		if(!isset($this->data_handler_name)){
+			if($block->displayType() == 'table'){
+				$block_data_handler = new TableData($block, $this->report_data_model, $this->benchmarks, $db_table);
+			}
+			
+			if($block->displayType() == 'trend chart' || $block->displayType() == 'compare chart'){
+				$block_data_handler = new ChartData($block, $this->report_data_model);
+			}
+		}
+		//End load data-handling library
 		
-		if($block->displayType() == 'trend chart' || $block->displayType() == 'compare chart'){
-			$block_data_handler = new ChartData($block, $this->report_data_model);
-		}
 
 		$results = $block_data_handler->getData($filters->criteriaKeyValue());//$report_count, 
 		// end report data

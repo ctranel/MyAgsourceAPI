@@ -1,8 +1,15 @@
 <?php
-require_once APPPATH . 'models/report_model.php';
-class Newinfectionsanddrycures_model extends Report_model {
-	public function __construct($section_path){
-		parent::__construct($section_path);
+namespace myagsource\Report\Content\Table;
+
+require_once APPPATH . 'libraries/Report/Content/Table/TableData.php';
+
+use \myagsource\Datasource\DbObjects\DbTable;
+use \myagsource\Benchmarks\Benchmarks;
+
+
+class Newinfectionsanddrycures extends TableData {
+	public function __construct(TableBlock $block, \Report_data_model $report_datasource, Benchmarks $benchmarks, DbTable $db_table){
+		parent::__construct($block, $report_datasource, $benchmarks, $db_table);
 	}
 	
 	/*  
@@ -14,12 +21,14 @@ class Newinfectionsanddrycures_model extends Report_model {
 	 * @param bool add sum column
 	 * @return array pivoted resultset
 	 * @author ctranel
+	 * 
+	 * @todo: update code to match refactored code
 	 */
-	public function pivot($arr_dataset, $header_field, $header_field_width, $label_column_width, $bool_avg_column = FALSE, $bool_sum_column = FALSE, $bool_bench_column = FALSE){
+	public function pivot($arr_dataset){
 		$avg_l1_1st_new_infection_pct = $arr_dataset[0]['l1_1st_new_infection_pct'];
 		$avg_l4_1st_new_infection_pct = $arr_dataset[0]['l4_1st_new_infection_pct'];
 		$avg_l4_dry_cow_cured_pct = $arr_dataset[0]['l4_dry_cow_cured_pct'];
-		$new_dataset = parent::pivot($arr_dataset, $header_field, $header_field_width, $label_column_width, $bool_avg_column, $bool_sum_column, $bool_bench_column);
+		$new_dataset = parent::pivot($arr_dataset);
 		//update total field in new dataset
 		$new_dataset['l1_1st_new_infection_pct']['average'] = $avg_l1_1st_new_infection_pct;
 		$new_dataset['l4_1st_new_infection_pct']['average'] = $avg_l4_1st_new_infection_pct;
