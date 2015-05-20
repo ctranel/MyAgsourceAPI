@@ -63,7 +63,6 @@
 				    <li>Ellsworth, Iowa: 515-836-4444</li>
 				    <li>Lincoln, Neb: 402-476-0300</li>
 				    <li>Umatilla, Ore: 541-922-4894</li>
-				    <li>
 			    </ul>
 			    
           		<p>To learn how our services can help improve your production email <a href="mailto:labinfo@agsource.com">labinfo@agsource.com</a> or visit <a href="http://www.agsource.com/laboratories">www.agsource.com\laboratories</a>.</p>
