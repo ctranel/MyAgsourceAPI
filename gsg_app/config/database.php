@@ -91,7 +91,7 @@ if(ENVIRONMENT == 'production'){
 		$db['vma']['autoinit'] = TRUE;
 		$db['vma']['stricton'] = FALSE;
 }
-elseif(ENVIRONMENT == 'qa' || ENVIRONMENT == 'localhost'){
+elseif(ENVIRONMENT == 'qa'){
 	$db['default']['hostname'] = 'testdare.verona.crinet\\MYAGSQA' ;
 	$db['default']['username'] = 'webuser';
 	$db['default']['password'] = 'm1$Ags_qa';
