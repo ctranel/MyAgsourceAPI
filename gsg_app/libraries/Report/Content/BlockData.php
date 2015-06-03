@@ -140,65 +140,67 @@ abstract class BlockData implements iBlockData{
 	 * @author ctranel
 	 */
 	public function pivot($arr_dataset){
-		$header_text = ' ';
+		//$header_text = ' ';
 		$header_field = $this->block->pivotFieldName();
-		$header_field_width = 10;
-		$label_column_width = 10;
+		//$header_field_width = 10;
+		//$label_column_width = 10;
 		
 		$new_dataset = [];
+		//don't want to insert the sum or count in middle of row, so store in temp vars until end
+		$sum = [];
+		$count = [];
 
 		if(!isset($arr_dataset) || empty($arr_dataset)){
 			return false;
 		}
 		foreach($arr_dataset as $k => $row){
 			foreach($row as $name => $val){
-				if(strpos($name, 'isnull') === FALSE && isset($row[$header_field]) && !empty($row[$header_field])) { //2nd part eliminates rows where fresh date is null (FCS)
+				if(strpos($name, 'isnull') === false && isset($row[$header_field]) && !empty($row[$header_field])) { //2nd part eliminates rows where fresh date is null (FCS)
 					$new_dataset[$name][$k] = $val;
 
-					if(isset($new_dataset[$name]['total']) === FALSE && $val !== NULL){
-						$new_dataset[$name]['total'] = 0;
-						$new_dataset[$name]['count'] = 0;
+					if(isset($sum[$name]) === false && $val !== null){
+						$sum[$name] = 0;
+						$count[$name] = 0;
 					} 
 					
 					if($val !== NULL){
-						$new_dataset[$name]['total'] += $val;
-						$new_dataset[$name]['count'] ++;
+						$sum[$name] += $val;
+						$count[$name]++;
 					} 
 				}				
 			}
 		}
-/*
-		if($this->block->hasAvgRow()){
-			$this->arr_fields['Average'] = 'average';
-			$this->arr_pdf_widths['average'] = $header_field_width;
-			$this->arr_field_sort['average'] = 'ASC';
-			$this->arr_unsortable_columns[] = 'average';
-		}
-		if($this->block->hasSumRow()){
-			$this->arr_fields['Total'] = 'total';
-			$this->arr_pdf_widths['total'] = $header_field_width;
-			$this->arr_field_sort['total'] = 'ASC';
-			$this->arr_unsortable_columns[] = 'total';
-		}
-*/
-		foreach($new_dataset as $k=>$a){
+
+		$first = true;
+		foreach($new_dataset as $k=>&$a){
 			if(!empty($k)){
 //				if($bool_bench_column){
 //					if($arr_benchmarks[$k] !== NULL) $sum_data['benchmark'] = round($arr_benchmarks[$k], $this->arr_decimal_points[$k]);//strpos($arr_benchmarks[$k], '.') !== FALSE ? trim(trim($arr_benchmarks[$k],'0'), '.') : $arr_benchmarks[$k];
 //					else $sum_data['benchmark'] = NULL;
 //				}
-				if($this->block->hasAvgRow()){
-					$new_dataset[$k]['average'] = $new_dataset[$k]['total'] / $new_dataset[$name]['count'];
-					if(isset($this->arr_decimal_points[$k])) $new_dataset[$k]['average'] = round($new_dataset[$k]['average'], $this->arr_decimal_points[$k]);
+				if($this->block->hasSumRow() && isset($sum[$k]) === true){
+					if($first){
+						$new_dataset[$k][] = 'Total';
+					}
+					else{
+						$new_dataset[$k][] = $sum[$k];
+					}
 				}
-				if(($this->block->hasAvgRow() && !$this->block->hasSumRow()) || (!$this->block->hasAvgRow() && !$this->block->hasSumRow())){ //total column should not be displayed on PDF if it is only used to calculate avg 
-					unset($new_dataset[$k]['total']);
+				if($this->block->hasAvgRow() && isset($sum[$k]) === true){
+					$tmp = $sum[$k] / $count[$k];
+					if(isset($this->arr_decimal_points[$k])){
+						$tmp = round($tmp, $this->arr_decimal_points[$k]);
+					}
+					if($first){
+						$new_dataset[$k][] = 'Average';
+					}
+					else{
+						$new_dataset[$k][] = $tmp;
+					}
 				}
-				unset($new_dataset[$k]['count']);
 			}
+			$first = false;
 		}
-		//the following line is needed--didn't finish researching, but fresh cow summary tables break when it is removed
-		//$this->arr_db_field_list = $this->arr_fields;
 		return $new_dataset;
 	}
 }

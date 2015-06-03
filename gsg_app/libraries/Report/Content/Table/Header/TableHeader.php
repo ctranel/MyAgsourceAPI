@@ -49,20 +49,35 @@ class TableHeader {
 	protected $header_group_fields;
 	
 	/**
+	 * columns - leafs of header structure
+	 * 
+	 * container of Report\Content\Table\TableField objects, used in cases where table is not pivoted
+	 * @var \SplObjectStorage
+	 **/
+	protected $columns;
+	
+	/**
+	 * arr_columns - leafs of header structure
+	 * 
+	 * @var array used in cases where table is pivoted
+	 **/
+	protected $arr_columns;
+	
+	/**
 	 * block
 	 * 
 	 * Report\Block object
 	 * @var Block
-	 **/
 	protected $block_fields;
+	 **/
 	
 	/**
 	 * rows
 	 * 
 	 * container of TableHeaderRow objects
 	 * @var \SplObjectStorage
-	 **/
 	protected $rows;
+	 **/
 	
 	/**
 	 * supplemental
@@ -71,7 +86,7 @@ class TableHeader {
 	 **/
 	protected $supplemental_factory;
 	
-	public function __construct(iBlock $block, $header_groups, $supplemental_factory){
+	public function __construct(iBlock $block, $header_groups, SupplementalFactory $supplemental_factory){
 		$this->header_group_fields = [];
 		$this->header_structure = [];
 		$this->block = $block;
@@ -84,18 +99,27 @@ class TableHeader {
 	 *  @return int
 	 **/
 	public function columnCount(){
-		return $this->block->reportFields()->count();
+		if(is_a($this->columns, 'SplObjectStorage')){
+			return $this->columns->count();
+		}
+		else{
+			return count($this->arr_columns);
+		}
 	}
 	
 	/**
 	 *  @method: get_table_header_array() takes array of data structure and returns and array of menu data including text,
 	 * 		colspan, rowspan and level (to be used to create class names in view) *
+	 *  @param array representing alternative header row
 	 *  @access public
 	 **/
-	public function getTableHeaderStructure(){
+	public function getTableHeaderStructure($alt_header = null){
 		//pivoted tables will generate their own header
 		if($this->block->hasPivot()){
-			return;
+			$this->arr_columns = $alt_header;
+		}
+		else{
+			$this->columns = $this->block->reportFields();
 		}
 		
 		$depth = 0;
@@ -110,8 +134,11 @@ class TableHeader {
 	}
 	
 	/**
-	 * @method setTableHeaderStructure()
-	 * @return multi-dimensional array of header data ('arr_unsortable_columns', 'arr_field_sort', 'arr_header_data')
+	 * setTableHeaderGroups
+	 * 
+	 * Sets object's header_group_fields property based on the block's field list.
+	 * 
+	 * @return void
 	 * @author ctranel
 	 * 
 	 * @todo: pass objects instead of arrays in objects
@@ -121,7 +148,7 @@ class TableHeader {
 			foreach($this->header_groups as $h){
 				$header_group_supplemental = $this->supplemental_factory->getHeaderGrpSupplemental($h['header_group_id'], $h['a_href'], $h['a_rel'], $h['a_title'], $h['a_class'], $h['comment']);
 				//if it is a top level element
-				if($h['parent_id'] == NULL) {
+				if($h['parent_id'] == null) {
 					//$this->header_group_fields[] = new TableHeaderCell($h['id'], $h['parent_id'], $h['text']);//, 'pdf_width' => 0];
 					$this->header_group_fields[] = ['id' => $h['id'], 'parent_id' => $h['parent_id'], 'db_field_name' => null, 'text' => $h['text'], 'children' => null, 'pdf_width' => 0, 'supplemental' => $header_group_supplemental];
 				}
@@ -134,12 +161,18 @@ class TableHeader {
 
 		}
 		//add leaves (columns) to structure
-		$fields = $this->block->reportFields();
-		foreach($fields as $f){
-			if($f->isDisplayed()){
-				$this->addLeaf($this->header_group_fields, $f->headerGroupId(), ['children' => ['id' => null, 'parent_id' => $f->headerGroupId(), 'db_field_name' => $f->dbFieldName(), 'text' => $f->displayName(), 'pdf_width' => $f->pdfWidth(), 'is_sortable' => $f->isSortable(), 'is_displayed' => $f->isDisplayed(), 'default_sort_order' => $f->defaultSortOrder(), 'supplemental' => $f->headerSupplemental()]]);
-				//$this->addLeaf($this->header_group_fields, $f->headerGroupId(), new TableHeaderCell($h['id'], $h['parent_id'], $h['text']));
-					//['children' => ['id' => null, 'parent_id' => $f->headerGroupId(), 'text' => $f->displayName(), 'pdf_width' => $f->pdfWidth(), 'is_sortable' => $f->isSortable(), 'is_displayed' => $f->isDisplayed()]]);
+		if(is_a($this->columns, 'splObjectStorage')){ //used when table is not pivoted
+			foreach($this->columns as $f){
+				if($f->isDisplayed()){
+					$this->addLeaf($this->header_group_fields, $f->headerGroupId(), ['children' => ['id' => null, 'parent_id' => $f->headerGroupId(), 'db_field_name' => $f->dbFieldName(), 'text' => $f->displayName(), 'pdf_width' => $f->pdfWidth(), 'is_sortable' => $f->isSortable(), 'is_displayed' => $f->isDisplayed(), 'default_sort_order' => $f->defaultSortOrder(), 'supplemental' => $f->headerSupplemental()]]);
+					//$this->addLeaf($this->header_group_fields, $f->headerGroupId(), new TableHeaderCell($h['id'], $h['parent_id'], $h['text']));
+						//['children' => ['id' => null, 'parent_id' => $f->headerGroupId(), 'text' => $f->displayName(), 'pdf_width' => $f->pdfWidth(), 'is_sortable' => $f->isSortable(), 'is_displayed' => $f->isDisplayed()]]);
+				}
+			}
+		}
+		if(is_array($this->arr_columns)){ //used when table is pivoted
+			foreach($this->arr_columns as $f){
+				$this->addLeaf($this->header_group_fields, null, ['children' => ['id' => null, 'parent_id' => null, 'db_field_name' => null, 'text' => $f, 'pdf_width' => null, 'is_sortable' => false, 'is_displayed' => true, 'default_sort_order' => null, 'supplemental' => null]]);
 			}
 		}
 	}
@@ -272,12 +305,12 @@ class TableHeader {
 	 * @return void
 	 * @author ctranel
 	 */
-	protected function addLeaf(&$input, $key_in, $new_val_in, $arr_order = NULL){
+	protected function addLeaf(&$input, $key_in, $new_val_in, $arr_order = null){
 		if (!is_array($input) || empty($new_val_in)){
 			return false;
 		}
 //		$cnt = 0;
-		//if there are no parent headers (i.e., header groups) and the leaf ($new_val_in) has not parent id set--single level headers
+		//if there are no parent headers (i.e., header groups) and the leaf ($new_val_in) has no parent id set--single level headers
 		if(!isset($input['children']) && !isset($new_val_in['children']['parent_id'])){
 			$input[] = $new_val_in['children'];
 			return;

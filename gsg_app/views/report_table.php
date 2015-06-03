@@ -36,7 +36,7 @@
 	<table id="<?php echo $block->path(); ?>" class="tbl">
 		<?php if (!empty($table_header)): ?>
 				<thead> <?php echo $table_header; ?> </thead>
-		<?php elseif($block->hasPivot()): ?>
+<?php elseif($block->hasPivot() && false): ?>
 			<thead><th class="subcat-heading">Metric</th> <?php
 			foreach($data[$block->pivotFieldName()] as $c): ?>
 				<th class="subcat-heading">
@@ -52,18 +52,20 @@
 				if($fields):
 					if($block->hasPivot()):
 						foreach($fields as $f):
-							$row_class = $c % 2 == 1?'odd':'even';
-							?><tr class="<?php echo $row_class; ?>"><?php
-							if(!$f->isDisplayed()){
-								continue;
-							}
-							?><td><?php 
-								echo $f->displayName();
-							?></td><?php 
-							foreach($data[$f->dbFieldName()] as $k => $v):
-								displayCell($f, $v);
-							endforeach;
-							$c++;
+							if(isset($data[$f->dbFieldName()]) && is_array($data[$f->dbFieldName()])):
+								$row_class = $c % 2 == 1?'odd':'even';
+								?><tr class="<?php echo $row_class; ?>"><?php
+								if(!$f->isDisplayed()){
+									continue;
+								}
+								?><td><?php 
+									echo $f->displayName();
+								?></td><?php 
+								foreach($data[$f->dbFieldName()] as $k => $v):
+									displayCell($f, $v);
+								endforeach;
+								$c++;
+							endif;
 						endforeach;
 					else:
 						foreach($data as $cr):

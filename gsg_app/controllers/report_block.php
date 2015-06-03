@@ -394,21 +394,30 @@ class report_block extends CI_Controller {
 		if($block->displayType() == 'table'){
 			//header
 			$header_groups = $this->report_block_model->getHeaderGroups($block->id());
+			
 			//@todo: pull this only when needed?
 			$arr_dates = $this->herd_model->get_test_dates_7_short($this->session->userdata('herd_code'));
 			$header_groups = $this->adjustHeaderGroups($header_groups, $arr_dates);
+			//
+			
 
+			$top_row = null;
+			if($block->hasPivot()){
+				reset($this->report_data['data']);
+				$tmp_key = key($this->report_data['data']);
+				$top_row = [ucwords(str_replace('_', ' ', $tmp_key))] + $this->report_data['data'][$tmp_key];
+				unset($this->report_data['data'][$tmp_key]);
+			}
 			$table_header = new TableHeader($block, $header_groups, new SupplementalFactory($this->supplemental_model, site_url()));
-		
+			
 			$table_header_data = [
-				'structure' => $table_header->getTableHeaderStructure(),
+				'structure' => $table_header->getTableHeaderStructure($top_row),
 				'form_id' => $this->report_form_id,
 				'block' => $block,
 				'report_count' => $report_count
 			];
-			
-			$this->report_data['table_header'] = $this->load->view('table_header', $table_header_data, TRUE);
 
+			$this->report_data['table_header'] = $this->load->view('table_header', $table_header_data, TRUE);
 			//finish table
 			$this->report_data['num_columns'] = $table_header->columnCount();
 			/*
@@ -425,7 +434,7 @@ class report_block extends CI_Controller {
 		}
 		//end table
 
-    	
+//die($this->report_data['html']);    	
 		//@todo: base header on accept property of request header 
 		$return_val = json_encode($this->report_data);//, JSON_HEX_QUOT | JSON_HEX_TAG); //json_encode_jsfunc
 		header("Content-type: application/json"); //being sent as json
