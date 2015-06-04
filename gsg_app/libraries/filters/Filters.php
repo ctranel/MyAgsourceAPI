@@ -26,7 +26,6 @@ class Filters{
 	private $filter_model; //model object
 	private $arr_criteria; //array of criteria objects
 	private $arr_criteria_key_value;
-	private $primary_model;
 	private $log_filter_text;
 	
 	public function __construct(\Filter_model $filter_model){
