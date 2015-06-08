@@ -7,23 +7,6 @@ use \myagsource\Datasource\DbObjects\DbTable;
 use \myagsource\Benchmarks\Benchmarks;
 
 class Numbersoldordied extends TableData {
-	//Overriding parent function to add total and percent columns
-	function get_table_header_data(){
-		$this->load->library('table_header');
-		$this->arr_unsortable_columns[] = 'Total';
-		$this->arr_unsortable_columns[] = 'Percent';
-		$this->arr_fields['Total'] = 'total';
-		$this->arr_fields['Percent'] = 'percent';
-		$table_header_data = array(
-				'arr_unsortable_columns' => $this->arr_unsortable_columns,
-				'arr_field_sort' => $this->arr_field_sort,
-				'arr_header_data' => $this->arr_fields,
-		);
-		$table_header_data['structure'] = $this->table_header->get_table_header_array($table_header_data['arr_header_data']);
-		$table_header_data['num_columns'] = $this->table_header->get_column_count();
-		return $table_header_data;
-	}
-	
 	
 	/*  
 	 * @method pivot() overrides report_model

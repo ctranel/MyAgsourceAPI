@@ -1,5 +1,4 @@
 <?php
-
 namespace myagsource\Report\Content\Chart;
 
 require_once APPPATH . 'libraries/Datasource/DbObjects/DbField.php';
@@ -31,31 +30,31 @@ class ChartBlock extends Block {
 	 * @var string
 	 **/
 	protected $chart_type;
-	
+
 	/**
 	 * array of category field names
 	 * @var array
 	 **/
 	protected $categories;
-	
+
 	/**
 	 * collection of XAxis objects
 	 * @var SplObjectStorage
 	 **/
 	protected $x_axes;
-	
+
 	/**
 	 * collection of YAxis objects
 	 * @var SplObjectStorage
 	 **/
 	protected $y_axes;
-	
+
 	/**
 	 * collection of series objects
 	 * @var SplObjectStorage
 	 **/
 	protected $series;
-		
+
 	/**
 	 */
 	function __construct($block_datasource, $id, $page_id, $name, $description, $scope, $active, $path, $max_rows, $cnt_row, 
@@ -70,7 +69,7 @@ class ChartBlock extends Block {
 		$this->y_axes = new \SplObjectStorage();
 		$this->setChartAxes();
 	}
-		
+
 	public function xAxes(){
 		return $this->x_axes;
 	}
@@ -203,7 +202,7 @@ class ChartBlock extends Block {
 		}
 		return $ret;
 	}
-	
+
 	/**
 	 * @method getOutputData
 	 * @param int number of datapoints
@@ -240,10 +239,13 @@ class ChartBlock extends Block {
 			return $this->deriveSeries();//count($this->json['data'], COUNT_RECURSIVE));
 		}
 		$ret = [];
+		$cnt = 0;
 
 		//boxplots have 3 columns per series, all other chart types are 1:1
 		foreach($this->report_fields as $f){
-			$idx = (int)$f->seriesGroup();
+			$idx = $f->seriesGroup();
+			$idx = isset($idx) ? (int)$idx : $cnt;
+				
 			if($f->isDisplayed()){
 				$ret[$idx] = [
 					'name' => $f->displayName(),
@@ -258,11 +260,12 @@ class ChartBlock extends Block {
 						'order' => 8,
 					];
 				}
+				$cnt++;
 			}
 		}
 		return $ret;
 	}
-	
+
 	/**
 	 * @method numSeries
 	 * @return int number of series on chart
@@ -287,50 +290,6 @@ class ChartBlock extends Block {
 		return count($series);
 	}
 
-/*	
-	public function loadData($report_count){
-		$arr_axes = $report_datasource->get_chart_axes($arr_this_block['id']);
-		$x_axis_date_field = NULL;
-	
-		$this->json['name'] = $arr_this_block['name'];
-		$this->json['description'] = $arr_this_block['description'];
-		$this->json['chart_type'] = $arr_this_block['chart_type'];
-	
-		$tmp_categories = null;
-		if(isset($arr_axes) && !empty($arr_axes)){
-			$this->json['arr_axes'] = $arr_axes;
-			$tmp_x_axis = current($this->json['arr_axes']['x']);
-			if(isset($tmp_x_axis['categories'])){
-				$tmp_categories = $tmp_x_axis['categories'];
-			}
-		}
-	
-	
-		$report_datasource->set_chart_fields($arr_this_block['id']);
-		$arr_fields = $report_datasource->get_fields();
-		if(!is_array($arr_fields) || empty($arr_fields)){
-			return false;
-		}
-		$arr_fieldnames = $this->derive_field_array($arr_fields);
-	
-		if(is_array($arr_axes['x'])){
-			foreach($arr_axes['x'] as $a){
-				$tmp_cat = isset($a['categories']) && !empty($a['categories']) ? $a['categories'] : NULL;
-				if($a['data_type'] === 'datetime' || $a['data_type'] === 'date'){
-					$x_axis_date_field = $a['db_field_name'];
-				}
-				if(isset($a['db_field_name']) && !empty($a['db_field_name'])){
-					$report_datasource->add_field(array('Date' => $a['db_field_name']));
-				}
-			}
-		}
-		$this->json['data'] = $report_datasource->get_graph_data($arr_fieldnames, $this->filters->criteriaKeyValue(), $this->max_rows, $x_axis_date_field, $arr_this_block['path'], $tmp_categories);
-		$this->json['series'] = $this->derive_series($arr_fields, $this->json['chart_type'], $tmp_categories, count($this->json['data'], COUNT_RECURSIVE));
-		$this->json['filter_text'] = $this->filters->get_filter_text();
-	}
-
-*/	
-	
 	/**
 	 * @method deriveSeries
 	 * @param int number of datapoints
@@ -343,7 +302,6 @@ class ChartBlock extends Block {
 		//in order for this function to work correctly, the DB view must have all fields in one row, or have series' as columns and categories as row keys.
 		$return_val = [];
 		$c = 0;
-	
 
 		//if there is more than one datapoint per category
 		if((int)($this->report_fields->count() / count($this->categories)) > 1){
@@ -352,7 +310,7 @@ class ChartBlock extends Block {
 		else{
 			$num_series = $this->report_fields->count();
 		}
-	
+
 		foreach($this->report_fields as $f){
 			$return_val[$c]['name'] = $f->displayName();
 			if($f->unitOfMeasure()){

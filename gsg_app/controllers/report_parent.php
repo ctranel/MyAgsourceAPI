@@ -276,7 +276,7 @@ abstract class report_parent extends CI_Controller {
 							$sort_by = implode('|', $this->arr_sort_by);
 							$sort_order = implode('|', $this->arr_sort_order);
 						}
-						$this->reports->sort_text($this->arr_sort_by, $this->arr_sort_order);//this function sets text, and could return it if needed
+						$this->reports->sortText($this->arr_sort_by, $this->arr_sort_order);//this function sets text, and could return it if needed
 						$tmp_data = $this->ajax_report(urlencode($this->page->path()), urlencode($pb->path()), urlencode($sort_by), $sort_order, 'csv', NULL);
 						$data[] = array('test_date' => $pb['description']);
 						$data = array_merge($data, $tmp_data);
@@ -567,7 +567,7 @@ abstract class report_parent extends CI_Controller {
 			$product_code,
 			$format,
 			$this->page->id(),
-			'',//$this->reports->sort_text_brief($this->arr_sort_by, $this->arr_sort_order),
+			'',//$this->reports->sortTextBrief($this->arr_sort_by, $this->arr_sort_order),
 			$filter_text
 		);
 	}

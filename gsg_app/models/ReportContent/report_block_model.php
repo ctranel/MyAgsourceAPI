@@ -43,6 +43,26 @@ class report_block_model extends CI_Model {
 	}
 	
 	/**
+	 * @method getWhereData()
+	 * @param int block id
+	 * @return returns multi-dimensional array, arr_sort_by field data and arr_sort_order
+	 * @author ctranel
+	 * @todo: implement nested where group iteration (i.e., parent_id field of where groups)
+	 **/
+	public function getWhereData($block_id){
+		return $this->db
+			->select("f.id AS db_field_id, f.db_table_id, f.db_field_name
+				, f.name, f.description, f.pdf_width, f.default_sort_order, f.data_type, f.is_timespan_field as is_timespan
+				, f.is_natural_sort, is_fk_field AS is_foreign_key, f.is_nullable, f.decimal_points AS decimal_scale, f.unit_of_measure, f.data_type as datatype, f.max_length, wg.operator, wc.where_group_id, wc.condition")
+			->from('users.dbo.blocks_where_groups wg')
+			//->join('users.dbo.blocks_where_groups wg2', 'wg.id = wg2.parent_id', 'inner')
+			->join('users.dbo.blocks_where_conditions wc', 'wg.block_id = ' . $block_id . ' AND wg.id = wc.where_group_id', 'inner')
+			->join('users.dbo.db_fields f', 'wc.field_id = f.id' , 'inner')
+			->get()
+			->result_array();
+	}
+	
+	/**
 	 * @method getSortData()
 	 * @param int block id
 	 * @return returns multi-dimensional array, arr_sort_by field data and arr_sort_order
@@ -53,12 +73,12 @@ class report_block_model extends CI_Model {
 			->select("f.id AS db_field_id, f.db_table_id, f.db_field_name
 				, f.name, f.description, f.pdf_width, f.default_sort_order, f.data_type, f.is_timespan_field as is_timespan
 				, f.is_natural_sort, is_fk_field AS is_foreign_key, f.is_nullable, f.decimal_points AS decimal_scale, f.unit_of_measure, f.data_type as datatype, f.max_length, s.sort_order")
-			->join('users.dbo.blocks_sort_by s', 'b.id = s.block_id AND b.id = ' . $block_id, 'inner')
-			->join('users.dbo.db_fields f', 's.field_id = f.id' , 'inner')
+			->from('users.dbo.blocks_sort_by s')
+			->join('users.dbo.db_fields f', 's.field_id = f.id AND s.block_id = ' . $block_id , 'inner')
 //			->join('users.dbo.db_tables t', 'f.db_table_id = t.id', 'inner')
 //			->join('users.dbo.db_databases d', 't.database_id = d.id' , 'inner')
 			->order_by('s.list_order', 'asc')
-			->get($this->tables['blocks'] . ' b')
+			->get()
 			->result_array();
 	}
 	

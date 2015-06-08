@@ -389,7 +389,6 @@ class report_block extends CI_Controller {
 		if(isset($this->supplemental) && !empty($this->supplemental)){
 			$this->report_data['supplemental'] = $this->supplemental;
 		}
-		
 		//table
 		if($block->displayType() == 'table'){
 			//header
@@ -501,7 +500,7 @@ class report_block extends CI_Controller {
 			$product_code,
 			$format,
 			$this->page->id(),
-			$this->reports->sort_text_brief($this->arr_sort_by, $this->arr_sort_order),
+			$this->reports->sortTextBrief($this->arr_sort_by, $this->arr_sort_order),
 			$filter_text
 		);
 	}

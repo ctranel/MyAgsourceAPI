@@ -63,7 +63,13 @@ class Report_data_model extends CI_Model {
 	 * @author ctranel
 	 **/
 	function search(iBlock $block, $select_fields, $arr_filter_criteria){//, $arr_sort_by = array(''), $arr_sort_order = array(''), $limit = NULL) {
-		$this->load->helper('multid_array_helper');
+//		$this->load->helper('multid_array_helper');
+
+		//load data used to build query
+		$where_array = $block->getWhereGroupArray();
+		$group_by_array = $block->getGroupBy();
+		
+		//Start building query
 		$this->db->from($block->primaryTableName());
 		/*
 		 * @todo: add joins
@@ -74,11 +80,12 @@ class Report_data_model extends CI_Model {
 			}
 		}		
 		*/
+		$this->prepWhereCriteria($where_array);
 		if(is_array($arr_filter_criteria) && !empty($arr_filter_criteria)){
-			$this->prep_where_criteria($arr_filter_criteria);
+			$this->setFilters($arr_filter_criteria);
 		}
 
-		$this->db->group_by($block->getGroupBy());
+		$this->db->group_by($group_by_array);
 		$this->prep_sort($block); // the prep_sort function adds the sort field to the active record object
 
 		//add select fields to query
@@ -105,34 +112,83 @@ class Report_data_model extends CI_Model {
 	 **/
 	
 
-	/** function prep_where_criteria
+	/** function prepWhereCriteria
+	 * 
+	 * translates filter criteria into sql format
+	 * @param $arr_filter_criteria
+	 * @return void
+	 * 
+	 * @todo: too much business logic?
+	 * @todo: implement child/nested groups
+	 */
+	
+	protected function prepWhereCriteria($where_groups){
+		if(isset($where_groups) && is_array($where_groups)){
+//			$is_firstg = true;
+			foreach($where_groups as $k => $v){
+				$sql = '(';
+				$is_firstc = true;
+//				if(!$is_firstg){
+//					$sql .= ') AND (';
+//				}
+				foreach($v['criteria'] as $c){
+					if(!$is_firstc){
+						$sql .= ' ' . $v['operator'] . ' ';
+					}
+					$sql .= $c;
+					$is_firstc = false;
+				}
+				//if this criteria has children
+/*				if()){
+					//concatenate all conditions with the operator
+					foreach($v as $vv){
+						//if it is another group
+						if(isset($vv['operator'])){
+							//recursive call, use this as a wrapper that calls a function that returns only SQL snippets (i.e., the code at the top of the foreach above)
+						}
+						//$this->db->where(' ' . $v['operator'] . ' ', $v['criteria']);
+					}
+				}
+*/
+//				$is_firstg = false;
+				$sql .= ')';
+				$this->db->where($sql);
+			}
+		}
+	}
+		
+		
+		
+	/** setFilters
 	 * 
 	 * translates filter criteria into sql format
 	 * @param $arr_filter_criteria
 	 * @return void
 	 */
 	
-	protected function prep_where_criteria($where_criteria){
-		foreach($where_criteria as $k => $v){
-			if(empty($v) === FALSE || $v === '0'){
-				if(is_array($v)){
-					//if filter is a range
-					if(key($v) === 'dbfrom' || key($v) === 'dbto'){
-						if(isset($where_criteria[$k]['dbfrom']) && !empty($where_criteria[$k]['dbfrom']) && isset($where_criteria[$k]['dbto']) && !empty($where_criteria[$k]['dbto'])){
-							$from = is_date_format($where_criteria[$k]['dbfrom']) ? date_to_mysqldatetime($where_criteria[$k]['dbfrom']) : $where_criteria[$k]['dbfrom'];
-							$to = is_date_format($where_criteria[$k]['dbto']) ? date_to_mysqldatetime($where_criteria[$k]['dbto']) : $where_criteria[$k]['dbto'];
-							$this->db->where($k . " BETWEEN '" . $from . "' AND '" . $to . "'");
+	protected function setFilters($where_criteria){
+		if(isset($where_criteria) && is_array($where_criteria)){
+			foreach($where_criteria as $k => $v){
+				if(empty($v) === FALSE || $v === '0'){
+					if(is_array($v)){
+						//if filter is a range
+						if(key($v) === 'dbfrom' || key($v) === 'dbto'){
+							if(isset($where_criteria[$k]['dbfrom']) && !empty($where_criteria[$k]['dbfrom']) && isset($where_criteria[$k]['dbto']) && !empty($where_criteria[$k]['dbto'])){
+								$from = is_date_format($where_criteria[$k]['dbfrom']) ? date_to_mysqldatetime($where_criteria[$k]['dbfrom']) : $where_criteria[$k]['dbfrom'];
+								$to = is_date_format($where_criteria[$k]['dbto']) ? date_to_mysqldatetime($where_criteria[$k]['dbto']) : $where_criteria[$k]['dbto'];
+								$this->db->where($k . " BETWEEN '" . $from . "' AND '" . $to . "'");
+							}
+						}
+						else {
+							$v = array_filter($v, create_function('$a', 'return (!empty($a) || $a === "0" || $a === 0);'));
+							if(empty($v)) continue;
+							$this->db->where_in($k, $v);
 						}
 					}
-					else {
-						$v = array_filter($v, create_function('$a', 'return (!empty($a) || $a === "0" || $a === 0);'));
-						if(empty($v)) continue;
-						$this->db->where_in($k, $v);
-					}
+					else { //is not an array
+						$this->db->where($k, $v);
+					} 
 				}
-				else { //is not an array
-					$this->db->where($k, $v);
-				} 
 			}
 		}
 	}

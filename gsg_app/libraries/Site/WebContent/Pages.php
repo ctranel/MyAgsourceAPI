@@ -12,7 +12,7 @@ use \myagsource\Site\WebContent\Page;
 use \myagsource\dhi\Herd;
 
 /**
- * A repository? for page objects
+ * A factory for page objects
  * 
  * 
  * @name Pages

@@ -2,23 +2,22 @@
 namespace myagsource\Report;
 
 /**
- * Name:  iSort
+ * Name:  iWhereCriteria
  *
  * Author: ctranel
  *
- * Created:  04-02-2015
+ * Created:  06-04-2015
  *
- * Description:  Interface for report sorting.
+ * Description:  Interface for report where criteria.
  *
  */
-interface iSort {
+interface iWhereCriteria {
 	/**
 	 */
 	function __construct(\myagsource\Datasource\iDataField $datafield, $order);
 	function fieldName();
-	function order();
-	function sortText($is_first);
-	function sortTextBrief($is_first);
+//	function operator();
+	function criteria();
 }
 
 ?>

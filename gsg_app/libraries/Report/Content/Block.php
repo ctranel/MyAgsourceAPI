@@ -3,12 +3,14 @@ namespace myagsource\Report\Content;
 
 require_once APPPATH . 'libraries/Report/iBlock.php';
 require_once APPPATH . 'libraries/Report/Content/Sort.php';
+require_once APPPATH . 'libraries/Report/Content/WhereGroup.php';
 require_once APPPATH . 'libraries/Datasource/DbObjects/DbField.php';
 //require_once APPPATH . 'libraries/Site/iWebContentRepository.php';
 
 use \myagsource\Report\iBlock;
 use \myagsource\dhi\Herd;
 use \myagsource\Report\Content\Sort;
+use \myagsource\Report\Content\WhereGroup;
 use \myagsource\Datasource\DbObjects\DbField;
 use \myagsource\Supplemental\Content\SupplementalFactory;
 use \myagsource\Datasource\iDataField;
@@ -214,6 +216,7 @@ abstract class Block implements iBlock {
 		$this->supp_param_fieldnames = [];
 		
 		//load data for remaining fields
+		$this->setWhereGroups();
 		$this->setDefaultSort();
 		//@todo: joins
 	}
@@ -323,7 +326,62 @@ abstract class Block implements iBlock {
 		];
 	}
 
-		
+	/**
+	 * setWhereGroups()
+	 * 
+	 * @return void
+	 * @author ctranel
+	 * @todo: implement child/nested groups
+	 **/
+	protected function setWhereGroups(){
+		$this->where_groups = new \SplObjectStorage();
+		$criteria = new \SplObjectStorage();
+		$arr_ret = [];
+		$arr_res = $this->datasource->getWhereData($this->id);
+		if(!is_array($arr_res) || empty($arr_res)){
+			return;
+		}
+		$prev_group = $arr_res[0]['where_group_id'];
+		$prev_op = $arr_res[0]['operator'];
+		if(is_array($arr_res)){
+			foreach($arr_res as $s){
+				if($prev_group != $s['where_group_id']){
+					$this->where_groups->attach(new WhereGroup($prev_op, $criteria));
+					$criteria = new \SplObjectStorage();
+				}
+				$criteria_datafield = new DbField($s['db_field_id'], $s['db_table_id'], $s['db_field_name'], $s['name'], $s['description'], $s['pdf_width'], $s['default_sort_order'],
+						 $s['datatype'], $s['max_length'], $s['decimal_scale'], $s['unit_of_measure'], $s['is_timespan'], $s['is_foreign_key'], $s['is_nullable'], $s['is_natural_sort']);
+				$criteria->attach(new WhereCriteria($criteria_datafield, $s['condition']));
+
+				$prev_group = $s['where_group_id'];
+				$prev_op = $s['operator'];
+			}
+			//add the last item
+			$this->where_groups->attach(new WhereGroup($s['operator'], $criteria));
+		}
+	}
+	
+	/**
+	 * getWhereGroupArray()
+	 * 
+	 * @return array of (nested) where groups
+	 * @author ctranel
+	 **/
+	public function getWhereGroupArray(){
+		$ret = [];
+		if(!is_a($this->where_groups, 'SplObjectStorage')){
+			$this->where_groups = $this->setWhereGroups();
+		}
+		if($this->where_groups->count() === 0){
+			return;
+		}
+
+		foreach($this->where_groups as $wg){
+			$ret[] = $wg->criteria();
+		}
+		return $ret;
+	}
+	
 	/**
 	 * @method sortText()
 	 * @return string sort text
@@ -334,7 +392,7 @@ abstract class Block implements iBlock {
 		$is_first = true;
 		if(isset($this->sorts) && $this->sorts->count() > 0){
 			foreach($this->sorts as $s){
-				$ret .= $is_verbose ? $s->sort_text($is_first) : $s->sort_text_brief($is_first);
+				$ret .= $is_verbose ? $s->sortText($is_first) : $s->sortTextBrief($is_first);
 				$is_first = false;
 			}
 		}

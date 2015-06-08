@@ -13,44 +13,6 @@
  */
 
 class Filter_model extends CI_Model {
-	public function __construct(){
-		parent::__construct();
-	}
-
-	
-	/** function prep_where_criteria -- overrode parent function to set where criteria to end of the date given (on form, the user enters only the date).
-	 *
-	 * translates filter criteria into sql format
-	 * @param $arr_filter_criteria
-	 * @return void
-	 * @author ctranel
-	
-	 public function prep_where_criteria($arr_filter_criteria){
-		foreach($arr_filter_criteria as $k => $v){
-			if(empty($v) === FALSE){
-				if(is_array($v)){
-					if(($tmp_key = array_search('NULL', $v)) !== FALSE){
-						unset($v[$tmp_key]);
-						$text = implode(',', $v);
-						if(!empty($v)) $this->{$this->db_group_name}->where("($k IS NULL OR $k IN ( $text ))");
-						else $this->{$this->db_group_name}->where("$k IS NULL");
-					}
-					elseif(key($v) === 'dbfrom' || key($v) === 'dbto'){
-						$from = is_date_format($arr_filter_criteria[$v['dbfrom']]) ? date_to_mysqldatetime($arr_filter_criteria[$v['dbfrom']]) : $arr_filter_criteria[$v['dbfrom']];
-						$to = is_date_format($arr_filter_criteria[$v['dbto']]) ? date_to_mysqldatetime($arr_filter_criteria[$v['dbto']]) : $arr_filter_criteria[$v['dbto']];
-						$this->{$this->db_group_name}->where($k . " BETWEEN '" . $from . "' AND '" . $to . "'");
-					}
-					else $this->{$this->db_group_name}->where_in($k, $v);
-				}
-				else { //is not an array
-					$this->{$this->db_group_name}->where($k, $v);
-				}
-			}
-		}
-	}
-	 */
-	
-	
 	/**
 	 * get_page_filters
 	 * @return array of filter data for given page
