@@ -160,8 +160,10 @@ abstract class BlockField {
 			return "FORMAT(" . $this->data_field->dbTableName() . "." . $this->data_field->dbFieldName() . ", '" . $this->display_format . "', 'en-US') AS " . $this->data_field->dbFieldName();
 		}
 		if(isset($this->aggregate) && !empty($this->aggregate)){
-			$this->name = strtolower($this->aggregate) . '_' . $this->data_field->dbFieldName();
-			return $this->aggregate . '(' . $this->data_field->dbTableName() . '.' . $this->data_field->dbFieldName() . ') AS ' . $this->name;
+			$alias_field_name = strtolower($this->aggregate) . '_' . $this->data_field->dbFieldName();
+			$ret_val = $this->aggregate . '(' . $this->data_field->dbTableName() . '.' . $this->data_field->dbFieldName() . ') AS ' . $alias_field_name;
+			$this->data_field->setDbFieldName($alias_field_name);
+			return $ret_val;
 		}
 		return $this->data_field->dbFieldName();
 	}

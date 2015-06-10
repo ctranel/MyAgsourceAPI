@@ -132,6 +132,10 @@ class DbField implements iDataField {
 		return $this->db_field_name;
 	}
 
+	public function setDbFieldName($value){
+		$this->db_field_name = $value;
+	}
+
 	public function dbTableName(){
 		return $this->db_table_name;
 	}
