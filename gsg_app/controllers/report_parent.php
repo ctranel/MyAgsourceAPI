@@ -11,6 +11,7 @@ require_once(APPPATH . 'libraries/Site/WebContent/Pages.php');
 require_once(APPPATH . 'libraries/Site/WebContent/Blocks.php');
 require_once(APPPATH . 'libraries/Report/Content/Csv.php');
 require_once(APPPATH . 'libraries/Report/Content/Pdf.php');
+require_once(APPPATH . 'libraries/Notifications/Notifications.php');
 
 use \myagsource\Benchmarks\Benchmarks;
 use \myagsource\Access_log;
@@ -25,6 +26,7 @@ use \myagsource\Site\WebContent\Block as PageBlock;
 use \myagsource\Report\Content\Csv;
 use \myagsource\Report\Content\Pdf;
 use \myagsource\Report\iBlock;
+use \myagsource\notices\Notifications;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
@@ -99,6 +101,9 @@ abstract class report_parent extends CI_Controller {
 	protected $print_all = FALSE;
 	protected $bool_is_summary;
 	protected $supplemental;
+	
+	protected $notifications;
+	protected $notices;
 
 	/**
 	 * Benchmark settings
@@ -113,6 +118,7 @@ abstract class report_parent extends CI_Controller {
 		$this->load->model('web_content/section_model');
 		$this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
 		$this->load->model('web_content/block_model');
+		$this->load->model('notice_model');
 		$this->blocks = new Blocks($this->block_model);
 		$this->pages = new Pages($this->page_model, $this->blocks);
 		$sections = new Sections($this->section_model, $this->pages);
@@ -159,6 +165,12 @@ abstract class report_parent extends CI_Controller {
 		$this->page_header_data['top_sections'] = $this->as_ion_auth->top_sections;
 		$this->page_header_data['user_sections'] = $this->as_ion_auth->user_sections;
 		$this->page_header_data['num_herds'] = $this->herd_access->getNumAccessibleHerds($this->session->userdata('user_id'), $this->as_ion_auth->arr_task_permissions(), $this->session->userdata('arr_regions'));
+		
+		//NOTICES
+		//Get any system notices
+		$this->notifications = new Notifications($this->notice_model);
+	    $this->notifications->populateNotices();
+	    $this->notices = $this->notifications->getNoticesTexts();
 		
 		/*
 		 * 
@@ -246,7 +258,7 @@ abstract class report_parent extends CI_Controller {
 		
 		$arr_blocks = $this->blocks->getByPage($this->page->id());
 		$this->page->loadChildren($arr_blocks);
-		
+				
 		//FILTERS
 		//Determine if any report blocks have is_summary flag - will determine if pstring needs to be loaded and filters shown
 		//@todo make pstring 0 work on both cow and summary reports simultaneously
@@ -465,7 +477,8 @@ abstract class report_parent extends CI_Controller {
 						'{table_sort: "' . $this->config->item("base_url_assets") . 'js/jquery/stupidtable.min.js"}',
 						'{tooltip: "https://cdn.jsdelivr.net/qtip2/2.2.0/jquery.qtip.min.js"}',
 						'{datepick: "' . $this->config->item("base_url_assets") . 'js/jquery/jquery.datepick.min.js"}'
-					)
+					),
+			        'notices'=>$this->notices
 				]
 			);
 			//load the report-specific js file if it exists
