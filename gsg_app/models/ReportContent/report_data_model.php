@@ -259,13 +259,13 @@ class Report_data_model extends CI_Model {
     * @author ctranel
     **/
     public function getStartDate($primary_table_name, $date_field, $num_dates = 12, $date_format = 'MMM-yy', $num_dates_to_shift = 0) {
-		$sql = "SELECT FORMAT(a." . $date_field . ", 'MM-dd-yyyy', 'en-US') AS " . $date_field . "
-    		FROM (SELECT DISTINCT TOP " . ($num_dates + $num_dates_to_shift) . " " . $date_field . ", ROW_NUMBER() OVER (ORDER BY " . $date_field . " DESC) AS rownum
+		$sql = "SELECT TOP 1 FORMAT(a." . $date_field . ", 'MM-dd-yyyy', 'en-US') AS " . $date_field . "
+    		FROM (SELECT DISTINCT TOP " . ($num_dates + $num_dates_to_shift) . " " . $date_field . "
                 FROM " . $primary_table_name . " 
                 WHERE herd_code = '" . $this->session->userdata('herd_code') . "' AND " . $date_field . " IS NOT NULL
                 ORDER BY " . $date_field . " DESC) a
-            WHERE rownum = " . ($num_dates + $num_dates_to_shift);
-        $result = $this->db->query($sql)->result_array();
+            ORDER BY " . $date_field . " DESC";
+		$result = $this->db->query($sql)->result_array();
         if(is_array($result) && !empty($result)) return $result[(count($result) - 1)][$date_field];
 		else return FALSE;
 	}	
