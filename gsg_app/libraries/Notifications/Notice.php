@@ -13,11 +13,8 @@ class Notice{
     private $type;
     private $time_added;
     
-    
-    
-    public function __construct(\Notice_model $notice_model, $notice_data){
+    public function __construct($notice_data){
 
-        $this->notice_model = $notice_model;
         $this->message = $notice_data['message'];
         $this->start_time = $notice_data['start_time'];
         $this->end_time = $notice_data['end_time'];
@@ -37,6 +34,10 @@ class Notice{
             ,'time_added' => $this->time_added
         );
         return $arr_return;
+    }
+    
+    public function getMessage() {
+        return $this->message;
     }
     
 }

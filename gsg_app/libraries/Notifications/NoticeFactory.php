@@ -1,6 +1,6 @@
 <?php
 namespace myagsource\notices;
-require_once 'NoticeFactory.php';
+require_once 'Notice.php';
 
 
 class NoticeFactory {
@@ -9,8 +9,8 @@ class NoticeFactory {
         
     }
 
-    public static function createNotice($notice_model, $notice_data){
-        return new Notice($notice_model, $notice_data);
+    public static function createNotice($notice_data){
+        return new Notice($notice_data);
     }
     
 }

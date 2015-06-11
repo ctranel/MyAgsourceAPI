@@ -143,7 +143,9 @@
 		</ul>
 	<!--left side of page-->
 	<div id="main-content">
-	<?php if (!empty($page_heading)) echo heading($page_heading);
+	<?php
+	
+	if(!empty($page_heading)) echo heading($page_heading);
 
 	if(isset($error)):
 		if (is_array($error) &&!empty($error)):
@@ -154,6 +156,17 @@
 			<div id="errors"><?php echo $error;?></div>
 <?php 	endif;
 	endif;
+
+	if(isset($notices) && !empty($notices)) { ?>
+<div> 
+<?php   foreach($notices as $n) {
+            echo $n;   
+        }
+?>
+</div>
+<?php 
+    }
+
 	if(isset($message)):
 		if (is_array($message) && !empty($message)):
 			foreach($message as $m) {?>
