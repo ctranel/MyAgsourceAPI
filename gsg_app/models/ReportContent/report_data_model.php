@@ -64,7 +64,6 @@ class Report_data_model extends CI_Model {
 	 **/
 	function search(iBlock $block, $select_fields, $arr_filter_criteria){//, $arr_sort_by = array(''), $arr_sort_order = array(''), $limit = NULL) {
 //		$this->load->helper('multid_array_helper');
-
 		//load data used to build query
 		$where_array = $block->getWhereGroupArray();
 		$group_by_array = $block->getGroupBy();
@@ -94,24 +93,17 @@ class Report_data_model extends CI_Model {
 			$select_fields = ['*'];
 		}
 
-//$this->db->select('d'); //uncomment to dump search query to screen
 		$this->db->select($select_fields, FALSE);
+		if($block->maxRows() > 0){
+			$this->db->limit($block->maxRows());
+		}
+//$this->db->select('d'); //uncomment to dump search query to screen
 		$ret = $this->db->get()->result_array();
 		$this->num_results = count($ret);
 		//$ret['arr_unsortable_columns'] = $this->arr_unsortable_columns;
 		return $ret;
 	}
 	
-	/**
-	 * @method prep_select_fields()
-	 * @param arr_fields: copy of fields array to be formatted into SQL
-	 * @return array of sql-prepped select fields
-	 * @author ctranel
-	protected function prep_select_fields(){
-	}
-	 **/
-	
-
 	/** function prepWhereCriteria
 	 * 
 	 * translates filter criteria into sql format
