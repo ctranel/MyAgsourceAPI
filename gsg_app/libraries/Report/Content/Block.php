@@ -65,10 +65,10 @@ abstract class Block implements iBlock {
 	protected $report_fields;
 	
 	/**
-	 * array of field names to be added to the field objects
-	 * @var array of strings
+	 * collection of iDataField objects
+	 * @var SplObjectStorage
 	 **/
-	protected $addl_select_field_names;
+	protected $group_by;
 
 	/**
 	 * collection of WhereGroup objects
@@ -282,10 +282,6 @@ abstract class Block implements iBlock {
 		return $this->is_summary;
 	}
 
-	public function hasCntRow(){
-		return $this->cnt_row;
-	}
-
 	public function hasAvgRow(){
 		return $this->avg_row;
 	}
@@ -313,19 +309,6 @@ abstract class Block implements iBlock {
 		return $ret;
 	}
 	
-	/**
-	 * addFieldName
-	 * 
-	 * Add a field name to be included in the data query.  Will not create a new series
-	 * 
-	 * @return void
-	 * @access public
-	 *
-	 **/
-	public function addFieldName($name){
-		$this->addl_select_field_names[] = $name;
-	}
-
 	/**
 	 * @method getOutputData
 	 * @return array of output data for block

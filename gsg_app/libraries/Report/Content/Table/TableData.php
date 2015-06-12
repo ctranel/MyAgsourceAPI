@@ -85,10 +85,7 @@ class TableData extends BlockData {
 			}
 		}
 		if($this->block->hasPivot()){
-			$results = $this->pivot($results);
-		}
-		elseif($this->block->hasCntRow() || $this->block->hasAvgRow() || $this->block->hasSumRow()){
-			$results = $this->addAggregateRows($results);
+			$results = $this->pivot($results, $this->block->pivotFieldName(), 10, 10, $this->block->hasAvgRow(), $this->block->hasSumRow());
 		}
 		return $results;
 	}

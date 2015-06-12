@@ -52,18 +52,6 @@ abstract class BlockData implements iBlockData{
 		$this->report_datasource = $report_datasource;
 	}
 	
-	/**
-	 * prepSelectFields()
-	 * 
-	 * In place to allow child classes to interact with select fields
-	 * 
-	 * @return array of sql-prepped select fields
-	 * @author ctranel
-	 **/
-	protected function prepSelectFields(){
-
-	}
-	
 	/** function whereCriteria
 	 *
 	 * translates filter criteria into sql format
@@ -72,6 +60,21 @@ abstract class BlockData implements iBlockData{
 	 */
 	
 	protected function whereCriteria($arr_where_criteria){
+		//incorporate built-in report filters if set
+		/* NOT CURRENTLY USED
+			if(is_array($this->arr_where_field) && !empty($this->arr_where_field)){
+		$tmp_cnt = count($this->arr_where_field);
+		for($x = 0; $x < $tmp_cnt; $x++){
+		//if the field does not have a table prefix, add it
+		if(strpos($this->arr_where_field[$x], '.') === FALSE){
+		$this->arr_where_field[$x] =
+		isset($this->arr_field_table[$this->arr_where_field[$x]]) && !empty($this->arr_field_table[$this->arr_where_field[$x]])
+		? $this->arr_field_table[$this->arr_where_field[$x]] . '.' . $this->arr_where_field[$x]
+		: $this->primary_table_name . '.' . $this->arr_where_field[$x];
+		}
+		$this->{$this->db_group_name}->where($this->arr_where_field[$x] . $this->arr_where_operator[$x] . $this->arr_where_criteria[$x]);
+		}
+		} */
 		foreach($arr_where_criteria as $k => $v){
 			//@todo: the below is only for databases as datasource
 			if(strpos($k, '.') === FALSE) {
@@ -112,6 +115,7 @@ abstract class BlockData implements iBlockData{
 	* @param array fields to sort by
 	* @param array sort order--corresponds to first parameter
 	* @author ctranel
+	*/
 	protected function prep_sort($arr_sort_by, $arr_sort_order){
 		$arr_len = is_array($arr_sort_by)?count($arr_sort_by):0;
 		for($c=0; $c<$arr_len; $c++) {
@@ -128,7 +132,6 @@ abstract class BlockData implements iBlockData{
 			}
 		}
 	}
-	*/
 	
 	/*  
 	 * @method pivot()
@@ -137,7 +140,10 @@ abstract class BlockData implements iBlockData{
 	 * @author ctranel
 	 */
 	public function pivot($arr_dataset){
+		//$header_text = ' ';
 		$header_field = $this->block->pivotFieldName();
+		//$header_field_width = 10;
+		//$label_column_width = 10;
 		
 		$new_dataset = [];
 		//don't want to insert the sum or count in middle of row, so store in temp vars until end
@@ -164,8 +170,6 @@ abstract class BlockData implements iBlockData{
 				}				
 			}
 		}
-		
-//		return $this->addAggregateRow($new_dataset);
 
 		$first = true;
 		foreach($new_dataset as $k=>&$a){
@@ -184,9 +188,9 @@ abstract class BlockData implements iBlockData{
 				}
 				if($this->block->hasAvgRow() && isset($sum[$k]) === true){
 					$tmp = $sum[$k] / $count[$k];
-//					if(isset($this->arr_decimal_points[$k])){
-//						$tmp = round($tmp, $this->arr_decimal_points[$k]);
-//					}
+					if(isset($this->arr_decimal_points[$k])){
+						$tmp = round($tmp, $this->arr_decimal_points[$k]);
+					}
 					if($first){
 						$new_dataset[$k][] = 'Average';
 					}
@@ -199,61 +203,5 @@ abstract class BlockData implements iBlockData{
 		}
 		return $new_dataset;
 	}
-
-	/*
-	* addAggregateRows
-	* 
-	* @param array dataset
-	* @return array modified resultset
-	* @author ctranel
-	*/
-	public function addAggregateRows($arr_dataset){
-		$sum = [];
-		$avg = [];
-		$count = [];
-	
-		if(!isset($arr_dataset) || empty($arr_dataset)){
-			return false;
-		}
-		$first_col_key = key($arr_dataset[0]);
-		foreach($arr_dataset as $k => $row){
-			foreach($row as $name => $val){
-				if(strpos($name, 'isnull') === false && is_numeric($val)) {
-					//$new_dataset[$name][$k] = $val;
-	
-					if(isset($sum[$name]) === false && $val !== null){
-						$sum[$name] = 0;
-						$count[$name] = 0;
-					}
-						
-					if($val !== NULL){
-						$sum[$name] += $val;
-						$count[$name]++;
-					}
-				}
-			}
-		}
-
-		if($this->block->hasCntRow() && count($count) > 1){
-			$count[$first_col_key] = 'CNT';
-			$arr_dataset[] = $count;
-		}
-		if($this->block->hasSumRow() && count($sum) > 1){
-			$sum[$first_col_key] = 'SUM';
-			$arr_dataset[] = $sum;
-		}
-		if($this->block->hasAvgRow() && count($sum) > 1){
-			foreach($sum as $k => $v){
-				$avg[$k] = $sum[$k] / $count[$k];
-//				if(isset($this->arr_decimal_points[$k])){
-//					$tmp = round($tmp, $this->arr_decimal_points[$k]);
-//				}
-			}
-			$avg[$first_col_key] = 'AVG';
-			$arr_dataset[] = $avg;
-		}
-		return $arr_dataset;
-	}
-	
 }
 ?>
