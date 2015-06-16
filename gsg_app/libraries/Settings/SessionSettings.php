@@ -1,5 +1,5 @@
 <?php
-namespace myagsource\settings;
+namespace myagsource\Settings;
 
 require_once APPPATH . 'libraries/Settings/Setting.php';
 

@@ -1,5 +1,5 @@
 <?php
-namespace myagsource\settings;
+namespace myagsource\Settings;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /**
