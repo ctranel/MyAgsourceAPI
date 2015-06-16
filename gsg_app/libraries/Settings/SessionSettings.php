@@ -1,7 +1,7 @@
 <?php
 namespace myagsource\settings;
 
-require_once APPPATH . 'libraries' . FS_SEP . 'settings' . FS_SEP . 'Setting.php';
+require_once APPPATH . 'libraries/Settings/Setting.php';
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /**
