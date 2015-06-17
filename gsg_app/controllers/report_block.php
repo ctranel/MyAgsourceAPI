@@ -345,6 +345,7 @@ class report_block extends CI_Controller {
 				}
 				
 				if($block->displayType() == 'trend chart' || $block->displayType() == 'compare chart'){
+					$this->data_handler_name = 'myagsource\\Report\\Content\\Chart\\' . $this->data_handler_name;
 					$block_data_handler = new $this->data_handler_name($block, $this->report_data_model);
 				}
 			}

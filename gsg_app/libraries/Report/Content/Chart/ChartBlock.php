@@ -112,7 +112,7 @@ class ChartBlock extends Block {
 				$arr_table_ref_cnt[$s['table_name']] = isset($arr_table_ref_cnt[$s['table_name']]) ? ($arr_table_ref_cnt[$s['table_name']] + 1) : 1;
 				$datafield = new DbField($s['db_field_id'], $s['table_name'], $s['db_field_name'], $s['name'], $s['description'], $s['pdf_width'], $s['default_sort_order'],
 						 $s['datatype'], $s['max_length'], $s['decimal_scale'], $s['unit_of_measure'], $s['is_timespan'], $s['is_foreign_key'], $s['is_nullable'], $s['is_natural_sort']);
-				$this->report_fields->attach(new ChartField($s['id'], $s['name'], $datafield, $s['is_displayed'], $s['display_format'], $s['aggregate'], $s['is_sortable'], $s['chart_type'], $s['axis_index'], $s['trend_type'], $s['series_group'], $header_supp, $data_supp));
+				$this->report_fields->attach(new ChartField($s['id'], $s['name'], $datafield, $s['is_displayed'], $s['display_format'], $s['aggregate'], $s['is_sortable'], $s['chart_type'], $s['axis_index'], $s['trend_type'], $s['field_group'], $header_supp, $data_supp));
 			}
 			$this->primary_table_name = array_search(max($arr_table_ref_cnt), $arr_table_ref_cnt);
 			//set up arr_fields hierarchy
