@@ -34,7 +34,7 @@ class Lactations_model extends CI_Model {
 	
 	public function getOffspringArray($herd_code, $serial_num){
 		$arr_ret = $this->{$this->db_group_name}
-		->select("calf_control_num, calving_date, calf_name, calf_visible_id, sex_desc, twin_code, calving_ease_code, calf_sire_naab, calf_sire_name")
+		->select("calf_control_num, FORMAT(calving_date, 'd') as calving_date, calf_name, calf_visible_id, sex_desc, twin_code, calving_ease_code, calf_sire_naab, calf_sire_name")
 		->where('herd_code', $herd_code)
 		->where('serial_num', $serial_num)
 		->order_by('CONVERT(datetime, calving_date, 101)')
