@@ -5,9 +5,10 @@ if(isset($structure) && is_array($structure)):
 	<tr>
 		<?php foreach($row as $k => $th):
 			//html properties
-			$th_id = str_replace(' ', '_', strtolower($th->text()));
+			$th_id = $th->dbFieldName();//str_replace(' ', '_', strtolower($th->text()));
 			$class = ($th->colspan() > '1') ? 'cat-heading' : 'subcat-heading';
-			$class .= " $th_id";
+			$class .= " " . str_replace(' ', '_', strtolower($th->text()));
+			//$class .= " $th_id";
 			 ?><th id="<?php echo $th_id; ?>" colspan="<?php echo $th->colspan(); ?>" rowspan="<?php echo $th->rowspan(); ?>"<?php 
 			$inner_html = $th->text();
 			$after_text = '';
