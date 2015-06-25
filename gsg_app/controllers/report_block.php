@@ -405,7 +405,7 @@ class report_block extends CI_Controller {
 			if($block->hasPivot()){
 				reset($this->report_data['data']);
 				$tmp_key = key($this->report_data['data']);
-				$top_row = [ucwords(str_replace('_', ' ', $tmp_key))] + $this->report_data['data'][$tmp_key];
+				$top_row = array_merge([ucwords(str_replace('_', ' ', $tmp_key))],$this->report_data['data'][$tmp_key]);
 				unset($this->report_data['data'][$tmp_key]);
 			}
 			$table_header = new TableHeader($block, $header_groups, new SupplementalFactory($this->supplemental_model, site_url()));
