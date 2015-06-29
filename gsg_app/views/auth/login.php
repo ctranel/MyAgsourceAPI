@@ -2,7 +2,7 @@
 <div class='mainInfo'>
 	<?php if(isset($page_heading) !== false) echo heading($page_heading); ?>
 	
-  <div id="infoMessage">MyAgsource will be down for maintenance from 1:00 to 3:00am on June 28, 2015.  We apologize for any inconvenience.</div>
+  <!-- <div id="infoMessage">MyAgsource will be down for maintenance from 1:00 to 3:00am on June 28, 2015.  We apologize for any inconvenience.</div> -->
 	<div class="row">
 		<div class="col-sm-6">
 			<div class="box login">
