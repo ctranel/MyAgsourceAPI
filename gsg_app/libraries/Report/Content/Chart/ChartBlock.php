@@ -55,10 +55,13 @@ class ChartBlock extends Block {
 	 **/
 	protected $series;
 
+	//added to know when to remove or keep nulls in chart data - KLM
+	protected $keep_nulls;
+	
 	/**
 	 */
 	function __construct($block_datasource, $id, $page_id, $name, $description, $scope, $active, $path, $max_rows, $cnt_row, 
-			$sum_row, $avg_row, $bench_row, $is_summary, $display_type, $chart_type, SupplementalFactory $supp_factory) {
+			$sum_row, $avg_row, $bench_row, $is_summary, $display_type, $chart_type, SupplementalFactory $supp_factory, $keep_nulls) {
 		parent::__construct($block_datasource, $id, $page_id, $name, $description, $scope, $active, $path, $max_rows, $cnt_row, 
 			$sum_row, $avg_row, $bench_row, $is_summary, $display_type, $supp_factory);
 		
@@ -70,6 +73,10 @@ class ChartBlock extends Block {
 		$this->setChartAxes();
 	}
 
+	public function keepNulls(){
+	    return $this->keep_nulls;
+	}
+	
 	public function xAxes(){
 		return $this->x_axes;
 	}
@@ -147,7 +154,7 @@ class ChartBlock extends Block {
 					$a['datatype'], $a['max_length'], $a['decimal_scale'], $a['unit_of_measure'], $a['is_timespan'], $a['is_foreign_key'], $a['is_nullable'], $a['is_natural_sort']);
 				//add fields as a report field so it is included in the select statement
 				$display_format = $a['data_type'] === 'datetime' ? 'MM-dd-yy' : null;
-				$this->report_fields->attach(new ChartField($a['id'], $a['name'], $datafield, false, $display_format, null, 0, null, null, null, null));
+				$this->report_fields->attach(new ChartField($a['id'], $a['name'], $datafield, false, $display_format, null, true, null, null, null, null));
 				
 			}
 			if($a['x_or_y'] === 'x'){
