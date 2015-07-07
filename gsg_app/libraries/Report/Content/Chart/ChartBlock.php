@@ -58,9 +58,9 @@ class ChartBlock extends Block {
 	/**
 	 */
 	function __construct($block_datasource, $id, $page_id, $name, $description, $scope, $active, $path, $max_rows, $cnt_row, 
-			$sum_row, $avg_row, $bench_row, $is_summary, $display_type, $chart_type, SupplementalFactory $supp_factory) {
+			$sum_row, $avg_row, $bench_row, $is_summary, $display_type, $chart_type, SupplementalFactory $supp_factory, $field_groups) {
 		parent::__construct($block_datasource, $id, $page_id, $name, $description, $scope, $active, $path, $max_rows, $cnt_row, 
-			$sum_row, $avg_row, $bench_row, $is_summary, $display_type, $supp_factory);
+			$sum_row, $avg_row, $bench_row, $is_summary, $display_type, $supp_factory, $field_groups);
 		
 		$this->setReportFields();
 		
@@ -68,14 +68,24 @@ class ChartBlock extends Block {
 		$this->x_axes = new \SplObjectStorage();
 		$this->y_axes = new \SplObjectStorage();
 		$this->setChartAxes();
+		$this->setSeries();
 	}
 
 	public function xAxes(){
 		return $this->x_axes;
 	}
+	
+//currently using for testing only
+	public function series(){
+		return $this->series;
+	}
 
 	public function chartType(){
 		return $this->chart_type;
+	}
+
+	public function categories(){
+		return $this->categories;
 	}
 
 	/**
@@ -112,7 +122,7 @@ class ChartBlock extends Block {
 				$arr_table_ref_cnt[$s['table_name']] = isset($arr_table_ref_cnt[$s['table_name']]) ? ($arr_table_ref_cnt[$s['table_name']] + 1) : 1;
 				$datafield = new DbField($s['db_field_id'], $s['table_name'], $s['db_field_name'], $s['name'], $s['description'], $s['pdf_width'], $s['default_sort_order'],
 						 $s['datatype'], $s['max_length'], $s['decimal_scale'], $s['unit_of_measure'], $s['is_timespan'], $s['is_foreign_key'], $s['is_nullable'], $s['is_natural_sort']);
-				$this->report_fields->attach(new ChartField($s['id'], $s['name'], $datafield, $s['is_displayed'], $s['display_format'], $s['aggregate'], $s['is_sortable'], $s['chart_type'], $s['axis_index'], $s['trend_type'], $s['field_group'], $header_supp, $data_supp));
+				$this->report_fields->attach(new ChartField($s['id'], $s['name'], $datafield, $s['category_id'], $s['is_displayed'], $s['display_format'], $s['aggregate'], $s['is_sortable'], $s['chart_type'], $s['axis_index'], $s['trend_type'], $s['field_group'], $header_supp, $data_supp, $s['field_group'], $s['field_group_ref_key']));
 			}
 			$this->primary_table_name = array_search(max($arr_table_ref_cnt), $arr_table_ref_cnt);
 			//set up arr_fields hierarchy
@@ -147,7 +157,7 @@ class ChartBlock extends Block {
 					$a['datatype'], $a['max_length'], $a['decimal_scale'], $a['unit_of_measure'], $a['is_timespan'], $a['is_foreign_key'], $a['is_nullable'], $a['is_natural_sort']);
 				//add fields as a report field so it is included in the select statement
 				$display_format = $a['data_type'] === 'datetime' ? 'MM-dd-yy' : null;
-				$this->report_fields->attach(new ChartField($a['id'], $a['name'], $datafield, false, $display_format, null, 0, null, null, null, null));
+				$this->report_fields->attach(new ChartField($a['id'], $a['name'], $datafield, null, false, $display_format, null, true, null, null, null, null));
 				
 			}
 			if($a['x_or_y'] === 'x'){
@@ -166,39 +176,45 @@ class ChartBlock extends Block {
 	}
 
 	/**
-	 * @method getAxesOutput
-	 * @return array of output data for x and y axis.  null if no axes in chart
+	 * @method getXAxisOutput
+	 * @return array
 	 * @access protected
 	 *
 	 **/
-	protected function getAxesOutput(){
-		$tmp = [];
+	protected function getXAxisOutput(){
 		$ret = [];
 		$cnt = 0;
-		if($this->x_axes->count() === 0 && $this->y_axes->count() === 0){
+		if($this->x_axes->count() === 0){
 			return;
 		}
 		foreach($this->x_axes as $a){
 			if($cnt === 0 || $a->category() === null){
-				$tmp[$cnt] = $a->getOutputData();
+				$ret[$cnt] = $a->getOutputData();
 			}
 			if($cnt === 0 && $a->category() !== null){
-				$tmp[$cnt]['categories'] = $this->categories;
+				$ret[$cnt]['categories'] = $this->categories;
 			}
 			$cnt++;
 		}
-		if(!empty($tmp)){
-			$ret['x'] = $tmp;
-		}
-	
-		$tmp = [];
+		return $ret;
+	}
+
+	/**
+	 * @method getYAxisOutput
+	 * @return array
+	 * @access protected
+	 *
+	 **/
+	protected function getYAxisOutput(){
+		$ret = [];
 		$cnt = 0;
-		foreach($this->y_axes as $a){
-			$tmp[$cnt] = $a->getOutputData();
-			$cnt++;
+		if($this->y_axes->count() === 0){
+			return;
 		}
-		if(!empty($tmp)){
-			$ret['y'] = $tmp;
+
+		foreach($this->y_axes as $a){
+			$ret[$cnt] = $a->getOutputData();
+			$cnt++;
 		}
 		return $ret;
 	}
@@ -213,49 +229,50 @@ class ChartBlock extends Block {
 	public function getOutputData(){//$cnt_datapoints){
 		$ret = parent::getOutputData();
 		$ret['chart_type'] = $this->chart_type;
-		$ret['arr_axes'] = $this->getAxesOutput();
-		if(empty($ret['arr_axes'])){
-			unset($ret['arr_axes']);
+		if($this->x_axes->count() > 0){
+			$ret['arr_axes']['x'] = $this->getXAxisOutput();
 		}
-		$ret['series'] = $this->getSeriesOutput();
-		if(empty($ret['series'])){
-			unset($ret['series']);
+		if($this->y_axes->count() > 0){
+			$ret['arr_axes']['y'] = $this->getYAxisOutput();
+		}
+		if(isset($this->series) && !empty($this->series)){
+			$ret['series'] = $this->series;
 		}
 		return $ret;
 	}
 
 	/**
-	 * getSeriesOutput
+	 * setSeries
 	 * 
 	 * 
 	 * 
-	 * @param int number of datapoints
-	 * @return array of output data for block
+	 * @return void
 	 * @access protected
 	 *
 	 **/
-	protected function getSeriesOutput(){//$cnt_datapoints){
-		if(!empty($this->categories)){
-			return $this->deriveSeries();//count($this->json['data'], COUNT_RECURSIVE));
+	protected function setSeries(){
+		if(!empty($this->categories) || !empty($this->field_groups)){
+			$this->series = $this->deriveSeries();//count($this->json['data'], COUNT_RECURSIVE));
+			$this->series = array_values($this->series);
+			return;
 		}
-		$ret = [];
 		$cnt = 0;
 
 		//boxplots have 3 columns per series, all other chart types are 1:1
 		foreach($this->report_fields as $f){
-			$idx = $f->seriesGroup();
+			$idx = $f->fieldGroup();
 			$idx = isset($idx) ? (int)$idx : $cnt;
 				
 			if($f->isDisplayed()){
-				$ret[$idx] = [
+				$this->series[$idx] = [
 					'name' => $f->displayName(),
 					'um' => $f->unitOfMeasure(),
 					'type' => $f->chartType(),
 					'yAxis' => $f->axisIndex(),
 				];
 				if($f->trendType() !== null){
-					$ret[$idx]['regression'] = true;
-					$ret[$idx]['regressionSettings'] = [
+					$this->series[$idx]['regression'] = true;
+					$this->series[$idx]['regressionSettings'] = [
 						'type' => $f->trendType(),
 						'order' => 8,
 					];
@@ -263,11 +280,14 @@ class ChartBlock extends Block {
 				$cnt++;
 			}
 		}
-		return $ret;
+		$this->series = array_values($this->series);
 	}
 
 	/**
 	 * @method numSeries
+	 * 
+	 * used only for boxplots.  hopefully this functionality can be absorbed by field group functionality
+	 * 
 	 * @return int number of series on chart
 	 * @access protected
 	 *
@@ -275,13 +295,13 @@ class ChartBlock extends Block {
 	public function numSeries(){
 		$series = [];
 		foreach($this->report_fields as $f){
-			$sg = $f->seriesGroup();
+			$sg = $f->fieldGroup();
 			if(!isset($sg)){
 				continue;
 			}
 			$idx = array_search($sg, $series, true);
 			if($idx === false){
-				$series[] = $f->seriesGroup();
+				$series[] = $f->fieldGroup();
 			}
 		}
 		if(empty($series)){
@@ -292,38 +312,39 @@ class ChartBlock extends Block {
 
 	/**
 	 * @method deriveSeries
-	 * @param int number of datapoints
+	 * @param int num series'
 	 * @return array of output data for block
 	 * @access protected
 	 *
 	 **/
-	protected function deriveSeries(){//$cnt_datapoints){
-		//as of 9/11/2014, in order to get labels correct, we need to change the header text in blocks_select_fields for the first {number of series'} fields
-		//in order for this function to work correctly, the DB view must have all fields in one row, or have series' as columns and categories as row keys.
+	protected function deriveSeries(){
 		$return_val = [];
+		$cat_cnt_divisor = count($this->categories) === 0 ? 1 : count($this->categories);
+		$field_cnt = (int)$this->report_fields->count() / $cat_cnt_divisor;
+
 		$c = 0;
-
-		//if there is more than one datapoint per category
-		if((int)($this->report_fields->count() / count($this->categories)) > 1){
-			$num_series = $this->report_fields->count() / count($this->categories);
-		}
-		else{
-			$num_series = $this->report_fields->count();
-		}
-
 		foreach($this->report_fields as $f){
-			$return_val[$c]['name'] = $f->displayName();
+			//@todo: what if a chart has the same number for field id and group_id (not really possible since group num starts at 1 for each block but...)
+			if($f->fieldGroup()){
+				$idx = $f->fieldGroup();
+			}
+			else{
+				$idx = $f->id();
+			}
+			
+			$return_val[$idx]['name'] = $f->displayName();
 			if($f->unitOfMeasure()){
-				$return_val[$c]['um'] = $f->unitOfMeasure();
+				$return_val[$idx]['um'] = $f->unitOfMeasure();
 			}
 			if($f->axisIndex()){
-				$return_val[$c]['yAxis'] = $f->axisIndex();
+				$return_val[$idx]['yAxis'] = $f->axisIndex();
 			}
 			if($f->chartType()){
-				$return_val[$c]['type'] = $f->chartType();
+				$return_val[$idx]['type'] = $f->chartType();
 			}
+			
 			$c++;
-			if($c >= $num_series){
+			if($c >= $field_cnt){
 				break;
 			}
 		}

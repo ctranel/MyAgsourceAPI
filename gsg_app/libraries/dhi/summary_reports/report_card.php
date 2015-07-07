@@ -29,7 +29,6 @@ class Report_card extends ChartData {
 	 * @param arr_fields: copy of fields array to be formatted into SQL
 	 * @return array of sql-prepped select fields
 	 * @author ctranel
-	 **/
 	protected function prepSelectFields(){
 		if(!$this->is_historical){
 			foreach($this->arr_db_field_list as $sf){
@@ -41,6 +40,7 @@ class Report_card extends ChartData {
 		}
 		return parent::prep_select_fields();
 	}
+	 **/
 	
 	/**
 	 * @method setRowToSeries - used when each row from a set of database results corresponds with a series of data.
@@ -49,7 +49,7 @@ class Report_card extends ChartData {
 	 * @access protected
 	 *
 	 **/
-	protected function setRowToSeries(){
+	protected function setRowToSerieszzz(){
 		if($this->is_historical){
 			return parent::setRowToSeries();
 		}
@@ -58,30 +58,32 @@ class Report_card extends ChartData {
 			foreach($this->dataset as $k=>$row){
 				$count = 0;
 				foreach($this->block->getFieldlistArray() as $f){
-					$f = str_replace('_pct', '', $f);
-					//bar series
-					$arr_return[0][$count] = array(
-						'x' => $count,
-						'y' => (float)$row[$f . '_pct'],
-						'val' => (float)$row[$f],
-					);
-					//scatterplot point for each of the 3 benchmark breakpoints
-					$arr_return[1][] = array(
-						'x' => $count,
-						'y' => 10,
-						'val' => (float)$row[$f . '_10_pct'],
-					);
-					$arr_return[1][] = array(
-						'x' => $count,
-						'y' => 50,
-						'val' => (float)$row[$f . '_50_pct'],
-					);
-					$arr_return[1][] = array(
-						'x' => $count,
-						'y' => 90,
-						'val' => (float)$row[$f . '_90_pct'],
-					);
-					$count++;
+					if(strpos($f, 'pct') === false){
+						$f = str_replace('_pct', '', $f);
+						//bar series
+						$arr_return[0][$count] = array(
+							'x' => $count,
+							'y' => (float)$row[$f . '_pct'],
+							'val' => (float)$row[$f],
+						);
+						//scatterplot point for each of the 3 benchmark breakpoints
+						$arr_return[1][] = array(
+							'x' => $count,
+							'y' => 10,
+							'val' => (float)$row[$f . '_10_pct'],
+						);
+						$arr_return[1][] = array(
+							'x' => $count,
+							'y' => 50,
+							'val' => (float)$row[$f . '_50_pct'],
+						);
+						$arr_return[1][] = array(
+							'x' => $count,
+							'y' => 90,
+							'val' => (float)$row[$f . '_90_pct'],
+						);
+						$count++;
+					}
 				}
 			}
 			return $arr_return;

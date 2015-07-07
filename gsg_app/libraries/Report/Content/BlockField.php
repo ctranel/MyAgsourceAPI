@@ -30,6 +30,12 @@ abstract class BlockField {
 	protected $data_field;
 
 	/**
+	 * category_id
+	 * @var int
+	 **/
+	protected $category_id;
+
+	/**
 	 * block name
 	 * @var string
 	 **/
@@ -71,32 +77,49 @@ abstract class BlockField {
 	 **/
 	protected $data_supp;
 	
+	/**
+	 * field_group
+	 * @var int
+	 **/
+	protected $field_group;
+	
+	/**
+	 * field_group_ref_key
+	 * @var string
+	 **/
+	protected $field_group_ref_key;
 	
 	/**
 	 */
-	public function __construct($id, $name, DbField $data_field, $is_displayed, $display_format, $aggregate, $is_sortable, $header_supp, $data_supp) {
+	public function __construct($id, $name, DbField $data_field, $category_id, $is_displayed, $display_format, $aggregate, $is_sortable, $header_supp, $data_supp, $field_group, $field_group_ref_key) {
 		$this->id = $id;
 		$this->name = $name;
 		$this->data_field = $data_field;
+		$this->category_id = $category_id;
 		$this->is_displayed = $is_displayed;
 		$this->display_format = $display_format;
 		$this->aggregate = $aggregate;
 		$this->is_sortable = $is_sortable;
 		$this->header_supp = $header_supp;
 		$this->data_supp = $data_supp;
+		$this->field_group = $field_group;
+		$this->field_group_ref_key = $field_group_ref_key;
 	}
 	
-	/* debugging
 	public function id() {
 		return $this->id;
 	}
-  */
+	
 	public function dbFieldName() {
 		return $this->data_field->dbFieldName();
 	}
 
 	public function displayName() {
 		return $this->name;
+	}
+
+	public function categoryId() {
+		return $this->category_id;
 	}
 
 	public function decimalScale() {
@@ -137,6 +160,14 @@ abstract class BlockField {
 
 	public function isNaturalSort() {
 		return $this->data_field->isNaturalSort();
+	}
+
+	public function fieldGroup() {
+		return $this->field_group;
+	}
+
+	public function fieldGroupRefKey() {
+		return $this->field_group_ref_key;
 	}
 
 	public function dataSupplemental() {

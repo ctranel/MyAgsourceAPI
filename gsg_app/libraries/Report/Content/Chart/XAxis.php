@@ -100,7 +100,7 @@ class XAxis {
 			'min' => $this->min,
 			'max' => $this->max,
 			'opposite' => $this->opposite,
-			'data_type' => $dbfield_type,
+			'data_type' => $this->data_type,
 			'db_field_name' => $dbfield_name,
 			'text' => $this->label_text,
 //			'um' => $this->um,

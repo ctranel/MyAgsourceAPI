@@ -46,12 +46,11 @@ class ChartField extends BlockField {
 
 	/**
 	 */
-	public function __construct($id, $name, DbField $data_field, $is_displayed, $display_format, $aggregate, $is_sortable, $chart_type, $axis_index, $trend_type, $field_group, $header_supp = null, $data_supp = null) {
-		parent::__construct($id, $name, $data_field, $is_displayed, $display_format, $aggregate, $is_sortable, $header_supp, $data_supp);
+	public function __construct($id, $name, DbField $data_field, $category_id, $is_displayed, $display_format, $aggregate, $is_sortable, $chart_type, $axis_index, $trend_type, $field_group, $header_supp = null, $data_supp = null, $field_group = null, $field_group_ref_key = null) {
+		parent::__construct($id, $name, $data_field, $category_id, $is_displayed, $display_format, $aggregate, $is_sortable, $header_supp, $data_supp, $field_group, $field_group_ref_key);
 		$this->chart_type = $chart_type;
 		$this->axis_index = $axis_index;
 		$this->trend_type = $trend_type;
-		$this->field_group = $field_group;
 	}
 	
 	public function chartType(){
@@ -64,10 +63,6 @@ class ChartField extends BlockField {
 
 	public function trendType(){
 		return $this->trend_type;
-	}
-
-	public function seriesGroup(){
-		return $this->field_group;
 	}
 }
 

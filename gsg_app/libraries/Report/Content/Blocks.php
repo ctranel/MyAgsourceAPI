@@ -4,7 +4,6 @@ namespace myagsource\Report\Content;
 
 require_once(APPPATH . 'libraries/Report/Content/Table/TableBlock.php');
 require_once(APPPATH . 'libraries/Report/Content/Chart/ChartBlock.php');
-//require_once(APPPATH . 'libraries/Report/iReportContentRepository.php');
 require_once(APPPATH . 'libraries/Report/iBlock.php');
 require_once(APPPATH . 'libraries/dhi/Herd.php');
 require_once(APPPATH . 'libraries/Datasource/DbObjects/DbTable.php');
@@ -45,7 +44,7 @@ class Blocks {// implements iReportContentRepository {
 	 **/
 	protected $supplemental_factory;
 	
-	function __construct(\report_block_model $datasource_blocks, \db_field_model $datasource_dbfield, \myagsource\Supplemental\Content\SupplementalFactory $supplemental_factory = null) {
+	function __construct(\report_block_model $datasource_blocks, \db_field_model $datasource_dbfield, SupplementalFactory $supplemental_factory = null) {
 		$this->datasource_blocks = $datasource_blocks;
 		$this->datasource_dbfield = $datasource_dbfield;
 		$this->supplemental_factory = $supplemental_factory;
@@ -71,20 +70,7 @@ class Blocks {// implements iReportContentRepository {
 
 		//$sort = 
 		$r = $results[0];
-		if($r['display_type'] === 'table'){
-			$block = new TableBlock($this->datasource_blocks, $r['id'], $r['page_id'], $r['name'], $r['description'], $r['scope'], $r['active'], $r['path'], $r['max_rows'], $r['cnt_row'], 
-				$r['sum_row'], $r['avg_row'], $r['bench_row'], $r['is_summary'], $r['display_type'], $this->supplemental_factory);
-			if(isset($r['pivot_db_field'])){
-				$p = $this->datasource_dbfield->getFieldData($r['pivot_db_field']);
-				$pivot_field = new DbField($p['id'], $p['db_table'], $p['db_field_name'], $p['name'], $p['description'], $p['pdf_width'], $p['default_sort_order'], $p['datatype'], $p['max_length'], $p['decimal_scale'], $p['unit_of_measure'], $p['is_timespan'], $p['is_foreign_key'], $p['is_nullable'], $p['is_natural_sort']);
-				$block->setPivot($pivot_field);
-			}
-		}
-		else{
-			$block = new ChartBlock($this->datasource_blocks, $r['id'], $r['page_id'], $r['name'], $r['description'], $r['scope'], $r['active'], $r['path'], $r['max_rows'], $r['cnt_row'], 
-				$r['sum_row'], $r['avg_row'], $r['bench_row'], $r['is_summary'], $r['display_type'], $r['chart_type'], $this->supplemental_factory);
-		}
-		return $block;
+		return $this->getBlock($r);
 	}
 
 	/*
@@ -104,19 +90,51 @@ class Blocks {// implements iReportContentRepository {
 			return false;
 		}
 		foreach($results as $r){
-			if($r['display_type'] === 'table'){
-				$blocks->attach(new TableBlock($this->datasource_blocks, $r['id'], $r['page_id'], $r['name'], $r['description'], $r['scope'], $r['active'], $r['path'], $r['max_rows'], $r['cnt_row'], $r['sum_row'], $r['avg_row'], $r['bench_row'], $r['is_summary'], $r['display_type'], $this->supplemental_factory));
-				if(isset($r['pivot_db_field'])){
-					$p = $this->datasource_dbfield->getFieldData($r['pivot_db_field']);
-					$pivot_field = new DbField($p['id'], $p['db_table'], $p['db_field_name'], $p['name'], $p['description'], $p['pdf_width'], $p['default_sort_order'], $p['datatype'], $p['max_length'], $p['decimal_scale'], $p['unit_of_measure'], $p['is_timespan'], $p['is_foreign_key'], $p['is_nullable'], $p['is_natural_sort']);
-					$block->setPivot($pivot_field);
-				}
-			}
-			else{
-				$blocks->attach(new ChartBlock($this->datasource_blocks, $r['id'], $r['page_id'], $r['name'], $r['description'], $r['scope'], $r['active'], $r['path'], $r['max_rows'], $r['cnt_row'], $r['sum_row'], $r['avg_row'], $r['bench_row'], $r['is_summary'], $r['display_type'], $r['chart_type'], $this->supplemental_factory));
-			}
+			$blocks->attach($this->getBlock($r));
 		}
 		return $blocks;
+	}
+	
+	/*
+	 * getBlock
+	 * 
+	 * @param array result set row
+	 * @author ctranel
+	 * @returns \myagsource\Report\iBlock
+	 */
+	protected function getBlock($r){
+		$field_groups = $this->datasource_blocks->getFieldGroupData($r['id']);
+		$field_groups = $this->keyFieldGroupData($field_groups);
+		
+		if($r['display_type'] === 'table'){
+			$block = new TableBlock($this->datasource_blocks, $r['id'], $r['page_id'], $r['name'], $r['description'], $r['scope'], $r['active'], $r['path'], $r['max_rows'], $r['cnt_row'], $r['sum_row'], $r['avg_row'], $r['bench_row'], $r['is_summary'], $r['display_type'], $this->supplemental_factory, $field_groups);
+			if(isset($r['pivot_db_field'])){
+				$p = $this->datasource_dbfield->getFieldData($r['pivot_db_field']);
+				$pivot_field = new DbField($p['id'], $p['db_table'], $p['db_field_name'], $p['name'], $p['description'], $p['pdf_width'], $p['default_sort_order'], $p['datatype'], $p['max_length'], $p['decimal_scale'], $p['unit_of_measure'], $p['is_timespan'], $p['is_foreign_key'], $p['is_nullable'], $p['is_natural_sort']);
+				$block->setPivot($pivot_field);
+			}
+		}
+		else{
+			$block = new ChartBlock($this->datasource_blocks, $r['id'], $r['page_id'], $r['name'], $r['description'], $r['scope'], $r['active'], $r['path'], $r['max_rows'], $r['cnt_row'], $r['sum_row'], $r['avg_row'], $r['bench_row'], $r['is_summary'], $r['display_type'], $r['chart_type'], $this->supplemental_factory, $field_groups);
+		}
+		return $block;
+	}
+	
+	
+	//@TODO: WHERE SHOULD THIS GO??
+	protected function keyFieldGroupData($field_groups){
+		if(!isset($field_groups) || empty($field_groups)){
+			return false;
+		}
+		
+		$ret = [];
+		foreach($field_groups as $fg){
+			$fg_num = $fg['field_group_num'];
+			unset($fg['field_group_num']);
+			$ret[$fg_num] = $fg;
+		}
+		
+		return $ret;
 	}
 }
 

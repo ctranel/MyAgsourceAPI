@@ -28,9 +28,9 @@ class TableBlock extends Block {
 	/**
 	 */
 	function __construct($block_datasource, $id, $page_id, $name, $description, $scope, $active, $path, $max_rows, $cnt_row, 
-			$sum_row, $avg_row, $bench_row, $is_summary, $display_type, SupplementalFactory $supp_factory) {
+			$sum_row, $avg_row, $bench_row, $is_summary, $display_type, SupplementalFactory $supp_factory, $field_groups) {
 		parent::__construct($block_datasource, $id, $page_id, $name, $description, $scope, $active, $path, $max_rows, $cnt_row, 
-			$sum_row, $avg_row, $bench_row, $is_summary, $display_type, $supp_factory);
+			$sum_row, $avg_row, $bench_row, $is_summary, $display_type, $supp_factory, $field_groups);
 		
 		$this->setReportFields();
 	}
@@ -70,7 +70,7 @@ class TableBlock extends Block {
 				$arr_table_ref_cnt[$s['table_name']] = isset($arr_table_ref_cnt[$s['table_name']]) ? ($arr_table_ref_cnt[$s['table_name']] + 1) : 1;
 				$datafield = new DbField($s['db_field_id'], $s['table_name'], $s['db_field_name'], $s['name'], $s['description'], $s['pdf_width'], $s['default_sort_order'],
 						 $s['datatype'], $s['max_length'], $s['decimal_scale'], $s['unit_of_measure'], $s['is_timespan'], $s['is_foreign_key'], $s['is_nullable'], $s['is_natural_sort']);
-				$this->report_fields->attach(new TableField($s['id'], $s['name'], $datafield, $s['is_displayed'], $s['display_format'], $s['aggregate'], $s['is_sortable'], $header_supp, $data_supp, $s['block_header_group_id']));
+				$this->report_fields->attach(new TableField($s['id'], $s['name'], $datafield, $s['category_id'], $s['is_displayed'], $s['display_format'], $s['aggregate'], $s['is_sortable'], $header_supp, $data_supp, $s['block_header_group_id'], $s['field_group'], $s['field_group_ref_key']));
 			}
 			$this->primary_table_name = array_search(max($arr_table_ref_cnt), $arr_table_ref_cnt);
 			//set up arr_fields hierarchy

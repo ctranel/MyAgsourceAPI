@@ -282,10 +282,11 @@ function process_chart(div_id, data_in){
 			if(typeof pre_render == 'function'){
 				options = pre_render(options, client_data);
 			}
+//console.log(JSON.stringify(options));
 			chart[block_index] = new Highcharts.Chart(options);
-			while(chart[block_index].series.length > options.series.length){//(Object.size(chart[block_index].series) > count){
-				chart[block_index].series[chart[block_index].series.length].remove(true);
-			}
+//			while(chart[block_index].series.length > options.series.length){//(Object.size(chart[block_index].series) > count){
+//				chart[block_index].series[chart[block_index].series.length].remove(true);
+//			}
 		}
 		if(typeof(client_data) == "object" && typeof post_render == 'function'){
 			post_render(client_data);
@@ -334,7 +335,7 @@ function process_table(div_id, block_index, table_data){
 }
 
 function getAxisLabelFormat(axis_type){
-	if(axis_type !== null && axis_type.indexOf('date') >= 0){
+	if(axis_type !== null && typeof(axis_type) !== 'undefined' && axis_type.indexOf('date') >= 0){
 		return function(){return Highcharts.dateFormat('%b %e, %Y', this.value);};
 	}
 	else{

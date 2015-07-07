@@ -128,7 +128,7 @@ function get_bar_options(options_json){
             color: '#C0C0C0'
          }
      };
-	options_json.xAxis.type = 'linear';
+	options_json.xAxis[0].type = 'linear';
 	//options_json.xAxis.categories = [];
 	return options_json;
 }

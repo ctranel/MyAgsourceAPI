@@ -27,8 +27,8 @@ class ChartData extends BlockData{
 	 * categories
 	 *
 	 * @var Array
-	 **/
 	protected $categories;
+	 **/
 	
 	/**
 	 * x_axis_field_name
@@ -42,31 +42,10 @@ class ChartData extends BlockData{
 	 */
 	function __construct(ChartBlock $block, \Report_data_model $report_datasource) {
 		parent::__construct($block, $report_datasource);
-		$this->setCategories();
+//		$this->setCategories();
 		$this->setXAxesField();
 	}
 
-	/* -----------------------------------------------------------------
-	*  setCategories
-
-	*  Sets category properties for chart data object
-
-	*  @author: ctranel
-	*  @date: Apr 29, 2015
-	*  @return void
-	*  @throws: 
-	*  @todo: handle multiple x axis db fields?
-	* -----------------------------------------------------------------
-	*/
-	protected function setCategories(){
-		foreach($this->block->xAxes() as $x){
-			$c = $x->category();
-			if(isset($c) && !empty($c)){
-				$this->categories[] = $c;
-			}
-		}
-	}
-	
 	/* -----------------------------------------------------------------
 	*  setCategories
 
@@ -104,21 +83,34 @@ class ChartData extends BlockData{
 		$criteria_key_value = $this->whereCriteria($criteria_key_value);
 		$select_fields = $this->block->getSelectFields();
 		$this->dataset = $this->report_datasource->search($this->block, $select_fields, $criteria_key_value);
-		if(isset($this->categories) && is_array($this->categories)){
-			return $this->setRowToSeries($this->categories);
+
+		$tmp_cat = $this->block->categories();
+		if(isset($tmp_cat) && is_array($tmp_cat) && !empty($tmp_cat)){
+			$this->splitByCategories();
+			$ret = true;
 		}
+
+		$tmp_fg = $this->block->fieldGroups();
+		if(isset($tmp_fg) && is_array($tmp_fg) && !empty($tmp_fg)){
+			$this->concatFieldGroups();
+			$ret = true;
+		}
+		
+		//if categories and/or field groups were set, no need to continue
+		if(isset($ret)){
+			return $this->dataset;
+		}
+		
 		if(!isset($this->x_axis_dbfield_name)){//not a category or trend chart (e.g., pie chart)
 			return array_values($this->dataset);
 		}
-		else{
-			if($this->block->chartType() === 'boxplot'){
-//var_dump($this->block); die;
-				$num_boxplot_series = (int)($this->block->reportFields()->count() / 3);
-//die((string)$num_boxplot_series);
-				return $this->setBoxplotData(200000000);
-			}
-			return $this->setLongitudinalData();
+
+		//default condition
+		if($this->block->chartType() === 'boxplot'){
+			$num_boxplot_series = (int)($this->block->reportFields()->count() / 3);
+			return $this->setBoxplotData(200000000);
 		}
+		return $this->setLongitudinalData();
 	}
 	
 	/**
@@ -254,25 +246,108 @@ class ChartData extends BlockData{
 	 * @return array of data for the graph
 	 * @access protected
 	 *
-	 **/
 	protected function setRowToSeries(){
-		$mod_base = count($this->categories);
+		if(isset($this->block->categories()) && is_array($this->block->categories())){
+			return $this->splitByCategories();
+		}
+		//handle field groups
+
+		if(isset($this->block->fieldGroups()) && is_array($this->block->fieldGroups())){
+			return $this->concatFieldGroups();
+		}
+	}
+	 **/
+
+	/**
+	 * @method concatFieldGroups - used when data for multiple categories are returned in one row.  
+	 * Breaks data down so that there is one row per category, each row having one entry for each series.
+	 * 
+	 * @return array of data for the graph
+	 * @access protected
+	 *
+	 **/
+	
+	protected function concatFieldGroups(){
+		if(is_array($this->dataset) && !empty($this->dataset)){
+			$arr_return = [];
+			foreach($this->dataset as $series=>$rows){
+				$categories = [];
+				$cat_idx = 0;
+				foreach($rows as $cat=>$v){
+					if(!array_key_exists($cat, $categories)){
+						$categories[$cat] = $cat_idx;
+						$cat_idx++;
+					}
+					//$cnt = 0;
+					$ser_idx = 0;
+					$field_definitions = $this->block->reportFields();
+					foreach($field_definitions as $f){
+						if(!isset($v[$f->dbFieldName()])){
+							continue;
+						}
+
+						if($f->fieldGroup()){
+							$ser_idx = $f->fieldGroup();
+						}
+						else{
+							$ser_idx++;
+						}
+						
+						$ref_key = $f->fieldGroupRefKey();
+//print($ser_idx . ' - ' . $categories[$cat] . ' - ' . $ref_key . ' - ' . $v[$f->dbFieldName()] . "<br>\n");						
+						$arr_return[$ser_idx][$categories[$cat]][$ref_key] = $v[$f->dbFieldName()];
+						
+						//@todo: 
+						if(!isset($arr_return[$ser_idx][$categories[$cat]]['x'])){
+							$arr_return[$ser_idx][$categories[$cat]]['x'] = $categories[$cat];
+						}
+					}
+				}
+			}
+			foreach($arr_return as $k => $a){
+				$this->dataset[$k] = array_values($a);
+			}
+			$this->dataset = array_values($this->dataset);
+		}
+		else return FALSE;
+	}
+	
+	/**
+	 * @method splitByCategories - used when data for multiple categories are returned in one row.  
+	 * Breaks data down so that there is one row per category, each row having one entry for each series.
+	 * 
+	 * @return array of data for the graph
+	 * @access protected
+	 *
+	 **/
+	
+	protected function splitByCategories(){
+		$mod_base = (int)($this->block->numFields() /count($this->block->categories()));
 		if(is_array($this->dataset) && !empty($this->dataset)){
 			$key = 0;
 			foreach($this->dataset as $k=>$row){
 				$count = 1;
+
 				$key++;
 				//must account for multiple series being returned in a single row
-				foreach($this->block->getFieldlistArray() as $kk => $f){
+				foreach($this->block->reportFields() as $kk => $f){
 					if($count > $mod_base && $count % $mod_base == 1){
 						$key++;
 					}
 					if(!isset($key)) $key = $k;
-					$arr_return[$key][] = (float)$row[$f];
+					
+					//if field groups are used, use that. Otherwise use the key that was calculated based on incremented series'
+					$fg = $f->fieldGroup();
+					$series = isset($fg) ? $fg : $key;
+					unset($fg);
+					
+					$cat = $f->categoryId();
+					
+					$arr_return[$series][$cat][$f->dbFieldName()] = $row[$f->dbFieldName()];
 					$count++;
 				}
 			}
-			return $arr_return;
+			$this->dataset = $arr_return;
 		}
 		else return FALSE;
 	}

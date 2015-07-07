@@ -186,6 +186,12 @@ abstract class Block implements iBlock {
 	 **/
 	protected $supp_param_fieldnames;
 	
+	/**
+	 * field_groups
+	 * @var numerically keyed array
+	 **/
+	protected $field_groups;
+	
 /**
 	 * __construct
 	 *
@@ -193,7 +199,7 @@ abstract class Block implements iBlock {
 	 * @author ctranel
 	 **/
 	public function __construct($block_datasource, $id, $page_id, $name, $description, $scope, $active, $path, $max_rows, $cnt_row, 
-			$sum_row, $avg_row, $bench_row, $is_summary, $display_type, SupplementalFactory $supp_factory = null) {
+			$sum_row, $avg_row, $bench_row, $is_summary, $display_type, SupplementalFactory $supp_factory = null, $field_groups = null) {
 		$this->datasource = $block_datasource;
 		$this->id = $id;
 		$this->page_id = $page_id;
@@ -208,6 +214,7 @@ abstract class Block implements iBlock {
 		$this->avg_row = $avg_row;
 		$this->bench_row = $bench_row;
 		$this->is_summary = $is_summary;
+		$this->field_groups = $field_groups;
 		//$this->group_by_fields = $group_by_fields;
 		//$this->where_fields = $group_by_fields;
 		$this->display_type = $display_type;
@@ -282,6 +289,10 @@ abstract class Block implements iBlock {
 		return $this->is_summary;
 	}
 
+	public function fieldGroups(){
+		return $this->field_groups;
+	}
+
 	public function hasCntRow(){
 		return $this->cnt_row;
 	}
@@ -300,6 +311,10 @@ abstract class Block implements iBlock {
 	
 	public function reportFields(){
 		return $this->report_fields;
+	}
+	
+	public function numFields(){
+		return $this->report_fields->count();
 	}
 
 	public function getFieldlistArray(){
@@ -645,16 +660,6 @@ abstract class Block implements iBlock {
 	* */
 	public function setPivot(iDataField $pivot_field){
 		$this->pivot_field = $pivot_field;
-	}
-	
-	/**
-	 * @method setGroupBy()
-	 * @param SplObjectStorage of GroupBy objects
-	 * @return void
-	 * @access public
-	* */
-	protected function setGroupBy(){
-		$this->group_by = $group_by;
 	}
 }
 

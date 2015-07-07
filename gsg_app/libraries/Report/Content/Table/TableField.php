@@ -46,8 +46,8 @@ class TableField extends BlockField {
 
 	/**
 	 */
-	function __construct($id, $name, DbField $data_field, $is_displayed, $display_format, $aggregate, $is_sortable, $header_supp, $data_supp, $header_group_id) {
-		parent::__construct($id, $name, $data_field, $is_displayed, $display_format, $aggregate, $is_sortable, $header_supp, $data_supp);
+	function __construct($id, $name, DbField $data_field, $category_id, $is_displayed, $display_format, $aggregate, $is_sortable, $header_supp, $data_supp, $header_group_id, $field_group = null, $field_group_ref_key = null) {
+		parent::__construct($id, $name, $data_field, $category_id, $is_displayed, $display_format, $aggregate, $is_sortable, $header_supp, $data_supp, $field_group, $field_group_ref_key);
 		$this->header_group_id = $header_group_id;
 	}
 	
