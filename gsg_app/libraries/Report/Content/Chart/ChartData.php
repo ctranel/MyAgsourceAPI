@@ -95,6 +95,11 @@ class ChartData extends BlockData{
 			$this->concatFieldGroups();
 			$ret = true;
 		}
+		// field names are maintained in dataset when breaking into categories because field group functionality requires them.
+		// if dataset has categories but not field groups, we need to remove the field names from the dataset
+		elseif(isset($ret)){
+			$this->dataset = $this->stripFieldNames();
+		}
 		
 		//if categories and/or field groups were set, no need to continue
 		if(isset($ret)){
@@ -105,7 +110,7 @@ class ChartData extends BlockData{
 			return array_values($this->dataset);
 		}
 
-		//default condition
+		//@todo: use field groups for boxplots
 		if($this->block->chartType() === 'boxplot'){
 			$num_boxplot_series = (int)($this->block->reportFields()->count() / 3);
 			return $this->setBoxplotData(200000000);
@@ -268,48 +273,36 @@ class ChartData extends BlockData{
 	 **/
 	
 	protected function concatFieldGroups(){
-		if(is_array($this->dataset) && !empty($this->dataset)){
-			$arr_return = [];
-			foreach($this->dataset as $series=>$rows){
-				$categories = [];
-				$cat_idx = 0;
-				foreach($rows as $cat=>$v){
-					if(!array_key_exists($cat, $categories)){
-						$categories[$cat] = $cat_idx;
-						$cat_idx++;
-					}
-					//$cnt = 0;
-					$ser_idx = 0;
-					$field_definitions = $this->block->reportFields();
-					foreach($field_definitions as $f){
-						if(!isset($v[$f->dbFieldName()])){
-							continue;
-						}
+		if(!is_array($this->dataset) || empty($this->dataset)){
+			return false;
+		}
+		$arr_return = [];
+		foreach($this->dataset as $series=>$rows){
+			$categories = [];
+			$cat_idx = 0;
+			foreach($rows as $cat=>$v){
+				//get the position of the category, 0 indexed
+				if(!array_key_exists($cat, $categories)){
+					$categories[$cat] = $cat_idx;
+					$cat_idx++;
+				}
 
-						if($f->fieldGroup()){
-							$ser_idx = $f->fieldGroup();
-						}
-						else{
-							$ser_idx++;
-						}
-						
-						$ref_key = $f->fieldGroupRefKey();
-//print($ser_idx . ' - ' . $categories[$cat] . ' - ' . $ref_key . ' - ' . $v[$f->dbFieldName()] . "<br>\n");						
-						$arr_return[$ser_idx][$categories[$cat]][$ref_key] = $v[$f->dbFieldName()];
-						
-						//@todo: 
-						if(!isset($arr_return[$ser_idx][$categories[$cat]]['x'])){
-							$arr_return[$ser_idx][$categories[$cat]]['x'] = $categories[$cat];
-						}
+				$field_definitions = $this->block->reportFields();
+				foreach($field_definitions as $f){
+					if(!isset($v[$f->dbFieldName()])){
+						continue;
+					}
+					$ser_idx = $f->fieldGroup();
+					$ref_key = $f->fieldGroupRefKey();
+					$arr_return[$ser_idx][$categories[$cat]][$ref_key] = $v[$f->dbFieldName()];
+					
+					if(!isset($arr_return[$ser_idx][$categories[$cat]]['x'])){
+						$arr_return[$ser_idx][$categories[$cat]]['x'] = $categories[$cat];
 					}
 				}
 			}
-			foreach($arr_return as $k => $a){
-				$this->dataset[$k] = array_values($a);
-			}
-			$this->dataset = array_values($this->dataset);
 		}
-		else return FALSE;
+		$this->dataset = $arr_return;
 	}
 	
 	/**
@@ -322,34 +315,69 @@ class ChartData extends BlockData{
 	 **/
 	
 	protected function splitByCategories(){
-		$mod_base = (int)($this->block->numFields() /count($this->block->categories()));
+		$mod_base = (int)($this->block->numFields() /count($this->block->categories()));//
 		if(is_array($this->dataset) && !empty($this->dataset)){
-			$key = 0;
+			$ser_key = 0;
+			$prev_cat = '';
 			foreach($this->dataset as $k=>$row){
-				$count = 1;
-
-				$key++;
 				//must account for multiple series being returned in a single row
 				foreach($this->block->reportFields() as $kk => $f){
-					if($count > $mod_base && $count % $mod_base == 1){
-						$key++;
+					//When changing to new category, reset ser_key counter
+					$cat = $f->categoryId();
+					if($cat !== $prev_cat){
+						$ser_key = 1;
 					}
-					if(!isset($key)) $key = $k;
+					else{
+						$ser_key++;
+					}
+					$prev_cat = $cat;
 					
 					//if field groups are used, use that. Otherwise use the key that was calculated based on incremented series'
 					$fg = $f->fieldGroup();
-					$series = isset($fg) ? $fg : $key;
+					$series = isset($fg) ? $fg : $ser_key;
 					unset($fg);
 					
-					$cat = $f->categoryId();
-					
 					$arr_return[$series][$cat][$f->dbFieldName()] = $row[$f->dbFieldName()];
-					$count++;
 				}
 			}
 			$this->dataset = $arr_return;
 		}
 		else return FALSE;
 	}
+
+	/**
+	 * stripFieldNames
+	 * 
+	 * Removes text keys from dataset recursively (keys become numeric).
+	 * 
+	 * @return array of data for the graph
+	 * @access protected
+	 *
+	 **/
+	
+	protected function stripFieldNames(){
+		if(!isset($this->dataset) || !is_array($this->dataset)){
+			return false;
+		}
+		return array_values_recursive($this->dataset);
+	}
 }
+
+//utility function outside of class.  See todo below
+/**
+	 * Get all values from a multidimensional array
+	 *
+	 * @param $arr array
+	 * @return null|string|array
+	 * @todo -- building into class for dataset object?
+	 */
+	function array_values_recursive(array $arr){
+		$arr = array_values($arr);
+        foreach($arr as $key => $val){
+        	if(is_array($val)){//array_values($val) === $val){
+                $arr[$key] = array_values_recursive($val);
+            }
+		}
+		return $arr;
+	}
 ?>

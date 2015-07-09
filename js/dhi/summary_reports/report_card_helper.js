@@ -3,30 +3,22 @@
 		//if there is a second yAxis, change the color
 		if(typeof options_in.yAxis != 'undefined') {
 			if(client_data.block.substring(0, 7) !== 'rc_long'){
-//				var tmpdata = Array();
-//				tmpdata[0] = options_in.series[0].data;
-//				tmpdata[1] = options_in.series[1].data;
-//				options_in.series = [
-//				    {type:"bar",data:tmpdata[0],name:"Percentile"},
-//				    {type:"scatter",data:tmpdata[1],marker:{radius:0}}
-//				];
 				options_in.legend.enabled = false;
+
+				//y values not stored for scatter series', add them to datapoints
+				options_in.series[1].marker = {radius: 0};
+				for(i in options_in.series[1].data){
+					options_in.series[1].data[i].y = 10;
+				}
+				options_in.series[2].marker = {radius: 0};
+				for(i in options_in.series[2].data){
+					options_in.series[2].data[i].y = 50;
+				}
+				options_in.series[3].marker = {radius: 0};
+				for(i in options_in.series[3].data){
+					options_in.series[3].data[i].y = 90;
+				}
 			}
-			
-			
-			
-			for(i in options_in.series[1].data){
-				options_in.series[1].data[i].y = 10;
-			}
-			for(i in options_in.series[2].data){
-				options_in.series[2].data[i].y = 50;
-			}
-			for(i in options_in.series[3].data){
-				options_in.series[3].data[i].y = 90;
-			}
-			
-			
-			
 
 			options_in.tooltip.formatter = function(){return this.y + ["th","st","nd","rd"][!(this.y%10>3||Math.floor(this.y%100/10)==1)*this.y%10] + ' Percentile';};
 			options_in.plotOptions = {};
