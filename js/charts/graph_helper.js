@@ -215,6 +215,7 @@ function process_chart(div_id, data_in){
 			alert('No Axis Data');
 		}
 		//end set axis labels
+		
 		if(typeof(data_in.series) !== 'undefined'){
 			if(data_in.chart_type === 'pie'){
 				//use the info from the second series
@@ -222,6 +223,12 @@ function process_chart(div_id, data_in){
 			}
 			else{
 				options.series = data_in.series;
+				//set regression line colors equal to their related series (box plot or scatter graph) color
+				for(var s in options.series) {
+					if (typeof(options.series[s].regressionSettings) !== 'undefined') {
+						options.series[s].regressionSettings.color = var_arr_graph_colors[s];
+					}
+				}
 			}
 		}
 		if(typeof(data_in.client_data) !== 'undefined'){

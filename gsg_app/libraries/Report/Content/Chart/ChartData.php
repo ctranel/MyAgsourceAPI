@@ -115,7 +115,7 @@ class ChartData extends BlockData{
 			$num_boxplot_series = (int)($this->block->reportFields()->count() / 3);
 			return $this->setBoxplotData(200000000);
 		}
-		return $this->setLongitudinalData();
+		return $this->setLongitudinalData($this->block->keepNulls());
 	}
 	
 	/**
@@ -125,28 +125,32 @@ class ChartData extends BlockData{
 	 * @access protected
 	 *
 	 **/
-	protected function setLongitudinalData(){
+	protected function setLongitudinalData($keep_nulls = true){
 		$count = count($this->dataset);
 		for($x = 0; $x < $count; $x++){
 			$arr_y_values = $this->dataset[$x];
-
 			$arr_fields = array_keys($arr_y_values);
 			$date_key = array_search($this->x_axis_dbfield_name, $arr_fields);
 			unset($arr_fields[$date_key]);
 			if($this->x_axis_dbfield_name == 'age_months'){
 				foreach($arr_fields as $k=>$f){
-					$tmp_data = is_numeric($this->dataset[$x][$f]) ? (float)$this->dataset[$x][$f] : $this->dataset[$x][$f];
-					$arr_return[$k][] = array($this->dataset[$x][$this->x_axis_dbfield_name], $tmp_data);
+					if($keep_nulls == true || $tmp_data != null) {
+    				    $tmp_data = is_numeric($this->dataset[$x][$f]) ? (float)$this->dataset[$x][$f] : $this->dataset[$x][$f];
+    					$arr_return[$k][] = array($this->dataset[$x][$this->x_axis_dbfield_name], $tmp_data);
+					}
 				}
 			}
 			elseif(isset($this->dataset[$x][$this->x_axis_dbfield_name]) && !empty($this->dataset[$x][$this->x_axis_dbfield_name])){
 				$arr_d = explode('-', $this->dataset[$x][$this->x_axis_dbfield_name]);
 				foreach($arr_fields as $k=>$f){
 					$tmp_data = is_numeric($this->dataset[$x][$f]) ? (float)$this->dataset[$x][$f] : $this->dataset[$x][$f];
-					$arr_return[$k][] = [(mktime(0, 0, 0, $arr_d[0], $arr_d[1],$arr_d[2]) * 1000), $tmp_data];
+					if($keep_nulls == true || $tmp_data != null) {
+					    $arr_return[$k][] = [(mktime(0, 0, 0, $arr_d[0], $arr_d[1],$arr_d[2]) * 1000), $tmp_data];
+					}
 				}
 			}
 		}
+		
 		if(isset($arr_return) && is_array($arr_return)){
 			return $arr_return;
 		}

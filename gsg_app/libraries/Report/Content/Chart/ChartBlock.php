@@ -55,12 +55,15 @@ class ChartBlock extends Block {
 	 **/
 	protected $series;
 
+	//added to know when to remove or keep nulls in chart data - KLM
+	protected $keep_nulls;
+	
 	/**
 	 */
 	function __construct($block_datasource, $id, $page_id, $name, $description, $scope, $active, $path, $max_rows, $cnt_row, 
-			$sum_row, $avg_row, $bench_row, $is_summary, $display_type, $chart_type, SupplementalFactory $supp_factory, $field_groups) {
+			$sum_row, $avg_row, $bench_row, $is_summary, $display_type, $chart_type, SupplementalFactory $supp_factory, $field_groups, $keep_nulls) {
 		parent::__construct($block_datasource, $id, $page_id, $name, $description, $scope, $active, $path, $max_rows, $cnt_row, 
-			$sum_row, $avg_row, $bench_row, $is_summary, $display_type, $supp_factory, $field_groups);
+			$sum_row, $avg_row, $bench_row, $is_summary, $display_type, $supp_factory, $field_groups, $keep_nulls);
 		
 		$this->setReportFields();
 		
@@ -71,6 +74,10 @@ class ChartBlock extends Block {
 		$this->setSeries();
 	}
 
+	public function keepNulls(){
+	    return $this->keep_nulls;
+	}
+	
 	public function xAxes(){
 		return $this->x_axes;
 	}
