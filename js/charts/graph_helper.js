@@ -105,6 +105,7 @@ function process_chart(div_id, data_in){
 
 	var um = undefined;
 	options = get_chart_options(options, data_in.chart_type);
+	options.tooltip.formatter = undefined;	
 	
 	options.title = {"text": data_in.description};
 	options.exporting = {"filename": data_in.name};
