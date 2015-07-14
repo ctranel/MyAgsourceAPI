@@ -3,7 +3,7 @@
 .tip-link {font-size: .8em;} */
 a.tooltip {text-decoration: underline;}
 a.tooltip:hover {cursor:pointer;}
-.tip a.qtip-ajax {font-size: .85em;}
+a.qtip-ajax {font-size: .85em;}
 
 .qtip {max-width: 560px;}
 .qtip-content {font-size: 11.5px; line-height: 13px;}
