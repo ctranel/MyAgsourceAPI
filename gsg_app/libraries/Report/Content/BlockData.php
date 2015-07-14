@@ -211,13 +211,16 @@ abstract class BlockData implements iBlockData{
 		$sum = [];
 		$avg = [];
 		$count = [];
+		$data_type = [];
 	
 		if(!isset($arr_dataset) || empty($arr_dataset)){
 			return false;
 		}
+		
 		$first_col_key = key($arr_dataset[0]);
 		foreach($arr_dataset as $k => $row){
 			foreach($row as $name => $val){
+			    $data_type[$name] = $this->block->getFieldDataType($name);
 				if(strpos($name, 'isnull') === false && is_numeric($val)) {
 					//$new_dataset[$name][$k] = $val;
 	
@@ -244,7 +247,14 @@ abstract class BlockData implements iBlockData{
 		}
 		if($this->block->hasAvgRow() && count($sum) > 1){
 			foreach($sum as $k => $v){
-				$avg[$k] = $sum[$k] / $count[$k];
+			    //prevent averaging of inappropriate data_types
+			    if ((strpos($data_type[$k],'int') !== false) || (strpos($data_type[$k], 'numeric') !== false)|| (strpos($data_type[$k], 'decimal') !== false) || (strpos($data_type[$k], 'money') !== false)) {
+			        //prevent division by zero
+			        if ($count[$k] > 0) $avg[$k] = $sum[$k] / $count[$k];			         
+			    }  
+			    else {
+			        $avg[$k] = null;
+			    }
 //				if(isset($this->arr_decimal_points[$k])){
 //					$tmp = round($tmp, $this->arr_decimal_points[$k]);
 //				}
