@@ -170,7 +170,7 @@ abstract class BlockField {
 		return $this->field_group_ref_key;
 	}
 
-	public function dataSupplemental() {
+	public function dataSupplementalContent() {
 		if(isset($this->data_supp)){
 			return $this->data_supp->getContent();
 		}
@@ -179,6 +179,12 @@ abstract class BlockField {
 	public function headerSupplemental() {
 		if(isset($this->header_supp)){
 			return $this->header_supp;
+		}
+	}
+
+	public function headerSupplementalContent() {
+		if(isset($this->header_supp)){
+			return $this->header_supp->getContent();
 		}
 	}
 

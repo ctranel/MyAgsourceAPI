@@ -58,9 +58,8 @@
 								if(!$f->isDisplayed()){
 									continue;
 								}
-								?><td><?php 
-									echo $f->displayName();
-								?></td><?php 
+								
+								displayHeaderCell($f, $f->displayName());
 								foreach($data[$f->dbFieldName()] as $k => $v):
 									displayCell($f, $v);
 								endforeach;
@@ -110,15 +109,15 @@
 			$value = number_format($value, $f->decimalScale());
 		}
 		
-		$supplemental = $f->dataSupplemental();
+		$supplemental = $f->dataSupplementalContent();
 		if(isset($supplemental)){
-			//supplemental comments are not currently an option, only supplemental links
-			$orig_val = $value;
+			//@todo: supplemental comments are not currently an option, only supplemental links
 			$value = $supplemental['links'][0];
 			preg_match_all('~\{(.*?)\}~', $value, $tmp);
 			$arr_param_fields = $tmp[1];
 			if(isset($arr_param_fields) && is_array($arr_param_fields) && !empty($arr_param_fields)){
 				foreach($arr_param_fields as $p){
+					//replace placeholder with row value
 					if(isset($cr[$p])){
 						$value = str_replace('{' . $p . '}', $cr[$p], $value);
 					}
@@ -136,6 +135,15 @@
 		?><td><?php echo $value; ?></td><?php
 	}
 
+	function displayHeaderCell($f, $value){
+		$supplemental = $f->headerSupplementalContent();
+		if(isset($supplemental)){
+			//@todo: supplemental comments are not currently an option, only supplemental links
+			$value = $value . ' ' . $supplemental['links'][0];
+		}
+		?><td><?php echo $value; ?></td><?php
+		}
+		
 	
 	
 	?>
