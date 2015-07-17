@@ -382,7 +382,13 @@ class ChartBlock extends Block {
 		$ret = parent::getSelectFields();
 		if(isset($this->x_axes) && is_a($this->x_axes, 'SplObjectStorage')){
 			foreach($this->x_axes as $a){
-				$ret[] = $a->dbFieldName();
+				$type = $a->dataType();
+				if(strpos($type, 'date') !== false || strpos($type, 'time') !== false){
+					$ret[] = "FORMAT(" . $a->dbFieldName() . ", 'MM-dd-yyyy', 'en-US') AS " . $a->dbFieldName();
+				}
+				else{
+					$ret[] = $a->dbFieldName();
+				}
 			}
 		}
 		return $ret;

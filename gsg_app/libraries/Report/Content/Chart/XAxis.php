@@ -80,6 +80,10 @@ class XAxis {
 		return $this->category;
 	}
 
+	function dataType(){
+		return $this->data_type;
+	}
+
 	function dbFieldName(){
 		if($this->datafield instanceof iDataField){
 			return $this->datafield->dbFieldName();
