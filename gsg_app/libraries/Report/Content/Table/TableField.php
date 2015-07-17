@@ -54,6 +54,10 @@ class TableField extends BlockField {
 	public function headerGroupId(){
 		return $this->header_group_id;
 	}
+	
+	public function getDataType(){
+	    return $this->data_field->datatype();
+	}
 
 }
 

@@ -83,5 +83,14 @@ class TableBlock extends Block {
 			}
 		}
 	}
+	
+	public function getFieldDataType($field_name){
+	    foreach ($this->report_fields as $k => $v) {
+	        if($v->dbFieldName() == $field_name) {
+	           return $v->getDataType();
+	        }
+	    }
+	}
+	
 }
 ?>
