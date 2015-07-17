@@ -384,7 +384,7 @@ class ChartBlock extends Block {
 			foreach($this->x_axes as $a){
 				$type = $a->dataType();
 				if(strpos($type, 'date') !== false || strpos($type, 'time') !== false){
-					$ret[] = "FORMAT(" . $a->dbFieldName() . ", 'MM-dd-yyyy', 'en-US') AS " . $a->dbFieldName();
+					$ret[] = "FORMAT(" . $a->dbFieldName() . ", 'yyyy-MM-dd', 'en-US') AS " . $a->dbFieldName();
 				}
 				else{
 					$ret[] = $a->dbFieldName();
