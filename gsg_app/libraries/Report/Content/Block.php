@@ -620,7 +620,7 @@ abstract class Block implements iBlock {
 				$ret[] = $f;
 			}
 		}
-		//@todo: complementary fields (report card snapshot = ~3-4 fields per item)
+
 		return $ret;
 	}
 	

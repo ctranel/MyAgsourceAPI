@@ -115,6 +115,7 @@ abstract class BlockField {
 	}
 
 	public function displayName() {
+		//@todo: if field group is set, use that label
 		return $this->name;
 	}
 

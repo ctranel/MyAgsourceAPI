@@ -140,7 +140,14 @@ function get_boxplot_options(options_json){
 		whiskerWidth: 0,
         pointWidth: 8,
         lineWidth: 8,
-        medianColor: null
+        medianColor: null,
+    	tooltip: {
+    		pointFormat: '<span style="color:{point.color}">\u25CF</span> <b> {series.name}</b><br/>' + // docs
+    			'Upper quartile: {point.q3}<br/>' +
+    			'Median: {point.median}<br/>' +
+    			'Lower quartile: {point.q1}<br/>'
+    	},
+
 	};
 	return options_json;
 }

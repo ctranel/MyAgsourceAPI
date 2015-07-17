@@ -56,6 +56,10 @@ class ChartBlock extends Block {
 	protected $series;
 
 	//added to know when to remove or keep nulls in chart data - KLM
+	/**
+	 * chart_type
+	 * @var boolean
+	 **/
 	protected $keep_nulls;
 	
 	/**
@@ -63,10 +67,11 @@ class ChartBlock extends Block {
 	function __construct($block_datasource, $id, $page_id, $name, $description, $scope, $active, $path, $max_rows, $cnt_row, 
 			$sum_row, $avg_row, $bench_row, $is_summary, $display_type, $chart_type, SupplementalFactory $supp_factory, $field_groups, $keep_nulls) {
 		parent::__construct($block_datasource, $id, $page_id, $name, $description, $scope, $active, $path, $max_rows, $cnt_row, 
-			$sum_row, $avg_row, $bench_row, $is_summary, $display_type, $supp_factory, $field_groups, $keep_nulls);
+			$sum_row, $avg_row, $bench_row, $is_summary, $display_type, $supp_factory, $field_groups);
 		
 		$this->setReportFields();
 		
+		$this->keep_nulls = $keep_nulls;
 		$this->chart_type = $chart_type;
 		$this->x_axes = new \SplObjectStorage();
 		$this->y_axes = new \SplObjectStorage();
@@ -164,7 +169,8 @@ class ChartBlock extends Block {
 					$a['datatype'], $a['max_length'], $a['decimal_scale'], $a['unit_of_measure'], $a['is_timespan'], $a['is_foreign_key'], $a['is_nullable'], $a['is_natural_sort']);
 				//add fields as a report field so it is included in the select statement
 				$display_format = $a['data_type'] === 'datetime' ? 'MM-dd-yy' : null;
-				$this->report_fields->attach(new ChartField($a['id'], $a['name'], $datafield, null, false, $display_format, null, true, null, null, null, null));
+				//@todo: this probably shouldn't be in report_fields.  Have prep select function pull fields from x axis objects?
+				//$this->report_fields->attach(new ChartField($a['id'], $a['name'], $datafield, null, false, $display_format, null, true, null, null, null, null));
 				
 			}
 			if($a['x_or_y'] === 'x'){
@@ -331,15 +337,17 @@ class ChartBlock extends Block {
 
 		$c = 0;
 		foreach($this->report_fields as $f){
-			//@todo: what if a chart has the same number for field id and group_id (not really possible since group num starts at 1 for each block but...)
-			if($f->fieldGroup()){
-				$idx = $f->fieldGroup();
+			$fg = $f->fieldGroup();
+			if(isset($fg)){
+				$idx = $fg;
+				$name = $this->field_groups[$fg]['name'];
 			}
 			else{
 				$idx = $f->id();
+				$name = $f->displayName();
 			}
 			
-			$return_val[$idx]['name'] = $f->displayName();
+			$return_val[$idx]['name'] = $name;
 			if($f->unitOfMeasure()){
 				$return_val[$idx]['um'] = $f->unitOfMeasure();
 			}
@@ -356,6 +364,28 @@ class ChartBlock extends Block {
 			}
 		}
 		return $return_val;
+	}
+	
+	/************************************* 
+	 * overridden Block functions
+	 *************************************/
+	
+	/**
+	 * @method getSelectFields()
+	 *
+	 * Retrieves fields designated as select, supplemental params (if set),
+	 *
+	 * @return string table name
+	 * @access public
+	 * */
+	public function getSelectFields(){
+		$ret = parent::getSelectFields();
+		if(isset($this->x_axes) && is_a($this->x_axes, 'SplObjectStorage')){
+			foreach($this->x_axes as $a){
+				$ret[] = $a->dbFieldName();
+			}
+		}
+		return $ret;
 	}
 }
 ?>

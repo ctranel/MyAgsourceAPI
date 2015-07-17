@@ -264,7 +264,7 @@ class Report_data_model extends CI_Model {
                 FROM " . $primary_table_name . " 
                 WHERE herd_code = '" . $this->session->userdata('herd_code') . "' AND " . $date_field . " IS NOT NULL
                 ORDER BY " . $date_field . " DESC) a
-            ORDER BY " . $date_field . " DESC";
+            ORDER BY a." . $date_field . " ASC";
 		$result = $this->db->query($sql)->result_array();
         if(is_array($result) && !empty($result)) return $result[(count($result) - 1)][$date_field];
 		else return FALSE;

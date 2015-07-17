@@ -115,7 +115,7 @@ class Blocks {// implements iReportContentRepository {
 			}
 		}
 		else{
-			$block = new ChartBlock($this->datasource_blocks, $r['id'], $r['page_id'], $r['name'], $r['description'], $r['scope'], $r['active'], $r['path'], $r['max_rows'], $r['cnt_row'], $r['sum_row'], $r['avg_row'], $r['bench_row'], $r['is_summary'], $r['display_type'], $r['chart_type'], $this->supplemental_factory, $field_groups, $r['keep_nulls']);
+			$block = new ChartBlock($this->datasource_blocks, $r['id'], $r['page_id'], $r['name'], $r['description'], $r['scope'], $r['active'], $r['path'], $r['max_rows'], $r['cnt_row'], $r['sum_row'], $r['avg_row'], $r['bench_row'], $r['is_summary'], $r['display_type'], $r['chart_type'], $this->supplemental_factory, $field_groups, (bool)$r['keep_nulls']);
 		}
 		return $block;
 	}

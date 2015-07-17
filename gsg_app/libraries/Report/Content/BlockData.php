@@ -61,7 +61,8 @@ abstract class BlockData implements iBlockData{
 	 * @author ctranel
 	 **/
 	protected function prepSelectFields(){
-
+die('BlockData->prepSelectFields');
+		//nothing that applies to both graphs and tables yet
 	}
 	
 	/** function whereCriteria
