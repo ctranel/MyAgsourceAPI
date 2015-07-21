@@ -16,10 +16,10 @@
 				//set offsets for boxplot series
 				if(i % 2 === 0 && i > 0){
 					var offset = getSeriesOffset(boxplot_count, i, series_adjustment);
-					for(x in options_in.series[i]['data']){
+					for(c in options_in.series[i]['data']){
 						//update first value of this and corresponding trend series
-						options_in.series[i]['data'][x][0] += offset;
-						options_in.series[parseInt(i) + 1]['data'][x][0] += offset;
+						options_in.series[i]['data'][c]['x'] += offset;
+						options_in.series[parseInt(i) + 1]['data'][c]['x'] += offset;
 					}
 				}
 			}

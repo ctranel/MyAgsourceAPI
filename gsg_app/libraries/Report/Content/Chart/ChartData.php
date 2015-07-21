@@ -100,7 +100,7 @@ class ChartData extends BlockData{
 				$this->concatFieldGroups();
 			}
 			else{
-				$this->dataset = $this->stripFieldNames();
+				$this->stripFieldNames();
 			}
 		}
 		//linear
@@ -112,9 +112,9 @@ class ChartData extends BlockData{
 			if(isset($tmp_fg) && is_array($tmp_fg) && !empty($tmp_fg)){
 				$this->concatFieldGroups();
 			}
-			//else{
-				$this->dataset = $this->stripFieldNames();
-			//}
+			else{
+				$this->stripFieldNames();
+			}
 		}
 
 		// field names are maintained in dataset when breaking into categories because field group functionality requires them.
@@ -123,12 +123,6 @@ class ChartData extends BlockData{
 //		}
 		
 		return $this->dataset;
-		
-		//@todo: use field groups for boxplots
-		//if($this->block->chartType() === 'boxplot'){
-		//	$num_boxplot_series = (int)($this->block->reportFields()->count() / 3);
-		//	return $this->setBoxplotData(200000000);
-		//}
 	}
 	
 	/**
@@ -257,28 +251,32 @@ class ChartData extends BlockData{
 					}
 					$ser_idx = $f->fieldGroup();
 					$ref_key = $f->fieldGroupRefKey();
+//var_dump($ref_key);
 					if(isset($ref_key)){
-						$arr_return[$ser_idx][$x_val][$ref_key] = $v[$f->dbFieldName()];
+						//if the value is an array, we assume [xValue, yValue].  We want the yValue
+						$tmp_val = is_array($v[$f->dbFieldName()]) ? $v[$f->dbFieldName()][1] : $v[$f->dbFieldName()];
+						$arr_return[$ser_idx][$x_val][$ref_key] = $tmp_val;
 					}
 					else{
 						$arr_return[$ser_idx][$x_val][] = $v[$f->dbFieldName()][1];
 						//@todo: this assumes that chart is a boxplot (duplicates top and bottom values for a total of 5.  Should actually for and create a PR for highcharts)
-						if(count($arr_return[$ser_idx][$x_val]) === 1 || count($arr_return[$ser_idx][$x_val]) === 5){
-							$arr_return[$ser_idx][$x_val][] = $v[$f->dbFieldName()][1];
-						}
+						//if(count($arr_return[$ser_idx][$x_val]) === 1 || count($arr_return[$ser_idx][$x_val]) === 5){
+							//$arr_return[$ser_idx][$x_val][] = $v[$f->dbFieldName()][1];
+						//}
 					}
 				}
 				if(array_search($x_val, $arr_return[$ser_idx][$x_val]) === false){
-					if(isset($ref_key)){
+					//if(isset($ref_key)){
 						$arr_return[$ser_idx][$x_val]['x'] = $x_val;
-					}
-					else{
-						array_unshift($arr_return[$ser_idx][$x_val], $x_val);
-					}
+					//}
+					//else{
+					//	array_unshift($arr_return[$ser_idx][$x_val], $x_val);
+					//}
 				}
 			}
 		}
 		$this->dataset = $arr_return;
+		$this->stripFieldNames();
 	}
 	
 	/**
@@ -294,7 +292,7 @@ class ChartData extends BlockData{
 		if(!isset($this->dataset) || !is_array($this->dataset)){
 			return false;
 		}
-		return array_values_recursive($this->dataset);
+		$this->dataset = array_values_recursive($this->dataset);
 	}
 }
 
@@ -307,11 +305,19 @@ class ChartData extends BlockData{
 	 * @todo -- build into class for dataset object?
 	 */
 	function array_values_recursive(array $arr){
+//$k = key($arr);
 		$arr = array_values($arr);
-        foreach($arr as $key => $val){
-        	if(is_array($val)){//array_values($val) === $val){
-                $arr[$key] = array_values_recursive($val);
-            }
+		foreach($arr as $key => $val){
+			if(is_array($val)){//array_values($val) === $val){
+//if(isset($val['x'])) echo "$k: " . $val['x'] . "<br>\n";
+//else echo "$k: x not set<br>\n";
+				if(!isset($val['x'])){
+					$arr[$key] = array_values_recursive($val);
+				}
+				else{
+					$arr[$key] = $val;
+				}
+			}
 		}
 		return $arr;
 	}

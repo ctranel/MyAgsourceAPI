@@ -80,6 +80,9 @@ function get_chart_options(options_json, chart_type){
 		case 'boxplot':
 			return get_boxplot_options(options_json);
 			break;
+		case 'columnrange':
+			return get_columnrange_options(options_json);
+			break;
 		default: //line
 			return get_line_options(options_json);
 			break;
@@ -146,6 +149,23 @@ function get_boxplot_options(options_json){
     			'Upper quartile: {point.q3}<br/>' +
     			'Median: {point.median}<br/>' +
     			'Lower quartile: {point.q1}<br/>'
+    	},
+
+	};
+	return options_json;
+}
+
+function get_columnrange_options(options_json){
+	options_json.chart.type = 'columnrange';
+	options_json.plotOptions.columnrange = {
+		grouping: false,
+        pointWidth: 12,
+        //edgeWidth: 0,
+        //lineWidth: 8,
+    	tooltip: {
+    		pointFormat: '<span style="color:{point.color}">\u25CF</span> <b> {series.name}</b><br/>' + // docs
+    			'Upper Value: {point.high}<br/>' +
+    			'Lower Value: {point.low}<br/>'
     	},
 
 	};
