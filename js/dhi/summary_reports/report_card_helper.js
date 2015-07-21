@@ -7,20 +7,25 @@
 
 				//y values not stored for scatter series', add them to datapoints
 				options_in.series[1].marker = {radius: 0};
+				//options_in.series[1].tooltip = {pointFormatter: function(){return false;}};
 				for(i in options_in.series[1].data){
 					options_in.series[1].data[i].y = 10;
 				}
 				options_in.series[2].marker = {radius: 0};
+				//options_in.series[2].tooltip = {pointFormatter: function(){return false;}};
 				for(i in options_in.series[2].data){
 					options_in.series[2].data[i].y = 50;
 				}
 				options_in.series[3].marker = {radius: 0};
+				//options_in.series[3].tooltip = {pointFormatter: function(){return false;}};
 				for(i in options_in.series[3].data){
 					options_in.series[3].data[i].y = 90;
 				}
 			}
 
-			options_in.tooltip.formatter = function(){return this.y + ["th","st","nd","rd"][!(this.y%10>3||Math.floor(this.y%100/10)==1)*this.y%10] + ' Percentile';};
+			options_in.tooltip.formatter = function(){
+					return this.y + ["th","st","nd","rd"][!(this.y%10>3||Math.floor(this.y%100/10)==1)*this.y%10] + ' Percentile';
+			};
 			options_in.plotOptions = {};
 			options_in.plotOptions.bar = {
 				pointWidth: 20,
@@ -28,7 +33,7 @@
 	               enabled: true,
 	               align: 'right',
 	               x: -2,
-	               y: 0,
+	               //y: 0,
 	               color: '#303030',
 	               formatter:function(){return this.point.val;}
 	            }
@@ -37,12 +42,14 @@
 	            dataLabels: {
 	            	crop: false,
 	            	overflow: "none",
+	            	allowOverlap: true,
 	                enabled: true,
 	                align: 'right',
-	                y: -5,//28,
 	                color: '#D75325',
-	                formatter:function(){return this.point.val.toString();}
-	            }
+	                formatter: function(){return this.point.val.toString();},
+	                style: {fontWeight: 'normal'}
+	            },
+	            enableMouseTracking: false
 	        },
 
 			options_in.yAxis[0].tickInterval = 10;

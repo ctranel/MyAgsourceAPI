@@ -466,9 +466,9 @@ abstract class report_parent extends CI_Controller {
 						'</script>'
 					),
 					'arr_headjs_line'=>array(
-						'{highcharts: "https://code.highcharts.com/4.0.4/highcharts.js"}',
-						'{highcharts_more: "https://code.highcharts.com/4.0.4/highcharts-more.js"}',
-						'{exporting: "https://code.highcharts.com/4.0.4/modules/exporting.js"}',
+						'{highcharts: "https://code.highcharts.com/4.1.7/highcharts.js"}',
+						'{highcharts_more: "https://code.highcharts.com/4.1.7/highcharts-more.js"}',
+						'{exporting: "https://code.highcharts.com/4.1.7/modules/exporting.js"}',
 						'{regression: "' . $this->config->item("base_url_assets") . 'js/charts/high_regression.js"}',
 						'{popup: "' . $this->config->item("base_url_assets") . 'js/jquery/popup.min.js"}',
 						'{chart_options: "' . $this->config->item("base_url_assets") . 'js/charts/chart_options.js"}',
