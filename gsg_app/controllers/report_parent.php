@@ -127,9 +127,14 @@ abstract class report_parent extends CI_Controller {
 		
 		$class_dir = $this->router->fetch_directory(); //this should match the name of this file (minus ".php".  Also used as base for css and js file names and model directory name
 		$class = $this->router->fetch_class();
+		if($class === 'index'){
+			$class = '';
+		}
 		$method = $this->router->fetch_method();
 		$this->section_path = $class_dir . $class;
-
+		if(substr($this->section_path, -1) === '/'){
+			$this->section_path = substr($this->section_path, 0, -1);
+		}
 		//load sections
 		$this->section = $sections->getByPath($this->section_path . '/');
 		$this->session->set_userdata('section_id', $this->section->id());
@@ -158,6 +163,7 @@ abstract class report_parent extends CI_Controller {
 		$arr_path = explode('/',$path);
 		$page_name = $method;
 		$block_name = '';
+
 		$this->page = $this->pages->getByPath($page_name, $this->section->id());
 		$this->report_path = $this->section_path . '/' . $this->page->path();
 		//$this->primary_model_name = $this->page->path() . '_model';

@@ -5,10 +5,10 @@ use \myagsource\Benchmarks\Benchmarks;
 
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
-class Benchmark extends CI_Controller {
-	
+class Benchmark extends CI_Controller {	
 	function __construct(){
 		parent::__construct();
+		
 /*		if(!isset($this->as_ion_auth)){
 			redirect('auth/login', 'refresh');
 		}
@@ -64,7 +64,7 @@ class Benchmark extends CI_Controller {
 		$make_default = $arr_params['make_default'];
 		unset($arr_params['make_default']);
 		
-		$formatted_form_data = Benchmarks_lib::parseFormData($arr_params);
+		$formatted_form_data = Benchmarks::parseFormData($arr_params);
 
 		//set session benchmarks
 		//$benchmarks->setSessionValues($formatted_form_data);
