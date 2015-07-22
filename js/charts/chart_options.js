@@ -44,7 +44,9 @@ var global_options = {
 		borderWidth: 1,
 		reversed: false
 	},
-	tooltip : {},
+	tooltip : {
+		xDateFormat: '%b %e, %Y'
+	},
 	plotOptions: {},
     series: [{
     }]
@@ -160,8 +162,6 @@ function get_columnrange_options(options_json){
 	options_json.plotOptions.columnrange = {
 		grouping: false,
         pointWidth: 12,
-        //edgeWidth: 0,
-        //lineWidth: 8,
     	tooltip: {
     		pointFormat: '<span style="color:{point.color}">\u25CF</span> <b> {series.name}</b><br/>' + // docs
     			'Upper Value: {point.high}<br/>' +
