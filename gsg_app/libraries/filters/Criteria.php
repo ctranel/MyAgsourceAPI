@@ -19,7 +19,7 @@ class Criteria{
 	private $type;
 	private $field_name;
 	private $label;
-	private $on_form;
+	private $user_editable;
 	private $options;
 	private $options_source;
 	//private $list_order;
@@ -36,7 +36,7 @@ class Criteria{
 		$this->label = $criteria_data['name'];
 		$this->default_value = $criteria_data['default_value'];
 		$this->options_source = $criteria_data['options_source'];
-		$this->on_form = $criteria_data['on_form'];
+		$this->user_editable = $criteria_data['user_editable'];
 		if(isset($criteria_data['arr_selected_values'])){
 			$this->setFilterCriteria($criteria_data['arr_selected_values']);
 		}
@@ -89,7 +89,7 @@ class Criteria{
 	* -----------------------------------------------------------------
 	*/
 	public function isDisplayed(){
-		return (count($this->options) > 1 || !isset($this->options_source)) && $this->on_form;
+		return (count($this->options) > 1 || !isset($this->options_source)) && $this->user_editable;
 	}
 
 	/* -----------------------------------------------------------------
