@@ -41,9 +41,8 @@ class Index extends report_parent {
 		$this->filters->setCriteria(
 				$this->section->id(),
 				$this->page->path(),
-				array(
-					'herd_code' =>	$this->session->userdata('herd_code'),
-				) //filter form submissions never trigger a new page load (i.e., this function is never fired by a form submission)
+				['herd_code' =>	$this->session->userdata('herd_code')], //filter form submissions never trigger a new page load (i.e., this function is never fired by a form submission)
+				'herd_code'
 		);
 		//END FILTERS
 		

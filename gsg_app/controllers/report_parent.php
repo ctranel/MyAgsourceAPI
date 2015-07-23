@@ -532,7 +532,6 @@ abstract class report_parent extends CI_Controller {
 			//'arr_filters' => $this->filters->filter_list(),
 			'arr_filters' => $this->filters->toArray(),
 		];
-
 		if(isset($arr_filter_data)){
 			$collapse_data['content'] = $this->load->view($report_filter_path, $arr_filter_data, TRUE);
 			$collapse_data['title'] = 'Set Filters';

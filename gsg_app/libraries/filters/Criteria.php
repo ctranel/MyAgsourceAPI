@@ -19,6 +19,7 @@ class Criteria{
 	private $type;
 	private $field_name;
 	private $label;
+	private $on_form;
 	private $options;
 	private $options_source;
 	//private $list_order;
@@ -35,6 +36,7 @@ class Criteria{
 		$this->label = $criteria_data['name'];
 		$this->default_value = $criteria_data['default_value'];
 		$this->options_source = $criteria_data['options_source'];
+		$this->on_form = $criteria_data['on_form'];
 		if(isset($criteria_data['arr_selected_values'])){
 			$this->setFilterCriteria($criteria_data['arr_selected_values']);
 		}
@@ -87,7 +89,7 @@ class Criteria{
 	* -----------------------------------------------------------------
 	*/
 	public function isDisplayed(){
-		return count($this->options) > 1 || !isset($this->options_source);
+		return (count($this->options) > 1 || !isset($this->options_source)) && $this->on_form;
 	}
 
 	/* -----------------------------------------------------------------
@@ -213,7 +215,7 @@ class Criteria{
 	*  @param: array page-level filters
 	*  @return void
 	*  @throws: 
-	*  @todo: remove herd_code reference
+	*  @todo: remove--options should be passed to constructor rather than filter_model
 	* -----------------------------------------------------------------
 	*/
 	protected function setOptions($herd_code){

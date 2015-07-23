@@ -152,6 +152,7 @@ class Filters{
 					'default_value' => $f,
 					'db_field_name' => $k,
 					'arr_selected_values' => $arr_form_data[$k],
+					'on_form' => false,
 				);
 				$this->arr_criteria[$k] = CriteriaFactory::createCriteria($this->filter_model, $arr_tmp, $arr_form_data['herd_code']);
 			}
