@@ -154,7 +154,7 @@ class Filters{
 					'arr_selected_values' => $arr_form_data[$k],
 					'user_editable' => false,
 				);
-				$this->arr_criteria[$k] = CriteriaFactory::createCriteria($this->filter_model, $arr_tmp, $arr_form_data['herd_code']);
+				$this->arr_criteria[$k] = CriteriaFactory::createCriteria($this->filter_model, $arr_tmp, [[$arr_form_data['herd_code']]]);
 			}
 		}
 		foreach($arr_page_filter_data as $k=>$f){
@@ -162,7 +162,7 @@ class Filters{
 			if(isset($arr_form_data[$k]) && !empty($arr_form_data[$k])){
 				$f['arr_selected_values'] = $arr_form_data[$k];
 			}
-			$this->arr_criteria[$k] = CriteriaFactory::createCriteria($this->filter_model, $f, $arr_form_data['herd_code']);
+			$this->arr_criteria[$k] = CriteriaFactory::createCriteria($this->filter_model, $f, [['db_field_name' => 'herd_code', 'operator' => '=', 'value' => $arr_form_data['herd_code']]]);
 		}
 	}
 

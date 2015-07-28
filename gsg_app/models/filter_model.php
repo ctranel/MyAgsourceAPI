@@ -44,19 +44,21 @@ class Filter_model extends CI_Model {
 	 * @return array of criteria options for given filter
 	 * @author ctranel
 	 **/
-	public function getCriteriaOptions($source_table, $herd_code = null) {
+	public function getCriteriaOptions($source_table, $options_conditions) {
 		// if herd code is available in the lookup table, create herd code as a where criteria
 		list($db, $schema, $table) = explode('.', $source_table);
 		$sql = "USE " . $db . "; SELECT column_name FROM information_schema.columns WHERE table_name = '" . trim($table) . "' AND column_name = 'herd_code'";
 		$arr_fields = $this->db->query($sql)->result_array();
-		if(count($arr_fields) > 0){
-			if(isset($herd_code) && !empty($herd_code)){
-				$this->db->where('herd_code', $herd_code);
-			}
-			else {
-				return false;
+		if(count($arr_fields) === 0){
+			return false;
+		}
+		
+		if(isset($options_conditions) && is_array($options_conditions)){
+			foreach($options_conditions as $c){
+				$this->db->where($c['db_field_name'] . ' ' . $c['operator'], $c['value']);
 			}
 		}
+		
 		// run query
 		$results = $this->db
 		->select('value, label, is_default')

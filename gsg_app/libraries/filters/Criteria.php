@@ -27,22 +27,23 @@ class Criteria{
 	private $log_filter_text;
 	private $arr_selected_values = array();
 	private $arr_options; //array of criteria objects
-	private $filter_model;
 	
-	public function __construct(\Filter_model $filter_model, $criteria_data, $herd_code){
-		$this->filter_model = $filter_model;
+	public function __construct($criteria_data, $options){
 		$this->type = $criteria_data['type'];
+		$this->options = $options;
 		$this->field_name = $criteria_data['db_field_name'];
 		$this->label = $criteria_data['name'];
 		$this->default_value = $criteria_data['default_value'];
 		$this->options_source = $criteria_data['options_source'];
-		$this->user_editable = $criteria_data['user_editable'];
+		$this->user_editable = (bool)$criteria_data['user_editable'];
 		if(isset($criteria_data['arr_selected_values'])){
 			$this->setFilterCriteria($criteria_data['arr_selected_values']);
 		}
+		
+		
 
 		//$this->list_order = $criteria_data['list_order'];
-		$this->setOptions($herd_code);
+		//$this->setOptions($options_conditions);
 		$this->setDefaults();
 	}
 
@@ -217,13 +218,13 @@ class Criteria{
 	*  @throws: 
 	*  @todo: remove--options should be passed to constructor rather than filter_model
 	* -----------------------------------------------------------------
-	*/
-	protected function setOptions($herd_code){
+	protected function setOptions($options_conditions){
 		$this->options_source;
 		if(isset($this->options_source) && !empty($this->options_source)){
-			$this->options = $this->filter_model->getCriteriaOptions($this->options_source, $herd_code);
+			$this->options = $this->filter_model->getCriteriaOptions($this->options_source, $options_conditions);
 		}
 	}
+	*/
 
 	/* -----------------------------------------------------------------
 	*  setDefaults() sets looks up options and sets default criteria
