@@ -194,7 +194,7 @@ class Index extends report_parent {
 		//filters	
 		$report_filter_path = 'filters';
 		if(file_exists(APPPATH . 'views/' . $this->section_path . '/filters.php')){
-			$report_filter_path =  $this->section_path . '/filters' . $report_filter_path;
+			$report_filter_path =  $this->section_path . '/filters';
 		}
 
 		$arr_filter_data = array(
