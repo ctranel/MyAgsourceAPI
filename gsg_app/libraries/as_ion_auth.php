@@ -119,8 +119,8 @@ class As_ion_auth extends Ion_auth {
 				$sections_with_permission = $this->ion_auth_model->sectionsWithPermission($this->session->userdata('user_id'), $this->session->userdata('herd_code'));
 			}
 			*/
-	
-			$dhi_section = $sections->getByPath('dhi/');
+			//@todo: hard-coded "/" path will not work when we add soil labs or any division other than DHI.  Will need the division user is in.
+			$dhi_section = $sections->getByPath('/');
 			$sections->loadChildren($dhi_section, $pages, $this->session->userdata('user_id'), $herd, $this->arr_task_permissions);
 			$this->top_sections = $dhi_section->children();
 			if(isset($active_section)){
