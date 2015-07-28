@@ -336,7 +336,7 @@ class report_block extends CI_Controller {
 		/*Load the most specific data-handling library that exists */
 		$tmp_path = $page_path . '/' . $block_name;
 		while(strpos($tmp_path, '/') !== false){
-			if(file_exists(APPPATH . 'libraries/' . $tmp_path . '.php')){
+			if(file_exists(APPPATH . 'libraries' . $tmp_path . '.php')){
 				$this->data_handler_name = ucwords(substr($tmp_path, (strripos($tmp_path, '/') + 1)));
 				require_once APPPATH . 'libraries/' . $tmp_path . '.php';
 				if($block->displayType() == 'table'){
@@ -351,6 +351,7 @@ class report_block extends CI_Controller {
 			}
 			$tmp_path = substr($tmp_path, 0, strripos($tmp_path, '/'));
 		}
+
 		//if no specific data-handling library found, go with the general data-handling library 
 		if(!isset($this->data_handler_name)){
 			if($block->displayType() == 'table'){

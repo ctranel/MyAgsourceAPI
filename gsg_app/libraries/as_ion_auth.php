@@ -109,7 +109,8 @@ class As_ion_auth extends Ion_auth {
 			$control_dir = $this->router->fetch_directory();
 			//all sections must have directories in the main controller directory
 			if($control_dir != $section_path && !empty($control_dir)){
-				$active_section = $sections->getByPath($control_dir);
+			//@todo: hard-coded "/" path will not work when we add soil labs or any division other than DHI.  Use control_dir instead.
+				$active_section = $sections->getByPath('/');
 				$sections->loadChildren($active_section, $pages, $this->session->userdata('user_id'), $herd, $this->arr_task_permissions);
 			} 
 			

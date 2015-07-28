@@ -152,7 +152,6 @@ die('BlockData->prepSelectFields');
 			foreach($row as $name => $val){
 				if(strpos($name, 'isnull') === false && isset($row[$header_field]) && !empty($row[$header_field])) { //2nd part eliminates rows where fresh date is null (FCS)
 					$new_dataset[$name][$k] = $val;
-
 					if(isset($sum[$name]) === false && $val !== null){
 						$sum[$name] = 0;
 						$count[$name] = 0;
@@ -165,9 +164,8 @@ die('BlockData->prepSelectFields');
 				}				
 			}
 		}
-		
-//		return $this->addAggregateRow($new_dataset);
 
+		//Data is pivoted, now handle aggregate rows.
 		$first = true;
 		foreach($new_dataset as $k=>&$a){
 			if(!empty($k)){
