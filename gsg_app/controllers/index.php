@@ -89,7 +89,7 @@ class Index extends report_parent {
 					$arr_blk_data = array(
 							'block_num' => $x,
 							'link_url' => site_url($this->section_path) . '/' . $this->page->path() . '/' . $pb->path(),
-							'form_id' => $this->report_form_id,
+//							'form_id' => $this->report_form_id,
 							//'odd_even' => $odd_even,
 							'block' => $pb->path(),
 							//'sort_by' => urlencode($sort_by),

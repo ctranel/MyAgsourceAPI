@@ -309,7 +309,7 @@ class TableHeader {
 		if (!is_array($input) || empty($new_val_in)){
 			return false;
 		}
-//		$cnt = 0;
+
 		//if there are no parent headers (i.e., header groups) and the leaf ($new_val_in) has no parent id set--single level headers
 		if(!isset($input['children']) && !isset($new_val_in['children']['parent_id'])){
 			$input[] = $new_val_in['children'];
@@ -324,7 +324,6 @@ class TableHeader {
 					$input[$key]['children'] = [];
 				}
 				$input[$key]['children'][] = $new_val_in['children'];
-				//$value = $new_val_in;
 				return;
 			}
 			
@@ -335,4 +334,36 @@ class TableHeader {
 		}
 		return;
 	}
+	
+	/**
+	 * mergeDateIntoHeader
+	 *
+	 * merges dynamic date list into headers
+	 *
+	 * @param array header_group_data
+	 * @param array dates to be merged
+	 * @return void
+	 * @author ctranel
+	 */
+	public static function mergeDateIntoHeader($header_groups, $dates){
+		if(isset($header_groups) && is_array($header_groups)){
+			foreach($header_groups as $hk => $hv){
+				$c = 0;
+				if(isset($dates) && is_array($dates)){
+					foreach($dates[0] as $key => $value){
+						if ($key == $hv['text']) {
+							if ($value == '0-0') {
+								$value='No Test (-'.$c.')';
+							}
+							$header_groups[$hk]['text'] = $value;
+							break;
+						}
+						$c++;
+					}
+				}
+			}
+		}
+		return $header_groups;
+	}
+	
 }

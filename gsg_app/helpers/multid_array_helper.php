@@ -98,7 +98,7 @@ if ( ! function_exists('array_extract_value_recursive')) {
 	 * @author ctranel
 	 */
 	function array_extract_value_recursive($key_in, array $arr_in){
-		$new_val = array();
+		$new_val = [];
 	    array_walk_recursive($arr_in, create_function('$val, $key, $obj', 'if($key == key($obj) || key($obj) == "*") array_push($obj[key($obj)], $val);'), array($key_in => &$new_val));
 	    return $new_val;
 	}

@@ -90,7 +90,7 @@ abstract class report_parent extends CI_Controller {
 	 **/
 	protected $herd;
 
-	protected $report_form_id;
+//	protected $report_form_id;
 	protected $arr_sort_by = array();
 	protected $arr_sort_order = array();
 	protected $product_name;
@@ -167,7 +167,7 @@ abstract class report_parent extends CI_Controller {
 		$this->page = $this->pages->getByPath($page_name, $this->section->id());
 		$this->report_path = $this->section_path . '/' . $this->page->path();
 		//$this->primary_model_name = $this->page->path() . '_model';
-		$this->report_form_id = 'report_criteria';//filter-form';
+//		$this->report_form_id = 'report_criteria';//filter-form';
 		$this->page_header_data['top_sections'] = $this->as_ion_auth->top_sections;
 		$this->page_header_data['user_sections'] = $this->as_ion_auth->user_sections;
 		$this->page_header_data['num_herds'] = $this->herd_access->getNumAccessibleHerds($this->session->userdata('user_id'), $this->as_ion_auth->arr_task_permissions(), $this->session->userdata('arr_regions'));
@@ -404,7 +404,7 @@ abstract class report_parent extends CI_Controller {
 					$arr_blk_data = array(
 							'block_num' => $x,
 							'link_url' => site_url($this->section_path) . '/' . $this->page->path() . '/' . $curr->path(),
-							'form_id' => $this->report_form_id,
+//							'form_id' => $this->report_form_id,
 							'block' => $curr->path(),
 							'odd_even' => $odd_even,
 					);

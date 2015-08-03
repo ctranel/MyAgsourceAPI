@@ -6,12 +6,14 @@ namespace myagsource\Report\Content\Table;
 require_once APPPATH . 'libraries/Datasource/DbObjects/DbField.php';
 require_once APPPATH . 'libraries/Report/Content/Table/TableField.php';
 require_once APPPATH . 'libraries/Report/Content/Block.php';
+require_once(APPPATH . 'libraries/Report/Content/Table/Header/TableHeader.php');
 
 //use \myagsource\Datasource\DbObjects\DbTable;
 use \myagsource\Datasource\DbObjects\DbField;
 use \myagsource\Report\Content\Table\TableField;
 use \myagsource\Report\Content\Block;
 use \myagsource\Supplemental\Content\SupplementalFactory;
+use \myagsource\Report\Content\Table\Header\TableHeader;
 
 /**
  * Name:  TableBlock
@@ -24,9 +26,18 @@ use \myagsource\Supplemental\Content\SupplementalFactory;
  *
  */
 class TableBlock extends Block {
+	/**
+	 * table_header
+	 * @var TableHeader
+	 **/
+	protected $table_header;
 	
 	/**
-	 */
+	 * top_row
+	 * @var array
+	 **/
+	protected $top_row;
+	
 	function __construct($block_datasource, $id, $page_id, $name, $description, $scope, $active, $path, $max_rows, $cnt_row, 
 			$sum_row, $avg_row, $bench_row, $is_summary, $display_type, SupplementalFactory $supp_factory, $field_groups) {
 		parent::__construct($block_datasource, $id, $page_id, $name, $description, $scope, $active, $path, $max_rows, $cnt_row, 
@@ -35,6 +46,59 @@ class TableBlock extends Block {
 		$this->setReportFields();
 	}
 	
+	/**
+	 * setTableHeader
+	 * 
+	 * @param int report count
+	 * @return array of output data for block
+	 * @access public
+	 *
+	 **/
+	public function setTableHeader(&$report_data, SupplementalFactory $supplemental_factory, $header_groups){
+		$this->table_header = new TableHeader($this, $header_groups, $supplemental_factory);
+		
+		$top_row = null;
+		if($this->hasPivot()){
+			reset($report_data);
+			$tmp_key = key($report_data);
+			$this->top_row = array_merge([ucwords(str_replace('_', ' ', $tmp_key))],$report_data[$tmp_key]);
+			unset($report_data[$tmp_key]);
+		}
+	}
+
+	/**
+	 * getTableHeaderData
+	 * 
+	 * @param int report count
+	 * @return array of output data for block
+	 * @access public
+	 *
+	 **/
+	public function getTableHeaderData($report_count){
+		return [
+			'structure' => $this->table_header->getTableHeaderStructure($this->top_row),
+	//		'form_id' => $this->report_form_id,
+			'block' => $this,
+			'report_count' => $report_count
+		];
+		
+	}
+
+	/**
+	 * getOutputData
+	 * 
+	 * overrides parent function
+	 * 
+	 * @return array of output data for block
+	 * @access public
+	 *
+	 **/
+	public function getOutputData(){
+		$return_val = parent::getOutputData();
+		$return_val['num_columns'] = $this->table_header->columnCount();
+		return $return_val;
+	}
+
 	/**
 	 * setReportFields
 	 * 

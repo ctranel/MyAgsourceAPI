@@ -10,8 +10,9 @@ require_once(APPPATH . 'libraries/Site/WebContent/Blocks.php');
 require_once(APPPATH . 'libraries/Site/WebContent/Pages.php');
 require_once(APPPATH . 'libraries/Site/WebContent/Sections.php');
 require_once(APPPATH . 'libraries/Datasource/DbObjects/DbTable.php');
-require_once(APPPATH . 'libraries/Datasource/DbObjects/DbField.php');
 require_once(APPPATH . 'libraries/Report/Content/Chart/ChartData.php');
+require_once(APPPATH . 'libraries/Report/Content/SortBuilder.php');
+require_once(APPPATH . 'libraries/DataHandler.php');
 require_once(APPPATH . 'libraries/Report/Content/Table/TableData.php');
 require_once(APPPATH . 'libraries/Report/Content/Table/Header/TableHeader.php');
 
@@ -27,9 +28,9 @@ use \myagsource\Report\Content\Blocks;
 use \myagsource\Report\Content\Chart\ChartData;
 use \myagsource\Report\Content\Table\Header\TableHeader;
 use \myagsource\Datasource\DbObjects\DbTable;
-use \myagsource\Datasource\DbObjects\DbField;
-use myagsource\Report\Content\Sort;
-use myagsource\Report\Content\Table\TableData;
+use \myagsource\Report\Content\SortBuilder;
+use \myagsource\DataHandler;
+use \myagsource\Report\Content\Table\TableData;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
@@ -157,7 +158,8 @@ class report_block extends CI_Controller {
 			die('Report not found');
 		}
 		$this->report_path = $this->section_path . $this->page->path();
-*/		$this->report_form_id = 'report_criteria';//filter-form';
+*/
+//		$this->report_form_id = 'report_criteria';//filter-form';
 
 		
 		//load most specific model available.  Must load model before setting section
@@ -258,20 +260,8 @@ class report_block extends CI_Controller {
 		$output = $block->displayType();
 		
 		//SORT
-		$sort_by = urldecode($sort_by);
-		if($sort_by != 'null' && $sort_order != 'null' && !empty($sort_by) && !empty($sort_order)) {
-			$arr_sort_by = explode('|', $sort_by);
-			$arr_sort_order = explode('|', $sort_order);
-			if(isset($arr_sort_order) && is_array($arr_sort_order)){
-				$block->resetSort();
-				foreach($arr_sort_order as $k=>$s){
-					$f = $this->report_block_model->getFieldByName($block->id(), $arr_sort_by[$k]);
-					$datafield = new DbField($f['db_field_id'], $f['table_name'], $f['db_field_name'], $f['name'], $f['description'], $f['pdf_width'], $f['default_sort_order'],
-						 $f['datatype'], $f['max_length'], $f['decimal_scale'], $f['unit_of_measure'], $f['is_timespan'], $f['is_foreign_key'], $f['is_nullable'], $f['is_natural_sort']);
-					$block->addSort(new Sort($datafield, $arr_sort_order[$k]));
-				}
-			}
-		}
+		$sort_builder = new SortBuilder();
+		$sort_builder->build($block, $sort_by, $sort_order);
 		//END SORT
 		
 		//FILTERS
@@ -296,7 +286,7 @@ class report_block extends CI_Controller {
 
 			/*
 			 * If this is a cow level block, and the filter is set to 0 (pstring), remove filter
-			 * Needed for that contain both cow level and summary reports.
+			 * Needed for reports that contain both cow level and summary reports.
 			*/
 			foreach($arr_params as $k => $v){
 				if(!$block->isSummary()){
@@ -325,45 +315,19 @@ class report_block extends CI_Controller {
 		$herd_info = $this->herd_model->header_info($this->herd->herdCode());
 		$this->load->model('benchmark_model');
 		$this->benchmarks = new Benchmarks($this->session->userdata('user_id'), $this->input->post('herd_code'), $herd_info, $this->setting_model, $this->benchmark_model, $this->session->userdata('benchmarks'));
-			// end benchmarks
+		// end benchmarks
 			
 		// report data
-		$this->load->model ( 'ReportContent/report_data_model' );
-		$this->load->model ( 'Datasource/db_table_model' );
-		$db_table = new DbTable ( $block->primaryTableName (), $this->db_table_model );
+		$this->load->model('ReportContent/report_data_model');
+		$this->load->model('Datasource/db_table_model');
+		$db_table = new DbTable($block->primaryTableName (), $this->db_table_model);
 		//$block_data = new BlockDataFactory($block, $this->report_data_model, $this->benchmarks, $db_table);
 
-		/*Load the most specific data-handling library that exists */
+		// Load the most specific data-handling library that exists
 		$tmp_path = $page_path . '/' . $block_name;
-		while(strpos($tmp_path, '/') !== false){
-			if(file_exists(APPPATH . 'libraries' . $tmp_path . '.php')){
-				$this->data_handler_name = ucwords(substr($tmp_path, (strripos($tmp_path, '/') + 1)));
-				require_once APPPATH . 'libraries/' . $tmp_path . '.php';
-				if($block->displayType() == 'table'){
-					$this->data_handler_name = 'myagsource\\Report\\Content\\Table\\' . $this->data_handler_name;
-					$block_data_handler = new $this->data_handler_name($block, $this->report_data_model, $this->benchmarks, $db_table);
-				}
-				
-				if($block->displayType() == 'trend chart' || $block->displayType() == 'compare chart'){
-					$this->data_handler_name = 'myagsource\\Report\\Content\\Chart\\' . $this->data_handler_name;
-					$block_data_handler = new $this->data_handler_name($block, $this->report_data_model);
-				}
-			}
-			$tmp_path = substr($tmp_path, 0, strripos($tmp_path, '/'));
-		}
-
-		//if no specific data-handling library found, go with the general data-handling library 
-		if(!isset($this->data_handler_name)){
-			if($block->displayType() == 'table'){
-				$block_data_handler = new TableData($block, $this->report_data_model, $this->benchmarks, $db_table);
-			}
-			
-			if($block->displayType() == 'trend chart' || $block->displayType() == 'compare chart'){
-				$block_data_handler = new ChartData($block, $this->report_data_model);
-			}
-		}
+		$data_handler = new DataHandler();
+		$block_data_handler = $data_handler->load($block, $tmp_path, $this->report_data_model, $db_table, $this->benchmarks);
 		//End load data-handling library
-		
 
 		$results = $block_data_handler->getData($filters->criteriaKeyValue());//$report_count, 
 		// end report data
@@ -378,49 +342,34 @@ class report_block extends CI_Controller {
 		}
 		*/
 
-		//Gather meta-data into $this->report_data
-		$this->report_data = $block->getOutputData();//count($results, COUNT_RECURSIVE));
+		//Handle table headers for table blocks
+		if($block->displayType() == 'table'){
+			//table header
+			$header_groups = $this->report_block_model->getHeaderGroups($block->id());
+			
+			//@todo: pull this only when needed? move adjustHeaderGroups to TableBlock or TableHeader class
+			$arr_dates = $this->herd_model->get_test_dates_7_short($this->session->userdata('herd_code'));
+			$header_groups = TableHeader::mergeDateIntoHeader($header_groups, $arr_dates);
+			
+			$supp_factory = new SupplementalFactory($this->supplemental_model, site_url());
+			$block->setTableHeader($results, $supp_factory, $header_groups);
+			unset($supp_factory);
+		}
+		$this->report_data = $block->getOutputData();
 		$this->report_data['herd_code'] = $this->session->userdata('herd_code');
 		if($block->hasBenchmark()){
 			$this->report_data['benchmark_text'] = $this->benchmarks->get_bench_text();
 		}
 
-		//$this->report_data['block'] = $block;
 		$this->report_data['data'] = $results;
 		
 		if(isset($this->supplemental) && !empty($this->supplemental)){
 			$this->report_data['supplemental'] = $this->supplemental;
 		}
-		//table
+
 		if($block->displayType() == 'table'){
-			//header
-			$header_groups = $this->report_block_model->getHeaderGroups($block->id());
-			
-			//@todo: pull this only when needed?
-			$arr_dates = $this->herd_model->get_test_dates_7_short($this->session->userdata('herd_code'));
-			$header_groups = $this->adjustHeaderGroups($header_groups, $arr_dates);
-			//
-			
-
-			$top_row = null;
-			if($block->hasPivot()){
-				reset($this->report_data['data']);
-				$tmp_key = key($this->report_data['data']);
-				$top_row = array_merge([ucwords(str_replace('_', ' ', $tmp_key))],$this->report_data['data'][$tmp_key]);
-				unset($this->report_data['data'][$tmp_key]);
-			}
-			$table_header = new TableHeader($block, $header_groups, new SupplementalFactory($this->supplemental_model, site_url()));
-			
-			$table_header_data = [
-				'structure' => $table_header->getTableHeaderStructure($top_row),
-				'form_id' => $this->report_form_id,
-				'block' => $block,
-				'report_count' => $report_count
-			];
-
-			$this->report_data['table_header'] = $this->load->view('table_header', $table_header_data, TRUE);
+			$this->report_data['table_header'] = $this->load->view('table_header', $block->getTableHeaderData($report_count), TRUE);
 			//finish table
-			$this->report_data['num_columns'] = $table_header->columnCount();
 			/*
 			 * @todo: when we have a javascript framework in place, we will send table data via json too.
 			 * for now, we need to send the html for the table instead of the data
@@ -433,9 +382,7 @@ class report_block extends CI_Controller {
 				$this->report_data['html'] = '<p class="message">No data found.</p>';
 			}
 		}
-		//end table
 
-//die($this->report_data['html']);    	
 		//@todo: base header on accept property of request header 
 		$return_val = json_encode($this->report_data);//, JSON_HEX_QUOT | JSON_HEX_TAG); //json_encode_jsfunc
 		header("Content-type: application/json"); //being sent as json
@@ -456,26 +403,6 @@ class report_block extends CI_Controller {
 		return $section;
 	}
 	
-	protected function adjustHeaderGroups($header_groups, $dates){
-		if(isset($header_groups) && is_array($header_groups)){
-			foreach($header_groups as $hk => $hv){
-				$c = 0;
-				if(isset($dates) && is_array($dates)){
-					foreach($dates[0] as $key => $value){
-						if ($key == $hv['text']) {
-							if ($value == '0-0') {
-								$value='No Test (-'.$c.')';
-							}
-							$header_groups[$hk]['text'] = $value;
-							break;
-						}
-						$c++;
-					}
-				}
-			}
-		}
-		return $header_groups;
-	}
 /*		
 	protected function _record_access($event_id, $format, $product_code = null){
 		if($this->session->userdata('user_id') === FALSE){
