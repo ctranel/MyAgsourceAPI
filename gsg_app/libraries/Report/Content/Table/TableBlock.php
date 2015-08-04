@@ -39,7 +39,7 @@ class TableBlock extends Block {
 	protected $top_row;
 	
 	function __construct($block_datasource, $id, $page_id, $name, $description, $scope, $active, $path, $max_rows, $cnt_row, 
-			$sum_row, $avg_row, $bench_row, $is_summary, $display_type, SupplementalFactory $supp_factory, $field_groups) {
+			$sum_row, $avg_row, $bench_row, $is_summary, $display_type, SupplementalFactory $supp_factory = null, $field_groups) {
 		parent::__construct($block_datasource, $id, $page_id, $name, $description, $scope, $active, $path, $max_rows, $cnt_row, 
 			$sum_row, $avg_row, $bench_row, $is_summary, $display_type, $supp_factory, $field_groups);
 		
@@ -54,7 +54,7 @@ class TableBlock extends Block {
 	 * @access public
 	 *
 	 **/
-	public function setTableHeader(&$report_data, SupplementalFactory $supplemental_factory, $header_groups){
+	public function setTableHeader(&$report_data, SupplementalFactory $supplemental_factory = null, $header_groups){
 		$this->table_header = new TableHeader($this, $header_groups, $supplemental_factory);
 		
 		$top_row = null;
@@ -77,11 +77,23 @@ class TableBlock extends Block {
 	public function getTableHeaderData($report_count){
 		return [
 			'structure' => $this->table_header->getTableHeaderStructure($this->top_row),
-	//		'form_id' => $this->report_form_id,
 			'block' => $this,
 			'report_count' => $report_count
 		];
 		
+	}
+
+	/**
+	 * getTableHeaderCsv
+	 * 
+	 * @param int report count
+	 * @return array of output data for block
+	 * @access public
+	 *
+	 **/
+	public function getTableHeaderLeafs(){
+		$header_leafs = $this->table_header->getHeaderLeafs($this->top_row);
+		return $header_leafs;
 	}
 
 	/**

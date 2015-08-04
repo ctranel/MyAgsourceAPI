@@ -27,16 +27,16 @@ class Csv{
 	}
 	
 	/**
-	 * create_csv - creates PDF version of report.
+	 * create_csv - creates CSV version of report.
 	 * @param array of data for report.
 	 * @param string herd code
 	 * @return void
 	 * @author ctranel
 	 **/
-	function create_csv($data, $herd_code){
+	function create_csv($data){
 		$delimiter = ",";
 		$newline = "\r\n";
-		echo $this->csv_from_result($data, $delimiter, $newline);
+		return $this->csv_from_result($data, $delimiter, $newline);
 	}
 	
 	/**
@@ -59,7 +59,6 @@ class Csv{
 			$cnt = count($data);
 			$active_el = current($data);
 			$out = '';
-			$print_header_next = TRUE;
 				
 			while(count($arr_tmp) < 2 && $i < $cnt){
 				//echo "\n" . count($data) . ' - ' . $cnt . ' - ' . $i . "\n";
@@ -67,27 +66,24 @@ class Csv{
 				$i++;
 				$active_el = next($data);
 			}
-			//reset($data);
 			foreach ($data as $row) {
-				if($print_header_next){
-					$out .= _write_header($row, $enclosure, $delim, $newline);
-					$print_header_next = FALSE;
-				}
 				foreach ($row as $key=>$item) {
 					if(stripos($key, 'isnull') === FALSE) {
 						//handle special cases
-						if ($key == "net_merit_amt"){
+						//@todo: get special cases out of here
+						if ($key === "net_merit_amt"){
 							$arr_item = explode('*', $item);
 							$denote = isset($arr_item[1]) ? '*' : '';
 							$out .= $enclosure.str_replace($enclosure, $enclosure.$enclosure, $arr_item[0]).$enclosure.$delim;
 							$out .= $enclosure.str_replace($enclosure, $enclosure.$enclosure, $denote).$enclosure.$delim;
 						}
-						else $out .= $enclosure.str_replace($enclosure, $enclosure.$enclosure, $item).$enclosure.$delim;
+						else{
+							$out .= $enclosure.str_replace($enclosure, $enclosure.$enclosure, $item).$enclosure.$delim;
+						}
 					}
 				}
 				$out = rtrim($out);
 				$out .= $newline;
-				if(count($row) == 1) $print_header_next = TRUE;
 			}
 			return $out;
 		}
@@ -96,36 +92,4 @@ class Csv{
 			return false;
 		}
 	}
-	
-	// --------------------------------------------------------------------
-	
-	/**
-	 * Generate CSV from a query result object
-	 *
-	 * @access	public
-	 * @param	array	Row data
-	 * @param	string	The enclosure
-	 * @param	string	The delimiter
-	 * @param	string	The newline character
-	 * @return	string
-	 */
-	protected function _write_header($row, $enclosure, $delim, $newline){
-		$out = '';
-		foreach ($row as $name=>$value) {
-			if(stripos($name, 'isnull') === FALSE){
-				if(stripos($name, 'DATE') !== FALSE) $name = '';
-				if ($name == "net_merit_amt"){
-					$out .= $enclosure.strtoupper(str_replace('_', ' ', str_replace($enclosure, $enclosure.$enclosure, $name))).$enclosure.$delim;
-					$out .= $enclosure.strtoupper(str_replace('_', ' ', str_replace($enclosure, $enclosure.$enclosure, "NM$ is EST"))).$enclosure.$delim;
-				}
-				else {
-					$out .= $enclosure.strtoupper(str_replace('_', ' ', str_replace($enclosure, $enclosure.$enclosure, $name))).$enclosure.$delim;
-				}
-			}
-		}
-		$out = rtrim($out);
-		$out .= $newline;
-		return $out;
-	}
-	
 }

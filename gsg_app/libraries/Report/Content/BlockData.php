@@ -221,8 +221,6 @@ die('BlockData->prepSelectFields');
 			foreach($row as $name => $val){
 			    $data_type[$name] = $this->block->getFieldDataType($name);
 				if(strpos($name, 'isnull') === false && is_numeric($val)) {
-					//$new_dataset[$name][$k] = $val;
-	
 					if(isset($sum[$name]) === false && $val !== null){
 						$sum[$name] = 0;
 						$count[$name] = 0;
@@ -232,6 +230,10 @@ die('BlockData->prepSelectFields');
 						$sum[$name] += $val;
 						$count[$name]++;
 					}
+				}
+				elseif(!is_numeric($val) && !isset($count[$name])){
+					$sum[$name] = null;
+					$count[$name] = null;
 				}
 			}
 		}

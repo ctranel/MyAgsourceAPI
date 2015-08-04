@@ -274,48 +274,7 @@ abstract class report_parent extends CI_Controller {
 		$this->filters->setCriteria($this->section->id(), $this->page->path(), ['herd_code' =>	$this->herd->herdCode()]); //filter form submissions never trigger a new page load (i.e., this function is never fired by a form submission)
 		//END FILTERS
 /*
-		if ($display_format == 'csv'){
-			$csv = new Csv();
-			$data = array();
-			if(isset($arr_blocks) && is_array($arr_blocks)){
-				foreach($arr_blocks as $pb){
-					if($pb['display_type'] !== 'table'){
-						continue;
-					}
-					if(($arr_block_in !== NULL && in_array($pb->path(), $arr_block_in)) || $arr_block_in == NULL){
-						if(isset($sort_by) && isset($sort_order)){
-							$this->arr_sort_by = array_values(explode('|', $sort_by));
-							$this->arr_sort_order = array_values(explode('|', $sort_order));
-						}
-						else {
-							$tmp = $pb->get_default_sort($pb->path());
-							$this->arr_sort_by = $tmp['arr_sort_by'];
-							$this->arr_sort_order = $tmp['arr_sort_order'];
-							$sort_by = implode('|', $this->arr_sort_by);
-							$sort_order = implode('|', $this->arr_sort_order);
-						}
-						$this->reports->sortText($this->arr_sort_by, $this->arr_sort_order);//this function sets text, and could return it if needed
-						$tmp_data = $this->ajax_report(urlencode($this->page->path()), urlencode($pb->path()), urlencode($sort_by), $sort_order, 'csv', NULL);
-						$data[] = array('test_date' => $pb['description']);
-						$data = array_merge($data, $tmp_data);
-					}
-				}
-			}
-			if(is_array($data) && !empty($data)){
-				$this->config->set_item('compress_output', FALSE);
-				
-				$filename = $this->herd->herdCode() . '-' . date('mdy-His') . '.csv';
-				header('Content-type: application/excel');
-				header('Content-disposition: attachment; filename=' . $filename);
-				$csv->create_csv($data);
-				$this->_record_access(90, 'csv', $this->config->item('product_report_code'));
-			}
-			else {
-				$this->{$this->primary_model_name}->arr_messages[] = 'There is no data to export into an Excel file.';
-			}
-			exit;
-		}
-		elseif ($display_format == 'pdf' && !is_null($arr_block_in)) {
+		if ($display_format == 'pdf' && !is_null($arr_block_in)) {
 			$ci_pdf = new Ci_pdf();
 			$pdf = new Pdf($ci_pdf);
 			//@todo: parameters

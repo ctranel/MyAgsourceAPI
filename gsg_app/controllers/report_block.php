@@ -363,9 +363,6 @@ class report_block extends CI_Controller {
 		$return_val = json_encode($this->report_data);//, JSON_HEX_QUOT | JSON_HEX_TAG); //json_encode_jsfunc
 		header("Content-type: application/json"); //being sent as json
 		echo $return_val;
-		if($return_val) {
-			return $return_val;
-		}
 	}
 
 	protected function getSection(){
@@ -378,36 +375,4 @@ class report_block extends CI_Controller {
 		$section = $sections->getByPath($this->section_path);
 		return $section;
 	}
-	
-/*		
-	protected function _record_access($event_id, $format, $product_code = null){
-		if($this->session->userdata('user_id') === FALSE){
-			return FALSE;
-		}
-		$herd_code = $this->session->userdata('herd_code');
-		$herd_enroll_status_id = empty($herd_code) ? NULL : $this->session->userdata('herd_enroll_status_id');
-		$recent_test = $this->session->userdata('recent_test_date');
-		$recent_test = empty($recent_test) ? NULL : $recent_test;
-		
-		$filter_text = isset($this->filters) ? $this->filters->get_filter_text() : NULL;
-
-		$this->load->model('access_log_model');
-		$access_log = new Access_log($this->access_log_model);
-		
-		$access_log->write_entry(
-			$this->as_ion_auth->is_admin(),
-			$event_id,
-			$herd_code,
-			$recent_test,
-			$herd_enroll_status_id,
-			$this->session->userdata('user_id'),
-			$this->session->userdata('active_group_id'),
-			$product_code,
-			$format,
-			$this->page->id(),
-			$this->reports->sortTextBrief($this->arr_sort_by, $this->arr_sort_order),
-			$filter_text
-		);
-	}
-*/
 }

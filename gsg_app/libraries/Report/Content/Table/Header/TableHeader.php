@@ -86,7 +86,7 @@ class TableHeader {
 	 **/
 	protected $supplemental_factory;
 	
-	public function __construct(iBlock $block, $header_groups, SupplementalFactory $supplemental_factory){
+	public function __construct(iBlock $block, $header_groups, SupplementalFactory $supplemental_factory = null){
 		$this->header_group_fields = [];
 		$this->header_structure = [];
 		$this->block = $block;
@@ -134,6 +134,41 @@ class TableHeader {
 	}
 	
 	/**
+	 *  @method: getHeaderLeafs
+     *
+	 *  @param array representing alternative header row
+	 *  @access public
+	 **/
+	public function getHeaderLeafs($alt_header = null){
+		//pivoted tables will generate their own header
+		if($this->block->hasPivot()){
+			$this->arr_columns = $alt_header;
+		}
+		else{
+			$this->columns = $this->block->reportFields();
+		}
+		
+		$depth = 0;
+		$rowspan = 1;
+		$this->setTableHeaderGroups();
+		
+		$tot_levels = array_depth($this->header_group_fields);
+		$this->getHeaderLayer($this->header_group_fields, $depth, $rowspan, $tot_levels, []);
+		ksort($this->header_structure);
+
+		$result = [];
+		
+		array_walk_recursive(
+			$this->header_structure,
+			function($val, $key) use (&$result) {
+				if($val->DbFieldName() !== null) $result[] = $val->text();
+			}
+		);
+
+		return $result;
+	}
+	
+	/**
 	 * setTableHeaderGroups
 	 * 
 	 * Sets object's header_group_fields property based on the block's field list.
@@ -146,7 +181,10 @@ class TableHeader {
 	protected function setTableHeaderGroups(){
 		if(is_array($this->header_groups) && !empty($this->header_groups)){
 			foreach($this->header_groups as $h){
-				$header_group_supplemental = $this->supplemental_factory->getHeaderGrpSupplemental($h['header_group_id'], $h['a_href'], $h['a_rel'], $h['a_title'], $h['a_class'], $h['comment']);
+				$header_group_supplemental = null;
+				if(($this->supplemental_factory)){
+					$header_group_supplemental = $this->supplemental_factory->getHeaderGrpSupplemental($h['header_group_id'], $h['a_href'], $h['a_rel'], $h['a_title'], $h['a_class'], $h['comment']);
+				}
 				//if it is a top level element
 				if($h['parent_id'] == null) {
 					//$this->header_group_fields[] = new TableHeaderCell($h['id'], $h['parent_id'], $h['text']);//, 'pdf_width' => 0];
