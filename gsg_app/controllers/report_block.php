@@ -96,24 +96,45 @@ class report_block extends CI_Controller {
 	 **/
 	protected $herd;
 	
-//	protected $arr_sort_by = [];
-//	protected $arr_sort_order = [];
+	/**
+	 * product_name
+	 * 
+	 * @var String
+	 **/
 	protected $product_name;
-	protected $section_path; //The path to the site section; set in constructor to point to the controller name
-//	protected $page_header_data;
-	protected $report_data;
-	protected $display;
-	protected $html;
-	protected $filters; //filters object
-	protected $supplemental;
 
 	/**
-	 * Benchmark settings
+	 * section_path
 	 * 
-	 * @var Session_settings object
-	protected $bench_setting;
-	 */
-	
+	 * The path to the site section; set in constructor to point to the controller name
+	 * 
+	 * @var String
+	 **/
+	protected $section_path;
+
+	/**
+	 * report_data
+	 * 
+	 * @var Array
+	 **/
+	protected $report_data;
+
+	/**
+	 * filters
+	 * 
+	 * Filters object
+	 * @var Filters
+	 **/
+	protected $filters;
+
+	/**
+	 * supplemental
+	 * 
+	 * Supplemental
+	 * @var Supplemental
+	 **/
+	protected $supplemental;
+
 	function __construct(){
 		parent::__construct();
 		$this->load->model('herd_model');
@@ -125,53 +146,10 @@ class report_block extends CI_Controller {
 		$this->supp_factory = new SupplementalFactory($this->supplemental_model, site_url());
 		$this->blocks = new Blocks($this->report_block_model, $this->db_field_model, $this->supp_factory);
 
-		//web content
-//		$this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
-//		$this->load->model('web_content/block_model');
-//		$this->web_blocks = new WebBlocks($this->block_model);
-//		$this->pages = new Pages($this->page_model, $this->web_blocks);
-//		$sections = new Sections($this->section_model, $this->pages);
-
-		
 		$this->herd_access = new HerdAccess($this->herd_model);
 		$this->herd = new Herd($this->herd_model, $this->session->userdata('herd_code'));
-//		$class_dir = $this->router->fetch_directory(); //this should match the name of this file (minus ".php".  Also used as base for css and js file names and model directory name
-//		$class = $this->router->fetch_class();
 		$method = $this->router->fetch_method();
-//		$this->section_path = $class_dir . $class;
 
-		// info used for links within datasets (table header sorts, etc)
-/*
-		$path = uri_string();
-		$arr_path = explode('/',$path);
-		$method_index = array_search($method, $arr_path);
-		$page_path = $arr_path[$method_index + 1];
-
-		$page_path = str_replace('|', '/', urldecode($page_path));
-		$arr_path = array_filter(explode('/', $page_path));
-		$path_page_segment = $arr_path[count($arr_path) - 1];
-		//handle index pages (e.g., dhi/prod/test_day/index)
-		
-		
-		$this->page = $this->pages->getByPath($path_page_segment, $this->session->userdata('section_id'));
-		if(!$this->page){
-			die('Report not found');
-		}
-		$this->report_path = $this->section_path . $this->page->path();
-*/
-//		$this->report_form_id = 'report_criteria';//filter-form';
-
-		
-		//load most specific model available.  Must load model before setting section
-//		$path = uri_string();
-//		$arr_path = explode('/',$path);
-
-		
-//@todo: fix line below, why is path coming in as 'land' and not 'dhi/'?  redirect?
-/*		$this->section_path = str_replace('land', 'dhi/', $this->section_path);
-		$this->section = $sections->getByPath($this->section_path);
-		$sections->loadChildren($this->section, $this->pages, $this->session->userdata('user_id'), $herd, $this->ion_auth_model->getTaskPermissions());
-*/
 		if(!$this->authorize($method)) {
 			if($this->session->flashdata('message')) $this->session->keep_flashdata('message');
 			if($method != 'ajax_report') $this->session->set_flashdata('redirect_url', $this->uri->uri_string());
@@ -321,7 +299,6 @@ class report_block extends CI_Controller {
 		$this->load->model('ReportContent/report_data_model');
 		$this->load->model('Datasource/db_table_model');
 		$db_table = new DbTable($block->primaryTableName (), $this->db_table_model);
-		//$block_data = new BlockDataFactory($block, $this->report_data_model, $this->benchmarks, $db_table);
 
 		// Load the most specific data-handling library that exists
 		$tmp_path = $page_path . '/' . $block_name;
@@ -351,8 +328,7 @@ class report_block extends CI_Controller {
 			$arr_dates = $this->herd_model->get_test_dates_7_short($this->session->userdata('herd_code'));
 			$header_groups = TableHeader::mergeDateIntoHeader($header_groups, $arr_dates);
 			
-			$supp_factory = new SupplementalFactory($this->supplemental_model, site_url());
-			$block->setTableHeader($results, $supp_factory, $header_groups);
+			$block->setTableHeader($results, $this->supp_factory, $header_groups);
 			unset($supp_factory);
 		}
 		$this->report_data = $block->getOutputData();
