@@ -2,11 +2,11 @@
 //namespace myagsource;
 
 require_once(APPPATH . 'libraries/dhi/Herd.php');
-require_once(APPPATH.'libraries/access_log.php');
+require_once(APPPATH.'libraries/AccessLog.php');
 require_once(APPPATH . 'libraries/Benchmarks/Benchmarks.php');
 require_once(APPPATH.'libraries/dhi/HerdAccess.php');
 
-use \myagsource\Access_log;
+use \myagsource\AccessLog;
 use \myagsource\dhi\Herd;
 use \myagsource\Benchmarks\Benchmarks;
 use \myagsource\dhi\HerdAccess;
@@ -22,7 +22,7 @@ class Change_herd extends CI_Controller {
 	 */
 	protected $herd_access;
 	/* 
-	 * @var Access_log object
+	 * @var AccessLog object
 	 */
 	protected $access_log;
 

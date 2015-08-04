@@ -2,7 +2,7 @@
 //namespace myagsource;
 require_once(APPPATH . 'libraries/filters/Filters.php');
 require_once(APPPATH . 'libraries/Benchmarks/Benchmarks.php');
-require_once(APPPATH . 'libraries/access_log.php');
+require_once(APPPATH . 'libraries/AccessLog.php');
 require_once(APPPATH . 'libraries/Supplemental/Content/SupplementalFactory.php');
 require_once(APPPATH . 'libraries/dhi/HerdAccess.php');
 require_once(APPPATH . 'libraries/dhi/Herd.php');
@@ -14,7 +14,7 @@ require_once(APPPATH . 'libraries/Report/Content/Pdf.php');
 require_once(APPPATH . 'libraries/Notifications/Notifications.php');
 
 use \myagsource\Benchmarks\Benchmarks;
-use \myagsource\Access_log;
+use \myagsource\AccessLog;
 use \myagsource\report_filters\Filters;
 use \myagsource\Supplemental\Content\SupplementalFactory;
 use \myagsource\dhi\HerdAccess;
@@ -531,7 +531,7 @@ abstract class report_parent extends CI_Controller {
 		$filter_text = isset($this->filters) ? $this->filters->get_filter_text() : NULL;
 
 		$this->load->model('access_log_model');
-		$access_log = new Access_log($this->access_log_model);
+		$access_log = new AccessLog($this->access_log_model);
 		
 		$access_log->write_entry(
 			$this->as_ion_auth->is_admin(),

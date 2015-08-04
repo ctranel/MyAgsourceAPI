@@ -3,13 +3,13 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 require_once APPPATH . 'libraries/dhi/Herd.php';
 require_once APPPATH . 'libraries/Ion_auth.php';
-require_once APPPATH . 'libraries/access_log.php';
+require_once APPPATH . 'libraries/AccessLog.php';
 require_once APPPATH . 'libraries/Site/WebContent/Sections.php';
 require_once APPPATH . 'libraries/Site/WebContent/Pages.php';
 require_once APPPATH . 'libraries/Site/WebContent/Blocks.php';
 require_once(APPPATH . 'libraries/dhi/HerdAccess.php');
 
-use \myagsource\Access_log;
+use \myagsource\AccessLog;
 use \myagsource\Site\WebContent\Sections;
 use \myagsource\Site\WebContent\Pages;
 use \myagsource\Site\WebContent\Blocks;
@@ -87,7 +87,7 @@ class As_ion_auth extends Ion_auth {
 		//}
 		parent::__construct();
 //		$this->load->model('access_log_model');
-//		$this->access_log = new Access_log($this->access_log_model);
+//		$this->access_log = new AccessLog($this->access_log_model);
 		$this->load->model('web_content/section_model');
 		$this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
 		$this->load->model('web_content/block_model');

@@ -1,6 +1,6 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 require_once APPPATH . 'controllers/report_parent.php';
-class Access_log extends report_parent {
+class AccessLog extends report_parent {
 
 	function __construct(){
 		parent::__construct();

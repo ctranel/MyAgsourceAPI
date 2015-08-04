@@ -15,7 +15,7 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 *
 */
 
-class Access_log
+class AccessLog
 {
 	/**
 	 * model object for access logs

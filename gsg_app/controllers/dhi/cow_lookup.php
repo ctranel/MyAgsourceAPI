@@ -1,6 +1,6 @@
 <?php 
 
-use \myagsource\Access_log;
+use \myagsource\AccessLog;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 class Cow_lookup extends CI_Controller {
@@ -154,7 +154,7 @@ class Cow_lookup extends CI_Controller {
 		$recent_test = empty($recent_test) ? NULL : $recent_test;
 		
 		$this->load->model('access_log_model');
-		$access_log = new Access_log($this->access_log_model);
+		$access_log = new AccessLog($this->access_log_model);
 				
 		$access_log->write_entry(
 			$this->as_ion_auth->is_admin(),
