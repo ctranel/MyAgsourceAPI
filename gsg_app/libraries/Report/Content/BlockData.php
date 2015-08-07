@@ -73,22 +73,24 @@ die('BlockData->prepSelectFields');
 	 */
 	
 	protected function whereCriteria($arr_where_criteria){
-		foreach($arr_where_criteria as $k => $v){
-			//@todo: the below is only for databases as datasource
-			if(strpos($k, '.') === FALSE) {
-				$tbl = $this->block->getFieldTable($k); //get table for this block
-				$tbl = isset($tbl) && !empty($tbl) ? $tbl : $this->block->primaryTableName();
-				$db_field = $tbl . '.' . $k;
-
-				//@todo: pull this out into function (array wrapper class (dependency)? pass function as param?)	
-				$keys = array_keys($arr_where_criteria);
-				$index = array_search($k, $keys, true);
-				
-				if ($index !== false) {
-					$keys[$index] = $db_field;
-					$arr_where_criteria = array_combine($keys, $arr_where_criteria);
+		if(isset($arr_where_criteria) && is_array($arr_where_criteria)){
+			foreach($arr_where_criteria as $k => $v){
+				//@todo: the below is only for databases as datasource
+				if(strpos($k, '.') === FALSE) {
+					$tbl = $this->block->getFieldTable($k); //get table for this block
+					$tbl = isset($tbl) && !empty($tbl) ? $tbl : $this->block->primaryTableName();
+					$db_field = $tbl . '.' . $k;
+	
+					//@todo: pull this out into function (array wrapper class (dependency)? pass function as param?)	
+					$keys = array_keys($arr_where_criteria);
+					$index = array_search($k, $keys, true);
+					
+					if ($index !== false) {
+						$keys[$index] = $db_field;
+						$arr_where_criteria = array_combine($keys, $arr_where_criteria);
+					}
+					//end function
 				}
-				//end function
 			}
 		}
 		return $arr_where_criteria;

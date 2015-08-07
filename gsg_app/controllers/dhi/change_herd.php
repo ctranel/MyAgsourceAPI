@@ -47,7 +47,7 @@ class Change_herd extends CI_Controller {
 		}
 
 		$this->load->model('access_log_model');
-		$this->access_log = new Access_log($this->access_log_model);
+		$this->access_log = new AccessLog($this->access_log_model);
 				
 		$this->page_header_data['top_sections'] = $this->as_ion_auth->top_sections;
 

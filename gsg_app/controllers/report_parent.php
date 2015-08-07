@@ -359,10 +359,10 @@ abstract class report_parent extends CI_Controller {
 					if(strpos($display_type, 'chart') !== false){
 						$consec_charts++;
 					}
-					
+//var_dump(urlencode($this->section_path . '/' . $this->page->path())); die;
 					$arr_blk_data = array(
 							'block_num' => $x,
-							'link_url' => site_url($this->section_path) . '/' . $this->page->path() . '/' . $curr->path(),
+							'block_csv_url_encoded' => site_url('csv/blocks/csv') . '/' . urlencode(str_replace('/', '|', $this->section_path) . '|' . $this->page->path()) . '/' . $curr->path() . '/null/null/',
 //							'form_id' => $this->report_form_id,
 							'block' => $curr->path(),
 							'odd_even' => $odd_even,

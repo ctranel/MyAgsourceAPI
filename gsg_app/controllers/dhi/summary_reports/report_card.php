@@ -33,13 +33,13 @@ class Report_card extends report_parent {
 	 * @param boolean/string file_format: return the value of function (TRUE), or echo it (FALSE).  Defaults to FALSE
 	 * @param string cache_buster: text to make page appear as a different page so that new data is retrieved
 	 */
-	 public function ajax_report($page, $block, $sort_by = 'null', $sort_order = 'null', $file_format = 'web', $test_date = FALSE, $report_count=0, $json_filter_data = NULL, $first=FALSE, $cache_buster = NULL) {//, $herd_size_code = FALSE, $all_breeds_code = FALSE
+	 public function ajax_report($page, $block, $sort_by = 'null', $sort_order = 'null', $report_count=0, $json_filter_data = NULL, $cache_buster = NULL) {//, $herd_size_code = FALSE, $all_breeds_code = FALSE
 		if(strpos($page, '_long') === FALSE){
 		 	$this->{$this->primary_model_name}->historical(false);
 		}
 		else{
 		 	$this->{$this->primary_model_name}->historical(true);
 		}
-		parent::ajax_report($page, $block, $sort_by, $sort_order, $file_format, $test_date, $report_count, $json_filter_data, $first);
+		parent::ajax_report($page, $block, $sort_by, $sort_order, $report_count, $json_filter_data);
 	 }
 }

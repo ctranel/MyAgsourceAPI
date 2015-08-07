@@ -3,8 +3,7 @@
 class Access_log_model extends CI_Model {
 	public function __construct(){
 		parent::__construct();
-		$this->db_group_name = 'default';
-		$this->{$this->db_group_name} = $this->load->database($this->db_group_name, TRUE);
+		$this->tables  = $this->config->item('tables', 'ion_auth');
 	}
 	
 	/**
@@ -19,7 +18,7 @@ class Access_log_model extends CI_Model {
 			$data['report_code'] = $data['product_code'];
 			unset($data['product_code']);
 		}
-		return $this->{$this->db_group_name}->insert($this->tables['access_log'], $data);
+		return $this->db->insert($this->tables['access_log'], $data);
 	}
 
 	/**
@@ -34,9 +33,9 @@ class Access_log_model extends CI_Model {
 	 **/
 	function getLogBySgHerdTest($sg_acct_num, $herd_code, $test_date = NULL){
 		if(isset($test_date)){
-			$this->{$this->db_group_name}->where('recent_test_date', $test_date);
+			$this->db->where('recent_test_date', $test_date);
 		}
-		return $this->{$this->db_group_name}
+		return $this->db
 			->join($this->tables['access_log_events'] . ' ale', 'al.event_id = ale.id', 'inner')
 			->join($this->tables['users_service_groups'] . ' usg', 'al.user_id = usg.user_id', 'left')
 			->where('usg.sg_acct_num', $sg_acct_num)
