@@ -93,7 +93,7 @@ if(ENVIRONMENT == 'production'){
 		$db['vma']['stricton'] = FALSE;
 }
 elseif(ENVIRONMENT == 'qa' || ENVIRONMENT == 'localhost'){
-	$db['default']['hostname'] = 'AGDBTEST' ;
+	$db['default']['hostname'] = '192.168.3.55' ;
 	$db['default']['username'] = 'webuser';
 	$db['default']['password'] = '$UserInTheDEV!';
 	$db['default']['database'] = "users";
