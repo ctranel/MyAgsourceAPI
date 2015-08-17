@@ -137,7 +137,6 @@ class ChartData extends BlockData{
 		$tmp_fg = $this->block->fieldGroups();
 		$has_field_groups = (isset($tmp_fg) && !empty($tmp_fg));
 		unset($tmp_fg);
-
 		for($x = 0; $x < $count; $x++){
 			$ser_key = 1;
 			$arr_y_values = $this->dataset[$x];
@@ -156,7 +155,6 @@ class ChartData extends BlockData{
 			    $tmp_data = is_numeric($this->dataset[$x][$f]) ? (float)$this->dataset[$x][$f] : $this->dataset[$x][$f];
 				if($keep_nulls === true || isset($tmp_data)) {
    				    $tmp_data = is_numeric($this->dataset[$x][$f]) ? (float)$this->dataset[$x][$f] : $this->dataset[$x][$f];
-   					//$arr_return[$ser_key][$x_val][$f] = $tmp_data;
    					if($has_field_groups){
    						$arr_return[$ser_key][$x_val][$f] = [
 	   						$x_val,
@@ -169,8 +167,8 @@ class ChartData extends BlockData{
 	   						$tmp_data
 	   					];
    					}
-   					$ser_key++;
 				}
+   				$ser_key++;
 			}
 		}
 		if(isset($arr_return) && is_array($arr_return)){
