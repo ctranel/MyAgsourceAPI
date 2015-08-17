@@ -14,6 +14,11 @@
         var i = 0 ;
         for (i = 0 ; i < series.length ; i++){
             var s = series[i];
+        	//if block added by ctranel
+            if(typeof(s.data) === 'undefined'){
+        		continue;
+        	}
+
             if ( s.regression && !s.rendered ) {
                 s.regressionSettings =  s.regressionSettings || {} ;
                 s.regressionSettings.tooltip = s.regressionSettings.tooltip || {} ;
@@ -50,14 +55,13 @@
                 }else if (regressionType == "logarithmic"){
                     regression = _logarithmic(s.data) ;
                 }else if (regressionType == "loess"){
-                    var loessSmooth = s.regressionSettings.loessSmooth || 25
+                	var loessSmooth = s.regressionSettings.loessSmooth || 25
                     regression = _loess(s.data, loessSmooth/100) ;
                 }else {
                     console.error("Invalid regression type: " , regressionType) ;
                     break;
                 }
 
-                
                 regression.rSquared =  coefficientOfDetermination(s.data, regression.points).toFixed(2);
                 regression.rValue = Math.sqrt(regression.rSquared,2).toFixed(2) ;
                 extraSerie.data = regression.points ;
@@ -316,7 +320,6 @@
      * - https://gist.github.com/avibryant/1151823
      */
     function _loess (data, bandwidth) {
-//console.debug(data);
     	var bandwidth = bandwidth || 0.25 ;
         
         var xval = data.map(function(pair){return pair[0]});

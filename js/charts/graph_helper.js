@@ -61,9 +61,10 @@ function updateBlock(container_div_id, block_in, block_index, sort_field, sort_o
 	if($("#filter-form")){
 		params = encodeURIComponent(JSON.stringify($("#filter-form").serializeObject()));
 	}
+
 	if(typeof(sort_field) == 'undefined') sort_field = null;
 	if(typeof(sort_order) == 'undefined') sort_order = null;
-	load_block(site_url + 'report_block/ajax_report/' + encodeURIComponent(page_url.replace(/\//g, '|')) + '/' + encodeURIComponent(block_in) + '/' + encodeURIComponent(sort_field) + '/' + sort_order + block_index + '/' + params + '/' + cache_bust, container_div_id, block_index, params);
+	load_block(site_url + 'report_block/ajax_report/' + encodeURIComponent(page_url.replace(/\//g, '|')) + '/' + encodeURIComponent(block_in) + '/' + encodeURIComponent(sort_field) + '/' + sort_order + '/' + block_index + '/' + params + '/' + cache_bust, container_div_id, block_index, params);
 	setFixedNav();
 	return false;
 }
