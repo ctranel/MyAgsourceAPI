@@ -169,6 +169,8 @@ class ChartBlock extends Block {
 					$a['datatype'], $a['max_length'], $a['decimal_scale'], $a['unit_of_measure'], $a['is_timespan'], $a['is_foreign_key'], $a['is_nullable'], $a['is_natural_sort']);
 				//add fields as a report field so it is included in the select statement
 				$display_format = $a['data_type'] === 'datetime' ? 'MM-dd-yy' : null;
+				//@todo: this probably shouldn't be in report_fields.  Have prep select function pull fields from x axis objects?
+				$this->report_fields->attach(new ChartField($a['id'], $a['name'], $datafield, null, false, $display_format, null, true, null, null, null, null));
 			}
 			if($a['x_or_y'] === 'x'){
 				//if($a['data_type'] === 'datetime' || $a['data_type'] === 'date'){
@@ -322,7 +324,9 @@ class ChartBlock extends Block {
 
 	/**
 	 * @method deriveSeries
-	 * @param int num series'
+	 * 
+	 * Used when the x axis does not correspond with a data column
+	 * 
 	 * @return array of output data for block
 	 * @access protected
 	 *
