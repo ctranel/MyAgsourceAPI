@@ -2,7 +2,7 @@
 <div class='mainInfo'>
 	<?php if(isset($page_heading) !== false) echo heading($page_heading); ?>
 	
-	<!-- <div id="infoMessage">MyAgsource will be down for maintenance from 4:00 to 4:30 on January 5, 2015.  We apologize for any inconvenience.</div> -->
+  <!-- <div id="infoMessage">MyAgsource will be down for maintenance from 1:00 to 3:00am on June 28, 2015.  We apologize for any inconvenience.</div> -->
 	<div class="row">
 		<div class="col-sm-6">
 			<div class="box login">
@@ -59,8 +59,9 @@
 			    
 			    <p>Having trouble?  Please call AgSource Laboratories:</p>
 			    <ul>
-				    <li>Lincoln, Neb: 402-476-0300</li>
 				    <li>Bonduel, Wis: 715-758-2178</li>
+				    <li>Ellsworth, Iowa: 515-836-4444</li>
+				    <li>Lincoln, Neb: 402-476-0300</li>
 				    <li>Umatilla, Ore: 541-922-4894</li>
 			    </ul>
 			    
