@@ -21,7 +21,7 @@ class Filter_model extends CI_Model {
 	public function get_page_filters($section_id, $page_path) {
 		$ret_array = array();
 		$results = $this->db
-		->select('pf.name, pf.type, pf.options_source, pf.default_value, pf.db_field_name, pf.user_editable')
+		->select('pf.name, pf.type, pf.options_source, pf.options_filter_form_field_name, pf.default_value, pf.db_field_name, pf.user_editable')
 		->where('p.section_id', $section_id)
 		->where('p.path', $page_path)
 		->join('users.dbo.pages p', "pf.page_id = p.id", "inner")
@@ -46,19 +46,23 @@ class Filter_model extends CI_Model {
 	 **/
 	public function getCriteriaOptions($source_table, $options_conditions) {
 		// if herd code is available in the lookup table, create herd code as a where criteria
-		list($db, $schema, $table) = explode('.', $source_table);
+//echo $source_table;
+/*		list($db, $schema, $table) = explode('.', $source_table);
 		$sql = "USE " . $db . "; SELECT column_name FROM information_schema.columns WHERE table_name = '" . trim($table) . "' AND column_name = 'herd_code'";
 		$arr_fields = $this->db->query($sql)->result_array();
+var_dump($arr_fields);
 		if(count($arr_fields) === 0){
 			return false;
 		}
-		
+*/		
 		if(isset($options_conditions) && is_array($options_conditions)){
 			foreach($options_conditions as $c){
 				$this->db->where($c['db_field_name'] . ' ' . $c['operator'], $c['value']);
 			}
 		}
-		
+//if($source_table == 'vma.dbo.lookup_filter_lact_cow'){
+//	$this->db->select('zzz');
+//}	
 		// run query
 		$results = $this->db
 		->select('value, label, is_default')

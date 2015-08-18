@@ -35,6 +35,7 @@ class Criteria{
 		$this->label = $criteria_data['name'];
 		$this->default_value = $criteria_data['default_value'];
 		$this->options_source = $criteria_data['options_source'];
+//		$this->options_filter_form_field_name = $criteria_data['options_filter_form_field_name'];
 		$this->user_editable = (bool)$criteria_data['user_editable'];
 		if(isset($criteria_data['arr_selected_values'])){
 			$this->setFilterCriteria($criteria_data['arr_selected_values']);

@@ -29,7 +29,7 @@ class CriteriaFactory {
 		$options = null;
 		if(isset($criteria_data['options_source']) && !empty($criteria_data['options_source'])){
 			$options = $filter_model->getCriteriaOptions($criteria_data['options_source'], $options_conditions);
-//var_dump($options);
+//var_dump($options_conditions);
 		}
 		//$options = $self->setOptions($filter_model, $criteria_data['options_source'], $options_conditions);
 		return new Criteria($criteria_data, $options);

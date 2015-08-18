@@ -130,6 +130,7 @@ class Filters{
 	*  @param: array page-level filter data
 	*  @param: array filter form data
 	*  @return void
+	*  @todo: remove specific references to herd code
 	*  @throws: 
 	* -----------------------------------------------------------------
 	*/
@@ -137,7 +138,7 @@ class Filters{
 		if(!isset($arr_page_filter_data)){
 			return false;
 		}
-
+		
 		//if there is a value in form data that is not in FilterCriteria (e.g., a value that is set programmatically (herd_code)), need to set that up
 		$arr_to_create = array_diff_key($arr_form_data, $arr_page_filter_data);
 		if(is_array($arr_to_create) && !empty($arr_to_create)){
@@ -149,12 +150,13 @@ class Filters{
 					'name' => ucwords(str_replace('_', ' ', $k)),
 					'type' => 'value',
 					'options_source' => null,
+//					'options_filter_form_field_name' => null,
 					'default_value' => $f,
 					'db_field_name' => $k,
 					'arr_selected_values' => $arr_form_data[$k],
 					'user_editable' => false,
 				);
-				$this->arr_criteria[$k] = CriteriaFactory::createCriteria($this->filter_model, $arr_tmp, [[$arr_form_data['herd_code']]]);
+				$this->arr_criteria[$k] = CriteriaFactory::createCriteria($this->filter_model, $arr_tmp, null);
 			}
 		}
 		foreach($arr_page_filter_data as $k=>$f){
@@ -162,7 +164,16 @@ class Filters{
 			if(isset($arr_form_data[$k]) && !empty($arr_form_data[$k])){
 				$f['arr_selected_values'] = $arr_form_data[$k];
 			}
-			$this->arr_criteria[$k] = CriteriaFactory::createCriteria($this->filter_model, $f, [['db_field_name' => 'herd_code', 'operator' => '=', 'value' => $arr_form_data['herd_code']]]);
+			$options_filter = null;
+			if(isset($arr_form_data[$f['options_filter_form_field_name']])){
+				$options_filter = [[
+					'db_field_name' => $f['options_filter_form_field_name'],
+					'operator' => '=',
+					'value' => $arr_form_data[$f['options_filter_form_field_name']],
+				]];
+			}
+//var_dump($k, $f);
+			$this->arr_criteria[$k] = CriteriaFactory::createCriteria($this->filter_model, $f, $options_filter);
 		}
 	}
 
