@@ -46,11 +46,9 @@ class Filter_model extends CI_Model {
 	 **/
 	public function getCriteriaOptions($source_table, $options_conditions) {
 		// if herd code is available in the lookup table, create herd code as a where criteria
-//echo $source_table;
 /*		list($db, $schema, $table) = explode('.', $source_table);
 		$sql = "USE " . $db . "; SELECT column_name FROM information_schema.columns WHERE table_name = '" . trim($table) . "' AND column_name = 'herd_code'";
 		$arr_fields = $this->db->query($sql)->result_array();
-var_dump($arr_fields);
 		if(count($arr_fields) === 0){
 			return false;
 		}
@@ -60,9 +58,6 @@ var_dump($arr_fields);
 				$this->db->where($c['db_field_name'] . ' ' . $c['operator'], $c['value']);
 			}
 		}
-//if($source_table == 'vma.dbo.lookup_filter_lact_cow'){
-//	$this->db->select('zzz');
-//}	
 		// run query
 		$results = $this->db
 		->select('value, label, is_default')

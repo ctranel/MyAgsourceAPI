@@ -172,7 +172,6 @@ class Filters{
 					'value' => $arr_form_data[$f['options_filter_form_field_name']],
 				]];
 			}
-//var_dump($k, $f);
 			$this->arr_criteria[$k] = CriteriaFactory::createCriteria($this->filter_model, $f, $options_filter);
 		}
 	}
