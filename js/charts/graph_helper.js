@@ -283,7 +283,7 @@ function process_chart(div_id, data_in){
 			if(typeof(options.tooltip) === 'undefined'){//typeof(data_in.tooltip) === 'undefined' && 
 				options.tooltip = {};
 			}
-			if(typeof(options.tooltip) === 'undefined' && typeof(options.tooltip.formatter) === 'undefined'){
+			if(typeof(options.tooltip.formatter) === 'undefined'){
 			//@todo: line below will break if there is ever a chart with multiple x axes
 				options.tooltip.formatter = getTooltipFormat(options.chart.type, options.xAxis.type, um);
 			}
@@ -291,6 +291,7 @@ function process_chart(div_id, data_in){
 			if(typeof pre_render == 'function'){
 				options = pre_render(options, client_data);
 			}
+//console.log(options);
 //console.log(JSON.stringify(options));
 			chart[block_index] = new Highcharts.Chart(options);
 //			while(chart[block_index].series.length > options.series.length){//(Object.size(chart[block_index].series) > count){

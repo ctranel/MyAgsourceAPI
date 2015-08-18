@@ -45,7 +45,7 @@ var global_options = {
 		reversed: false
 	},
 	tooltip : {
-		xDateFormat: '%b %e, %Y'
+		DateFormat: '%b %e, %Y'
 	},
 	plotOptions: {},
     series: [{
@@ -201,12 +201,5 @@ function get_line_options(options_json){
 
 function get_scatter_options(options_json){
 	options_json.chart.type = 'scatter';
-/*	options_json.plotOptions.scatter = {
-        dataLabels: {
-            enabled: true,
-            align: 'right',
-            color: '#AA4643'
-        }
-    };*/
 	return options_json;
 }
