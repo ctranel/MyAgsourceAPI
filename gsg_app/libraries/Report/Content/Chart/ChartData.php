@@ -83,7 +83,6 @@ class ChartData extends BlockData{
 		$criteria_key_value = $this->whereCriteria($criteria_key_value);
 		$select_fields = $this->block->getSelectFields();
 		$this->dataset = $this->report_datasource->search($this->block, $select_fields, $criteria_key_value);
-
 		$tmp_cat = $this->block->categories();
 		//neither category nor timeline (e.g., pie charts)
 		if(!isset($this->x_axis_dbfield_name) && (!isset($tmp_cat) || empty($tmp_cat))){//not a category or trend chart (e.g., pie chart)
@@ -93,11 +92,13 @@ class ChartData extends BlockData{
 		//categories
 		if(isset($tmp_cat) && is_array($tmp_cat) && !empty($tmp_cat)){
 			$this->splitByCategories();
+//var_dump($this->dataset);
 			
 			//field groups
 			$tmp_fg = $this->block->fieldGroups();
 			if(isset($tmp_fg) && is_array($tmp_fg) && !empty($tmp_fg)){
 				$this->concatFieldGroups();
+//var_dump($this->dataset);
 			}
 			else{
 				$this->stripFieldNames();
@@ -249,7 +250,6 @@ class ChartData extends BlockData{
 					}
 					$ser_idx = $f->fieldGroup();
 					$ref_key = $f->fieldGroupRefKey();
-//var_dump($ref_key);
 					if(isset($ref_key)){
 						//if the value is an array, we assume [xValue, yValue].  We want the yValue
 						$tmp_val = is_array($v[$f->dbFieldName()]) ? $v[$f->dbFieldName()][1] : $v[$f->dbFieldName()];
@@ -263,9 +263,10 @@ class ChartData extends BlockData{
 						//}
 					}
 				}
-				if(array_search($x_val, $arr_return[$ser_idx][$x_val]) === false){
+				//if the x value is not included in the data, add it in
+				if(array_key_exists('x', $arr_return[$ser_idx][$x_val]) === false){
 					//if(isset($ref_key)){
-						$arr_return[$ser_idx][$x_val]['x'] = $x_val;
+					$arr_return[$ser_idx][$x_val]['x'] = $x_val;
 					//}
 					//else{
 					//	array_unshift($arr_return[$ser_idx][$x_val], $x_val);
