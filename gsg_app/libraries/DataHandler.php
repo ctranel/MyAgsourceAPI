@@ -49,9 +49,9 @@ class DataHandler {
 	
 	function load(iBlock $block, $path, $report_data_datasource, DbTable $db_table, Benchmarks $benchmarks = null){
 		while(strpos($path, '/') !== false){
-			if(file_exists(APPPATH . 'libraries' . $path . '.php')){
+			if(file_exists(APPPATH . $path . '.php')){
 				$data_handler_name = ucwords(substr($path, (strripos($path, '/') + 1)));
-				require_once APPPATH . 'libraries/' . $path . '.php';
+				require_once APPPATH . $path . '.php';
 				if($block->displayType() == 'table'){
 					$data_handler_name = 'myagsource\\Report\\Content\\Table\\' . $data_handler_name;
 					$block_data_handler = new $data_handler_name($block, $report_data_datasource, $benchmarks, $db_table);

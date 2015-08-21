@@ -301,7 +301,7 @@ class report_block extends CI_Controller {
 		$db_table = new DbTable($block->primaryTableName (), $this->db_table_model);
 
 		// Load the most specific data-handling library that exists
-		$tmp_path = $page_path . '/' . $block_name;
+		$tmp_path = 'libraries/' . $page_path . '/' . $block_name;
 		$data_handler = new DataHandler();
 		$block_data_handler = $data_handler->load($block, $tmp_path, $this->report_data_model, $db_table, $this->benchmarks);
 		//End load data-handling library
