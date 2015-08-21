@@ -179,7 +179,10 @@ function get_pie_options(options_json){
 		dataLabels: {
 			enabled: true,
 			formatter: function(){return '<b>' + customFormatGtLt(this.point.name) + '</b>: ' + this.point.y + ' animals';},
-			color: '#c0c0c0'
+			color: '#c0c0c0',
+			style: {
+				textShadow: false
+			}
 		}
     };
 	options_json.tooltip = {
