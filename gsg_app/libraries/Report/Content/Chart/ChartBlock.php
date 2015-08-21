@@ -338,30 +338,32 @@ class ChartBlock extends Block {
 
 		$c = 0;
 		foreach($this->report_fields as $f){
-			$fg = $f->fieldGroup();
-			if(isset($fg)){
-				$idx = $fg;
-				$name = $this->field_groups[$fg]['name'];
-			}
-			else{
-				$idx = $f->id();
-				$name = $f->displayName();
-			}
-			
-			$return_val[$idx]['name'] = $name;
-			if($f->unitOfMeasure()){
-				$return_val[$idx]['um'] = $f->unitOfMeasure();
-			}
-			if($f->axisIndex()){
-				$return_val[$idx]['yAxis'] = $f->axisIndex();
-			}
-			if($f->chartType()){
-				$return_val[$idx]['type'] = $f->chartType();
-			}
-			
-			$c++;
-			if($c >= $field_cnt){
-				break;
+			if($f->isDisplayed()){
+				$fg = $f->fieldGroup();
+				if(isset($fg)){
+					$idx = $fg;
+					$name = $this->field_groups[$fg]['name'];
+				}
+				else{
+					$idx = $f->id();
+					$name = $f->displayName();
+				}
+				
+				$return_val[$idx]['name'] = $name;
+				if($f->unitOfMeasure()){
+					$return_val[$idx]['um'] = $f->unitOfMeasure();
+				}
+				if($f->axisIndex()){
+					$return_val[$idx]['yAxis'] = $f->axisIndex();
+				}
+				if($f->chartType()){
+					$return_val[$idx]['type'] = $f->chartType();
+				}
+				
+				$c++;
+				if($c >= $field_cnt){
+					break;
+				}
 			}
 		}
 		return $return_val;
