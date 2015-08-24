@@ -172,23 +172,24 @@ function get_columnrange_options(options_json){
 	return options_json;
 }
 
+//@todo: many settings are specific to Inbreeding Distribution.  Additional charts will require this to be removed
 function get_pie_options(options_json){
 	options_json.chart.type = 'pie';
 	options_json.plotOptions.pie = {
         allowPointSelect: true,
 		dataLabels: {
 			enabled: true,
-			formatter: function(){return '<b>' + customFormatGtLt(this.point.name) + '</b>: ' + this.point.y + ' animals';},
+			formatter: function(){return '<b>' + customFormatGtLt(this.point.name) + '</b>: ' + this.point.y + ' Animals<br>Distribution: ' + Math.round(this.point.percentage * 10)/10 + '%';},
 			color: '#c0c0c0',
 			style: {
 				textShadow: false
 			}
 		}
     };
-	options_json.tooltip = {
+	options_json.tooltip = false; /*{
         pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>',
         useHTML:true
-    };
+    };*/
 	return options_json;
 }
 

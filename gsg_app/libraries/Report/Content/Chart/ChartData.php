@@ -84,21 +84,15 @@ class ChartData extends BlockData{
 		$select_fields = $this->block->getSelectFields();
 		$this->dataset = $this->report_datasource->search($this->block, $select_fields, $criteria_key_value);
 		$tmp_cat = $this->block->categories();
-		//neither category nor timeline (e.g., pie charts)
-		if(!isset($this->x_axis_dbfield_name) && (!isset($tmp_cat) || empty($tmp_cat))){//not a category or trend chart (e.g., pie chart)
-			return array_values($this->dataset);
-		}
 
 		//categories
 		if(isset($tmp_cat) && is_array($tmp_cat) && !empty($tmp_cat)){
 			$this->splitByCategories();
-//var_dump($this->dataset);
 			
 			//field groups
 			$tmp_fg = $this->block->fieldGroups();
 			if(isset($tmp_fg) && is_array($tmp_fg) && !empty($tmp_fg)){
 				$this->concatFieldGroups();
-//var_dump($this->dataset);
 			}
 			else{
 				$this->stripFieldNames();
@@ -118,11 +112,6 @@ class ChartData extends BlockData{
 			}
 		}
 
-		// field names are maintained in dataset when breaking into categories because field group functionality requires them.
-		// if dataset has categories but not field groups, we need to remove the field names from the dataset
-//		else{
-//		}
-		
 		return $this->dataset;
 	}
 	
@@ -135,6 +124,7 @@ class ChartData extends BlockData{
 	 **/
 	protected function splitLinearData($keep_nulls = true){
 		$count = count($this->dataset);
+		$x_val = 0;
 		$tmp_fg = $this->block->fieldGroups();
 		$has_field_groups = (isset($tmp_fg) && !empty($tmp_fg));
 		unset($tmp_fg);
@@ -143,12 +133,18 @@ class ChartData extends BlockData{
 			$arr_y_values = $this->dataset[$x];
 			$arr_fields = array_keys($arr_y_values);
 			$date_key = array_search($this->x_axis_dbfield_name, $arr_fields);
-			unset($arr_fields[$date_key]);
+			if(isset($arr_fields[$date_key]) && !empty($date_key)){
+				unset($arr_fields[$date_key]);
+			}
+			//if no x axis (pie charts)
+			if(!isset($this->x_axis_dbfield_name)){
+				$x_val++;
+			}
 			//@todo: use field meta data rather than hard-coding "age_months"?
-			if($this->x_axis_dbfield_name == 'age_months'){
+			elseif($this->x_axis_dbfield_name == 'age_months'){
 				$x_val = $this->dataset[$x][$this->x_axis_dbfield_name];
 			}
-			elseif(isset($this->dataset[$x][$this->x_axis_dbfield_name]) && !empty($this->dataset[$x][$this->x_axis_dbfield_name])){
+			else{//if(isset($this->dataset[$x][$this->x_axis_dbfield_name]) && !empty($this->dataset[$x][$this->x_axis_dbfield_name])){
 				$arr_d = explode('-', $this->dataset[$x][$this->x_axis_dbfield_name]);
 				$x_val = (mktime(0, 0, 0, $arr_d[1], $arr_d[2],$arr_d[0]) * 1000);
 			}
@@ -215,10 +211,6 @@ class ChartData extends BlockData{
 					}
 					$prev_cat = $cat;
 					$arr_return[$ser_key][$x_val][$f->dbFieldName()] = $row[$f->dbFieldName()];
-   					//$arr_return[$ser_key][$x_val][$f->dbFieldName()] = [
-   					//	$x_val,
-   					//	$row[$f->dbFieldName()]
-   					//];
 				}
 			}
 			$this->dataset = $arr_return;
@@ -253,29 +245,25 @@ class ChartData extends BlockData{
 					if(isset($ref_key)){
 						//if the value is an array, we assume [xValue, yValue].  We want the yValue
 						$tmp_val = is_array($v[$f->dbFieldName()]) ? $v[$f->dbFieldName()][1] : $v[$f->dbFieldName()];
-						$arr_return[$ser_idx][$x_val][$ref_key] = $tmp_val;
+						if(!isset($this->x_axis_dbfield_name)){ //no x axis means only one series (pie chart), don't need a to include series
+							$arr_return[$x_val][$ref_key] = $tmp_val;
+						}
+						else{
+							$arr_return[$ser_idx][$x_val][$ref_key] = $tmp_val;
+						}
 					}
 					else{
 						$arr_return[$ser_idx][$x_val][] = $v[$f->dbFieldName()][1];
-						//@todo: this assumes that chart is a boxplot (duplicates top and bottom values for a total of 5.  Should actually for and create a PR for highcharts)
-						//if(count($arr_return[$ser_idx][$x_val]) === 1 || count($arr_return[$ser_idx][$x_val]) === 5){
-							//$arr_return[$ser_idx][$x_val][] = $v[$f->dbFieldName()][1];
-						//}
 					}
 				}
-				//if the x value is not included in the data, add it in
-				if(array_key_exists('x', $arr_return[$ser_idx][$x_val]) === false){
-					//if(isset($ref_key)){
+				//if the xaxis is ser, and the x value is not included in the data, add it in
+				if(isset($this->x_axis_dbfield_name) && array_key_exists('x', $arr_return[$ser_idx][$x_val]) === false){
 					$arr_return[$ser_idx][$x_val]['x'] = $x_val;
-					//}
-					//else{
-					//	array_unshift($arr_return[$ser_idx][$x_val], $x_val);
-					//}
 				}
 			}
 		}
 		$this->dataset = $arr_return;
-		$this->stripFieldNames();
+		$this->stripFieldNames(isset($this->x_axis_dbfield_name));
 	}
 	
 	/**
@@ -303,14 +291,14 @@ class ChartData extends BlockData{
 	 * @return null|string|array
 	 * @todo -- build into class for dataset object?
 	 */
-	function array_values_recursive(array $arr){
+	function array_values_recursive(array $arr, $has_x_axis = true){
 //$k = key($arr);
 		$arr = array_values($arr);
 		foreach($arr as $key => $val){
 			if(is_array($val)){//array_values($val) === $val){
 //if(isset($val['x'])) echo "$k: " . $val['x'] . "<br>\n";
 //else echo "$k: x not set<br>\n";
-				if(!isset($val['x'])){
+				if(!isset($val['x']) && $has_x_axis){
 					$arr[$key] = array_values_recursive($val);
 				}
 				else{
