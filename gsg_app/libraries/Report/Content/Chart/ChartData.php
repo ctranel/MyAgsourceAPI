@@ -92,7 +92,7 @@ class ChartData extends BlockData{
 			//field groups
 			$tmp_fg = $this->block->fieldGroups();
 			if(isset($tmp_fg) && is_array($tmp_fg) && !empty($tmp_fg)){
-				$this->concatFieldGroups();
+				$this->concatFieldGroups($tmp_cat);
 			}
 			else{
 				$this->stripFieldNames();
@@ -228,7 +228,7 @@ class ChartData extends BlockData{
 	 * @todo: needs to handle time 
 	 **/
 	
-	protected function concatFieldGroups(){
+	protected function concatFieldGroups($categories = null){
 		if(!is_array($this->dataset) || empty($this->dataset)){
 			return false;
 		}
@@ -245,7 +245,7 @@ class ChartData extends BlockData{
 					if(isset($ref_key)){
 						//if the value is an array, we assume [xValue, yValue].  We want the yValue
 						$tmp_val = is_array($v[$f->dbFieldName()]) ? $v[$f->dbFieldName()][1] : $v[$f->dbFieldName()];
-						if(!isset($this->x_axis_dbfield_name)){ //no x axis means only one series (pie chart), don't need a to include series
+						if(!isset($this->x_axis_dbfield_name) && !isset($categories)){ //no x axis nor categories means only one series (pie chart), don't need a to include series
 							$arr_return[$x_val][$ref_key] = $tmp_val;
 						}
 						else{
@@ -275,11 +275,11 @@ class ChartData extends BlockData{
 	 * @access protected
 	 *
 	 **/
-	protected function stripFieldNames(){
+	protected function stripFieldNames($has_x_axis = true){
 		if(!isset($this->dataset) || !is_array($this->dataset)){
 			return false;
 		}
-		$this->dataset = array_values_recursive($this->dataset);
+		$this->dataset = array_values_recursive($this->dataset, $has_x_axis);
 	}
 }
 
@@ -299,7 +299,7 @@ class ChartData extends BlockData{
 //if(isset($val['x'])) echo "$k: " . $val['x'] . "<br>\n";
 //else echo "$k: x not set<br>\n";
 				if(!isset($val['x']) && $has_x_axis){
-					$arr[$key] = array_values_recursive($val);
+					$arr[$key] = array_values_recursive($val, $has_x_axis);
 				}
 				else{
 					$arr[$key] = $val;
