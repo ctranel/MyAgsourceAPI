@@ -284,7 +284,7 @@ function process_chart(div_id, data_in){
 				options.tooltip = {};
 			}
 			if(typeof(options.tooltip.formatter) === 'undefined' &&
-				(typeof(options.plotOptions[options.chart.type].tooltip) === 'undefined' || typeof(options.plotOptions[options.chart.type].tooltip.pointFormat) === 'undefined')
+				(typeof(options.plotOptions[options.chart.type]) === 'undefined' || typeof(options.plotOptions[options.chart.type].tooltip) === 'undefined' || typeof(options.plotOptions[options.chart.type].tooltip.pointFormat) === 'undefined')
 			){
 			//@todo: line below will break if there is ever a chart with multiple x axes
 				options.tooltip.formatter = getTooltipFormat(options.chart.type, options.xAxis.type, um);
