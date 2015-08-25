@@ -99,12 +99,15 @@ class TableHeader {
 	 *  @return int
 	 **/
 	public function columnCount(){
+		/*
 		if(is_a($this->columns, 'SplObjectStorage')){
 			return $this->columns->count();
 		}
 		else{
 			return count($this->arr_columns);
 		}
+		*/
+		return $this->block->reportFields()->count();
 	}
 	
 	/**
