@@ -58,7 +58,7 @@ class TableBlock extends Block {
 		$this->table_header = new TableHeader($this, $header_groups, $supplemental_factory);
 		
 		$top_row = null;
-		if($this->hasPivot()){
+		if($this->hasPivot() && is_array($report_data) && !empty($report_data)){
 			reset($report_data);
 			$tmp_key = key($report_data);
 			$this->top_row = array_merge([ucwords(str_replace('_', ' ', $tmp_key))],$report_data[$tmp_key]);
