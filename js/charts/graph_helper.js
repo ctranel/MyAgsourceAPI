@@ -356,7 +356,7 @@ function getAxisLabelFormat(axis_type){
 }
 
 function getTooltipFormat(chart_type, xaxis_type, um){
-	if(typeof(um) === 'undefined'){
+	if(typeof(um) === 'undefined' || um === null){
 		um = '';
 	}
 	if(chart_type === "boxplot"){
