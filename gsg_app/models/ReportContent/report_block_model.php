@@ -164,11 +164,9 @@ class report_block_model extends CI_Model {
 					 FROM users.dbo.block_header_groups t
 					 join cteRecursive r ON r.parent_id = t.id
 				)
-				SELECT h.*, hl.content_id AS header_group_id, hl.a_href, hl.a_title, hl.a_rel, hl.a_class, hc.comment FROM (
+				SELECT h.* FROM (
 					SELECT DISTINCT * FROM cteRecursive
 				) h
-				LEFT JOIN users.dbo.supp_links hl ON h.id = hl.content_id AND hl.content_type_id = 7
-				LEFT JOIN users.dbo.supp_comments hc ON h.id = hc.content_id AND hc.content_type_id = 7
 
 				ORDER BY parent_id, list_order";
 

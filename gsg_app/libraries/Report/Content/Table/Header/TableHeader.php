@@ -183,7 +183,7 @@ class TableHeader {
 			foreach($this->header_groups as $h){
 				$header_group_supplemental = null;
 				if(($this->supplemental_factory)){
-					$header_group_supplemental = $this->supplemental_factory->getHeaderGrpSupplemental($h['header_group_id'], $h['a_href'], $h['a_rel'], $h['a_title'], $h['a_class'], $h['comment']);
+					$header_group_supplemental = $this->supplemental_factory->getHeaderGrpSupplemental($h['id']);
 				}
 				//if it is a top level element
 				if($h['parent_id'] == null) {

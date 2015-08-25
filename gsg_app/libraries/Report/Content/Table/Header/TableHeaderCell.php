@@ -162,7 +162,7 @@ class TableHeaderCell {
 	public function supplementalLink(){
 		if($this->supplemental instanceof iSupplemental){
 			$tmp = $this->supplemental->getContent();
-			return $tmp['links'][0];
+			return isset($tmp['links'][0]) ? $tmp['links'][0] : null;
 		}
 	}
 

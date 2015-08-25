@@ -110,25 +110,17 @@ class SupplementalFactory
 	*  @return: Supplemental object
 	*  @throws:
 	* -----------------------------------------------------------------*/
-	public function getHeaderGrpSupplemental($supp_id, $href, $rel, $title, $class, $comment) {
-		if(!isset($supp_id)){
+	public function getHeaderGrpSupplemental($header_grp_id) {
+		if(!isset($header_grp_id)){
 			return null;
 		}
 
-		$supplemental_links = new \SplObjectStorage();
-		$supplemental_comments = new \SplObjectStorage();
+		$links = $this->datasource->getLinks(7, $header_grp_id);
+		$supplemental_links = SupplementalLink::datasetToObjects($this->site_url, $links, $this->datasource);
+	
+		$comments = $this->datasource->getComments(7, $header_grp_id);
+		$supplemental_comments = SupplementalComment::datasetToObjects($comments);
 		
-		// Links
-		//$links = $this->datasource->getLinks(4, $field_id);
-		$tmp = new SupplementalLink($this->site_url, $supp_id, $href, $rel, $title, $class);
-		$tmp->setParams($this->datasource);
-		$supplemental_links->attach($tmp);
-		// Comments
-		//$comments = $this->datasource->getComments(4, $field_id);
-		//$supplemental_comments = SupplementalComment::datasetToObjects($comment);
-		$supplemental_comments->attach(new SupplementalComment($comment));
-
-		//Create and return object
 		$supp = new Supplemental($supplemental_links, $supplemental_comments);
 		return $supp;
 	}
