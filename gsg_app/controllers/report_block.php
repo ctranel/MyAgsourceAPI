@@ -238,7 +238,7 @@ class report_block extends CI_Controller {
 		$output = $block->displayType();
 		
 		//SORT
-		$sort_builder = new SortBuilder();
+		$sort_builder = new SortBuilder($this->report_block_model);
 		$sort_builder->build($block, $sort_by, $sort_order);
 		//END SORT
 		

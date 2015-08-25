@@ -249,7 +249,7 @@ class Blocks extends CI_Controller {
 		$output = $this->block->displayType();
 		
 		//SORT
-		$sort_builder = new SortBuilder();
+		$sort_builder = new SortBuilder($this->report_block_model);
 		$sort_builder->build($this->block, $sort_by, $sort_order);
 		//END SORT
 		
