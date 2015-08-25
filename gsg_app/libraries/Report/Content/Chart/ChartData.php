@@ -111,7 +111,6 @@ class ChartData extends BlockData{
 				$this->stripFieldNames();
 			}
 		}
-
 		return $this->dataset;
 	}
 	
@@ -168,6 +167,8 @@ class ChartData extends BlockData{
    				$ser_key++;
 			}
 		}
+		//if there is a null value for the first series, subsequent series' will be in the first position of the array.  Need to sort by series index key
+		ksort($arr_return);
 		if(isset($arr_return) && is_array($arr_return)){
 			$this->dataset = $arr_return;
 		}
