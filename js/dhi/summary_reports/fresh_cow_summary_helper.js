@@ -10,13 +10,13 @@
 			if(client_data['block'] === 'transition_cow_index_tci_'){
 				options_in.plotOptions.columnrange.tooltip.pointFormat = '<span style="color:{point.color}">\u25CF</span> <b> {series.name}</b><br/>' + // docs
 		    			'75th Percentile Value: {point.low}<br/>' +
-		    			'Median Value: {point.med}<br/>' +
+		    			'50th Percentile Value: {point.med}<br/>' +
 		    			'25th Percentile Value: {point.high}<br/>';
 			}
 			if(client_data['block'] === 'first_test_linear_score_b' || client_data['block'] === 'ratio_of_first_test_fat_t'){
 				options_in.plotOptions.columnrange.tooltip.pointFormat = '<span style="color:{point.color}">\u25CF</span> <b> {series.name}</b><br/>' + // docs
 		    			'25th Percentile Value: {point.high}<br/>' +
-		    			'Median Value: {point.med}<br/>' +
+		    			'50th Percentile Value: {point.med}<br/>' +
 		    			'75th Percentile Value: {point.low}<br/>';
 			}
 			
