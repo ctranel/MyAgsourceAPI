@@ -249,6 +249,12 @@ function process_chart(div_id, data_in){
 			$('#' + div_id).html('<p class-"chart-error">' + client_data.error + '</p>');
 		}
 		else{
+			var count = 0;
+			var is_tooltip_preset = !(
+				typeof(options.tooltip) === 'undefined' &&
+				typeof(options.tooltip.formatter) === 'undefined' &&
+				(typeof(options.plotOptions[options.chart.type]) === 'undefined' || typeof(options.plotOptions[options.chart.type].tooltip) === 'undefined' || typeof(options.plotOptions[options.chart.type].tooltip.pointFormat) === 'undefined')
+			);
 			//add data to object
 			var tmpData = data_in.data;
 			//if type is chart we need to change the structure of the data
@@ -268,7 +274,6 @@ function process_chart(div_id, data_in){
 				tmpData = new_data;
 			}
 			
-			var count = 0;
 			for(var x in tmpData){
 				if(typeof options.series[count] === 'undefined'){
 					options.series[count] = {};
@@ -276,18 +281,21 @@ function process_chart(div_id, data_in){
 				if(typeof(options.series[count].um) !== 'undefined'){
 					um = options.series[count].um;
 				}
+				if(!is_tooltip_preset){
+					options.series[count].tooltip = {
+						pointFormatter: getTooltipFormat(options.chart.type, options.xAxis.type, um)
+					};
+				}
 				options.series[count].data = tmpData[x];
 				count++;
 			}
 			//set tooltip format
 			if(typeof(options.tooltip) === 'undefined'){//typeof(data_in.tooltip) === 'undefined' && 
-				options.tooltip = {};
+//				options.tooltip = {};
 			}
-			if(typeof(options.tooltip.formatter) === 'undefined' &&
-				(typeof(options.plotOptions[options.chart.type]) === 'undefined' || typeof(options.plotOptions[options.chart.type].tooltip) === 'undefined' || typeof(options.plotOptions[options.chart.type].tooltip.pointFormat) === 'undefined')
-			){
+			if(!is_tooltip_preset){
 			//@todo: line below will break if there is ever a chart with multiple x axes
-				options.tooltip.formatter = getTooltipFormat(options.chart.type, options.xAxis.type, um);
+//				options.tooltip.formatter = getTooltipFormat(options.chart.type, options.xAxis.type, um);
 			}
 			options.chart.renderTo = div_id;
 			if(typeof pre_render == 'function'){
