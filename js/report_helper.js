@@ -22,6 +22,15 @@ if($('#filter-form')){ //if there is a filter form (only on pages with one table
 		ev.preventDefault();
 		updatePage(this);
 	});
+	//attach filter criteria to csv link
+	if($('.download-csv')){
+		$('.download-csv').click(function(ev){
+			params = encodeURIComponent(JSON.stringify($("#filter-form").serializeObject()));
+			this.href += params;
+console.log($("#filter-form"));
+ev.preventDefault();
+		});
+	}
 }
 
 head.ready(function() {

@@ -29,6 +29,7 @@ class Criteria{
 	private $arr_options; //array of criteria objects
 	
 	public function __construct($criteria_data, $options){
+//var_dump($criteria_data);
 		$this->type = $criteria_data['type'];
 		$this->options = $options;
 		$this->field_name = $criteria_data['db_field_name'];
@@ -185,23 +186,18 @@ class Criteria{
 			$this->arr_selected_values['dbfrom'] = $page_filter_value[0];
 			$this->arr_selected_values['dbto'] = $page_filter_value[1];
 		}
-		elseif($this->type === 'select multiple'){
-			if(is_array($page_filter_value)){
-				foreach($page_filter_value as $k1=>$v1){
-					$page_filter_value[$k1] = explode('|', $v1);
-				}
-				$page_filter_value = array_flatten($page_filter_value);
-				$this->arr_selected_values = $page_filter_value;
+		elseif(is_array($page_filter_value)){
+			foreach($page_filter_value as $k1=>$v1){
+				$page_filter_value[$k1] = explode('|', $v1);
 			}
-			else {
-				$this->arr_selected_values = array($page_filter_value);
-			}
+			$page_filter_value = array_flatten($page_filter_value);
+			$this->arr_selected_values = $page_filter_value;
 		}
 		elseif(strpos($page_filter_value, '|')){
 			$this->arr_selected_values = explode('|', $page_filter_value);
 		}
 		else {
-			$this->arr_selected_values = array($page_filter_value);
+			$this->arr_selected_values = [$page_filter_value];
 		}
 	}
 
