@@ -11,9 +11,8 @@
  *  @version: 1.0
  * -----------------------------------------------------------------
  */
-require_once APPPATH . 'models/report_model.php';
 
- class Keto_model extends Report_model{
+ class Keto_model extends CI_Model{
 	
 	/**
 	 * __construct
@@ -21,8 +20,8 @@ require_once APPPATH . 'models/report_model.php';
 	 * @return void
 	 * @author kmarshall
 	 **/
-	public function __construct($section_path){
-		parent::__construct($section_path);
+	public function __construct(){
+		parent::__construct();
 	}
 
 	

@@ -28,7 +28,6 @@ class Keto extends report_parent {
 	}
 	
 	function ajax_keto_supp() {
-
 //		echo $this->page;
 		$tip = $this->keto_model->getKetoPageTip($this->session->userdata('herd_code'));
 		$this->load->view('dhi/summary_reports/ketomonitor/pagesupp', $tip);
