@@ -289,14 +289,7 @@ function process_chart(div_id, data_in){
 				options.series[count].data = tmpData[x];
 				count++;
 			}
-			//set tooltip format
-			if(typeof(options.tooltip) === 'undefined'){//typeof(data_in.tooltip) === 'undefined' && 
-//				options.tooltip = {};
-			}
-			if(!is_tooltip_preset){
-			//@todo: line below will break if there is ever a chart with multiple x axes
-//				options.tooltip.formatter = getTooltipFormat(options.chart.type, options.xAxis.type, um);
-			}
+
 			options.chart.renderTo = div_id;
 			if(typeof pre_render == 'function'){
 				options = pre_render(options, client_data);
