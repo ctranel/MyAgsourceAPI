@@ -45,9 +45,15 @@ var global_options = {
 		reversed: false
 	},
 	tooltip : {
-		DateFormat: '%b %e, %Y'
+		xDateFormat: '%b %e, %Y'
 	},
-	plotOptions: {},
+	plotOptions: {
+		scatter: {
+			tooltip: {
+				xDateFormat: '%b %e, %Y'
+			}
+		}
+	},
     series: [{
     }]
 	// SET MORE THEME-RELATED VARIABLES (COLOR, ETC)?
@@ -205,5 +211,10 @@ function get_line_options(options_json){
 
 function get_scatter_options(options_json){
 	options_json.chart.type = 'scatter';
+	options_json.plotOptions.scatter = {
+		tooltip: {
+			headerFormat: '<span style="font-size: 10px">{point.key}</span><br/>'
+		}
+	};
 	return options_json;
 }

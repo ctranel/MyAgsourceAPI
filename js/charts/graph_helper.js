@@ -106,7 +106,7 @@ function process_chart(div_id, data_in){
 
 	var um = undefined;
 	options = get_chart_options(options, data_in.chart_type);
-	options.tooltip.formatter = undefined;
+//	options.tooltip.formatter = undefined;
 
 	options.title = {"text": data_in.description};
 	options.exporting = {"filename": data_in.name};
@@ -148,7 +148,6 @@ function process_chart(div_id, data_in){
 					}
 					options.xAxis[cnt].categories = typeof(data_in.arr_axes.x[c].categories) !== "undefined" ? data_in.arr_axes.x[c].categories : null;
 					options.xAxis[cnt].type = data_in.arr_axes.x[c].data_type;
-	
 					if(data_in.chart_type != 'bar'){
 						options.xAxis[cnt].title = {"text": data_in.arr_axes.x[c].text};
 						if(data_in.arr_axes.x[c].data_type != null && data_in.arr_axes.x[c].data_type.indexOf('date') >= 0){
@@ -251,9 +250,22 @@ function process_chart(div_id, data_in){
 		else{
 			var count = 0;
 			var is_tooltip_preset = !(
-				typeof(options.tooltip) === 'undefined' &&
-				typeof(options.tooltip.formatter) === 'undefined' &&
-				(typeof(options.plotOptions[options.chart.type]) === 'undefined' || typeof(options.plotOptions[options.chart.type].tooltip) === 'undefined' || typeof(options.plotOptions[options.chart.type].tooltip.pointFormat) === 'undefined')
+				(
+					typeof(options.tooltip) === 'undefined' ||
+					(
+						typeof(options.tooltip.formatter) === 'undefined' &&
+						typeof(options.tooltip.pointFormat) === 'undefined' &&
+						typeof(options.tooltip.pointFormatter) === 'undefined'
+					)
+				) && (
+					typeof(options.plotOptions[options.chart.type]) === 'undefined' || 
+					typeof(options.plotOptions[options.chart.type].tooltip) === 'undefined' || 
+					(
+						typeof(options.plotOptions[options.chart.type].tooltip.formatter) === 'undefined' &&
+						typeof(options.plotOptions[options.chart.type].tooltip.pointFormat) === 'undefined' &&
+						typeof(options.plotOptions[options.chart.type].tooltip.pointFormatter) === 'undefined'
+					)
+				)
 			);
 			//add data to object
 			var tmpData = data_in.data;
@@ -282,9 +294,12 @@ function process_chart(div_id, data_in){
 					um = options.series[count].um;
 				}
 				if(!is_tooltip_preset){
+console.log(options.xAxis[0].type);	
+//console.log(is_tooltip_preset)
 					options.series[count].tooltip = {
-						pointFormatter: getTooltipFormat(options.chart.type, options.xAxis.type, um)
+						pointFormatter: getTooltipFormat(um)
 					};
+//console.log(JSON.stringify(options.xAxis.type))
 				}
 				options.series[count].data = tmpData[x];
 				count++;
@@ -356,66 +371,21 @@ function getAxisLabelFormat(axis_type){
 	}
 }
 
-function getTooltipFormat(chart_type, xaxis_type, um){
+function getTooltipFormat(um){
 	if(typeof(um) === 'undefined' || um === null){
 		um = '';
 	}
-	if(chart_type === "boxplot"){
-		return function(){
-			var p = this.point;
-			var n = parseInt(this.x, 10);
-			if(this.series.options.type === "boxplot" || typeof(this.series.options.type) === "undefined"){
-				if(!isNaN(n) && n == this.x && n.toString() == this.x.toString() && n > 100000000000 && n < 9999999999999){
-					return "<b>" + Highcharts.dateFormat("%B %Y", this.x) +"</b><br>" + this.series.name +"<br>75th Percentile: "+ p.q1 + "<br>50th Percentile: "+ p.median + "<br>25th Percentile: "+ p.q3;
-				}
-				else{
-					return '<b>' + this.x + ':</b><br>' + this.series.name +"<br>75th Percentile: "+ p.q1 + "<br>50th Percentile: "+ p.median + "<br>25th Percentile: "+ p.q3;
-				};
-			}
-			else { //no tooltip for non-boxplot series on boxplot charts
-				return false;
-			}
+	return function(){
+		var n = parseInt(this.x, 10);
+		if(!isNaN(n) && n == this.x && n.toString() == this.x.toString() && n > 100000000000 && n < 9999999999999){
+			return '<b>' + this.series.name + ':</b> ' + this.y + ' ' + um;
+		}
+		else{
+			return '<b>' + this.series.name + ':</b><br>' + this.x + ' - ' + this.y + ' ' + um;
 		};
-	}
-	else {
-		return function(){
-			var n = parseInt(this.x, 10);
-			if(!isNaN(n) && n == this.x && n.toString() == this.x.toString() && n > 100000000000 && n < 9999999999999){
-				return '<b>' + this.series.name + ':</b><br>' + Highcharts.dateFormat('%B %e, %Y', this.x) + ' - ' + this.y + ' ' + um;
-			}
-			else{
-				return '<b>' + this.series.name + ':</b><br>' + this.x + ' - ' + this.y + ' ' + um;
-			};
-		};
-	}
+	};
 }
 
 function customFormatGtLt(pointName) {
     return pointName.replace(/</gm, '&lt;').replace(/>/gm, '&gt;').replace(/<=/gm, '&le;').replace(/>=/gm, '&ge;');
-}
-
-//debugging functions
-function dump(arr,level) {
-	var dumped_text = "";
-	if(!level) level = 0;
-
-	//The padding given at the beginning of the line.
-	var level_padding = "";
-	for(var j=0;j<level+1;j++) level_padding += "    ";
-
-	if(typeof(arr) == 'object') { //Array/Hashes/Objects
-	 for(var item in arr) {
-	  var value = arr[item];
-	 
-	  if(typeof(value) == 'object') { //If it is an array,
-	   dumped_text += level_padding + "'" + item + "' ...\n";
-	   dumped_text += dump(value,level+1);
-	  } else {
-	   dumped_text += level_padding + "'" + item + "' => \"" + value + "\"\n";
-	  }
-	 }
-	} else { //Stings/Chars/Numbers etc.
-	 dumped_text = "===>"+arr+"<===("+typeof(arr)+")";
-	}
-	return dumped_text;
 }
