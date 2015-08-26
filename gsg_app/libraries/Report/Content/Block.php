@@ -578,7 +578,7 @@ abstract class Block implements iBlock {
 				}
 			}
 		}
-		return null;
+		return false;
 	}
 	
 	/**
@@ -596,7 +596,7 @@ abstract class Block implements iBlock {
 				}
 			}
 		}
-		return null;
+		return false;
 	}
 
 	/**
