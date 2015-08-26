@@ -103,7 +103,7 @@ end table headings */
 #report-links a.current {font-weight: bold;}
 ul.report-nav {margin: 0; padding: 0; list-style: none; border: none;}
 ul.report-nav {display:inline; margin: 0; list-style: none; border: none;}
-ul.report-nav li {display:inline; border-left: solid 1px #003C39;}
+ul.report-nav li {display:inline-block; border-left: solid 1px #003C39;}
 ul.report-nav li.first {border-left: none;}
 ul.report-nav li a {text-decoration: none; font: normal .85em helvetica,arial,sans-serif; color:#003C39; white-space: nowrap;}
 ul.report-nav li a:hover {text-decoration: underline;}
