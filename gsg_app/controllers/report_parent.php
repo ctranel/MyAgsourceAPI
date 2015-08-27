@@ -114,7 +114,32 @@ abstract class report_parent extends CI_Controller {
 	
 	function __construct(){
 		parent::__construct();
+
+		//set up herd
 		$this->load->model('herd_model');
+		$this->herd_access = new HerdAccess($this->herd_model);
+		$this->herd = new Herd($this->herd_model, $this->session->userdata('herd_code'));
+
+		if(!isset($this->as_ion_auth)){
+	       	return FALSE;
+		}
+		//is someone logged in?
+		if(!$this->as_ion_auth->logged_in() && $this->herd->herdCode() != $this->config->item('default_herd')) {
+			$this->session->set_flashdata('message', $this->session->flashdata('message') . "Please log in.  ");
+			$this->redirect(site_url('auth/login'));
+	       	exit;
+		}
+		
+		//is a herd selected?
+		if(!$this->herd->herdCode() || $this->herd->herdCode() == ''){
+			$this->session->set_flashdata('message',  $this->session->flashdata('message') . "Please select a herd and try again.  ");
+			$this->redirect(site_url('dhi/change_herd/select'));
+		}
+		
+		//does logged in user have access to selected herd?
+		
+		
+		
 		$this->load->model('web_content/section_model');
 		$this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
 		$this->load->model('web_content/block_model');
@@ -122,8 +147,6 @@ abstract class report_parent extends CI_Controller {
 		$this->blocks = new Blocks($this->block_model);
 		$this->pages = new Pages($this->page_model, $this->blocks);
 		$sections = new Sections($this->section_model, $this->pages);
-		$this->herd_access = new HerdAccess($this->herd_model);
-		$this->herd = new Herd($this->herd_model, $this->session->userdata('herd_code'));
 		
 		$class_dir = $this->router->fetch_directory(); //this should match the name of this file (minus ".php".  Also used as base for css and js file names and model directory name
 		$class = $this->router->fetch_class();
@@ -145,20 +168,12 @@ abstract class report_parent extends CI_Controller {
 			$method = $this->section->defaultPagePath();
 		}
 
-		if(!$this->authorize($method)) {
-			if($this->session->flashdata('message')){
-				$this->session->keep_flashdata('message');
-			}
-			if(strpos($method, 'ajax') === false){
-				$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
-			}
-			redirect(site_url('auth/login'));
+		//does selected user have access to current page for selected herd?
+		if(!$this->has_page_access($method)) {
+			$this->session->set_flashdata('message',  $this->session->flashdata('message') . "You do not have permission to view the requested report for herd " . $this->herd->herdCode() . ".  Please select a report from the navigation.");
+			redirect(site_url());
 		}
 
-		if($this->herd->herdCode() == ''){
-			$this->session->keep_flashdata('redirect_url');
-			redirect(site_url('dhi/change_herd/select'));			
-		}
 
 		$arr_path = explode('/',$path);
 		$page_name = $method;
@@ -178,23 +193,6 @@ abstract class report_parent extends CI_Controller {
 	    $this->notifications->populateNotices();
 	    $this->notices = $this->notifications->getNoticesTexts();
 		
-		/*
-		 * 
-		load most specific model available.  Must load model before setting section
-		//Load the most specific model that exists
-		if(file_exists(APPPATH . 'models/' . $this->section_path . $block_name . '_model.php')){
-			$this->primary_model_name = $block_name. '_model';
-			$this->load->model($this->section_path . $this->primary_model_name, '', FALSE, $this->section_path);
-		}
-		elseif(file_exists(APPPATH . 'models/' . $this->section_path . $class . '_model.php')){
-			$this->primary_model_name = $class . '_model';
-			$this->load->model($this->section_path . $this->primary_model_name, '', FALSE, $this->section_path);
-		}
-		else{
-			$this->primary_model_name = 'report_model';
-			$this->load->model('report_model', '', FALSE, $this->section_path);
-		}
-		 */
 		/* Load the profile.php config file if it exists*/
 		if (ENVIRONMENT == 'development' || ENVIRONMENT == 'localhost') {
 			$this->config->load('profiler', false, true);
@@ -203,22 +201,23 @@ abstract class report_parent extends CI_Controller {
 			} 
 		}
 	}
-
-	protected function authorize($method){
-		if(!isset($this->as_ion_auth)){
-	       	return FALSE;
+	
+	//redirects while retaining message and conditionally setting redirect url
+	//@todo: needs to be a part of some kind of authorization class
+	protected function redirect($url){
+		if($this->session->flashdata('message')){
+			$this->session->keep_flashdata('message');
 		}
-		if(!$this->as_ion_auth->logged_in() && $this->herd->herdCode() != $this->config->item('default_herd')) {
-	       	$this->session->set_flashdata('message', "Please log in.");
-			return FALSE;
-		}
-		if(!$this->herd->herdCode()){
-			$this->session->set_flashdata('message',  $this->session->flashdata('message') . "Please select a herd and try again.");
-			if($this->session->flashdata('message')) $this->session->keep_flashdata('message');
+		if(isset($method) && strpos($method, 'ajax') === false){
 			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
-			redirect(site_url('dhi/change_herd/select'));
-  			exit;
 		}
+		else{
+			$this->session->keep_flashdata('redirect_url');
+		}
+		redirect($url);
+	}
+
+	protected function has_page_access($method){
 		//if section scope is public, pass unsubscribed test
 		//@todo: build display_hierarchy/report_organization, etc interface with get_scope function (with classes for super_sections, sections, etc)
 		$pass_unsubscribed_test = true; //$this->as_ion_auth->get_scope('sections', $this->section->id()) == 'pubic';
@@ -242,7 +241,7 @@ abstract class report_parent extends CI_Controller {
 			exit;
 		}
 		elseif(!$pass_view_nonowned_test) {
-			$this->session->set_flashdata('message', 'You do not have permission to view the ' . $this->product_name . ' for herd ' . $this->herd->herdCode() . '.  Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' if you have questions or concerns.');
+			$this->session->set_flashdata('message', 'You do not have permission to view the requested report for herd ' . $this->herd->herdCode() . '.  Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' if you have questions or concerns.');
  			if($this->session->flashdata('message')) $this->session->keep_flashdata('message');
 			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
 			redirect(site_url('dhi/change_herd/select'));

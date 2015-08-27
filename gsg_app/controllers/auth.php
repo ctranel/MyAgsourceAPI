@@ -36,9 +36,11 @@ class Auth extends Ionauth {
 		}*/
 	}
 	
+	//@todo: Why is pstring here???
 	function index($pstring = NULL){
 			$this->session->keep_flashdata('redirect_url');
-			redirect(site_url('dhi/index/' . $pstring));
+			//redirect(site_url('dhi/index/' . $pstring));
+			redirect(site_url());
 	}
 
 	function section_info(){

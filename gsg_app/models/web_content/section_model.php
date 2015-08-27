@@ -98,7 +98,6 @@ class Section_model extends CI_Model {
 	 * @param string herd_code
 	 * @return array of section data for given user
 	 * @author ctranel
-	 **/
 	public function herd_is_subscribed($section_id, $herd_code) {
 		//join to sections _reports then to herd_output
 		$res = $this->db
@@ -112,4 +111,5 @@ class Section_model extends CI_Model {
 		
 		return (count($res) > 0);
 	}
+	 **/
 }
