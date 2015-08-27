@@ -53,17 +53,41 @@ class Section_model extends CI_Model {
 	 * @author ctranel
 	 **/
 	public function getSubscribedSections($parent_section_id, $herd_code) {
-		$tmp_arr_sections = [];
-		$this->db
-		->join('users.dbo.sections_reports sr', 's.id = sr.section_id', 'inner')
-		->join('herd.dbo.herd_output ho', "sr.report_code = ho.report_code AND ho.end_date IS NOT NULL AND ho.medium_type_code = 'w'", 'inner')
-		->where('s.scope_id', 2) // 2 = subscription
-		->where('ho.herd_code', $herd_code)
-		->where('ho.end_date IS NULL')
-		->where_in('s.parent_id', $parent_section_id);
-	
+		$sql = "
+			WITH section_tree AS
+				(
+					SELECT id, parent_id, name, description, scope_id, path, active, default_page_path, list_order
+					FROM users.dbo.sections
+					WHERE id IN(
+						SELECT DISTINCT p.section_id
+							FROM users.dbo.pages p
+							INNER JOIN users.dbo.pages_reports pr ON p.id = pr.page_id AND p.active = 1 AND p.scope_id = 2
+							INNER JOIN herd.dbo.herd_output ho ON pr.report_code = ho.report_code AND ho.herd_code = '" . $herd_code . "' AND ho.end_date IS NULL AND ho.medium_type_code = 'W' 
+					)
+			
+					UNION ALL
+			
+					SELECT s.id, s.parent_id, s.name, s.description, s.scope_id, s.path, s.active, s.default_page_path, s.list_order
+					FROM users.dbo.sections s
+						JOIN section_tree st ON st.parent_id = s.id   
+				)
+			
+			SELECT a.*, ls.name AS scope FROM (
+				SELECT id, parent_id, name, description, scope_id, path, active, default_page_path, list_order
+				FROM section_tree
+			
+				INTERSECT
+			
+				SELECT id, parent_id, name, description, scope_id, path, active, default_page_path, list_order
+				FROM users.dbo.sections
+				WHERE parent_id = " . $parent_section_id . " AND active = 1
+			) a
+			
+			INNER JOIN users.dbo.lookup_scopes ls ON a.scope_id = ls.id";
 		
-		$tmp_arr_sections = $this->getSections($herd_code);
+		$tmp_arr_sections = $this->db
+		->query($sql)
+		->result_array();
 
 		return $tmp_arr_sections;
 	}
@@ -78,7 +102,7 @@ class Section_model extends CI_Model {
 	public function herd_is_subscribed($section_id, $herd_code) {
 		//join to sections _reports then to herd_output
 		$res = $this->db
-		->join('users.dbo.sections_reports sr', 's.id = sr.section_id', 'inner')
+		->join('users.dbo.pages_reports sr', 's.id = sr.section_id', 'inner')
 		->join('herd.dbo.herd_output ho', 'sr.report_code = ho.report_code', 'inner')
 		->where('s.scope_id', 2) // 2 = subscription
 		->where('ho.herd_code', $herd_code)

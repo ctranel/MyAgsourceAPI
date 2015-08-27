@@ -84,14 +84,14 @@ class Sections implements iWebContentRepository {
 		 */
 		else{
 			if(in_array('View Subscriptions', $arr_task_permissions)){
-				$tmp_array = array_merge($tmp_array, $this->datasource_sections->getSubscribedSections($user_id, $parent_id, $herd->herdCode()));
+				$tmp_array = array_merge($tmp_array, $this->datasource_sections->getSubscribedSections($section->id(), $herd->herdCode()));
 			}
 			if(in_array('View Account', $arr_task_permissions)){
-				$criteria = ['ls.name' => 'View Account', 'parent_id' => $parent_id];
+				$criteria = ['ls.name' => 'View Account', 'parent_id' => $section->id()];
 				$tmp_array = array_merge($tmp_array, $this->datasource_sections->getByCriteria($criteria));
 			}
 			if(in_array('View Admin', $arr_task_permissions)){
-				$criteria = ['ls.name' => 'View Admin', 'parent_id' => $parent_id];
+				$criteria = ['ls.name' => 'View Admin', 'parent_id' => $section->id()];
 				$tmp_array = array_merge($tmp_array, $this->datasource_sections->getByCriteria($criteria));
 			}
 		}

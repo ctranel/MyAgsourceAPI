@@ -181,7 +181,7 @@ class Section implements iWebContent
 		//have permission only for subscribed content.  All other scopes are strictly users-based
 		else{
 			if(in_array('View Subscriptions', $arr_task_permissions)){
-				$tmp_array = array_merge($tmp_array, $this->datasource_sections->getSubscribedSections($user_id, $this->id, $herd->herdCode()));
+				$tmp_array = array_merge($tmp_array, $this->datasource_sections->getSubscribedSections($this->id, $herd->herdCode()));
 			}
 			if(in_array('View Account', $arr_task_permissions)){
 				$criteria = ['ls.name' => 'View Account', 'parent_id' => $this->id];
