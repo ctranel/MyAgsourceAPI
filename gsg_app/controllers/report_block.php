@@ -350,13 +350,8 @@ class report_block extends CI_Controller {
 			 * @todo: when we have a javascript framework in place, we will send table data via json too.
 			 * for now, we need to send the html for the table instead of the data
 			 */
-			if(isset($this->report_data['data']) && is_array($this->report_data['data'])) {
 				$this->report_data['html'] = $this->load->view('report_table.php', $this->report_data, TRUE);
-				unset($this->report_data['data']);
-			}
-			else {
-				$this->report_data['html'] = '<p class="message">No data found.</p>';
-			}
+				unset($this->report_data['data'],$this->report_data['table_header']);
 		}
 
 		//@todo: base header on accept property of request header 

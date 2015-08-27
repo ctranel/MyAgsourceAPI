@@ -294,12 +294,9 @@ function process_chart(div_id, data_in){
 					um = options.series[count].um;
 				}
 				if(!is_tooltip_preset){
-console.log(options.xAxis[0].type);	
-//console.log(is_tooltip_preset)
 					options.series[count].tooltip = {
 						pointFormatter: getTooltipFormat(um)
 					};
-//console.log(JSON.stringify(options.xAxis.type))
 				}
 				options.series[count].data = tmpData[x];
 				count++;

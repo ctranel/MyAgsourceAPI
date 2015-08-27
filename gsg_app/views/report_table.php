@@ -47,7 +47,7 @@
 		<?php endif;
 		 ?><tbody>
 			<?php $c = 1;
-			if(!empty($data) && is_array($data)):
+			if(isset($data) && is_array($data) && !empty($data)):
 			$fields = $block->reportFields();
 				if($fields):
 					if($block->hasPivot()):
