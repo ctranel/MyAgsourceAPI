@@ -85,8 +85,13 @@
 								else{
 									$value = '';
 								}
-								displayCell($f, $value, $cr);
-							endforeach;
+								if($c > (count($data) - $block->getAppendedRowsCount())) {
+    								displayCell($f, $value, $cr, true);
+								}
+                                else {
+                                    displayCell($f, $value, $cr, false);
+                                }
+								endforeach;
 							?></tr><?php
 							$c++;
 						endforeach;
@@ -103,14 +108,14 @@
 		<table id="fh-<?php echo $block->path(); ?>" class="fixed-header"></table>
 	<?php endif; 
 	
-	function displayCell($f, $value, $cr = null){
+	function displayCell($f, $value, $cr = null, $appended_row = false){
 		$field_name = $f->dbFieldName();
 		if($f->isNumeric() && is_numeric($value)){// && $tmp_key != $value){
 			$value = number_format($value, $f->decimalScale());
 		}
 		
 		$supplemental = $f->dataSupplementalContent();
-		if(isset($supplemental)){
+		if(isset($supplemental) && !$appended_row){
 			//@todo: supplemental comments are not currently an option, only supplemental links
 			$value = $supplemental['links'][0];
 			preg_match_all('~\{(.*?)\}~', $value, $tmp);
