@@ -192,6 +192,9 @@ abstract class Block implements iBlock {
 	 **/
 	protected $field_groups;
 	
+    //The count of rows appended to the end of a dataset's rows; the number of these rows: sum_row,avg_row,cnt_row,bench_row
+	protected $appended_rows_count;
+	
 /**
 	 * __construct
 	 *
@@ -226,6 +229,21 @@ abstract class Block implements iBlock {
 		$this->setWhereGroups();
 		$this->setDefaultSort();
 		//@todo: joins
+		
+		$this->appended_rows_count = 0;
+		if ($cnt_row) {
+		    $this->appended_rows_count++;
+		}
+		if ($sum_row) {
+		    $this->appended_rows_count++;
+		}
+		if ($avg_row) {
+		    $this->appended_rows_count++;
+		}
+		if ($bench_row) {
+		    $this->appended_rows_count++;
+		}
+		
 	}
 	
 	/*
@@ -326,6 +344,10 @@ abstract class Block implements iBlock {
 			$ret[] = $f->dbFieldName();
 		}
 		return $ret;
+	}
+	
+	public function getAppendedRowsCount(){
+	    return $this->appended_rows_count;
 	}
 	
 	/**
