@@ -137,8 +137,28 @@ class report_block extends CI_Controller {
 
 	function __construct(){
 		parent::__construct();
+		//set up herd
 		$this->load->model('herd_model');
+		$this->herd_access = new HerdAccess($this->herd_model);
+		$this->herd = new Herd($this->herd_model, $this->session->userdata('herd_code'));
+
+		//is someone logged in?
+		if(!$this->as_ion_auth->logged_in() && $this->herd->herdCode() != $this->config->item('default_herd')) {
+			$this->post_message("Please log in.  ");
+		}
 		
+		//is a herd selected?
+		if(!$this->herd->herdCode() || $this->herd->herdCode() == ''){
+			$this->post_message("Please select a herd and try again.  ");
+		}
+		
+		//does logged in user have access to selected herd?
+		$has_herd_access = $this->herd_access->hasAccess($this->session->userdata('user_id'), $this->herd->herdCode(), $this->session->userdata('arr_regions'), $this->ion_auth_model->getTaskPermissions());
+		if(!$has_herd_access){
+			$this->post_message("You do not have permission to access this herd.  Please select another herd and try again.  ");
+		}
+		
+				
 		// report content
 		$this->load->model('supplemental_model');
 		$this->load->model('ReportContent/report_block_model');
@@ -146,20 +166,14 @@ class report_block extends CI_Controller {
 		$this->supp_factory = new SupplementalFactory($this->supplemental_model, site_url());
 		$this->blocks = new Blocks($this->report_block_model, $this->db_field_model, $this->supp_factory);
 
-		$this->herd_access = new HerdAccess($this->herd_model);
-		$this->herd = new Herd($this->herd_model, $this->session->userdata('herd_code'));
 		$method = $this->router->fetch_method();
 
-		if(!$this->authorize($method)) {
-			if($this->session->flashdata('message')) $this->session->keep_flashdata('message');
-			if($method != 'ajax_report') $this->session->set_flashdata('redirect_url', $this->uri->uri_string());
-			redirect(site_url('auth/login'));
+			//does selected user have access to current page for selected herd?
+		if(!$this->has_page_access($method)) {
+			$this->session->set_flashdata('message',  $this->session->flashdata('message') . "You do not have permission to view the requested report for herd " . $this->herd->herdCode() . ".  Please select a report from the navigation.");
+			$this->redirect(site_url());
 		}
-		
-		if($this->session->userdata('herd_code') == ''){ // || $this->session->userdata('herd_code') == '35990571'
-			$this->session->keep_flashdata('redirect_url');
-			redirect(site_url('dhi/change_herd/select'));			
-		}
+				
 		/* Load the profile.php config file if it exists
 		if (ENVIRONMENT == 'development' || ENVIRONMENT == 'localhost') {
 			$this->config->load('profiler', false, true);
@@ -169,46 +183,47 @@ class report_block extends CI_Controller {
 		}*/
 	}
 
-	protected function authorize(){
-		if(!isset($this->as_ion_auth)){
-			echo "Your session has expired, please log in and try again..";
-			exit;
-		}
-		if(!$this->as_ion_auth->logged_in()) {
-			echo "Your session has expired, please log in and try again...";
-			exit;
-		}
-		if(!isset($this->herd)){
-			echo 'Either your session expired, or you have not yet chosen a herd.  Please select a herd and try again.';
-  			exit;
-		}
+	//redirects while retaining message and conditionally setting redirect url
+	//@todo: needs to be a part of some kind of authorization class
+	protected function post_message($message = ''){
+		$this->session->keep_flashdata('redirect_url');
+		echo $message;
+		exit;
+	}
+
+	protected function has_page_access($method){
 		//if section scope is public, pass unsubscribed test
 		//@todo: build display_hierarchy/report_organization, etc interface with get_scope function (with classes for super_sections, sections, etc)
 		$pass_unsubscribed_test = true; //$this->as_ion_auth->get_scope('sections', $this->section->id()) == 'pubic';
 		//@todo: redo access tests
 //		$pass_unsubscribed_test = $this->as_ion_auth->has_permission("View All Content") || $this->web_content_model->herd_is_subscribed($this->section->id(), $this->herd->herdCode());
-		$pass_view_nonowned_test = $this->as_ion_auth->has_permission("View All Herds") || $this->session->userdata('herd_code') == $this->config->item('default_herd');
-		if(!$pass_view_nonowned_test){
-			$pass_view_nonowned_test = in_array($this->herd->herdCode(), $this->herd_access->getAccessibleHerdCodes($this->session->userdata('user_id'), $this->as_ion_auth->arr_task_permissions(), $this->session->userdata('arr_regions')));
-		}
-		if($pass_unsubscribed_test && $pass_view_nonowned_test){
-			return TRUE;
-		}
+		$pass_view_nonowned_test = $this->as_ion_auth->has_permission("View All Herds");
+		if(!$pass_view_nonowned_test) $pass_view_nonowned_test = in_array($this->herd->herdCode(), $this->herd_access->getAccessibleHerdCodes($this->session->userdata('user_id'), $this->as_ion_auth->arr_task_permissions(), $this->session->userdata('arr_regions')));
+		if($pass_unsubscribed_test && $pass_view_nonowned_test) return TRUE;
 		elseif(!$pass_unsubscribed_test && !$pass_view_nonowned_test) {
-			echo 'Herd ' . $this->herd->herdCode() . ' is not subscribed to the ' . $this->product_name . ', nor do you have permission to view this report for herd ' . $this->herd->herdCode() . '.  Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' if you have questions or concerns.';
+			$this->session->set_flashdata('message', 'Herd ' . $this->herd->herdCode() . ' is not subscribed to the ' . $this->product_name . ', nor do you have permission to view this report for herd ' . $this->herd->herdCode() . '.  Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' if you have questions or concerns.');
+ 			if($this->session->flashdata('message')) $this->session->keep_flashdata('message');
+			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
+			redirect(site_url('dhi/change_herd/select'));
 			exit;
 		}
 		elseif(!$pass_unsubscribed_test) {
-			echo 'Herd ' . $this->herd->herdCode() . ' is not subscribed to the ' . $this->product_name . '.  Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' if you have questions or concerns.';
+			$this->session->set_flashdata('message', 'Herd ' . $this->herd->herdCode() . ' is not subscribed to the ' . $this->product_name . '.  Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' if you have questions or concerns.');
+ 			if($this->session->flashdata('message')) $this->session->keep_flashdata('message');
+			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
+			redirect(site_url());
 			exit;
 		}
 		elseif(!$pass_view_nonowned_test) {
-			echo 'You do not have permission to view the ' . $this->product_name . ' for herd ' . $this->herd->herdCode() . '.  Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' if you have questions or concerns.';
+			$this->session->set_flashdata('message', 'You do not have permission to view the requested report for herd ' . $this->herd->herdCode() . '.  Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' if you have questions or concerns.');
+ 			if($this->session->flashdata('message')) $this->session->keep_flashdata('message');
+			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
+			redirect(site_url('dhi/change_herd/select'));
 			exit;
 		}
 		return FALSE;
 	}
-	
+		
 	/*
 	 * ajax_report: Called via AJAX to populate graphs
 	 * @param string page path
@@ -225,11 +240,6 @@ class report_block extends CI_Controller {
 	 * @todo: can I delete the last 2 params?
 	 */
 	public function ajax_report($page_path, $block_name, $sort_by = 'null', $sort_order = 'null', $report_count=0, $json_filter_data = NULL, $cache_buster = NULL) {//, $herd_size_code = FALSE, $all_breeds_code = FALSE
-		//verify user has permission to view content for given herd
-		if(!$this->authorize()) {
-			die('not authorized');
-		}
-		
 		$page_path = str_replace('|', '/', urldecode($page_path));
 		$this->section_path = substr($page_path, 0, (strrpos($page_path, '/') + 1));
 		$path_page_segment = substr($page_path, (strrpos($page_path, '/') + 1));

@@ -73,7 +73,7 @@ class HerdAccess
 		if(!$user_id || !$herd_code || !$arr_permissions){
 			return false;
 		}
-		if(in_array('View All "Herds', $arr_permissions)){
+		if(in_array('View All Herds', $arr_permissions)){
 			return true;
 		}
 		if(in_array('View Herds in Region', $arr_permissions)){

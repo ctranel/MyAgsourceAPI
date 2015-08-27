@@ -120,25 +120,21 @@ abstract class report_parent extends CI_Controller {
 		$this->herd_access = new HerdAccess($this->herd_model);
 		$this->herd = new Herd($this->herd_model, $this->session->userdata('herd_code'));
 
-		if(!isset($this->as_ion_auth)){
-	       	return FALSE;
-		}
 		//is someone logged in?
 		if(!$this->as_ion_auth->logged_in() && $this->herd->herdCode() != $this->config->item('default_herd')) {
-			$this->session->set_flashdata('message', $this->session->flashdata('message') . "Please log in.  ");
-			$this->redirect(site_url('auth/login'));
-	       	exit;
+			$this->redirect(site_url('auth/login'), "Please log in.  ");
 		}
 		
 		//is a herd selected?
 		if(!$this->herd->herdCode() || $this->herd->herdCode() == ''){
-			$this->session->set_flashdata('message',  $this->session->flashdata('message') . "Please select a herd and try again.  ");
-			$this->redirect(site_url('dhi/change_herd/select'));
+			$this->redirect(site_url('dhi/change_herd/select'), "Please select a herd and try again.  ");
 		}
 		
 		//does logged in user have access to selected herd?
-		
-		
+		$has_herd_access = $this->herd_access->hasAccess($this->session->userdata('user_id'), $this->herd->herdCode(), $this->session->userdata('arr_regions'), $this->ion_auth_model->getTaskPermissions());
+		if(!$has_herd_access){
+			$this->redirect(site_url('dhi/change_herd/select'),"You do not have permission to access this herd.  Please select another herd and try again.  ");
+		}
 		
 		$this->load->model('web_content/section_model');
 		$this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
@@ -170,10 +166,8 @@ abstract class report_parent extends CI_Controller {
 
 		//does selected user have access to current page for selected herd?
 		if(!$this->has_page_access($method)) {
-			$this->session->set_flashdata('message',  $this->session->flashdata('message') . "You do not have permission to view the requested report for herd " . $this->herd->herdCode() . ".  Please select a report from the navigation.");
-			redirect(site_url());
+			$this->redirect(site_url(), "You do not have permission to view the requested report for herd " . $this->herd->herdCode() . ".  Please select a report from the navigation.");
 		}
-
 
 		$arr_path = explode('/',$path);
 		$page_name = $method;
@@ -204,10 +198,8 @@ abstract class report_parent extends CI_Controller {
 	
 	//redirects while retaining message and conditionally setting redirect url
 	//@todo: needs to be a part of some kind of authorization class
-	protected function redirect($url){
-		if($this->session->flashdata('message')){
-			$this->session->keep_flashdata('message');
-		}
+	protected function redirect($url, $message = ''){
+		$this->session->set_flashdata('message',  $this->session->flashdata('message') . $message);
 		if(isset($method) && strpos($method, 'ajax') === false){
 			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
 		}
