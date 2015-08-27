@@ -17,6 +17,7 @@ class Keto extends report_parent {
 		$this->session->set_flashdata('redirect_url', $redirect_url);
 		redirect(site_url('dhi/summary_reports/keto/keto_summary'));
 	}
+	
 	function keto_summary($block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
 	 	$this->product_name = 'Summary';
 	 	parent::display($block_in, $display_format);
@@ -26,12 +27,4 @@ class Keto extends report_parent {
 	 	$this->product_name = 'Cow List';
 	 	parent::display($block_in, $display_format);
 	}
-	
-	function ajax_keto_supp() {
-//		echo $this->page;
-		$tip = $this->keto_model->getKetoPageTip($this->session->userdata('herd_code'));
-		$this->load->view('dhi/summary_reports/ketomonitor/pagesupp', $tip);
-		
-	}
-
 }
