@@ -210,7 +210,7 @@ class Index extends report_parent {
 		}
 		
 		foreach($arr_view_blocks as $k => $b){
-			$col = $k === 'Herd Overview' ? 'feature' : 'info';
+			$col = $k === 'Herd Performance Overview' ? 'feature' : 'info';
 			$this->data['widget'][$col][] = array(
 				'content' => $b,
 				'title' => $k,
