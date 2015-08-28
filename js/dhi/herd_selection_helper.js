@@ -15,6 +15,7 @@ head.ready(function() {
 		var herd_code = $("#herd_code").val();
 		if(herd_code == 0){
 			alert('Please select a herd from the dropdown to continue.');
+			return false;
 		}
 		$.ajax({
 			url: "ajax_herd_enrolled/" + herd_code,
