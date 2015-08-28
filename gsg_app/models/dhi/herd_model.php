@@ -240,7 +240,7 @@ class Herd_model extends CI_Model {
 	 *           excluding herds that are expired for this user
 	 *           and also excluding herds that are not active.
 	 **/
-	public function getHerdCodesByUser($user_id, $limit = FALSE){
+	public function getHerdCodesByUser($user_id, $limit = NULL){
 		if(!$user_id){
 			return false;
 		}
