@@ -8,7 +8,7 @@
 		<li><?php echo anchor('auth/list_accounts','List Accounts', 'class="teal_banner"') ?></li>
 <?php	$class = '';
 	endif; ?>
-	<?php if(($this->as_ion_auth->logged_in())): ?>
+	<?php if($this->as_ion_auth->is_editable_user($this->session->userdata('user_id'), $this->session->userdata('user_id'))): ?>
 		<li class="<?php echo $class; ?>"><?php echo anchor('auth/edit_user','Edit Account', 'class="teal_banner"') ?></li>
 <?php	$class = '';
 	endif; ?>

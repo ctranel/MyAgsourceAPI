@@ -121,21 +121,22 @@ abstract class report_parent extends CI_Controller {
 		$this->herd = new Herd($this->herd_model, $this->session->userdata('herd_code'));
 
 		//is someone logged in?
-		if(!$this->as_ion_auth->logged_in() && $this->herd->herdCode() != $this->config->item('default_herd')) {
-			$this->redirect(site_url('auth/login'), "Please log in.  ");
+		if($this->herd->herdCode() != $this->config->item('default_herd')){
+			if(!$this->as_ion_auth->logged_in()) {
+				$this->redirect(site_url('auth/login'), "Please log in.  ");
+			}
+			
+			//is a herd selected?
+			if(!$this->herd->herdCode() || $this->herd->herdCode() == ''){
+				$this->redirect(site_url('dhi/change_herd/select'), "Please select a herd and try again.  ");
+			}
+			
+			//does logged in user have access to selected herd?
+			$has_herd_access = $this->herd_access->hasAccess($this->session->userdata('user_id'), $this->herd->herdCode(), $this->session->userdata('arr_regions'), $this->ion_auth_model->getTaskPermissions());
+			if(!$has_herd_access){
+				$this->redirect(site_url('dhi/change_herd/select'),"You do not have permission to access this herd.  Please select another herd and try again.  ");
+			}
 		}
-		
-		//is a herd selected?
-		if(!$this->herd->herdCode() || $this->herd->herdCode() == ''){
-			$this->redirect(site_url('dhi/change_herd/select'), "Please select a herd and try again.  ");
-		}
-		
-		//does logged in user have access to selected herd?
-		$has_herd_access = $this->herd_access->hasAccess($this->session->userdata('user_id'), $this->herd->herdCode(), $this->session->userdata('arr_regions'), $this->ion_auth_model->getTaskPermissions());
-		if(!$has_herd_access){
-			$this->redirect(site_url('dhi/change_herd/select'),"You do not have permission to access this herd.  Please select another herd and try again.  ");
-		}
-		
 		$this->load->model('web_content/section_model');
 		$this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
 		$this->load->model('web_content/block_model');
@@ -200,7 +201,7 @@ abstract class report_parent extends CI_Controller {
 	//@todo: needs to be a part of some kind of authorization class
 	protected function redirect($url, $message = ''){
 		$this->session->set_flashdata('message',  $this->session->flashdata('message') . $message);
-		if(isset($method) && strpos($method, 'ajax') === false){
+		if(isset($method) && strpos($method, 'ajax') === false && strpos($method, '/demo') === false){
 			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
 		}
 		else{

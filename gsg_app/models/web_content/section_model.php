@@ -83,7 +83,8 @@ class Section_model extends CI_Model {
 				WHERE parent_id = " . $parent_section_id . " AND active = 1
 			) a
 			
-			INNER JOIN users.dbo.lookup_scopes ls ON a.scope_id = ls.id";
+			INNER JOIN users.dbo.lookup_scopes ls ON a.scope_id = ls.id
+			ORDER BY list_order";
 		
 		$tmp_arr_sections = $this->db
 		->query($sql)

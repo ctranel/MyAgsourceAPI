@@ -105,7 +105,7 @@ class As_ion_auth extends Ion_auth {
 		if($this->logged_in()){
 			$this->arr_task_permissions = $this->ion_auth_model->getTaskPermissions();
 			//RETRIEVE NAVIGATION DATA
-			if(strpos($tmp_uri, 'ajax') === FALSE && strpos($tmp_uri, '/csv/') === FALSE){//set supersection if there is one
+			if(strpos($tmp_uri, 'ajax') === FALSE && strpos($tmp_uri, '/csv/') === FALSE && strpos($tmp_uri, '/demo') === false){//set supersection if there is one
 				$section_path = $this->router->fetch_class(); //this should match the name of this file (minus ".php".  Also used as base for css and js file names and model directory name
 				$control_dir = $this->router->fetch_directory();
 				//all sections must have directories in the main controller directory
@@ -133,7 +133,7 @@ class As_ion_auth extends Ion_auth {
 		//reliably set the referrer, used when determining whether to set the redirect variable on pages like select herd
 		$this->referrer = $this->session->userdata('referrer');
 
-		if($this->session->userdata('referrer') != $tmp_uri && strpos($tmp_uri, 'ajax') === FALSE && strpos($tmp_uri, '/csv/') === FALSE){
+		if($this->session->userdata('referrer') != $tmp_uri && strpos($tmp_uri, 'ajax') === false && strpos($tmp_uri, '/csv/') === false && strpos($tmp_uri, '/demo') === false){
 			$this->session->set_userdata('referrer', $tmp_uri);
 		}
 		
@@ -231,7 +231,7 @@ class As_ion_auth extends Ion_auth {
 	public function is_editable_user($user_id, $logged_user_id){
 		$obj_user = $this->ion_auth_model->user($user_id)->row();
 		//$obj_user->arr_groups = array_keys($this->ion_auth_model->get_users_group_array($obj_user->id));
-		if($this->has_permission('Edit All Users') || $user_id == $logged_user_id){
+		if($this->has_permission('Edit All Users')){
 			return TRUE;
 		}
 		if($this->has_permission('Edit Users In Region')){
@@ -239,6 +239,9 @@ class As_ion_auth extends Ion_auth {
 		}
 		if($this->has_permission('Edit Producers In Region')){
 			return $this->ion_auth_model->is_child_user_by_group_and_association(2, $obj_user->assoc_acct_num, $user_id);
+		}
+		if($this->as_ion_auth->has_permission("Edit Own Account") && $user_id == $logged_user_id){
+			return true;
 		}
 		else {
 			return false;

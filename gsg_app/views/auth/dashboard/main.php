@@ -1,7 +1,9 @@
 <?php
 if (!empty($page_header)) echo $page_header;
 if (!empty($page_heading)) echo heading($page_heading);
-if (!empty($report_nav)) echo $report_nav; ?>
+if(isset($herd_code) && $herd_code == $this->config->item('default_herd')): ?>
+	<p class="important-message">This is sample herd data, please <?php echo anchor('auth/login', 'login'); ?> or <?php echo anchor('auth/create_user', 'register'); ?> to see your herd's data.</p>
+<?php endif; ?>
 <div id="d-herd" class="col-sm-3">
 	<?php if(isset($widget['herd'])): 
 		foreach($widget['herd'] as $w): ?>

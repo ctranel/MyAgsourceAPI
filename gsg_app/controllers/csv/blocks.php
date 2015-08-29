@@ -193,7 +193,7 @@ class Blocks extends CI_Controller {
 	//@todo: needs to be a part of some kind of authorization class
 	protected function redirect($url, $message = ''){
 		$this->session->set_flashdata('message',  $this->session->flashdata('message') . $message);
-		if(isset($method) && strpos($method, 'ajax') === false){
+		if(isset($method) && strpos($method, 'ajax') === false && strpos($method, '/demo') === false){
 			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
 		}
 		else{

@@ -643,7 +643,7 @@ class Auth extends Ionauth {
 	}
 
 	function list_accounts(){
-		if(!$this->as_ion_auth->has_permission("Add All Users") && !$this->as_ion_auth->has_permission("Add Users In Region")){
+		if(!$this->as_ion_auth->has_permission("Edit All Users") && !$this->as_ion_auth->has_permission("Edit Users In Region")){
        		$this->session->set_flashdata('message',  $this->session->flashdata('message') . "You do not have permission to edit user accounts.");
        		redirect(site_url(), 'refresh');
 		}
@@ -1101,7 +1101,9 @@ class Auth extends Ionauth {
 	}
 
 	function edit_user($user_id = FALSE) {
-		if($user_id === FALSE) $user_id = $this->session->userdata('user_id');
+		if($user_id === FALSE){
+			$user_id = $this->session->userdata('user_id');
+		}
 		//does the logged in user have permission to edit this user?
 		if (!$this->as_ion_auth->logged_in()) {
 			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());

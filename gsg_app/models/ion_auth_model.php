@@ -100,7 +100,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * @author ctranel
 	 **/
 	public function login($identity, $password, $remember=FALSE){
-		$this->ion_auth->set_hook('post_login_successful', 'set_session_meta', 'Ion_auth_model', '_set_session_meta');
+		$this->as_ion_auth->set_hook('post_login_successful', 'set_session_meta', 'Ion_auth_model', '_set_session_meta');
 		return parent::login($identity, $password, $remember);
 	}
 
@@ -181,6 +181,8 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 **/
 	public function users($group=FALSE, $limit=NULL, $offset=NULL, $arr_joins = NULL)
 	{
+		//@todo: find where this is getting set without getting unset, and fix.
+		unset($this->_ion_order_by);
 		if (!empty($this->meta_sections)){
 			foreach($this->meta_sections as $s){
 				if($s != 'users_sections' && $s != 'users_herds'){ //creates multiple records for users with multiple sections.
@@ -193,7 +195,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 				}
 			}
 		}
- 		if (!empty($this->herd_meta_sections)){
+		if (!empty($this->herd_meta_sections)){
 			foreach($this->herd_meta_sections as $s){
 				if($s != 'herds_sections'){ //creates multiple records for herds with multiple sections.
 					if (!empty($this->columns[$s])) {
@@ -205,7 +207,6 @@ class Ion_auth_model extends Ion_auth_parent_model
 				}
 			}
 		}
-
 		$this->db->join(
 		    $this->tables['users_groups'], 
 		    $this->tables['users_groups'].'.user_id = ' . $this->tables['users'].'.id', 
