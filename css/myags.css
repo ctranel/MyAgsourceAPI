@@ -162,5 +162,7 @@ label:after {content: ":";}
 input.require, input.required, select.require {background-color: #CCEAE8}
 label .require {color:#003C39; font-weight:bold;}
 
+.consult-form table td {padding: 0 5px;}
+
 #infoMessage p, #infoMessage {background-color:#fff; color:#F60E27;}
 div#infoMessage {margin: 0 0 10px 0;}

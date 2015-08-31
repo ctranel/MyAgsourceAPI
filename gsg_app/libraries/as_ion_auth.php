@@ -500,6 +500,37 @@ class As_ion_auth extends Ion_auth {
 	}
 
 	/**
+	 * @method getHerdPermissionsByStatus()
+	 * @description does service group account number exist?
+	 * @param string service group user_id
+	 * @return array
+	 * @access public
+	 *
+	 **/
+	public function getHerdPermissionsByStatus($sg_user_id){
+		if(empty($sg_user_id)){
+			$this->set_error('service_group_required');
+			return false;
+		}
+		$herds = $this->herd_model->getHerdDataByPermissions($sg_user_id);
+		if(!isset($herds) || !is_array($herds)){
+			return false;
+		}
+		
+		$arr_herds = [];
+		foreach($herds as $h){
+			$exp_date = new DateTime($h['expires_date']);
+			if($h['status'] === 'grant' && $h['expires_date'] !== null && new DateTime($h['expires_date']) > new DateTime()){
+				$arr_herds['expired'][] = $h;
+			}
+			else {
+				$arr_herds[$h['status']][] = $h;
+			}
+		}
+		return $arr_herds;
+	}
+	
+	/**
 	 * @method service_grp_exists()
 	 * @description does service group account number exist?
 	 * @param string service group account number

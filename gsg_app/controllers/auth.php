@@ -232,7 +232,8 @@ class Auth extends Ionauth {
 		}
 
 		$this->load->model('dhi/herd_model');
-		$herds_by_status = $this->herd_model->getHerdsByPermissionGranted($this->session->userdata('user_id'));
+		$herds_by_status = $this->as_ion_auth->getHerdPermissionsByStatus($this->session->userdata('user_id'));
+
 		if(isset($herds_by_status['open']) && is_array($herds_by_status['open'])){
 
 			$section_data['content'] = $this->_set_consult_herd_section($herds_by_status['open'], 'open', array('Resend Request Email'));

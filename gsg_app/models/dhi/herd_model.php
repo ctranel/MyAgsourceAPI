@@ -230,12 +230,28 @@ class Herd_model extends CI_Model {
 	}
 
 	/**
+	 * @method getHerdDataByPermissions
+	 * @param int consultant's user id
+	 * @return array of arrays representing data table
+	 * @access public
+	 *
+	 **/
+	function getHerdDataByPermissions($sg_user_id = FALSE){
+		if(!$sg_user_id) $sg_user_id = $this->session->userdata('user_id');
+		$this->db
+			->select('rs.name AS status, ch.exp_date AS expires_date, ch.id')
+			->join($this->tables['consultants_herds'] . ' ch', 'h.herd_code = ch.herd_code', 'inner')
+			->join('users.dbo.lookup_sg_request_status' . ' rs', 'ch.request_status_id = rs.id', 'inner')
+		->where('ch.sg_user_id', $sg_user_id);
+		return $this->getHerds();
+	}
+
+	/**
 	 * @method getHerdCodesByUser
 	 *
 	 * @param int user id
 	 * @return simple array of herd codes
 	 *         empty array if no herds found.
-	 * @author Carol McCullough-Dieter
 	 * @description This function queries the users_herds table and the herd_id table,
 	 *           excluding herds that are expired for this user
 	 *           and also excluding herds that are not active.
