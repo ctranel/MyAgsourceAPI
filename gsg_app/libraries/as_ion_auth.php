@@ -520,7 +520,7 @@ class As_ion_auth extends Ion_auth {
 		$arr_herds = [];
 		foreach($herds as $h){
 			$exp_date = new DateTime($h['expires_date']);
-			if($h['status'] === 'grant' && $h['expires_date'] !== null && new DateTime($h['expires_date']) > new DateTime()){
+			if($h['status'] === 'grant' && $h['expires_date'] !== null && new DateTime($h['expires_date']) < new DateTime()){
 				$arr_herds['expired'][] = $h;
 			}
 			else {
