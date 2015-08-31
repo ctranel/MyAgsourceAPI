@@ -116,7 +116,8 @@ class Auth extends Ionauth {
 			}
 		}
 		$this->page_header_data['message'] = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
-		$consultants_by_status = $this->ion_auth_model->get_consultants_by_herd($this->session->userdata('herd_code'));
+		//$consultants_by_status = $this->ion_auth_model->get_consultants_by_herd($this->session->userdata('herd_code'));
+		$consultants_by_status = $this->as_ion_auth->getConsultantsByHerd($this->session->userdata('herd_code'));
 		if(isset($consultants_by_status['open']) && is_array($consultants_by_status['open'])){
 			$section_data['content'] = $this->_set_consult_section($consultants_by_status['open'], 'open', array('Grant Access', 'Deny Access'));
 			$section_data['title'] = 'Open Requests';

@@ -219,7 +219,7 @@ class Index extends report_parent {
 		
 
 		if($this->as_ion_auth->has_permission('Update SG Access')){
-			$consultants_by_status = $this->ion_auth_model->get_consultants_by_herd($this->session->userdata('herd_code'));
+			$consultants_by_status = $this->as_ion_auth->getConsultantsByHerd($this->session->userdata('herd_code'));
 			if(isset($consultants_by_status['open']) && is_array($consultants_by_status['open'])){
 				$this->data['widget']['herd'][] = array(
 					'content' => $this->_set_consult_section($consultants_by_status['open'], 'open', array('Grant Access', 'Deny Access')),

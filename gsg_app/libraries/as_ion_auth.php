@@ -531,6 +531,37 @@ class As_ion_auth extends Ion_auth {
 	}
 	
 	/**
+	 * @method getConsultantsByHerd()
+	 * @description does service group account number exist?
+	 * @param string service group user_id
+	 * @return array
+	 * @access public
+	 *
+	 **/
+	public function getConsultantsByHerd($herd_code){
+		if(empty($herd_code)){
+			$this->set_error('herd_code_required');
+			return false;
+		}
+		$sgs = $this->ion_auth_model->getServiceGroupDataByHerd($herd_code);
+		if(!isset($sgs) || !is_array($sgs)){
+			return false;
+		}
+		
+		$arr_sgs = [];
+		foreach($sgs as $h){
+			$exp_date = new DateTime($h['exp_date']);
+			if($h['request_status'] === 'grant' && $h['exp_date'] !== null && new DateTime($h['exp_date']) < new DateTime()){
+				$arr_sgs['expired'][] = $h;
+			}
+			else {
+				$arr_sgs[$h['request_status']][] = $h;
+			}
+		}
+		return $arr_sgs;
+	}
+	
+	/**
 	 * @method service_grp_exists()
 	 * @description does service group account number exist?
 	 * @param string service group account number

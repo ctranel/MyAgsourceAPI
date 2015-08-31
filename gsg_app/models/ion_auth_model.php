@@ -868,47 +868,28 @@ SELECT DISTINCT id, name, list_order FROM cteAnchor ORDER BY list_order;";
 	}
 	
 	/**
-	 * @method get_consultants_by_herd
+	 * @method getServiceGroupDataByHerd
 	 *
 	 * @param string herd code
 	 * @return array of consultant records, keyed by consultant status
 	 * @author ctranel
 	 **/
-	public function get_consultants_by_herd($herd_code){
+	public function getServiceGroupDataByHerd($herd_code){
 		$result = $this->db
-		->select('ch.*, u.first_name, u.last_name, c.account_name, lus.name AS request_status')
+		->select('ch.id, ch.herd_code, ch.exp_date, ch.sg_user_id, u.first_name, u.last_name, c.account_name, lus.name AS request_status')
 		->from($this->tables['consultants_herds'] . ' ch')
 		->join($this->tables['users'] . ' u', 'ch.sg_user_id = u.id')
 		->join($this->tables['users_service_groups'] . ' uc', 'u.id = uc.user_id')
 		->join($this->tables['service_groups'] . ' c', 'uc.sg_acct_num = c.account_num')
-		->join('users.dbo.lookup_sg_request_status lus', 'ch.request_status_id = lus.id')
-		->where('(ch.exp_date IS NULL OR ch.exp_date > GETDATE())')
+		->join('users.dbo.lookup_sg_request_status lus', 'ch.request_status_id = lus.id', 'inner')
+//		->where('(ch.exp_date IS NULL OR ch.exp_date > GETDATE())')
 		->where('herd_code', $herd_code)
 		->get()
 		->result_array();
-		if(!empty($result)){
-			foreach($result as $r){
-				if(empty($r['request_status'])) $r['request_status'] = 'open';
-				$arr_return[$r['request_status']][] = $r;
-			}
+		
+		if(isset($result)){
+			return $result;
 		}
-		$result = $this->db
-		->select('ch.*, u.first_name, u.last_name, c.account_name')
-		->from($this->tables['consultants_herds'] . ' ch')
-		->join($this->tables['users'] . ' u', 'ch.sg_user_id = u.id')
-		->join($this->tables['users_service_groups'] . ' uc', 'u.id = uc.user_id')
-		->join($this->tables['service_groups'] . ' c', 'uc.sg_acct_num = c.account_num')
-		->join('users.dbo.lookup_sg_request_status lus', 'ch.request_status_id = lus.id', 'left')
-		->where("((ch.exp_date IS NOT NULL AND ch.exp_date <= GETDATE()) AND lus.name IN('open', 'grant'))")
-		->where('herd_code', $herd_code)
-		->get()
-		->result_array();
-		if(!empty($result)){
-			foreach($result as $r){
-				$arr_return['expired'][] = $r;
-			}
-		}
-		if(isset($arr_return)) return $arr_return;
 		else return FALSE;
 	}
 
