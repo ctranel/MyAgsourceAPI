@@ -842,7 +842,7 @@ SELECT DISTINCT id, name, list_order FROM cteAnchor ORDER BY list_order;";
 	 **/
 	public function get_consult_relationship_by_id($id){
 		$result = $this->db
-			->where('(ch.exp_date IS NULL OR ch.exp_date > GETDATE())')
+			->where('(exp_date IS NULL OR exp_date > GETDATE())')
 			->where(array('id' => $id))
 			->where(array('request_status_id' => 1))
 			->get($this->tables['consultants_herds'])->result_array();
