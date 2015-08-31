@@ -38,7 +38,7 @@ class Demo extends CI_Controller {
 		$this->session->unset_userdata('arr_tstring');
 		$this->session->unset_userdata('tstring');
 		
-		if ($this->as_ion_auth->login('support@myagsource.com', 'WebDev34', false))
+		if ($this->as_ion_auth->login('support@myagsource.com', 'AQECTGBUZI', false))
 		{ //if the login is successful
 		//$this->_record_access(1); //1 is the page code for login for the user management section
 		$this->session->set_flashdata('message', $this->as_ion_auth->messages());
