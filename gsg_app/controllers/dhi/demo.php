@@ -48,7 +48,7 @@ class Demo extends CI_Controller {
 		else
 		{ //if the login was un-successful
 		$this->session->keep_flashdata('redirect_url');
-		$this->session->set_flashdata('message', 'Sorry, we could not log in the guest user.  Please contact customer service for assistance');
+		$this->session->set_flashdata('message', 'Sorry, we could not log in the guest user.  Please contact customer service for assistance: 1-800-236-4995');
 		redirect(site_url('auth/login')); //use redirects instead of loading views for compatibility with MY_Controller libraries
 		}
 		
