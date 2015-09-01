@@ -55,6 +55,23 @@ class Herd_model extends CI_Model {
 	}
 
 	/**
+	 * getHerdCodesByRegion
+	 *
+	 * @param string region number
+	 * @return array of object herd
+	 * @author ctranel
+	 **/
+	function getHerdCodesByRegion($region_arr_in, $limit = NULL){
+		if (!isset($region_arr_in) || !is_array($region_arr_in) || empty($region_arr_in)) {
+			return FALSE;
+		}	
+		$this->db
+			->join('address.dbo.association a', 'h.dhi_affiliate_num = a.affiliate_num AND h.association_num = a.association_num', 'inner')
+			->where_in('a.assoc_name', $region_arr_in);
+		return $this->getHerdCodes($limit);
+	}
+
+	/**
 	 * @method getHerdsByPermissionGranted
 	 * @param int consultant's user id
 	 * @return array of stdClass with all herds for given tech num
@@ -196,21 +213,6 @@ class Herd_model extends CI_Model {
 		$results = $this->db->get($this->tables['herds'] . ' h');
 		$this->load->helper('multid_array_helper');
 		return get_elements_by_key('herd_code', $results->result_array());
-	}
-
-	/**
-	 * getHerdCodesByRegion
-	 *
-	 * @param string region number
-	 * @return array of object herd
-	 * @author ctranel
-	 **/
-	function getHerdCodesByRegion($region_arr_in, $limit = NULL){
-		if (!isset($region_arr_in) || !is_array($region_arr_in) || empty($region_arr_in)) {
-			return FALSE;
-		}	
-		$this->db->where_in('association_num', $region_arr_in);
-		return $this->getHerdCodes($limit);
 	}
 
 	/**

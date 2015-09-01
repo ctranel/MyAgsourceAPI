@@ -47,7 +47,7 @@ class HerdAccess
 			return $this->datasource->getHerds();
 		}
 		$arr_herds = [];
-		if(in_array('View Herds in Region', $arr_permissions)){
+		if(in_array('View Herds In Region', $arr_permissions)){
 			array_merge($arr_herds, $this->datasource->getHerdCodesByRegion($arr_regions));
 		}
 		if(in_array('View Assigned Herds', $arr_permissions)){
@@ -76,7 +76,7 @@ class HerdAccess
 		if(in_array('View All Herds', $arr_permissions)){
 			return true;
 		}
-		if(in_array('View Herds in Region', $arr_permissions)){
+		if(in_array('View Herds In Region', $arr_permissions)){
 			if(in_array($herd_code, $this->datasource->getHerdCodesByRegion($arr_regions))){
 				return true;
 			}
@@ -107,23 +107,18 @@ class HerdAccess
 		if(!$user_id || !$arr_permissions){
 			return false;
 		}
-		$arr_return_reg = array();
-		$arr_return_user = array();
-		$arr_return_permission = array();
+		$arr_return_reg = [];
+		$arr_return_user = [];
+		$arr_return_permission = [];
 	
 		if(in_array('View All Herds', $arr_permissions)){
 			return $this->datasource->getHerdCodes(null, null, $limit_in);
 		}
-		if(in_array('View Herds in Region', $arr_permissions)){
+		if(in_array('View Herds In Region', $arr_permissions)){
 			if(!isset($arr_regions) || !is_array($arr_regions)){
 				return FALSE;
 			}
-			//extract region number from account number
-			$arr_region_nums = array();
-			foreach($arr_regions AS $k => $v){
-				$arr_region_nums[] = substr($k, -3);
-			}
-			$tmp = $this->datasource->getHerdCodesByRegion($arr_region_nums, $limit_in);
+			$tmp = $this->datasource->getHerdCodesByRegion($arr_regions, $limit_in);
 			if(isset($tmp) && is_array($tmp)) $arr_return_reg = $tmp;
 			unset($tmp);
 		}
