@@ -367,7 +367,7 @@ class report_block extends CI_Controller {
 		//@todo: base header on accept property of request header 
 		$return_val = json_encode($this->report_data);//, JSON_HEX_QUOT | JSON_HEX_TAG); //json_encode_jsfunc
 		header("Content-type: application/json"); //being sent as json
-		echo $return_val;
+		$this->load->view('echo.php', ['text' => $return_val]);
 	}
 
 	protected function getSection(){
