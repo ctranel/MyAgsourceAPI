@@ -187,7 +187,7 @@ class report_block extends CI_Controller {
 	//@todo: needs to be a part of some kind of authorization class
 	protected function post_message($message = ''){
 		$this->session->keep_flashdata('redirect_url');
-		echo $message;
+		$this->load->view('echo.php', ['text' => $message]);
 		exit;
 	}
 

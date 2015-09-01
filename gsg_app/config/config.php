@@ -432,16 +432,16 @@ $config['csrf_expire'] = 7200;
 	switch (ENVIRONMENT)
 	{
 		case 'development':
-			$config['compress_output'] = FALSE;
+			$config['compress_output'] = false;
 		break;
 		case 'localhost':
-			$config['compress_output'] = FALSE;
+			$config['compress_output'] = false;
 		break;
 		case 'qa':
-			$config['compress_output'] = FALSE;
+			$config['compress_output'] = true;
 		break;
 		case 'production':
-			$config['compress_output'] = FALSE;
+			$config['compress_output'] = true;
 		break;
 		default:
 			exit('The application environment is not set correctly - compress_output.');

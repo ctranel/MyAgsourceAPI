@@ -44,8 +44,7 @@ class Benchmark extends CI_Controller {
 		$this->session->set_flashdata('redirect_url', $redirect_url);
 		
 		if((!isset($this->as_ion_auth) || !$this->as_ion_auth->logged_in()) && $this->session->userdata('herd_code') != $this->config->item('default_herd')){
-			$msg = $this->load->view('session_expired', array('url'=>$this->session->flashdata('redirect_url')), true);
-			echo $msg;
+			$this->load->view('session_expired', array('url'=>$this->session->flashdata('redirect_url')));
 			exit;
 		}
 		

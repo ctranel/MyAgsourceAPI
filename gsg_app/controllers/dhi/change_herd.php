@@ -313,14 +313,14 @@ class Change_herd extends CI_Controller {
 		$group = $this->session->userdata('active_group_id');
 		if($this->as_ion_auth->has_permission('View Assign w permission') === FALSE) {
 			//return a 0 for non-service groups
-			echo json_encode(array('enroll_status' => 0, 'new_test' => false));
+			$this->load->view('echo.php', ['text' => json_encode(['enroll_status' => 0, 'new_test' => false])]);
 			exit;
 		}
 		$this->herd = new Herd($this->herd_model, $herd_code);
 		$enroll_status = $this->herd->getHerdEnrollStatus($this->config->item('product_report_code'));
 		$recent_test = $this->herd->getRecentTest();
 		$has_accessed = $this->access_log->sgHasAccessedTest($this->session->userdata('sg_acct_num'), $herd_code, $recent_test);
-		echo json_encode(array('enroll_status' => $enroll_status, 'new_test' => !$has_accessed));
+		$this->load->view('echo.php', ['text' => json_encode(['enroll_status' => $enroll_status, 'new_test' => !$has_accessed])]);
 		exit;
 	}
 	
