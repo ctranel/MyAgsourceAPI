@@ -39,9 +39,9 @@
 	</div>
 </div>
 <?php if($show_all_events):?>
-<a class="button incr-lact-tests" data-target="#events" data-toggle="tab" href="<?php echo site_url('dhi/cow_lookup/events/' . $serial_num); ?>">Show Current Lact Events</a>
+<a class="button incr-lact-tests" data-target="#events" data-toggle="tab" href="<?php echo site_url('dhi/ajax_cow_lookup/events/' . $serial_num); ?>">Show Current Lact Events</a>
 <?php else:?>
-<a class="button incr-lact-tests" data-target="#events" data-toggle="tab" href="<?php echo site_url('dhi/cow_lookup/events/' . $serial_num . '/1'); ?>">Show All Events</a>
+<a class="button incr-lact-tests" data-target="#events" data-toggle="tab" href="<?php echo site_url('dhi/ajax_cow_lookup/events/' . $serial_num . '/1'); ?>">Show All Events</a>
 <?php
 endif;
 if(isset($arr_events) && is_array($arr_events)): ?>

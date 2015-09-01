@@ -2,13 +2,13 @@
 	<h2><?php echo $barn_name; ?></h2>
 	<!-- <div class="withheld"><?php //echo $withheld; ?></div> -->
 	<ul id="cow-lookup-tabs" class="nav nav-tabs">
-		<li><a data-target="#events" data-toggle="tab" href="<?php echo site_url('/dhi/cow_lookup/events/' . $serial_num); ?>">Events</a></li>
-		<li><a data-target="#id" data-toggle="tab" href="<?php echo site_url('/dhi/cow_lookup/id/' . $serial_num); ?>">ID</a></li>
-		<li><a id="dam-tab" data-target="#dam" data-toggle="tab" href="<?php echo site_url('/dhi/cow_lookup/dam/' . $serial_num); ?>">Dam</a></li>
-		<li><a id="sire-tab" data-target="#sire" data-toggle="tab" href="<?php echo site_url('/dhi/cow_lookup/sire/' . $serial_num); ?>">Sire</a></li>
-		<li><a data-target="#tests" data-toggle="tab" href="<?php echo site_url('/dhi/cow_lookup/tests/' . $serial_num); ?>">Tests</a></li>
-		<li><a data-target="#lactations" data-toggle="tab" href="<?php echo site_url('/dhi/cow_lookup/lactations/' . $serial_num); ?>">Lactations</a></li>
-		<li><a data-target="#graphs" data-toggle="tab" href="<?php echo site_url('/dhi/cow_lookup/graphs/' . $serial_num); ?>">Graphs</a></li>
+		<li><a data-target="#events" data-toggle="tab" href="<?php echo site_url('/dhi/ajax_cow_lookup/events/' . $serial_num); ?>">Events</a></li>
+		<li><a data-target="#id" data-toggle="tab" href="<?php echo site_url('/dhi/ajax_cow_lookup/id/' . $serial_num); ?>">ID</a></li>
+		<li><a id="dam-tab" data-target="#dam" data-toggle="tab" href="<?php echo site_url('/dhi/ajax_cow_lookup/dam/' . $serial_num); ?>">Dam</a></li>
+		<li><a id="sire-tab" data-target="#sire" data-toggle="tab" href="<?php echo site_url('/dhi/ajax_cow_lookup/sire/' . $serial_num); ?>">Sire</a></li>
+		<li><a data-target="#tests" data-toggle="tab" href="<?php echo site_url('/dhi/ajax_cow_lookup/tests/' . $serial_num); ?>">Tests</a></li>
+		<li><a data-target="#lactations" data-toggle="tab" href="<?php echo site_url('/dhi/ajax_cow_lookup/lactations/' . $serial_num); ?>">Lactations</a></li>
+		<li><a data-target="#graphs" data-toggle="tab" href="<?php echo site_url('/dhi/ajax_cow_lookup/graphs/' . $serial_num); ?>">Graphs</a></li>
 	</ul>
 	<div class="tab-content">
 		<div class="tab-pane" id="events"><?php if(isset($events_content)) echo $events_content; ?></div>

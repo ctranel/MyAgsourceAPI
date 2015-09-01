@@ -3,7 +3,7 @@
 use \myagsource\AccessLog;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
-class Cow_lookup extends CI_Controller {
+class Ajax_cow_lookup extends CI_Controller {
 	var $barn_name;
 	var $curr_lact_num;
 	var $curr_calving_date;
@@ -16,12 +16,12 @@ class Cow_lookup extends CI_Controller {
 		$redirect_url = set_redirect_url($this->uri->uri_string(), $this->session->flashdata('redirect_url'), $this->as_ion_auth->referrer);
 		$this->session->set_flashdata('redirect_url', $redirect_url);
 		
-		if((!isset($this->as_ion_auth) || !$this->as_ion_auth->logged_in()) && $this->session->userdata('herd_code') != $this->config->item('default_herd')){
-			$msg = $this->load->view('session_expired', array('url'=>$this->session->flashdata('redirect_url')), true);
-			echo $msg;
+		$herd_code = $this->session->userdata('herd_code');
+		if(((!isset($this->as_ion_auth) || !$this->as_ion_auth->logged_in()) && $herd_code != $this->config->item('default_herd')) || empty($herd_code)){
+			$this->load->view('session_expired', array('url'=>$this->session->flashdata('redirect_url')));
 			exit;
 		}
-		
+
 		/* Load the profile.php config file if it exists
 		if (ENVIRONMENT == 'development' || ENVIRONMENT == 'localhost') {
 			$this->config->load('profiler', false, true);
@@ -87,7 +87,7 @@ class Cow_lookup extends CI_Controller {
 	function sire($serial_num){
 		$this->load->model('dhi/cow_lookup/sire_model');
     	$data = $this->sire_model->getCowArray($this->session->userdata('herd_code'), $serial_num);
-		$this->load->view('dhi/cow_lookup/sire', $data);
+    	$this->load->view('dhi/cow_lookup/sire', $data);
 	}
 	
 	function tests($serial_num, $lact_num=NULL){

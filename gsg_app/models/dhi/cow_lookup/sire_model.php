@@ -25,7 +25,7 @@ class Sire_model extends CI_Model {
 		->get('vma.dbo.vma_Cow_Lookup_Sire')
 		->result_array();
 	
-		if(is_array($arr_ret)){
+		if(is_array($arr_ret) && isset($arr_ret[0])){
 			return $arr_ret[0];
 		}
 		return false;
