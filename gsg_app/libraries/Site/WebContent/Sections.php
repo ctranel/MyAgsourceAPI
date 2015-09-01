@@ -94,6 +94,11 @@ class Sections implements iWebContentRepository {
 				$criteria = ['ls.name' => 'View Admin', 'parent_id' => $section->id()];
 				$tmp_array = array_merge($tmp_array, $this->datasource_sections->getByCriteria($criteria));
 			}
+			
+			$tmp_array = array_merge($tmp_array, $this->datasource_sections->getPublicSections($section->id()));			
+
+			require_once(APPPATH . 'helpers/multid_array_helper.php');
+			usort($tmp_array, \sort_by_key_value_comp('list_order'));
 		}
 		
 		if(is_array($tmp_array) && !empty($tmp_array)){
