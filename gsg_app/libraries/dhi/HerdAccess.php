@@ -95,10 +95,47 @@ class HerdAccess
 	}
 
 	/**
+	 * @method getAccessibleHerdsData()
+	 * @param int user_id
+	 * @param int region_num (need to accept array?)
+	 * @return mixed array of herd data or boolean
+	 * @access public
+	 *
+	 **/
+	
+	public function getAccessibleHerdsData($user_id, $arr_permissions, $arr_regions = false, $limit_in = NULL){
+		if(!$user_id || !$arr_permissions){
+			return false;
+		}
+		$arr_return_reg = [];
+		$arr_return_user = [];
+		$arr_return_permission = [];
+	
+		if(in_array('View All Herds', $arr_permissions)){
+			return $this->datasource->getHerds();
+		}
+		if(in_array('View Herds In Region', $arr_permissions)){
+			if(!isset($arr_regions) || !is_array($arr_regions)){
+				return FALSE;
+			}
+			$tmp = $this->datasource->getHerdsByRegion($arr_regions, $limit_in);
+			if(isset($tmp) && is_array($tmp)) $arr_return_reg = $tmp;
+			unset($tmp);
+		}
+		if(in_array('View Assigned Herds', $arr_permissions)){
+			$arr_return_user = $this->datasource->getHerdsByUser($user_id, $limit_in);
+		}
+		if(in_array('View Assign w permission', $arr_permissions)){
+			$arr_return_permission = $this->datasource->getHerdsByPermissionGranted($limit_in);
+		}
+		return array_merge($arr_return_reg, $arr_return_user, $arr_return_permission);
+	}
+	
+	/**
 	 * @method getAccessibleHerdCodes()
 	 * @param int user_id
 	 * @param int region_num (need to accept array?)
-	 * @return mixed array of herds or boolean
+	 * @return mixed array of herd codes or boolean
 	 * @access public
 	 *
 	 **/

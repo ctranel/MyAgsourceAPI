@@ -50,7 +50,9 @@ class Herd_model extends CI_Model {
 			//return FALSE;
 			return array();
 		}	
-		$this->db->where_in('h.association_num', $region_arr_in);
+		$this->db
+			->join('address.dbo.association a', 'h.dhi_affiliate_num = a.affiliate_num AND h.association_num = a.association_num', 'inner')
+			->where_in('a.assoc_name', $region_arr_in);
 		return $this->getHerds($limit);
 	}
 

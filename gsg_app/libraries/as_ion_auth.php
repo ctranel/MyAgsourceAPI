@@ -274,44 +274,6 @@ class As_ion_auth extends Ion_auth {
 	}
 
 	/**
-	 * @method get_viewable_herds()
-	 * @param int user_id
-	 * @param array of region acct_num=>name
-	 * @return mixed array of herds or boolean
-	 * @access public
-	 *
-	 **/
-	public function get_viewable_herds($user_id, $arr_regions = false, $limit_in = NULL){
-		$arr_return_reg = array();
-		$arr_return_user = array();
-		$arr_return_permission = array();
-		if($this->has_permission('View All Herds')){
-			return $this->herd_model->getHerds();
-		}
-		
-		if($this->has_permission('View Herds In Region')){
-			if(!isset($arr_regions) || !is_array($arr_regions)){
-				return FALSE;
-			}
-			//extract region number from account number
-			$arr_region_nums = array();
-			foreach($arr_regions AS $k => $v){
-				$arr_region_nums[] = substr($k, -3);
-			}
-			$arr_return_reg = $this->herd_model->getHerdsByRegion($arr_region_nums, $limit_in);
-		}
-		if($this->has_permission('View Assigned Herds')){
-			$arr_return_user = $this->herd_model->getHerdsByUser($user_id, $limit_in);
-		}
-		if($this->has_permission('View Assign w permission')){
-			$arr_return_permission = $this->herd_model->getHerdsByPermissionGranted($user_id, $limit_in);
-		}
-		return array_merge($arr_return_reg, $arr_return_user, $arr_return_permission);
-	}
-
-	
-
-	/**
 	 * @method get_group_dropdown_data()
 	 * @param int active group id
 	 * @return array (key=>value) array of groups for populating options lists

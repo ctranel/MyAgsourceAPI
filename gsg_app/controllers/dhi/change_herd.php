@@ -136,7 +136,8 @@ class Change_herd extends CI_Controller {
 		else
 		{
 			$err = '';
-			$tmp_arr = $this->as_ion_auth->get_viewable_herds($this->session->userdata('user_id'), $this->session->userdata('arr_regions'));
+			//$tmp_arr = $this->as_ion_auth->get_viewable_herds($this->session->userdata('user_id'), $this->session->userdata('arr_regions'));
+			$tmp_arr = $this->herd_access->getAccessibleHerdsData($this->session->userdata('user_id'), $this->as_ion_auth->arr_task_permissions(), $this->session->userdata('arr_regions'));
 			if(is_array($tmp_arr) && !empty($tmp_arr)){
 				if(count($tmp_arr) == 1){
 					$this->herd = new Herd($this->herd_model, $tmp_arr[0]['herd_code']);
