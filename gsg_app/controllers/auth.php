@@ -1360,7 +1360,6 @@ class Auth extends Ionauth {
 		$supervisor_acct_num_options = $this->as_ion_auth->get_dhi_supervisor_dropdown_data($arr_tech_obj);
 		$return_val = json_encode($supervisor_acct_num_options);
 		$this->load->view('echo.php', ['text' => $return_val]);
-		exit();
 	}
 	
 	function ajax_terms(){

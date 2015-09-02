@@ -241,13 +241,11 @@ class Custom_report extends CI_Controller {
 		header('Content-type: application/json');
 //		$data = $this->web_content_model->get_sections_select_data($super_section_id);
 		$this->load->view('echo.php', ['text' => json_encode($data)]);
-		exit();
 	}
 	function select_page_data($section_id){
 		header('Content-type: application/json');
 //		$data = $this->web_content_model->get_pages_select_data($section_id);
 		$this->load->view('echo.php', ['text' => json_encode($data)]);
-		exit();
 	}
 	function select_table_data($cow_or_summary){
 		header('Content-type: application/json');
@@ -268,18 +266,15 @@ class Custom_report extends CI_Controller {
 		
 		$data = $this->custom_report_model->get_tables_select_data($cat_id);
 		$this->load->view('echo.php', ['text' => json_encode($data)]);
-		exit();
 	}
 	function select_field_data($table_id){
 		header('Content-type: application/json');
 		$data = $this->custom_report_model->get_fields_select_data($table_id);
 		$this->load->view('echo.php', ['text' => json_encode($data)]);
-		exit();
 	}
 	function insert_after_data($page_id){
 		header('Content-type: application/json');
 		$data = $this->custom_report_model->get_insert_after_data($page_id);
 		$this->load->view('echo.php', ['text' => json_encode($data)]);
-		exit();
 	}
 }

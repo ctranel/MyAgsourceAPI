@@ -12,7 +12,6 @@ class Supplemental extends CI_Controller {
 		if((!isset($this->as_ion_auth) || !$this->as_ion_auth->logged_in()) && $this->session->userdata('herd_code') != $this->config->item('default_herd')){
 			$msg = $this->load->view('session_expired', array('url'=>$this->session->flashdata('redirect_url')), true);
 			$this->load->view('echo.php', ['text' => $msg]);
-			exit;
 		}
 		
 		/* Load the profile.php config file if it exists

@@ -188,7 +188,6 @@ class report_block extends CI_Controller {
 	protected function post_message($message = ''){
 		$this->session->keep_flashdata('redirect_url');
 		$this->load->view('echo.php', ['text' => $message]);
-		exit;
 	}
 
 	protected function has_page_access($method){

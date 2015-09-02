@@ -53,7 +53,7 @@ class Change_herd extends CI_Controller {
 
 		$this->page_header_data['num_herds'] = $this->herd_access->getNumAccessibleHerds($this->session->userdata('user_id'), $this->as_ion_auth->arr_task_permissions(), $this->session->userdata('arr_regions'));
 		/* Load the profile.php config file if it exists */
-		if (ENVIRONMENT == 'development' || ENVIRONMENT == 'localhost') {
+		if ((ENVIRONMENT == 'development' || ENVIRONMENT == 'localhost') && strpos($this->router->method, 'ajax') === false) {
 			$this->config->load('profiler', false, true);
 			if ($this->config->config['enable_profiler']) {
 				$this->output->enable_profiler(TRUE);
@@ -315,14 +315,12 @@ class Change_herd extends CI_Controller {
 		if($this->as_ion_auth->has_permission('View Assign w permission') === FALSE) {
 			//return a 0 for non-service groups
 			$this->load->view('echo.php', ['text' => json_encode(['enroll_status' => 0, 'new_test' => false])]);
-			exit;
 		}
 		$this->herd = new Herd($this->herd_model, $herd_code);
 		$enroll_status = $this->herd->getHerdEnrollStatus($this->config->item('product_report_code'));
 		$recent_test = $this->herd->getRecentTest();
 		$has_accessed = $this->access_log->sgHasAccessedTest($this->session->userdata('sg_acct_num'), $herd_code, $recent_test);
 		$this->load->view('echo.php', ['text' => json_encode(['enroll_status' => $enroll_status, 'new_test' => !$has_accessed])]);
-		exit;
 	}
 	
 	protected function set_herd_session_data($herd_enroll_status_id){

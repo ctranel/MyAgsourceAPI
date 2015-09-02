@@ -357,8 +357,8 @@ class Blocks extends CI_Controller {
 			
 			header('Content-type: application/excel');
 			header('Content-disposition: attachment; filename=' . $filename);
-			$this->load->view('echo.php', ['text' => $csv_text]);
 			$this->_record_access(90, 'csv', $page->id(), $this->config->item('product_report_code'));
+			$this->load->view('echo.php', ['text' => $csv_text]);
 		}
 		else {
 			//send error response code
