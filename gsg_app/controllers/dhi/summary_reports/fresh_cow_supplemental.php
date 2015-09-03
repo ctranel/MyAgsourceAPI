@@ -32,6 +32,9 @@ class Fresh_cow_supplemental extends CI_Controller {
     function ajax_tci_culling() {
 	 	$this->load->model('dhi/summary_reports/fresh_cow_summary_model');
     	$tip = $this->fresh_cow_summary_model->getFCPageTip($this->session->userdata('herd_code'));
-	 	$this->load->view('dhi/summary_reports/fresh_cow_summary/pagesupp', $tip);
+		header("Cache-Control: no-cache, must-revalidate, max-age=0");
+		header("Cache-Control: post-check=0, pre-check=0", false);
+		header("Pragma: no-cache");
+    	$this->load->view('dhi/summary_reports/fresh_cow_summary/pagesupp', $tip);
     }
 }

@@ -320,6 +320,10 @@ class Change_herd extends CI_Controller {
 		$enroll_status = $this->herd->getHerdEnrollStatus($this->config->item('product_report_code'));
 		$recent_test = $this->herd->getRecentTest();
 		$has_accessed = $this->access_log->sgHasAccessedTest($this->session->userdata('sg_acct_num'), $herd_code, $recent_test);
+		header('Content-type: application/json');
+		header("Cache-Control: no-cache, must-revalidate, max-age=0");
+		header("Cache-Control: post-check=0, pre-check=0", false);
+		header("Pragma: no-cache");
 		$this->load->view('echo.php', ['text' => json_encode(['enroll_status' => $enroll_status, 'new_test' => !$has_accessed])]);
 	}
 	

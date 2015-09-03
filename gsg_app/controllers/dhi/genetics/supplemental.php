@@ -37,7 +37,10 @@ class Supplemental extends CI_Controller {
     			$this->session->userdata('pstring'),
     			$this->session->userdata('recent_test_date')
     	);
-		$this->load->view('dhi/genetics/quartiles', $arr_avg);
+		header("Cache-Control: no-cache, must-revalidate, max-age=0");
+		header("Cache-Control: post-check=0, pre-check=0", false);
+		header("Pragma: no-cache");
+    	$this->load->view('dhi/genetics/quartiles', $arr_avg);
     }
 
     function ajax_heifer() {
@@ -47,6 +50,9 @@ class Supplemental extends CI_Controller {
     			$this->session->userdata('pstring'),
     			$this->session->userdata('recent_test_date')
     	);
+		header("Cache-Control: no-cache, must-revalidate, max-age=0");
+		header("Cache-Control: post-check=0, pre-check=0", false);
+		header("Pragma: no-cache");
     	$this->load->view('dhi/genetics/quartiles', $arr_avg);
     }
     
@@ -56,6 +62,9 @@ class Supplemental extends CI_Controller {
 				$this->session->userdata('herd_code'),
     			$this->session->userdata('recent_test_date')
     	);
+		header("Cache-Control: no-cache, must-revalidate, max-age=0");
+		header("Cache-Control: post-check=0, pre-check=0", false);
+		header("Pragma: no-cache");
     	$this->load->view('dhi/genetics/calves_due', array('arr_avg'=>$arr_avg));
     }
     

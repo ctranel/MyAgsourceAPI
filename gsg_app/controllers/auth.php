@@ -1359,10 +1359,17 @@ class Auth extends Ionauth {
 		$arr_tech_obj = $this->ion_auth_model->get_dhi_supervisor_acct_nums_by_association($assoc_acct_num);
 		$supervisor_acct_num_options = $this->as_ion_auth->get_dhi_supervisor_dropdown_data($arr_tech_obj);
 		$return_val = json_encode($supervisor_acct_num_options);
+		header('Content-type: application/json');
+		header("Cache-Control: no-cache, must-revalidate, max-age=0");
+		header("Cache-Control: post-check=0, pre-check=0", false);
+		header("Pragma: no-cache");
 		$this->load->view('echo.php', ['text' => $return_val]);
 	}
 	
 	function ajax_terms(){
+		header("Cache-Control: no-cache, must-revalidate, max-age=0");
+		header("Cache-Control: post-check=0, pre-check=0", false);
+		header("Pragma: no-cache");
 		$this->load->view('auth/terms', array());
 	}
 	

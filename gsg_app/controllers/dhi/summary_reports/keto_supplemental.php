@@ -33,6 +33,9 @@ class Keto_supplemental extends CI_Controller {
     function ajax_summary() {
 		$this->load->model('dhi/summary_reports/keto/keto_model');
     	$tip = $this->keto_model->getKetoPageTip($this->session->userdata('herd_code'));
-		$this->load->view('dhi/summary_reports/ketomonitor/pagesupp', $tip);
+		header("Cache-Control: no-cache, must-revalidate, max-age=0");
+		header("Cache-Control: post-check=0, pre-check=0", false);
+		header("Pragma: no-cache");
+    	$this->load->view('dhi/summary_reports/ketomonitor/pagesupp', $tip);
     }
 }

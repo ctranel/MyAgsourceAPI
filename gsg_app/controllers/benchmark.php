@@ -34,6 +34,7 @@ class Benchmark extends CI_Controller {
  * @param string serialized form parameters 
  * @access	public
  * @return	void
+ * @todo: sending confirmation to client???
  */
 	function ajax_set($ser_form_data){
 		//for ajax pages

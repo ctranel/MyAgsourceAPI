@@ -250,7 +250,7 @@ class report_block extends CI_Controller {
 		$sort_builder = new SortBuilder($this->report_block_model);
 		$sort_builder->build($block, $sort_by, $sort_order);
 		//END SORT
-		
+
 		//FILTERS
 		if(isset($json_filter_data)){
 			$section = $this->getSection();
@@ -366,6 +366,9 @@ class report_block extends CI_Controller {
 		//@todo: base header on accept property of request header 
 		$return_val = json_encode($this->report_data);//, JSON_HEX_QUOT | JSON_HEX_TAG); //json_encode_jsfunc
 		header("Content-type: application/json"); //being sent as json
+		header("Cache-Control: no-cache, must-revalidate, max-age=0");
+		header("Cache-Control: post-check=0, pre-check=0", false);
+		header("Pragma: no-cache");
 		$this->load->view('echo.php', ['text' => $return_val]);
 	}
 
