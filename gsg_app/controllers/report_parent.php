@@ -411,7 +411,7 @@ abstract class report_parent extends CI_Controller {
 					'title'=>$this->product_name . ' - ' . $this->config->item('site_title'),
 					'description'=>$this->product_name . ' - ' . $this->config->item('site_title'),
 					'message' => [$this->session->flashdata('message')],// + $this->{$this->primary_model_name}->arr_messages,
-					'section_nav' => $this->load->view('section_nav', $arr_sec_nav_data, TRUE),
+					'navigation' => $this->load->view('navigation', [], TRUE),
 					'page_heading' => $this->product_name . " for Herd " . $this->herd->herdCode(),
 					'arr_head_line' => array(
 						'<script type="text/javascript">',
@@ -457,13 +457,6 @@ abstract class report_parent extends CI_Controller {
 		];
 
 		$this->page_footer_data = [];
-		$report_nav_path = 'report_nav';
-		if(file_exists(APPPATH . 'views/' . $this->section_path . '/report_nav.php')){
-			$report_nav_path =  $this->section_path . '/' . $report_nav_path;
-		}
-		//if(count($arr_nav_data['obj_pages']) < 2) {
-		//	$this->carabiner->css('hide_report_nav.css', 'screen');
-		//}
 		$report_filter_path = 'filters';
 		if(file_exists(APPPATH . 'views/' . $this->section_path . '/filters.php')){
 			$report_filter_path =  $this->section_path . '/filters' . $report_filter_path;
@@ -502,11 +495,6 @@ abstract class report_parent extends CI_Controller {
 			$data['benchmarks'] = $this->load->view('collapsible', $collapse_data, TRUE);
 		}
 
-		if((is_a($arr_nav_data['obj_pages'], 'SplObjectStorage') && $arr_nav_data['obj_pages']->count() > 1) || 
-			(isset($arr_nav_data['arr_links']) && is_array($arr_nav_data['arr_links']) && count($arr_nav_data['arr_links']) > 1)) {
-			$data['report_nav'] = $this->load->view($report_nav_path, $arr_nav_data, TRUE);
-		}
-		
 		$this->_record_access(90, 'web', $this->config->item('product_report_code'));
 		$this->load->view('report', $data);
 	}

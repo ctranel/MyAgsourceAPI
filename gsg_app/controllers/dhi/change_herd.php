@@ -202,7 +202,6 @@ class Change_herd extends CI_Controller {
 			$this->page_footer_data = array();
 			$this->page_header_data['message'] = compose_error($err, validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages());
 			$arr_redirect_url = explode('/', $redirect_url);
-			if(file_exists($arr_redirect_url[0] . FS_SEP . 'section_nav')) $this->page_header_data['section_nav'] = $this->load->view($arr_redirect_url[0] . '/section_nav', NULL, TRUE);
 			$this->data['page_header'] = $this->load->view('page_header', $this->page_header_data, TRUE);
 			$this->data['page_heading'] = 'Select Herd - ' . $this->config->item('product_name');
 			$this->data['page_footer'] = $this->load->view('page_footer', $this->page_footer_data, TRUE);
@@ -300,7 +299,6 @@ class Change_herd extends CI_Controller {
 			}
 			$arr_redirect_url = explode('/', $redirect_url);
 
-			if(file_exists($arr_redirect_url[0] . FS_SEP . 'section_nav')) $this->page_header_data['section_nav'] = $this->load->view($arr_redirect_url[0] . '/section_nav', NULL, TRUE);
 			$this->data['page_header'] = $this->load->view('page_header', $this->page_header_data, TRUE);
 			$this->data['page_heading'] = 'Request Herd - ' . $this->config->item('product_name');
 			$this->data['page_footer'] = $this->load->view('page_footer', NULL, TRUE);
