@@ -23,8 +23,7 @@ bright red; #F60E27
 
 .hover {display:block;}
 
-/* super section nav
-.navbar-background {height: 31px; width: 100%; border-top: solid 5px #EF5C29; background-color: #222; position: fixed; z-index: 1000;} */
+
 /* override bootstrap styles to apply to all nav */
 .navbar {border: none; min-height: 24px; border-radius:0; z-index: 1001; white-space: nowrap; margin-bottom: 0;}
 .navbar>a {display: block; font-weight: bold;}
@@ -34,7 +33,7 @@ bright red; #F60E27
 .nav li a {padding: 2px 8px; text-decoration: none;}
 .dropdown-menu {background-color: transparent; box-shadow: none;}
 .navbar-nav {margin: 0;}
-.nav {/*padding-right: 20px;/* background-color:#e6f4f4;*/}
+.nav {z-index:100; /*padding-right: 20px;/* background-color:#e6f4f4;*/}
 @media (min-width: 10px){
 	.navbar-nav>li {float: none;}
 }

@@ -50,7 +50,7 @@ ul{margin: 0; }
 
 #main-content {padding:0 10px; text-align: left; margin-top: 65px;}
 p {padding: 0 0 5px;}
-#header {width: 100%; min-height: 60px; background: #fff url("https://myagsource.com/asset_cache/i/logo-s.png") no-repeat 5px 15px; clear: both; position: fixed; padding: 0 0 0 200px;}
+#header {z-index:100; width: 100%; min-height: 60px; background: #fff url("https://myagsource.com/asset_cache/i/logo-s.png") no-repeat 5px 15px; clear: both; position: fixed; padding: 0 0 0 200px;}
 #header a {text-decoration:none;}
 .header-link {position: absolute; left: 0; top: 0; width:200px; height:60px;}
 
