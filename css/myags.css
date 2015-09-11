@@ -46,8 +46,9 @@ h3 {font-family:"Helvetica", "Arial", "Verdana", sans-serif;
 img, embed, object, video {border: none; max-width: 100%;}
 sup {font-size: .7em;}
 a {text-decoration: underline;}
+ul{margin: 0; }
 
-#main-content {padding:0 10px; text-align: left; margin-top: 93px;}
+#main-content {padding:0 10px; text-align: left; margin-top: 65px;}
 p {padding: 0 0 5px;}
 #header {width: 100%; min-height: 60px; background: #fff url("https://myagsource.com/asset_cache/i/logo-s.png") no-repeat 5px 15px; clear: both; position: fixed; padding: 0 0 0 200px;}
 #header a {text-decoration:none;}
@@ -104,4 +105,4 @@ label .require {color:#003C39; font-weight:bold;}
 .consult-form table td {padding: 0 5px;}
 
 #infoMessage p, #infoMessage {background-color:#fff; color:#F60E27;}
-div#infoMessage {margin: 0 0 10px 0;}
+div#infoMessage {margin: 0 0 10px 0; clear: both;}

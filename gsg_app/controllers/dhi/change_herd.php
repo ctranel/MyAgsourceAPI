@@ -49,9 +49,8 @@ class Change_herd extends CI_Controller {
 		$this->load->model('access_log_model');
 		$this->access_log = new AccessLog($this->access_log_model);
 				
-		$this->page_header_data['top_sections'] = $this->as_ion_auth->top_sections;
-
 		$this->page_header_data['num_herds'] = $this->herd_access->getNumAccessibleHerds($this->session->userdata('user_id'), $this->as_ion_auth->arr_task_permissions(), $this->session->userdata('arr_regions'));
+		$this->page_header_data['navigation'] = $this->load->view('navigation', [], TRUE);
 		/* Load the profile.php config file if it exists */
 		if ((ENVIRONMENT == 'development' || ENVIRONMENT == 'localhost') && strpos($this->router->method, 'ajax') === false) {
 			$this->config->load('profiler', false, true);

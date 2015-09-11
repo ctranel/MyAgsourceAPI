@@ -19,8 +19,9 @@ class Index extends report_parent {
 			$this->session->keep_flashdata('redirect_url');
 			redirect(site_url('auth/login'));
 		}
-		$this->page_header_data['user_sections'] = $this->as_ion_auth->top_sections;
 		$this->page_header_data['num_herds'] = $this->herd_access->getNumAccessibleHerds($this->session->userdata('user_id'), $this->as_ion_auth->arr_task_permissions(), $this->session->userdata('arr_regions'));
+		$this->page_header_data['navigation'] = $this->load->view('navigation', [], TRUE);
+		
 		$this->load->library('form_validation');
 		/* Load the profile.php config file if it exists */
 		if (ENVIRONMENT == 'development' || ENVIRONMENT == 'localhost') {
@@ -162,7 +163,6 @@ class Index extends report_parent {
 		}
 
 		//header and footer
-		$this->page_header_data['section_nav'] = $this->load->view('auth/section_nav', NULL, TRUE);
 		$this->data['page_header'] = $this->load->view('page_header', $this->page_header_data, TRUE);
 		$this->data['page_footer'] = $this->load->view('page_footer', $this->footer_data, TRUE);
 //		$this->load->_ci_cached_vars = array();

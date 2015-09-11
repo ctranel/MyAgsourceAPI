@@ -159,6 +159,7 @@ abstract class report_parent extends CI_Controller {
 		$this->section = $sections->getByPath($this->section_path . '/');
 		$this->session->set_userdata('section_id', $this->section->id());
 		$sections->loadChildren($this->section, $this->pages, $this->session->userdata('user_id'), $this->herd, $this->ion_auth_model->getTaskPermissions());
+
 		$path = uri_string();
 
 		if(strpos($path, $method) === false){
@@ -176,10 +177,7 @@ abstract class report_parent extends CI_Controller {
 
 		$this->page = $this->pages->getByPath($page_name, $this->section->id());
 		$this->report_path = $this->section_path . '/' . $this->page->path();
-		//$this->primary_model_name = $this->page->path() . '_model';
-//		$this->report_form_id = 'report_criteria';//filter-form';
-		$this->page_header_data['top_sections'] = $this->as_ion_auth->top_sections;
-		$this->page_header_data['user_sections'] = $this->as_ion_auth->user_sections;
+
 		$this->page_header_data['num_herds'] = $this->herd_access->getNumAccessibleHerds($this->session->userdata('user_id'), $this->as_ion_auth->arr_task_permissions(), $this->session->userdata('arr_regions'));
 		
 		//NOTICES
@@ -399,11 +397,6 @@ abstract class report_parent extends CI_Controller {
 		}
 		
 		if(is_array($this->page_header_data)){
-			$arr_sec_nav_data = array(
-				'subsections' => $this->as_ion_auth->user_sections,
-				'section_id' => $this->section->id(),
-				'section_path' => $this->section_path,
-			);
 			$arr_blocks->rewind();
 
 			$this->page_header_data = array_merge($this->page_header_data,

@@ -34,7 +34,7 @@ bright red; #F60E27
 .nav li a {padding: 2px 8px; text-decoration: none;}
 .dropdown-menu {background-color: transparent; box-shadow: none;}
 .navbar-nav {margin: 0;}
-#top-nav2-mega .nav {padding-right: 20px; background-color:#e6f4f4;}
+.nav {/*padding-right: 20px;/* background-color:#e6f4f4;*/}
 @media (min-width: 10px){
 	.navbar-nav>li {float: none;}
 }
@@ -48,8 +48,8 @@ bright red; #F60E27
 #top-nav ul li.current {background-color: #00958E; border-topz: solid 2px #EF5C29;}
 #top-nav ul li.current a {background-color: #00958E; font-weight: bold;}
 
-#top-nav2 {background-color: #E6F4F4; color: #003C39; border: 1px solid #000; border-top: none; position: absolute; display:inline-block;}
-#top-nav2-layer  {
+.layer  {
+	display:none;
 	background-color: #00958E;
 	/* Safari 4-5, Chrome 1-9 */
 	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(), to(#00958E));
@@ -66,20 +66,22 @@ bright red; #F60E27
 	/* Opera 11.10+ */
 	background: -o-linear-gradient(top, #00958E, #66bfbb);
 }
-#top-nav2-layer ul>li>a {color: #e8e8e8;}
-#top-nav2-layer ul>li>a:hover {background-color: inherit; color: #003C39;}
-#top-nav2-layer ul li.current {background-color: #E6F4F4; color: #003C39;}
-#top-nav2-layer ul li.current a {background-color: #E6F4F4; color: #003C39; font-weight: bold;}
-#top-nav2-layer h3, #top-nav3 h3 {margin-bottom: 0; padding: 5px; font-size:10pt}
+.layer ul>li>a {color: #e8e8e8;}
+.layer ul>li>a:hover {background-color: inherit; color: #003C39;}
+.layer ul li.current {background-color: #E6F4F4; color: #003C39;}
+.layer ul li.current a {background-color: #E6F4F4; color: #003C39; font-weight: bold;}
 
-#top-nav3-mega, #top-nav3 {background-color: #E6F4F4; border-top: none;}
-#top-nav3-mega ul, #top-nav3 ul {padding-left: 5px; vertical-align: top;}
-#top-nav2-mega #top-nav3-mega ul>li {display:inline-block;}
-#top-nav3-mega ul>li.heading>a {font-weight: bold;}
-#top-nav3-mega ul>li>ul, #top-nav3-mega ul>li, #top-nav3-mega ul>li>ul>li, #top-nav2-mega #top-nav3-mega ul>li>ul>li, #top-nav2-mega #top-nav3 ul>li {display: block; vertical-align:top;}
-#top-nav3-mega ul>li>a:hover {background-color: inherit; color: #00958E;}
-#top-nav3-mega ul li.current {}
-#top-nav3-mega ul li.current a {font-weight: bold;}
+nav.mega, nav.mega-category {background-color:#e6f4f4; position: absolute; z-index: 200; }
+nav.mega ul, nav.mega-category ul {background-color: #e6f4f4; padding: 0; }
+nav.mega-category ul li nav.mega ul {position: relative; padding: 0 10px 10px 10px; }
+
+.mega-category ul li {display: inline-block; vertical-align:top;}
+
+.mega ul li.current a {font-weight: bold;}
+.mega ul, .mega ul li {display: block; vertical-align:top;}
+.mega ul>li>a:hover {background-color: inherit; color: #00958E;}
+.mega ul li {display: block; border-bottom: solid 1px #CCEAE8; }
+.mega ul>li.heading>a {font-weight: bold;}
 
 ul#session-nav {margin: -5px 0 0; padding: 0; list-style: none;}
 ul#session-nav li {padding: 0 5px; margin: 0; float: right; line-height: 1.1em; border-left: solid 1px #00958E;}

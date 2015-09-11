@@ -20,24 +20,6 @@ if ( ! function_exists('array_search_recursive')) {
 	}
 }
 
-if ( ! function_exists('sort_by_key_value_comp')) {
-	/**
-	 * sort_by_key_value_comp() sorts multidimensional array by the key provided
-	 * 
-	 * designed to be used as a parameter for the native usort function
-	 * 
-	 * @param mixed key
-	 * @return array
-	 * @author ctranel
-	 **/
-
-	function sort_by_key_value_comp($key) {
-	    return function ($a, $b) use ($key) {
-	        return strnatcmp($a[$key], $b[$key]);
-	    };
-	}
-}
-
 
 if ( ! function_exists('array_flatten')) {
 	/**
