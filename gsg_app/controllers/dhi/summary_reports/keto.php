@@ -27,4 +27,9 @@ class Keto extends report_parent {
 	 	$this->product_name = 'Cow List';
 	 	parent::display($block_in, $display_format);
 	}
+
+	function keto_cows_due($block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
+	 	$this->product_name = 'Cows Due';
+	 	parent::display($block_in, $display_format);
+	}
 }
