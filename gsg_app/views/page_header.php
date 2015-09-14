@@ -3,10 +3,10 @@
 <head profile="http://www.w3.org/2005/10/profile">
 	<title><?php if(isset($title)) echo $title; ?></title>
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">    
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+    <meta name="robots" content="NO FOLLOW,NO INDEX">
 <!--    <meta http-equiv="pragma" content="no-cache">
     <meta http-equiv="cache-control" content="no-cache">
-    <meta http-equiv="content-type" content="text/html;charset=UTF-8">
-     <meta name="robots" content="NO FOLLOW,NO INDEX">
     <meta name="googlebot" content="NOARCHIVE"> -->
     <meta name="description" content="<?php if(isset($description)) echo $description; ?>">
     <meta name="keywords" content="<?php echo $this->config->item('product_name'); ?> - <?php echo $this->config->item('cust_serv_company'); ?>" />
@@ -57,10 +57,19 @@
 		<?php echo $navigation?>
 	</div> <!-- header -->
 	<div id="main-content" style="height: 9000px;">
-		<ul id="session-nav">
-		<!-- <li><?php echo anchor('http://agsource.crinet.com', 'AgSource Site'); ?></li> -->
-			<?php if(($this->as_ion_auth->logged_in())): ?>
-				<li><?php echo anchor('auth/logout', 'Log Out'); ?></li>
+		<ul id="session-nav" class="dropdown">
+			<?php if(($this->as_ion_auth->logged_in())):
+				$arr_groups = $this->session->userdata('arr_groups');
+				if(isset($arr_groups) && is_array($arr_groups) && count($arr_groups) > 1): ?>
+					<li class="groupnav"><a class="dropdown-toggle" data-toggle="dropdown"><?php echo $arr_groups[$this->session->userdata('active_group_id')]; ?></a>
+						<ul class="dropdown-menu" role="menu">
+							<?php foreach($arr_groups as $k=>$v): ?>
+								<li role="presentation"><?php echo anchor($url . 'auth/set_role/'. $k, $v);?></li>
+							<?php endforeach; ?>
+						</ul>
+					</li> <!-- close "Select Section" li -->
+				<?php endif; ?>
+			<li><?php echo anchor('auth/logout', 'Log Out'); ?></li>
 				<li><?php echo anchor('', 'Home/Account'); ?></li>
 				<li><?php echo anchor('help', 'Help'); ?></li>
 				<?php if($this->as_ion_auth->has_permission("View Assign w permission")): ?>
@@ -84,8 +93,8 @@
 				<li><?php echo anchor('help', 'Help'); ?></li>
 			<?php endif; ?>
 		</ul>
+		
 	<?php
-	
 	if(!empty($page_heading)) echo heading($page_heading);
 
 	if(isset($error)):
