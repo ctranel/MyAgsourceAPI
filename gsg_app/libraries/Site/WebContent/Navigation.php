@@ -7,10 +7,10 @@ namespace myagsource\Site\WebContent;
 use \myagsource\dhi\Herd;
 
 /**
- * A repository? for section objects
+ * Constructs permission-and-herd-based navigation
  * 
  * 
- * @name Sections
+ * @name Navigation
  * @author ctranel
  * 
  *        
@@ -56,6 +56,7 @@ class Navigation{// implements iWebContentRepository {
 	//if we allow producers to select which sections to allow, we will need to pass that array to this section as well
 	protected function setData(){ 
 		$scope = ['public'];
+		$tmp_array = [];
 
 		if(in_array('View All Content', $this->arr_task_permissions)){
 			$tmp_array = $this->datasource_navigation->getAllContent();
@@ -66,7 +67,7 @@ class Navigation{// implements iWebContentRepository {
 			 * have permission only for subscribed content.  All other scopes are strictly users-based
 			 */
 			if(in_array('View Subscriptions', $this->arr_task_permissions)){
-				$tmp_array = array_merge($tmp_array, $this->datasource_navigation->getSubscribedContent($herd->herdCode()));
+				$tmp_array = array_merge($tmp_array, $this->datasource_navigation->getSubscribedContent($this->herd->herdCode()));
 			}
 			if(in_array('View Account', $this->arr_task_permissions)){
 				$scope[] = 'account';
