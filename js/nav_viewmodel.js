@@ -122,8 +122,14 @@
 	    };
 	};
 	
-//	$(document).ready(function() {
+//$(document).ready(function() {
     $.getJSON('/nav/ajax_json', function(nav_data, textStatus, jqXHR){
-    	ko.applyBindings(new ViewModel(JSON.parse(jqXHR.responseText)));
+    	ko.applyBindings(new ViewModel(JSON.parse(decodeHtml(jqXHR.responseText))));
     });
 //});
+    
+function decodeHtml(html) {
+    var txt = document.createElement("textarea");
+    txt.innerHTML = html;
+    return txt.value;
+}

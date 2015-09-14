@@ -15,24 +15,22 @@ class Nav extends CI_Controller {
 		$this->herd_access = new HerdAccess($this->herd_model);
 		$this->herd = new Herd($this->herd_model, $this->session->userdata('herd_code'));
 
-		//is someone logged in?
-		if($this->herd->herdCode() != $this->config->item('default_herd')){
-			if(!$this->as_ion_auth->logged_in()) {
-				$this->redirect(site_url('auth/login'), "Please log in.  ");
-			}
-			
-			//is a herd selected?
-			if(!$this->herd->herdCode() || $this->herd->herdCode() == ''){
-				$this->redirect(site_url('dhi/change_herd/select'), "Please select a herd and try again.  ");
-			}
-			
-			//does logged in user have access to selected herd?
-			$has_herd_access = $this->herd_access->hasAccess($this->session->userdata('user_id'), $this->herd->herdCode(), $this->session->userdata('arr_regions'), $this->ion_auth_model->getTaskPermissions());
-			if(!$has_herd_access){
-				$this->redirect(site_url('dhi/change_herd/select'),"You do not have permission to access this herd.  Please select another herd and try again.  ");
-			}
+			//is someone logged in?
+		if(!$this->as_ion_auth->logged_in() && $this->herd->herdCode() != $this->config->item('default_herd')) {
+			$this->post_message("Please log in.  ");
 		}
 		
+		//is a herd selected?
+		if(!$this->herd->herdCode() || $this->herd->herdCode() == ''){
+			$this->post_message("Please select a herd and try again.  ");
+		}
+		
+		//does logged in user have access to selected herd?
+		$has_herd_access = $this->herd_access->hasAccess($this->session->userdata('user_id'), $this->herd->herdCode(), $this->session->userdata('arr_regions'), $this->ion_auth_model->getTaskPermissions());
+		if(!$has_herd_access){
+			$this->post_message("You do not have permission to access this herd.  Please select another herd and try again.  ");
+		}
+				
 		$this->session->keep_flashdata('message');
 		$this->session->keep_flashdata('redirect_url');
 		//make sure previous page remains as the redirect url 
@@ -53,7 +51,14 @@ class Nav extends CI_Controller {
 		} */
 	}
 	
-    function index(){
+	//redirects while retaining message and conditionally setting redirect url
+	//@todo: needs to be a part of some kind of authorization class
+	protected function post_message($message = ''){
+		$this->session->keep_flashdata('redirect_url');
+		$this->load->view('echo.php', ['text' => $message]);
+	}
+
+	function index(){
 		echo 'Direct access to this page is not allowed.';
     }
 
