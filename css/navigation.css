@@ -68,10 +68,10 @@ bright red; #F60E27
 .layer ul>li>a {color: #e8e8e8;}
 .layer ul>li>a:hover {background-color: inherit; color: #003C39;}
 .layer ul li.current {background-color: #E6F4F4; color: #003C39;}
-.layer ul li.current a {background-color: #E6F4F4; color: #003C39; font-weight: bold;}
+.layer ul li.current a {background-color: inherit; color: #003C39; font-weight: bold;}
 
-nav.mega, nav.mega-category {background-color:#e6f4f4; position: absolute; z-index: 200; }
-nav.mega ul, nav.mega-category ul {background-color: #e6f4f4; padding: 0; }
+nav.mega, nav.mega-category {background-color:#e6f4f4; position: absolute; z-index: 200; display: none;}
+nav.mega ul, nav.mega-category ul {background-color: inherit; padding: 0; }
 nav.mega-category ul li nav.mega ul {position: relative; padding: 0 10px 10px 10px; }
 
 .mega-category ul li {display: inline-block; vertical-align:top;}

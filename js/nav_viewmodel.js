@@ -86,19 +86,15 @@
 	    };
 	};
 	
-	var ViewModel = ViewModel || function () {
+	var ViewModel = ViewModel || function (nav) {
 	    var self = this;
 
 	    self.selectedChild = ko.observable();
 	    self.children = ko.observableArray();
 
-	    $.getJSON('/nav/ajax_json', function(nav_data, textStatus, jqXHR){
-			    var nav = JSON.parse(jqXHR.responseText);
-			    for(i in nav){
-			    	self.children.push(new MenuEntry(nav[i].name, nav[i].href, false, nav[i].children));
-			    }
-		    }
-		);
+	    for(i in nav){
+	    	self.children.push(new MenuEntry(nav[i].name, nav[i].href, false, nav[i].children));
+	    }
 		
 	    self.deselectChildren = function(){
 	    	for(i in self.children()){
@@ -126,4 +122,8 @@
 	    };
 	};
 	
-	ko.applyBindings(new ViewModel());
+//	$(document).ready(function() {
+    $.getJSON('/nav/ajax_json', function(nav_data, textStatus, jqXHR){
+    	ko.applyBindings(new ViewModel(JSON.parse(jqXHR.responseText)));
+    });
+//});

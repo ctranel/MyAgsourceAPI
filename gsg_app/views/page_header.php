@@ -35,8 +35,8 @@
 			{sectionhelper: "<?php echo $this->config->item('base_url_assets'); ?>js/as_section_helper.js"},
 			{formhelper: "<?php echo $this->config->item('base_url_assets'); ?>js/form_helper.js"},
 			{ko: "https://cloud.github.com/downloads/knockout/knockout/knockout-2.1.0.js"},
-			{navmodel: "<?php echo $this->config->item('base_url_assets'); ?>js/nav_viewmodel.js"},
-			{navhelper: "<?php echo $this->config->item('base_url_assets'); ?>js/nav.js"}
+			{navhelper: "<?php echo $this->config->item('base_url_assets'); ?>js/nav.js"},
+			{navmodel: "<?php echo $this->config->item('base_url_assets'); ?>js/nav_viewmodel.js"}
 			<?php
 				if(!empty($arr_headjs_line) && is_array($arr_headjs_line) !== FALSE):
 					$c = count($arr_headjs_line);
