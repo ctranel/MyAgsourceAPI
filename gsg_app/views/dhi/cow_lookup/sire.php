@@ -1,6 +1,3 @@
-<?php if(!isset($sire_naab)): ?>
-	No sire data found
-<?php else: ?>
 	<div class="row">
 		<div class="col-sm-8 col-xs-12">
 			<div class="box">
@@ -107,6 +104,3 @@
 			</div>
 		</div>
 	</div>
-<?php 
-endif;
-?>

@@ -87,7 +87,13 @@ class Ajax_cow_lookup extends CI_Controller {
 	function sire($serial_num){
 		$this->load->model('dhi/cow_lookup/sire_model');
     	$data = $this->sire_model->getCowArray($this->session->userdata('herd_code'), $serial_num);
-    	$this->load->view('dhi/cow_lookup/sire', $data);
+    	$test_empty = array_filter($data);
+    	if(!empty($test_empty)){
+	    	$this->load->view('dhi/cow_lookup/sire', $data);
+    	}
+    	else{
+    		$this->load->view('no_data', []);
+    	}
 	}
 	
 	function tests($serial_num, $lact_num=NULL){
