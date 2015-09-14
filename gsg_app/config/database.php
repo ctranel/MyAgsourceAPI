@@ -92,12 +92,12 @@ elseif(ENVIRONMENT == 'qa' || ENVIRONMENT == 'localhost'){
 	$db['default']['stricton'] = FALSE;
 }
 else{ // DEV Environments
-	$db['default']['hostname'] = '192.168.3.55' ;
-	$db['default']['username'] = 'webuser';
-	$db['default']['password'] = '$UserInTheDEV!';
-//	$db['default']['hostname'] = 'testdare.verona.crinet\\myagsource';
+//	$db['default']['hostname'] = '192.168.3.55' ;
 //	$db['default']['username'] = 'webuser';
-//	$db['default']['password'] = 'm1$AgSourze';
+//	$db['default']['password'] = '$UserInTheDEV!';
+	$db['default']['hostname'] = 'testdare.verona.crinet\\myagsource';
+	$db['default']['username'] = 'webuser';
+	$db['default']['password'] = 'm1$AgSourze';
 	$db['default']['database'] = "users";
 	$db['default']['dbdriver'] = 'mssql';
 	$db['default']['dbprefix'] = "";
