@@ -5,6 +5,9 @@
 			client_data['block'] == 'overall_early_prev_graph' 
 			) {	
 			options_in.xAxis[0].labels.formatter = function(){return Highcharts.dateFormat('%b %Y', this.value);};
+			options_in.series[2]['marker'] = {'enabled': false};
+			options_in.series[3]['marker'] = {'enabled': false};			
 		}
+		
 		return options_in;
 	}
