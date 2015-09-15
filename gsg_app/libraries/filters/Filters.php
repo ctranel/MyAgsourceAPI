@@ -147,7 +147,7 @@ class Filters{
 				if(!is_array($f)){
 					$f = [$f];
 				}
-				$arr_tmp = array(
+				$arr_tmp = [
 					'name' => ucwords(str_replace('_', ' ', $k)),
 					'type' => 'value',
 					'options_source' => null,
@@ -156,7 +156,7 @@ class Filters{
 					'db_field_name' => $k,
 					'arr_selected_values' => $arr_form_data[$k],
 					'user_editable' => false,
-				);
+				];
 				$this->arr_criteria[$k] = CriteriaFactory::createCriteria($this->filter_model, $arr_tmp, null);
 			}
 		}

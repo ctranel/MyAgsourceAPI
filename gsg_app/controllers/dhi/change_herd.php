@@ -49,9 +49,8 @@ class Change_herd extends CI_Controller {
 		$this->load->model('access_log_model');
 		$this->access_log = new AccessLog($this->access_log_model);
 				
-		$this->page_header_data['top_sections'] = $this->as_ion_auth->top_sections;
-
 		$this->page_header_data['num_herds'] = $this->herd_access->getNumAccessibleHerds($this->session->userdata('user_id'), $this->as_ion_auth->arr_task_permissions(), $this->session->userdata('arr_regions'));
+		$this->page_header_data['navigation'] = $this->load->view('navigation', [], TRUE);
 		/* Load the profile.php config file if it exists */
 		if ((ENVIRONMENT == 'development' || ENVIRONMENT == 'localhost') && strpos($this->router->method, 'ajax') === false) {
 			$this->config->load('profiler', false, true);
@@ -202,7 +201,6 @@ class Change_herd extends CI_Controller {
 			$this->page_footer_data = array();
 			$this->page_header_data['message'] = compose_error($err, validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages());
 			$arr_redirect_url = explode('/', $redirect_url);
-			if(file_exists($arr_redirect_url[0] . FS_SEP . 'section_nav')) $this->page_header_data['section_nav'] = $this->load->view($arr_redirect_url[0] . '/section_nav', NULL, TRUE);
 			$this->data['page_header'] = $this->load->view('page_header', $this->page_header_data, TRUE);
 			$this->data['page_heading'] = 'Select Herd - ' . $this->config->item('product_name');
 			$this->data['page_footer'] = $this->load->view('page_footer', $this->page_footer_data, TRUE);
@@ -300,7 +298,6 @@ class Change_herd extends CI_Controller {
 			}
 			$arr_redirect_url = explode('/', $redirect_url);
 
-			if(file_exists($arr_redirect_url[0] . FS_SEP . 'section_nav')) $this->page_header_data['section_nav'] = $this->load->view($arr_redirect_url[0] . '/section_nav', NULL, TRUE);
 			$this->data['page_header'] = $this->load->view('page_header', $this->page_header_data, TRUE);
 			$this->data['page_heading'] = 'Request Herd - ' . $this->config->item('product_name');
 			$this->data['page_footer'] = $this->load->view('page_footer', NULL, TRUE);
