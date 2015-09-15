@@ -15,8 +15,8 @@ class HTTP_Error extends CI_Controller {
 		
 		$this->page_header_data = [
 			'title'=>'Page Not Found',
-			'user_sections'=>$this->as_ion_auth->top_sections,
 			'num_herds'=>$herd_access->getNumAccessibleHerds($this->session->userdata('user_id'), $this->as_ion_auth->arr_task_permissions(), $this->session->userdata('arr_regions')),
+			'navigation' => $this->load->view('navigation', [], TRUE),
 		];
 		
 		$this->data['page_header'] = $this->load->view('page_header', $this->page_header_data, TRUE);

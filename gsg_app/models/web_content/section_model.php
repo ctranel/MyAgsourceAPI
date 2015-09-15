@@ -2,8 +2,6 @@
 class Section_model extends CI_Model {
 	public function __construct(){
 		parent::__construct();
-		$this->db_group_name = 'default';
-		$this->{$this->db_group_name} = $this->load->database($this->db_group_name, TRUE);
 		$this->tables = $this->config->item('tables', 'ion_auth');
 	}
 

@@ -21,16 +21,11 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 class Demo extends CI_Controller {
 	
-	//protected $arr_user_super_sections;
-	//protected $arr_user_sections;
 	/* 
 	 * @var Herd object
 	 */
-	//protected $herd;
 	
 	function index(){
-		//$this->load->model('ion_auth_model');
-		
 		//Clear out session
 		$this->session->unset_userdata('herd_code');
 		$this->session->unset_userdata('arr_pstring');
@@ -51,15 +46,7 @@ class Demo extends CI_Controller {
 		$this->session->set_flashdata('message', 'Sorry, we could not log in the guest user.  Please contact customer service for assistance: 1-800-236-4995');
 		redirect(site_url('auth/login')); //use redirects instead of loading views for compatibility with MY_Controller libraries
 		}
-		
-		
-		
-/*		
-		
-		$this->herd = new Herd($this->herd_model, $this->config->item('default_herd') );
-		$this->set_herd_session_data();
-		redirect(site_url());
-*/	}
+	}
 /*
 	protected function set_herd_session_data(){
 		$this->session->set_userdata('herd_code', $this->herd->herdCode());

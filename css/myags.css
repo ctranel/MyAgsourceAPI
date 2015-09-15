@@ -46,16 +46,16 @@ h3 {font-family:"Helvetica", "Arial", "Verdana", sans-serif;
 img, embed, object, video {border: none; max-width: 100%;}
 sup {font-size: .7em;}
 a {text-decoration: underline;}
+ul{margin: 0; }
 
-#main-content {padding:0 10px; text-align: left;}
-td.menu-padding {width:20px;}
+#main-content {padding:0 10px; text-align: left; margin-top: 65px;}
 p {padding: 0 0 5px;}
-#header {height:85px; background: #fff url("i/logo-m.png") no-repeat 50px 20px; padding: 10px 0 10px 10px; clear: both; margin-top:31px;}
+#header {z-index:100; width: 100%; min-height: 60px; background: #fff url("https://myagsource.com/asset_cache/i/logo-s.png") no-repeat 5px 15px; clear: both; position: fixed; padding: 0 0 0 200px;}
 #header a {text-decoration:none;}
-.header-link {width:233px; height:45px;}
+.header-link {position: absolute; left: 0; top: 0; width:200px; height:60px;}
 
 /* new styles */
-.container {margin:0 auto 30px; display:table; border-left: solid 2px #E8E8E8; border-right: solid 2px #E8E8E8; border-bottom: solid 2px #E8E8E8; padding:0;}
+.container {display:table; border-left: solid 2px #E8E8E8; border-right: solid 2px #E8E8E8; border-bottom: solid 2px #E8E8E8; padding:0;}
 
 a.button, .button {
 	background-color: #00958E;
@@ -94,66 +94,6 @@ a, .footer a:link, a:hover, a:active, a:visited {color: #003C39;}
 .important-message {font-size: 1.3em; color:#F60E27; background-color:inherit; font-weight:bold;}
 /* end general */
 
-/* application navigation */
-
-ul.primary-nav {
-	background-color: #00958E;
-	/* Safari 4-5, Chrome 1-9 */
-	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#00958E), to(#66bfbb));
-	
-	/* Safari 5.1, Chrome 10+ */
-	background: -webkit-linear-gradient(top, #66bfbb, #00958E);
-	
-	/* Firefox 3.6+ */
-	background: -moz-linear-gradient(top, #66bfbb, #00958E);
-	
-	/* IE 10 */
-	background: -ms-linear-gradient(top, #66bfbb, #00958E);
-	
-	/* Opera 11.10+ */
-	background: -o-linear-gradient(top, #66bfbb, #00958E);
-	white-space: nowrap; border: none; color: #FFFFFF; font-size: 9pt; height: 30px; padding: 1px 3px; margin: 0; border-radius: 0; min-height: 30px; border-top: solid 5px #EF5C29;}
-	
-ul.primary-nav li {float: left; border-left: solid 1px #E6F4F4; list-style: none; padding: 3px 10px;}
-ul.primary-nav li.first {border-left: none;}
-ul.primary-nav li a {white-space:nowrap; color: #E6F4F4; padding: 0; text-align: center; text-decoration: none;}
-ul.primary-nav li.current {background-color:#E6F4F4;}
-ul.primary-nav li.current a {background-color:#E6F4F4; color: #00958E; font-weight: bold;}
-ul.primary-nav a:hover {color: #CCEAE8;}
-
-/* section nav and group nav dropdowns */
-ul.primary-nav li.sectionnav, ul.primary-nav li.sectionnav ul, ul.primary-nav li.groupnav, ul.primary-nav li.groupnav ul {float: right; margin: 0; list-style: none; border: none;}
-ul.primary-nav li.sectionnav, ul.primary-nav li.groupnav {padding: 3px 5px 3px 0; width: 120px;}
-ul.primary-nav li.sectionnav ul, ul.primary-nav li.groupnav ul {position:relative;}/* cursor: pointer; visibility: hidden; margin: 4px -6px 0 0; height: 1px; overflow: visible;}*/
-ul.primary-nav li.sectionnav ul li, ul.primary-nav li.groupnav ul li {margin:0; padding: 5px; float: none; border-bottom: solid 1px #003C39; border-left: solid 1px #003C39; border-right: solid 1px #003C39; background-color:#EF5C29}
-ul.primary-nav li.sectionnav ul li a, ul.primary-nav li.groupnav ul li a {font: normal .85em helvetica,arial,sans-serif; color:#003C39; background-color: #EF5C29; display:block; text-align: left;}
-
-ul#session-nav {margin: -5px 0 0; padding: 0; list-style: none;}
-ul#session-nav li {padding: 0 5px; margin: 0; float: right; line-height: 1.1em; border-left: solid 1px #00958E;}
-ul#session-nav a {text-decoration: none; color: #00958E; font-weight: bold;}
-ul#session-nav {float:right;}
-
-.hover {display:block;}
-
-/* super section nav */
-.navbar-background {height: 31px; width: 100%; border-top: solid 5px #EF5C29; background-color: #222; position: fixed; z-index: 1000;}
-/* override bootstrap styles for top nav and dropdowns */
-.navbar-inverse {border: none; min-height: 25px; border-radius:0; border-top: solid 5px #EF5C29; position: fixed; z-index: 1001; white-space: nowrap;}
-.navbar-inverse ul {display: inline-block;}
-.navbar-inverse li {border-left: solid 1px #666; display: inline-block;}
-.navbar-inverse li.first {border-left: none;}
-.navbar-inverse .navbar-nav>li>a {color: #E8E8E8;}
-.navbar-inverse li.current {background-color: #666; border-topz: solid 2px #EF5C29;}
-.navbar-inverse li.current a {background-color: #666; font-weight: bold;}
-.nav li a {padding: 3px 8px; text-decoration: none;}
-.dropdown-menu {background-color: transparent; box-shadow: none;}
-.navbar-nav {margin: 0;}
-@media (min-width: 10px){
-	.navbar-nav>li {float: none;}
-}
-@media (min-width: 768px){
-	.navbar-nav>li {float: none;}
-}
 
 /* forms */
 label, fieldset legend {color:#003C39;}
@@ -165,4 +105,4 @@ label .require {color:#003C39; font-weight:bold;}
 .consult-form table td {padding: 0 5px;}
 
 #infoMessage p, #infoMessage {background-color:#fff; color:#F60E27;}
-div#infoMessage {margin: 0 0 10px 0;}
+div#infoMessage {margin: 0 0 10px 0; clear: both;}

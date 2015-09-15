@@ -53,20 +53,6 @@ class As_ion_auth extends Ion_auth {
 	protected $arr_task_permissions;
 
 	/**
-	 * top_sections
-	 *
-	 * @var SplObjectStorage
-	 **/
-	public $top_sections;
-
-	/**
-	 * user_sections
-	 *
-	 * @var array
-	 **/
-	public $user_sections;
-
-	/**
 	 * gsg_access
 	 *
 	 * @var string
@@ -104,30 +90,6 @@ class As_ion_auth extends Ion_auth {
 
 		if($this->logged_in()){
 			$this->arr_task_permissions = $this->ion_auth_model->getTaskPermissions();
-			//RETRIEVE NAVIGATION DATA
-			if(strpos($tmp_uri, 'ajax') === FALSE && strpos($tmp_uri, '/csv/') === FALSE && strpos($tmp_uri, '/demo') === false){//set supersection if there is one
-				$section_path = $this->router->fetch_class(); //this should match the name of this file (minus ".php".  Also used as base for css and js file names and model directory name
-				$control_dir = $this->router->fetch_directory();
-				//all sections must have directories in the main controller directory
-				if($control_dir != $section_path && !empty($control_dir)){
-					$active_section = $sections->getByPath($control_dir);
-					$sections->loadChildren($active_section, $pages, $this->session->userdata('user_id'), $herd, $this->arr_task_permissions);
-				} 
-				
-				/* will be used if we allow producers to specify consultant access by section
-				$sections_with_permission = [];
-				if($this->has_permission('View Assign w permission')){
-					$sections_with_permission = $this->ion_auth_model->sectionsWithPermission($this->session->userdata('user_id'), $this->session->userdata('herd_code'));
-				}
-				*/
-				//@todo: hard-coded "dhi/" path will not work when we add soil labs or any division other than DHI.  Will need the division user is in.
-				$dhi_section = $sections->getByPath('dhi/');
-				$sections->loadChildren($dhi_section, $pages, $this->session->userdata('user_id'), $herd, $this->arr_task_permissions);
-				$this->top_sections = $dhi_section->children();
-				if(isset($active_section)){
-					$this->user_sections = $active_section->children();
-				}
-			}
 		}
 
 		//reliably set the referrer, used when determining whether to set the redirect variable on pages like select herd

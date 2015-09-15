@@ -20,8 +20,8 @@ class Auth extends Ionauth {
 		$this->session->keep_flashdata('redirect_url');
 		$this->redirect_url = set_redirect_url($this->uri->uri_string(), $this->session->flashdata('redirect_url'), $this->as_ion_auth->referrer);
 		$this->session->set_flashdata('redirect_url', $this->redirect_url);
-		$this->page_header_data['top_sections'] = $this->as_ion_auth->top_sections;
 		$this->page_header_data['num_herds'] = $herd_access->getNumAccessibleHerds($this->session->userdata('user_id'), $this->as_ion_auth->arr_task_permissions(), $this->session->userdata('arr_regions'));
+		$this->page_header_data['navigation'] = $this->load->view('navigation', [], TRUE);
 		
 		//load necessary files
 		$this->load->library('form_validation');
@@ -160,7 +160,6 @@ class Auth extends Ionauth {
 				)
 			);
 		}
-		$this->page_header_data['section_nav'] = $this->load->view('auth/section_nav', NULL, TRUE);
 		$this->data['page_header'] = $this->load->view('page_header', $this->page_header_data, TRUE);
 		$this->data['page_heading'] = "Manage Herd Access";
 		$footer_data = array();
@@ -276,7 +275,6 @@ class Auth extends Ionauth {
 				)
 			);
 		}
-		$this->page_header_data['section_nav'] = $this->load->view('auth/section_nav', NULL, TRUE);
 		$this->data['page_header'] = $this->load->view('page_header', $this->page_header_data, TRUE);
 		$this->data['page_heading'] = "Manage Herd Access";
 		$footer_data = array();
@@ -477,7 +475,6 @@ class Auth extends Ionauth {
 					)
 				);
 			}
-			$this->page_header_data['section_nav'] = $this->load->view('auth/section_nav', NULL, TRUE);
 			$this->data['page_header'] = $this->load->view('page_header', $this->page_header_data, TRUE);
 			$this->data['page_heading'] = 'Grant Consultant Access';
 			$footer_data = array(
@@ -634,7 +631,6 @@ class Auth extends Ionauth {
 					)
 				);
 			}
-			$this->page_header_data['section_nav'] = $this->load->view('auth/section_nav', NULL, TRUE);
 			$this->data['page_header'] = $this->load->view('page_header', $this->page_header_data, TRUE);
 			$this->data['page_heading'] = 'Request Data Access';
 			$footer_data = array(
@@ -676,7 +672,6 @@ class Auth extends Ionauth {
 				}); });</script>'
 			)
 		);
-		$this->page_header_data['section_nav'] = $this->load->view('auth/section_nav', NULL, TRUE);
 		$this->data['page_header'] = $this->load->view('page_header', $this->page_header_data, true);
 		$this->data['page_heading'] = 'User List';
 		$this->data['page_footer'] = $this->load->view('page_footer', $this->footer_data, TRUE);
@@ -744,7 +739,6 @@ class Auth extends Ionauth {
 					)
 				);
 			}
-			$this->page_header_data['section_nav'] = $this->load->view('auth/section_nav', NULL, TRUE);
 			$this->data['page_header'] = $this->load->view('page_header', $this->page_header_data, TRUE);
 			$this->data['page_heading'] = $this->config->item('product_name') . 'Login';
 			$this->data['page_footer'] = $this->load->view('page_footer', NULL, TRUE);
@@ -782,7 +776,6 @@ class Auth extends Ionauth {
 				)
 			);
 		}
-		$this->page_header_data['section_nav'] = $this->load->view('auth/section_nav', NULL, TRUE);
 		$this->data['page_header'] = $this->load->view('page_header', $this->page_header_data, true);
 		$this->data['page_heading'] = 'Update Password';
 		$this->data['page_footer'] = $this->load->view('page_footer', null, true);
@@ -800,7 +793,6 @@ class Auth extends Ionauth {
 				)
 			);
 		}
-		$this->page_header_data['section_nav'] = $this->load->view('auth/section_nav', NULL, TRUE);
 		$this->data['page_header'] = $this->load->view('page_header', $this->page_header_data, TRUE);
 		$this->data['page_heading'] = 'Forgotten Password';
 		$this->data['page_footer'] = $this->load->view('page_footer', null, TRUE);
@@ -817,7 +809,6 @@ class Auth extends Ionauth {
 				)
 			);
 		}
-		$this->page_header_data['section_nav'] = $this->load->view('auth/section_nav', NULL, TRUE);
 		$this->data['page_header'] = $this->load->view('page_header', $this->page_header_data, TRUE);
 		$this->data['page_heading'] = 'Forgotten Password';
 		$this->data['page_footer'] = $this->load->view('page_footer', null, TRUE);
@@ -835,7 +826,6 @@ class Auth extends Ionauth {
 				)
 			);
 		}
-		$this->page_header_data['section_nav'] = $this->load->view('auth/section_nav', NULL, TRUE);
 		$this->data['page_header'] = $this->load->view('page_header', $this->page_header_data, true);
 		$this->data['page_heading'] = 'Deactivate User';
 		$this->data['page_footer'] = $this->load->view('page_footer', null, true);
@@ -1087,7 +1077,6 @@ class Auth extends Ionauth {
 				);
 			}
 			$this->carabiner->css('popup.css');
-			$this->page_header_data['section_nav'] = $this->load->view('auth/section_nav', NULL, TRUE);
 			$this->data['page_header'] = $this->load->view('page_header', $this->page_header_data, TRUE);
 			$this->data['page_heading'] = 'Register User';
 			$footer_data = array(
@@ -1341,7 +1330,6 @@ class Auth extends Ionauth {
 					)
 				);
 			}
-			$this->page_header_data['section_nav'] = $this->load->view('auth/section_nav', NULL, TRUE);
 			$this->footer_data = array(
 				'arr_deferred_js'=>array(
 					$this->config->item('base_url_assets') . 'js/gs_auth_form_helper.js',

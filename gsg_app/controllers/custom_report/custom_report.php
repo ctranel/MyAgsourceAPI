@@ -14,8 +14,8 @@ class Custom_report extends CI_Controller {
 		$this->load->model('herd_model');
 		$herd_access = new HerdAccess($this->herd_model);
 
-		$this->page_header_data['user_sections'] = $this->as_ion_auth->top_sections;
 		$this->page_header_data['num_herds'] = $herd_access->getNumAccessibleHerds($this->session->userdata('user_id'), $this->as_ion_auth->arr_task_permissions(), $this->session->userdata('arr_regions'));
+		$this->page_header_data['navigation'] = $this->load->view('navigation', [], TRUE);
 		
 		//load necessary files
 		$this->load->model('custom_report_model');
@@ -201,7 +201,6 @@ class Custom_report extends CI_Controller {
 						array(
 							'title'=>'Custom Report - ' . $this->config->item('product_name'),
 							'description'=>'Custom report for ' . $this->config->item('product_name'),
-							'section_nav' => $this->load->view('auth/section_nav', NULL, TRUE),
 							'arr_head_line' => array(
 								'<script type="text/javascript">',
 								'	var page = "";',
@@ -209,7 +208,6 @@ class Custom_report extends CI_Controller {
 								'	var herd_code = "' . $this->session->userdata('herd_code') . '";',
 								'</script>'
 							),						
-							'user_sections' => $this->page_header_data['user_sections'],
 							'arr_headjs_line' => array(
 								'{customhelper: "' . $this->config->item('base_url_assets') . 'js/custom_report_helper.js"}',
 								'{formhelper: "' . $this->config->item('base_url_assets') . 'js/form_helper.js"}'
