@@ -182,18 +182,39 @@ class Herd
 	}
 
 	/* -----------------------------------------------------------------
-	 *  Returns array of general herd information used in header and other locations
+	 *  header_info
 
 	 *  Returns array of general herd information used in header and other locations
 
-	 *  @since: 1.0
 	 *  @author: ctranel
 	 *  @date: May 20, 2014
-	 *  @param: string herd code
 	 *  @return: array
 	 *  @throws: 
 	 * -----------------------------------------------------------------*/
 	public function header_info() {
 		return $this->herd_model->header_info($this->herd_code);
+	}
+
+	/* -----------------------------------------------------------------
+	 *  getCowOptions
+
+	 *  Returns array of general herd information used in header and other locations
+
+	 *  @author: ctranel
+	 *  @date: Sept 15, 2015
+	 *  @param string: name of the field to be displayed
+	 *  @return: array
+	 *  @throws: 
+	 * -----------------------------------------------------------------*/
+	public function getCowOptions($value_field) {
+		$cows = $this->herd_model->getCowList($this->herd_code);
+		if(!$cows || empty($cows)){
+			return false;
+		}
+		$return = [];
+		foreach($cows as $c){
+			$return[$c['serial_num']] = $c[$value_field];
+		}
+		return $return;
 	}
 }

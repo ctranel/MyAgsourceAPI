@@ -82,7 +82,7 @@ nav.mega-category ul li nav.mega ul {position: relative; padding: 0 10px 10px 10
 .mega ul li {display: block; border-bottom: solid 1px #CCEAE8; }
 .mega ul>li.heading>a {font-weight: bold;}
 
-ul#session-nav {margin: -5px 0 0; padding: 0; list-style: none;}
+ul#session-nav {margin: 0 0; padding: 0; list-style: none;}
 ul#session-nav li {padding: 0 5px; margin: 0; float: right; line-height: 1.1em; border-left: solid 1px #00958E; position:relative;}
 ul#session-nav a {text-decoration: none; color: #00958E; font-weight: bold;}
 ul#session-nav {float:right;}

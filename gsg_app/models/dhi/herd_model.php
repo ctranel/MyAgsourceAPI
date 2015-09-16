@@ -445,4 +445,25 @@ class Herd_model extends CI_Model {
 		}
 		return FALSE;
 	}
+
+	/**
+	 * getCowList
+	 * @param string herd code
+	 * @param string or array of report codes
+	 * @return array of herd output data arrays
+	 * @author ctranel
+	 **/
+	public function getCowList($herd_code){
+		$result = $this->db
+		->select('serial_num, control_num, list_order_num, visible_id, barn_name')
+		->where('herd_code', $herd_code)
+		->where('term_date IS NULL')
+		->where('is_active', 1)
+		->get('[animal].[dbo].[cow_id]')
+		->result_array();
+		if(is_array($result)){
+			return $result;
+		}
+		return FALSE;
+	}
 }

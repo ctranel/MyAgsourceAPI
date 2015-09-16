@@ -74,13 +74,13 @@ else: ?>
 endif; ?>
 <script type="text/javascript">
 //links that reload tab content
-$(function() {
-	  $(".incr-lact-tests").bind("click", function(e) {loadTab(e)} );
-	});
+window.onload = function() {
+	$(".incr-lact-tests").bind("click", function(e) {loadTab(e)} );
 
-//add simple column sorting
-var table = $(".simple-sort").stupidtable({
-    "date":function(a,b){return dateFunc(a,b);}
-});
-table.bind('aftertablesort', function (event, data) {addRowClasses();} );
+	//add simple column sorting
+	var table = $(".simple-sort").stupidtable({
+	    "date":function(a,b){return dateFunc(a,b);}
+	});
+	table.bind('aftertablesort', function (event, data) {addRowClasses();} );
+};
 </script>

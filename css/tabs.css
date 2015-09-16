@@ -55,6 +55,6 @@ ul.nav-tabs li a:hover {background-color: #00958E; color: #003C39; border-color:
 }
 
 .tab-content>.tab-pane{
-	width: 99.6%; /* to prevent scrollbar */
+	width: 99.4%; /* to prevent scrollbar */
 }
 }
