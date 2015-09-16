@@ -4,7 +4,6 @@
 	white-space: nowrap;
 	display: block; 
 	position: relative;
-	z-index: -1;
 }
 form#select_cow {
 	display: block; 
