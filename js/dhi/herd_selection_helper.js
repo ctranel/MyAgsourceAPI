@@ -13,7 +13,8 @@ head.ready(function() {
 	$("#select_herd").on("submit", function(ev) {
 		var ret_val = true;
 		var herd_code = $("#herd_code").val();
-		if(herd_code == 0){
+		var herd_code_fill = $("#herd_code_fill").val();
+		if(herd_code == 0 || (herd_code_fill.length == 8 && herd_code_fill !== herd_code)){
 			alert('Please select a herd from the dropdown to continue.');
 			return false;
 		}

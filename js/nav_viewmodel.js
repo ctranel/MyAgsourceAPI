@@ -108,6 +108,10 @@
 	    
 	    self.setSelected = function(menu_item, ev){
 	    	self.deselectChildren();
+
+	    	if(menu_item.children().length === 0){
+	    		return true;
+	    	}
 	    	menu_item.isSelected(true);
 	    	self.selectedChild(menu_item);
 	    	

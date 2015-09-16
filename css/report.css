@@ -2,13 +2,6 @@
 
 sub {color: #003E3F; font-size: 80%; font-family: "Arial Narrow","Arial","Verdana",sans-serif;}
 
-/* charts only
-.jqPlot {clear: left;}
-.chart-container {margin: 30px auto 0; text-align: center;}
-.chart-container a, text, tspan {text-decoration: none;}
-.chart {background:transparent url('i/logo-m-watermark.png') no-repeat center 140px; text-align: center;}
-.highcharts-container {border: solid 1px #c0c0c0; margin: 0 auto;}
-*/
 .chart-container {display:none; margin: 20px auto; border:solid 1px #999; width: auto; overflow: auto; background:transparent url('i/logo-m-watermark.png') no-repeat center 140px;} /**/
 .chart-container a, text, tspan {text-decoration: none;}
 .chart-odd {clear: both; float: left;}
@@ -96,7 +89,7 @@ end table headings */
 #comments {position:absolute; right:120px; border: solid 1px #000; min-width: 150px; min-height: 100px; max-width:25%; text-align: left; vertical-align: top; padding: 15px;}
 /* end header herd info */
 
-/* inter-chart navigation */
+/* inter-chart navigation
 #report-links {border: solid 1px #003C39; margin: 15px auto; padding: 10px; background-color: #E6F4F4; clear: left;}
 #report-links {border-top: solid 5px #EF5C29;}
 #report-links a {color:#003C39; padding: 0 5px;}
@@ -110,7 +103,7 @@ ul.report-nav li a:hover {text-decoration: underline;}
 ul.report-nav li a.sel {font-weight: bold;  text-decoration: underline;}
 
 .subnav {margin-left: 20px;}
-
+ */
 #herd-text {}
 #herd-text .general-herd {}
 #herd-text .report-specific {float: right;}
