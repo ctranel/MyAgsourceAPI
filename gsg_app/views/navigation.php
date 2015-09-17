@@ -4,13 +4,17 @@
 					<!-- ko foreach: children -->
 						<li data-bind="css:{'current': (isSelected)}"><a data-bind="click: $parent.setSelected, text: name, attr: {href: href}"></a></li>
 					<!-- /ko -->
+					<li style="width: 100%"><a name="top-nav">&nbsp</a></li>
 				</ul>
 			</nav>
 			<!-- ko if: (typeof(selectedChild()) !== 'undefined') -->
 				<!-- ko if: (selectedChild().threeLevelNav) -->
 				<nav class="navbar layer" id="top-nav2-layer" role="navigation" data-bind="with: selectedChild">
 					<ul class="nav navbar-nav" data-bind="foreach: children">
-						<li data-bind="css:{'current': (isSelected)}"><a data-bind="click: $parent.setSelected, text: name, attr: {href: href}"></a></li>
+						<!-- ko foreach: children -->
+							<li data-bind="css:{'current': (isSelected)}"><a data-bind="click: $parent.setSelected, text: name, attr: {href: href}"></a></li>
+						<!-- /ko -->
+						<li style="width: 100%"><a name="top-nav">&nbsp</a></li>
 					</ul>
 				</nav>
 				<nav class="navbar mega" id="top-nav2-mega" role="navigation" data-bind="with: selectedChild().selectedChild">

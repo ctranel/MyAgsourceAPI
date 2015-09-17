@@ -71,7 +71,6 @@
 				<?php endif; ?>
 			<li><?php echo anchor('auth/logout', 'Log Out'); ?></li>
 				<li><?php echo anchor('', 'Home/Account'); ?></li>
-				<li><?php echo anchor('help', 'Help'); ?></li>
 				<?php if($this->as_ion_auth->has_permission("View Assign w permission")): ?>
 					<li><?php echo anchor('auth/service_grp_manage_herds', 'Manage Herd Access'); ?></li>
 					<li><?php echo anchor('auth/service_grp_request', 'Request Herd Access'); ?></li>

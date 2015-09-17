@@ -50,9 +50,24 @@ ul{margin: 0; }
 
 #main-content {padding:0 10px; text-align: left; margin-top: 65px;}
 p {padding: 0 0 5px;}
-#header {width: 100%; height: 56px; background-color:#E6F4F4; clear: both; position: fixed; padding: 0 0 30px 200px; border-bottom: solid 2px #EF5C29; z-index: 100;}
+#header {width: 100%; height: 56px; background-color:#E6F4F4; clear: both; position: fixed; padding: 0 0 30px 200px; border-bottom: solid 2px #EF5C29; z-index: 100;
+	/* Safari 4-5, Chrome 1-9 */
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#E6F4F4), to(#66bfbb));
+	
+	/* Safari 5.1, Chrome 10+ */
+	background: -webkit-linear-gradient(left, #E6F4F4, #66bfbb);
+	
+	/* Firefox 3.6+ */
+	background: -moz-linear-gradient(left, #E6F4F4, #66bfbb);
+	
+	/* IE 10 */
+	background: -ms-linear-gradient(left, #E6F4F4, #66bfbb);
+	
+	/* Opera 11.10+ */
+	background: -o-linear-gradient(left, #E6F4F4, #66bfbb);
+}
 #header a {text-decoration:none;}
-.header-link {position: absolute; left: 0; top: 0; width:200px; height:56px; background: url("i/logo-s.png") no-repeat 5px 10px; border-bottom: solid 2px #EF5C29;}
+.header-link {position: absolute; left: 0; top: 0; width:200px; height:56px; background: url("i/logo-s.png") no-repeat 5px 10px; border-bottom: solid 2px #EF5C29; border-top: solid 5px #EF5C29;}
 
 /* new styles */
 .container {display:table; border-left: solid 2px #E8E8E8; border-right: solid 2px #E8E8E8; border-bottom: solid 2px #E8E8E8; padding:0;}
