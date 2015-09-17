@@ -47,6 +47,23 @@
 		else{
 			options_in.yAxis.tickInterval = null;
 		}
+		
+		//if there is a second yAxis, change the color
+		if(client_data['block'] == 'overall_keto_prev' ||
+			client_data['block'] == 'overall_early_prev_graph' 
+			) {	
+			options_in.xAxis[0].labels.formatter = function(){return Highcharts.dateFormat('%b %Y', this.value);};
+			options_in.series[2]['marker'] = {'enabled': false};
+			options_in.series[3]['marker'] = {'enabled': false};			
+		}
+
+		if(typeof(chart) != 'undefined' && client_data['block'] == 'prev3_test_mgmt_mun') {
+			 //chart is global variable declared in graph_helper.js
+			 options_in.xAxis.tickPositions = [options_in.series[0].data[0][0],
+				                        options_in.series[0].data[1][0],
+				                        options_in.series[0].data[2][0]];
+		}
+
 		return options_in;
 	}
 	

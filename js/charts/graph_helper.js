@@ -314,7 +314,7 @@ function process_chart(div_id, data_in){
 //			}
 		}
 		if(typeof(client_data) == "object" && typeof post_render == 'function'){
-			post_render(client_data);
+			post_render(client_data, block_index);
 		}
 		//attach events to new blocks
 		attachDataFieldEvents();
@@ -343,7 +343,7 @@ function process_table(div_id, block_index, table_data){
 			$('#' + div_id).html(table_data.html);
 		}
 		if(typeof(table_data.client_data) == "object" && typeof post_render == 'function'){
-			post_render(table_data.client_data);
+			post_render(table_data.client_data, block_index);
 		}
 		//@todo: after we convert tables to use JSON, we should only call this if count > ?
 		//without setTimeout, the fixed header is not hidden when page loads

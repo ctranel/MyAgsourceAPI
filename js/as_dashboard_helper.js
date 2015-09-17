@@ -35,7 +35,7 @@ function zpre_render_table(div_id, data){
 	data.html = stripTags(data.html, tags);
 }
 
-function post_render(data){
+function post_render(data, block_index){
 	var div_id = data.block;
 	//move headers from report block to dashboard widget
 	var h2_div = $("#" + div_id).prevAll('h2').clone();
@@ -61,7 +61,7 @@ function post_render(data){
 		}
 	);
 }
-
+/*
 function stripTags(html, tags) {
 	var div = document.createElement('div');
 	div.innerHTML = html;
@@ -74,3 +74,4 @@ function stripTags(html, tags) {
 	}
 	return div.innerHTML;
 }
+*/

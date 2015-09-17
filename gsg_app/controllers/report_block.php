@@ -243,13 +243,7 @@ class report_block extends CI_Controller {
 		$num_parts = count($path_parts);
 		$path_page_segment = $path_parts[$num_parts - 1];
 		$this->section_path = $path_parts[$num_parts - 2] . '/';
-/*var_dump($page_path, $this->section_path, $path_page_segment);
-		
-		$page_path = str_replace('|', '/', urldecode($page_path));
-		$this->section_path = substr($page_path, 0, (strrpos($page_path, '/') + 1));
-		$path_page_segment = substr($page_path, (strrpos($page_path, '/') + 1));
-var_dump($page_path, $this->section_path, $path_page_segment);
-*/		
+
 		$block = $this->blocks->getByPath(urldecode($block_name));
 		$output = $block->displayType();
 		

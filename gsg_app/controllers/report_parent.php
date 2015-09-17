@@ -156,7 +156,6 @@ abstract class report_parent extends CI_Controller {
 			$this->full_section_path = substr($this->full_section_path, 0, -1);
 		}
 		//load sections
-//var_dump($class_dir, $class, $this->full_section_path);
 		$this->section = $sections->getByPath($class . '/');
 		$this->session->set_userdata('section_id', $this->section->id());
 		$sections->loadChildren($this->section, $this->pages, $this->session->userdata('user_id'), $this->herd, $this->ion_auth_model->getTaskPermissions());
