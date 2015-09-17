@@ -56,7 +56,7 @@
 		<a href="https://myagsource.com/"><div class="header-link">&nbsp;</div></a>
 		<?php echo $navigation?>
 	</div> <!-- header -->
-	<div id="main-content" style="height: 9000px;">
+	<div id="main-content">
 		<ul id="session-nav" class="dropdown">
 			<?php if(($this->as_ion_auth->logged_in())):
 				$arr_groups = $this->session->userdata('arr_groups');

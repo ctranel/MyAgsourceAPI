@@ -58,7 +58,7 @@ abstract class report_parent extends CI_Controller {
 	 * section_path
 	 * @var string
 	 **/
-	protected $section_path;
+	protected $full_section_path;
 	
 	/**
 	 * pages
@@ -151,12 +151,13 @@ abstract class report_parent extends CI_Controller {
 			$class = '';
 		}
 		$method = $this->router->fetch_method();
-		$this->section_path = $class_dir . $class;
-		if(substr($this->section_path, -1) === '/'){
-			$this->section_path = substr($this->section_path, 0, -1);
+		$this->full_section_path = $class_dir . $class;
+		if(substr($this->full_section_path, -1) === '/'){
+			$this->full_section_path = substr($this->full_section_path, 0, -1);
 		}
 		//load sections
-		$this->section = $sections->getByPath($this->section_path . '/');
+//var_dump($class_dir, $class, $this->full_section_path);
+		$this->section = $sections->getByPath($class . '/');
 		$this->session->set_userdata('section_id', $this->section->id());
 		$sections->loadChildren($this->section, $this->pages, $this->session->userdata('user_id'), $this->herd, $this->ion_auth_model->getTaskPermissions());
 
@@ -176,7 +177,7 @@ abstract class report_parent extends CI_Controller {
 		$block_name = '';
 
 		$this->page = $this->pages->getByPath($page_name, $this->section->id());
-		$this->report_path = $this->section_path . '/' . $this->page->path();
+		$this->report_path = $this->full_section_path . '/' . $this->page->path();
 
 		$this->page_header_data['num_herds'] = $this->herd_access->getNumAccessibleHerds($this->session->userdata('user_id'), $this->as_ion_auth->arr_task_permissions(), $this->session->userdata('arr_regions'));
 		
@@ -349,10 +350,9 @@ abstract class report_parent extends CI_Controller {
 					if(strpos($display_type, 'chart') !== false){
 						$consec_charts++;
 					}
-//var_dump(urlencode($this->section_path . '/' . $this->page->path())); die;
 					$arr_blk_data = array(
 							'block_num' => $x,
-							'block_csv_url_encoded' => site_url('csv/blocks/csv') . '/' . urlencode(str_replace('/', '|', $this->section_path) . '|' . $this->page->path()) . '/' . $curr->path() . '/null/null/',
+							'block_csv_url_encoded' => site_url('csv/blocks/csv') . '/' . urlencode(str_replace('/', '|', $this->full_section_path) . '|' . $this->page->path()) . '/' . $curr->path() . '/null/null/',
 //							'form_id' => $this->report_form_id,
 							'block' => $curr->path(),
 							'odd_even' => $odd_even,
@@ -383,7 +383,7 @@ abstract class report_parent extends CI_Controller {
 		$this->carabiner->css('expandable.css');
 		$this->carabiner->css('chart.css', 'print');
 		$this->carabiner->css('report.css', 'print');
-		$this->carabiner->css($this->section_path . '.css', 'screen');
+		$this->carabiner->css($this->full_section_path . '.css', 'screen');
 		if($this->filters->displayFilters()){
 			//$this->carabiner->css('filters.css', 'screen');
 			$this->carabiner->css('agsource.datepick.css', 'screen');
@@ -432,8 +432,8 @@ abstract class report_parent extends CI_Controller {
 				]
 			);
 			//load the report-specific js file if it exists
-			if(file_exists(PROJ_DIR . '/' . 'js' . '/' . $this->section_path . '_helper.js')){
-				$this->page_header_data['arr_headjs_line'][] = '{inv_helper: "' . $this->config->item("base_url_assets") . 'js/' . $this->section_path . '_helper.js"}';
+			if(file_exists(PROJ_DIR . '/' . 'js' . '/' . $this->full_section_path . '_helper.js')){
+				$this->page_header_data['arr_headjs_line'][] = '{inv_helper: "' . $this->config->item("base_url_assets") . 'js/' . $this->full_section_path . '_helper.js"}';
 			}
 			$this->page_header_data['arr_headjs_line'][] = 'function(){' . $tmp_js . ';}';
 		}
@@ -444,15 +444,15 @@ abstract class report_parent extends CI_Controller {
 		$this->benchmarks = new Benchmarks($this->session->userdata('user_id'), $this->input->post('herd_code'), $this->herd_model->header_info($this->herd->herdCode()), $this->setting_model, $this->benchmark_model, $this->session->userdata('benchmarks'));
 		$arr_benchmark_data = $this->benchmarks->getFormData($this->session->userdata('benchmarks')); 
 		$arr_nav_data = [
-			'section_path' => $this->section_path,
+			'section_path' => $this->full_section_path,
 			'curr_page' => $this->page->path(),
 			'obj_pages' => $this->section->pages(),
 		];
 
 		$this->page_footer_data = [];
 		$report_filter_path = 'filters';
-		if(file_exists(APPPATH . 'views/' . $this->section_path . '/filters.php')){
-			$report_filter_path =  $this->section_path . '/filters' . $report_filter_path;
+		if(file_exists(APPPATH . 'views/' . $this->full_section_path . '/filters.php')){
+			$report_filter_path =  $this->full_section_path . '/filters' . $report_filter_path;
 		}
 
 		$data = [

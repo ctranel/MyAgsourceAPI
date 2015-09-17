@@ -104,11 +104,12 @@ class Navigation{// implements iWebContentRepository {
 		foreach ($data as $k=>$d) {
 			if ($d['parent_id'] == $parent_id) {
 				unset($data[$k]);
+				$full_path = $path . $d['path'];
 				$tmp_array = [
 					'name' => $d['name'],
-					'href' => '/' . $path . $d['path'],
+					'href' => '/' . $full_path,
 				];
-				$children = $this->buildTree($data, $d['id'], $d['path']);
+				$children = $this->buildTree($data, $d['id'], $full_path);
 				if ($children) {
 					$tmp_array['children'] = $children;
 				}
