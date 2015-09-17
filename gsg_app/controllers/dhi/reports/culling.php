@@ -13,7 +13,7 @@ class Culling extends report_parent {
         
     }
     
-    function hs_inv($block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
+    function cull_summ($block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
         $this->product_name = 'Culling Summary';
         parent::display($block_in, $display_format);
     }
