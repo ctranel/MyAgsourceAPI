@@ -83,9 +83,13 @@ function load_block(server_path, div_id, block_index, params){
 
 	$('#waiting-icon' + block_index).show();
 
-	$.get(server_path, '', function(data) { process_block(div_id, block_index, data); })
+	$.get(server_path, '', function(data) {
+		process_block(div_id, block_index, data); 
+		$('#header').css('width', $("#container").width() + 4);
+	})
 		.fail(function(){console.log(this.responseText);})
-		.fail(function(jqXHR, textStatus, errorThrown){console.log(errorThrown);});
+		.fail(function(jqXHR, textStatus, errorThrown){console.log(errorThrown);
+	});
 	//cancel link when called from anchor tag
 	return;
 }
