@@ -6,9 +6,9 @@ sub {color: #003E3F; font-size: 80%; font-family: "Arial Narrow","Arial","Verdan
 .chart-container a, text, tspan {text-decoration: none;}
 .chart-odd {clear: both; float: left;}
 .chart-even {float: right;}
-.chart-last-odd {clear: both;}
+.chart-only, .chart-last-odd {clear: both;}
 .chart {width: 520px;}
-
+ 
 .chart-container .supplemental-link {text-align: center; margin-top:-5px;}
 .chart-container .supplemental-link a {text-decoration: underline;}
 .highcharts-subtitle {margin-top: -13px !important;}
