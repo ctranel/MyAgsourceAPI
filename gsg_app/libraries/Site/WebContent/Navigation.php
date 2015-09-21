@@ -107,6 +107,7 @@ class Navigation{// implements iWebContentRepository {
 				$full_path = $path . $d['path'];
 				$tmp_array = [
 					'name' => $d['name'],
+					'id' => str_replace('/', '', $d['path']),
 					'href' => '/' . $full_path,
 				];
 				$children = $this->buildTree($data, $d['id'], $full_path);

@@ -85,7 +85,7 @@ function load_block(server_path, div_id, block_index, params){
 
 	$.get(server_path, '', function(data) {
 		process_block(div_id, block_index, data); 
-		$('#header').css('width', $("#container").width() + 4);
+		$('#header').css('width', $("#container").width() + 2);
 	})
 		.fail(function(){console.log(this.responseText);})
 		.fail(function(jqXHR, textStatus, errorThrown){console.log(errorThrown);

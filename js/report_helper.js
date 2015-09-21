@@ -96,7 +96,7 @@ function createFixedHeader(full_table_id){
 	//});
 		
 	$(window).bind("scroll", function() {
-		var pageOffsetTop = $(this).scrollTop();
+		var pageOffsetTop = $(this).scrollTop() + $('#header').outerHeight();
 		$('.tbl').each(function(){
 	    	if(!$('#fh-' + $(this).attr('id')).length){
 	    		return;
@@ -106,7 +106,7 @@ function createFixedHeader(full_table_id){
 	    	$fixedHeader = $('#fh-' + $(this).attr('id'));
 	    	$fixedHeader.css('width', $full_table.css('width'));
 	    	//if the header is above the top of the window but the bottom is not
-            if (pageOffsetTop >= tableOffsetTop && pageOffsetTop <= (tableOffsetBottom - $fixedHeader.height())) {
+	    	if (pageOffsetTop >= tableOffsetTop && pageOffsetTop <= (tableOffsetBottom - $fixedHeader.height())) {
 		    	if($fixedHeader.is(":hidden")){
 		    		$fixedHeader.show();
 		    	}
