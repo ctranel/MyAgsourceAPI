@@ -7,10 +7,10 @@ use \myagsource\Datasource\DbObjects\DbTable;
 use \myagsource\Benchmarks\Benchmarks;
 
 class Herd_overview extends TableData {
-	protected $arr_high_is_bad = array('l1_avg_linear_score', 'l4_avg_linear_score', 'wtd_avg_scc',
+	protected $arr_high_is_bad = ['l1_avg_linear_score', 'l4_avg_linear_score', 'wtd_avg_scc',
 			'l0_new_infection_pct', 'chronic_cases_pct', 'l1_1st_new_infection_pct', 'pregnancy_loss_pct',
 			'l0_exit_herd_pct', 'l0_left_60_dim_pct'
-	);
+	];
 	
 	/*
 	 * @method pivot() overrides report_model

@@ -30,24 +30,24 @@ class DataHandler {
 	}
 	
 	/* -----------------------------------------------------------------
-	*  removeCriteria
+	*  load
 
-	*  removes specified criteria object from filters array
+	*  loads either chart or table data handler
 
 	*  @author: ctranel
 	*  @date: May 13, 2015
 	*  @param: iBlock 
-	*  @param: string 
-	*  @param: report_data_model 
-	*  @param: string 
-	*  @param: string 
+	*  @param: string path
+	*  @param: report_data_model
+	*  @param: DbTable 
+	*  @param: Benchmarks 
 	*  @return iBlockData
 	*  @throws: 
 	 * 
 	 * @todo: get rid of "new" keywords, or consider this a factory?
 	 */
 	
-	function load(iBlock $block, $path, $report_data_datasource, DbTable $db_table, Benchmarks $benchmarks = null){
+	function load(iBlock $block, $path, \report_data_model $report_data_datasource, DbTable $db_table, Benchmarks $benchmarks = null){
 		while(strpos($path, '/') !== false){
 			if(file_exists(APPPATH . $path . '.php')){
 				$data_handler_name = ucwords(substr($path, (strripos($path, '/') + 1)));

@@ -239,11 +239,12 @@ class report_block extends CI_Controller {
 	 * @todo: can I delete the last 2 params?
 	 */
 	public function ajax_report($page_path, $block_name, $sort_by = 'null', $sort_order = 'null', $report_count=0, $json_filter_data = NULL, $cache_buster = NULL) {//, $herd_size_code = FALSE, $all_breeds_code = FALSE
-		$path_parts = explode('|', urldecode($page_path));
+		$page_path = str_replace('|', '/', trim(urldecode($page_path), '|'));
+		$path_parts = explode('/', $page_path);
 		$num_parts = count($path_parts);
 		$path_page_segment = $path_parts[$num_parts - 1];
-		$this->section_path = $path_parts[$num_parts - 2] . '/';
-
+		$this->section_path = isset($path_parts[$num_parts - 2]) ? $path_parts[$num_parts - 2] . '/' : '/';
+		
 		$block = $this->blocks->getByPath(urldecode($block_name));
 		$output = $block->displayType();
 		
