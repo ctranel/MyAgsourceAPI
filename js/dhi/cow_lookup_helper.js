@@ -4,10 +4,10 @@ head.ready(function() {
 			event.preventDefault();
 			return;
 		}
-		var textValue = $(this).val();
+		var textValue = $(this).val().toLowerCase();
 		$("#cow_ref").attr("selectedIndex", "0");
 		$('#cow_ref option').filter(function () {
-			return $(this).html().indexOf(textValue) === 0; 
+			return $(this).text().toLowerCase().indexOf(textValue) === 0; 
 		}).prop("selected",true);
 	});
 	
