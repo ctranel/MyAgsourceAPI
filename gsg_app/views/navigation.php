@@ -73,16 +73,13 @@
 				</nav>
 				<!-- /ko -->
 				<!-- ko if: (selectedChild().oneLevel) -->
-				<nav class="navbar mega" id="top-nav2-mega" style="display:none" role="navigation" data-bind="visible: selectedChild().oneLevel, foreach: selectedChild().children">
-					<div class="nav navbar-nav">
-						<nav class="navbar" id="top-nav3" role="navigation">
-							<a data-bind="click: $parent.setSelected, text: name, attr: {href: href}"></a>
-							<ul data-bind="foreach: children">
-								<li data-bind="css:{'heading': (children().length > 0)}">
-									<a data-bind="click: $parent.setSelected, text: name, attr: {href: href}"></a>
-								</li>
-							</ul>
-						</nav>
+				<nav class="navbar mega" id="top-nav2-mega" style="display:none" role="navigation" data-bind="visible: selectedChild().oneLevel()">
+					<div class="nav navbar-nav" data-bind="tedxt: selectedChild().children().length">
+						<ul data-bind="foreach: selectedChild().children">
+							<li>
+								<a data-bind="click: $parent.setSelected, text: name, attr: {href: href}"></a>
+							</li>
+						</ul>
 					</div>
 				</nav>
 				<!-- /ko -->

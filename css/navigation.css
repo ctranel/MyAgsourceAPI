@@ -25,7 +25,7 @@ bright red; #F60E27
 
 /* override bootstrap styles to apply to all nav */
 .navbar {border: none; min-height: 24px; border-radius:0; z-index: 1001; white-space: nowrap; margin-bottom: 0;}
-.navbar>a {display: block; font-weight: bold;}
+.navbar>a {display: block;}
 .navbar ul {display: inline-block;}
 .navbar li {display: inline-block;}
 .navbar li.first {border-left: none;}

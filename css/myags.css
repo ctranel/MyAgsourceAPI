@@ -117,5 +117,5 @@ label .require {color:#003C39; font-weight:bold;}
 
 .consult-form table td {padding: 0 5px;}
 
-#infoMessage p, #infoMessage {background-color:#fff; color:#F60E27;}
-div#infoMessage {margin: 0 0 10px 0; clear: both;}
+#info-message p, #info-message {background-color:#fff; color:#F60E27;}
+div#info-message {margin: 0 0 10px 0; clear: both;}

@@ -27,7 +27,6 @@ if($('#filter-form')){ //if there is a filter form (only on pages with one table
 		$('.download-csv').click(function(ev){
 			params = encodeURIComponent(JSON.stringify($("#filter-form").serializeObject()));
 			this.href += params;
-console.log($("#filter-form"));
 ev.preventDefault();
 		});
 	}
@@ -38,40 +37,6 @@ head.ready(function() {
 		$('.hasDatepicker').datepick({dateFormat: 'mm-dd-yyyy'});
 	}
 });
-
-
-
-
-function assocFormToObject(objForm){
-	var elements = objForm.elements;
-	var obj_return = {};
-	var el_len = elements.length;
-	for(var i=0; i<el_len; i++){
-		var e = elements[i];
-		if(typeof(e.type) !== 'undefined'){
-			if((e.type === 'text' || e.type === 'hidden' || e.type.indexOf('select') >= 0) && typeof(e.value !== 'undefined')){
-				if(e.name.indexOf('[') >= 0){
-					var name = e.name.substring(0, e.name.indexOf("['"));
-					var idx = e.name.substring(e.name.indexOf("['") + 2, e.name.indexOf("']"));
-					if(typeof(obj_return[name]) === 'undefined'){
-						obj_return[name] = {};
-					} 
-					obj_return[name][idx] = e.value;
-				}
-				else {
-					obj_return[e.name] = e.value;
-				}
-			}
-		}
-	}
-	return obj_return;
-	
-/*	
-	$(objForm).each(function(){
-		console.log(dump($(this).attr('name')));
-	});
-*/
-}
 
 //fixed header
 function createFixedHeader(full_table_id){
@@ -121,47 +86,6 @@ function createFixedHeader(full_table_id){
 	});
 	
 	//$(window).scroll();
-}
-
-//Benchmarks
-if($('#benchmark-form')){ //if there is a filter form (only on pages with one table)
-	$('#default').click(function(ev){
-		$('#make_default').val('1');
-	});
-	
-	$('#set').click(function(ev){
-		$('#make_default').val('0');
-	});
-	
-	$('#benchmark-form').submit(function(ev){
-		ev.preventDefault();
-		params = assocFormToObject(document.getElementById('benchmark-form'));
-		params = encodeURIComponent(JSON.stringify(params));
-		$.post(site_url + 'benchmark/ajax_set/' + params)
-			.done(function(){
-				updatePage(this);
-			})
-			.fail(function(){});
-
-		
-	});
-	
-	$('#breed').change(function(){
-		if($('#breed').val() === 'HO'){
-			$('.HO').show();
-			$('.HO_JE').show();
-		}
-		else if($('#breed').val() === 'JE'){
-			$('.HO').hide();
-			$('.HO_JE').show();
-		}
-		else{
-			$('.HO').hide();
-			$('.HO_JE').hide();
-		}
-	});
-	
-	$('#breed').trigger("change");
 }
 
 $('.handle').click(function(ev){

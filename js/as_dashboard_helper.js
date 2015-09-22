@@ -38,6 +38,7 @@ function zpre_render_table(div_id, data){
 function post_render(data, block_index){
 	var div_id = data.block;
 	//move headers from report block to dashboard widget
+console.log(div_id);
 	var h2_div = $("#" + div_id).prevAll('h2').clone();
 	var h3_div = $("#" + div_id).parent().find('h3').clone();
 	$("#" + div_id).closest('.box').find('h2, h3').remove();

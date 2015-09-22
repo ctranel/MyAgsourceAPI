@@ -9,7 +9,7 @@
 	    self.numChildren = ko.computed(function(){
 	    	return self.children().length;
 	    });
-	    self.hasChildren = ko.computed(function(){
+	    self.hasGrandChildren = ko.computed(function(){
 	    	for(var i in self.children()){
 	    		if(self.children()[i].children().length > 0){
   					return true;
@@ -35,18 +35,18 @@
 	    	if(self.threeLevelNav()){
 	    		return false;
 	    	}
-	    	return (self.children().length > 3 && self.hasChildren());
+	    	return (self.children().length > 3 && self.hasGrandChildren());
 	    });
 
 	    self.twoLevelMega = ko.computed(function(){
 	    	if(self.threeLevelNav()){
 	    		return false;
 	    	}
-	    	return (self.children().length < 4 && self.hasChildren());
+	    	return (self.children().length < 4 && self.hasGrandChildren());
 	    });
 
 	    self.oneLevel = ko.computed(function(){
-	    	return !self.hasChildren();
+	    	return (!self.hasGrandChildren() && self.children().length > 0);
 	    });
 	    
 
@@ -88,13 +88,6 @@
 	    	}
 	    	//mega menus should not show when original nav is refreshed
 	    	$('.mega').hide();
-	    	/*when we no longer worry about IE8 we can do with staight JS:
-				var elements = new Array();
-				elements = getElementsByClassName('mega');
-				for(i in elements ){
-				     elements[i].style.display = "none";
-				};
-			*/
 	    };
 	};
 	
@@ -121,7 +114,7 @@
 	    	}
 	    };
 	    
-	    self.setSelected = function(menu_item){
+	    self.setSelected = function(menu_item, ev){
 	    	self.deselectChildren();
 
 	    	menu_item.isSelected(true);
@@ -129,6 +122,16 @@
 	    	if(menu_item.children().length === 0){
 	    		return true;
 	    	};
+	    	
+	    	//Top level nav is common to all navigation structures and is a sibling subsequent
+	    	//navigation.  If the level immediately following the top level is a dropdown/mega,
+	    	//we need to line up the left side with the clicked menu item as though it were a child
+	    	if(menu_item.oneLevel()){
+	    		var el_parent = $('#' + menu_item.id).closest('li');
+	    		var el_child = $(el_parent).closest('nav').next('nav');
+	    		
+	    		el_child.offset({left: el_parent.offset().left});
+	    	}
 	    };
 	    
 	    self.setSelectedToCurrentPage = function(){

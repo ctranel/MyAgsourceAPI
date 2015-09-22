@@ -34,6 +34,7 @@
 			{bootstrap: "https://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"},
 			{sectionhelper: "<?php echo $this->config->item('base_url_assets'); ?>js/as_section_helper.js"},
 			{formhelper: "<?php echo $this->config->item('base_url_assets'); ?>js/form_helper.js"},
+			{ajaxforms: "<?php echo $this->config->item('base_url_assets'); ?>js/ajax_forms.js"},
 			{ko: "https://cloud.github.com/downloads/knockout/knockout/knockout-2.1.0.js"},
 			{navhelper: "<?php echo $this->config->item('base_url_assets'); ?>js/nav.js"},
 			{navmodel: "<?php echo $this->config->item('base_url_assets'); ?>js/nav_viewmodel.js"}
@@ -98,7 +99,7 @@
 
 	if(isset($error)):
 		if (is_array($error) &&!empty($error)):
-			foreach($error as $e) {?>
+			foreach($error as $e) { ?>
 				<div id="errors"><?php echo $e;?></div>
 			<?php }
 		else: ?>
@@ -119,13 +120,13 @@
 	if(isset($message)):
 		if (is_array($message) && !empty($message)):
 			foreach($message as $m) {?>
-				<div id="infoMessage"><?php echo $m;?></div>
+				<div id="info-message"><?php echo $m;?></div>
 			<?php }
 		elseif(!is_array($message)): ?>
-			<div id="infoMessage"><?php echo $message;?></div>
+			<div id="info-message"><?php echo $message;?></div>
 <?php 	endif;
 	elseif($this->session->flashdata('message') != ''): ?>
-			<div id="infoMessage"><?php echo $this->session->flashdata('message');?></div>
+			<div id="info-message"><?php echo $this->session->flashdata('message');?></div>
 <?php
 	endif;
 	
