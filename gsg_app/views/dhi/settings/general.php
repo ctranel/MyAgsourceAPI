@@ -1,7 +1,10 @@
 <?php echo validation_errors(); ?>
 <?php echo form_open(site_url('dhi/settings/general/ajax_set'), array('name'=>'setting-form', 'id'=>'setting-form', 'class'=>'ajax-form'));	
-	echo form_fieldset('Display Animals By:', ['id' => 'cow-id-fieldset', 'class' => $cow_id_field['class']]);
-		echo form_dropdown('cow_id_field', $cow_id_field['options'], $cow_id_field['selected'], 'id="cow-id-field"');
+	echo form_fieldset('Identification', ['id' => 'cow-id-fieldset', 'class' => $cow_id_field['class']]);
+?>
+	<label for="cow-id-field">Display Animals By</label>
+<?php
+	echo form_dropdown('cow_id_field', $cow_id_field['options'], $cow_id_field['selected'], 'id="cow-id-field"');
 	echo form_fieldset_close();
 ?>
 	<input type="hidden" name="make_default" value="0" id="make_default">
