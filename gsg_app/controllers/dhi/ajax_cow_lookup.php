@@ -46,12 +46,12 @@ class Ajax_cow_lookup extends CI_Controller {
     	$events_data['serial_num'] = $serial_num;
     	$events_data['show_all_events'] = false;
     	$events_data['arr_events'] = $this->events_model->getEventsArray($this->session->userdata('herd_code'), $serial_num, $this->curr_calving_date, false);
-    	$data = array(
+    	$data = [
 			'serial_num'=>$serial_num
     		,'cow_id'=>$events_data[$this->cow_id_field]
 			,'events_content' => $this->load->view('dhi/cow_lookup/events', $events_data, true)
     		,'tab' => $tab
-    	);
+    	];
     	$this->_record_access(93, $this->config->item('product_report_code'));
     	$this->load->view('dhi/cow_lookup/land', $data);
 	}

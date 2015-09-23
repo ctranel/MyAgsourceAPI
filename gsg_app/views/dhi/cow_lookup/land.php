@@ -22,58 +22,60 @@
 </div>
 
 <script type="text/javascript">
-window.onload = function() {
-		  $("#cow-lookup-tabs").tab();
-		  $("#cow-lookup-tabs").bind("click", function(e) {    
-		    var contentID  = $(e.target).attr("data-target");
-		    var contentURL = $(e.target).attr("href");
-		    if (typeof(contentURL) != 'undefined' && $(contentID).html().length < 20)
-		      $(contentID).load(contentURL, function(){ $("#cow-lookup-tabs").tab(); });
-		    else
-		      $(contentID).tab('show');
-		  });
-		  $('#cow-lookup-tabs a:first').tab("show");
+function wirePage(){
+	$("#cow-lookup-tabs").tab();
+	$("#cow-lookup-tabs").bind("click", function(e) {    
+	    var contentID  = $(e.target).attr("data-target");
+	    var contentURL = $(e.target).attr("href");
+	    if (typeof(contentURL) != 'undefined' && $(contentID).html().length < 20){
+	    	$(contentID).load(contentURL, function(){ $("#cow-lookup-tabs").tab(); });
+	    }
+		else {
+	    	$(contentID).tab('show');
+		}
+	});
+	$('#cow-lookup-tabs a:first').tab("show");
 
 	
 	var date_from_string = function(str){
-		    var pattern = "^(\\d{1,2})\/(\\d{1,2})\/(\\d{4})$";
-		    var re = new RegExp(pattern);
-		    var DateParts = re.exec(str).slice(1);
-		
-		    var Year = DateParts[2];
-		    var Month = DateParts[0];
-		    var Day = DateParts[1];
-		    return new Date(Year, Month, Day);
-		}
+	    var pattern = "^(\\d{1,2})\/(\\d{1,2})\/(\\d{4})$";
+	    var re = new RegExp(pattern);
+	    var DateParts = re.exec(str).slice(1);
+
+	    var Year = DateParts[2];
+	    var Month = DateParts[0];
+	    var Day = DateParts[1];
+	    return new Date(Year, Month, Day);
+	}
 	
 	var dateFunc = function(a,b){
-		    // Get these into date objects for comparison.
-		    aDate = date_from_string(a);
-		    bDate = date_from_string(b);
-		
-		    return aDate - bDate;
-		}
+	    // Get these into date objects for comparison.
+	    aDate = date_from_string(a);
+	    bDate = date_from_string(b);
+	
+	    return aDate - bDate;
+	}
 	
 	var addRowClasses = function(){
-			$(".simple-sort").each(function(){
-				var cnt = 1;
-				var cls = 'odd';
-				$(this).find ('tbody  tr').each(function(){
-					cls = 'even';
-					if(cnt % 2 == 1) cls = 'odd';
-					$(this).removeClass("odd even");
-					$(this).addClass(cls);
-					cnt++;
-				});
+		$(".simple-sort").each(function(){
+			var cnt = 1;
+			var cls = 'odd';
+			$(this).find ('tbody  tr').each(function(){
+				cls = 'even';
+				if(cnt % 2 == 1) cls = 'odd';
+				$(this).removeClass("odd even");
+				$(this).addClass(cls);
+				cnt++;
 			});
-		}
+		});
+	}
 	
 	var loadTab = function(e){
-		    var contentID  = $(e.target).attr("data-target");
-		    var contentURL = $(e.target).attr("href");
-		    $(contentID).load(contentURL, function(){ $("#cow-lookup-tabs").tab(); });
-		}
-	
+		var contentID  = $(e.target).attr("data-target");
+		var contentURL = $(e.target).attr("href");
+		$(contentID).load(contentURL, function(){ $("#cow-lookup-tabs").tab(); });
+	};
+
 	<?php
 	if($tab == 'sire'): ?>
 		$('#sire-tab').trigger('click');
@@ -85,4 +87,15 @@ window.onload = function() {
 	endif; 
 	?>
 }
+
+function checkJquery(){
+	if(typeof(jQuery) !== 'undefined' && typeof($("#cow-lookup-tabs").tab) == 'function'){
+		wirePage();
+	}
+	else{
+		setTimeout(checkJquery, 50);
+	}
+}
+
+checkJquery();
 </script>
