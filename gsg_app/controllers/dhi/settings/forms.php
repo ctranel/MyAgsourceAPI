@@ -1,17 +1,19 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
-require_once(APPPATH . 'libraries/Benchmarks/Benchmarks.php');
 require_once(APPPATH . 'libraries/dhi/HerdAccess.php');
 require_once(APPPATH . 'libraries/dhi/Herd.php');
 require_once(APPPATH . 'libraries/AccessLog.php');
 require_once(APPPATH . 'libraries/Notifications/Notifications.php');
+require_once APPPATH . 'libraries/Settings/SessionSettings.php';
+require_once(APPPATH . 'libraries/Benchmarks/Benchmarks.php');
 
-use \myagsource\Benchmarks\Benchmarks;
+use myagsource\Settings\SessionSettings;
 use \myagsource\dhi\HerdAccess;
 use \myagsource\dhi\Herd;
 use \myagsource\AccessLog;
 use \myagsource\notices\Notifications;
+use \myagsource\Benchmarks\Benchmarks;
 
-class Settings extends CI_Controller {
+class Forms extends CI_Controller {
 	/**
 	 * herd_access
 	 * @var HerdAccess
@@ -86,23 +88,44 @@ class Settings extends CI_Controller {
 		redirect($url);
 	}
 
+	function general(){
+		$err = '';
+		//form validation is handled by the controller to which the form is submitted
+		
+		//get setting data and load form
+		$this->load->model('setting_model');
+		$this->settings = new SessionSettings($this->session->userdata('user_id'), $this->session->userdata('herd_code'), $this->setting_model, 'general_dhi', $this->session->userdata('general_dhi')); //last optional param is session_values
+		$settings_data = $this->settings->getFormData($this->session->userdata('dhi_settings')); 
+		if(isset($settings_data)){
+			$page_data['form'] = $this->load->view('dhi/settings/general', $settings_data, TRUE);
+		}
+		else{
+			$err = 'General DHI Settings form could not be found.  Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' for assistance.';
+		}
+
+		//header
+		$this->page_header_data = array_merge($this->page_header_data,
+			[
+				'title'=>'General DHI Settings  - ' . $this->config->item('product_name'),
+				'description'=>'General DHI Settings Form for ' . $this->config->item('product_name'),
+				'arr_headjs_line'=>[
+					'{form_helper: "' . $this->config->item("base_url_assets") . 'js/form_helper.js"}',
+				]
+			]
+		);
+		$this->page_header_data['message'] = compose_error($err, validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages());
+		$this->page_header_data['page_heading'] = 'General DHI Settings';
+		
+		//put it all together
+		$page_data['page_header'] = $this->load->view('page_header', $this->page_header_data, TRUE);
+		$page_data['page_footer'] = $this->load->view('page_footer', [], TRUE);
+			
+		$this->load->view('form_page', $page_data);
+   	}
+	
 	function benchmarks(){
 		$err = '';
-		//validate form input
-		$this->load->library('form_validation');
-		//$this->form_validation->set_rules('cow_ref', 'Cow', 'required|max_length[8]');
-		//$this->form_validation->set_rules('herd_code_fill', 'Type Herd Code');
-
-		if ($this->form_validation->run() == TRUE) { //successful submission
-			//save form data
-
-			//$this->_record_access(2); //2 is the page code for herd change
-//			redirect(site_url($redirect_url));
-//			exit();
-		}
-		else {
-			
-		}
+		//form validation is handled by the controller to which the form is submitted
 
 		//get benchmark data and load form
 		$this->load->model('setting_model');
@@ -110,7 +133,7 @@ class Settings extends CI_Controller {
 		$this->benchmarks = new Benchmarks($this->session->userdata('user_id'), $this->input->post('herd_code'), $this->herd_model->header_info($this->herd->herdCode()), $this->setting_model, $this->benchmark_model, $this->session->userdata('benchmarks'));
 		$arr_benchmark_data = $this->benchmarks->getFormData($this->session->userdata('benchmarks')); 
 		if(isset($arr_benchmark_data)){
-			$page_data['form'] = $this->load->view('set_benchmarks', $arr_benchmark_data, TRUE);
+			$page_data['form'] = $this->load->view('dhi/settings/benchmarks', $arr_benchmark_data, TRUE);
 		}
 		else{
 			$err = 'Benchmark form could not be found.  Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' for assistance.';
@@ -136,7 +159,7 @@ class Settings extends CI_Controller {
 		$this->load->view('form_page', $page_data);
    	}
 	
-	function log_page(){
+   	function log_page(){
 		echo $this->access_log_model->write_entry();
 		exit;
 	}

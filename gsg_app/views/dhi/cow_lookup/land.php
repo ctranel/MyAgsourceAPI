@@ -1,5 +1,5 @@
 <div id="tab-container">
-	<h2><?php echo $barn_name; ?></h2>
+	<h2><?php echo $cow_id; ?></h2>
 	<!-- <div class="withheld"><?php //echo $withheld; ?></div> -->
 	<ul id="cow-lookup-tabs" class="nav nav-tabs">
 		<li><a data-target="#events" data-toggle="tab" href="<?php echo site_url('/dhi/ajax_cow_lookup/events/' . $serial_num); ?>">Events</a></li>

@@ -185,7 +185,7 @@ class Index extends report_parent {
 		$arr_benchmark_data = $this->benchmarks->getFormData($this->session->userdata('benchmarks')); 
 		if(isset($arr_benchmark_data)){
 			$this->data['widget']['herd'][] = array(
-				'content' => $this->load->view('set_benchmarks', $arr_benchmark_data, TRUE),
+				'content' => $this->load->view('dhi/settings/benchmarks', $arr_benchmark_data, TRUE),
 				'title' => 'Benchmarks',
 				'id' => 'benhmarks',
 			);

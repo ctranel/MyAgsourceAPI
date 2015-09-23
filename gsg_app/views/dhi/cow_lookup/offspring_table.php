@@ -36,7 +36,7 @@ if(isset($arr_offspring) && is_array($arr_offspring)): ?>
 	</table>
 <?php 
 else: ?>
-	<div>No offspring found for <?php echo $barn_name; ?></div>
+	<div>No offspring found for <?php echo $cow_id; ?></div>
 <?php 
 endif; ?>
 

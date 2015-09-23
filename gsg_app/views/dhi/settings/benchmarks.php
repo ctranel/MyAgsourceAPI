@@ -1,5 +1,5 @@
 <?php echo validation_errors(); ?>
-<?php echo form_open(site_url('benchmark/ajax_set'), array('name'=>'benchmark-form', 'id'=>'benchmark-form', 'class'=>'ajax-form'));	
+<?php echo form_open(site_url('dhi/settings/benchmark/ajax_set'), array('name'=>'benchmark-form', 'id'=>'benchmark-form', 'class'=>'ajax-form'));	
 	echo form_fieldset('Select Breed', array('id' => 'breed-fieldset', 'class' => $breed['class']));
 		echo form_dropdown('breed', $breed['options'], $breed['selected'], 'id="breed"');
 	echo form_fieldset_close();

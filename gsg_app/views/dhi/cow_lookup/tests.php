@@ -62,7 +62,7 @@ if(isset($arr_tests) && is_array($arr_tests)): ?>
 	</table><!-- end #EVENTS_EVENTS -->
 <?php 
 else: ?>
-	<div>No tests found for <?php echo $barn_name; ?></div>
+	<div>No tests found for <?php echo $cow_id; ?></div>
 <?php 
 endif; ?>
 <script type="text/javascript">

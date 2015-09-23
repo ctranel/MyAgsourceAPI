@@ -4,7 +4,14 @@ use \myagsource\AccessLog;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 class Ajax_cow_lookup extends CI_Controller {
-	var $barn_name;
+	
+	/**
+	 * cow_id_field
+	 * @var String
+	 **/
+	protected $cow_id_field;
+	
+	var $cow_id;
 	var $curr_lact_num;
 	var $curr_calving_date;
 	
@@ -16,6 +23,7 @@ class Ajax_cow_lookup extends CI_Controller {
 		$redirect_url = set_redirect_url($this->uri->uri_string(), $this->session->flashdata('redirect_url'), $this->as_ion_auth->referrer);
 		$this->session->set_flashdata('redirect_url', $redirect_url);
 		
+		$this->cow_id_field = $this->session->userdata('general_dhi')['cow_id_field'];
 		$herd_code = $this->session->userdata('herd_code');
 		if(((!isset($this->as_ion_auth) || !$this->as_ion_auth->logged_in()) && $herd_code != $this->config->item('default_herd')) || empty($herd_code)){
 			$this->load->view('session_expired', array('url'=>$this->session->flashdata('redirect_url')));
@@ -40,7 +48,7 @@ class Ajax_cow_lookup extends CI_Controller {
     	$events_data['arr_events'] = $this->events_model->getEventsArray($this->session->userdata('herd_code'), $serial_num, $this->curr_calving_date, false);
     	$data = array(
 			'serial_num'=>$serial_num
-    		,'barn_name'=>$events_data['barn_name']
+    		,'cow_id'=>$events_data[$this->cow_id_field]
 			,'events_content' => $this->load->view('dhi/cow_lookup/events', $events_data, true)
     		,'tab' => $tab
     	);
@@ -97,7 +105,7 @@ class Ajax_cow_lookup extends CI_Controller {
 	}
 	
 	function tests($serial_num, $lact_num=NULL){
-		if(!isset($this->curr_lact_num) || !isset($this->barn_name)) {
+		if(!isset($this->curr_lact_num) || !isset($this->cow_id)) {
 			$this->_loadObjVars($serial_num);
 		}
 		if(!isset($lact_num)){
@@ -106,7 +114,7 @@ class Ajax_cow_lookup extends CI_Controller {
 		$this->load->model('dhi/cow_lookup/tests_model');
 		$data = array(
 			'arr_tests' => $this->tests_model->getTests($this->session->userdata('herd_code'), $serial_num, $lact_num)
-			,'barn_name' => $this->barn_name
+			,'cow_id' => $this->cow_id
 			,'serial_num' => $serial_num
 			,'lact_num' => $lact_num
 			,'curr_lact_num' => $this->curr_lact_num
@@ -124,7 +132,7 @@ class Ajax_cow_lookup extends CI_Controller {
 	}
 	
 	function graphs($serial_num, $lact_num=NULL){
-		if(!isset($this->curr_lact_num) || !isset($this->barn_name)) {
+		if(!isset($this->curr_lact_num) || !isset($this->cow_id)) {
 			$this->_loadObjVars($serial_num);
 		}
 		if(!isset($lact_num)){
@@ -134,7 +142,7 @@ class Ajax_cow_lookup extends CI_Controller {
 		$this->load->library('chart');
 		$data = array(
 			'arr_tests' => $this->chart->formatDataSet($this->graphs_model->getGraphData($this->session->userdata('herd_code'), $serial_num, $lact_num), 'lact_dim')
-			,'barn_name' => $this->barn_name
+			,'cow_id' => $this->cow_id
 			,'serial_num' => $serial_num
 			,'lact_num' => $lact_num
 			,'curr_lact_num' => $this->curr_lact_num
@@ -145,7 +153,7 @@ class Ajax_cow_lookup extends CI_Controller {
 	protected function _loadObjVars($serial_num){
 		$this->load->model('dhi/cow_lookup/events_model');
 		$events_data = $this->events_model->getCowArray($this->session->userdata('herd_code'), $serial_num);
-		$this->barn_name = $events_data['barn_name'];
+   		$this->cow_id = $events_data[$this->cow_id_field];
 		$this->curr_lact_num = $events_data['curr_lact_num'];
 		$this->curr_calving_date = $events_data['curr_calving_date'];
 	} 

@@ -69,33 +69,33 @@ class Benchmarks extends SessionSettings
 		$this->benchmark_model = $benchmark_model;
 		$this->session_data = $session_benchmarks;
 		
-		$this->arr_herd_size_groups = array(
-			1 => array('floor' => 1, 'ceiling' => 124),
-			2 => array('floor' => 125, 'ceiling' => 500),
-			3 => array('floor' => 501, 'ceiling' => 2000),
-			4 => array('floor' => 2001, 'ceiling' => 100000),
-		);
+		$this->arr_herd_size_groups = [
+			1 => ['floor' => 1, 'ceiling' => 124],
+			2 => ['floor' => 125, 'ceiling' => 500],
+			3 => ['floor' => 501, 'ceiling' => 2000],
+			4 => ['floor' => 2001, 'ceiling' => 100000],
+		];
 
 		/**
 		 * @todo : need a more elegent/flexible/reliable (using DB?) way to set a multidimensional setting
 		 */
 		$this->arr_criteria_table = array(
-			'PROD' => array(
+			'PROD' => [
 				'field' => 'rha_milk_lbs',
 				'sort_order' => 'desc',
-			),
-			'GEN' => array(
+			],
+			'GEN' => [
 				'field' => 'net_merit_amt',
 				'sort_order' => 'desc',
-			),
-			'REPRO' => array(
+			],
+			'REPRO' => [
 				'field' => 'pregnancy_rate_pct',
 				'sort_order' => 'desc',
-			),
-			'UH' => array(
+			],
+			'UH' => [
 				'field' => 'wtd_avg_scc',
 				'sort_order' => 'asc',
-			),
+			],
 		);
 		
 		$this->setHerdDefaults($herd_info['breed_code'], $herd_info['herd_size']);
