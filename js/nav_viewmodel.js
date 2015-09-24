@@ -94,23 +94,26 @@
 	var ViewModel = ViewModel || function (nav) {
 	    var self = this;
 
-	    self.selectedChild = ko.observable();
-	    self.children = ko.observableArray();
-	    self.numChildren = ko.computed(function(){
-	    	return self.children().length;
+	    self.selectedNav = ko.observable();
+	    self.navItems = ko.observableArray();
+	    self.numTopNavItems = ko.computed(function(){
+	    	return self.navItems().length;
 	    });
 
 	    for(i in nav){
-	    	self.children.push(new MenuEntry(nav[i].name, nav[i].id, nav[i].href, false, nav[i].children));
+	    	self.navItems.push(new MenuEntry(nav[i].name, nav[i].id, nav[i].href, false, nav[i].children));
 	    }
 		
 	    self.deselectChildren = function(){
-	    	for(i in self.children()){
-	    		self.children()[i].selectedChild = ko.observable();
-    			self.children()[i].isSelected(false);
-    			if(self.children()[i].numChildren() > 0){
-    				self.children()[i].deselectChildren();
-    			}
+	    	self.selectedNav(undefined);
+	    	for(i in self.navItems()){
+	    		if(self.navItems()[i].isSelected()){
+	    			self.navItems()[i].isSelected(false);
+	    			self.navItems()[i].selectedChild(null);
+	    			if(self.navItems()[i].numChildren() > 0){
+	    				self.navItems()[i].deselectChildren();
+	    			}
+	    		}
 	    	}
 	    };
 	    
@@ -118,7 +121,7 @@
 	    	self.deselectChildren();
 
 	    	menu_item.isSelected(true);
-	    	self.selectedChild(menu_item);
+	    	self.selectedNav(menu_item);
 	    	if(menu_item.children().length === 0){
 	    		return true;
 	    	};
@@ -137,13 +140,13 @@
 	    self.setSelectedToCurrentPage = function(){
 	    	self.deselectChildren();
 	    	var path_parts = window.location.pathname.substring(1).split("/");
-	    	for(var i in self.children()){
-	    		var path_index = path_parts.indexOf(self.children()[i].id);
+	    	for(var i in self.navItems()){
+	    		var path_index = path_parts.indexOf(self.navItems()[i].id);
 	    		if(path_index !== -1){
-	    			self.setSelected(self.children()[i]);
+	    			self.setSelected(self.navItems()[i]);
 	    			var path_param = path_parts.slice(path_index + 1);
 	    			if(path_param.length > 0){
-	    				self.children()[i].setSelectedToCurrentPage(path_param);
+	    				self.navItems()[i].setSelectedToCurrentPage(path_param);
 	    			}
 	    		}
 	    	}
