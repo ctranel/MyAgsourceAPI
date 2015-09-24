@@ -450,7 +450,7 @@ class Herd_model extends CI_Model {
 	 * getCowList
 	 * @param string herd code
 	 * @param string or array id fields
-	 * @return array of herd output data arrays
+	 * @return array
 	 * @author ctranel
 	 **/
 	public function getCowList($herd_code, $id_field){

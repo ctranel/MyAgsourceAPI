@@ -128,7 +128,7 @@ class Cow_lookup extends CI_Controller {
 		$err = '';
 		$form_data['cow_selected'] = $serial_num;
 		if(is_array($cow_options) && !empty($cow_options)){
-			$form_data['cow_options'] = $cow_options;
+			$form_data['cow_options'] = ['' => 'Select'] + $cow_options;
 			unset($cow_options);
 		}
 		else{
