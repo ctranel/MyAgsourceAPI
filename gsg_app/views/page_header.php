@@ -71,7 +71,24 @@
 					</li> <!-- close "Select Section" li -->
 				<?php endif; ?>
 			<li><?php echo anchor('auth/logout', 'Log Out'); ?></li>
-				<li><?php echo anchor('', 'Home/Account'); ?></li>
+				<li><?php echo anchor('', 'Dashboard'); ?></li>
+				<?php 
+					$class = 'first';
+					if($this->as_ion_auth->has_permission("Add All Users") || $this->as_ion_auth->has_permission("Add Users In Region")): ?>
+						<li class="<?php echo $class; ?>"><?php echo anchor('auth/create_user','Add Account', 'class="teal_banner"') ?></li>
+				<?php	$class = '';
+					endif; 
+					if($this->as_ion_auth->has_permission("Edit All Users") || $this->as_ion_auth->has_permission("Edit Users In Region")): ?>
+						<li><?php echo anchor('auth/list_accounts','List Accounts', 'class="teal_banner"') ?></li>
+				<?php	$class = '';
+					endif; ?>
+					<?php if($this->as_ion_auth->is_editable_user($this->session->userdata('user_id'), $this->session->userdata('user_id'))): ?>
+						<li class="<?php echo $class; ?>"><?php echo anchor('auth/edit_user','Edit Account', 'class="teal_banner"') ?></li>
+				<?php	$class = '';
+					endif; ?>
+					<?php if(false && $this->as_ion_auth->has_permission("View Access Log")): ?>
+						<li class="<?php echo $class; ?>"><?php echo anchor('access_log/display', 'Access Log', 'class="teal_banner"'); ?></li>
+					<?php endif; ?>
 				<?php if($this->as_ion_auth->has_permission("View Assign w permission")): ?>
 					<li><?php echo anchor('auth/service_grp_manage_herds', 'Manage Herd Access'); ?></li>
 					<li><?php echo anchor('auth/service_grp_request', 'Request Herd Access'); ?></li>
@@ -86,10 +103,10 @@
 				<?php if($this->as_ion_auth->has_permission("Request Herd")): ?>
 					<li><?php echo anchor('dhi/change_herd/request', 'Request Herd'); ?></li>
 				<?php endif; ?>
-				<?php elseif($this->router->fetch_method() != 'login'): ?>
+			<?php elseif($this->router->fetch_method() != 'login'): ?>
 				<li><?php echo anchor('auth/login', 'Log In');?></li>
 				<li><?php echo anchor('auth/create_user', 'Register');?></li>
-				<li><?php echo anchor('', 'Home/Account'); ?></li>
+				<li><?php echo anchor('', 'Dashboard'); ?></li>
 				<li><?php echo anchor('help', 'Help'); ?></li>
 			<?php endif; ?>
 		</ul>
