@@ -96,6 +96,7 @@ class Forms extends CI_Controller {
 		$this->load->model('setting_model');
 		$this->settings = new SessionSettings($this->session->userdata('user_id'), $this->session->userdata('herd_code'), $this->setting_model, 'general_dhi', $this->session->userdata('general_dhi')); //last optional param is session_values
 		$settings_data = $this->settings->getFormData($this->session->userdata('dhi_settings')); 
+		
 		if(isset($settings_data)){
 			$page_data['form'] = $this->load->view('dhi/settings/general', $settings_data, TRUE);
 		}
@@ -114,7 +115,7 @@ class Forms extends CI_Controller {
 			]
 		);
 		$this->page_header_data['message'] = compose_error($err, validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages());
-		$this->page_header_data['page_heading'] = 'General DHI Settings';
+		$this->page_header_data['page_heading'] = 'General DHI Settings for Herd ' . $this->session->userdata('herd_code');
 		
 		//put it all together
 		$page_data['page_header'] = $this->load->view('page_header', $this->page_header_data, TRUE);
@@ -138,7 +139,7 @@ class Forms extends CI_Controller {
 		else{
 			$err = 'Benchmark form could not be found.  Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' for assistance.';
 		}
-
+		
 		//header
 		$this->page_header_data = array_merge($this->page_header_data,
 			[
@@ -150,7 +151,7 @@ class Forms extends CI_Controller {
 			]
 		);
 		$this->page_header_data['message'] = compose_error($err, validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages());
-		$this->page_header_data['page_heading'] = 'Benchmark Settings';
+		$this->page_header_data['page_heading'] = 'Benchmark Settings for Herd ' . $this->session->userdata('herd_code');
 		
 		//put it all together
 		$page_data['page_header'] = $this->load->view('page_header', $this->page_header_data, TRUE);

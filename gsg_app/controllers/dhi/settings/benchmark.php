@@ -1,4 +1,7 @@
 <?php
+/*
+ * Form-processing controller.  Does not load a new page, only gives JSON response to the form submission
+ */
 require_once(APPPATH . 'libraries/Benchmarks/Benchmarks.php');
 
 use \myagsource\Benchmarks\Benchmarks;
