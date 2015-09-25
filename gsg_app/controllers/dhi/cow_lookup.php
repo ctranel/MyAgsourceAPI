@@ -99,16 +99,16 @@ class Cow_lookup extends CI_Controller {
 		//validate form input
 		$this->load->library('form_validation');
 		$this->form_validation->set_rules('cow_ref', 'Cow', 'required|max_length[8]');
+		$this->form_validation->set_rules('tab', 'Tab', '');
 		//$this->form_validation->set_rules('herd_code_fill', 'Type Herd Code');
 		$cow_options = $this->herd->getCowOptions($this->cow_id_field);
 		if ($this->form_validation->run() == TRUE) { //successful submission
 			$serial_num = $this->form_validation->set_value('cow_ref', key($cow_options));
-			//$this->_record_access(2); //2 is the page code for herd change
-//			redirect(site_url($redirect_url));
-//			exit();
+			$tab = $this->form_validation->set_value('tab', 'events');
 		}
 		else {
 			$serial_num = key($cow_options);
+			$tab = 'events';
 		}
 
 		//load cow data for tabs
@@ -122,7 +122,7 @@ class Cow_lookup extends CI_Controller {
 			'serial_num'=>$serial_num
     		,'cow_id'=>$events_data[$this->cow_id_field]
 			,'events_content' => $this->load->view('dhi/cow_lookup/events', $events_data, true)
-    		,'tab' => 'events'
+    		,'tab' => $tab
     	];
 				
 		$err = '';
@@ -136,8 +136,9 @@ class Cow_lookup extends CI_Controller {
 		}
 
 		$form_data['cow_ref'] = 'id = "cow_ref"';
-
-		$form_data['cow_fill'] = ['name' => 'cow_fill',
+		$form_data['tab'] = $tab;
+		$form_data['cow_fill'] = [
+			'name' => 'cow_fill',
 			'id' => 'cow_fill',
 			'type' => 'text',
 			'size' => '15',
