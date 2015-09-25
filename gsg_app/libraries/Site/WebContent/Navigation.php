@@ -105,9 +105,10 @@ class Navigation{// implements iWebContentRepository {
 			if ($d['parent_id'] == $parent_id) {
 				unset($data[$k]);
 				$full_path = $path . $d['path'];
+				$dom_id = explode('/', trim($d['path'], '/'))[0];
 				$tmp_array = [
 					'name' => $d['name'],
-					'id' => str_replace('/', '', $d['path']),
+					'id' => $dom_id,//split and take the first element
 					'href' => '/' . $full_path,
 				];
 				$children = $this->buildTree($data, $d['id'], $full_path);
