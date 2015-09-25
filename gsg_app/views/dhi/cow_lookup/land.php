@@ -33,7 +33,7 @@ function wirePage(){
 		else {
 	    	$(contentID).tab('show');
 		}
-		if($('#select_cow')){
+		if(!!document.getElementById('select_cow')){
 			document.getElementById('select_cow')['tab'].setAttribute('value', contentID.replace('#', ''));
 		}
 	});
@@ -79,7 +79,7 @@ function wirePage(){
 		$(contentID).load(contentURL, function(){ $("#cow-lookup-tabs").tab(); });
 	};
 
-	if($('#select_cow')){
+	if(!!document.getElementById('select_cow')){
 		var selected_tab = document.getElementById('select_cow')['tab'].getAttribute('value');
 		$('#' + selected_tab + '-tab').trigger('click');
 	}
