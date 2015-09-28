@@ -91,8 +91,8 @@ abstract class report_parent extends CI_Controller {
 	protected $herd;
 
 //	protected $report_form_id;
-	protected $arr_sort_by = array();
-	protected $arr_sort_order = array();
+	protected $arr_sort_by = [];
+	protected $arr_sort_order = [];
 	protected $product_name;
 	protected $report_path;
 	//protected $primary_model_name;
@@ -105,13 +105,6 @@ abstract class report_parent extends CI_Controller {
 	protected $notifications;
 	protected $notices;
 
-	/**
-	 * Benchmark settings
-	 * 
-	 * @var Session_settings object
-	protected $bench_setting;
-	 */
-	
 	function __construct(){
 		parent::__construct();
 
@@ -156,7 +149,6 @@ abstract class report_parent extends CI_Controller {
 			$this->full_section_path = substr($this->full_section_path, 0, -1);
 		}
 		//load sections
-//var_dump($class_dir, $class, $this->full_section_path);
 		$this->section = $sections->getByPath($class . '/');
 		$this->session->set_userdata('section_id', $this->section->id());
 		$sections->loadChildren($this->section, $this->pages, $this->session->userdata('user_id'), $this->herd, $this->ion_auth_model->getTaskPermissions());
@@ -482,7 +474,7 @@ abstract class report_parent extends CI_Controller {
 		$data['page_supplemental'] = $page_supp->getContent();
 
 		if(isset($arr_benchmark_data)){
-			$collapse_data['content'] = $this->load->view('set_benchmarks', $arr_benchmark_data, TRUE);
+			$collapse_data['content'] = $this->load->view('dhi/settings/benchmarks', $arr_benchmark_data, TRUE);
 			$collapse_data['title'] = 'Set Benchmarks';
 			$collapse_data['id'] = 'bench-div';
 			$data['benchmarks'] = $this->load->view('collapsible', $collapse_data, TRUE);

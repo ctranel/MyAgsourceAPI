@@ -102,7 +102,7 @@ class SessionSettings {
 			return false;//$this->loadSettings();
 		}
 		
-		$ret_val = array();
+		$ret_val = [];
 		if(isset($this->arr_settings) && is_array($this->arr_settings)){
 			foreach($this->arr_settings as $k=>$s){
 				$sess_val = isset($session_values[$k]) ? $session_values[$k] : null;
@@ -223,7 +223,7 @@ class SessionSettings {
 	*/
 	public static function parseFormData($form_data){
 		return $form_data;
-/*		$ret_val = array();
+/*		$ret_val = [];
 		if(!isset($form_data) || !is_array($form_data)){
 			return false;
 		}
@@ -263,7 +263,7 @@ class SessionSettings {
 		if(!isset($arr_settings) || !is_array($arr_settings)){
 			return false;
 		}
-		$arr_data = array();
+		$arr_data = [];
 		
 		$user_id = isset($this->user) ? $this->user : null;
 		

@@ -64,7 +64,7 @@ if(isset($arr_lacts) && is_array($arr_lacts)): ?>
 	</table><!-- end #EVENTS_EVENTS -->
 <?php 
 else: ?>
-	<div>No lactations found for <?php echo $barn_name; ?></div>
+	<div>No lactations found for <?php echo $cow_id; ?></div>
 <?php 
 endif; ?>
 

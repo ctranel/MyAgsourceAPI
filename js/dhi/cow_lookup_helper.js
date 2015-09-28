@@ -1,14 +1,25 @@
 head.ready(function() {
 	$("#cow_fill").on("keyup blur change", function(event) {
-	 	if (event.which == "9" || event.which == "13" || event.which == "16" || event.which == "18") {
+		if (event.which == "9" || event.which == "13" || event.which == "16" || event.which == "18") {
 			event.preventDefault();
 			return;
 		}
-		var textValue = $(this).val();
-		$("#cow_ref").attr("selectedIndex", "0");
+		var textValue = $(this).val().toLowerCase();
+
 		$('#cow_ref option').filter(function () {
-			return $(this).html().indexOf(textValue) === 0; 
+			return $(this).text().toLowerCase().indexOf(textValue) === 0; 
 		}).prop("selected",true);
+		
+		var sel_index = document.getElementById('cow_ref').selectedIndex;
+		var sel_val = document.getElementById('cow_ref').options[sel_index].innerHTML;
+
+		if(sel_val.toLowerCase().indexOf(textValue) !== 0){
+			document.getElementById('info-message').innerHTML = 'No cows match ' + $(this).val();
+			document.getElementById('cow_ref').options[sel_index].selected = false; 
+		}
+		else {
+			document.getElementById('info-message').innerHTML = '';
+		}
 	});
 	
 	$("#select_cow").on("submit", function(ev) {

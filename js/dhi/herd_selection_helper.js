@@ -2,11 +2,21 @@ head.ready(function() {
 	$("#herd_code_fill").on("keyup blur change", function(event) {
 	 	if (event.which == "9" || event.which == "13" || event.which == "16" || event.which == "18") {
 			event.preventDefault();
+			return;
+		}
+
+		var textValue = $(this).val();
+		$("#herd_code").attr("selectedIndex", "0");
+		$('#herd_code option[value^="' + $(this).val() + '"]').prop("selected",true);
+		
+		var sel_index = document.getElementById('herd_code').selectedIndex;
+		var sel_val = document.getElementById('herd_code').options[sel_index].value;
+		if(sel_val.indexOf(textValue) !== 0){
+			document.getElementById('info-message').innerHTML = 'No herds match ' + $(this).val();
+			document.getElementById('herd_code').options[sel_index].selected = false; 
 		}
 		else {
-			var textValue = $(this).val();
-			$("#herd_code").attr("selectedIndex", "0");
-			var matches = $('#herd_code option[value^="' + $(this).val() + '"]').prop("selected",true);
+			document.getElementById('info-message').innerHTML = '';
 		}
 	});
 	

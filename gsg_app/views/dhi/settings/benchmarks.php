@@ -1,5 +1,5 @@
 <?php echo validation_errors(); ?>
-<?php echo form_open('benchmarks/ajax_set', array('name'=>'benchmark-form', 'id'=>'benchmark-form'));	
+<?php echo form_open(site_url('dhi/settings/benchmark/ajax_set'), array('name'=>'benchmark-form', 'id'=>'benchmark-form', 'class'=>'ajax-form'));	
 	echo form_fieldset('Select Breed', array('id' => 'breed-fieldset', 'class' => $breed['class']));
 		echo form_dropdown('breed', $breed['options'], $breed['selected'], 'id="breed"');
 	echo form_fieldset_close();
@@ -19,3 +19,37 @@
 	<input type="hidden" name="make_default" value="0" id="make_default">
 	<div class="submit"><?php echo form_submit('bench_submit', 'Set Benchmarks', 'class="button" id="set"'); ?>&nbsp;&nbsp;&nbsp;<?php echo form_submit('bench_submit', 'Save as Default', 'class="button" id="default"'); ?></div>
 <?php echo form_close();?>
+
+<script type="text/javascript">
+<!--
+//Benchmarks
+window.onload = function(){
+	if($('#benchmark-form')){ //if there is a filter form (only on pages with one table)
+		$('#default').click(function(ev){
+			$('#make_default').val('1');
+		});
+		
+		$('#set').click(function(ev){
+			$('#make_default').val('0');
+		});
+		
+		$('#breed').change(function(){
+			if($('#breed').val() === 'HO'){
+				$('.HO').show();
+				$('.HO_JE').show();
+			}
+			else if($('#breed').val() === 'JE'){
+				$('.HO').hide();
+				$('.HO_JE').show();
+			}
+			else{
+				$('.HO').hide();
+				$('.HO_JE').hide();
+			}
+		});
+		
+		$('#breed').trigger("change");
+	}
+}
+//-->
+</script>

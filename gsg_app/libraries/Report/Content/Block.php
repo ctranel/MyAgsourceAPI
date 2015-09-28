@@ -376,6 +376,7 @@ abstract class Block implements iBlock {
 			'filter_text' => $this->filters->get_filter_text(),
 			'client_data' => [
 				'block' => $this->path, //original program included sort_by, sort_order, graph_order but couldn't find anywhere it was used
+				
 			],
 		];
 	}

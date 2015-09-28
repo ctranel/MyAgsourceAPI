@@ -24,7 +24,13 @@ class Cow_lookup extends CI_Controller {
 	 **/
 	protected $herd;
 	
-	var $barn_name;
+	/**
+	 * cow_id_field
+	 * @var String
+	 **/
+	protected $cow_id_field;
+	
+	var $cow_id;
 	var $curr_lact_num;
 	var $curr_calving_date;
 
@@ -33,6 +39,7 @@ class Cow_lookup extends CI_Controller {
 		$this->load->model('herd_model');
 		$this->herd_access = new HerdAccess($this->herd_model);
 		$this->herd = new Herd($this->herd_model, $this->session->userdata('herd_code'));
+		$this->cow_id_field = $this->session->userdata('general_dhi')['cow_id_field'];
 		$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
 		
 		//is someone logged in?
@@ -92,17 +99,16 @@ class Cow_lookup extends CI_Controller {
 		//validate form input
 		$this->load->library('form_validation');
 		$this->form_validation->set_rules('cow_ref', 'Cow', 'required|max_length[8]');
+		$this->form_validation->set_rules('tab', 'Tab', '');
 		//$this->form_validation->set_rules('herd_code_fill', 'Type Herd Code');
-
-		$cow_options = $this->herd->getCowOptions('barn_name');
+		$cow_options = $this->herd->getCowOptions($this->cow_id_field);
 		if ($this->form_validation->run() == TRUE) { //successful submission
 			$serial_num = $this->form_validation->set_value('cow_ref', key($cow_options));
-			//$this->_record_access(2); //2 is the page code for herd change
-//			redirect(site_url($redirect_url));
-//			exit();
+			$tab = $this->form_validation->set_value('tab', 'events');
 		}
 		else {
 			$serial_num = key($cow_options);
+			$tab = 'events';
 		}
 
 		//load cow data for tabs
@@ -114,25 +120,25 @@ class Cow_lookup extends CI_Controller {
     	$events_data['arr_events'] = $this->events_model->getEventsArray($this->session->userdata('herd_code'), $serial_num, $this->curr_calving_date, false);
     	$tab_data = [
 			'serial_num'=>$serial_num
-    		,'barn_name'=>$events_data['barn_name']
+    		,'cow_id'=>$events_data[$this->cow_id_field]
 			,'events_content' => $this->load->view('dhi/cow_lookup/events', $events_data, true)
-    		,'tab' => 'events'
+    		,'tab' => $tab
     	];
 				
 		$err = '';
 		$form_data['cow_selected'] = $serial_num;
 		if(is_array($cow_options) && !empty($cow_options)){
-			$form_data['cow_options'] = $cow_options;
+			$form_data['cow_options'] = ['' => 'Select'] + $cow_options;
 			unset($cow_options);
 		}
 		else{
 			$err = 'A list of cows could not be generated for your herd.  If you believe this is an error, please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . '.';
 		}
 
-		
 		$form_data['cow_ref'] = 'id = "cow_ref"';
-
-		$form_data['cow_fill'] = ['name' => 'cow_fill',
+		$form_data['tab'] = $tab;
+		$form_data['cow_fill'] = [
+			'name' => 'cow_fill',
 			'id' => 'cow_fill',
 			'type' => 'text',
 			'size' => '15',
@@ -140,18 +146,6 @@ class Cow_lookup extends CI_Controller {
 			'value' => $this->form_validation->set_value('cow_fill'),
 		];
 
-		$form_data['id_field'] = ['name' => 'id_field',
-				'id' => 'id_field',
-				'type' => 'radio',
-				'options' => [
-					'control_num' => 'Control Number',
-					'visible_id' => 'Visible Id',
-					'barn_name' => 'Barn Name',
-					'list_order_num' => 'List Number',
-				],
-				'value' => $this->form_validation->set_radio('id_field'),
-		];
-		
 		$this->page_header_data = array_merge($this->page_header_data,
 			[
 				'title'=>'Cow Lookup - ' . $this->config->item('product_name'),
@@ -187,7 +181,7 @@ class Cow_lookup extends CI_Controller {
    	protected function _loadObjVars($serial_num){
    		$this->load->model('dhi/cow_lookup/events_model');
    		$events_data = $this->events_model->getCowArray($this->session->userdata('herd_code'), $serial_num);
-   		$this->barn_name = $events_data['barn_name'];
+   		$this->cow_id = $events_data[$this->cow_id_field];
    		$this->curr_lact_num = $events_data['curr_lact_num'];
    		$this->curr_calving_date = $events_data['curr_calving_date'];
    	}

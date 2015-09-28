@@ -15,23 +15,18 @@
 	}
 	
 	//this function is called in the graph_helper.js file after the JSON data file has loaded.  It can make report specific updates after the data has been loaded (see commented code for example)
-	function post_render(client_data){
+	function post_render(client_data, block_index){
 		if(typeof(client_data) !== 'undefined'){
 			if(typeof(client_data['block']) !== 'undefined'){
-				//$('#block-links > ul > li > a').css('text-decoration', 'none');
-				//$('#block-links > ul > li > a').css('font-weight', 'normal');
-				//$('#' + app_data['block']).css('text-decoration', 'underline');
-				//$('#' + app_data['block']).css('font-weight', 'bold');
-				//$('input[name=block][value=' + value_in + ']').attr("checked", true);
-
-				 if(typeof(chart) != 'undefined' && client_data['block'] == 'weighted_average_scc_-_la' && typeof(client_data['avg_weighted_avg']) != 'undefined' && typeof(chart.series) != 'undefined'){
+				client_data['avg_weighted_avg'] = 200;
+				 if(client_data['block'] == 'weighted_average_scc_-_la' && typeof(client_data['avg_weighted_avg']) != 'undefined' && typeof(chart[block_index].series) != 'undefined'){
 					//chart is global variable declared in graph_helper.js
-					$.each(chart.series[0].data, function(i, point) {
+					$.each(chart[block_index].series[0].data, function(i, point) {
 					    if(point.y > client_data['avg_weighted_avg']) {
-					    	point.update({color: 'red'}, FALSE);
+					    	point.update({color: 'red'}, false);
 					    }
 					});
-					chart.redraw();
+					chart[block_index].redraw();
 				}
 			}
 		}

@@ -89,7 +89,7 @@ class Index extends report_parent {
 					if($display == 'table') $cnt = 0;
 					$arr_blk_data = array(
 							'block_num' => $x,
-							'link_url' => site_url($this->section_path) . '/' . $this->page->path() . '/' . $pb->path(),
+							'link_url' => site_url($this->full_section_path) . '/' . $this->page->path() . '/' . $pb->path(),
 //							'form_id' => $this->report_form_id,
 							//'odd_even' => $odd_even,
 							'block' => $pb->path(),
@@ -185,7 +185,7 @@ class Index extends report_parent {
 		$arr_benchmark_data = $this->benchmarks->getFormData($this->session->userdata('benchmarks')); 
 		if(isset($arr_benchmark_data)){
 			$this->data['widget']['herd'][] = array(
-				'content' => $this->load->view('set_benchmarks', $arr_benchmark_data, TRUE),
+				'content' => $this->load->view('dhi/settings/benchmarks', $arr_benchmark_data, TRUE),
 				'title' => 'Benchmarks',
 				'id' => 'benhmarks',
 			);
@@ -193,8 +193,8 @@ class Index extends report_parent {
 		
 		//filters	
 		$report_filter_path = 'filters';
-		if(file_exists(APPPATH . 'views/' . $this->section_path . '/filters.php')){
-			$report_filter_path =  $this->section_path . '/filters';
+		if(file_exists(APPPATH . 'views/' . $this->full_section_path . '/filters.php')){
+			$report_filter_path =  $this->full_section_path . '/filters';
 		}
 
 		$arr_filter_data = array(

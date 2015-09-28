@@ -25,7 +25,7 @@ bright red; #F60E27
 
 /* override bootstrap styles to apply to all nav */
 .navbar {border: none; min-height: 24px; border-radius:0; z-index: 1001; white-space: nowrap; margin-bottom: 0;}
-.navbar>a {display: block; font-weight: bold;}
+.navbar>a {display: block;}
 .navbar ul {display: inline-block;}
 .navbar li {display: inline-block;}
 .navbar li.first {border-left: none;}
@@ -40,7 +40,7 @@ bright red; #F60E27
 	.navbar-nav>li {float: none;}
 }
 
-#top-nav {width: 100%; border-top: solid 5px #EF5C29; zbackground-color: #505151;
+#top-nav {width: 100%; border-top: solid 5px #EF5C29; overflow: hidden;
 	background-color: #A7DAD8;
 	/* Safari 4-5, Chrome 1-9 */
 	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#A7DAD8), to(#66bfbb));
@@ -61,13 +61,10 @@ bright red; #F60E27
 #top-nav ul>li {border-bottom: solid 1px #E6F4F4; margin-left: -4px;}
 #top-nav ul>li>a {color: #003C39;}
 #top-nav ul>li>a:hover {background-color: inherit; color: #66bfbb;}
-#top-nav ul li.current {background-color: #E6F4F4; border-right: solid 1px #003C39; border-left: solid 1px #003C39;}
+#top-nav ul li.current {background-color: #E6F4F4;}
 #top-nav ul li.current a {background-color: #E6F4F4; font-weight: bold; color: #003C39}
 
 .layer  {
-	display:none;
-	border-left: solid 1px #003C39;
-	border-right: solid 1px #003C39;
 	background-color: #E6F4F4;
 	margin-left: -4px;
 	margin-top: -1px;
@@ -90,17 +87,17 @@ bright red; #F60E27
 .zlayer ul>li {border-bottom: solid 1px #003C39; border-top: solid 1px #003C39; margin-left: -4px;}
 .layer ul>li>a {color: #003C39;}
 .layer ul>li>a:hover {background-color: inherit; color: #66bfbb;}
-.layer ul li.current {background-color: #E6F4F4; color: #003C39; border: solid 1px #003C39; border-bottom: none;}
-.layer ul li.current a {background-color: inherit; color: #003C39; font-weight: bold;}
+.layer ul>li.current {background-color: #E6F4F4; color: #003C39; border: solid 1px #CCEAE8; border-bottom: none;}
+.layer ul>li.current>a {background-color: inherit; color: #003C39; font-weight: bold;}
 
-nav.mega {display: none;}
+nav.mega {}
 nav.mega, nav.mega-category {background-color:#E6F4F4; position: absolute; z-index: 200; }
-nav.mega ul, nav.mega-category ul {background-color: inherit; padding: 0; border: solid 1px #003C39; border-top: none; margin-left: -1px}
+nav.mega ul, nav.mega-category ul {background-color: inherit; padding: 0; border: solid 1px #CCEAE8; border-top: none; margin-left: -1px}
 nav.mega-category ul li nav.mega ul {position: relative; padding: 0 10px 10px 10px; }
 
 .mega-category ul li {display: inline-block; vertical-align:top;}
 
-.mega ul li.current a {font-weight: bold;}
+.mega ul>li.current>a {font-weight: bold;}
 .mega ul, .mega ul li {display: block; vertical-align:top;}
 .mega ul>li>a {background-color: inherit; color: #003C39;}
 .mega ul>li>a:hover {background-color: inherit; color: #66bfbb;}

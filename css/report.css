@@ -6,9 +6,9 @@ sub {color: #003E3F; font-size: 80%; font-family: "Arial Narrow","Arial","Verdan
 .chart-container a, text, tspan {text-decoration: none;}
 .chart-odd {clear: both; float: left;}
 .chart-even {float: right;}
-.chart-last-odd {clear: both;}
+.chart-only, .chart-last-odd {clear: both;}
 .chart {width: 520px;}
-
+ 
 .chart-container .supplemental-link {text-align: center; margin-top:-5px;}
 .chart-container .supplemental-link a {text-decoration: underline;}
 .highcharts-subtitle {margin-top: -13px !important;}
@@ -76,7 +76,7 @@ th span.hide-column {cursor: pointer;}
 .sort_asc:after {content: "▲";}
 .sort_desc:after {content: "▼";}
 
-.fixed-header {position: fixed; top: 58px; display:none; background-color:white; border-collapse: collapse; z-index: 1}
+.fixed-header {position: fixed; top: 56px; display:none; background-color:white; border-collapse: collapse; z-index: 1}
 /* .fixed-header thead, .fixed-header tr, .fixed-header th {box-sizing: content-box !important;}
 end table headings */
 

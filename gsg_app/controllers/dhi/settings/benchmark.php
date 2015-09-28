@@ -1,4 +1,7 @@
 <?php
+/*
+ * Form-processing controller.  Does not load a new page, only gives JSON response to the form submission
+ */
 require_once(APPPATH . 'libraries/Benchmarks/Benchmarks.php');
 
 use \myagsource\Benchmarks\Benchmarks;
@@ -36,7 +39,7 @@ class Benchmark extends CI_Controller {
  * @return	void
  * @todo: sending confirmation to client???
  */
-	function ajax_set($ser_form_data){
+	function ajax_set($ser_form_data = null){
 		//for ajax pages
 		$this->session->keep_flashdata('message');
 		$this->session->keep_flashdata('redirect_url');
@@ -45,19 +48,26 @@ class Benchmark extends CI_Controller {
 		$this->session->set_flashdata('redirect_url', $redirect_url);
 		
 		if((!isset($this->as_ion_auth) || !$this->as_ion_auth->logged_in()) && $this->session->userdata('herd_code') != $this->config->item('default_herd')){
-			$this->load->view('session_expired', array('url'=>$this->session->flashdata('redirect_url')));
+			http_response_code(401);
+			echo json_encode(['error'=>['message'=>'Your session has expired, please log in and try again.']]);
 			exit;
 		}
 		
 		//do we have any data?
 		if(!isset($ser_form_data)){
-			return false;
+			http_response_code(400);
+			echo json_encode(['error'=>['message'=>'No form data received.']]);
+			exit;
 		}
 		
 		//HANDLE DATA
 		$arr_params = json_decode(urldecode($ser_form_data), true);
 		//verify csrf
-		if(isset($arr_params['csrf_test_name']) && $arr_params['csrf_test_name'] != $this->security->get_csrf_hash()) die("I don't recognize your browser session, your session may have expired, or you may have cookies turned off.");
+		if(isset($arr_params['csrf_test_name']) && $arr_params['csrf_test_name'] != $this->security->get_csrf_hash()){
+			http_response_code(403);
+			echo json_encode(['error'=>['message'=>"I don't recognize your browser session, your session may have expired, or you may have cookies turned off."]]);
+			exit;
+		}
 		unset($arr_params['csrf_test_name']);
 
 		$this->load->model('setting_model');

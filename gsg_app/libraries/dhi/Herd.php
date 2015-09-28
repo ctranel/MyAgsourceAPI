@@ -207,7 +207,7 @@ class Herd
 	 *  @throws: 
 	 * -----------------------------------------------------------------*/
 	public function getCowOptions($value_field) {
-		$cows = $this->herd_model->getCowList($this->herd_code);
+		$cows = $this->herd_model->getCowList($this->herd_code, $value_field);
 		if(!$cows || empty($cows)){
 			return false;
 		}

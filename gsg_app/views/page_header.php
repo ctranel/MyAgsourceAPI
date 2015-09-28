@@ -34,6 +34,7 @@
 			{bootstrap: "https://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"},
 			{sectionhelper: "<?php echo $this->config->item('base_url_assets'); ?>js/as_section_helper.js"},
 			{formhelper: "<?php echo $this->config->item('base_url_assets'); ?>js/form_helper.js"},
+			{ajaxforms: "<?php echo $this->config->item('base_url_assets'); ?>js/ajax_forms.js"},
 			{ko: "https://cloud.github.com/downloads/knockout/knockout/knockout-2.1.0.js"},
 			{navhelper: "<?php echo $this->config->item('base_url_assets'); ?>js/nav.js"},
 			{navmodel: "<?php echo $this->config->item('base_url_assets'); ?>js/nav_viewmodel.js"}
@@ -70,7 +71,24 @@
 					</li> <!-- close "Select Section" li -->
 				<?php endif; ?>
 			<li><?php echo anchor('auth/logout', 'Log Out'); ?></li>
-				<li><?php echo anchor('', 'Home/Account'); ?></li>
+				<li><?php echo anchor('', 'Dashboard'); ?></li>
+				<?php 
+					$class = 'first';
+					if($this->as_ion_auth->has_permission("Add All Users") || $this->as_ion_auth->has_permission("Add Users In Region")): ?>
+						<li class="<?php echo $class; ?>"><?php echo anchor('auth/create_user','Add Account', 'class="teal_banner"') ?></li>
+				<?php	$class = '';
+					endif; 
+					if($this->as_ion_auth->has_permission("Edit All Users") || $this->as_ion_auth->has_permission("Edit Users In Region")): ?>
+						<li><?php echo anchor('auth/list_accounts','List Accounts', 'class="teal_banner"') ?></li>
+				<?php	$class = '';
+					endif; ?>
+					<?php if($this->as_ion_auth->is_editable_user($this->session->userdata('user_id'), $this->session->userdata('user_id'))): ?>
+						<li class="<?php echo $class; ?>"><?php echo anchor('auth/edit_user','Edit Account', 'class="teal_banner"') ?></li>
+				<?php	$class = '';
+					endif; ?>
+					<?php if(false && $this->as_ion_auth->has_permission("View Access Log")): ?>
+						<li class="<?php echo $class; ?>"><?php echo anchor('access_log/display', 'Access Log', 'class="teal_banner"'); ?></li>
+					<?php endif; ?>
 				<?php if($this->as_ion_auth->has_permission("View Assign w permission")): ?>
 					<li><?php echo anchor('auth/service_grp_manage_herds', 'Manage Herd Access'); ?></li>
 					<li><?php echo anchor('auth/service_grp_request', 'Request Herd Access'); ?></li>
@@ -85,10 +103,10 @@
 				<?php if($this->as_ion_auth->has_permission("Request Herd")): ?>
 					<li><?php echo anchor('dhi/change_herd/request', 'Request Herd'); ?></li>
 				<?php endif; ?>
-				<?php elseif($this->router->fetch_method() != 'login'): ?>
+			<?php elseif($this->router->fetch_method() != 'login'): ?>
 				<li><?php echo anchor('auth/login', 'Log In');?></li>
 				<li><?php echo anchor('auth/create_user', 'Register');?></li>
-				<li><?php echo anchor('', 'Home/Account'); ?></li>
+				<li><?php echo anchor('', 'Dashboard'); ?></li>
 				<li><?php echo anchor('help', 'Help'); ?></li>
 			<?php endif; ?>
 		</ul>
@@ -98,7 +116,7 @@
 
 	if(isset($error)):
 		if (is_array($error) &&!empty($error)):
-			foreach($error as $e) {?>
+			foreach($error as $e) { ?>
 				<div id="errors"><?php echo $e;?></div>
 			<?php }
 		else: ?>
@@ -119,13 +137,13 @@
 	if(isset($message)):
 		if (is_array($message) && !empty($message)):
 			foreach($message as $m) {?>
-				<div id="infoMessage"><?php echo $m;?></div>
+				<div id="info-message"><?php echo $m;?></div>
 			<?php }
 		elseif(!is_array($message)): ?>
-			<div id="infoMessage"><?php echo $message;?></div>
+			<div id="info-message"><?php echo $message;?></div>
 <?php 	endif;
 	elseif($this->session->flashdata('message') != ''): ?>
-			<div id="infoMessage"><?php echo $this->session->flashdata('message');?></div>
+			<div id="info-message"><?php echo $this->session->flashdata('message');?></div>
 <?php
 	endif;
 	

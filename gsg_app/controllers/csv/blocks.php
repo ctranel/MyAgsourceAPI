@@ -251,13 +251,11 @@ class Blocks extends CI_Controller {
 	 * @todo: can I delete the last 2 params?
 	 */
 	public function csv($page_path, $block_name, $sort_by = 'null', $sort_order = 'null', $json_filter_data = NULL) {
-		$page_path = str_replace('|', '/', urldecode($page_path));
-		
-		$this->section_path = substr($page_path, 0, (strrpos($page_path, '/') + 1));
-		$section = $this->sections->getByPath($this->section_path);
-		$path_page_segment = substr($page_path, (strrpos($page_path, '/') + 1));
-		$page = $this->pages->getByPath($path_page_segment);
-		
+		$path_parts = explode('|', urldecode($page_path));
+		$num_parts = count($path_parts);
+		$path_page_segment = $path_parts[$num_parts - 1];
+		$this->section_path = $path_parts[$num_parts - 2] . '/';
+				
 		$this->block = $this->blocks->getByPath(urldecode($block_name));
 		$output = $this->block->displayType();
 		

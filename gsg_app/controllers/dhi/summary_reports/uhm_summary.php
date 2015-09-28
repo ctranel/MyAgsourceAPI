@@ -35,10 +35,4 @@ class Uhm_summary extends report_parent {
 	 	$this->product_name = 'UHM - Weighted Avg SCC';
 	 	parent::display($block_in, $display_format);
 	 }
-	 
-	 protected function get_section_data($block, $sort_by, $sort_order, $report_count){
-	 	$arr_return = parent::get_section_data($block, $sort_by, $sort_order, $report_count);
-	 	$arr_return['avg_weighted_avg'] = 200;//if block == 'weighted_average_scc_-_la', get average scc
-	 	return $arr_return;
-	 }
 }

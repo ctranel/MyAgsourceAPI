@@ -5,11 +5,13 @@ require_once(APPPATH . 'libraries/dhi/Herd.php');
 require_once(APPPATH.'libraries/AccessLog.php');
 require_once(APPPATH . 'libraries/Benchmarks/Benchmarks.php');
 require_once(APPPATH.'libraries/dhi/HerdAccess.php');
+require_once APPPATH . 'libraries/Settings/SessionSettings.php';
 
 use \myagsource\AccessLog;
 use \myagsource\dhi\Herd;
 use \myagsource\Benchmarks\Benchmarks;
 use \myagsource\dhi\HerdAccess;
+use myagsource\Settings\SessionSettings;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 class Change_herd extends CI_Controller {
@@ -338,6 +340,9 @@ class Change_herd extends CI_Controller {
 		$this->load->model('benchmark_model');
 		$benchmarks = new Benchmarks($this->session->userdata('user_id'), $this->input->post('herd_code'), $this->herd->header_info($this->input->post('herd_code')), $this->setting_model, $this->benchmark_model, []);
 		$this->session->set_userdata('benchmarks', $benchmarks->getSettingKeyValues());
+
+		$general_dhi = new SessionSettings($this->session->userdata('user_id'), $this->input->post('herd_code'), $this->setting_model, 'general_dhi', []);
+		$this->session->set_userdata('general_dhi', $general_dhi->getSettingKeyValues());
 	}
 
 	protected function _record_access($event_id){

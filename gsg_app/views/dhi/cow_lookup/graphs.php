@@ -30,7 +30,7 @@ options.tooltip = {
 	};
 options.title = {
 		'useHTML': false,
-		'text': 'Name = <?php if(isset($barn_name)) echo $barn_name; ?>'
+		'text': 'Name = <?php if(isset($cow_id)) echo $cow_id; ?>'
 	};
 options.subtitle = {
 		'text': 'Lactation <?php if(isset($lact_num)) echo $lact_num; ?>'
