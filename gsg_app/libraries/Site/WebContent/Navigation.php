@@ -75,7 +75,7 @@ class Navigation{// implements iWebContentRepository {
 			if(in_array('View Admin', $this->arr_task_permissions)){
 				$scope[] = 'admin';
 			}
-			if(!empty($criteria)){
+			if(!empty($scope)){
 				$tmp_array = array_merge($tmp_array, $this->datasource_navigation->getContentByScope($scope));
 			}
 			//$tmp_array = array_merge($tmp_array, $this->datasource_navigation->getPublicContent($section->id()));			

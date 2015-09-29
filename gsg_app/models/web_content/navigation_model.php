@@ -49,7 +49,13 @@ class Navigation_model extends CI_Model {
 	 * @author ctranel
 	 **/
 	public function getContentByScope($scopes) {
-		$scope_text = "'" . explode("','", $scopes) . "'";
+		if(empty($scopes)){
+			return false;
+		}
+		if(!is_array($scopes)){
+			$scopes = [$scopes];
+		}
+		$scope_text = "'" . implode("','", $scopes) . "'";
 		$sql = "
 			WITH section_tree AS
 			(
