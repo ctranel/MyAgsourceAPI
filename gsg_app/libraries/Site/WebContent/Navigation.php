@@ -1,6 +1,7 @@
 <?php
-
 namespace myagsource\Site\WebContent;
+
+require_once(APPPATH . 'helpers/multid_array_helper.php');
 
 //use \myagsource\Site\iWebContentRepository;
 //use \myagsource\Site\iWebContent;
@@ -78,9 +79,9 @@ class Navigation{// implements iWebContentRepository {
 			if(!empty($scope)){
 				$tmp_array = array_merge($tmp_array, $this->datasource_navigation->getContentByScope($scope));
 			}
-			//$tmp_array = array_merge($tmp_array, $this->datasource_navigation->getPublicContent($section->id()));			
 
-			require_once(APPPATH . 'helpers/multid_array_helper.php');
+			$tmp_array = array_map("unserialize", array_unique(array_map("serialize", $tmp_array)));
+
 			usort($tmp_array, \sort_by_key_value_comp('list_order'));
 		}
 		return $tmp_array;
