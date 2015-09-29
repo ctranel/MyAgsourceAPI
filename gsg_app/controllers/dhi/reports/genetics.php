@@ -77,6 +77,11 @@ class Genetics extends report_parent {
         $this->product_name = 'Youngstock Analysis';
         parent::display($block_in, $display_format);
     }
-    
+
+    function sire_values($block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
+        $this->product_name = 'Sire Values by Lactation';
+        parent::display($block_in, $display_format);
+    }
+     
     
 }
