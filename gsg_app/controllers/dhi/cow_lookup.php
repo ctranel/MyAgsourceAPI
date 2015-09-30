@@ -159,7 +159,6 @@ class Cow_lookup extends CI_Controller {
 					'{chart_options: "' . $this->config->item("base_url_assets") . 'js/charts/chart_options.js"}',
 					'{graph_helper: "' . $this->config->item("base_url_assets") . 'js/charts/graph_helper.js"}',
 					'{report_helper: "' . $this->config->item("base_url_assets") . 'js/report_helper.js"}',
-					'{table_sort: "' . $this->config->item("base_url_assets") . 'js/jquery/stupidtable.min.js"}',
 				]
 			]
 		);

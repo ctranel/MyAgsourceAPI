@@ -22,24 +22,33 @@
 </div>
 
 <script type="text/javascript">
+var loadTab = function(e){
+	var contentID  = $(e.target).attr("data-target");
+    var contentURL = $(e.target).attr("href");
+    if (typeof(contentURL) != 'undefined' && $(contentID).html().length < 20){
+    	$(contentID).load(contentURL, function(){ $("#cow-lookup-tabs").tab(); });
+    }
+	else {
+    	$(contentID).tab('show');
+	}
+	if(!!document.getElementById('select_cow')){
+		document.getElementById('select_cow')['tab'].setAttribute('value', contentID.replace('#', ''));
+	}
+}
+
+var reloadTab = function(e){
+		var contentID  = $(e.target).attr("data-target");
+		var contentURL = $(e.target).attr("href");
+		$(contentID).load(contentURL, function(){ $("#cow-lookup-tabs").tab(); });
+	};
+
 function wirePage(){
 	$("#cow-lookup-tabs").tab();
 	$("#cow-lookup-tabs").bind("click", function(e) {    
-	    var contentID  = $(e.target).attr("data-target");
-	    var contentURL = $(e.target).attr("href");
-	    if (typeof(contentURL) != 'undefined' && $(contentID).html().length < 20){
-	    	$(contentID).load(contentURL, function(){ $("#cow-lookup-tabs").tab(); });
-	    }
-		else {
-	    	$(contentID).tab('show');
-		}
-		if(!!document.getElementById('select_cow')){
-			document.getElementById('select_cow')['tab'].setAttribute('value', contentID.replace('#', ''));
-		}
+	    loadTab(e);
 	});
 	$('#cow-lookup-tabs a:first').tab("show");
 
-	
 	var date_from_string = function(str){
 	    var pattern = "^(\\d{1,2})\/(\\d{1,2})\/(\\d{4})$";
 	    var re = new RegExp(pattern);
@@ -73,12 +82,6 @@ function wirePage(){
 		});
 	}
 	
-	var loadTab = function(e){
-		var contentID  = $(e.target).attr("data-target");
-		var contentURL = $(e.target).attr("href");
-		$(contentID).load(contentURL, function(){ $("#cow-lookup-tabs").tab(); });
-	};
-
 	if(!!document.getElementById('select_cow')){
 		var selected_tab = document.getElementById('select_cow')['tab'].getAttribute('value');
 		$('#' + selected_tab + '-tab').trigger('click');
@@ -98,8 +101,11 @@ function wirePage(){
 }
 
 function checkJquery(){
-	if(typeof(jQuery) !== 'undefined' && typeof($("#cow-lookup-tabs").tab) == 'function'){
+	if(typeof(jQuery) !== 'undefined' && typeof($("#cow-lookup-tabs").tab) === 'function'){
 		wirePage();
+		if(typeof(wireEventTab) === "function"){
+			wireEventTab();
+		}
 	}
 	else{
 		setTimeout(checkJquery, 50);
