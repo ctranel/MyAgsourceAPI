@@ -127,6 +127,14 @@ class Cow_lookup extends CI_Controller {
 	    		,'tab' => $tab
 	    	];
     	}
+    	else{
+    		$tab_data = [
+				'serial_num'=>$serial_num
+	    		,'cow_id'=>'unknown'
+				,'events_content' => 'No Data Found for Selected Animal.'
+	    		,'tab' => $tab
+	    	];
+    	}
     	
 		$err = '';
 		$form_data['cow_selected'] = $serial_num;
@@ -175,12 +183,7 @@ class Cow_lookup extends CI_Controller {
 		$page_data['page_footer'] = $this->load->view('page_footer', $page_footer_data, TRUE);
 		$page_data['form'] = $this->load->view('dhi/cow_lookup/cow_lookup_form', $form_data, true);
 		
-		if(isset($tab_data) && !empty($tab_data)){
-			$page_data['tabs'] = $this->load->view('dhi/cow_lookup/land', $tab_data, true);
-		}
-		else{
-			$page_data['tabs'] = 'No Data Found for Selected Animal.';
-		}
+		$page_data['tabs'] = $this->load->view('dhi/cow_lookup/land', $tab_data, true);
 			
 		$this->load->view('dhi/cow_lookup/cow_lookup_page', $page_data);
    	}
