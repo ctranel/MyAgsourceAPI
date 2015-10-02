@@ -136,7 +136,7 @@ class Navigation_model extends CI_Model {
 				SELECT 999999 AS id, section_id AS parent_id, name, description, scope_id, path, active, path, list_order
 				FROM users.dbo.pages p
 					INNER JOIN users.dbo.pages_reports pr ON p.id = pr.page_id AND p.active = 1 AND p.scope_id = 2
-					INNER JOIN herd.dbo.herd_output ho ON pr.report_code = ho.report_code AND ho.herd_code = '35031038' AND ho.end_date IS NULL AND ho.medium_type_code = 'W' 
+					INNER JOIN herd.dbo.herd_output ho ON pr.report_code = ho.report_code AND ho.herd_code = '" . $herd_code . "' AND ho.end_date IS NULL AND ho.medium_type_code = 'W' 
 			) a
 			
 			INNER JOIN users.dbo.lookup_scopes ls ON a.scope_id = ls.id
