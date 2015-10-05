@@ -28,7 +28,7 @@
 
 
 /* override report.css style */
-#sortable {margin: 20px auto;}
+#sortable {margin: 20px auto; clear:both;}
 .subcat-heading {cursor: pointer; * cursor: hand;}
 
 
