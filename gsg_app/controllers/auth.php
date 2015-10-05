@@ -363,7 +363,13 @@ class Auth extends Ionauth {
 				$arr_relationship_data['request_status_id'] = (int)$post_request_status_id;
 			}
 			$tmp = human_to_mysql($this->input->post('exp_date'));
-			if(isset($tmp) && !empty($tmp)) $arr_relationship_data['exp_date'] = $tmp;
+			if(isset($tmp) && !empty($tmp)) {
+			    $arr_relationship_data['exp_date'] = $tmp;
+			}
+			elseif (isset($tmp) && empty($tmp)) {
+			    $arr_relationship_data['exp_date'] = null;
+			}
+			
 
 			//convert submitted section id values to int
 			$arr_post_section_id = $this->input->post('section_id');
