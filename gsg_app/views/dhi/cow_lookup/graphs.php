@@ -117,14 +117,16 @@ for (var i =1;i < 9;i++){
 $('.chart-container').show();
 </script>
 <script type="text/javascript">
-$(function() {
-	  $(".incr-lact-tests").bind("click", function(e) {    
-	    var contentID  = $(e.target).attr("data-target");
-	    var contentURL = $(e.target).attr("href");
-       	$(contentID).html('Loading...');
-        $(contentID).load(contentURL, function(){
-             $("#cow-lookup-tabs").tab();
-        });
-	  });
-	});
+var loadChartTab = function() {
+	$(".incr-lact-tests").bind("click", function(e) {reloadTab(e)} );
+};
+
+if(typeof(jQuery) !== 'undefined'){
+	loadChartTab();
+}
+else{
+	window.onload = function() {
+		loadChartTab();
+	};
+}
 </script>

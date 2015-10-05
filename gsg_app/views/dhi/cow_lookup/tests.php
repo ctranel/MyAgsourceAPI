@@ -66,14 +66,22 @@ else: ?>
 <?php 
 endif; ?>
 <script type="text/javascript">
-	//links that reload tab content
-	$(function() {
-		  $(".incr-lact-tests").bind("click", function(e) {loadTab(e)} );
-		});
+var loadTests = function() {
+	$(".incr-lact-tests").bind("click", function(e) {reloadTab(e)} );
 
 	//add simple column sorting
 	var table = $(".simple-sort").stupidtable({
 		  "date":function(a,b){return dateFunc(a,b);}
 	});
 	table.bind('aftertablesort', function (event, data) {addRowClasses();} );
+};
+
+if(typeof(jQuery) !== 'undefined'){
+	loadTests();
+}
+else{
+	window.onload = function() {
+		loadTests();
+	};
+}
 </script>

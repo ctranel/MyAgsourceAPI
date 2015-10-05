@@ -11,6 +11,8 @@ class Nav extends CI_Controller {
 	
 	function __construct(){
 		parent::__construct();
+		$this->session->keep_all_flashdata();
+		
 		$this->load->model('herd_model');
 		$this->herd_access = new HerdAccess($this->herd_model);
 		$this->herd = new Herd($this->herd_model, $this->session->userdata('herd_code'));
@@ -31,11 +33,10 @@ class Nav extends CI_Controller {
 			$this->post_message("You do not have permission to access this herd.  Please select another herd and try again.  ");
 		}
 				
-		$this->session->keep_flashdata('message');
-		$this->session->keep_flashdata('redirect_url');
+//		$this->session->keep_flashdata('redirect_url');
 		//make sure previous page remains as the redirect url 
-		$redirect_url = set_redirect_url($this->uri->uri_string(), $this->session->flashdata('redirect_url'), $this->as_ion_auth->referrer);
-		$this->session->set_flashdata('redirect_url', $redirect_url);
+//		$redirect_url = set_redirect_url($this->uri->uri_string(), $this->session->flashdata('redirect_url'), $this->as_ion_auth->referrer);
+//		$this->session->set_flashdata('redirect_url', $redirect_url);
 		
 		if((!isset($this->as_ion_auth) || !$this->as_ion_auth->logged_in()) && $this->session->userdata('herd_code') != $this->config->item('default_herd')){
 			$this->load->view('session_expired', array('url'=>$this->session->flashdata('redirect_url')));
@@ -54,8 +55,14 @@ class Nav extends CI_Controller {
 	//redirects while retaining message and conditionally setting redirect url
 	//@todo: needs to be a part of some kind of authorization class
 	protected function post_message($message = ''){
-		$this->session->keep_flashdata('redirect_url');
-		$this->load->view('echo.php', ['text' => $message]);
+		header("Cache-Control: no-cache, must-revalidate, max-age=0");
+		header("Cache-Control: post-check=0, pre-check=0", false);
+		header("Pragma: no-cache");
+		header("Expires: -1");
+		header("Content-type: application/json"); //being sent as json
+
+		$this->load->view('echo.php', ['text' => '[]']);
+		exit();
 	}
 
 	function index(){
@@ -69,6 +76,7 @@ class Nav extends CI_Controller {
 		header("Cache-Control: no-cache, must-revalidate, max-age=0");
 		header("Cache-Control: post-check=0, pre-check=0", false);
 		header("Pragma: no-cache");
+		header("Expires: -1");
 		header("Content-type: application/json"); //being sent as json
 		
 		echo $Navigation->jsonOutput('DHI');

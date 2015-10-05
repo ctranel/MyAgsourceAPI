@@ -115,16 +115,27 @@ class Cow_lookup extends CI_Controller {
 		$this->_loadObjVars($serial_num);
     	$this->load->model('dhi/cow_lookup/events_model');
     	$events_data = $this->events_model->getCowArray($this->session->userdata('herd_code'), $serial_num);
-    	$events_data['serial_num'] = $serial_num;
-    	$events_data['show_all_events'] = false;
-    	$events_data['arr_events'] = $this->events_model->getEventsArray($this->session->userdata('herd_code'), $serial_num, $this->curr_calving_date, false);
-    	$tab_data = [
-			'serial_num'=>$serial_num
-    		,'cow_id'=>$events_data[$this->cow_id_field]
-			,'events_content' => $this->load->view('dhi/cow_lookup/events', $events_data, true)
-    		,'tab' => $tab
-    	];
-				
+    	$tab_data = [];
+    	if($events_data){
+    		$events_data['serial_num'] = $serial_num;
+	    	$events_data['show_all_events'] = false;
+	    	$events_data['arr_events'] = $this->events_model->getEventsArray($this->session->userdata('herd_code'), $serial_num, $this->curr_calving_date, false);
+	    	$tab_data = [
+				'serial_num'=>$serial_num
+	    		,'cow_id'=>$events_data[$this->cow_id_field]
+				,'events_content' => $this->load->view('dhi/cow_lookup/events', $events_data, true)
+	    		,'tab' => $tab
+	    	];
+    	}
+    	else{
+    		$tab_data = [
+				'serial_num'=>$serial_num
+	    		,'cow_id'=>'unknown'
+				,'events_content' => 'No Data Found for Selected Animal.'
+	    		,'tab' => $tab
+	    	];
+    	}
+    	
 		$err = '';
 		$form_data['cow_selected'] = $serial_num;
 		if(is_array($cow_options) && !empty($cow_options)){
@@ -159,7 +170,6 @@ class Cow_lookup extends CI_Controller {
 					'{chart_options: "' . $this->config->item("base_url_assets") . 'js/charts/chart_options.js"}',
 					'{graph_helper: "' . $this->config->item("base_url_assets") . 'js/charts/graph_helper.js"}',
 					'{report_helper: "' . $this->config->item("base_url_assets") . 'js/report_helper.js"}',
-					'{table_sort: "' . $this->config->item("base_url_assets") . 'js/jquery/stupidtable.min.js"}',
 				]
 			]
 		);
@@ -172,6 +182,7 @@ class Cow_lookup extends CI_Controller {
 		$page_data['page_header'] = $this->load->view('page_header', $this->page_header_data, TRUE);
 		$page_data['page_footer'] = $this->load->view('page_footer', $page_footer_data, TRUE);
 		$page_data['form'] = $this->load->view('dhi/cow_lookup/cow_lookup_form', $form_data, true);
+		
 		$page_data['tabs'] = $this->load->view('dhi/cow_lookup/land', $tab_data, true);
 			
 		$this->load->view('dhi/cow_lookup/cow_lookup_page', $page_data);

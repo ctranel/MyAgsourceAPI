@@ -73,14 +73,22 @@ else: ?>
 <?php 
 endif; ?>
 <script type="text/javascript">
-//links that reload tab content
-window.onload = function() {
-	$(".incr-lact-tests").bind("click", function(e) {loadTab(e)} );
+var loadEvents = function(){
+	$(".incr-lact-tests").bind("click", function(e) {reloadTab(e);} );
 
 	//add simple column sorting
 	var table = $(".simple-sort").stupidtable({
 	    "date":function(a,b){return dateFunc(a,b);}
 	});
 	table.bind('aftertablesort', function (event, data) {addRowClasses();} );
-};
+}
+
+if(typeof(jQuery) !== 'undefined'){
+	loadEvents();
+}
+else{
+	window.onload = function() {
+		loadEvents();
+	};
+}
 </script>
