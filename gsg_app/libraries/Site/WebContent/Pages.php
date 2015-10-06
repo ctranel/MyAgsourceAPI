@@ -53,7 +53,7 @@ class Pages implements iWebContentRepository {
 		if(empty($results)){
 			return false;
 		}
-		return new Page($results[0]['id'], $results[0]['section_id'], $results[0]['name'], $results[0]['description'], $results[0]['scope_id'], $results[0]['active'], $results[0]['path']);
+		return new Page($results[0]['id'], $results[0]['section_id'], $results[0]['name'], $results[0]['description'], $results[0]['scope'], $results[0]['active'], $results[0]['path']);
 	}
 
 	/*
@@ -72,7 +72,7 @@ class Pages implements iWebContentRepository {
 			return false;
 		}
 		foreach($results as $k => $v){
-			$pages->attach(new Page($v['id'], $v['section_id'], $v['name'], $v['description'], $v['scope_id'], $v['active'], $v['path']));
+			$pages->attach(new Page($v['id'], $v['section_id'], $v['name'], $v['description'], $v['scope'], $v['active'], $v['path']));
 		}
 		return $pages;
 	}

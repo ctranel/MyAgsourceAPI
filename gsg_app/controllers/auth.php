@@ -404,7 +404,7 @@ class Auth extends Ionauth {
 				$obj_user = $this->ion_auth_model->user($user_id)->row();
 				$obj_user->arr_groups = array_keys($this->ion_auth_model->get_users_group_array($obj_user->id));
 				//note: active group id should always be 2
-				$tmp_array = $this->as_ion_auth->get_sections_array(2, $user_id, $obj_user->herd_code, NULL, array('subscription','public','unmanaged'));
+				$tmp_array = $this->as_ion_auth->get_sections_array(2, $user_id, $obj_user->herd_code, NULL, array('subscription','base','unmanaged'));
 				$obj_user->section_id = $this->as_ion_auth->set_form_array($tmp_array, 'id', 'id'); // populate array of sections for which user is enrolled
 				$tmp_array = $this->input->post('section_id');
 				$arr_form_section_id = isset($tmp_array) && is_array($tmp_array) ? $tmp_array : $obj_user->section_id;
@@ -413,7 +413,7 @@ class Auth extends Ionauth {
 			$this->data['sections_selected'] = $arr_form_section_id;
 			$this->data['section_id'] = 'id="section_id"';
 			//note: active group id should always be 2
-			$tmp_array = $this->as_ion_auth->get_sections_array($this->session->userdata('active_group_id'), $this->session->userdata('user_id'), $this->session->userdata('herd_code'), NULL, array('subscription', 'public', 'unmanaged'));
+			$tmp_array = $this->as_ion_auth->get_sections_array($this->session->userdata('active_group_id'), $this->session->userdata('user_id'), $this->session->userdata('herd_code'), NULL, array('subscription', 'base', 'unmanaged'));
 			$this->data['section_options'] = $this->as_ion_auth->set_form_array($tmp_array, 'id', 'name');
 			unset($tmp_array);
 */
@@ -566,7 +566,7 @@ class Auth extends Ionauth {
 			$obj_user = $this->ion_auth_model->user($user_id)->row();
 			$obj_user->arr_groups = array_keys($this->ion_auth_model->get_users_group_array($obj_user->id));
 /*			
-			$tmp_array = $this->as_ion_auth->get_sections_array($this->session->userdata('active_group_id'), $user_id, $obj_user->herd_code, NULL, array('subscription','public','unmanaged'));
+			$tmp_array = $this->as_ion_auth->get_sections_array($this->session->userdata('active_group_id'), $user_id, $obj_user->herd_code, NULL, array('subscription','base','unmanaged'));
 			$obj_user->section_id = $this->as_ion_auth->set_form_array($tmp_array, 'id', 'id'); // populate array of sections for which user is enrolled
 
 			$tmp_array = $this->input->post('section_id');
@@ -575,9 +575,9 @@ class Auth extends Ionauth {
 			$this->data['sections_selected'] = $arr_form_section_id;
 			$this->data['section_id'] = 'id="section_id"';
 				
-			$arr_super_sections = $this->as_ion_auth->get_super_sections_array($this->session->userdata('active_group_id'), $this->session->userdata('user_id'), $this->session->userdata('herd_code'), array('subscription','public','unmanaged'));
+			$arr_super_sections = $this->as_ion_auth->get_super_sections_array($this->session->userdata('active_group_id'), $this->session->userdata('user_id'), $this->session->userdata('herd_code'), array('subscription','base','unmanaged'));
 			$arr_super_section_id = array_extract_value_recursive('id', $arr_super_sections);
-			$tmp_array = $this->as_ion_auth->get_sections_array($this->session->userdata('active_group_id'), $user_id, FALSE, $arr_super_section_id, array('subscription','public','unmanaged'));
+			$tmp_array = $this->as_ion_auth->get_sections_array($this->session->userdata('active_group_id'), $user_id, FALSE, $arr_super_section_id, array('subscription','base','unmanaged'));
 			$this->data['section_options'] = $this->as_ion_auth->set_form_array($tmp_array, 'id', 'name');
 */
 			$this->data['herd_code'] = array(

@@ -72,7 +72,7 @@ class Nav extends CI_Controller {
     function ajax_json() {
 		$this->load->model('web_content/navigation_model');
 		$Navigation = new Navigation($this->navigation_model, $this->herd, $this->as_ion_auth->arr_task_permissions());
-
+die($Navigation->jsonOutput('DHI'));
 		header("Cache-Control: no-cache, must-revalidate, max-age=0");
 		header("Cache-Control: post-check=0, pre-check=0", false);
 		header("Pragma: no-cache");

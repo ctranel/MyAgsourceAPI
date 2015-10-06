@@ -1,14 +1,16 @@
-	var MenuEntry = function (title, id, href, selected, objSubEntries) {
+	var MenuEntry = function (title, id, href, scope, selected, objSubEntries) {
 	    var self = this;
 		self.name = title;
 		self.id = id;
 		self.href = href;
+		self.scope = scope + '';
 		self.isSelected = ko.observable(false);
 	    self.selectedChild = ko.observable();
 	    self.children = ko.observableArray();
 	    self.numChildren = ko.computed(function(){
 	    	return self.children().length;
 	    });
+
 	    self.hasGrandChildren = ko.computed(function(){
 	    	for(var i in self.children()){
 	    		if(self.children()[i].children().length > 0){
@@ -51,7 +53,7 @@
 	    
 
 	    for(var i in objSubEntries){
-	    	self.children.push(new MenuEntry(objSubEntries[i].name, objSubEntries[i].id, objSubEntries[i].href, false, objSubEntries[i].children));
+	    	self.children.push(new MenuEntry(objSubEntries[i].name, objSubEntries[i].id, objSubEntries[i].href, objSubEntries[i].scope, false, objSubEntries[i].children));
 	    }
 	    
 	    self.deselectChildren = function(){
@@ -101,7 +103,7 @@
 	    });
 
 	    for(i in nav){
-	    	self.navItems.push(new MenuEntry(nav[i].name, nav[i].id, nav[i].href, false, nav[i].children));
+	    	self.navItems.push(new MenuEntry(nav[i].name, nav[i].id, nav[i].href, nav[i].scope, false, nav[i].children));
 	    }
 		
 	    self.deselectChildren = function(){

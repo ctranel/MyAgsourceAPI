@@ -46,7 +46,7 @@ class Help extends CI_Controller{
 	
 	function generatePageHeader() {
 		$this->load->helper('multid_array_helper');
-		$arr_scope = array('subscription','public','unmanaged');
+		$arr_scope = array('subscription','base','unmanaged');
 		
 		if(is_array($this->page_header_data)){
 			$this->page_header_data = array_merge($this->page_header_data,

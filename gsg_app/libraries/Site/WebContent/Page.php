@@ -1,9 +1,11 @@
 <?php
 namespace myagsource\Site\WebContent;
 
+require_once APPPATH . 'libraries/Site/iPage.php';
 require_once APPPATH . 'libraries/Site/iWebContent.php';
 require_once APPPATH . 'libraries/Site/iWebContentRepository.php';
 
+use myagsource\Site\iPage;
 use myagsource\Site\iWebContent;
 use myagsource\Site\iWebContentRepository;
 use myagsource\dhi\Herd;
@@ -21,7 +23,7 @@ use myagsource\dhi\Herd;
 *
 */
 
-class Page implements iWebContent {
+class Page implements iWebContent, iPage {
 	/**
 	 * section id
 	 * @var int
@@ -96,6 +98,10 @@ class Page implements iWebContent {
 
 	public function name(){
 		return $this->name;
+	}
+
+	public function scope(){
+		return $this->scope;
 	}
 
 	public function children(){
