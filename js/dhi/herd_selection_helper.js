@@ -36,10 +36,10 @@ head.ready(function() {
 			success: function(data) {
 				if(data['new_test'] === true){ 
 					if(data['enroll_status'] === 1){ //not on MyAgSource
-						ret_val = confirm("Herd "  + herd_code + " is not enrolled on MyAgSource.  If you choose to continue, you will be billed for all access beyond base reports.  Do you want to continue?");
+						ret_val = confirm("Herd "  + herd_code + " is not enrolled on MyAgSource.  If you choose to continue, you will be billed.  Do you want to continue?");
 					}
 					else if(data['enroll_status'] === 2){//on trial
-						ret_val = confirm("Herd "  + herd_code + " is not being billed for MyAgSource.  If you choose to continue, you will be billed for all access beyond base reports.  Do you want to continue?");
+						ret_val = confirm("Herd "  + herd_code + " is not being billed for MyAgSource.  If you choose to continue, you will be billed.  Do you want to continue?");
 					}
 				}
 			}

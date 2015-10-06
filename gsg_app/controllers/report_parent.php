@@ -191,9 +191,7 @@ abstract class report_parent extends CI_Controller {
 
 		//does user have access to current page for selected herd?
 		$this->herd_page_access = new HerdPageAccess($this->herd_model, $this->herd, $this->page);
-		
 		$this->page_access = new PageAccess($this->page, $this->as_ion_auth->has_permission("View All Content"));
-
 		if(!$this->page_access->hasAccess($this->herd_page_access->hasAccess())) {
 			$this->redirect(site_url(), 'You do not have permission to view the requested report for herd ' . $this->herd->herdCode() . '.  Please select a report from the navigation or contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' if you have questions or concerns.');
 		}
