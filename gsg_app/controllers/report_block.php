@@ -8,6 +8,8 @@ require_once(APPPATH . 'libraries/dhi/Herd.php');
 require_once(APPPATH . 'libraries/Report/Content/Blocks.php');
 require_once(APPPATH . 'libraries/Site/WebContent/Blocks.php');
 require_once(APPPATH . 'libraries/Site/WebContent/Pages.php');
+require_once(APPPATH . 'libraries/Site/WebContent/PageAccess.php');
+require_once(APPPATH . 'libraries/dhi/HerdPageAccess.php');
 require_once(APPPATH . 'libraries/Site/WebContent/Sections.php');
 require_once(APPPATH . 'libraries/Datasource/DbObjects/DbTable.php');
 require_once(APPPATH . 'libraries/Report/Content/Chart/ChartData.php');
@@ -20,6 +22,8 @@ use \myagsource\Benchmarks\Benchmarks;
 use \myagsource\report_filters\Filters;
 use \myagsource\Supplemental\Content\SupplementalFactory;
 use \myagsource\dhi\HerdAccess;
+use \myagsource\dhi\HerdPageAccess;
+use \myagsource\Site\WebContent\PageAccess;
 use \myagsource\dhi\Herd;
 use \myagsource\Site\WebContent\Sections;
 use \myagsource\Site\WebContent\Pages;
@@ -51,6 +55,18 @@ class report_block extends CI_Controller {
 	 * @var HerdAccess
 	 **/
 	protected $herd_access;
+	
+	/**
+	 * herd_page_access
+	 * @var HerdPageAccess
+	 **/
+	protected $herd_page_access;
+	
+	/**
+	 * sections
+	 * @var Sections
+	 **/
+	protected $sections;
 	
 	/**
 	 * section
@@ -166,14 +182,14 @@ class report_block extends CI_Controller {
 		$this->supp_factory = new SupplementalFactory($this->supplemental_model, site_url());
 		$this->blocks = new Blocks($this->report_block_model, $this->db_field_model, $this->supp_factory);
 
-		$method = $this->router->fetch_method();
-
-			//does selected user have access to current page for selected herd?
-		if(!$this->has_page_access($method)) {
-			$this->session->set_flashdata('message',  $this->session->flashdata('message') . "You do not have permission to view the requested report for herd " . $this->herd->herdCode() . ".  Please select a report from the navigation.");
-			$this->redirect(site_url());
-		}
-				
+		//set up web content objects
+		$this->load->model('web_content/section_model');
+		$this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
+		$this->load->model('web_content/block_model', 'WebBlockModel');
+		$web_blocks = new WebBlocks($this->WebBlockModel);
+		$this->pages = new Pages($this->page_model, $web_blocks);
+		$this->sections = new Sections($this->section_model, $this->pages);
+		
 		/* Load the profile.php config file if it exists
 		if (ENVIRONMENT == 'development' || ENVIRONMENT == 'localhost') {
 			$this->config->load('profiler', false, true);
@@ -183,67 +199,45 @@ class report_block extends CI_Controller {
 		}*/
 	}
 
-	//redirects while retaining message and conditionally setting redirect url
 	//@todo: needs to be a part of some kind of authorization class
 	protected function post_message($message = ''){
-		$this->session->keep_flashdata('redirect_url');
+		$this->session->keep_all_flashdata();
 		$this->load->view('echo.php', ['text' => $message]);
+//		exit;
 	}
 
-	protected function has_page_access($method){
-		//if section scope is public, pass unsubscribed test
-		//@todo: build display_hierarchy/report_organization, etc interface with get_scope function (with classes for super_sections, sections, etc)
-		$pass_unsubscribed_test = true; //$this->as_ion_auth->get_scope('sections', $this->section->id()) == 'pubic';
-		//@todo: redo access tests
-//		$pass_unsubscribed_test = $this->as_ion_auth->has_permission("View All Content") || $this->web_content_model->herd_is_subscribed($this->section->id(), $this->herd->herdCode());
-		$pass_view_nonowned_test = $this->as_ion_auth->has_permission("View All Herds");
-		if(!$pass_view_nonowned_test) $pass_view_nonowned_test = in_array($this->herd->herdCode(), $this->herd_access->getAccessibleHerdCodes($this->session->userdata('user_id'), $this->as_ion_auth->arr_task_permissions(), $this->session->userdata('arr_regions')));
-		if($pass_unsubscribed_test && $pass_view_nonowned_test) return TRUE;
-		elseif(!$pass_unsubscribed_test && !$pass_view_nonowned_test) {
-			$this->session->set_flashdata('message', 'Herd ' . $this->herd->herdCode() . ' is not subscribed to the ' . $this->product_name . ', nor do you have permission to view this report for herd ' . $this->herd->herdCode() . '.  Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' if you have questions or concerns.');
- 			if($this->session->flashdata('message')) $this->session->keep_flashdata('message');
-			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
-			redirect(site_url('dhi/change_herd/select'));
-			exit;
-		}
-		elseif(!$pass_unsubscribed_test) {
-			$this->session->set_flashdata('message', 'Herd ' . $this->herd->herdCode() . ' is not subscribed to the ' . $this->product_name . '.  Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' if you have questions or concerns.');
- 			if($this->session->flashdata('message')) $this->session->keep_flashdata('message');
-			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
-			redirect(site_url());
-			exit;
-		}
-		elseif(!$pass_view_nonowned_test) {
-			$this->session->set_flashdata('message', 'You do not have permission to view the requested report for herd ' . $this->herd->herdCode() . '.  Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' if you have questions or concerns.');
- 			if($this->session->flashdata('message')) $this->session->keep_flashdata('message');
-			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
-			redirect(site_url('dhi/change_herd/select'));
-			exit;
-		}
-		return FALSE;
-	}
-		
 	/*
 	 * ajax_report: Called via AJAX to populate graphs
 	 * @param string page path
 	 * @param string block name
-	 * @param string output
 	 * @param string sort by
 	 * @param string sort order
-	 * @param boolean/string file_format: return the value of function (TRUE), or echo it (FALSE).  Defaults to FALSE
-	 * @param string test date
 	 * @param int report count
 	 * @param string serialized filter data
-	 * @param boolean first
 	 * @param string cache_buster: text to make page appear as a different page so that new data is retrieved
-	 * @todo: can I delete the last 2 params?
+	 * @todo: can I delete the last param?
 	 */
 	public function ajax_report($page_path, $block_name, $sort_by = 'null', $sort_order = 'null', $report_count=0, $json_filter_data = NULL, $cache_buster = NULL) {//, $herd_size_code = FALSE, $all_breeds_code = FALSE
+		$this->session->keep_all_flashdata();
+		
 		$page_path = str_replace('|', '/', trim(urldecode($page_path), '|'));
 		$path_parts = explode('/', $page_path);
 		$num_parts = count($path_parts);
 		$path_page_segment = $path_parts[$num_parts - 1];
+		
+		//load section
 		$this->section_path = isset($path_parts[$num_parts - 2]) ? $path_parts[$num_parts - 2] . '/' : '/';
+		$this->section = $this->sections->getByPath($this->section_path);
+		
+		//is container page viewable to this user?
+		//does user have access to current page for selected herd?
+		$this->page = $this->pages->getByPath($path_page_segment, $this->section->id());
+		$this->herd_page_access = new HerdPageAccess($this->herd_model, $this->herd, $this->page);
+		$this->page_access = new PageAccess($this->page, $this->as_ion_auth->has_permission("View All Content"));
+		if(!$this->page_access->hasAccess($this->herd_page_access->hasAccess())) {
+			$this->post_message('You do not have permission to view the requested report for herd ' . $this->herd->herdCode() . '.  Please select a report from the navigation or contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' if you have questions or concerns.');
+			return;
+		}
 		
 		$block = $this->blocks->getByPath(urldecode($block_name));
 		$output = $block->displayType();
@@ -255,7 +249,7 @@ class report_block extends CI_Controller {
 
 		//FILTERS
 		if(isset($json_filter_data)){
-			$section = $this->getSection();
+			$section = $this->section;
 			$arr_params = (array)json_decode(urldecode($json_filter_data));
 			if(isset($arr_params['csrf_test_name']) && $arr_params['csrf_test_name'] != $this->security->get_csrf_hash()){
 				die("I don't recognize your browser session, your session may have expired, or you may have cookies turned off.");
@@ -371,17 +365,7 @@ class report_block extends CI_Controller {
 		header("Cache-Control: no-cache, must-revalidate, max-age=0");
 		header("Cache-Control: post-check=0, pre-check=0", false);
 		header("Pragma: no-cache");
+		header("Expires: -1");
 		$this->load->view('echo.php', ['text' => $return_val]);
-	}
-
-	protected function getSection(){
-		$this->load->model('web_content/section_model');
-		$this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
-		$this->load->model('web_content/block_model', 'WebBlockModel');
-		$web_blocks = new WebBlocks($this->WebBlockModel);
-		$pages = new Pages($this->page_model, $web_blocks);
-		$sections = new Sections($this->section_model, $pages);
-		$section = $sections->getByPath($this->section_path);
-		return $section;
 	}
 }

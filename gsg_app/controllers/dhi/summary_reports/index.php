@@ -5,8 +5,7 @@ class Index extends CI_Controller {
 	}
 	
 	function index(){
-		$redirect_url = set_redirect_url($this->uri->uri_string(), $this->session->flashdata('redirect_url'), $this->as_ion_auth->referrer);
-		$this->session->set_flashdata('redirect_url', $redirect_url);
+		$this->session->keep_all_flashdata();
 		redirect(site_url('dhi/summary_reports/herd_summary/hs_prod'));
 	}
 }

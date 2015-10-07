@@ -7,28 +7,33 @@
  *
  * @access	public
  * @param	string	current controller path
- * @return	$redirect_url
+ * @param	string	current redirect path
+ * @return	$redirect_path
  */
 if ( ! function_exists('set_redirect_url'))
 {
-	function set_redirect_url($curr_control_path, $redirect_url_in, $referrer_in){
+	function set_redirect_url($curr_control_path, $redirect_path_in){
+		$redirect_path = $curr_control_path;
+		//if we don't want to use current path as a redirect, keep the current REDIRECT path
 		if(
-			$referrer_in === $curr_control_path
-			|| $referrer_in === 'auth/login'
-			|| strpos($referrer_in, 'change_herd') !== FALSE
-			|| $referrer_in === 'auth/logout'
-			|| $referrer_in === 'benchmarks'
-			|| strpos($referrer_in, 'cow_page') !== FALSE
-			|| strpos($referrer_in, 'help') !== FALSE
-			|| strpos($referrer_in, 'custom_reports/select') !== FALSE
-			|| strpos($referrer_in, 'custom_reports/insert') !== FALSE
-			|| strpos($referrer_in, 'download/') !== FALSE
-			|| strpos($referrer_in, 'ajax_') !== FALSE
+			$redirect_path === 'auth/login'
+			|| strpos($redirect_path, 'change_herd') !== FALSE
+			|| $redirect_path === 'auth/logout'
+			|| $redirect_path === 'benchmarks'
+			|| strpos($redirect_path, 'help') !== FALSE
+			|| strpos($redirect_path, 'csv') !== FALSE
+			|| strpos($redirect_path, 'pdf') !== FALSE
+			|| strpos($redirect_path, 'nav/') !== FALSE
+			|| strpos($redirect_path, '/set_role') !== FALSE
+			|| strpos($redirect_path, 'setting') !== FALSE
+			|| strpos($redirect_path, 'custom_reports/select') !== FALSE
+			|| strpos($redirect_path, 'custom_reports/insert') !== FALSE
+			|| strpos($redirect_path, 'download/') !== FALSE
+			|| strpos($redirect_path, 'ajax') !== FALSE
 		){
-			$referrer_in = '';
+			$redirect_path = $redirect_path_in;
 		}
-		$redirect_url = $redirect_url_in !== FALSE ? str_replace('/csv', '', str_replace('/pdf', '', $redirect_url_in)) : $referrer_in;
-		return $redirect_url;
+		return $redirect_path;
 	}
 }
 // ------------------------------------------------------------------------

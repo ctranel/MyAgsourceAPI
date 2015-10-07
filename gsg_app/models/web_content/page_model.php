@@ -18,10 +18,12 @@ class Page_model extends CI_Model {
 	 **/
 	public function getPages() {
 		return $this->db
-			->where($this->tables['pages'] . '.active', 1)
-			->where("(" . $this->tables['pages'] . ".user_id IS NULL OR " . $this->tables['pages'] . ".user_id = " . $this->user_id . ")")
-			->order_by($this->tables['pages'] . '.list_order')
-			->get($this->tables['pages'])
+			->select('p.*, s.name AS scope')
+			->where('p.active', 1)
+			->where("(p.user_id IS NULL OR p.user_id = " . $this->user_id . ")")
+			->join('users.dbo.lookup_scopes s', 'p.scope_id = s.id', 'inner')
+			->order_by('p.list_order')
+			->get($this->tables['pages'] . ' p')
 			->result_array();
 	}
 	

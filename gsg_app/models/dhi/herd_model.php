@@ -468,4 +468,70 @@ class Herd_model extends CI_Model {
 		}
 		return FALSE;
 	}
+
+
+	/**
+	 * getHerdPagesData
+	 * @param string herd code
+	 * @return array of section data
+	 * @author ctranel
+	 **/
+	public function getHerdPagesData($herd_code) {
+		if(!isset($herd_code) || empty($herd_code)){
+			return false;
+		}
+	
+		$sql = "
+			SELECT a.*, ls.name AS scope FROM (
+				SELECT p.id, section_id, name, description, scope_id, path, active, list_order, pr.report_code
+				FROM users.dbo.pages p
+					INNER JOIN users.dbo.pages_reports pr ON (p.id = pr.page_id AND p.active = 1 AND p.scope_id = 2)
+					INNER JOIN herd.dbo.herd_output ho ON pr.report_code = ho.report_code AND ho.herd_code = '" . $herd_code . "' AND ho.end_date IS NULL AND ho.medium_type_code = 'W'
+	
+				UNION ALL
+	
+				SELECT id, section_id, name, description, scope_id, path, active, list_order, NULL AS report_code
+				FROM users.dbo.pages p
+				WHERE scope_id = 1 AND active = 1
+			) a
+		
+			INNER JOIN users.dbo.lookup_scopes ls ON a.scope_id = ls.id
+			ORDER BY list_order
+		";
+		return $this->db->query($sql)->result_array();
+	}
+	
+	/**
+	 * herdHasPageAccess
+	 * @param string herd code
+	 * @param int page_id
+	 * @return array of section data
+	 * @author ctranel
+	public function herdHasPageAccess($herd_code, $page_id) {
+		if(!isset($herd_code) || empty($herd_code)){
+			return false;
+		}
+	
+		$sql = "
+			SELECT a.*, ls.name AS scope FROM (
+				SELECT section_id, name, description, scope_id, path, active, list_order, pr.report_code
+				FROM users.dbo.pages p
+					INNER JOIN users.dbo.pages_reports pr ON (p.id = pr.page_id AND p.active = 1 AND p.scope_id = 2 AND p.id = )
+					INNER JOIN herd.dbo.herd_output ho ON pr.report_code = ho.report_code AND ho.herd_code = '" . $herd_code . "' AND ho.end_date IS NULL AND ho.medium_type_code = 'W'
+	
+				UNION ALL
+	
+				SELECT section_id, name, description, scope_id, path, active, list_order, NULL AS report_code
+				FROM users.dbo.pages p
+				WHERE scope_id = 1 AND active = 1
+			) a
+		
+			INNER JOIN users.dbo.lookup_scopes ls ON a.scope_id = ls.id
+			WHERE page_id = " . $page_id . "
+			ORDER BY list_order
+		";
+		return $this->db->query($sql);
+	}
+	 **/
+	
 }

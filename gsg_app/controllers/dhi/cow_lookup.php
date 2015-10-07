@@ -36,11 +36,14 @@ class Cow_lookup extends CI_Controller {
 
 	function __construct(){
 		parent::__construct();
+		//set redirect, this handles keeping flashdata when appropriate
+		$redirect_url = set_redirect_url($this->uri->uri_string(), $this->session->userdata('redirect_url'));
+		$this->session->set_userdata('redirect_url', $redirect_url);
+		
 		$this->load->model('herd_model');
 		$this->herd_access = new HerdAccess($this->herd_model);
 		$this->herd = new Herd($this->herd_model, $this->session->userdata('herd_code'));
 		$this->cow_id_field = $this->session->userdata('general_dhi')['cow_id_field'];
-		$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
 		
 		//is someone logged in?
 		if($this->herd->herdCode() != $this->config->item('default_herd')){
@@ -86,12 +89,7 @@ class Cow_lookup extends CI_Controller {
 	//@todo: needs to be a part of some kind of authorization class
 	protected function redirect($url, $message = ''){
 		$this->session->set_flashdata('message',  $this->session->flashdata('message') . $message);
-		if(isset($method) && strpos($method, 'ajax') === false && strpos($method, '/demo') === false){
-			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
-		}
-		else{
-			$this->session->keep_flashdata('redirect_url');
-		}
+		$this->session->keep_all_flashdata();
 		redirect($url);
 	}
 

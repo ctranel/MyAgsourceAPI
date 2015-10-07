@@ -33,11 +33,6 @@ class Nav extends CI_Controller {
 			$this->post_message("You do not have permission to access this herd.  Please select another herd and try again.  ");
 		}
 				
-//		$this->session->keep_flashdata('redirect_url');
-		//make sure previous page remains as the redirect url 
-//		$redirect_url = set_redirect_url($this->uri->uri_string(), $this->session->flashdata('redirect_url'), $this->as_ion_auth->referrer);
-//		$this->session->set_flashdata('redirect_url', $redirect_url);
-		
 		if((!isset($this->as_ion_auth) || !$this->as_ion_auth->logged_in()) && $this->session->userdata('herd_code') != $this->config->item('default_herd')){
 			$this->load->view('session_expired', array('url'=>$this->session->flashdata('redirect_url')));
 			exit;

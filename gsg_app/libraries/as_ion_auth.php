@@ -32,13 +32,6 @@ class As_ion_auth extends Ion_auth {
 	public $is_admin;
 
 	/**
-	 * referrer
-	 *
-	 * @var string
-	 **/
-	public $referrer;
-
-	/**
 	 * arr_groups
 	 *
 	 * @var array id=>name
@@ -92,13 +85,6 @@ class As_ion_auth extends Ion_auth {
 			$this->arr_task_permissions = $this->ion_auth_model->getTaskPermissions();
 		}
 
-		//reliably set the referrer, used when determining whether to set the redirect variable on pages like select herd
-		$this->referrer = $this->session->userdata('referrer');
-
-		if($this->session->userdata('referrer') != $tmp_uri && strpos($tmp_uri, 'ajax') === false && strpos($tmp_uri, '/csv/') === false && strpos($tmp_uri, '/demo') === false){
-			$this->session->set_userdata('referrer', $tmp_uri);
-		}
-		
 		$this->is_admin = $this->is_admin();
 	}
 	

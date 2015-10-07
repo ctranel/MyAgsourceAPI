@@ -56,7 +56,7 @@ class Navigation{// implements iWebContentRepository {
 	 **/
 	//if we allow producers to select which sections to allow, we will need to pass that array to this section as well
 	protected function setData(){ 
-		$scope = ['public'];
+		$scope = ['base'];
 		$tmp_array = [];
 
 		if(in_array('View All Content', $this->arr_task_permissions)){
@@ -111,6 +111,7 @@ class Navigation{// implements iWebContentRepository {
 					'name' => $d['name'],
 					'id' => $dom_id,//split and take the first element
 					'href' => '/' . $full_path,
+					'scope' => $d['scope'],
 				];
 				$children = $this->buildTree($data, $d['id'], $full_path);
 				if ($children) {
@@ -138,6 +139,7 @@ class Navigation{// implements iWebContentRepository {
 		if(isset($section)){
 			$tree = self::getSubTree('name', $section, $this->tree);//array_search('Herd Summary', array_column($this->tree, 'name'));
 		}
+//var_dump($tree, $section, $this->tree); die;
 		$json = json_encode(isset($tree) ? $tree :$this->tree);
 		return $json;
 	}
@@ -153,15 +155,22 @@ class Navigation{// implements iWebContentRepository {
 	 * @author ctranel
 	 **/
 	protected static function getSubTree($prop_name, $prop_value, $haystack){
+		$return_val = [];
 		foreach($haystack as $val) {
 			if(isset($val[$prop_name]) && $val[$prop_name] === $prop_value) {
-				return $val['children'];
+				$return_val = $return_val + $val['children'];
 			}
 			elseif(isset($val['children']) && is_array($val['children'])){
-				return self::getSubTree($prop_name, $prop_value, $val['children']);
+				$tmp = self::getSubTree($prop_name, $prop_value, $val['children']);
+				if($tmp){
+					$return_val = $return_val + $tmp;
+				}
 			}
 		}
-		return false;
+		
+		if(!empty($return_val)){
+			return $return_val;
+		}
 	}
 }
 

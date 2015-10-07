@@ -106,6 +106,8 @@ class blocks extends CI_Controller {
 
 	function __construct(){
 		parent::__construct();
+		$this->session->keep_all_flashdata();
+
 		$this->load->model('herd_model');
 /*		$this->load->model('web_content/section_model');
 		$this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
@@ -116,39 +118,6 @@ class blocks extends CI_Controller {
 //		$sections = new Sections($this->section_model, $this->pages);
 		$this->herd_access = new HerdAccess($this->herd_model);
 		$this->herd = new Herd($this->herd_model, $this->session->userdata('herd_code'));
-/*		
-		$class_dir = $this->router->fetch_directory(); //this should match the name of this file (minus ".php".  Also used as base for css and js file names and model directory name
-		$class = $this->router->fetch_class();
-		if($class === 'index'){
-			$class = '';
-		}
-		$method = $this->router->fetch_method();
-		$this->section_path = $class_dir . $class;
-		if(substr($this->section_path, -1) === '/'){
-			$this->section_path = substr($this->section_path, 0, -1);
-		}
-		//load sections
-		$this->section = $sections->getByPath($this->section_path . '/');
-		$this->session->set_userdata('section_id', $this->section->id());
-		$sections->loadChildren($this->section, $this->pages, $this->session->userdata('user_id'), $this->herd, $this->ion_auth_model->getTaskPermissions());
-		$path = uri_string();
-
-		if(strpos($path, $method) === false){
-			$method = $this->section->defaultPagePath();
-		}
-
-		if(!$this->authorize($method)) {
-			$this->session->keep_flashdata('message');
-			$this->session->keep_flashdata('redirect_url');
-			//@todo: redirect, or send error message?
-			redirect(site_url('auth/login'));
-		}
-*/
-		if($this->herd->herdCode() == ''){
-			$this->session->keep_flashdata('redirect_url');
-			//@todo: redirect, or send error message?
-			redirect(site_url('dhi/change_herd/select'));			
-		}
 		$this->page_header_data['num_herds'] = $this->herd_access->getNumAccessibleHerds($this->session->userdata('user_id'), $this->as_ion_auth->arr_task_permissions(), $this->session->userdata('arr_regions'));
 		$this->page_header_data['navigation'] = $this->load->view('navigation', [], TRUE);
 		
@@ -162,60 +131,15 @@ class blocks extends CI_Controller {
 		}
 	}
 
-	protected function authorize($method){
-		if(!isset($this->as_ion_auth)){
-	       	return FALSE;
-		}
-		if(!$this->as_ion_auth->logged_in() && $this->herd->herdCode() != $this->config->item('default_herd')) {
-	       	$this->session->set_flashdata('message', "Please log in.");
-			return FALSE;
-		}
-		if(!$this->herd->herdCode()){
-			$this->session->set_flashdata('message',  $this->session->flashdata('message') . "Please select a herd and try again.");
-			if($this->session->flashdata('message')) $this->session->keep_flashdata('message');
-			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
-			redirect(site_url('dhi/change_herd/select'));
-  			exit;
-		}
-		//if section scope is public, pass unsubscribed test
-		//@todo: build display_hierarchy/report_organization, etc interface with get_scope function (with classes for super_sections, sections, etc)
-		$pass_unsubscribed_test = true; //$this->as_ion_auth->get_scope('sections', $this->section->id()) == 'pubic';
-		//@todo: redo access tests
-//		$pass_unsubscribed_test = $this->as_ion_auth->has_permission("View All Content") || $this->web_content_model->herd_is_subscribed($this->section->id(), $this->herd->herdCode());
-		$pass_view_nonowned_test = $this->as_ion_auth->has_permission("View All Herds");
-		if(!$pass_view_nonowned_test) $pass_view_nonowned_test = in_array($this->herd->herdCode(), $this->herd_access->getAccessibleHerdCodes($this->session->userdata('user_id'), $this->as_ion_auth->arr_task_permissions(), $this->session->userdata('arr_regions')));
-		if($pass_unsubscribed_test && $pass_view_nonowned_test) return TRUE;
-		elseif(!$pass_unsubscribed_test && !$pass_view_nonowned_test) {
-			$this->session->set_flashdata('message', 'Herd ' . $this->herd->herdCode() . ' is not subscribed to the ' . $this->product_name . ', nor do you have permission to view this report for herd ' . $this->herd->herdCode() . '.  Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' if you have questions or concerns.');
- 			if($this->session->flashdata('message')) $this->session->keep_flashdata('message');
-			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
-			redirect(site_url('dhi/change_herd/select'));
-			exit;
-		}
-		elseif(!$pass_unsubscribed_test) {
-			$this->session->set_flashdata('message', 'Herd ' . $this->herd->herdCode() . ' is not subscribed to the ' . $this->product_name . '.  Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' if you have questions or concerns.');
- 			if($this->session->flashdata('message')) $this->session->keep_flashdata('message');
-			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
-			redirect(site_url());
-			exit;
-		}
-		elseif(!$pass_view_nonowned_test) {
-			$this->session->set_flashdata('message', 'You do not have permission to view the ' . $this->product_name . ' for herd ' . $this->herd->herdCode() . '.  Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' if you have questions or concerns.');
- 			if($this->session->flashdata('message')) $this->session->keep_flashdata('message');
-			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
-			redirect(site_url('dhi/change_herd/select'));
-			exit;
-		}
-		return FALSE;
-	}
-	
 	function index(){
+		//keep flashdata is in constructor
 		redirect(site_url($this->report_path));
 	}
 
 	function get($arr_block_in, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
 		//Check for valid herd_code
 		if(!$this->herd){
+			//keep flashdata is in constructor
 			$this->session->set_flashdata('message', 'Please select a valid herd.');
 			redirect(site_url($this->report_path));
 		}
