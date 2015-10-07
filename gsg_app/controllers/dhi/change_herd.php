@@ -30,22 +30,18 @@ class Change_herd extends CI_Controller {
 
 	function __construct(){
 		parent::__construct();
+		$this->session->keep_all_flashdata();
+
 		$this->load->model('herd_model');
 		$this->herd_access = new HerdAccess($this->herd_model);
-		$this->session->keep_flashdata('redirect_url');
 		if(!isset($this->as_ion_auth)){
-			redirect('auth/login', 'refresh');
+			$this->redirect('auth/login');
 		}
 		if((!$this->as_ion_auth->logged_in())){
-			$redirect_url = set_redirect_url($this->uri->uri_string(), $this->session->flashdata('redirect_url'), $this->as_ion_auth->referrer);
-			$this->session->set_flashdata('redirect_url', $redirect_url);
 			if(strpos($this->session->flashdata('message'), 'Please log in.') === FALSE){
 				$this->session->set_flashdata('message',  $this->session->flashdata('message') . 'Please log in.');
 			}
-			else{
-				$this->session->keep_flashdata('message');
-			}
-			redirect(site_url('auth/login'));
+			$this->redirect(site_url('auth/login'));
 		}
 
 		$this->load->model('access_log_model');
@@ -62,20 +58,23 @@ class Change_herd extends CI_Controller {
 		}
 	}
 
+	//redirects while retaining message and conditionally setting redirect url
+	//@todo: needs to be a part of some kind of authorization class
+	protected function redirect($url, $message = ''){
+		//keep flashdata call is in constructor
+		$this->session->set_flashdata('message',  $this->session->flashdata('message') . $message);
+		redirect($url);
+	}
+
 	function index(){
 		if($this->as_ion_auth->has_permission("Select Herd")) {
-			$this->session->keep_flashdata('redirect_url');
-			$this->session->keep_flashdata('message');
-			redirect(site_url('dhi/change_herd/select'));
+			$this->redirect(site_url('dhi/change_herd/select'));
 		}
 		elseif($this->as_ion_auth->has_permission("Request Herd")) {
-			$this->session->keep_flashdata('redirect_url');
-			$this->session->keep_flashdata('message');
-			redirect(site_url('dhi/change_herd/request'));
+			$this->redirect(site_url('dhi/change_herd/request'));
 		}
 		else {
-			$this->session->set_flashdata('message', 'You do not have permissions to request herds.');
-			redirect(site_url($redirect_url));
+			$this->redirect(site_url($this->session->userdata('redirect_url')), 'You do not have permissions to request herds.');
 		}
 	}
 
@@ -87,17 +86,12 @@ class Change_herd extends CI_Controller {
  * @return	void
  */
 	function select(){
-		$tmp_uri = $this->uri->uri_string();
-		$redirect_url = set_redirect_url($tmp_uri, $this->session->flashdata('redirect_url'), $this->as_ion_auth->referrer);
-		$this->session->set_flashdata('redirect_url', $redirect_url);
-		if(empty($redirect_url) && $this->as_ion_auth->referrer !== $tmp_uri) $redirect_url = $tmp_uri;
 		if(!$this->as_ion_auth->has_permission("Select Herd") && $this->as_ion_auth->has_permission("Request Herd")){
-			redirect(site_url('dhi/change_herd/request'));
+			$this->redirect(site_url('dhi/change_herd/request'));
 			exit();
 		}
 		if(!$this->as_ion_auth->has_permission("Select Herd")){
-			$this->session->set_flashdata('message', 'You do not have permissions to select herds.');
-			redirect(site_url($redirect_url));
+			$this->redirect(site_url($this->session->userdata('redirect_url')), 'You do not have permissions to select herds.');
 			exit();
 		}
 		//validate form input
@@ -125,7 +119,7 @@ class Change_herd extends CI_Controller {
 			$this->set_herd_session_data($herd_enroll_status_id);
 			
 			$this->_record_access(2); //2 is the page code for herd change
-			redirect(site_url($redirect_url));
+			$this->redirect(site_url($this->session->userdata('redirect_url')));
 			exit();
 		}
 		else
@@ -152,7 +146,7 @@ class Change_herd extends CI_Controller {
 						}
 					}
 					$this->set_herd_session_data($herd_enroll_status_id);
-					redirect(site_url($redirect_url));
+					$this->redirect(site_url($this->session->userdata('redirect_url')));
 					exit();
 				}
 				$this->load->library('herds');
@@ -186,7 +180,6 @@ class Change_herd extends CI_Controller {
 			}
 			$this->page_footer_data = array();
 			$this->page_header_data['message'] = compose_error($err, validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages());
-			$arr_redirect_url = explode('/', $redirect_url);
 			$this->data['page_header'] = $this->load->view('page_header', $this->page_header_data, TRUE);
 			$this->data['page_heading'] = 'Select Herd - ' . $this->config->item('product_name');
 			$this->data['page_footer'] = $this->load->view('page_footer', $this->page_footer_data, TRUE);
@@ -204,16 +197,11 @@ class Change_herd extends CI_Controller {
  * @return	void
  */
 	function request(){
-		$tmp_uri = $this->uri->uri_string();
-		$redirect_url = set_redirect_url($tmp_uri, $this->session->flashdata('redirect_url'), $this->as_ion_auth->referrer);
-		$this->session->set_flashdata('redirect_url', $redirect_url);
-		if(empty($redirect_url) && $this->as_ion_auth->referrer !== $tmp_uri) $redirect_url = $tmp_uri;
 		if($this->as_ion_auth->has_permission("Select Herd") && !$this->as_ion_auth->has_permission("Request Herd")){
-			redirect(site_url('dhi/change_herd/select'));
+			$this->redirect(site_url('dhi/change_herd/select'));
 		}
 		if(!$this->as_ion_auth->has_permission("Request Herd")){
-			$this->session->set_flashdata('message', 'You do not have permissions to request herds.');
-			redirect(site_url($redirect_url));
+			$this->redirect(site_url($this->session->userdata('redirect_url')), 'You do not have permissions to request herds.');
 		}
 
 		//validate form input
@@ -226,8 +214,7 @@ class Change_herd extends CI_Controller {
 			$herd_release_code = $this->input->post('herd_release_code');
 			$error = $this->herd_model->herd_authorization_error($herd_code, $herd_release_code);
 			if($error){
-				$this->session->set_flashdata('message', 'Invalid data submitted: ' . $error);
-				redirect(site_url('dhi/change_herd/request'));
+				$this->redirect(site_url('dhi/change_herd/request'), 'Invalid data submitted: ' . $error);
 			}
 		}
 
@@ -236,9 +223,8 @@ class Change_herd extends CI_Controller {
 			$herd_enroll_status_id = $this->herd->getHerdEnrollStatus($this->config->item('product_report_code'));
 			if($this->session->userdata('active_group_id') == 2){ //user is a producer
 				if($herd_enroll_status_id == 1){ //herd is not enrolled
-					$this->session->set_flashdata('message', 'Herd ' . $this->input->post('herd_code') . ' is not signed up for ' . $this->config->item('product_name') . '. Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' to enroll on ' . $this->config->item('product_name') . '.');
 					//redirect back to select herd page again
-					redirect(site_url('dhi/change_herd/request'), 'refresh');
+					$this->redirect(site_url('dhi/change_herd/request'), 'Herd ' . $this->input->post('herd_code') . ' is not signed up for ' . $this->config->item('product_name') . '. Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' to enroll on ' . $this->config->item('product_name') . '.');
 					exit();
 				}
 				if($herd_enroll_status_id == 2){ //herd is not paying
@@ -254,7 +240,7 @@ class Change_herd extends CI_Controller {
 			$this->set_herd_session_data($herd_enroll_status_id);
 			
 			$this->_record_access(2); //2 is the page code for herd change
-			redirect(site_url($redirect_url));
+			$this->redirect(site_url($this->session->userdata('redirect_url')));
 		}
 		else {  //the user is not logging in so display the login page
 			$this->page_header_data['message'] = compose_error(validation_errors(), $this->session->flashdata('message'));
@@ -279,7 +265,6 @@ class Change_herd extends CI_Controller {
 					)
 				);
 			}
-			$arr_redirect_url = explode('/', $redirect_url);
 
 			$this->data['page_header'] = $this->load->view('page_header', $this->page_header_data, TRUE);
 			$this->data['page_heading'] = 'Request Herd - ' . $this->config->item('product_name');

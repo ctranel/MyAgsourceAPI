@@ -29,11 +29,12 @@ class Custom_report extends CI_Controller {
 		} */
 	}
 	function index(){
+		$this->session->keep_all_flashdata();
 		redirect(site_url('custom_report/create'), 'refresh');
 	}
 	function create(){
 		if(!isset($this->as_ion_auth) || !$this->as_ion_auth->logged_in()){
-			$this->session->keep_flashdata('redirect_url');
+			$this->session->keep_all_flashdata();
 			redirect(site_url('auth/login'));
 		}
 		$this->page_header_data['message'] = $this->session->flashdata('message');
@@ -41,8 +42,8 @@ class Custom_report extends CI_Controller {
 		if(!isset($user_id) || $user_id === FALSE) $user_id = $this->session->userdata('user_id');
 		//does the logged in user have permission to edit this user?
 		if (!$this->as_ion_auth->logged_in()) {
-			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
-			redirect(site_url('auth'), 'refresh');
+			$this->session->keep_all_flashdata();
+			redirect(site_url('auth'));
         }
         else{
 			$this->data['title'] = "Edit Account";
@@ -229,6 +230,7 @@ class Custom_report extends CI_Controller {
 			}
        	} 
        	//else {
+		//	$this->session->keep_all_flashdata();
        //		$this->session->set_flashdata('message', "You do not have permission to edit the requested account.");
        	//	redirect(site_url());
        	//}

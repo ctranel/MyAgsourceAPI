@@ -199,10 +199,9 @@ class report_block extends CI_Controller {
 		}*/
 	}
 
-	//redirects while retaining message and conditionally setting redirect url
 	//@todo: needs to be a part of some kind of authorization class
 	protected function post_message($message = ''){
-		$this->session->keep_flashdata('redirect_url');
+		$this->session->keep_all_flashdata();
 		$this->load->view('echo.php', ['text' => $message]);
 //		exit;
 	}
@@ -219,6 +218,8 @@ class report_block extends CI_Controller {
 	 * @todo: can I delete the last param?
 	 */
 	public function ajax_report($page_path, $block_name, $sort_by = 'null', $sort_order = 'null', $report_count=0, $json_filter_data = NULL, $cache_buster = NULL) {//, $herd_size_code = FALSE, $all_breeds_code = FALSE
+		$this->session->keep_all_flashdata();
+		
 		$page_path = str_replace('|', '/', trim(urldecode($page_path), '|'));
 		$path_parts = explode('/', $page_path);
 		$num_parts = count($path_parts);

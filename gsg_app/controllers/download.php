@@ -4,12 +4,13 @@ class Download extends CI_Controller {
 	function __construct(){
 		parent::__construct();
 /*		if(!isset($this->as_ion_auth)){
+			$this->session->keep_all_flashdata();
 			redirect('auth/login', 'refresh');
 		}
 		if((!$this->as_ion_auth->logged_in())){
-			$this->session->keep_flashdata('redirect_url');
-			$redirect_url = set_redirect_url($this->uri->uri_string(), $this->session->flashdata('redirect_url'), $this->as_ion_auth->referrer);
-			$this->session->set_flashdata('redirect_url', $redirect_url);
+			$this->session->keep_all_flashdata();
+			$redirect_url = set_redirect_url($this->uri->uri_string(), $this->session->flashdata('redirect_url'));
+			$this->session->set_userdata('redirect_url', $redirect_url);
 			if(strpos($this->session->flashdata('message'), 'Please log in.') === FALSE){
 				$this->session->set_flashdata('message',  $this->session->flashdata('message') . 'Please log in.');
 			}
@@ -34,7 +35,7 @@ class Download extends CI_Controller {
  * @return	void
  */
 	function index($filename){
-		$this->session->keep_flashdata('redirect_url');
+		$this->session->keep_all_flashdata();
 		if(file_exists(PROJ_DIR . FS_SEP . "img" . FS_SEP . $filename)){
 			$this->load->helper('download');
 			$data = file_get_contents(PROJ_DIR . FS_SEP . "img" . FS_SEP . $filename); // Read the file's contents

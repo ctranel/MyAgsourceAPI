@@ -13,8 +13,7 @@ class Genetic_summary extends report_parent {
 	}
 
 	 function index($block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
-	 	$redirect_url = set_redirect_url($this->uri->uri_string(), $this->session->flashdata('redirect_url'), $this->as_ion_auth->referrer);
-		$this->session->set_flashdata('redirect_url', $redirect_url);
+		$this->session->keep_all_flashdata();
 	 	redirect(site_url('dhi/summary_reports/genetic_summary/gen_over'));
 	 }
 

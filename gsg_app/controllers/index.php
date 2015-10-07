@@ -16,7 +16,7 @@ class Index extends report_parent {
 	function __construct(){
 		parent::__construct();
 		if(!isset($this->as_ion_auth) || $this->session->userdata('herd_code') === FALSE){
-			$this->session->keep_flashdata('redirect_url');
+			$this->session->keep_all_flashdata();
 			redirect(site_url('auth/login'));
 		}
 		$this->page_header_data['num_herds'] = $this->herd_access->getNumAccessibleHerds($this->session->userdata('user_id'), $this->as_ion_auth->arr_task_permissions(), $this->session->userdata('arr_regions'));

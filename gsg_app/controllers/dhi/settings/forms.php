@@ -30,10 +30,12 @@ class Forms extends CI_Controller {
 	
 	function __construct(){
 		parent::__construct();
+		//We want to return to the page visited BEFORE the form after the form is submitted
+		$this->session->keep_all_flashdata();
+		
 		$this->load->model('herd_model');
 		$this->herd_access = new HerdAccess($this->herd_model);
 		$this->herd = new Herd($this->herd_model, $this->session->userdata('herd_code'));
-		$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
 		
 		//is someone logged in?
 		if($this->herd->herdCode() != $this->config->item('default_herd')){
@@ -79,12 +81,6 @@ class Forms extends CI_Controller {
 	//@todo: needs to be a part of some kind of authorization class
 	protected function redirect($url, $message = ''){
 		$this->session->set_flashdata('message',  $this->session->flashdata('message') . $message);
-		if(isset($method) && strpos($method, 'ajax') === false && strpos($method, '/demo') === false){
-			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
-		}
-		else{
-			$this->session->keep_flashdata('redirect_url');
-		}
 		redirect($url);
 	}
 

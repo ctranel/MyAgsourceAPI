@@ -130,7 +130,11 @@ abstract class report_parent extends CI_Controller {
 
 	function __construct(){
 		parent::__construct();
-
+		
+		//set redirect, this handles keeping flashdata when appropriate
+		$redirect_url = set_redirect_url($this->uri->uri_string(), $this->session->userdata('redirect_url'));
+		$this->session->set_userdata('redirect_url', $redirect_url);
+		
 		//set up herd
 		$this->load->model('herd_model');
 		$this->herd_access = new HerdAccess($this->herd_model);
@@ -216,25 +220,19 @@ abstract class report_parent extends CI_Controller {
 	//redirects while retaining message and conditionally setting redirect url
 	//@todo: needs to be a part of some kind of authorization class
 	protected function redirect($url, $message = ''){
-		$this->session->set_flashdata('message',  $this->session->flashdata('message') . $message);
-		if(isset($method) && strpos($method, 'ajax') === false && strpos($method, '/demo') === false){
-			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
-		}
-		else{
-			$this->session->keep_flashdata('redirect_url');
-		}
+		$this->session->keep_all_flashdata();
+		$this->session->set_flashdata('message',  $this->session->flashdata('message') . '<br>' . $message);
 		redirect($url);
 	}
 
 	function index(){
-		redirect(site_url($this->report_path));
+		$this->redirect(site_url($this->report_path));
 	}
 
 	function display($arr_block_in, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
 		//Check for valid herd_code
 		if(!$this->herd){
-			$this->session->set_flashdata('message', 'Please select a valid herd.');
-			redirect(site_url($this->report_path));
+			$this->redirect(site_url($this->report_path), 'Please select a valid herd.');
 		}
 		
 		$arr_blocks = $this->blocks->getByPage($this->page->id());

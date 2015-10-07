@@ -147,6 +147,7 @@ class Blocks extends CI_Controller {
 
 	function __construct(){
 		parent::__construct();
+		$this->session->keep_all_flashdata();
 
 		//set up herd
 		$this->load->model('herd_model');
@@ -196,13 +197,8 @@ class Blocks extends CI_Controller {
 	//redirects while retaining message and conditionally setting redirect url
 	//@todo: needs to be a part of some kind of authorization class
 	protected function redirect($url, $message = ''){
+		//keep flashdata is in constructor
 		$this->session->set_flashdata('message',  $this->session->flashdata('message') . $message);
-		if(isset($method) && strpos($method, 'ajax') === false && strpos($method, '/demo') === false){
-			$this->session->set_flashdata('redirect_url', $this->uri->uri_string());
-		}
-		else{
-			$this->session->keep_flashdata('redirect_url');
-		}
 		redirect($url);
 	}
 
@@ -222,7 +218,7 @@ class Blocks extends CI_Controller {
 
 		//load section
 		$this->section_path = isset($path_parts[$num_parts - 2]) ? $path_parts[$num_parts - 2] . '/' : '/';
-		$this->section = $sections->getByPath($this->section_path);
+		$this->section = $this->sections->getByPath($this->section_path);
 						
 		//is container page viewable to this user?
 		//does user have access to current page for selected herd?
@@ -256,7 +252,7 @@ class Blocks extends CI_Controller {
 		
 			$this->load->helper('multid_array_helper');
 			$filters->setCriteria(
-					$section->id(),
+					$this->section->id(),
 					$path_page_segment,
 					['herd_code' => $this->session->userdata('herd_code')] + $arr_params
 			);
@@ -333,7 +329,7 @@ class Blocks extends CI_Controller {
 			
 			header('Content-type: application/excel');
 			header('Content-disposition: attachment; filename=' . $filename);
-			$this->_record_access(90, 'csv', $page->id(), $this->config->item('product_report_code'));
+			$this->_record_access(90, 'csv', $this->page->id(), $this->config->item('product_report_code'));
 			$this->load->view('echo.php', ['text' => $csv_text]);
 		}
 		else {

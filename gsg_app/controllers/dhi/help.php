@@ -13,7 +13,8 @@ class Help extends CI_Controller{
 		$this->load->model('herd_model');
 		$herd_access = new HerdAccess($this->herd_model);
 		if(!isset($this->as_ion_auth)){
-			redirect('auth/login', 'refresh');
+			$this->session->keep_all_flashdata();
+			redirect('auth/login');
 		}
 		$this->page_header_data['num_herds'] = $herd_access->getNumAccessibleHerds($this->session->userdata('user_id'), $this->as_ion_auth->arr_task_permissions(), $this->session->userdata('arr_regions'));
 		$this->page_header_data['navigation'] = $this->load->view('navigation', [], TRUE);

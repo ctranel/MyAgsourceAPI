@@ -12,6 +12,7 @@ class Land extends CI_Controller {
 	}
 	
 	function index(){
+		$this->session->keep_all_flashdata();
 		redirect(site_url('custom_report/custom_report/create'));
 	}
 }

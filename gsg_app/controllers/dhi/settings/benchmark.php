@@ -12,21 +12,13 @@ class Benchmark extends CI_Controller {
 	function __construct(){
 		parent::__construct();
 		
-/*		if(!isset($this->as_ion_auth)){
-			redirect('auth/login', 'refresh');
+		$this->session->keep_all_flashdata();
+		
+		if((!isset($this->as_ion_auth) || !$this->as_ion_auth->logged_in()) && $this->session->userdata('herd_code') != $this->config->item('default_herd')){
+			http_response_code(401);
+			echo json_encode(['error'=>['message'=>'Your session has expired, please log in and try again.']]);
+			exit;
 		}
-		if((!$this->as_ion_auth->logged_in())){
-			$this->session->keep_flashdata('redirect_url');
-			$redirect_url = set_redirect_url($this->uri->uri_string(), $this->session->flashdata('redirect_url'), $this->as_ion_auth->referrer);
-			$this->session->set_flashdata('redirect_url', $redirect_url);
-			if(strpos($this->session->flashdata('message'), 'Please log in.') === FALSE){
-				$this->session->set_flashdata('message',  $this->session->flashdata('message') . 'Please log in.');
-			}
-			else{
-				$this->session->keep_flashdata('message');
-			}
-			redirect(site_url('auth/login'));
-		} */
 	}
 
 /**
@@ -40,19 +32,6 @@ class Benchmark extends CI_Controller {
  * @todo: sending confirmation to client???
  */
 	function ajax_set($ser_form_data = null){
-		//for ajax pages
-		$this->session->keep_flashdata('message');
-		$this->session->keep_flashdata('redirect_url');
-		//make sure previous page remains as the redirect url
-		$redirect_url = set_redirect_url($this->uri->uri_string(), $this->session->flashdata('redirect_url'), $this->as_ion_auth->referrer);
-		$this->session->set_flashdata('redirect_url', $redirect_url);
-		
-		if((!isset($this->as_ion_auth) || !$this->as_ion_auth->logged_in()) && $this->session->userdata('herd_code') != $this->config->item('default_herd')){
-			http_response_code(401);
-			echo json_encode(['error'=>['message'=>'Your session has expired, please log in and try again.']]);
-			exit;
-		}
-		
 		//do we have any data?
 		if(!isset($ser_form_data)){
 			http_response_code(400);
@@ -87,7 +66,6 @@ class Benchmark extends CI_Controller {
 			$benchmarks->save_as_default($formatted_form_data);
 		}
 			
-		$this->session->keep_flashdata('redirect_url');
 		exit;
 	}
 }
