@@ -37,16 +37,9 @@
 	    	if(self.threeLevelNav()){
 	    		return false;
 	    	}
-	    	return (self.children().length > 3 && self.hasGrandChildren());
+	    	return (self.children().length > 0 && self.hasGrandChildren());
 	    });
-
-	    self.twoLevelMega = ko.computed(function(){
-	    	if(self.threeLevelNav()){
-	    		return false;
-	    	}
-	    	return (self.children().length < 4 && self.hasGrandChildren());
-	    });
-
+	    
 	    self.oneLevel = ko.computed(function(){
 	    	return (!self.hasGrandChildren() && self.children().length > 0);
 	    });

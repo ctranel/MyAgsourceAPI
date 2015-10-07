@@ -58,24 +58,6 @@
 					</ul>
 				</nav>
 				<!-- /ko -->
-				<!-- ko if: (selectedNav().twoLevelMega) -->
-				<nav class="navbar mega-category" id="top-nav2-mega" style="display:none" role="navigation" data-bind="visible: selectedNav().twoLevelMega()">
-					<div class="nav navbar-nav">
-						<ul data-bind="foreach: selectedNav().children">
-						<li>
-						<nav class="navbar mega" id="top-nav3-mega" role="navigation">
-							<a data-bind="text: name"></a>
-							<ul data-bind="foreach: children">
-								<li>
-									<a data-bind="click: $parent.setSelected, text: name, attr: {href: href}, css: {'base': (scope == 'base'), 'subscription': (scope == 'subscription')}"></a>
-								</li>
-							</ul>
-						</nav>
-						</li>
-						</ul>
-					</div>
-				</nav>
-				<!-- /ko -->
 				<!-- ko if: (selectedNav().oneLevel) -->
 				<nav class="navbar mega" id="top-nav2-mega" style="display:none" role="navigation" data-bind="visible: selectedNav().oneLevel()">
 					<div class="nav navbar-nav">
