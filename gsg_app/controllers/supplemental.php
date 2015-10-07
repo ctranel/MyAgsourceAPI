@@ -26,10 +26,7 @@ class Supplemental extends CI_Controller {
     function ajax_tip($comment_id) {
     	$this->load->model('supplemental_model');
     	$tip = $this->supplemental_model->getComment($comment_id);
-		header("Cache-Control: no-cache, must-revalidate, max-age=0");
-		header("Cache-Control: post-check=0, pre-check=0", false);
-		header("Pragma: no-cache");
-    	$this->load->view('tip', ['tip' => $tip]);
+		$this->load->view('tip', ['tip' => $tip]);
     }
     
     function ajax_overlay() {

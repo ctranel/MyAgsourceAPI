@@ -365,6 +365,7 @@ class report_block extends CI_Controller {
 		header("Cache-Control: no-cache, must-revalidate, max-age=0");
 		header("Cache-Control: post-check=0, pre-check=0", false);
 		header("Pragma: no-cache");
+		header("Expires: -1");
 		$this->load->view('echo.php', ['text' => $return_val]);
 	}
 }

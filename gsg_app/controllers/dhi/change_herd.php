@@ -275,7 +275,6 @@ class Change_herd extends CI_Controller {
 	}
 
 	public function ajax_herd_enrolled($herd_code){
-		header('Content-type: application/json');
 		$group = $this->session->userdata('active_group_id');
 		if($this->as_ion_auth->has_permission('View Assign w permission') === FALSE) {
 			//return a 0 for non-service groups
@@ -289,6 +288,7 @@ class Change_herd extends CI_Controller {
 		header("Cache-Control: no-cache, must-revalidate, max-age=0");
 		header("Cache-Control: post-check=0, pre-check=0", false);
 		header("Pragma: no-cache");
+		header("Expires: -1");
 		$this->load->view('echo.php', ['text' => json_encode(['enroll_status' => $enroll_status, 'new_test' => !$has_accessed])]);
 	}
 	

@@ -29,6 +29,7 @@ class Fresh_cow_supplemental extends CI_Controller {
 		header("Cache-Control: no-cache, must-revalidate, max-age=0");
 		header("Cache-Control: post-check=0, pre-check=0", false);
 		header("Pragma: no-cache");
-    	$this->load->view('dhi/summary_reports/fresh_cow_summary/pagesupp', $tip);
+		header("Expires: -1");
+		$this->load->view('dhi/summary_reports/fresh_cow_summary/pagesupp', $tip);
     }
 }

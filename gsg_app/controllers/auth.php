@@ -1317,13 +1317,11 @@ class Auth extends Ionauth {
 		header("Cache-Control: no-cache, must-revalidate, max-age=0");
 		header("Cache-Control: post-check=0, pre-check=0", false);
 		header("Pragma: no-cache");
+		header("Expires: -1");
 		$this->load->view('echo.php', ['text' => $return_val]);
 	}
 	
 	function ajax_terms(){
-		header("Cache-Control: no-cache, must-revalidate, max-age=0");
-		header("Cache-Control: post-check=0, pre-check=0", false);
-		header("Pragma: no-cache");
 		$this->load->view('auth/terms', array());
 	}
 	
