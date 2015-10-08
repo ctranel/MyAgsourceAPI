@@ -82,16 +82,16 @@ if (defined('ENVIRONMENT'))
 	switch (ENVIRONMENT)
 	{
 		case 'development':
-			$system_path = '/var/as_sys';
+			$system_path = '/var/as_sys2';
 		break;
 		case 'localhost':
-			$system_path = 'C:\\Program Files (x86)\\Zend\\Apache2\\as_sys';
+			$system_path = 'C:\\Program Files (x86)\\Zend\\Apache2\\as_sys2';
 		break;
 		case 'qa':
-			$system_path = "/var/www/as_sys";
+			$system_path = "/var/www/as_sys2";
 		break;
 		case 'production':
-			$system_path = "/var/as_sys";
+			$system_path = "/var/as_sys2";
 		break;
 
 		default:
