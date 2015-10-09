@@ -438,7 +438,7 @@ $config['csrf_expire'] = 7200;
 			$config['compress_output'] = false;
 		break;
 		case 'qa':
-			$config['compress_output'] = false;
+			$config['compress_output'] = true;
 		break;
 		case 'production':
 			$config['compress_output'] = true;
