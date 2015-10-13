@@ -269,17 +269,19 @@ class report_block extends CI_Controller {
 
 			/*
 			 * If this is a cow level block, and the filter is set to 0 (pstring), remove filter
-			 * Needed for reports that contain both cow level and summary reports.
+			 * Needed for pages that contain both cow level and summary reports.
 			*/
 			foreach($arr_params as $k => $v){
 				if(!$block->isSummary()){
 					if(is_array($v)){
-						$tmp = array_filter($v);
+						$tmp = array_filter($arr_params[$k], function($v){
+							return (empty($v) && $v !== 0);
+						});
 						if(empty($tmp)){
 							$filters->removeCriteria($k);
 						}
 					}
-					elseif($v == 0){
+					elseif(empty($v) && ($v !== 0 || $k === 'pstring')){
 						$filters->removeCriteria($k);
 					}
 				}

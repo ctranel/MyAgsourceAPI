@@ -141,7 +141,6 @@ class Filters{
 		
 		//if there is a value in form data that is not in FilterCriteria (e.g., a value that is set programmatically (herd_code)), need to set that up
 		$arr_to_create = array_diff_key($arr_form_data, $arr_page_filter_data);
-//var_dump($arr_to_create, $arr_page_filter_data, $arr_form_data);
 		if(is_array($arr_to_create) && !empty($arr_to_create)){
 			foreach($arr_to_create as $k=>$f){
 				if(!is_array($f)){
