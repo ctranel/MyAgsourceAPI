@@ -32,43 +32,35 @@ class General extends CI_Controller {
  * @todo: sending confirmation to client???
  */
 	function ajax_set($ser_form_data = null){
-		if((!isset($this->as_ion_auth) || !$this->as_ion_auth->logged_in()) && $this->session->userdata('herd_code') != $this->config->item('default_herd')){
-			http_response_code(401);
-			echo json_encode(['error'=>['message'=>'Your session has expired, please log in and try again.']]);
+		//form validation
+		$this->load->library('form_validation');
+		$this->form_validation->set_rules('cow_id_field', 'Cow ID Field', 'trim|alpha_dash');
+		
+		if($this->form_validation->run()){
+			$fields = [
+				'cow_id_field' => $this->input->post('cow_id_field'),
+			];
+			
+			$make_default = $this->input->post('make_default');
+			
+			$formatted_form_data = SessionSettings::parseFormData($fields);
+	
+				//set session benchmarks
+			$this->session->set_userdata('general_dhi', $formatted_form_data);
+			
+			//if set default, write to database
+			if($make_default){
+				$this->load->model('setting_model');
+				$settings = new SessionSettings($this->session->userdata('user_id'), $this->session->userdata('herd_code'), $this->setting_model, 'general_dhi', $this->session->userdata('general_dhi'));
+				$settings->save_as_default($formatted_form_data);
+			}
+	
 			exit;
 		}
-		
-		//do we have any data?
-		if(!isset($ser_form_data)){
+		else {
 			http_response_code(400);
-			echo json_encode(['error'=>['message'=>'No form data received.']]);
+			echo json_encode(['error'=>['message'=>validation_errors()]]);
 			exit;
 		}
-		
-		//HANDLE DATA
-		$arr_params = json_decode(urldecode($ser_form_data), true);
-		//verify csrf
-		if(isset($arr_params['csrf_test_name']) && $arr_params['csrf_test_name'] != $this->security->get_csrf_hash()){
-			http_response_code(403);
-			echo json_encode(['error'=>['message'=>"I don't recognize your browser session, your session may have expired, or you may have cookies turned off."]]);
-			exit;
-		}
-		unset($arr_params['csrf_test_name']);
-
-		$make_default = $arr_params['make_default'];
-		unset($arr_params['make_default']);
-		
-		$formatted_form_data = SessionSettings::parseFormData($arr_params);
-
-		$this->session->set_userdata('general_dhi', $formatted_form_data);
-		
-		//if set default, write to database
-		if($make_default){
-			$this->load->model('setting_model');
-			$benchmarks = new SessionSettings($this->session->userdata('user_id'), $this->session->userdata('herd_code'), $this->setting_model, 'general_dhi', $this->session->userdata('general_dhi'));
-			$benchmarks->save_as_default($formatted_form_data);
-		}
-
-		exit;
 	}
 }

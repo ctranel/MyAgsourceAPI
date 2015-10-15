@@ -31,41 +31,44 @@ class Benchmark extends CI_Controller {
  * @return	void
  * @todo: sending confirmation to client???
  */
-	function ajax_set($ser_form_data = null){
-		//do we have any data?
-		if(!isset($ser_form_data)){
-			http_response_code(400);
-			echo json_encode(['error'=>['message'=>'No form data received.']]);
-			exit;
-		}
+	function ajax_set(){
+		//form validation
+		$this->load->library('form_validation');
+		$this->form_validation->set_rules('breed', 'Breed', 'trim|alpha_dash');
+		$this->form_validation->set_rules('metric', 'Metric', 'trim|alpha_dash');
+		$this->form_validation->set_rules('criteria', 'Criteria', 'trim|alpha_dash');
+		$this->form_validation->set_rules("herd_size['dbfrom']", 'Herd Size Start', 'trim|integer');
+		$this->form_validation->set_rules("herd_size['dbto']", 'Herd Size End', 'trim|integer');
+		$this->form_validation->set_rules('make_default', 'Save as Default', 'trim');
 		
-		//HANDLE DATA
-		$arr_params = json_decode(urldecode($ser_form_data), true);
-		//verify csrf
-		if(isset($arr_params['csrf_test_name']) && $arr_params['csrf_test_name'] != $this->security->get_csrf_hash()){
-			http_response_code(403);
-			echo json_encode(['error'=>['message'=>"I don't recognize your browser session, your session may have expired, or you may have cookies turned off."]]);
-			exit;
-		}
-		unset($arr_params['csrf_test_name']);
-
-		$this->load->model('setting_model');
-		$make_default = $arr_params['make_default'];
-		unset($arr_params['make_default']);
-		
-		$formatted_form_data = Benchmarks::parseFormData($arr_params);
-
-		//set session benchmarks
-		//$benchmarks->setSessionValues($formatted_form_data);
-		$this->session->set_userdata('benchmarks', $formatted_form_data);
-		
-		//if set default, write to database
-		if($make_default){
-			$this->load->model('benchmark_model');
-			$benchmarks = new Benchmarks($this->session->userdata('user_id'), $this->session->userdata('herd_code'), $this->herd_model->header_info($this->session->userdata('herd_code')), $this->setting_model, $this->benchmark_model, $this->session->userdata('benchmarks'));
-			$benchmarks->save_as_default($formatted_form_data);
-		}
+		if($this->form_validation->run()){
+			$fields = [
+				'breed' => $this->input->post('breed'),
+				'metric' => $this->input->post('metric'),
+				'criteria' => $this->input->post('criteria'),
+				'herd_size' => $this->input->post('herd_size'),
+			];
 			
-		exit;
+			$make_default = $this->input->post('make_default');
+			
+			$formatted_form_data = Benchmarks::parseFormData($fields);
+	
+			//set session benchmarks
+			$this->session->set_userdata('benchmarks', $formatted_form_data);
+			
+			//if set default, write to database
+			if($make_default){
+				$this->load->model('setting_model');
+				$this->load->model('benchmark_model');
+				$benchmarks = new Benchmarks($this->session->userdata('user_id'), $this->session->userdata('herd_code'), $this->herd_model->header_info($this->session->userdata('herd_code')), $this->setting_model, $this->benchmark_model, $this->session->userdata('benchmarks'));
+				$benchmarks->save_as_default($formatted_form_data);
+			}
+			exit;
+		}
+		else {
+			http_response_code(400);
+			echo json_encode(['error'=>['message'=>validation_errors()]]);
+			exit;
+		}
 	}
 }

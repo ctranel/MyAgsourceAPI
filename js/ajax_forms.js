@@ -1,9 +1,9 @@
 	$('.ajax-form').submit(function(ev){
 		ev.preventDefault();
-		params = assocFormToObject(ev.target);
-		params = encodeURIComponent(JSON.stringify(params));
+		var data = assocFormToObject(ev.target);
+//		data = encodeURIComponent(JSON.stringify(data));
 		var response_obj;
-		$.post(ev.target.action + '/' + params)
+		$.post(ev.target.action, data)
 			.done(function(data){
 				if(typeof(updatePage) === 'function'){
 					updatePage(this);
