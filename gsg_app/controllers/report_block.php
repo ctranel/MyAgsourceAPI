@@ -275,7 +275,7 @@ class report_block extends CI_Controller {
 				if(!$block->isSummary()){
 					if(is_array($v)){
 						$tmp = array_filter($arr_params[$k], function($v){
-							return (empty($v) && $v !== 0);
+							return (!empty($v) || $v === 0 || $v === '0');
 						});
 						if(empty($tmp)){
 							$filters->removeCriteria($k);
