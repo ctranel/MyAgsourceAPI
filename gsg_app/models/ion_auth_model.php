@@ -601,6 +601,79 @@ SELECT DISTINCT id, name, list_order FROM cteAnchor ORDER BY list_order;";
 
 
 	/**
+	 * This function takes a password and validates it
+	 * against an entry in the users table.
+	 *
+	 * @return void
+	 * @author Mathew
+	 **/
+	public function hash_password_db($id, $password, $use_sha1_override=FALSE)
+	{
+		if (empty($id) || empty($password)) {
+			return FALSE;
+		}
+
+		$this->trigger_events('extra_where');
+
+		$query = $this->db->select($this->identity_column . ', password, salt')
+		                  ->where('id', $id)
+		                  ->limit(1)
+		                  ->get($this->tables['users']);
+
+		$hash_password_db = $query->row();
+
+		if ($query->num_rows() !== 1) {
+			return FALSE;
+		}
+
+		// bcrypt
+		if ($use_sha1_override === FALSE && $this->hash_method == 'bcrypt') {
+			if ($this->bcrypt->verify($password,$hash_password_db->password)) {
+				return TRUE;
+			}
+			//ctranel: for previously saved passwords, don't return false yet, also check sha1 auth
+			//return FALSE;
+		}
+
+		// sha1
+		if ($this->store_salt) {
+			$db_password = sha1($password . $hash_password_db->salt);
+		}
+		else {
+			$salt = substr($hash_password_db->password, 0, $this->salt_length);
+			$db_password =  $salt . substr(sha1($salt . $password), 0, -$this->salt_length);
+		}
+
+		if($db_password == $hash_password_db->password) {
+			//ctranel: save password with bcrypt 
+			$this->password_to_bcrypt($id, $password,$hash_password_db->password);
+			return TRUE;
+		}
+		else {
+			return FALSE;
+		}
+	}
+	
+	/**
+	 * This function takes a password and validates it
+	 * against an entry in the users table.
+	 *
+	 * @param int user id
+	 * @param string plain password
+	 * @param hashed password
+	 * @return void
+	 * @author Mathew
+	 **/
+	private function password_to_bcrypt($user_id, $input, $existingHash){
+		//store the new password and reset the remember code so all remembered instances have to re-login
+		$bcrypt_hash = crypt($input, $existingHash);
+		$data = array(
+				'password' => $bcrypt_hash,
+		);
+		$this->db->update($this->tables['users'], $data, ['id' => $user_id]);
+	}
+
+	/**
 	 * @method login_remembed_user
 	 *
 	 * @return bool

@@ -158,7 +158,7 @@ switch (ENVIRONMENT)
 $config['site_title']     = "MyAgSource";
 
 
-$config['hash_method']    = 'sha1';	// IMPORTANT: Make sure this is set to either sha1 or bcrypt
+$config['hash_method']    = 'bcrypt';	// IMPORTANT: Make sure this is set to either sha1 or bcrypt
 $config['default_rounds'] = 8;		// This does not apply if random_rounds is set to true
 $config['random_rounds']  = FALSE;
 $config['min_rounds']     = 5;
