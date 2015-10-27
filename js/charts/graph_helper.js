@@ -89,6 +89,7 @@ function load_block(server_path, div_id, block_index, params){
 		var h_width = parseInt($("#header").css('width'));
 		var width = c_width > h_width ? c_width : h_width;
 		$('#nav-width-control').css('width', width);
+		$('#header').css('width', width - 2);
 		//$('#container').css('width', width);
 	})
 		.fail(function(){console.log(this.responseText);})
