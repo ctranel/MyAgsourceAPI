@@ -208,13 +208,13 @@ abstract class report_parent extends CI_Controller {
 	    $this->notifications->populateNotices();
 	    $this->notices = $this->notifications->getNoticesTexts();
 		
-		/* Load the profile.php config file if it exists*/
+		/* Load the profile.php config file if it exists
 		if (ENVIRONMENT == 'development' || ENVIRONMENT == 'localhost') {
 			$this->config->load('profiler', false, true);
 			if ($this->config->config['enable_profiler']) {
 				$this->output->enable_profiler(TRUE);
 			} 
-		}
+		}*/
 	}
 	
 	//redirects while retaining message and conditionally setting redirect url

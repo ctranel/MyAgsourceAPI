@@ -112,4 +112,6 @@ ul#session-nav>li>ul {position: absolute; float: none;}
 ul#session-nav>li>ul>li {float: none;}
 ul#session-nav>li>ul, ul#session-nav>li>ul a {background-color: #00958E; color: #E6F4F4; }
 
+
+#nav-width-control{position: absolute; height: 0px;}
 /* END NAVIGATION */

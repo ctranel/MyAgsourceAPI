@@ -52,6 +52,7 @@
 </head>
 <body>
 <?php $url = site_url(); ?>
+<div id="nav-width-control">&nbsp;</div>
 <div class="container" id="container">
 	<div id="header">
 		<a href="https://myagsource.com/"><div class="header-link">&nbsp;</div></a>

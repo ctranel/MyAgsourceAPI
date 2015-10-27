@@ -49,7 +49,7 @@ a {text-decoration: underline;}
 ul{margin: 0; }
 p {padding: 0 0 5px;}
 
-.container {display:table; border-left: solid 2px #E8E8E8; border-right: solid 2px #E8E8E8; border-bottom: solid 2px #E8E8E8; padding:0;}
+.container {display:table; border-left: solid 2px #E8E8E8; border-right: solid 2px #E8E8E8; border-bottom: solid 2px #E8E8E8; padding:0; margin-bottom: 30px;}
 #header {width: inherit; height: 56px; background-color:#E6F4F4; clear: both; position: fixed; padding: 0 0 30px 200px; border-bottom: solid 2px #EF5C29; z-index: 100;
 	/* Safari 4-5, Chrome 1-9 */
 	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#E6F4F4), to(#66bfbb));

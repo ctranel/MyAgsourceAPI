@@ -85,7 +85,11 @@ function load_block(server_path, div_id, block_index, params){
 
 	$.get(server_path, '', function(data) {
 		process_block(div_id, block_index, data); 
-		$('#header').css('width', $("#container").width() + 2);
+		var c_width = parseInt($("#container").css('width'));
+		var h_width = parseInt($("#header").css('width'));
+		var width = c_width > h_width ? c_width : h_width;
+		$('#nav-width-control').css('width', width);
+		//$('#container').css('width', width);
 	})
 		.fail(function(){console.log(this.responseText);})
 		.fail(function(jqXHR, textStatus, errorThrown){console.log(errorThrown);
