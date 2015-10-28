@@ -5,13 +5,16 @@ window.onload=function(){
 </script>
 <?php
 
-if(isset($page_header)) echo $page_header;
-echo 'The address <strong>'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'].'</strong> is invalid.<br /><br />';
+if(isset($page_header)){
+	echo $page_header;
+}
+?>
+<p>Sorry, the page <strong><?php echo $_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'] ?></strong> was not found.  Please use the navigation above to continue.</p>
 
-echo 'If you arrived here from a link on our site, please <a id="contact_us" href="mailto:support@myagsource.com">contact us</a>, 
-		describe where the link was, and check the box "Include a screenshot of this page" on the feedback window.<br /><br />';
+<p>If you continue to have problems, please <a id="contact_us" href="mailto:support@myagsource.com">click here</a> and
+		describe the problem.  Also, clicking on the camera icon on the form will send us a screenshot of the page, which is very helpful.</p>
 
-echo '-OR-<br /><br />';
-
-echo 'Email us at <a href="mailto:support@myagsource.com">support@myagsource.com</a><br /><br />.';
-if(isset($page_footer)) echo $page_footer;
+<?php
+if(isset($page_footer)){
+	echo $page_footer;
+}
