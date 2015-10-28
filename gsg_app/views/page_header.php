@@ -111,9 +111,11 @@
 				<li><?php echo anchor('help', 'Help'); ?></li>
 			<?php endif; ?>
 		</ul>
-		
+	<div style="clear:both"></div>
 	<?php
-	if(!empty($page_heading)) echo heading($page_heading);
+	if(!empty($page_heading)):
+		echo heading($page_heading);
+	endif;
 
 	if(isset($error)):
 		if (is_array($error) &&!empty($error)):

@@ -1,34 +1,19 @@
-<html>
-<head>
-<title>404 Page Not Found</title>
-<style type="text/css">
-
-body {
-background-color:	#fff;
-margin:				40px;
-font-family:		Lucida Grande, Verdana, Sans-serif;
-font-size:			12px;
-color:				#000;
+<script type="text/javascript">
+window.onload=function(){
+	UserVoice.push(['addTrigger', '#contact_us', {}]);
 }
+</script>
+<?php
 
-#content  {
-border:				#999 1px solid;
-background-color:	#fff;
-padding:			20px 20px 12px 20px;
-}
+if(isset($header)){
+	echo $header;
+} ?>
+<p>Sorry, the page <strong><?php echo $page ?></strong> was not found.  Please use the navigation above to continue.</p>
 
-h1 {
-font-weight:		normal;
-font-size:			14px;
-color:				#990000;
-margin: 			0 0 4px 0;
+<p>If you continue to have problems, please <a id="contact_us" href="mailto:support@myagsource.com">click here</a> and
+		describe the problem.  Also, clicking on the camera icon on the form will send us a screenshot of the page, which is very helpful.</p>
+
+<?php 
+if(isset($footer)){
+	echo $footer;
 }
-</style>
-</head>
-<body>
-	<div id="content">
-		<h1><?php echo $heading; ?></h1>
-		<?php echo $message; ?>
-	</div>
-</body>
-</html>

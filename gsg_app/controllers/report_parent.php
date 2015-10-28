@@ -14,6 +14,7 @@ require_once(APPPATH . 'libraries/Site/WebContent/PageAccess.php');
 require_once(APPPATH . 'libraries/Report/Content/Csv.php');
 //require_once(APPPATH . 'libraries/Report/Content/Pdf.php');
 require_once(APPPATH . 'libraries/Notifications/Notifications.php');
+require_once(APPPATH . 'libraries/ErrorPage.php');
 
 use \myagsource\Benchmarks\Benchmarks;
 use \myagsource\AccessLog;
@@ -31,6 +32,7 @@ use \myagsource\Report\Content\Csv;
 //use \myagsource\Report\Content\Pdf;
 use \myagsource\Report\iBlock;
 use \myagsource\notices\Notifications;
+use \myagsource\ErrorPage;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
@@ -191,6 +193,20 @@ abstract class report_parent extends CI_Controller {
 		$block_name = '';
 
 		$this->page = $this->pages->getByPath($page_name, $this->section->id());
+		//if page is not found, display 404
+		if(!$this->page){
+			$page_header_data = [
+				'title'=>'Page Not Found',
+				'page_heading'=>'Page Not Found',
+				'navigation' => $this->load->view('navigation', [], TRUE),
+			];
+		
+			$page_header = $this->load->view('page_header', $page_header_data, TRUE);
+			$page_footer = $this->load->view('page_footer', NULL, TRUE);
+			$error_page = new ErrorPage(APPPATH, $page_header, $page_footer, 'error_404');
+			$error_page ->show_404($this->uri->uri_string());
+			exit;
+		}
 		$this->report_path = $this->full_section_path . '/' . $this->page->path();
 
 		//does user have access to current page for selected herd?
