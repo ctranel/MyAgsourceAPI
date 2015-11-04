@@ -1,3 +1,15 @@
+<?php 
+header('strict-transport-security: max-age=31536000; includeSubdomains');
+header("Content-Security-Policy:"
+	. " default-src https://" . $_SERVER['HTTP_HOST'] . " https://*." . $_SERVER['HTTP_HOST'] . " https://myagsource.com https://maxcdn.bootstrapcdn.com https://*.uservoice.com;"
+	. " script-src 'unsafe-inline' 'unsafe-eval' https://" . $_SERVER['HTTP_HOST'] . " https://*." . $_SERVER['HTTP_HOST'] . " https://cdnjs.cloudflare.com https://ajax.googleapis.com https://netdna.bootstrapcdn.com https://cloud.github.com https://code.highcharts.com https://cdn.jsdelivr.net https://www.google-analytics.com https://*.uservoice.com;"
+	. " style-src 'unsafe-inline' https://" . $_SERVER['HTTP_HOST'] . " https://*." . $_SERVER['HTTP_HOST'] . " https://maxcdn.bootstrapcdn.com https://cdn.jsdelivr.net;"
+	. " frame-src 'none';"
+);
+header('x-frame-options: SAMEORIGIN');
+header('X-XSS-Protection: 1; mode=block');
+header('X-Content-Type-Options: nosniff');
+?>
 <!doctype html>
 <html lang="en">
 <head profile="http://www.w3.org/2005/10/profile">
