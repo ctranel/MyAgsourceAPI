@@ -666,7 +666,7 @@ SELECT DISTINCT id, name, list_order FROM cteAnchor ORDER BY list_order;";
 	 **/
 	private function password_to_bcrypt($user_id, $input, $existingHash){
 		//store the new password and reset the remember code so all remembered instances have to re-login
-		$bcrypt_hash = crypt($input, $existingHash);
+		$bcrypt_hash = $this->hash_password($input);
 		$data = array(
 				'password' => $bcrypt_hash,
 		);
