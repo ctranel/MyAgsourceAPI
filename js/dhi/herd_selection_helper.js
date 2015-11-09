@@ -44,6 +44,6 @@ head.ready(function() {
 				}
 			}
 		});
-		return false;// ret_val;
+		return ret_val;
 	});
 });
