@@ -58,9 +58,9 @@ class Section_model extends CI_Model {
 					FROM users.dbo.sections
 					WHERE id IN(
 						SELECT DISTINCT p.section_id
-							FROM users.dbo.pages p
+						FROM users.dbo.pages p
 							INNER JOIN users.dbo.pages_reports pr ON p.id = pr.page_id AND p.active = 1 AND p.scope_id = 2
-							INNER JOIN herd.dbo.herd_output ho ON pr.report_code = ho.report_code AND ho.herd_code = '" . $herd_code . "' AND ho.end_date IS NULL AND ho.medium_type_code = 'W' 
+							INNER JOIN users.dbo.v_user_status_info si ON pr.report_code = si.report_code AND si.herd_code = '" . $herd_code . "' AND (si.herd_is_paying = 1 OR si.herd_is_active_trial = 1)
 					)
 			
 					UNION ALL
@@ -141,25 +141,4 @@ class Section_model extends CI_Model {
 
 		return $tmp_arr_sections;
 	}
-
-	/**
-	 * @method herd_is_subscribed
-	 * @param int section_id
-	 * @param string herd_code
-	 * @return array of section data for given user
-	 * @author ctranel
-	public function herd_is_subscribed($section_id, $herd_code) {
-		//join to sections _reports then to herd_output
-		$res = $this->db
-		->join('users.dbo.pages_reports sr', 's.id = sr.section_id', 'inner')
-		->join('herd.dbo.herd_output ho', 'sr.report_code = ho.report_code', 'inner')
-		->where('s.scope_id', 2) // 2 = subscription
-		->where('ho.herd_code', $herd_code)
-		->where('sr.section_id', $section_id)
-		->where('ho.end_date IS NULL')
-		->getSections();
-		
-		return (count($res) > 0);
-	}
-	 **/
 }

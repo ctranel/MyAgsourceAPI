@@ -433,12 +433,15 @@ class Herd_model extends CI_Model {
 			}
 			$this->db->where_in('report_code', $report_code);
 		}
+		else{
+			$this->db->join('users.dbo.pages_reports pr', 'ho.report_code = pr.report_code', 'inner');
+		}
 		$result = $this->db
-			->select('report_code, bill_account_num')
+			->select('ho.report_code, ho.herd_is_paying, ho.herd_is_active_trial')
 			->where('herd_code', $herd_code)
 			->where('end_date IS NULL')
 			->where('activity_code !=', 'Q')
-			->get('[herd].[dbo].[herd_output]')
+			->get('[users].[dbo].[v_user_status_info] ho')
 			->result_array();
 		if(is_array($result)){
 			return $result;
@@ -486,7 +489,7 @@ class Herd_model extends CI_Model {
 				SELECT p.id, section_id, name, description, scope_id, path, active, list_order, pr.report_code
 				FROM users.dbo.pages p
 					INNER JOIN users.dbo.pages_reports pr ON (p.id = pr.page_id AND p.active = 1 AND p.scope_id = 2)
-					INNER JOIN herd.dbo.herd_output ho ON pr.report_code = ho.report_code AND ho.herd_code = '" . $herd_code . "' AND ho.end_date IS NULL AND ho.medium_type_code = 'W'
+					INNER JOIN users.dbo.v_user_status_info si ON pr.report_code = si.report_code AND si.herd_code = '" . $herd_code . "' AND (si.herd_is_paying = 1 OR si.herd_is_active_trial = 1)
 	
 				UNION ALL
 	
@@ -502,36 +505,29 @@ class Herd_model extends CI_Model {
 	}
 	
 	/**
-	 * herdHasPageAccess
+	 * getHerdPagesData
 	 * @param string herd code
-	 * @param int page_id
 	 * @return array of section data
 	 * @author ctranel
-	public function herdHasPageAccess($herd_code, $page_id) {
-		if(!isset($herd_code) || empty($herd_code)){
-			return false;
-		}
-	
-		$sql = "
-			SELECT a.*, ls.name AS scope FROM (
-				SELECT section_id, name, description, scope_id, path, active, list_order, pr.report_code
-				FROM users.dbo.pages p
-					INNER JOIN users.dbo.pages_reports pr ON (p.id = pr.page_id AND p.active = 1 AND p.scope_id = 2 AND p.id = )
-					INNER JOIN herd.dbo.herd_output ho ON pr.report_code = ho.report_code AND ho.herd_code = '" . $herd_code . "' AND ho.end_date IS NULL AND ho.medium_type_code = 'W'
-	
-				UNION ALL
-	
-				SELECT section_id, name, description, scope_id, path, active, list_order, NULL AS report_code
-				FROM users.dbo.pages p
-				WHERE scope_id = 1 AND active = 1
-			) a
-		
-			INNER JOIN users.dbo.lookup_scopes ls ON a.scope_id = ls.id
-			WHERE page_id = " . $page_id . "
-			ORDER BY list_order
-		";
-		return $this->db->query($sql);
-	}
 	 **/
+	public function getTrialData($herd_code, $report_code = null) {
+		if(isset($report_code) && !empty($report_code)){
+			if(!is_array($report_code)){
+				$report_code = [$report_code];
+				$this->db->where_in('si.report_code', $report_code);
+			}
+		}
+		$r = $this->db
+			->distinct()
+			->select('si.herd_is_active_trial, si.herd_trial_is_expired, si.herd_trial_warning, si.herd_trial_expires, rd.value_abbrev')
+			->join('dhi_tables.dbo.report_code_definition rd', 'si.report_code = rd.code_value', 'inner')
+			->where('si.herd_code', $herd_code)
+			->where('si.herd_is_on_test', 1)
+			->where('si.herd_is_on_report', 1)
+			->where('si.herd_has_active_web_user', 1)
+			->where('(si.herd_is_active_trial = 1 OR si.herd_trial_is_expired = 1)')
+			->get('users.dbo.v_user_status_info si')->result_array();
+		return $r;
+	}
 	
 }

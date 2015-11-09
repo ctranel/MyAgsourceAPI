@@ -116,7 +116,7 @@ class Page implements iWebContent, iPage {
 		}
 		return false;
 	}
-		
+	
 	/**
 	 * @method loadChildren()
 	 * @param \SplObjectStorage children

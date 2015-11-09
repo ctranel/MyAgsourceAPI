@@ -188,7 +188,7 @@ class blocks extends CI_Controller {
 			header('Content-type: application/excel');
 			header('Content-disposition: attachment; filename=' . $filename);
 			$csv->create_csv($data);
-			$this->_record_access(90, 'csv', $this->config->item('product_report_code'));
+			$this->_record_access(90, 'csv', null);
 		}
 		else {
 			$this->{$this->primary_model_name}->arr_messages[] = 'There is no data to export into an Excel file.';

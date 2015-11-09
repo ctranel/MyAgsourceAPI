@@ -48,7 +48,7 @@ class Ajax_cow_lookup extends CI_Controller {
 			,'events_content' => $this->load->view('dhi/cow_lookup/events', $events_data, true)
     		,'tab' => $tab
     	];
-    	$this->_record_access(93, $this->config->item('product_report_code'));
+    	$this->_record_access(93);
     	$this->load->view('dhi/cow_lookup/land', $data);
 	}
 	
@@ -174,7 +174,7 @@ class Ajax_cow_lookup extends CI_Controller {
 			$herd_enroll_status_id,
 			$this->session->userdata('user_id'),
 			$this->session->userdata('active_group_id'),
-			$this->config->item('product_report_code')
+			null //no report code for cow lookup
 		);
 	}
 }

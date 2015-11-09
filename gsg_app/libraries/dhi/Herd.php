@@ -131,20 +131,20 @@ class Herd
 	public function getHerdEnrollStatus($report_code = NULL){
 		if(isset($report_code)){
 			if(!is_array($report_code)){
-				$report_code = array($report_code);
+				$report_code = [$report_code];
 			}
 		}
 		$herd_output = $this->herd_model->get_herd_output($this->herd_code, $report_code);
 		if(!$herd_output || count($herd_output) == 0){
-			$return_val = 1;
+			return 1;
 		}
-		elseif($herd_output[0]['bill_account_num'] == 'AS035099'){
-			$return_val = 2;
+		if($herd_output[0]['herd_is_paying'] === 1){
+			return 3;
 		}
-		else{
-			$return_val = 3;
+		if($herd_output[0]['herd_is_active_trial'] === 1){
+			return 2;
 		}
-		return $return_val;
+		return 1;
 	}
 	
 	/* -----------------------------------------------------------------
@@ -164,14 +164,13 @@ class Herd
 	*  @return int 
 	*  @throws: 
 	* -----------------------------------------------------------------
-	*/
-	public function getTrialDays($access_log, $user_id, $herd_code, $report_code){
+	public function getTrialDays($access_log, $herd_code, $report_code){
 		if(isset($report_code)){
 			if(!is_array($report_code)){
-				$report_code = array($report_code);
+				$report_code = [$report_code];
 			}
 		}
-		$initial_access = $access_log->getInitialAccessDate($user_id, $herd_code, $report_code);
+		$initial_access = $access_log->getInitialAccessDate($herd_code, $report_code);
 		if(empty($initial_access)){
 			return 0;
 		}
@@ -180,7 +179,31 @@ class Herd
 		$d_diff = $d_start->diff($d_end)->days;
 		return $d_diff;
 	}
+	*/
 
+	/* -----------------------------------------------------------------
+	 *  Returns number of days since the initial access for herds that
+	*  are not paying for the specified product.
+	
+	*  Returns number of days since the initial access for herds that
+	*  are not paying for the specified product.
+	
+	*  @since: version 1
+	*  @author: ctranel
+	*  @date: Jul 7, 2014
+	*  @param: access log object
+	*  @param: int user id
+	*  @param: string herd code
+	*  @param: string report code
+	*  @return int
+	*  @throws:
+	* -----------------------------------------------------------------*/
+	public function getTrialData($report_code = null){
+		$trials = $this->herd_model->getTrialData($this->herd_code, $report_code);
+		return $trials;
+	}
+	
+	
 	/* -----------------------------------------------------------------
 	 *  header_info
 

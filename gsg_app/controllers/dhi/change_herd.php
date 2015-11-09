@@ -107,52 +107,65 @@ class Change_herd extends CI_Controller {
 
 		if ($this->form_validation->run() == TRUE) { //successful submission
 			$this->herd = new Herd($this->herd_model, $this->input->post('herd_code'));
-			$herd_enroll_status_id = $this->herd->getHerdEnrollStatus($this->config->item('product_report_code'));
+			$herd_enroll_status_id = $this->herd->getHerdEnrollStatus();
 			if($this->session->userdata('active_group_id') == 2){ //user is a producer
-				if($herd_enroll_status_id == 1){ //herd is signed up at all
-					$this->session->set_flashdata('message', 'Herd ' . $this->input->post('herd_code') . ' is not signed up for ' . $this->config->item('product_name') . '. Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' to enroll on ' . $this->config->item('product_name') . '.');
+				$msg = '';
+				$trials = $this->herd->getTrialData();
+				if(isset($trials) && is_array($trials)){
+					$today  = new DateTime();
+					foreach($trials as $t){
+						$warn_date = new DateTime($t['herd_trial_warning']);
+						$expire_date = new DateTime($t['herd_trial_expires']);
+						$days_remain = $expire_date->diff($today)->days;
+						if($t['herd_trial_is_expired'] === 1){
+							$msg .= '<p>The trial period on ' . $t['value_abbrev'] . ' for herd ' . $this->input->post('herd_code') . ' has expired. Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' to enroll on ' . $t['value_abbrev'] . ' and get the full benefit of the MyAgSource web site.';
+						}
+						elseif($warn_date <= $today){
+							$msg .= 'Herd ' . $this->input->post('herd_code') . ' has ' . $days_remain . ' days remaining on its free trial of ' . $t['value_abbrev'] . '.  To ensure uninterrupted access, please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' to enroll on ' . $t['value_abbrev'] . ' and get the full benefit of the MyAgSource web site.';
+						}
+					}
 				}
-				if($herd_enroll_status_id == 2){ //herd is not paying
-					$trial_days = $this->herd->getTrialDays($this->access_log, $this->session->userdata('user_id'), $this->input->post('herd_code'), $this->config->item('product_report_code'));
-					if($trial_days >= $this->config->item('trial_length')){
-						$this->session->set_flashdata('message', 'The trial period for herd ' . $this->input->post('herd_code') . ' has expired. Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' to enroll on ' . $this->config->item('product_name') . ' and get the full benefit of the MyAgSource web site.');
-					}
-					elseif($trial_days >= $this->config->item('trial_warning')){
-						$this->session->set_flashdata('message', 'You have ' . ($this->config->item('trial_length') - $trial_days) . ' days remaining on your free trial.  To ensure uninterrupted access, please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' to enroll on ' . $this->config->item('product_name') . ' and get the full benefit of the MyAgSource web site.');
-					}
+				if($herd_enroll_status_id === 1){ //herd is not signed up at all
+					$msg .= 'Herd ' . $this->input->post('herd_code') . ' is not signed up for any eligible MyAgSource report products. Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' to enroll.';
 				}
 			}
 			$this->set_herd_session_data($herd_enroll_status_id);
 			
 			$this->_record_access(2); //2 is the page code for herd change
-			$this->redirect(site_url($this->session->userdata('redirect_url')));
+			$this->redirect(site_url($this->session->userdata('redirect_url')), $msg);
 			exit();
 		}
-		else
-		{
+		else {
 			$err = '';
 			//$tmp_arr = $this->as_ion_auth->get_viewable_herds($this->session->userdata('user_id'), $this->session->userdata('arr_regions'));
 			$tmp_arr = $this->herd_access->getAccessibleHerdsData($this->session->userdata('user_id'), $this->as_ion_auth->arr_task_permissions(), $this->session->userdata('arr_regions'));
 			if(is_array($tmp_arr) && !empty($tmp_arr)){
-				if(count($tmp_arr) == 1){
+				if(count($tmp_arr) === 1){
 					$this->herd = new Herd($this->herd_model, $tmp_arr[0]['herd_code']);
-					$herd_enroll_status_id = $this->herd->getHerdEnrollStatus($this->config->item('product_report_code'));
+					$herd_enroll_status_id = $this->herd->getHerdEnrollStatus();
 					if($this->session->userdata('active_group_id') == 2){ //user is a producer
-						if($herd_enroll_status_id == 1){ //herd is not enrolled
-							$this->session->set_flashdata('message', 'Herd ' . $this->input->post('herd_code') . ' is not signed up for ' . $this->config->item('product_name') . '. Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' to enroll on ' . $this->config->item('product_name') . '.');
+						$msg = '';
+						$trials = $this->herd->getTrialData();
+						if(isset($trials) && is_array($trials)){
+							$today  = new DateTime();
+							foreach($trials as $t){
+								$warn_date = new DateTime($t['herd_trial_warning']);
+								$expire_date = new DateTime($t['herd_trial_expires']);
+								$days_remain = $expire_date->diff($today)->days;
+								if($t['herd_trial_is_expired'] === 1){
+									$msg .= '<p>The trial period on ' . $t['value_abbrev'] . ' for herd ' . $this->input->post('herd_code') . ' has expired. Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' to enroll on ' . $t['value_abbrev'] . ' and get the full benefit of the MyAgSource web site.';
+								}
+								elseif($warn_date <= $today){
+									$msg .= 'Herd ' . $this->input->post('herd_code') . ' has ' . $days_remain . ' days remaining on its free trial of ' . $t['value_abbrev'] . '.  To ensure uninterrupted access, please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' to enroll on ' . $t['value_abbrev'] . ' and get the full benefit of the MyAgSource web site.';
+								}
+							}
 						}
-						if($herd_enroll_status_id == 2){ //herd is not paying
-							$trial_days = $this->herd->getTrialDays($this->access_log, $this->session->userdata('user_id'), $tmp_arr[0]['herd_code'], $this->config->item('product_report_code'));
-							if($trial_days >= $this->config->item('trial_length')){
-								$this->session->set_flashdata('message', 'Your free trial period has expired. Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' to enroll on ' . $this->config->item('product_name') . '.');
-							}
-							elseif($trial_days >= $this->config->item('trial_warning')){
-								$this->session->set_flashdata('message', 'You have ' . ($this->config->item('trial_length') - $trial_days) . ' days remaining on your free trial.  To ensure uninterrupted access, please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' to enroll on ' . $this->config->item('product_name') . '.');
-							}
+						if($herd_enroll_status_id === 1){ //herd is not signed up at all
+							$msg .= 'Herd ' . $this->input->post('herd_code') . ' is not signed up for any eligible MyAgSource report products. Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' to enroll.';
 						}
 					}
 					$this->set_herd_session_data($herd_enroll_status_id);
-					$this->redirect(site_url($this->session->userdata('redirect_url')));
+					$this->redirect(site_url($this->session->userdata('redirect_url')), $msg);
 					exit();
 				}
 				$this->load->library('herds');
@@ -164,27 +177,25 @@ class Change_herd extends CI_Controller {
 			}
 
 
-			$this->data['herd_code_fill'] = array('name' => 'herd_code_fill',
+			$this->data['herd_code_fill'] = ['name' => 'herd_code_fill',
 				'id' => 'herd_code_fill',
 				'type' => 'text',
 				'size' => '8',
 				'maxlength' => '8',
 				'value' => $this->form_validation->set_value('herd_code_fill'),
-			);
+			];
 
 
 			if(is_array($this->page_header_data)){
 				$this->page_header_data = array_merge($this->page_header_data,
-					array(
+					[
 						'title'=>'Select Herd - ' . $this->config->item('product_name'),
 						'description'=>'Herd Selection Form for ' . $this->config->item('product_name'),
-						'arr_headjs_line'=>array(
-							'{datatable: "' . $this->config->item("base_url_assets") . 'js/dhi/herd_selection_helper.js"}'
-						)
-					)
+						'arr_headjs_line'=>['{datatable: "' . $this->config->item("base_url_assets") . 'js/dhi/herd_selection_helper.js"}']
+					]
 				);
 			}
-			$this->page_footer_data = array();
+			$this->page_footer_data = [];
 			$this->page_header_data['message'] = compose_error($err, validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages());
 			$this->data['page_header'] = $this->load->view('page_header', $this->page_header_data, TRUE);
 			$this->data['page_heading'] = 'Select Herd - ' . $this->config->item('product_name');
@@ -229,22 +240,26 @@ class Change_herd extends CI_Controller {
 
 		if ($this->form_validation->run() == TRUE) { //if validation is successful
 			$this->herd = new Herd($this->herd_model, $this->input->post('herd_code'));
-			$herd_enroll_status_id = $this->herd->getHerdEnrollStatus($this->config->item('product_report_code'));
+			$herd_enroll_status_id = $this->herd->getHerdEnrollStatus();
 			if($this->session->userdata('active_group_id') == 2){ //user is a producer
-				if($herd_enroll_status_id == 1){ //herd is not enrolled
-					//redirect back to select herd page again
-					$this->session->keep_all_flashdata();
-					$this->redirect(site_url('dhi/change_herd/request'), 'Herd ' . $this->input->post('herd_code') . ' is not signed up for ' . $this->config->item('product_name') . '. Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' to enroll on ' . $this->config->item('product_name') . '.');
-					exit();
+				$msg = '';
+				$trials = $this->herd->getTrialData();
+				if(isset($trials) && is_array($trials)){
+					$today  = new DateTime();
+					foreach($trials as $t){
+						$warn_date = new DateTime($t['herd_trial_warning']);
+						$expire_date = new DateTime($t['herd_trial_expires']);
+						$days_remain = $expire_date->diff($today)->days;
+						if($t['herd_trial_is_expired'] === 1){
+							$msg .= '<p>The trial period on ' . $t['value_abbrev'] . ' for herd ' . $this->input->post('herd_code') . ' has expired. Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' to enroll on ' . $t['value_abbrev'] . ' and get the full benefit of the MyAgSource web site.';
+						}
+						elseif($warn_date <= $today){
+							$msg .= 'Herd ' . $this->input->post('herd_code') . ' has ' . $days_remain . ' days remaining on its free trial of ' . $t['value_abbrev'] . '.  To ensure uninterrupted access, please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' to enroll on ' . $t['value_abbrev'] . ' and get the full benefit of the MyAgSource web site.';
+						}
+					}
 				}
-				if($herd_enroll_status_id == 2){ //herd is not paying
-					$trial_days = $this->herd->getTrialDays($this->access_log, $this->session->userdata('user_id'), $this->input->post('herd_code'), $this->config->item('product_report_code'));
-					if($trial_days >= $this->config->item('trial_length')){
-						$this->session->set_flashdata('message', 'The trial period for herd ' . $this->input->post('herd_code') . ' has expired. Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' to enroll on ' . $this->config->item('product_name') . '.');
-					}
-					elseif($trial_days >= $this->config->item('trial_warning')){
-						$this->session->set_flashdata('message', 'You have ' . ($this->config->item('trial_length') - $trial_days) . ' days remaining on your free trial.  To ensure uninterrupted access, please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' to enroll on ' . $this->config->item('product_name') . '.');
-					}
+				if($herd_enroll_status_id === 1){ //herd is not signed up at all
+					$msg .= 'Herd ' . $this->input->post('herd_code') . ' is not signed up for any eligible MyAgSource report products. Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' to enroll.';
 				}
 			}
 			$this->set_herd_session_data($herd_enroll_status_id);
@@ -254,25 +269,25 @@ class Change_herd extends CI_Controller {
 		}
 		else {  //the user is not logging in so display the login page
 			$this->page_header_data['message'] = compose_error(validation_errors(), $this->session->flashdata('message'));
-			$this->data['herd_code'] = array('name' => 'herd_code',
+			$this->data['herd_code'] = ['name' => 'herd_code',
 				'id' => 'herd_code',
 				'type' => 'text',
 				'value' => $this->form_validation->set_value('herd_code'),
 				'class' => 'require'
-			);
-			$this->data['herd_release_code'] = array('name' => 'herd_release_code',
+			];
+			$this->data['herd_release_code'] = ['name' => 'herd_release_code',
 				'id' => 'herd_release_code',
 				'type' => 'text',
 				'value' => $this->form_validation->set_value('herd_release_code'),
 				'class' => 'require'
-			);
+			];
 			$this->data['report_path'] = '';
 			if(is_array($this->page_header_data)){
 				$this->page_header_data = array_merge($this->page_header_data,
-					array(
+					[
 						'title'=>'Request Herd - ' . $this->config->item('product_name'),
 						'description'=>'Herd Selection Form for ' . $this->config->item('product_name')
-					)
+					]
 				);
 			}
 
@@ -285,15 +300,18 @@ class Change_herd extends CI_Controller {
 	}
 
 	public function ajax_herd_enrolled($herd_code){
-		$group = $this->session->userdata('active_group_id');
+		//determines type of access for service groups
 		if($this->as_ion_auth->has_permission('View Assign w permission') === FALSE) {
-			//return a 0 for non-service groups
-			$this->load->view('echo.php', ['text' => json_encode(['enroll_status' => 0, 'new_test' => false])]);
+			$enroll_status = 0;
+			$has_accessed = false;
 		}
-		$this->herd = new Herd($this->herd_model, $herd_code);
-		$enroll_status = $this->herd->getHerdEnrollStatus($this->config->item('product_report_code'));
-		$recent_test = $this->herd->getRecentTest();
-		$has_accessed = $this->access_log->sgHasAccessedTest($this->session->userdata('sg_acct_num'), $herd_code, $recent_test);
+		else{
+			$this->herd = new Herd($this->herd_model, $herd_code);
+			//for now, we want to warn if herd is not enrolled on full product
+			$enroll_status = $this->herd->getHerdEnrollStatus(['AMYA-500', 'APAG-505']);
+			$recent_test = $this->herd->getRecentTest();
+			$has_accessed = $this->access_log->sgHasAccessedTest($this->session->userdata('sg_acct_num'), $herd_code, null, $recent_test);
+		}
 		header('Content-type: application/json');
 		header("Cache-Control: no-cache, must-revalidate, max-age=0");
 		header("Cache-Control: post-check=0, pre-check=0", false);

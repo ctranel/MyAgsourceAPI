@@ -2,7 +2,7 @@
 namespace myagsource\dhi;
 
 use myagsource\dhi\Herd;
-use myagsource\Site\WebContent\Page;
+use myagsource\Site\iPage;
 
 
 /**
@@ -12,7 +12,7 @@ use myagsource\Site\WebContent\Page;
 *  
 * Created:  12-12-2014
 *
-* Description:  Provides information about a user's access to herds.
+* Description:  Provides information about a herd's access to pages (AKA reports).
 *
 * Requirements: PHP5 or above
 */
@@ -20,10 +20,10 @@ use myagsource\Site\WebContent\Page;
 class HerdPageAccess
 {
 	/**
-	 * datasource
-	 * @var object
+	 * datasource_pages
+	 * @var page_model
 	 **/
-	protected $datasource;
+	protected $datasource_pages;
 
 	/**
 	 * herd
@@ -38,74 +38,61 @@ class HerdPageAccess
 	protected $page;
 
 	/**
+	 * report_code
+	 * @var string
+	 **/
+	protected $report_code;
+
+	/**
+	 * herd_is_paying
+	 * @var boolean
+	 **/
+	protected $herd_is_paying;
+
+	/**
+	 * herd_is_active_trial
+	 * @var boolean
+	 **/
+	protected $herd_is_active_trial;
+
+	/**
 	 * __construct
 	 *
 	 * @return void
 	 * @author ctranel
 	 **/
-	public function __construct($datasource, Herd $herd, Page $page) {
-		$this->datasource = $datasource;
+	public function __construct($datasource_pages, Herd $herd, iPage $page) {
+		$this->datasource_pages = $datasource_pages;
 		$this->herd = $herd;
 		$this->page = $page;
+		
+		$report_data = $this->datasource_pages->getReport($this->page->id(), $this->herd->herdCode());
+		$this->report_code = $report_data['report_code'];
+		$this->herd_is_paying = $report_data['herd_is_paying'];
+		$this->herd_is_active_trial = $report_data['herd_is_active_trial'];
 	}
 
+	/**
+	 * @method reportCode()
+	 * @return boolean
+	 * @access public
+	 **/
+	public function reportCode(){
+		return $this->report_code;
+	}
+	
 	/**
 	 * @method hasAccess()
 	 * @return boolean
 	 * @access public
 	 **/
 	public function hasAccess(){
-		$page_data = $this->datasource->getHerdPagesData($this->herd->herdCode());
-		if(!isset($page_data) || empty($page_data)){
-			return [];
+		if($this->page->scope() === 'base'){
+			return true;
 		}
-		foreach($page_data as $p){
-			if($p['id'] === $this->page->id()){
-				return true;
-			}
+		if($this->page->scope() === 'subscription' && ($this->herd_is_paying || $this->herd_is_active_trial)){
+			return true;
 		}
-		
 		return false;
 	}
-
-	/**
-	 * @method getAccessibleHerdsData()
-	 * @param int user_id
-	 * @param int region_num (need to accept array?)
-	 * @return mixed array of herd data or boolean
-	 * @access public
-	 *
-	
-	public function getAccessiblePages(){
-		if(!$user_id || !$arr_permissions){
-			return false;
-		}
-		$arr_return_reg = [];
-		$arr_return_user = [];
-		$arr_return_permission = [];
-	
-		if(in_array('View All Herds', $arr_permissions)){
-			return $this->datasource->getHerds();
-		}
-		if(in_array('View Herds In Region', $arr_permissions)){
-			if(!isset($arr_regions) || !is_array($arr_regions)){
-				return FALSE;
-			}
-			$tmp = $this->datasource->getHerdsByRegion($arr_regions, $limit_in);
-			if(isset($tmp) && is_array($tmp)) $arr_return_reg = $tmp;
-			unset($tmp);
-		}
-		if(in_array('View Assigned Herds', $arr_permissions)){
-			$arr_return_user = $this->datasource->getHerdsByUser($user_id, $limit_in);
-		}
-		if(in_array('View Assign w permission', $arr_permissions)){
-			$arr_return_permission = $this->datasource->getHerdsByPermissionGranted($limit_in);
-		}
-		return array_merge($arr_return_reg, $arr_return_user, $arr_return_permission);
-	}
-	 **/
 }
-
-
-
-

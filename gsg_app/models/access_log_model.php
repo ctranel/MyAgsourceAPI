@@ -22,26 +22,27 @@ class Access_log_model extends CI_Model {
 	}
 
 	/**
-	 * getLogBySgHerdTest
+	 * SGAccessInfoByTest
 	 *
 	 * @method log_by_user_herd_test
 	 * @param int user id
 	 * @param string herd code
+	 * @param array of report code strings
 	 * @param string test date (defaults to null)
 	 * @return boolean
 	 * @author ctranel
 	 **/
-	function getLogBySgHerdTest($sg_acct_num, $herd_code, $test_date = NULL){
+	function sgHasAccessedTest($sg_acct_num, $herd_code, $report_code, $test_date = NULL){
 		if(isset($test_date)){
 			$this->db->where('recent_test_date', $test_date);
 		}
 		return $this->db
-			->join($this->tables['access_log_events'] . ' ale', 'al.event_id = ale.id', 'inner')
+			->select('')
 			->join($this->tables['users_service_groups'] . ' usg', 'al.user_id = usg.user_id', 'left')
 			->where('usg.sg_acct_num', $sg_acct_num)
 			->where('al.herd_code', $herd_code)
-			->where('ale.tally_herd_access', 1)
-			->get($this->tables['access_log'] . ' al')
+			->where('al.user_has_accessed_herd', 1)
+			->get('users.dbo.v_user_status_info' . ' al')
 			->result_array();
 	}
 

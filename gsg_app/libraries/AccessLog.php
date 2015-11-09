@@ -62,12 +62,21 @@ class AccessLog
 			'group_id' => $group_id,
 			'format' => $format,
 			'report_page_id' => $report_page_id,
-			'access_time' => date('Y-m-d H:i:s')
+			'access_time' => date('Y-m-d H:i:s'),
+			'report_code' => $product_code
 		);
-		if ($product_code) $tmp_array['report_code'] = $product_code[0];
-		if ($report_page_id) $tmp_array['report_page_id'] = $report_page_id;
-		if ($sort) $tmp_array['sort_text'] = $sort;
-		if ($filters) $tmp_array['filter_text'] = $filters;
+		if(isset($product_code) && is_array($product_code)){
+			$tmp_array['report_code'] = $product_code[0];
+		}
+		if($report_page_id){
+			$tmp_array['report_page_id'] = $report_page_id;
+		}
+		if($sort){
+			$tmp_array['sort_text'] = $sort;
+		}
+		if($filters){
+			$tmp_array['filter_text'] = $filters;
+		}
 		return $this->access_log_model->write_entry_to_db($tmp_array);
 	}
 
@@ -81,8 +90,8 @@ class AccessLog
 	 * @return boolean
 	 * @author ctranel
 	 **/
-	function sgHasAccessedTest($user_id, $herd_code, $test_date = NULL){
-		$log = $this->access_log_model->getLogBySgHerdTest($user_id, $herd_code, $test_date);
+	function sgHasAccessedTest($user_id, $herd_code, $report_code, $test_date = NULL){
+		$log = $this->access_log_model->sgHasAccessedTest($user_id, $herd_code, $test_date);
 		return count($log) > 0;
 	}
 	

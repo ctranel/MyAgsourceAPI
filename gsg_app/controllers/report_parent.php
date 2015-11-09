@@ -210,7 +210,10 @@ abstract class report_parent extends CI_Controller {
 		$this->report_path = $this->full_section_path . '/' . $this->page->path();
 
 		//does user have access to current page for selected herd?
-		$this->herd_page_access = new HerdPageAccess($this->herd_model, $this->herd, $this->page);
+		
+		//SET REPORT CODE
+		
+		$this->herd_page_access = new HerdPageAccess($this->page_model, $this->herd, $this->page);
 		$this->page_access = new PageAccess($this->page, $this->as_ion_auth->has_permission("View All Content"));
 		if(!$this->page_access->hasAccess($this->herd_page_access->hasAccess())) {
 			$this->redirect(site_url(), 'You do not have permission to view the requested report for herd ' . $this->herd->herdCode() . '.  Please select a report from the navigation or contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' if you have questions or concerns.');
@@ -302,7 +305,7 @@ abstract class report_parent extends CI_Controller {
 					}
 				}
 			}
-			$this->_record_access(90, 'pdf', $this->config->item('product_report_code'));
+			$this->_record_access(90, 'pdf', $this->herd_page_access->reportCode());
 			$this->reports->create_pdf($block, $this->product_name, NULL, $herd_data, 'P');
 			exit;
 		}
@@ -486,7 +489,7 @@ abstract class report_parent extends CI_Controller {
 			$data['benchmarks'] = $this->load->view('collapsible', $collapse_data, TRUE);
 		}
 
-		$this->_record_access(90, 'web', $this->config->item('product_report_code'));
+		$this->_record_access(90, 'web', $this->herd_page_access->reportCode());
 		$this->load->view('report', $data);
 	}
 
@@ -503,7 +506,7 @@ abstract class report_parent extends CI_Controller {
 
 		$this->load->model('access_log_model');
 		$access_log = new AccessLog($this->access_log_model);
-		
+
 		$access_log->write_entry(
 			$this->as_ion_auth->is_admin(),
 			$event_id,

@@ -232,7 +232,7 @@ class report_block extends CI_Controller {
 		//is container page viewable to this user?
 		//does user have access to current page for selected herd?
 		$this->page = $this->pages->getByPath($path_page_segment, $this->section->id());
-		$this->herd_page_access = new HerdPageAccess($this->herd_model, $this->herd, $this->page);
+		$this->herd_page_access = new HerdPageAccess($this->page_model, $this->herd, $this->page);
 		$this->page_access = new PageAccess($this->page, $this->as_ion_auth->has_permission("View All Content"));
 		if(!$this->page_access->hasAccess($this->herd_page_access->hasAccess())) {
 			$this->post_message('You do not have permission to view the requested report for herd ' . $this->herd->herdCode() . '.  Please select a report from the navigation or contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' if you have questions or concerns.');
@@ -320,7 +320,7 @@ class report_block extends CI_Controller {
 		$first = ($first === 'true');
 		if($file_format == 'csv' || $file_format == 'pdf'){
 			if($first){
-				$this->_record_access(90, $file_format, $this->config->item('product_report_code'));
+				$this->_record_access(90, $file_format);
 			}
 			return $results;
 		}
