@@ -45,8 +45,6 @@
 	// admin_email and site_title are also set in ion_auth.php
 	$config['product_name']         = "MyAgSource";
 	//@todo: need to convert this to pull from DB
-	$config['trial_length']  		= "90";
-	$config['trial_warning']  		= "60";
 	$config['default_herd']			= "35999909";
 	$config['site_title']           = "MyAgSource";
 	$config['cust_serv_company']	= "AgSource Cooperative Services";
