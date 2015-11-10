@@ -8,14 +8,14 @@ header("Content-Security-Policy:"
 );
 header('x-frame-options: SAMEORIGIN');
 header('X-XSS-Protection: 1; mode=block');
+header('Content-Type: text/html;charset=UTF-8');
 header('X-Content-Type-Options: nosniff');
+header('X-UA-Compatible: IE=edge,chrome=1');
 ?>
 <!doctype html>
 <html lang="en">
 <head profile="http://www.w3.org/2005/10/profile">
 	<title><?php if(isset($title)) echo $title; ?></title>
-	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">    
-	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
     <meta name="robots" content="NO FOLLOW,NO INDEX">
 <!--    <meta http-equiv="pragma" content="no-cache">
     <meta http-equiv="cache-control" content="no-cache">
