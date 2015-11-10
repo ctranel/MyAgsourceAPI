@@ -6,12 +6,14 @@ require_once(APPPATH.'libraries/AccessLog.php');
 require_once(APPPATH . 'libraries/Benchmarks/Benchmarks.php');
 require_once(APPPATH.'libraries/dhi/HerdAccess.php');
 require_once APPPATH . 'libraries/Settings/SessionSettings.php';
+require_once(APPPATH . 'libraries/Notifications/Notifications.php');
 
 use \myagsource\AccessLog;
 use \myagsource\dhi\Herd;
 use \myagsource\Benchmarks\Benchmarks;
 use \myagsource\dhi\HerdAccess;
 use myagsource\Settings\SessionSettings;
+use \myagsource\notices\Notifications;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 class Change_herd extends CI_Controller {
@@ -28,6 +30,9 @@ class Change_herd extends CI_Controller {
 	 */
 	protected $access_log;
 
+	protected $notifications;
+	protected $notices;
+	
 	function __construct(){
 		parent::__construct();
 
@@ -47,7 +52,8 @@ class Change_herd extends CI_Controller {
 
 		$this->load->model('access_log_model');
 		$this->access_log = new AccessLog($this->access_log_model);
-				
+		$this->load->model('notice_model');
+		
 		$this->page_header_data['num_herds'] = $this->herd_access->getNumAccessibleHerds($this->session->userdata('user_id'), $this->as_ion_auth->arr_task_permissions(), $this->session->userdata('arr_regions'));
 		$this->page_header_data['navigation'] = $this->load->view('navigation', [], TRUE);
 		/* Load the profile.php config file if it exists */
@@ -61,7 +67,7 @@ class Change_herd extends CI_Controller {
 
 	//redirects while retaining message and conditionally setting redirect url
 	//@todo: needs to be a part of some kind of authorization class
-	protected function redirect($url, $message = ''){
+	protected function redirect($url, $message = []){
 		//don't always want to keep flashdata on this page
 		$this->session->set_flashdata('message',  $message);
 		redirect($url);
@@ -104,12 +110,12 @@ class Change_herd extends CI_Controller {
 		$this->load->library('form_validation');
 		$this->form_validation->set_rules('herd_code', 'Herd', 'required|max_length[8]');
 		//$this->form_validation->set_rules('herd_code_fill', 'Type Herd Code');
-
+		$msg = [];
+		
 		if ($this->form_validation->run() == TRUE) { //successful submission
 			$this->herd = new Herd($this->herd_model, $this->input->post('herd_code'));
 			$herd_enroll_status_id = $this->herd->getHerdEnrollStatus();
 			if($this->session->userdata('active_group_id') == 2){ //user is a producer
-				$msg = '';
 				$trials = $this->herd->getTrialData();
 				if(isset($trials) && is_array($trials)){
 					$today  = new DateTime();
@@ -118,20 +124,28 @@ class Change_herd extends CI_Controller {
 						$expire_date = new DateTime($t['herd_trial_expires']);
 						$days_remain = $expire_date->diff($today)->days;
 						if($t['herd_trial_is_expired'] === 1){
-							$msg .= '<p>The trial period on ' . $t['value_abbrev'] . ' for herd ' . $this->input->post('herd_code') . ' has expired. Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' to enroll on ' . $t['value_abbrev'] . ' and get the full benefit of the MyAgSource web site.';
+							$msg[] = '<p>The trial period on ' . $t['value_abbrev'] . ' for herd ' . $this->input->post('herd_code') . ' has expired. Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' to enroll on ' . $t['value_abbrev'] . ' and get the full benefit of the MyAgSource web site.';
 						}
 						elseif($warn_date <= $today){
-							$msg .= 'Herd ' . $this->input->post('herd_code') . ' has ' . $days_remain . ' days remaining on its free trial of ' . $t['value_abbrev'] . '.  To ensure uninterrupted access, please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' to enroll on ' . $t['value_abbrev'] . ' and get the full benefit of the MyAgSource web site.';
+							$msg[] = 'Herd ' . $this->input->post('herd_code') . ' has ' . $days_remain . ' days remaining on its free trial of ' . $t['value_abbrev'] . '.  To ensure uninterrupted access, please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' to enroll on ' . $t['value_abbrev'] . ' and get the full benefit of the MyAgSource web site.';
 						}
 					}
 				}
 				if($herd_enroll_status_id === 1){ //herd is not signed up at all
-					$msg .= 'Herd ' . $this->input->post('herd_code') . ' is not signed up for any eligible MyAgSource report products. Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' to enroll.';
+					$msg[] = 'Herd ' . $this->input->post('herd_code') . ' is not signed up for any eligible MyAgSource report products. Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' to enroll.';
 				}
 			}
 			$this->set_herd_session_data($herd_enroll_status_id);
 			
 			$this->_record_access(2); //2 is the page code for herd change
+
+			//NOTICES
+			//Get any system notices
+			$this->notifications = new Notifications($this->notice_model);
+			$this->notifications->populateNotices();
+			$notices = $this->notifications->getNoticesTexts();
+			
+			$msg = array_merge($msg,$notices);
 			$this->redirect(site_url($this->session->userdata('redirect_url')), $msg);
 			exit();
 		}
@@ -144,7 +158,6 @@ class Change_herd extends CI_Controller {
 					$this->herd = new Herd($this->herd_model, $tmp_arr[0]['herd_code']);
 					$herd_enroll_status_id = $this->herd->getHerdEnrollStatus();
 					if($this->session->userdata('active_group_id') == 2){ //user is a producer
-						$msg = '';
 						$trials = $this->herd->getTrialData();
 						if(isset($trials) && is_array($trials)){
 							$today  = new DateTime();
@@ -165,6 +178,7 @@ class Change_herd extends CI_Controller {
 						}
 					}
 					$this->set_herd_session_data($herd_enroll_status_id);
+						
 					$this->redirect(site_url($this->session->userdata('redirect_url')), $msg);
 					exit();
 				}

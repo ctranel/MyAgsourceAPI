@@ -139,16 +139,6 @@ header('X-UA-Compatible: IE=edge,chrome=1');
 <?php 	endif;
 	endif;
 
-	if(isset($notices) && !empty($notices)) { ?>
-<div> 
-<?php   foreach($notices as $n) {
-            echo $n;   
-        }
-?>
-</div>
-<?php 
-    }
-
 	if(isset($message)):
 		if (is_array($message) && !empty($message)):
 			foreach($message as $m) {?>
