@@ -13,7 +13,6 @@ require_once(APPPATH . 'libraries/Site/WebContent/Blocks.php');
 require_once(APPPATH . 'libraries/Site/WebContent/PageAccess.php');
 require_once(APPPATH . 'libraries/Report/Content/Csv.php');
 //require_once(APPPATH . 'libraries/Report/Content/Pdf.php');
-require_once(APPPATH . 'libraries/Notifications/Notifications.php');
 require_once(APPPATH . 'libraries/ErrorPage.php');
 
 use \myagsource\Benchmarks\Benchmarks;
@@ -31,7 +30,6 @@ use \myagsource\Site\WebContent\PageAccess;
 use \myagsource\Report\Content\Csv;
 //use \myagsource\Report\Content\Pdf;
 use \myagsource\Report\iBlock;
-use \myagsource\notices\Notifications;
 use \myagsource\ErrorPage;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
@@ -127,9 +125,6 @@ abstract class report_parent extends CI_Controller {
 	protected $bool_is_summary;
 	protected $supplemental;
 	
-	protected $notifications;
-	protected $notices;
-
 	function __construct(){
 		parent::__construct();
 		
@@ -162,7 +157,6 @@ abstract class report_parent extends CI_Controller {
 		$this->load->model('web_content/section_model');
 		$this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
 		$this->load->model('web_content/block_model');
-		$this->load->model('notice_model');
 		$this->blocks = new Blocks($this->block_model);
 		$this->pages = new Pages($this->page_model, $this->blocks);
 		$sections = new Sections($this->section_model, $this->pages);
@@ -220,13 +214,7 @@ abstract class report_parent extends CI_Controller {
 		}
 
 		$this->page_header_data['num_herds'] = $this->herd_access->getNumAccessibleHerds($this->session->userdata('user_id'), $this->as_ion_auth->arr_task_permissions(), $this->session->userdata('arr_regions'));
-		
-		//NOTICES
-		//Get any system notices
-		$this->notifications = new Notifications($this->notice_model);
-	    $this->notifications->populateNotices();
-	    $this->notices = $this->notifications->getNoticesTexts();
-		
+				
 		/* Load the profile.php config file if it exists
 		if (ENVIRONMENT == 'development' || ENVIRONMENT == 'localhost') {
 			$this->config->load('profiler', false, true);
@@ -428,8 +416,7 @@ abstract class report_parent extends CI_Controller {
 						'{table_sort: "' . $this->config->item("base_url_assets") . 'js/jquery/stupidtable.min.js"}',
 						'{tooltip: "https://cdn.jsdelivr.net/qtip2/2.2.0/jquery.qtip.min.js"}',
 						'{datepick: "' . $this->config->item("base_url_assets") . 'js/jquery/jquery.datepick.min.js"}'
-					),
-			        'notices'=>$this->notices
+					)
 				]
 			);
 			//load the report-specific js file if it exists
