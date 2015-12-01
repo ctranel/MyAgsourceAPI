@@ -392,7 +392,7 @@ abstract class report_parent extends CI_Controller {
 				[
 					'title'=>$this->product_name . ' - ' . $this->config->item('site_title'),
 					'description'=>$this->product_name . ' - ' . $this->config->item('site_title'),
-					'message' => [$this->session->flashdata('message')],// + $this->{$this->primary_model_name}->arr_messages,
+					'message' => $this->session->flashdata('message'),// + $this->{$this->primary_model_name}->arr_messages,
 					'navigation' => $this->load->view('navigation', [], TRUE),
 					'page_heading' => $this->product_name . " for Herd " . $this->herd->herdCode(),
 					'arr_head_line' => array(
