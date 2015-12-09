@@ -69,7 +69,6 @@ class Change_herd extends CI_Controller {
 	//@todo: needs to be a part of some kind of authorization class
 	protected function redirect($url, $message = []){
 		//don't always want to keep flashdata on this page
-		var_dump($message); die;
 		$this->session->set_flashdata('message',  $message);
 		redirect($url);
 	}
