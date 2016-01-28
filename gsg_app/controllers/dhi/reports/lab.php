@@ -32,6 +32,10 @@ class Lab extends report_parent {
 	     $this->product_name = 'Culture Results';
 	     parent::display($block_in, $display_format, isset($sort_by) ? urldecode($sort_by) : NULL, isset($sort_order) ? urldecode($sort_order) : NULL, isset($json_filter_data) ? urldecode($json_filter_data) : NULL);
 	 }
-	 
+
+	 function pcr_results($block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL, $json_filter_data = NULL){
+	     $this->product_name = 'PCR Results';
+	     parent::display($block_in, $display_format, isset($sort_by) ? urldecode($sort_by) : NULL, isset($sort_order) ? urldecode($sort_order) : NULL, isset($json_filter_data) ? urldecode($json_filter_data) : NULL);
+	 }
 	 
 }
