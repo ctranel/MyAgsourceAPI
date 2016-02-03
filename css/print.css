@@ -1,0 +1,21 @@
+@CHARSET "UTF-8";
+
+body {background: none !important; border: solid 1px #929496; width: 100%;}
+.downloads-container {display:none;}
+#inter-section-nav {display:none;}
+#session-nav {display:none;}
+#filters, #benchmarks, #bench-div {display:none;}
+#disclaimer {display:none;}
+/* #header {display: list-item; list-style-image: url("http://agsource.crinet.com/images/AgSource-Cooperative-Services/img-header-lft.gif"); list-style-position: inside; margin:0;} */
+#header {display: none;}
+a[href]:after {content: none !important;}
+#codeigniter_profiler{display:none;}
+#datafield-popup{display:none;}
+h2.block{font-size: 16px;}
+
+.table-container, .chart-container {page-break-inside:avoid;}
+
+#report-links{display:none; border: none;}
+.navbar-background{display:none; border: none;}
+.primary-nav {display:none; margin: 0; border: none;}
+.supplemental-link{display:none;}
