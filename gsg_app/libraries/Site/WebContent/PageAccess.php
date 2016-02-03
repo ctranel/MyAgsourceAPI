@@ -70,7 +70,6 @@ class PageAccess implements iPageAccess
 		
 		return false;
 	}
-
 }
 
 

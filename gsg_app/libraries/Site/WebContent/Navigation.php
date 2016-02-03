@@ -17,7 +17,7 @@ use \myagsource\dhi\Herd;
  *        
  */
 class Navigation{// implements iWebContentRepository {
-	/**
+	/** 
 	 * $datasource_sections
 	 * @var Section_model
 	 **/

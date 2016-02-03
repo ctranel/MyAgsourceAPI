@@ -204,24 +204,25 @@ abstract class report_parent extends CI_Controller {
 		$this->report_path = $this->full_section_path . '/' . $this->page->path();
 
 		//does user have access to current page for selected herd?
-		
-		//SET REPORT CODE
-		
 		$this->herd_page_access = new HerdPageAccess($this->page_model, $this->herd, $this->page);
-		$this->page_access = new PageAccess($this->page, $this->as_ion_auth->has_permission("View All Content"));
+		$this->page_access = new PageAccess($this->page, ($this->as_ion_auth->has_permission("View All Content") || $this->as_ion_auth->has_permission("View All Content-Billed")));
 		if(!$this->page_access->hasAccess($this->herd_page_access->hasAccess())) {
-			$this->redirect(site_url(), 'You do not have permission to view the requested report for herd ' . $this->herd->herdCode() . '.  Please select a report from the navigation or contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' if you have questions or concerns.');
+            $this->redirect(site_url(), 'You do not have permission to view the requested report for herd ' . $this->herd->herdCode() . '.  Please select a report from the navigation or contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' if you have questions or concerns.');
 		}
+        //the user can access this page for this herd, but do they have to pay?
+        if($this->as_ion_auth->has_permission("View All Content-Billed")){
+            $this->message[] = 'Herd ' . $this->herd->herdCode() . ' is not paying for this product.  You will be billed a monthly fee for any month in which you view content for which the herd is not paying.';
+        }
 
 		$this->page_header_data['num_herds'] = $this->herd_access->getNumAccessibleHerds($this->session->userdata('user_id'), $this->as_ion_auth->arr_task_permissions(), $this->session->userdata('arr_regions'));
 				
-		/* Load the profile.php config file if it exists
+		/* Load the profile.php config file if it exists*/
 		if (ENVIRONMENT == 'development' || ENVIRONMENT == 'localhost') {
 			$this->config->load('profiler', false, true);
 			if ($this->config->config['enable_profiler']) {
 				$this->output->enable_profiler(TRUE);
 			} 
-		}*/
+		}
 	}
 	
 	//redirects while retaining message and conditionally setting redirect url
@@ -241,7 +242,11 @@ abstract class report_parent extends CI_Controller {
 		if(!$this->herd){
 			$this->redirect(site_url($this->report_path), 'Please select a valid herd.');
 		}
-		
+
+        if(is_array($this->session->flashdata('message'))){
+            $this->message = $this->message + $this->session->flashdata('message');
+        }
+
 		$arr_blocks = $this->blocks->getByPage($this->page->id());
 		$this->page->loadChildren($arr_blocks);
 				
@@ -320,7 +325,7 @@ abstract class report_parent extends CI_Controller {
 			}
 
 			while($curr instanceof PageBlock){
-				if($arr_block_in == NULL || in_array($pb->path(), $arr_block_in)){
+				if($arr_block_in == NULL || in_array($curr->path(), $arr_block_in)){
 					//set up next iteration
 					$display_type = $curr->displayType();
 					$next_display_type = (isset($next) && $next instanceof PageBlock) ? $next->displayType() : null;
@@ -392,7 +397,7 @@ abstract class report_parent extends CI_Controller {
 				[
 					'title'=>$this->product_name . ' - ' . $this->config->item('site_title'),
 					'description'=>$this->product_name . ' - ' . $this->config->item('site_title'),
-					'message' => $this->session->flashdata('message'),// + $this->{$this->primary_model_name}->arr_messages,
+					'message' => $this->message,// + $this->{$this->primary_model_name}->arr_messages,
 					'navigation' => $this->load->view('navigation', [], TRUE),
 					'page_heading' => $this->product_name . " for Herd " . $this->herd->herdCode(),
 					'arr_head_line' => array(
