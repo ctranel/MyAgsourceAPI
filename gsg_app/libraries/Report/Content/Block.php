@@ -345,7 +345,20 @@ abstract class Block implements iBlock {
 		}
 		return $ret;
 	}
-	
+
+	public function getDisplayedFieldArray(){
+		if(!isset($this->report_fields) || $this->report_fields->count() === 0){
+			return false;
+		}
+		$ret = [];
+		foreach($this->report_fields as $f){
+			if($f->isDisplayed()){
+				$ret[] = $f->displayName();
+			}
+		}
+		return $ret;
+	}
+
 	public function getAppendedRowsCount(){
 	    return $this->appended_rows_count;
 	}

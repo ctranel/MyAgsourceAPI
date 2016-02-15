@@ -109,9 +109,9 @@ abstract class report_parent extends CI_Controller {
 	/**
 	 * message
 	 * 
-	 * @var String
+	 * @var Array (Strings)
 	 **/
-	protected $message;
+	protected $message = [];
 
 	//	protected $report_form_id;
 	protected $arr_sort_by = [];

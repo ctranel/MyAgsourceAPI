@@ -13,7 +13,7 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 *
 */
 
-class SupplementalComment extends \SplObjectStorage
+class SupplementalComment// extends \SplObjectStorage
 {
 	/**
 	 * link href
@@ -44,6 +44,23 @@ class SupplementalComment extends \SplObjectStorage
 	 * -----------------------------------------------------------------*/
 	 public function comment() {
 		return $this->comment;
+	}
+
+	/* -----------------------------------------------------------------
+	 *  returns propertiesArray
+
+	 *  returns propertiesArray
+
+	 *  @since: version
+	 *  @author: ctranel
+	 *  @date: Feb 12, 2016
+	 *  @return: array of properties
+	 *  @throws:
+	 * -----------------------------------------------------------------*/
+	public function propertiesArray() {
+		return [
+			'comment' => $this->comment
+		];
 	}
 
 	/* -----------------------------------------------------------------

@@ -58,8 +58,9 @@ class TableData extends BlockData {
 	 * @access public
 	 * 
 	 *@todo: criteria param should be removed when filter data is included in object
+     * @todo: when moving away from html being sent from server, split this into "setData" and "getData", so that "prepData" can optionally be called in between
 	 **/
-		public function getData($criteria_key_value){
+    public function getData($criteria_key_value){
 		//$report_datasource->populate_field_meta_arrays($arr_this_block['id']);
 		$arr_field_list = $this->block->getFieldlistArray();
 		$criteria_key_value = $this->whereCriteria($criteria_key_value);
@@ -90,7 +91,8 @@ class TableData extends BlockData {
 		elseif($this->block->hasCntRow() || $this->block->hasAvgRow() || $this->block->hasSumRow()){
 			$results = $this->addAggregateRows($results);
 		}
-		return $results;
+		$this->dataset = $results;
+        return $this->dataset;
 	}
 
 	/* 
@@ -117,5 +119,81 @@ class TableData extends BlockData {
 		}
 		return;
 	}
+
+	/*
+	 * prepareDisplayData
+	 *
+	 * preps query results for display
+	 *
+	 * @method structureData()
+	 * @return void
+	 * @author ctranel
+	 */
+	public function prepareDisplayData(){
+		if(!isset($this->dataset) || !is_array($this->dataset) || empty($this->dataset)){
+            throw new \exception('There is no data');
+        }
+        $c = 1;
+        $fields = $this->block->reportFields();
+        $ret = '';
+        if(!$fields || count($fields) === 0) {
+            throw new \exception('No columns found for this report');
+        }
+        if ($this->block->hasPivot()) {
+            foreach ($fields as $f) {
+                if (isset($this->dataset[$f->dbFieldName()]) && is_array($this->dataset[$f->dbFieldName()])):
+                    $row_class = $c % 2 == 1 ? 'odd' : 'even';
+                    //@todo: set a class property
+                    if (!$f->isDisplayed()) {
+                        continue;
+                    }
+
+                    $f->displayName($this->prepareHeaderCell($f, $f->displayName()));
+                    foreach ($this->dataset[$f->dbFieldName()] as $k => $v):
+                        $this->dataset[$f->dbFieldName()][$k] = $this->prepareCell($f, $v);
+                    endforeach;
+                    $c++;
+                endif;
+            }
+        } else {
+            foreach ($this->dataset as $k => $cr) {
+                $row_class = $c % 2 == 1 ? 'odd' : 'even';
+                //@todo: set a class property
+                //@todo: pull this logic out of view?
+                foreach ($fields as $f) {//$field_display => $field_name):
+                    $field_name = $f->dbFieldName();
+                    if (!$f->isDisplayed()) {
+                        unset($this->dataset[$k][$field_name]);
+                        continue;
+                    }
+                    if (is_array($cr) && array_key_exists($field_name, $cr)) {
+                        $value = $cr[$field_name];
+                    } elseif (is_object($cr) && property_exists($cr, $field_name)) {
+                        $value = $cr->$field_name;
+                    } else {
+                        $value = '';
+                    }
+                    if ($c > (count($this->dataset) - $this->block->getAppendedRowsCount())) {
+                        $this->dataset[$k][$field_name] = $this->prepareCell($f, $value, $cr, true);
+                    } else {
+                        $this->dataset[$k][$field_name] = $this->prepareCell($f, $value, $cr, false);
+                    }
+                }
+                $c++;
+            }
+        }
+        return $this->dataset;
+ 	}
+
+    protected function prepareCell($f, $value, $cr = null, $appended_row = false){
+        $field_name = $f->dbFieldName();
+        if($f->isNumeric() && is_numeric($value)){// && $tmp_key != $value){
+            $value = number_format($value, $f->decimalScale());
+        }
+        return $value;
+    }
+
+    protected function prepareHeaderCell($f, $value){
+        return $value;
+    }
 }
-?>

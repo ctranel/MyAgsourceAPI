@@ -116,6 +116,7 @@
 		
 		$supplemental = $f->dataSupplementalContent();
 		if(isset($supplemental) && !$appended_row){
+//if($field_name == 'control_num') {var_dump($supplemental['links']); die;}
 			//@todo: supplemental comments are not currently an option, only supplemental links
 			$value = $supplemental['links'][0];
 			preg_match_all('~\{(.*?)\}~', $value, $tmp);
@@ -147,7 +148,7 @@
 			$value = $value . ' ' . $supplemental['links'][0];
 		}
 		?><td><?php echo $value; ?></td><?php
-		}
+	}
 		
 	
 	

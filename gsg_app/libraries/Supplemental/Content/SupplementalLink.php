@@ -15,7 +15,7 @@ require_once(APPPATH . 'libraries/Supplemental/Content/SupplementalLinkParam.php
 *
 */
 
-class SupplementalLink extends \SplObjectStorage
+class SupplementalLink //extends \SplObjectStorage
 {
 	/**
 	 * link id
@@ -154,7 +154,28 @@ class SupplementalLink extends \SplObjectStorage
 	 public function params() {
 		return $this->params;
 	}
-	
+
+	/* -----------------------------------------------------------------
+	 *  returns propertiesArray
+
+	 *  returns propertiesArray
+
+	 *  @since: version
+	 *  @author: ctranel
+	 *  @date: Feb 12, 2016
+	 *  @return: array of properties
+	 *  @throws:
+	 * -----------------------------------------------------------------*/
+	public function propertiesArray() {
+		return [
+			'href' => $this->href,
+			'rel' => $this->rel,
+			'title' => $this->title,
+			'a_class' => $this->a_class,
+			'params' => $this->params
+		];
+	}
+
 	/* -----------------------------------------------------------------
 	 *  returns full anchor tag text
 

@@ -23,7 +23,7 @@ abstract class BlockData implements iBlockData{
 	 * block
 	 *
 	 * report block
-	 * @var Report\Content\Block
+	 * @var myagsource\Report\Content\Block
 	 **/
 	protected $block;
 	

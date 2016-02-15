@@ -316,16 +316,6 @@ class report_block extends CI_Controller {
 		$results = $block_data_handler->getData($filters->criteriaKeyValue());//$report_count, 
 		// end report data
 		
-		/*
-		$first = ($first === 'true');
-		if($file_format == 'csv' || $file_format == 'pdf'){
-			if($first){
-				$this->_record_access(90, $file_format);
-			}
-			return $results;
-		}
-		*/
-
 		//Handle table headers for table blocks
 		if($block->displayType() == 'table'){
 			//table header

@@ -55,7 +55,7 @@ class Blocks {// implements iReportContentRepository {
 	 * 
 	 * @param string path
 	 * @author ctranel
-	 * @returns Page
+	 * @returns \myagsource\Report\iBlock
 	 */
 	public function getByPath($path, $parent_id = null){
 		$block = null;
@@ -102,20 +102,20 @@ class Blocks {// implements iReportContentRepository {
 	 * @author ctranel
 	 * @returns \myagsource\Report\iBlock
 	 */
-	protected function getBlock($r){
-		$field_groups = $this->datasource_blocks->getFieldGroupData($r['id']);
+	protected function getBlock($report){
+		$field_groups = $this->datasource_blocks->getFieldGroupData($report['id']);
 		$field_groups = $this->keyFieldGroupData($field_groups);
 		
-		if($r['display_type'] === 'table'){
-			$block = new TableBlock($this->datasource_blocks, $r['id'], $r['page_id'], $r['name'], $r['description'], $r['scope'], $r['active'], $r['path'], $r['max_rows'], $r['cnt_row'], $r['sum_row'], $r['avg_row'], $r['bench_row'], $r['is_summary'], $r['display_type'], $this->supplemental_factory, $field_groups);
-			if(isset($r['pivot_db_field'])){
-				$p = $this->datasource_dbfield->getFieldData($r['pivot_db_field']);
+		if($report['display_type'] === 'table'){
+			$block = new TableBlock($this->datasource_blocks, $report['id'], $report['page_id'], $report['name'], $report['description'], $report['scope'], $report['active'], $report['path'], $report['max_rows'], $report['cnt_row'], $report['sum_row'], $report['avg_row'], $report['bench_row'], $report['is_summary'], $report['display_type'], $this->supplemental_factory, $field_groups);
+			if(isset($report['pivot_db_field'])){
+				$p = $this->datasource_dbfield->getFieldData($report['pivot_db_field']);
 				$pivot_field = new DbField($p['id'], $p['db_table'], $p['db_field_name'], $p['name'], $p['description'], $p['pdf_width'], $p['default_sort_order'], $p['datatype'], $p['max_length'], $p['decimal_scale'], $p['unit_of_measure'], $p['is_timespan'], $p['is_foreign_key'], $p['is_nullable'], $p['is_natural_sort']);
 				$block->setPivot($pivot_field);
 			}
 		}
 		else{
-			$block = new ChartBlock($this->datasource_blocks, $r['id'], $r['page_id'], $r['name'], $r['description'], $r['scope'], $r['active'], $r['path'], $r['max_rows'], $r['cnt_row'], $r['sum_row'], $r['avg_row'], $r['bench_row'], $r['is_summary'], $r['display_type'], $r['chart_type'], $this->supplemental_factory, $field_groups, (bool)$r['keep_nulls']);
+			$block = new ChartBlock($this->datasource_blocks, $report['id'], $report['page_id'], $report['name'], $report['description'], $report['scope'], $report['active'], $report['path'], $report['max_rows'], $report['cnt_row'], $report['sum_row'], $report['avg_row'], $report['bench_row'], $report['is_summary'], $report['display_type'], $report['chart_type'], $this->supplemental_factory, $field_groups, (bool)$report['keep_nulls']);
 		}
 		return $block;
 	}

@@ -68,6 +68,27 @@ class TableBlock extends Block {
 	}
 
 	/**
+	 * setFlatTableHeader
+	 *
+	 * @param int report count
+	 * @return array of output data for block
+	 * @access public
+	 *
+	 **/
+	public function setFlatTableHeader(&$report_data, SupplementalFactory $supplemental_factory = null, $header_groups){
+		$this->table_header = new TableHeader($this, $header_groups, $supplemental_factory);
+
+		$top_row = null;
+		if($this->hasPivot() && is_array($report_data) && !empty($report_data)){
+			reset($report_data);
+			$tmp_key = key($report_data);
+			//add placeholder for column generated from header row
+			$this->top_row = array_merge([''],$report_data[$tmp_key]);
+			unset($report_data[$tmp_key]);
+		}
+	}
+
+	/**
 	 * getTableHeaderData
 	 * 
 	 * @param int report count

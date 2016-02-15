@@ -2,6 +2,8 @@
 //namespace myagsource;
 require_once(APPPATH . 'libraries/filters/Filters.php');
 require_once(APPPATH . 'libraries/Benchmarks/Benchmarks.php');
+//use supp factory in CSV?
+require_once(APPPATH . 'libraries/Supplemental/Content/SupplementalFactory.php');
 require_once(APPPATH . 'libraries/dhi/HerdAccess.php');
 require_once(APPPATH . 'libraries/dhi/Herd.php');
 require_once(APPPATH . 'libraries/Report/Content/Blocks.php');
@@ -20,6 +22,8 @@ require_once(APPPATH . 'libraries/AccessLog.php');
 
 use \myagsource\Benchmarks\Benchmarks;
 use \myagsource\report_filters\Filters;
+//use supp factory in CSV?
+use \myagsource\Supplemental\Content\SupplementalFactory;
 use \myagsource\dhi\HerdAccess;
 use \myagsource\dhi\HerdPageAccess;
 use \myagsource\Site\WebContent\PageAccess;
@@ -174,8 +178,9 @@ class Blocks extends CI_Controller {
 		$this->load->model('supplemental_model');
 		$this->load->model('ReportContent/report_block_model');
 		$this->load->model('Datasource/db_field_model');
-//		$this->supp_factory = new SupplementalFactory($this->supplemental_model, site_url());
-		$this->blocks = new ReportBlocks($this->report_block_model, $this->db_field_model, null);
+//use supp factory in CSV?
+		$this->supp_factory = null;//new SupplementalFactory($this->supplemental_model, site_url());
+		$this->blocks = new ReportBlocks($this->report_block_model, $this->db_field_model, $this->supp_factory);
 
 		//set up web content objects
 		$this->load->model('web_content/section_model');
@@ -264,12 +269,14 @@ class Blocks extends CI_Controller {
 			foreach($arr_params as $k => $v){
 				if(!$this->block->isSummary()){
 					if(is_array($v)){
-						$tmp = array_filter($v);
+						$tmp = array_filter($arr_params[$k], function($v){
+							return (!empty($v) || $v === 0 || $v === '0');
+						});
 						if(empty($tmp)){
 							$filters->removeCriteria($k);
 						}
 					}
-					elseif($v == 0){
+					elseif(empty($v) && ($v !== 0 || $k === 'pstring')){
 						$filters->removeCriteria($k);
 					}
 				}
@@ -297,6 +304,8 @@ class Blocks extends CI_Controller {
 		//End load data-handling library
 
 		$results = $block_data_handler->getData($filters->criteriaKeyValue());//$report_count, 
+        $results = $block_data_handler->prepareDisplayData();
+
 		if(!is_array($results) || empty($results)){
 			
 		}
@@ -307,10 +316,13 @@ class Blocks extends CI_Controller {
 		
 		//@todo: pull this only when needed? move adjustHeaderGroups to TableBlock or TableHeader class
 		$arr_dates = $this->herd_model->get_test_dates_7_short($this->session->userdata('herd_code'));
-		$header_groups = TableHeader::mergeDateIntoHeader($header_groups, $arr_dates);
+		//no header groups in csv
+        //$header_groups = TableHeader::mergeDateIntoHeader($header_groups, $arr_dates);
 
-		$this->block->setTableHeader($results, null, $header_groups);
-		$header = $this->block->getTableHeaderLeafs();
+		//$this->block->setTableHeader($results, null, $header_groups);
+		//$header = $this->block->getTableHeaderLeafs();
+        //@todo: this will not work for pivots
+        $header = $this->block->getDisplayedFieldArray();
 		$benchmark_text = '';
 		if($this->block->hasBenchmark()){
 			$benchmark_text = $this->benchmarks->get_bench_text();

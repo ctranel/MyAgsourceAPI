@@ -84,6 +84,32 @@ class Supplemental implements iSupplemental
 	}
 
 	/* -----------------------------------------------------------------
+	 * getProperties
+
+	*  Factory for supplemental objects for blocks
+
+	*  @author: ctranel
+	*  @date: Oct 28, 2014
+	*  @return: Array of strings
+	*  @throws:
+	* -----------------------------------------------------------------*/
+
+	public function getProperties(){
+		$arr_supplemental = [];
+		if (isset($this->links) && is_object($this->links)){
+			foreach($this->links as $s){
+				$arr_supplemental['links'][] = $s->propertiesArray();
+			}
+		}
+		if (isset($this->comments) && is_object($this->comments)){
+			foreach($this->comments as $s){
+				$arr_supplemental['comments'][] = $s->propertiesArray();
+			}
+		}
+		return $arr_supplemental;
+	}
+
+	/* -----------------------------------------------------------------
 	 * getContent
 	
 	*  Factory for supplemental objects for blocks

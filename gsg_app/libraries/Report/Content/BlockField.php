@@ -3,7 +3,7 @@ namespace myagsource\Report\Content;
 
 require_once APPPATH . 'libraries/Datasource/DbObjects/DbField.php';
 
-use \myagsource\Datasource\DbObjects\DbField;
+use \myagsource\Datasource\iDataField;
 use myagsource\Supplemental\Content\Supplemental;
 
 /**
@@ -91,7 +91,7 @@ abstract class BlockField {
 	
 	/**
 	 */
-	public function __construct($id, $name, DbField $data_field, $category_id, $is_displayed, $display_format, $aggregate, $is_sortable, $header_supp, $data_supp, $field_group, $field_group_ref_key) {
+	public function __construct($id, $name, iDataField $data_field, $category_id, $is_displayed, $display_format, $aggregate, $is_sortable, $header_supp, $data_supp, $field_group, $field_group_ref_key) {
 		$this->id = $id;
 		$this->name = $name;
 		$this->data_field = $data_field;
@@ -174,6 +174,12 @@ abstract class BlockField {
 	public function dataSupplementalContent() {
 		if(isset($this->data_supp)){
 			return $this->data_supp->getContent();
+		}
+	}
+
+	public function dataSupplementalProperties() {
+		if(isset($this->data_supp)){
+			return $this->data_supp->getProperties();
 		}
 	}
 
