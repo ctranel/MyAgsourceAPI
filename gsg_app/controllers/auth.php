@@ -898,9 +898,9 @@ class Auth extends Ionauth {
 			);
 			if($additional_data['phone'] == '--') $additional_data['phone'] = '';
 		}
-		if ($is_validated === TRUE && $this->as_ion_auth->register($username, $password, $email, $additional_data, $arr_posted_group_id)) { //check to see if we are creating the user
+		if ($is_validated === TRUE && $this->as_ion_auth->register($username, $password, $email, $additional_data, $arr_posted_group_id, 'AMYA-500')) { //check to see if we are creating the user
 			//$this->as_ion_auth->activate();
-			$this->redirect(site_url("auth/login"), 'Your account has been created.  A member of the AgSource Customer Service team will contact you to activate your account.');
+			$this->redirect(site_url("auth/login"), 'Your account has been created.  You will be receiving an email shortly that will confirm your registration and allow you to activate your account.');
 		}
 		else { //display the create user form
 			//set the flash data error message if there is one

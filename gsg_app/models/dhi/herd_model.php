@@ -450,6 +450,41 @@ class Herd_model extends CI_Model {
 	}
 
 	/**
+	 * addHerdOutput
+	 * @param string herd code
+	 * @param string or array of report codes
+	 * @return boolean successful
+	 * @author ctranel
+	 **/
+	public function addHerdOutput($herd_code, $report_code){
+		if(!isset($herd_code) || empty($herd_code)){
+			throw new \exception('Herd code specified');
+		}
+        if(!isset($report_code) || empty($report_code)){
+            throw new \exception('Report code specified');
+        }
+
+        $data = [
+            'herd_code' => mysqli_real_escape_string($herd_code),
+            'report_code' => mysqli_real_escape_string($report_code),
+            'seq_num' => "(SELECT (max(seq_num)  + 1) FROM herd.dbo.herd_output WHERE seq_num < 30 GROUP BY herd_code HAVING herd_code = '" . $herd_code . "')",
+            'send_to_num' => '00000001',
+            'bill_account_num' => 'AS035099',
+            'copy_cnt' => 1,
+            'medium_type_code' => 'W',
+            'start_date' => date('Y-m-d'),
+            'activity_code' => 'A',
+        ];
+
+		$result = $this->db->insert('herd.dbo.herd_output', $data, false)
+			->result_array();
+		if(is_array($result)){
+			return $result;
+		}
+		return FALSE;
+	}
+
+	/**
 	 * getCowList
 	 * @param string herd code
 	 * @param string or array id fields
