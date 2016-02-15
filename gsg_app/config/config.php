@@ -57,13 +57,13 @@
 	switch (ENVIRONMENT)
 	{
 		case 'development':
-			$config['admin_email']          = "ghartmann@agsource.com"; 	// Admin Email, admin@example.com
-			$config['cust_serv_email']		= "ghartmann@agsource.com"; //custom CDT
+			$config['admin_email']          = "ctranel@agsource.com"; 	// Admin Email, admin@example.com
+			$config['cust_serv_email']		= "ctranel@agsource.com"; //custom CDT
 			$config['cust_serv_phone']		= "1-800-236-4995"; //custom CDT
 			break;
 		case 'localhost':
-			$config['admin_email']          = "ghartmann@agsource.com"; 	// Admin Email, admin@example.com
-			$config['cust_serv_email']		= "ghartmann@agsource.com"; //custom CDT
+			$config['admin_email']          = "ctranel@agsource.com"; 	// Admin Email, admin@example.com
+			$config['cust_serv_email']		= "ctranel@agsource.com"; //custom CDT
 			$config['cust_serv_phone']		= "1-800-236-4995"; //custom CDT
 			break;
 		case 'qa':
