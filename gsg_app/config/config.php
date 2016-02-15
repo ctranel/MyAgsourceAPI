@@ -46,6 +46,7 @@
 	$config['product_name']         = "MyAgSource";
 	//@todo: need to convert this to pull from DB
 	$config['default_herd']			= "35999909";
+	$config['trial_period']			= 60; //number of days
 	$config['site_title']           = "MyAgSource";
 	$config['cust_serv_company']	= "AgSource Cooperative Services";
 	

@@ -327,14 +327,6 @@ class Ion_auth
 				'id'         => $user->id,
 				'email'      => $email,
 				'activation' => $activation_code,
-// ctranel addition
-				'first_name' 	=> $additional_data['first_name'],
-				'last_name'  	=> $additional_data['last_name'],
-				'herd_code'		=> $additional_data['herd_code'],
-				'phone'			=> $additional_data['phone'],
-				'best_time'	 	=> $additional_data['best_time'],
-				'sg_acct_num'	=> $additional_data['sg_acct_num'],
-// end ctranel addition
 			);
 			if(!$this->config->item('use_ci_email', 'ion_auth'))
 			{
@@ -348,9 +340,8 @@ class Ion_auth
 
 				$this->email->clear();
 				$this->email->from($this->config->item('admin_email', 'ion_auth'), $this->config->item('site_title', 'ion_auth'));
-				$this->email->to($this->config->item('cust_serv_email'));//was $this->email->to($email);
-// edit ctranel				$this->email->subject($this->config->item('site_title', 'ion_auth') . ' - Account Activation');
-				$this->email->subject($this->config->item('site_title', 'ion_auth') . ' - Account Activation - ' . $additional_data['last_name']);
+				$this->email->to($email);
+				$this->email->subject($this->config->item('site_title', 'ion_auth') . ' - Account Activation');
 				$this->email->message($message);
 
 				if ($this->email->send() == TRUE)
