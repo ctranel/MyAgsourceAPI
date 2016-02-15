@@ -133,7 +133,6 @@ class As_ion_auth extends Ion_auth {
         );
 
         $message = $this->load->view($this->config->item('email_templates', 'ion_auth').$this->config->item('user_herd_data', 'ion_auth'), $data, true);
-die($message);
         $this->email->clear();
         $this->email->from($this->config->item('admin_email'), $this->config->item('site_title'));
         $this->email->to($this->config->item('cust_serv_email'));
