@@ -9,7 +9,7 @@
 	<div>Email: <?php echo $email; ?></div>
 	<div>Phone: <?php echo $phone; ?></div>
 	<div>Best time to call: <?php echo $best_time; ?></div>
-	<?php if($group === 2){ ?>
+	<?php if((int)$group === 2){ ?>
 		<h2 style="font-size: 1em;">Herd Information</h2>
 		<div>Owner: <?php echo $arr_herd['herd_owner']; ?></div>
 		<div>Farm Name: <?php echo $arr_herd['farm_name']; ?></div>
