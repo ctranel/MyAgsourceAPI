@@ -668,6 +668,7 @@ class Auth extends Ionauth {
 	function login()
 	{
 		$this->data['title'] = "Login";
+		$this->data['trial_days'] = $this->config->item('trial_period');
 
 		//validate form input
 		$this->form_validation->set_rules('identity', 'Email Address', 'trim|required|valid_email');
