@@ -106,7 +106,7 @@ class As_ion_auth extends Ion_auth {
 
 		$id = parent::register($username, $password, $email, $additional_data, $group_name);
         if(!$id){
-            throw new \Exception('Recording of registration failed');
+            throw new \Exception('Recording of registration failed.');
         }
 
 		$herd_code = $additional_data['herd_code'];
