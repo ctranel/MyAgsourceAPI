@@ -129,22 +129,31 @@ class Herd
 	 *
 	 **/
 	public function getHerdEnrollStatus($report_code = NULL){
-		if(isset($report_code)){
+		$ret = 1;
+
+        if(isset($report_code)){
 			if(!is_array($report_code)){
 				$report_code = [$report_code];
 			}
 		}
-		$herd_output = $this->herd_model->get_herd_output($this->herd_code, $report_code);
-		if(!$herd_output || count($herd_output) == 0){
-			return 1;
+
+        $herd_output = $this->herd_model->get_herd_output($this->herd_code, $report_code);
+        if(!$herd_output || count($herd_output) == 0){
+            return 1;
+        }
+		foreach($herd_output as $ho){
+			if($ho['herd_is_paying'] === 1){
+				if($ret < 3){
+                    $ret = 3;
+                }
+			}
+			if($ho['herd_is_active_trial'] === 1){
+                if($ret < 2){
+                    $ret = 2;
+                }
+			}
 		}
-		if($herd_output[0]['herd_is_paying'] === 1){
-			return 3;
-		}
-		if($herd_output[0]['herd_is_active_trial'] === 1){
-			return 2;
-		}
-		return 1;
+        return $ret;
 	}
 	
 	/* -----------------------------------------------------------------

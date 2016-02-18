@@ -142,9 +142,6 @@ if ( ! function_exists('array_diff_recursive')) {
 				$ret[$k] = $v;
 			} else {
 				if (is_array($v) && is_array($array2[$k])) {
-                    if(is_numeric($k)){
-                        $ret[$k] = array_diff_recursive($v, $array2[$k]);
-                    }
                     $ret[$k] = $v;
 				} else {
 					if ((string)$v != (string)$array2[$k]) {

@@ -466,7 +466,8 @@ class Herd_model extends CI_Model {
 		}
 		$result = $this->db
 			->select('ho.report_code, ho.herd_is_paying, ho.herd_is_active_trial')
-			->where('herd_code', $herd_code)
+			->distinct()
+            ->where('herd_code', $herd_code)
 			->where('end_date IS NULL')
 			->where('activity_code !=', 'Q')
 			->get('[users].[dbo].[v_user_status_info] ho')
@@ -474,7 +475,7 @@ class Herd_model extends CI_Model {
 		if(is_array($result)){
 			return $result;
 		}
-		return false;
+		return [];
 	}
 
 	/**

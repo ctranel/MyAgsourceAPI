@@ -44,11 +44,11 @@ class Auth extends Ionauth {
 			//$this->redirect(site_url('dhi/index/' . $pstring));
 			$this->redirect(site_url());
 	}
-/*
-	function report_info_request(){
-		$arr_section_inquiry = $this->input->post('sections');
-		if(isset($arr_section_inquiry) && is_array($arr_section_inquiry)){
-			if($this->as_ion_auth->record_section_inquiry($arr_section_inquiry, $this->input->post('comments'))){
+
+	function product_info_request(){
+		$arr_inquiry = $this->input->post('products');
+		if(isset($arr_inquiry) && is_array($arr_inquiry)){
+			if($this->as_ion_auth->recordProductInquiry($arr_inquiry, $this->input->post('comments'))){
 				$this->session->set_flashdata('message', 'Thank you for your interest.  Your request for more information has been sent.');
 			}
 			else{
@@ -56,11 +56,11 @@ class Auth extends Ionauth {
 			}
 		}
 		else {
-			$this->session->set_flashdata('message', 'Please select one or more web products and resubmit your request.');
+			$this->session->set_flashdata('message', 'Please select one or more products and resubmit your request.');
 		}
 		$this->redirect(site_url($this->session->userdata('redirect_url')));
 	}
-*/	
+
 	/*
 	 * @description manage_service_grp is the page producers use to manage service group access
 	 */

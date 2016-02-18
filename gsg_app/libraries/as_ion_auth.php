@@ -336,23 +336,23 @@ class As_ion_auth extends Ion_auth {
 	}
 
 /**
-	 * @method record_section_inquiry()
-	 * @param array of section names
+	 * @method recordProductInquiry()
+	 * @param array of product codes
 	 * @param string comments
 	 * @return boolean success
 	 * @access public
 	 *
 	 **/
-	public function record_section_inquiry($arr_sections_in, $comments){
+	public function recordProductInquiry($arr_products_in, $comments){
 		//send emails
-		$data['sections'] = $arr_sections_in;
+		$data['products'] = $arr_products_in;
 		$data['comments'] = $comments;
 		$data['name'] = $this->session->userdata('first_name') . ' ' . $this->session->userdata('last_name');
 		$data['email'] = $this->session->userdata('email');
 		$herd_code = $this->session->userdata('herd_code');
 		if(isset($herd_code) && !empty($herd_code)) $data['herd_code'] = $this->session->userdata('herd_code');
 
-		$message = $this->load->view('auth/email/section_request.php', $data, true);
+		$message = $this->load->view('auth/email/productInfoRequest.tpl.php', $data, true);
 		$this->email->clear();
 		$config['mailtype'] = $this->config->item('email_type', 'ion_auth');
 		$this->email->initialize($config);
