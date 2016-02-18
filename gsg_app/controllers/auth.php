@@ -39,26 +39,26 @@ class Auth extends Ionauth {
 		redirect($url);
 	}
 	
-	//@todo: Why is pstring here???
-	function index($pstring = NULL){
-			//$this->redirect(site_url('dhi/index/' . $pstring));
+	function index(){
 			$this->redirect(site_url());
 	}
 
 	function product_info_request(){
 		$arr_inquiry = $this->input->post('products');
+        $arr_user = $this->ion_auth_model->user($this->session->userdata('user_id'))->result_array()[0];
+
 		if(isset($arr_inquiry) && is_array($arr_inquiry)){
-			if($this->as_ion_auth->recordProductInquiry($arr_inquiry, $this->input->post('comments'))){
-				$this->session->set_flashdata('message', 'Thank you for your interest.  Your request for more information has been sent.');
+			if($this->as_ion_auth->recordProductInquiry($arr_user['first_name'] . ' ' . $arr_user['last_name'], $arr_user['email'],$this->session->userdata('herd_code'), $arr_inquiry, $this->input->post('comments'))){
+				$msg = 'Thank you for your interest.  Your request for more information has been sent.';
 			}
 			else{
-				$this->session->set_flashdata('message', 'We encountered a problem sending your request.  Please try again or contact us at ' . $this->config->item("cust_serv_email") . ' or ' . $this->config->item("cust_serv_phone") . '.');
+                $msg = 'We encountered a problem sending your request.  Please try again or contact us at ' . $this->config->item("cust_serv_email") . ' or ' . $this->config->item("cust_serv_phone") . '.';
 			}
 		}
 		else {
-			$this->session->set_flashdata('message', 'Please select one or more products and resubmit your request.');
+            $msg = 'Please select one or more products and resubmit your request.';
 		}
-		$this->redirect(site_url($this->session->userdata('redirect_url')));
+		$this->redirect(site_url($this->session->userdata('redirect_url')), $msg);
 	}
 
 	/*

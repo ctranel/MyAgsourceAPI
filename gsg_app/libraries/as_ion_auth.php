@@ -337,20 +337,24 @@ class As_ion_auth extends Ion_auth {
 
 /**
 	 * @method recordProductInquiry()
+     * @param string user name
+     * @param string user email
+     * @param string herd code
 	 * @param array of product codes
 	 * @param string comments
 	 * @return boolean success
 	 * @access public
 	 *
 	 **/
-	public function recordProductInquiry($arr_products_in, $comments){
+	public function recordProductInquiry($user_name, $user_email, $herd_code, $products_in, $comments){
 		//send emails
-		$data['products'] = $arr_products_in;
+		$data['products'] = $products_in;
 		$data['comments'] = $comments;
-		$data['name'] = $this->session->userdata('first_name') . ' ' . $this->session->userdata('last_name');
-		$data['email'] = $this->session->userdata('email');
-		$herd_code = $this->session->userdata('herd_code');
-		if(isset($herd_code) && !empty($herd_code)) $data['herd_code'] = $this->session->userdata('herd_code');
+		$data['name'] = $user_name;
+		$data['email'] = $user_email;
+		if(isset($herd_code) && !empty($herd_code)){
+            $data['herd_code'] = $herd_code;
+        }
 
 		$message = $this->load->view('auth/email/productInfoRequest.tpl.php', $data, true);
 		$this->email->clear();
@@ -358,8 +362,7 @@ class As_ion_auth extends Ion_auth {
 		$this->email->initialize($config);
 		$this->email->set_newline("\r\n");
 		$this->email->from($this->config->item('admin_email'), $this->config->item('site_title'));
-		$this->email->to($data['email']);
-		$this->email->cc($this->config->item('cust_serv_email'));
+		$this->email->to($this->config->item('cust_serv_email'));
 		$this->email->subject($this->config->item('site_title') . ' - Product Inquiry');
 		$this->email->message($message);
 

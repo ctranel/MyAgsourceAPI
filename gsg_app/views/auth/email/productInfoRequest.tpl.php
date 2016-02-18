@@ -1,4 +1,4 @@
-<?php echo $name; ?> (<?php echo $email; ?>) has requested information on the following products:
+<?php echo $name; ?> (Herd <?php echo $herd_code; ?>, <?php echo $email; ?>) has requested information on the following products:
 <ul>
     <li>
         <?php echo implode('</li><li>', $products); ?>

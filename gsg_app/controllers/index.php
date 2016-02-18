@@ -52,9 +52,8 @@ class Index extends report_parent {
 				'herd_code'
 		);
 		//END FILTERS
-		
-		$this->page_header_data['message'] = $this->session->flashdata('message');
 
+        $this->page_header_data['message'] = $this->session->flashdata('message');
 		//get web content generated reports
 		//$this->objPage = $this->{$this->primary_model_name}->arr_blocks[$this->page->path()];
 		//$arr_blocks = $this->objPage['blocks'];
