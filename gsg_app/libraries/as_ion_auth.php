@@ -362,7 +362,7 @@ class As_ion_auth extends Ion_auth {
 		$this->email->initialize($config);
 		$this->email->set_newline("\r\n");
 		$this->email->from($this->config->item('admin_email'), $this->config->item('site_title'));
-		$this->email->to($this->config->item('cust_serv_email'));
+		$this->email->to($this->config->item('field_email'));
 		$this->email->subject($this->config->item('site_title') . ' - Product Inquiry');
 		$this->email->message($message);
 
