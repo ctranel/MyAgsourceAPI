@@ -2,9 +2,13 @@
 require_once(APPPATH . 'libraries/Benchmarks/Benchmarks.php');
 require_once APPPATH . 'controllers/report_parent.php';
 require_once(APPPATH . 'libraries/filters/Filters.php');
+require_once(APPPATH . 'libraries/Products/Products/Products.php');
+require_once(APPPATH . 'libraries/dhi/Herd.php');
 
-use \myagsource\Benchmarks\Benchmarks;
-use \myagsource\report_filters\Filters;
+use myagsource\Benchmarks\Benchmarks;
+use myagsource\report_filters\Filters;
+use myagsource\Products\Products\ProductsFactory;
+use myagsource\dhi\Herd;
 
 defined('BASEPATH') OR exit('No direct script access allowed');
 
@@ -12,6 +16,7 @@ class Index extends report_parent {
 	protected $page_header_data;
 	protected $footer_data;
 	protected $data;
+    protected $herd;
 	
 	function __construct(){
 		parent::__construct();
@@ -19,6 +24,7 @@ class Index extends report_parent {
 			$this->session->keep_all_flashdata();
 			redirect(site_url('auth/login'));
 		}
+        $this->herd = new Herd($this->herd_model, $this->session->userdata('herd_code'));
 		$this->page_header_data['num_herds'] = $this->herd_access->getNumAccessibleHerds($this->session->userdata('user_id'), $this->as_ion_auth->arr_task_permissions(), $this->session->userdata('arr_regions'));
 		$this->page_header_data['navigation'] = $this->load->view('navigation', [], TRUE);
 		
@@ -87,7 +93,7 @@ class Index extends report_parent {
 					//elseif($x == ($cnt - 1)) $odd_even = 'chart-last-odd';
 					//else $odd_even = 'chart-odd';
 					if($display == 'table') $cnt = 0;
-					$arr_blk_data = array(
+					$arr_blk_data = [
 							'block_num' => $x,
 							'link_url' => site_url($this->full_section_path) . '/' . $this->page->path() . '/' . $pb->path(),
 //							'form_id' => $this->report_form_id,
@@ -96,7 +102,7 @@ class Index extends report_parent {
 							//'sort_by' => urlencode($sort_by),
 							//'sort_order' => urlencode($sort_order),
 							'skip_heading' => true,
-					);
+					];
 					$arr_view_blocks[$pb->name()] = $this->load->view($display, $arr_blk_data, TRUE);
 					//add js line to populate the block after the page loads
 					$tmp_js .= "updateBlock(\"block-canvas$x\", \"" . $pb->path() . "\", \"$x\", \"null\", \"null\",\"false\");\n";//, \"" . $this->{$this->primary_model_name}->arr_blocks[$this->page]['display'][$display][$block]['description'] . "\", \"" . $bench_text . "\");\n";
@@ -132,10 +138,10 @@ class Index extends report_parent {
 		
 		if(is_array($this->page_header_data)){
 			$this->page_header_data = array_merge($this->page_header_data,
-				array(
+				[
 					'title'=>'Dashboard - ' . $this->config->item("product_name"),
 					'description'=>'Dashboard for ' . $this->config->item("product_name"),
-					'arr_head_line' => array(
+					'arr_head_line' => [
 							'<script type="text/javascript">',
 							'	var page = "' . $this->page->path() . '";',
 							'	var page_url = "' . $this->report_path . '";',
@@ -143,8 +149,8 @@ class Index extends report_parent {
 							'	var herd_code = "' . $this->session->userdata('herd_code') . '";',
 							'	var block = "' . $tmp_block	. '"',
 							'</script>'
-					),
-					'arr_headjs_line'=>array(
+					],
+					'arr_headjs_line'=>[
 						'{highcharts: "https://cdnjs.cloudflare.com/ajax/libs/highcharts/3.0.7/highcharts.js"}',
 						'{highcharts_more: "https://cdnjs.cloudflare.com/ajax/libs/highcharts/3.0.7/highcharts-more.js"}',
 						'{exporting: "https://cdnjs.cloudflare.com/ajax/libs/highcharts/3.0.7/modules/exporting.js"}',
@@ -156,8 +162,8 @@ class Index extends report_parent {
 						'{tooltip: "https://cdn.jsdelivr.net/qtip2/2.2.0/jquery.qtip.min.js"}',
 						'{datepick: "' . $this->config->item("base_url_assets") . 'js/jquery/jquery.datepick.min.js"}',
 						'{helper: "' . $this->config->item("base_url_assets") . 'js/as_dashboard_helper.js"}'
-					)
-				)
+					]
+				]
 			);
 			$this->page_header_data['arr_headjs_line'][] = 'function(){' . $tmp_js . ';}';
 		}
@@ -169,26 +175,34 @@ class Index extends report_parent {
 		//widgets (pull from DB?)
 		//get_herd_data
 		$herd_data = $this->herd_model->header_info($this->session->userdata('herd_code'));
-		$this->data['widget']['herd'][] = array(
+		$this->data['widget']['herd'][] = [
 			'content' => $this->load->view('auth/dashboard/herd_data', $herd_data, TRUE),
 			'title' => 'Herd Data'
-		);
+		];
 
-		$this->data['widget']['herd'][] = array(
+		$this->data['widget']['herd'][] = [
 			'content' => $this->load->view('auth/dashboard/message', null, true),
 			'title' => 'Message'
-		);
+		];
 
-		$this->load->model('setting_model');
+        $this->load->model('web_content/product_model');
+        $products_factory = new ProductsFactory($this->product_model, $this->herd, $this->as_ion_auth->arr_task_permissions());
+        $missing_products = $products_factory->inaccessibleProducts();
+        $this->data['widget']['herd'][] = [
+            'content' => $this->load->view('auth/dashboard/other_products', ['products' => $missing_products], true),
+            'title' => 'Maximize your profitability'
+        ];
+
+        $this->load->model('setting_model');
 		$this->load->model('benchmark_model');
 		$this->benchmarks = new Benchmarks($this->session->userdata('user_id'), $this->input->post('herd_code'), $this->herd_model->header_info($this->herd->herdCode()), $this->setting_model, $this->benchmark_model, $this->session->userdata('benchmarks'));
 		$arr_benchmark_data = $this->benchmarks->getFormData($this->session->userdata('benchmarks')); 
 		if(isset($arr_benchmark_data)){
-			$this->data['widget']['herd'][] = array(
+			$this->data['widget']['herd'][] = [
 				'content' => $this->load->view('dhi/settings/benchmarks', $arr_benchmark_data, TRUE),
 				'title' => 'Benchmarks',
 				'id' => 'benhmarks',
-			);
+			];
 		}
 		
 		//filters	
@@ -197,34 +211,34 @@ class Index extends report_parent {
 			$report_filter_path =  $this->full_section_path . '/filters';
 		}
 
-		$arr_filter_data = array(
+		$arr_filter_data = [
 				'arr_filters' => $this->filters->toArray(),
-		);
+		];
 
 		if($this->filters->displayFilters()){
-			$this->data['widget']['herd'][] = array(
+			$this->data['widget']['herd'][] = [
 				'content' => $this->load->view($report_filter_path, $arr_filter_data, TRUE),
 				'title' => 'Filters',
 				'id' => 'filters',
-			);
+			];
 		}
 		
 		foreach($arr_view_blocks as $k => $b){
 			$col = $k === 'Herd Performance Overview' ? 'feature' : 'info';
-			$this->data['widget'][$col][] = array(
+			$this->data['widget'][$col][] = [
 				'content' => $b,
 				'title' => $k,
-			);
+			];
 		}
 		
 
 		if($this->as_ion_auth->has_permission('Update SG Access')){
 			$consultants_by_status = $this->as_ion_auth->getConsultantsByHerd($this->session->userdata('herd_code'));
 			if(isset($consultants_by_status['open']) && is_array($consultants_by_status['open'])){
-				$this->data['widget']['herd'][] = array(
+				$this->data['widget']['herd'][] = [
 					'content' => $this->_set_consult_section($consultants_by_status['open'], 'open', array('Grant Access', 'Deny Access')),
 					'title' => 'Open Consultant Requests'
-				);
+				];
 			}
 		}
 		
@@ -242,24 +256,24 @@ class Index extends report_parent {
 	function _set_consult_section($data, $key, $arr_submit_options){
 	//this code is also used in auth/_set_consult_section
 			if(isset($data) && is_array($data)){
-			$this->section_data = array(
+			$this->section_data = [
 				'arr_submit_options' => $arr_submit_options,
 				'attributes' => array('class' => $key . ' consult-form'),
-			);
+			];
 			foreach($data as $h) {
 				$h['is_editable'] = TRUE;
 				$this->section_data['arr_records'][] = $this->load->view('auth/service_grp/service_grp_line', $h, TRUE);
 			}
 			//add disclaimer field for when producer can grant access
 			if($key === 'open') {
-				$this->section_data['disclaimer'] = array(
+				$this->section_data['disclaimer'] = [
 					'name' => 'disclaimer',
 					'id' => 'disclaimer',
 					'type' => 'checkbox',
 					'value' => '1',
 					'checked' => FALSE,
 					'class' => 'required',
-				);
+				];
 				$this->section_data['disclaimer_text'] = ' I understand that if I grant a consultant access to my herd&apos;s information, that consultant will be able to use any animal and herd summary data through their own ' . $this->config->item('product_name') . ' account. This consultant will not have access to my account information. An email will be sent to the consultant to inform them whether access has been granted or denied, and include any expiration date that is specified above.</p><p>Because relationships with consultants change over time, it is highly recommended that you do not share your login information with any consultant.';
 			}
 			//vars are cached between view loads, so we need to include the disclaimer var even when it shouldn't be set

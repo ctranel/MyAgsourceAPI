@@ -18,8 +18,8 @@ use \myagsource\dhi\Herd;
  */
 class Navigation{// implements iWebContentRepository {
 	/** 
-	 * $datasource_sections
-	 * @var Section_model
+	 * $datasource_navigation
+	 * @var navigation_model
 	 **/
 	protected $datasource_navigation;
 
@@ -54,7 +54,7 @@ class Navigation{// implements iWebContentRepository {
 	 * @return void
 	 * @access public
 	 **/
-	//if we allow producers to select which sections to allow, we will need to pass that array to this section as well
+	//@todo: if we allow producers to select which sections to allow for consultants, we will need to pass that array to this section as well
 	protected function setData(){ 
 		$scope = ['base'];
 		$tmp_array = [];
