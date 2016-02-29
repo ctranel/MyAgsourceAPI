@@ -44,8 +44,6 @@
     var menu_item;
 
     function menu_open(){
-//alert('here');
-console.log($(this).attr('id'));
 		cancel_timer();
     	menu_close();
     	menu_item = $(this).find('ul').css('visibility', 'visible');
