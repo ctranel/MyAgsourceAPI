@@ -71,15 +71,16 @@ class Csv{
 					if(stripos($key, 'isnull') === FALSE) {
 						//handle special cases
 						//@todo: get special cases out of here
-						if ($key === "net_merit_amt"){
+						/*
+						if ($key === "net_merit_amtzz"){
 							$arr_item = explode('*', $item);
 							$denote = isset($arr_item[1]) ? '*' : '';
 							$out .= $enclosure.str_replace($enclosure, $enclosure.$enclosure, $arr_item[0]).$enclosure.$delim;
 							$out .= $enclosure.str_replace($enclosure, $enclosure.$enclosure, $denote).$enclosure.$delim;
 						}
-						else{
+						else{ */
 							$out .= $enclosure.str_replace($enclosure, $enclosure.$enclosure, $item).$enclosure.$delim;
-						}
+						//}
 					}
 				}
 				$out = rtrim($out);

@@ -5,7 +5,7 @@
 				foreach($products as $a):
 					?><p><?php
 						echo form_checkbox('products[]', $a->productCode());
-						echo $a->name();
+						echo $a->description();
 					?></p><?php
 				endforeach;
 				?><p><?php
