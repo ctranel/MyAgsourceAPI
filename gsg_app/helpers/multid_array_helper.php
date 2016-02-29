@@ -121,36 +121,3 @@ if ( ! function_exists('array_extract_value_recursive')) {
 	    return $new_val;
 	}
 }
-
-if ( ! function_exists('array_diff_recursive')) {
-	/**
-	 * array_diff_recursive
-	 *
-	 * return values from 2nd parameter that are not found in 1st.  Removes empty arrays, but keeps null leaf elements.
-	 *
-	 * @param array
-	 * @param array
-	 * @return array
-	 * @author ctranel
-	 */
-
-	function array_diff_recursive($array1, $array2)
-	{
-		$ret = [];
-		foreach ($array1 as $k => $v) {
-			if (isset($array1[$k]) && !isset($array2[$k])) {
-				$ret[$k] = $v;
-			} else {
-				if (is_array($v) && is_array($array2[$k])) {
-                    $ret[$k] = $v;
-				} else {
-					if ((string)$v != (string)$array2[$k]) {
- 						$ret[$k] = $v;
-					}
-				}
-			}
-		}
-        return $ret;
- 	}
-}
-

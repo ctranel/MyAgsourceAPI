@@ -137,16 +137,14 @@ class ProductsFactory{
      **/
     public function inaccessibleProducts(){
         $ret = new \SplObjectStorage();
-        $all_products = $this->allProductsData();
         $accessible = $this->accessibleProductsData();
-        $tmp = \array_diff_recursive($accessible, $all_products);
+        $accessible_report_codes = \array_extract_value_recursive('product_code', $accessible);
 
-        if(!isset($tmp) || empty($tmp) || !is_array($tmp)){
-            return $ret;
+        $upsell_data = $this->datasource->getUpsellProducts($accessible_report_codes);
+
+        if(isset($upsell_data) && !empty($upsell_data) && is_array($upsell_data)){
+            $ret = $this->datasetToObjectStorage($upsell_data);
         }
-
-        $ret = $this->datasetToObjectStorage($tmp);
-
         return $ret;
     }
 

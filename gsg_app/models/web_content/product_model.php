@@ -50,11 +50,10 @@ class Product_model extends CI_Model {
 				INNER JOIN dhi_tables.dbo.report_catalog r ON pr.report_code = r.report_code
 			WHERE p.active = 1 AND ls.name IN(" . $scope_text . ")
 		";
-		
-		$tmp_arr_sections = $this->db
+
+        $tmp_arr_sections = $this->db
 		->query($sql)
 		->result_array();
-
 		return $tmp_arr_sections;
 	}
 
@@ -83,5 +82,38 @@ class Product_model extends CI_Model {
 		->result_array();
 
 		return $tmp_arr_sections;
+	}
+
+	/**
+	 * getUpsellProductCodes
+	 *
+	 * subscription is different in that it fetches content by herd data (i.e. herd output) for users that
+	 * have permission only for subscribed content.  All other scopes are strictly users-based
+	 *
+	 * @param array accessible report_codes
+	 * @return array of product data for given herd
+	 * @author ctranel
+	 **/
+	public function getUpsellProducts($accessible_report_codes) {
+		$sql = "
+			SELECT DISTINCT pr.report_code AS product_code, r.report_name AS name, r.report_description AS [description]
+			FROM users.dbo.pages_reports pr
+			INNER JOIN dhi_tables.dbo.report_catalog r ON pr.report_code = r.report_code
+		";
+		if(isset($accessible_report_codes) && is_array($accessible_report_codes) && !empty($accessible_report_codes)){
+			$code_string = "'" . implode("','", $accessible_report_codes) . "'";
+			$sql .= "
+			WHERE pr.page_id NOT IN (
+				SELECT page_id
+				FROM users.dbo.pages_reports
+                WHERE report_code IN($code_string)
+            )
+            ";
+		}
+
+		$tmp_arr = $this->db
+		->query($sql)
+		->result_array();
+		return $tmp_arr;
 	}
 }

@@ -187,10 +187,12 @@ class Index extends report_parent {
         $this->load->model('web_content/product_model');
         $products_factory = new ProductsFactory($this->product_model, $this->herd, $this->as_ion_auth->arr_task_permissions());
         $missing_products = $products_factory->inaccessibleProducts();
-        $this->data['widget']['herd'][] = [
-            'content' => $this->load->view('auth/dashboard/other_products', ['products' => $missing_products], true),
-            'title' => 'Maximize your profitability'
-        ];
+        if(isset($missing_products) && is_a($missing_products, 'splObjectStorage') && $missing_products->count() > 0){
+            $this->data['widget']['herd'][] = [
+                'content' => $this->load->view('auth/dashboard/other_products', ['products' => $missing_products], true),
+                'title' => 'Maximize your profitability'
+            ];
+        }
 
         $this->load->model('setting_model');
 		$this->load->model('benchmark_model');
