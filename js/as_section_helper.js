@@ -1,13 +1,7 @@
 	$(document).ready(function(){
 		var x = 0;
-        console.log(typeof(document.getElementById("table-wrapper" + x)));
-        console.log(typeof(document.getElementById("chart-container" + x)));
 		while(document.getElementById("table-wrapper" + x)  !== null || document.getElementById("chart-container" + x) !== null){
-            console.log(typeof(document.getElementById("table-wrapper" + x)));
-            console.log(typeof(document.getElementById("chart-container" + x)));
 			if(document.getElementById("table-wrapper" + x)  === null){
-                console.log('oops' + x)
-                if(x > 10) exit;
                 x++;
                 continue;
             }
