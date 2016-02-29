@@ -1,10 +1,20 @@
 	$(document).ready(function(){
 		var x = 0;
-		while($("#downloads-container" + x + " ul li").length){
-			$("#downloads-container" + x + " ul li").bind("click", function(){
+        console.log(typeof(document.getElementById("table-wrapper" + x)));
+        console.log(typeof(document.getElementById("chart-container" + x)));
+		while(document.getElementById("table-wrapper" + x)  !== null || document.getElementById("chart-container" + x) !== null){
+            console.log(typeof(document.getElementById("table-wrapper" + x)));
+            console.log(typeof(document.getElementById("chart-container" + x)));
+			if(document.getElementById("table-wrapper" + x)  === null){
+                console.log('oops' + x)
+                if(x > 10) exit;
+                x++;
+                continue;
+            }
+            $("#downloads-container" + x + " ul li").bind("click", function(){
 				window.location = $(this).find("a:first").attr('href');
 			});
-		
+
 		    $("#downloads-container" + x + "").click(menu_open);
 		    //$("#downloads-container" + x).mouseout(menu_timer);
 		    $("#downloads-container" + x + " ul:first").mouseover(cancel_timer);
@@ -41,6 +51,7 @@
 
     function menu_open(){
 //alert('here');
+console.log($(this).attr('id'));
 		cancel_timer();
     	menu_close();
     	menu_item = $(this).find('ul').css('visibility', 'visible');
