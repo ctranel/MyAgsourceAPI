@@ -121,7 +121,6 @@ class Change_herd extends CI_Controller {
 					$today  = new DateTime();
 					foreach($trials as $t){
 						if($t['herd_trial_warning'] === null || $t['herd_trial_expires'] === null){
-							$msg[] = '<p>The trial period on ' . $t['value_abbrev'] . ' for herd ' . $this->input->post('herd_code') . ' will begin when you view a report.';
 							continue;
 						}
 						$warn_date = new DateTime($t['herd_trial_warning']);
@@ -166,7 +165,6 @@ class Change_herd extends CI_Controller {
 							$today  = new DateTime();
 							foreach($trials as $t){
                                 if($t['herd_trial_warning'] === null || $t['herd_trial_expires'] === null){
-                                    $msg[] = '<p>The trial period on ' . $t['value_abbrev'] . ' for herd ' . $this->input->post('herd_code') . ' will begin when you view a report.';
                                     continue;
                                 }
 								$warn_date = new DateTime($t['herd_trial_warning']);
