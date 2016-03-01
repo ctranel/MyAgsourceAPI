@@ -120,6 +120,10 @@ class Change_herd extends CI_Controller {
 				if(isset($trials) && is_array($trials)){
 					$today  = new DateTime();
 					foreach($trials as $t){
+						if($t['herd_trial_warning'] === null || $t['herd_trial_expires'] === null){
+							$msg[] = '<p>The trial period on ' . $t['value_abbrev'] . ' for herd ' . $this->input->post('herd_code') . ' will begin when you view a report.';
+							continue;
+						}
 						$warn_date = new DateTime($t['herd_trial_warning']);
 						$expire_date = new DateTime($t['herd_trial_expires']);
 						$days_remain = $expire_date->diff($today)->days;
@@ -144,7 +148,6 @@ class Change_herd extends CI_Controller {
 			$this->notifications = new Notifications($this->notice_model);
 			$this->notifications->populateNotices();
 			$notices = $this->notifications->getNoticesTexts();
-
 			$msg = array_merge($msg,$notices);
 			$this->redirect(site_url($this->session->userdata('redirect_url')), $msg);
 			exit();
@@ -162,6 +165,10 @@ class Change_herd extends CI_Controller {
 						if(isset($trials) && is_array($trials)){
 							$today  = new DateTime();
 							foreach($trials as $t){
+                                if($t['herd_trial_warning'] === null || $t['herd_trial_expires'] === null){
+                                    $msg[] = '<p>The trial period on ' . $t['value_abbrev'] . ' for herd ' . $this->input->post('herd_code') . ' will begin when you view a report.';
+                                    continue;
+                                }
 								$warn_date = new DateTime($t['herd_trial_warning']);
 								$expire_date = new DateTime($t['herd_trial_expires']);
 								$days_remain = $expire_date->diff($today)->days;
@@ -178,7 +185,7 @@ class Change_herd extends CI_Controller {
 						}
 					}
 					$this->set_herd_session_data($herd_enroll_status_id);
-
+//die;
 					$this->redirect(site_url($this->session->userdata('redirect_url')), $msg);
 					exit();
 				}
