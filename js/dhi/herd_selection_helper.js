@@ -29,7 +29,7 @@ head.ready(function() {
 			return false;
 		}
 		//@todo: use promises rather than async: false
-		$.ajax({
+/*		$.ajax({
 			url: "ajax_herd_enrolled/" + herd_code,
 			async: false,
 			dataType: 'json',
@@ -43,7 +43,7 @@ head.ready(function() {
 					}
 				}
 			}
-		});
+		}); */
 		return ret_val;
 	});
 });
