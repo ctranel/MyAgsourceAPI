@@ -121,6 +121,7 @@ class Change_herd extends CI_Controller {
 					$today  = new DateTime();
 					foreach($trials as $t){
 						if($t['herd_trial_warning'] === null || $t['herd_trial_expires'] === null){
+							//$msg[] = '<p>The trial period on ' . $t['value_abbrev'] . ' for herd ' . $this->input->post('herd_code') . ' will begin when you view a report.';
 							continue;
 						}
 						$warn_date = new DateTime($t['herd_trial_warning']);
@@ -351,10 +352,10 @@ class Change_herd extends CI_Controller {
 		//load new benchmarks
 		$this->load->model('setting_model');
 		$this->load->model('benchmark_model');
-		$benchmarks = new Benchmarks($this->session->userdata('user_id'), $this->input->post('herd_code'), $this->herd->header_info($this->input->post('herd_code')), $this->setting_model, $this->benchmark_model, []);
+		$benchmarks = new Benchmarks($this->session->userdata('user_id'), $this->herd->herdCode(), $this->herd->header_info($this->herd->herdCode()), $this->setting_model, $this->benchmark_model, []);
 		$this->session->set_userdata('benchmarks', $benchmarks->getSettingKeyValues());
 
-		$general_dhi = new SessionSettings($this->session->userdata('user_id'), $this->input->post('herd_code'), $this->setting_model, 'general_dhi', []);
+		$general_dhi = new SessionSettings($this->session->userdata('user_id'), $this->herd->herdCode(), $this->setting_model, 'general_dhi', []);
 		$this->session->set_userdata('general_dhi', $general_dhi->getSettingKeyValues());
 	}
 
