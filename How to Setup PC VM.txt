@@ -1,0 +1,57 @@
+I.  Enable virtualization in BIOS
+    For HP laptops:
+    a.  Hit escape during bootup to access BIOS
+    b.  Hit key to enter BIOS (F10 on machines used at time of writing)
+    c.  Go to System Configuration
+    d.  Go to Device Configurations
+    e.  Find Virtualization Technology and enable it
+    f.  Save & exit
+
+II. Download and install Virtual Box
+    a.  Pretty straightforward.  Follow onscreen instructions
+III.    Create new VM in Virtual Box
+    a.  Load .ovf file
+    b.  Before launching VM…
+        i.  Settings -> Storage -> Controller: IDE COntroller - Click Add CD/DVD Device Icon – Leave empty
+        ii. Settings->Network->check enable
+            1.  Set to bridge adapter
+IV. Start VM
+V.  Include Linux functions
+    a.  VM Terminal Menu->Devices->Insert Guest Addition…
+    b.  Log in to VM
+        i.  sudo bash –l
+            1.  mount /dev/cdrom1 /mnt
+            2.  ls /mnt
+            3.  /mnt/VBoxLinuxAdditions.run
+VI. Edit linux/apache configuration (still in bash shell)
+    a.  Edit interfaces file
+        i.  vi /etc/network/interfaces
+            1.  See http://www.lagmonster.org/docs/vi.html for VI editor commands
+        ii. File should contain:
+            auto lo
+            iface lo inet loopback
+            auto eth0
+            iface eth0 inet static
+                address 192.168.x.x (static IP assigned by IT)
+                netmask 255.255.255.0
+                gateway 192.168.3.1
+        iii.    Save and exit (ZZ)
+    b.  Restart networking
+        i.  /etc/init.d/networking restart
+    c.  Edit resolv.conf
+        i.  vi /etc/resolv.conf
+        ii. File should contain:
+            nameserver 192.168.3.50
+            nameserver 192.168.100.50
+        iii.    Save and exit (ZZ)
+    d.  Edit etc/apache2/ports.conf
+        i.  vi /etc/apache2/ports.conf
+            Replace NameVirtualHost ips with your static ip
+            Leave ports 80 and 443 (HTTP and HTTPS) of the url alone; just the ip portion
+    d.  Update server
+        i.  apt-get update
+        ii. apt-get upgrade
+    e.  Exit bash shell
+VII.    Upload latest myagsource files
+VIII.   Update and Upgrade OS & PHP
+IX.   Test site
