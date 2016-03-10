@@ -353,7 +353,7 @@ abstract class report_parent extends CI_Controller {
 					);
 					$arr_view_blocks[] = $this->load->view($curr->displayType(), $arr_blk_data, TRUE);
 					//add js line to populate the block after the page loads
-					$tmp_js .= "head.ready('graph_helper.js', updateBlock('block-canvas$x'', '" . $curr->path() . "'', '$x'', 'null', 'null','false');\n";
+					$tmp_js .= "head.ready('graph_helper.js', updateBlock('block-canvas$x'', '" . $curr->path() . "'', '$x'', 'null', 'null','false'));\n";
 					$tmp_js .= "if ($( '#datepickfrom' ).length > 0) $( '#datepickfrom' ).datepick({dateFormat: 'mm-dd-yyyy'});";
 					$tmp_js .= "if ($( '#datepickto' ).length > 0) $( '#datepickto' ).datepick({dateFormat: 'mm-dd-yyyy'});";
 					$tmp_block = $curr->path();
