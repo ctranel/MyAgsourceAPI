@@ -104,7 +104,7 @@ class Index extends report_parent {
 					];
 					$arr_view_blocks[$pb->name()] = $this->load->view($display, $arr_blk_data, TRUE);
 					//add js line to populate the block after the page loads
-					$tmp_js .= "updateBlock(\"block-canvas$x\", \"" . $pb->path() . "\", \"$x\", \"null\", \"null\",\"false\");\n";//, \"" . $this->{$this->primary_model_name}->arr_blocks[$this->page]['display'][$display][$block]['description'] . "\", \"" . $bench_text . "\");\n";
+					$tmp_js .= "head.ready('graph_helper.js', updateBlock('block-canvas$x', '" . $pb->path() . "', '$x', 'null', 'null','false'));\n";//, \"" . $this->{$this->primary_model_name}->arr_blocks[$this->page]['display'][$display][$block]['description'] . "\", \"" . $bench_text . "\");\n";
 					$tmp_js .= "if ($( '#datepickfrom' ).length > 0) $( '#datepickfrom' ).datepick({dateFormat: 'mm-dd-yyyy'});";
 					$tmp_js .= "if ($( '#datepickto' ).length > 0) $( '#datepickto' ).datepick({dateFormat: 'mm-dd-yyyy'});";
 					$tmp_block = $pb->path();
