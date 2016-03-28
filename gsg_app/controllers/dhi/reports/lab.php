@@ -13,8 +13,8 @@ class Lab extends report_parent {
         
     }
     
-	function uhl_high_scc($block_in = NULL, $display_format = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
-	 	$this->product_name = 'High SCC Cows';
+	function bulk_scc($block_in = NULL, $display_format = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
+	 	$this->product_name = 'Bulk Tank SCC Contribution';
 		parent::display($block_in, $display_format);
 	 }
 
