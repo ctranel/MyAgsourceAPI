@@ -4,11 +4,13 @@ require_once APPPATH . 'controllers/report_parent.php';
 require_once(APPPATH . 'libraries/filters/Filters.php');
 require_once(APPPATH . 'libraries/Products/Products/Products.php');
 require_once(APPPATH . 'libraries/dhi/Herd.php');
+require_once(APPPATH . 'libraries/dhi/PdfArchives.php');
 
 use myagsource\Benchmarks\Benchmarks;
 use myagsource\report_filters\Filters;
 use myagsource\Products\Products\ProductsFactory;
 use myagsource\dhi\Herd;
+use myagsource\dhi\PdfArchives;
 
 defined('BASEPATH') OR exit('No direct script access allowed');
 
@@ -124,6 +126,7 @@ class Index extends report_parent {
 		$this->carabiner->css('tabs.css');
 		$this->carabiner->css('report.css');
 		$this->carabiner->css('expandable.css');
+        $this->carabiner->css('treeview.css');
 		$this->carabiner->css('chart.css', 'print');
 		$this->carabiner->css('report.css', 'print');
 		if($this->filters->displayFilters()){
@@ -179,6 +182,24 @@ class Index extends report_parent {
 			'title' => 'Herd Data'
 		];
 
+		//PDF test archives
+        $this->load->model('dhi/pdf_archive_model');
+        try{
+            $PdfArchives = new PdfArchives($this->pdf_archive_model, $this->session->userdata('herd_code'));
+            $pdf_archive_data = $PdfArchives->getHerdArchives();
+            $this->data['widget']['herd'][] = [
+                'content' => $this->load->view('auth/dashboard/past_results', ['tests' => $pdf_archive_data], TRUE),
+                'title' => 'Report Archives (PDF)'
+            ];
+        }
+        catch(\Exception $e){
+            $this->data['widget']['herd'][] = [
+                'content' => $this->load->view('auth/dashboard/error', ['message' => $e->getMessage()], TRUE),
+                'title' => 'Report Archives (PDF)'
+            ];
+        }
+
+        //message
 		$this->data['widget']['herd'][] = [
 			'content' => $this->load->view('auth/dashboard/message', null, true),
 			'title' => 'Message'
