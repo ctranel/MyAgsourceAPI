@@ -21,9 +21,11 @@ class Pdf_archive_model extends CI_Model {
         }
         // results query
         $q = $this->db->select("p.id, p.test_date, p.report_code, p.filename, r.report_name")
-            ->from('herd.dbo.herd_pdf_reports p')
+            ->from('herd.dbo.herd_pdf_report_log p')
             ->join('dhi_tables.dbo.report_catalog r', 'p.report_code=r.report_code')
-            ->where('p.herd_code',$herd_code);
+            ->where('p.herd_code',$herd_code)
+            ->distinct()
+            ->order_by('p.test_date DESC, r.report_name ASC');
         $ret = $q->get()->result_array();
 
         return $ret;
@@ -47,7 +49,7 @@ class Pdf_archive_model extends CI_Model {
         }
         // results query
         $q = $this->db->select("p.herd_code, p.test_date, p.report_code, p.filename, r.report_name")
-            ->from('herd.dbo.herd_pdf_reports p')
+            ->from('herd.dbo.herd_pdf_report_log p')
             ->join('dhi_tables.dbo.report_catalog r', 'p.report_code=r.report_code')
             ->where('p.id',$pdf_id)
             ->where('p.herd_code',$herd_code);

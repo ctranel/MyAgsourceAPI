@@ -4,13 +4,13 @@ require_once APPPATH . 'controllers/report_parent.php';
 require_once(APPPATH . 'libraries/filters/Filters.php');
 require_once(APPPATH . 'libraries/Products/Products/Products.php');
 require_once(APPPATH . 'libraries/dhi/Herd.php');
-//require_once(APPPATH . 'libraries/dhi/PdfArchives.php');
+require_once(APPPATH . 'libraries/dhi/PdfArchives.php');
 
 use myagsource\Benchmarks\Benchmarks;
 use myagsource\report_filters\Filters;
 use myagsource\Products\Products\ProductsFactory;
 use myagsource\dhi\Herd;
-//use myagsource\dhi\PdfArchives;
+use myagsource\dhi\PdfArchives;
 
 defined('BASEPATH') OR exit('No direct script access allowed');
 
@@ -183,7 +183,7 @@ class Index extends report_parent {
 		];
 
 		//PDF test archives
-/*        $this->load->model('dhi/pdf_archive_model');
+        $this->load->model('dhi/pdf_archive_model');
         try{
             $PdfArchives = new PdfArchives($this->pdf_archive_model, $this->session->userdata('herd_code'));
             $pdf_archive_data = $PdfArchives->getHerdArchives();
@@ -198,7 +198,7 @@ class Index extends report_parent {
                 'title' => 'Report Archives (PDF)'
             ];
         }
-*/
+
         //message
 		$this->data['widget']['herd'][] = [
 			'content' => $this->load->view('auth/dashboard/message', null, true),
