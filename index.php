@@ -33,6 +33,7 @@
 			define('ENVIRONMENT', 'development');
 			break;
 	}
+die(ENVIRONMENT);
 	/*
  *---------------------------------------------------------------
  * ERROR REPORTING
