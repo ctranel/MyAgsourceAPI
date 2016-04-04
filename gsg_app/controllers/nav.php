@@ -2,12 +2,14 @@
 require_once(APPPATH . 'libraries/Site/WebContent/Navigation.php');
 require_once(APPPATH . 'libraries/dhi/Herd.php');
 require_once(APPPATH . 'libraries/dhi/HerdAccess.php');
+require_once(APPPATH . 'libraries/Products/Products/Products.php');
 
 use \myagsource\Site\WebContent\Navigation;
 use \myagsource\dhi\Herd;
 use \myagsource\dhi\HerdAccess;
+use \myagsource\Products\Products\Products;
 
-class Nav extends CI_Controller {
+class Nav extends MY_Controller {
 	
 	function __construct(){
 		parent::__construct();
@@ -16,6 +18,9 @@ class Nav extends CI_Controller {
 		$this->load->model('herd_model');
 		$this->herd_access = new HerdAccess($this->herd_model);
 		$this->herd = new Herd($this->herd_model, $this->session->userdata('herd_code'));
+		
+		//$this->load->model('product_model');
+        //$this->products = new Products()
 
 			//is someone logged in?
 		if(!$this->as_ion_auth->logged_in() && $this->herd->herdCode() != $this->config->item('default_herd')) {
@@ -28,7 +33,7 @@ class Nav extends CI_Controller {
 		}
 		
 		//does logged in user have access to selected herd?
-		$has_herd_access = $this->herd_access->hasAccess($this->session->userdata('user_id'), $this->herd->herdCode(), $this->session->userdata('arr_regions'), $this->ion_auth_model->getTaskPermissions());
+		$has_herd_access = $this->herd_access->hasAccess($this->session->userdata('user_id'), $this->herd->herdCode(), $this->session->userdata('arr_regions'), $this->permissions->permissionsList());
 		if(!$has_herd_access){
 			$this->post_message("You do not have permission to access this herd.  Please select another herd and try again.  ");
 		}
@@ -66,7 +71,7 @@ class Nav extends CI_Controller {
 
     function ajax_json() {
 		$this->load->model('web_content/navigation_model');
-		$Navigation = new Navigation($this->navigation_model, $this->herd, $this->as_ion_auth->arr_task_permissions());
+		$Navigation = new Navigation($this->navigation_model, $this->herd, $this->permissions->permissionsList());
 
 		header("Cache-Control: no-cache, must-revalidate, max-age=0");
 		header("Cache-Control: post-check=0, pre-check=0", false);

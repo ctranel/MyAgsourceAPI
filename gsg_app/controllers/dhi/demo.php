@@ -19,7 +19,7 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 * -----------------------------------------------------------------
 */
 
-class Demo extends CI_Controller {
+class Demo extends MY_Controller {
 	
 	/* 
 	 * @var Herd object

@@ -2,7 +2,6 @@
 class Section_model extends CI_Model {
 	public function __construct(){
 		parent::__construct();
-		$this->tables = $this->config->item('tables', 'ion_auth');
 	}
 
     /**
@@ -16,7 +15,7 @@ class Section_model extends CI_Model {
 			->where('s.active', 1)
 			->order_by('s.parent_id', 'asc')
 			->order_by('s.list_order', 'asc')
-			->from($this->tables['sections'] . ' s')
+			->from('users.dbo.sections s')
 			->join('users.dbo.lookup_scopes ls', 's.scope_id = ls.id', 'inner');
 		return $this->db->get()->result_array();
 	}
@@ -51,6 +50,9 @@ class Section_model extends CI_Model {
 	 * @author ctranel
 	 **/
 	public function getSubscribedSections($parent_section_id, $herd_code) {
+        $parent_section_id = (int)$parent_section_id;
+        $herd_code = (int)$herd_code;
+
 		$sql = "
 			WITH section_tree AS
 				(
@@ -103,6 +105,8 @@ class Section_model extends CI_Model {
 	 * @author ctranel
 	 **/
 	public function getPublicSections($parent_section_id) {
+        $parent_section_id = (int)$parent_section_id;
+
 		$sql = "
 			WITH section_tree AS
 				(

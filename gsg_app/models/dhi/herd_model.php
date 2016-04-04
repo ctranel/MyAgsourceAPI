@@ -9,8 +9,6 @@ class Herd_model extends CI_Model {
 	
 	public function __construct(){
 		parent::__construct();
-		//initialize db tables data
-		$this->tables  = $this->config->item('tables', 'ion_auth');
 	}
 
 	/**
@@ -26,7 +24,7 @@ class Herd_model extends CI_Model {
 		//check herd_release_code against herd_code
 		$db_tmp_obj = $this->db->select('account_password')
 		->where('herd_code', $herd_code)
-		->get($this->tables['herds'])
+		->get('herd.dbo.herd_id')
 		->row();
 		$db_herd_release_code = '';
 		if(is_a($db_tmp_obj, 'stdClass')) {
@@ -89,7 +87,7 @@ class Herd_model extends CI_Model {
 		if(!$sg_user_id){
             $sg_user_id = $this->session->userdata('user_id');
         }
-		$this->db->join($this->tables['consultants_herds'] . ' ch', 'h.herd_code = ch.herd_code')
+		$this->db->join('users.dbo.service_groups_herds ch', 'h.herd_code = ch.herd_code')
 		->where('ch.sg_user_id', $sg_user_id)
 		->where('(ch.exp_date > GETDATE() OR ch.exp_date IS NULL)')
 		->where('request_status_id', 1);
@@ -111,10 +109,10 @@ class Herd_model extends CI_Model {
 		if(!$user_id){
             $user_id = $this->session->userdata('user_id');
         }
-		$this->db->join($this->tables['users_herds'] . ' uh', 'h.herd_code = uh.herd_code')
+		$this->db->join('users.dbo.users_herds uh', 'h.herd_code = uh.herd_code')
 		->where('uh.user_id', $user_id)
 		->where ('uh.status',1);
-//		->where(' (' . $this->tables['users_herds'] . '.expire_date >'. now() . ' OR  ' . $this->tables['users_herds'] . '.expire_date IS NULL) ');
+//		->where(' (users.dbo.users_herds.expire_date >'. now() . ' OR  users.dbo.users_herds.expire_date IS NULL) ');
 		return $this->getHerds($limit,null);
 		
 		
@@ -147,7 +145,7 @@ class Herd_model extends CI_Model {
 	public function update_herds_by_criteria($data, $criteria=null)
 	{
 		$this->db->where($criteria);
-		return $this->db->update($this->tables['herds'], $data);
+		return $this->db->update('herd.dbo.herd_id', $data);
 	}
 
 	/**
@@ -159,7 +157,7 @@ class Herd_model extends CI_Model {
 	 **/
 	public function insert_herd($data)
 	{
-		return $this->db->insert($this->tables['herds'], $data);
+		return $this->db->insert('herd.dbo.herd_id', $data);
 	}
 
 	/**
@@ -189,7 +187,7 @@ class Herd_model extends CI_Model {
 		elseif(isset($limit)){
             $this->db->limit($limit);
         }
-		$results = $this->db->get($this->tables['herds'] . ' h')->result_array();
+		$results = $this->db->get('herd.dbo.herd_id h')->result_array();
 		return $results;
 	}
 
@@ -232,7 +230,7 @@ class Herd_model extends CI_Model {
 		elseif(isset($limit)){
             $this->db->limit($limit);
         }
-		$results = $this->db->get($this->tables['herds'] . ' h');
+		$results = $this->db->get('herd.dbo.herd_id h');
 		$this->load->helper('multid_array_helper');
 		return get_elements_by_key('herd_code', $results->result_array());
 	}
@@ -246,7 +244,7 @@ class Herd_model extends CI_Model {
 	 **/
 	function getHerdCodesByPermissionGranted($sg_user_id = false){
 		if(!$sg_user_id) $sg_user_id = $this->session->userdata('user_id');
-		$this->db->join($this->tables['consultants_herds'] . ' ch', 'h.herd_code = ch.herd_code')
+		$this->db->join('users.dbo.service_groups_herds ch', 'h.herd_code = ch.herd_code')
 		->where('ch.sg_user_id', $sg_user_id)
 		->where('(ch.exp_date > GETDATE() OR ch.exp_date IS NULL)')
 		->where('request_status_id', 1);
@@ -264,8 +262,8 @@ class Herd_model extends CI_Model {
 		if(!$sg_user_id) $sg_user_id = $this->session->userdata('user_id');
 		$this->db
 			->select('rs.name AS status, ch.exp_date AS expires_date, ch.id')
-			->join($this->tables['consultants_herds'] . ' ch', 'h.herd_code = ch.herd_code', 'inner')
-			->join('users.dbo.lookup_sg_request_status' . ' rs', 'ch.request_status_id = rs.id', 'inner')
+			->join('users.dbo.service_groups_herds ch', 'h.herd_code = ch.herd_code', 'inner')
+			->join('users.dbo.lookup_sg_request_status rs', 'ch.request_status_id = rs.id', 'inner')
 		->where('ch.sg_user_id', $sg_user_id);
 		return $this->getHerds();
 	}
@@ -284,10 +282,9 @@ class Herd_model extends CI_Model {
 		if(!$user_id){
 			return false;
 		}
-		$this->db->join($this->tables['users_herds'] . ' uh', 'h.herd_code = uh.herd_code')
+		$this->db->join('users.dbo.users_herds' . ' uh', 'h.herd_code = uh.herd_code')
 		->where('uh.user_id', $user_id)
 		->where ('uh.status',1);
-//		->where(' (' . $this->tables['users_herds'] . '.expire_date >'. now() . ' OR  ' . $this->tables['users_herds'] . '.expire_date IS NULL) ');
 		return $this->getHerdCodes($limit,null);
 	}
 
@@ -300,10 +297,10 @@ class Herd_model extends CI_Model {
 	 **/
 	public function header_info($herd_code){
 		$q = $this->db->select("h.herd_code, h.farm_name, h.herd_owner, h.breed_code, h.state, r.assoc_name, CONCAT(s.first_name, ' ', s.last_name) AS supervisor_name, FORMAT(ct.test_date,'MM-dd-yyyy') AS test_date, ct.cow_cnt AS herd_size, ct.milk_cow_cnt", FALSE)
-		->from($this->tables['herds'] . ' h')
+		->from('herd.dbo.herd_id h')
 		->join('[herd].[dbo].[view_herd_id_curr_test] ct', 'h.herd_code = ' . 'ct.herd_code', 'left')
-		->join($this->tables['regions'] . ' r', 'ct.association_num = r.association_num', 'left')
-		->join($this->tables['dhi_supervisors'] . ' s', "CONCAT('SP', h.supervisor_num) = s.account_num", 'left')
+		->join('address.dbo.association r', 'ct.association_num = r.association_num', 'left')
+		->join('address.dbo.dhi_supervisor s', "CONCAT('SP', h.supervisor_num) = s.account_num", 'left')
 		->where('h.herd_code',$herd_code);
 		$ret = $q->get()->result_array();
 		if(!empty($ret) && is_array($ret)){
@@ -329,7 +326,7 @@ class Herd_model extends CI_Model {
 		if(strlen($herd_code) != 8) return null;
 		$q = $this->db
 		->select($field_name)
-		->from($this->tables['herds'])
+		->from('herd.dbo.herd_id')
 		->where('herd_code',$herd_code)
 		->limit(1);
 		$ret = $q->get()->result_array();
@@ -367,9 +364,9 @@ class Herd_model extends CI_Model {
 	 **/
 	public function herd_is_registered($herd_code){
 		$arr_results = $this->db->select('herd_code')
-		->from($this->tables['users'] . ' u')
-		->join($this->tables['users_herds'] . ' uh', 'u.id = uh.user_id')
-		->join($this->tables['users_groups'] . ' ug', 'u.id = ug.user_id')
+		->from('users.dbo.users u')
+		->join('users.dbo.users_herds uh', 'u.id = uh.user_id')
+		->join('users.dbo.users_groups ug', 'u.id = ug.user_id')
 		->where('uh.herd_code', $herd_code)
 		->where('u.active', 1)
 		->where('ug.group_id', 2)
@@ -390,9 +387,9 @@ class Herd_model extends CI_Model {
 	 **/
 	public function get_herd_emails($herd_code){
 		$arr_results = $this->db->select('email')
-		->from($this->tables['users'] . ' u')
-		->join($this->tables['users_herds'] . ' uh', 'u.id = uh.user_id')
-		->join($this->tables['users_groups'] . ' ug', 'u.id = ug.user_id')
+		->from('users.dbo.users u')
+		->join('users.dbo.users_herds uh', 'u.id = uh.user_id')
+		->join('users.dbo.users_groups ug', 'u.id = ug.user_id')
 		->where('uh.herd_code', $herd_code)
 		->where('u.active', 1)
 		->where('ug.group_id', 2)
@@ -410,7 +407,7 @@ class Herd_model extends CI_Model {
 	 **/
 	public function get_herd_test_dates_7($herd_code){
 		$arr_results = $this->db->select('test_date_1,test_date_2,test_date_3,test_date_4,test_date_5,test_date_6,test_date_7')
-		->from($this->tables['t13_herd_info'])
+		->from('rpm.dbo.t13_herd_info')
 		->where('herd_code', $herd_code)
 		->get()
 		->result_array();
@@ -421,7 +418,7 @@ class Herd_model extends CI_Model {
 	public function get_test_dates_7_short($herd_code){
 		$rpmdb = $this->load->database('default', true);
 		$arr_results = $rpmdb->select('short_date_1,short_date_2,short_date_3,short_date_4,short_date_5,short_date_6,short_date_7')
-		->from($this->tables['vma_Dates_Last_7_Tests'])
+		->from('vma.dbo.vma_Dates_Last_7_Tests')
 		->where('herd_code', $herd_code)
 		->get()
 		->result_array();

@@ -16,7 +16,7 @@ use myagsource\Settings\SessionSettings;
 use \myagsource\notices\Notifications;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
-class Change_herd extends CI_Controller {
+class Change_herd extends MY_Controller {
 	/* 
 	 * @var Herd object
 	 */
@@ -54,7 +54,7 @@ class Change_herd extends CI_Controller {
 		$this->access_log = new AccessLog($this->access_log_model);
 		$this->load->model('notice_model');
 
-		$this->page_header_data['num_herds'] = $this->herd_access->getNumAccessibleHerds($this->session->userdata('user_id'), $this->as_ion_auth->arr_task_permissions(), $this->session->userdata('arr_regions'));
+		$this->page_header_data['num_herds'] = $this->herd_access->getNumAccessibleHerds($this->session->userdata('user_id'), $this->permissions->permissionsList(), $this->session->userdata('arr_regions'));
 		$this->page_header_data['navigation'] = $this->load->view('navigation', [], TRUE);
 		/* Load the profile.php config file if it exists */
 		if ((ENVIRONMENT == 'development' || ENVIRONMENT == 'localhost') && strpos($this->router->method, 'ajax') === false) {
@@ -65,20 +65,12 @@ class Change_herd extends CI_Controller {
 		}
 	}
 
-	//redirects while retaining message and conditionally setting redirect url
-	//@todo: needs to be a part of some kind of authorization class
-	protected function redirect($url, $message = []){
-		//don't always want to keep flashdata on this page
-		$this->session->set_flashdata('message',  $message);
-		redirect($url);
-	}
-
 	function index(){
-		if($this->as_ion_auth->has_permission("Select Herd")) {
+		if($this->permissions->hasPermission("Select Herd")) {
 			$this->session->keep_all_flashdata();
 			$this->redirect(site_url('dhi/change_herd/select'));
 		}
-		elseif($this->as_ion_auth->has_permission("Request Herd")) {
+		elseif($this->permissions->hasPermission("Request Herd")) {
 			$this->session->keep_all_flashdata();
 			$this->redirect(site_url('dhi/change_herd/request'));
 		}
@@ -96,12 +88,13 @@ class Change_herd extends CI_Controller {
 	 * @return	void
 	 */
 	function select(){
-		if(!$this->as_ion_auth->has_permission("Select Herd") && $this->as_ion_auth->has_permission("Request Herd")){
+		if(!$this->permissions->hasPermission("Select Herd") && $this->permissions->hasPermission("Request Herd")){
 			$this->session->keep_all_flashdata();
 			$this->redirect(site_url('dhi/change_herd/request'));
 			exit();
 		}
-		if(!$this->as_ion_auth->has_permission("Select Herd")){
+
+		if(!$this->permissions->hasPermission("Select Herd")){
 			$this->session->keep_all_flashdata();
 			$this->redirect(site_url($this->session->userdata('redirect_url')), $this->session->flashdata('message') . '<br>You do not have permissions to select herds.');
 			exit();
@@ -155,7 +148,7 @@ class Change_herd extends CI_Controller {
 		else {
 			$err = '';
 			//$tmp_arr = $this->as_ion_auth->get_viewable_herds($this->session->userdata('user_id'), $this->session->userdata('arr_regions'));
-			$tmp_arr = $this->herd_access->getAccessibleHerdsData($this->session->userdata('user_id'), $this->as_ion_auth->arr_task_permissions(), $this->session->userdata('arr_regions'));
+			$tmp_arr = $this->herd_access->getAccessibleHerdsData($this->session->userdata('user_id'), $this->permissions->permissionsList(), $this->session->userdata('arr_regions'));
 			if(is_array($tmp_arr) && !empty($tmp_arr)){
 				if(count($tmp_arr) === 1){
 					$this->herd = new Herd($this->herd_model, $tmp_arr[0]['herd_code']);
@@ -234,11 +227,11 @@ class Change_herd extends CI_Controller {
 	 * @return	void
 	 */
 	function request(){
-		if($this->as_ion_auth->has_permission("Select Herd") && !$this->as_ion_auth->has_permission("Request Herd")){
+		if($this->permissions->hasPermission("Select Herd") && !$this->permissions->hasPermission("Request Herd")){
 			$this->session->keep_all_flashdata();
 			$this->redirect(site_url('dhi/change_herd/select'));
 		}
-		if(!$this->as_ion_auth->has_permission("Request Herd")){
+		if(!$this->permissions->hasPermission("Request Herd")){
 			$this->session->keep_all_flashdata();
 			$this->redirect(site_url($this->session->userdata('redirect_url')), $this->session->flashdata('message') . '<br>You do not have permissions to request herds.');
 		}
@@ -321,14 +314,14 @@ class Change_herd extends CI_Controller {
 
 	public function ajax_herd_enrolled($herd_code){
 		//determines type of access for service groups
-		if($this->as_ion_auth->has_permission('View Assign w permission') === FALSE) {
+		if($this->permissions->hasPermission('View Assign w permission') === FALSE) {
 			$enroll_status = 0;
 			$has_accessed = false;
 		}
 		else{
 			$this->herd = new Herd($this->herd_model, $herd_code);
 			//for now, we want to warn if herd is not enrolled on full product
-			$enroll_status = $this->herd->getHerdEnrollStatus(['AMYA-500', 'APAG-505']);
+			$enroll_status = $this->herd->getHerdEnrollStatus(['AMYA-550', 'AMYA-500', 'APAG-505']);
 			$recent_test = $this->herd->getRecentTest();
 			$has_accessed = $this->access_log->sgHasAccessedTest($this->session->userdata('sg_acct_num'), $herd_code, null, $recent_test);
 		}

@@ -1,20 +1,11 @@
 <?php 
-if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+namespace myagsource;
 
-require_once APPPATH . 'libraries/dhi/Herd.php';
-require_once APPPATH . 'libraries/Ion_auth.php';
-require_once APPPATH . 'libraries/AccessLog.php';
-require_once APPPATH . 'libraries/Site/WebContent/Sections.php';
-require_once APPPATH . 'libraries/Site/WebContent/Pages.php';
-require_once APPPATH . 'libraries/Site/WebContent/Blocks.php';
-require_once(APPPATH . 'libraries/dhi/HerdAccess.php');
+use myagsource\Permissions\Permissions\ProgramPermissions;
 
-use \myagsource\AccessLog;
-use \myagsource\Site\WebContent\Sections;
-use \myagsource\Site\WebContent\Pages;
-use \myagsource\Site\WebContent\Blocks;
-use \myagsource\dhi\Herd;
-use \myagsource\dhi\HerdAccess;
+require_once(APPPATH . 'libraries/Ion_auth.php');
+
+//use \myagsource\Ion_auth;
 
 /**
 * Name:  AS Ion Auth
@@ -23,7 +14,7 @@ use \myagsource\dhi\HerdAccess;
 * Requirements: PHP5.3 or above
 */
 
-class As_ion_auth extends Ion_auth {
+class As_ion_auth extends \Ion_auth {
 	/**
 	 * is_admin
 	 *
@@ -32,66 +23,23 @@ class As_ion_auth extends Ion_auth {
 	public $is_admin;
 
 	/**
-	 * arr_groups
+	 * permission
 	 *
-	 * @var array id=>name
+	 * @var ProgramPermissions
 	 **/
-//	public $arr_groups;
+	protected $permissions;
 
-	/**
-	 * arr_task_permissions
-	 *
-	 * @var array
-	 **/
-	protected $arr_task_permissions;
-
-	/**
-	 * gsg_access
-	 *
-	 * @var string
-	 **/
-	public $gsg_access;
-	
-	/**
-	 * herd_access
-	 *
-	 * @var HerdAccess
-	 **/
-	protected $herd_access; //object
-
-	public function __construct(){
+	public function __construct($permission){
 		//@todo: get most of this into a controller
 		//if (!$this->logged_in() && get_cookie('identity') && get_cookie('remember_code')){
 			//$this->arr_task_permissions = $this->ion_auth_model->getTaskPermissions('3');
 		//}
 		parent::__construct();
-//		$this->load->model('access_log_model');
-//		$this->access_log = new AccessLog($this->access_log_model);
-		$this->load->model('web_content/section_model');
-		$this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
-		$this->load->model('web_content/block_model');
-		$this->load->model('dhi/region_model');
-		$this->load->model('dhi/herd_model');
-		$this->load->helper('url');
-		$this->herd_access = new HerdAccess($this->herd_model);
-		$blocks = new Blocks($this->block_model);
-		$pages = new Pages($this->page_model, $blocks);
-		$sections = new Sections($this->section_model, $pages);
-		$herd = new Herd($this->herd_model, $this->session->userdata('herd_code'));
-		
-		$tmp_uri= $this->uri->uri_string();
 
-		if($this->logged_in()){
-			$this->arr_task_permissions = $this->ion_auth_model->getTaskPermissions();
-		}
+		$this->permissions = $permission;
+        $this->is_admin = $this->is_admin();
+	}
 
-		$this->is_admin = $this->is_admin();
-	}
-	
-	public function arr_task_permissions(){
-		return $this->arr_task_permissions;
-	}
-	
 	//overridden functions below
 	/**
 	 * @method register
@@ -105,8 +53,9 @@ class As_ion_auth extends Ion_auth {
         }
 
 		$id = parent::register($username, $password, $email, $additional_data, $group_name);
+
         if(!$id){
-            throw new \Exception('Recording of registration failed.');
+            throw new \Exception('Recording of registration failed: ' . $this->errors());
         }
 
 		$herd_code = $additional_data['herd_code'];
@@ -192,16 +141,16 @@ class As_ion_auth extends Ion_auth {
 	public function is_editable_user($user_id, $logged_user_id){
 		$obj_user = $this->ion_auth_model->user($user_id)->row();
 		//$obj_user->arr_groups = array_keys($this->ion_auth_model->get_users_group_array($obj_user->id));
-		if($this->has_permission('Edit All Users')){
+		if($this->permissions->hasPermission('Edit All Users')){
 			return TRUE;
 		}
-		if($this->has_permission('Edit Users In Region')){
+		if($this->permissions->hasPermission('Edit Users In Region')){
 			return ($this->ion_auth_model->is_child_user_by_association($obj_user->assoc_acct_num, $user_id));
 		}
-		if($this->has_permission('Edit Producers In Region')){
+		if($this->permissions->hasPermission('Edit Producers In Region')){
 			return $this->ion_auth_model->is_child_user_by_group_and_association(2, $obj_user->assoc_acct_num, $user_id);
 		}
-		if($this->as_ion_auth->has_permission("Edit Own Account") && $user_id == $logged_user_id){
+		if($this->permissions->hasPermission("Edit Own Account") && $user_id == $logged_user_id){
 			return true;
 		}
 		else {
@@ -219,14 +168,14 @@ class As_ion_auth extends Ion_auth {
 		$obj_user = $this->ion_auth_model->user($this->session->userdata('user_id'))->row();
 		//$obj_user->arr_groups = array_keys($this->ion_auth_model->get_users_group_array($obj_user->id));
 		
-		if($this->has_permission('Edit All Users')){
+		if($this->permissions->hasPermission('Edit All Users')){
 			return $this->ion_auth_model->users()->result_array();
 		}
-		if($this->has_permission('Edit Users In Region')){
+		if($this->permissions->hasPermission('Edit Users In Region')){
 			$arr_tmp2 = $this->ion_auth_model->get_users_by_association($obj_user->assoc_acct_num)->result_array();
 			return $arr_tmp2;
 		}
-		if($this->has_permission('Edit Producers In Region')){
+		if($this->permissions->hasPermission('Edit Producers In Region')){
 			return $this->ion_auth_model->get_users_by_group_and_association(2, $obj_user->assoc_acct_num)->result_array();
 		}
 		else { // Genex groups or producers
@@ -245,11 +194,11 @@ class As_ion_auth extends Ion_auth {
 	public function get_group_dropdown_data($active_group_id){
 		$arr_groups = array();
 		$ret_array = array();
-		if($this->has_permission('Add All Users')){
+		if($this->permissions->hasPermission('Add All Users')){
 			$arr_groups = $this->ion_auth_model->get_active_groups()->result_array();
 		}
 		elseif($this->logged_in()){
-			if($this->has_permission('Add Users In Region')){
+			if($this->permissions->hasPermission('Add Users In Region')){
 				$arr_groups = $this->ion_auth_model->get_editable_groups($active_group_id);
 			}
 		}
@@ -278,7 +227,8 @@ class As_ion_auth extends Ion_auth {
 	 **/
 	public function get_assoc_dropdown_data($arr_users_regions){
 		$ret_array = array();
-		if($this->has_permission("Edit All Users") || $this->has_permission("Add All Users")){
+        $this->load->model('dhi/region_model');
+		if($this->permissions->hasPermission("Edit All Users") || $this->permissions->hasPermission("Add All Users")){
 			$arr_assn_obj = $this->region_model->get_regions();
 		}
 		else{
@@ -320,19 +270,6 @@ class As_ion_auth extends Ion_auth {
 		else {
 			return false;
 		}
-	}
-
-	/**
-	 * @method has_permission
-	 * @param string task name
-	 * @return boolean
-	 * @access public
-	 *
-	 **/
-	public function has_permission($task_name){
-		$tmp_array = $this->arr_task_permissions;
-		if(is_array($tmp_array) !== FALSE) return in_array($task_name, $tmp_array);
-		else return FALSE;
 	}
 
 /**
@@ -409,8 +346,8 @@ class As_ion_auth extends Ion_auth {
 			return TRUE;
 		}
 		if(!in_array($session_group_id, $arr_form_group_id) && count($arr_form_group_id) == 1
-			&& $this->has_permission("Edit All Users") === FALSE && $this->has_permission("Edit Users In Region") === FALSE
-			&& $this->has_permission("Add All Users") === FALSE && $this->has_permission("Add Users In Region") === FALSE
+			&& $this->permissions->hasPermission("Edit All Users") === FALSE && $this->permissions->hasPermission("Edit Users In Region") === FALSE
+			&& $this->permissions->hasPermission("Add All Users") === FALSE && $this->permissions->hasPermission("Add Users In Region") === FALSE
 		) {
 			return FALSE;
 		}
@@ -476,8 +413,8 @@ class As_ion_auth extends Ion_auth {
 		
 		$arr_sgs = [];
 		foreach($sgs as $h){
-			$exp_date = new DateTime($h['exp_date']);
-			if($h['request_status'] === 'grant' && $h['exp_date'] !== null && new DateTime($h['exp_date']) < new DateTime()){
+			$exp_date = new \DateTime($h['exp_date']);
+			if($h['request_status'] === 'grant' && $h['exp_date'] !== null && new \DateTime($h['exp_date']) < new DateTime()){
 				$arr_sgs['expired'][] = $h;
 			}
 			else {

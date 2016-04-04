@@ -1,11 +1,13 @@
 <?php
 namespace myagsource\Products\Products;
 
-require_once(APPPATH . 'helpers/multid_array_helper.php');
+//require_once(APPPATH . 'helpers/multid_array_helper.php');
+require_once(APPPATH . 'libraries/Products/iProducts.php');
 require_once(APPPATH . 'libraries/Products/Products/Product.php');
 
 use myagsource\dhi\Herd;
-use myagsource\Products\Products;
+use myagsource\Products\iProducts;
+//use myagsource\Products\Products;
 
 /**
  * Constructs permission-and-herd-based navigation
@@ -16,7 +18,7 @@ use myagsource\Products\Products;
  *
  *
  */
-class ProductsFactory{
+class Products implements iProducts{
     /**
      * $datasource
      * @var Product_model
@@ -30,10 +32,10 @@ class ProductsFactory{
     protected $herd;
 
     /**
-     * $arr_task_permissions
+     * $arr_group_permissions
      * @var Array
      **/
-    protected $arr_task_permissions;
+    protected $arr_group_permissions;
 
     /**
      * $tree
@@ -41,10 +43,10 @@ class ProductsFactory{
     protected $tree;
      **/
 
-    function __construct(\Product_model $datasource, Herd $herd, $arr_task_permissions) {
+    function __construct(\Product_model $datasource, Herd $herd, $arr_group_permissions) {
         $this->datasource = $datasource;
         $this->herd = $herd;
-        $this->arr_task_permissions = $arr_task_permissions;
+        $this->arr_group_permissions = $arr_group_permissions;
     }
 
     /**
@@ -102,7 +104,7 @@ class ProductsFactory{
         $scope = ['base'];
         $tmp = [];
 
-        if(in_array('View All Content', $this->arr_task_permissions)){
+        if(in_array('View All Content', $this->arr_group_permissions)){
             $tmp = $this->datasource->getAllProducts();
         }
         else{
@@ -110,13 +112,13 @@ class ProductsFactory{
              * subscription is different from other scopes in that it fetches content by herd data (i.e. herd output) for users that
              * have permission only for subscribed content.  All other scopes are strictly users-based
              */
-            if(in_array('View Subscriptions', $this->arr_task_permissions)){
+            if(in_array('View Subscriptions', $this->arr_group_permissions)){
                 $tmp = array_merge($tmp, $this->datasource->getSubscribedProducts($this->herd->herdCode()));
             }
-            if(in_array('View Account', $this->arr_task_permissions)){
+            if(in_array('View Account', $this->arr_group_permissions)){
                 $scope[] = 'account';
             }
-            if(in_array('View Admin', $this->arr_task_permissions)){
+            if(in_array('View Admin', $this->arr_group_permissions)){
                 $scope[] = 'admin';
             }
             if(!empty($scope)){

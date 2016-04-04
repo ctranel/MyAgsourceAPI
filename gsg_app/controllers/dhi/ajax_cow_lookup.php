@@ -3,7 +3,7 @@
 use \myagsource\AccessLog;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
-class Ajax_cow_lookup extends CI_Controller {
+class Ajax_cow_lookup extends MY_Controller {
 	
 	/**
 	 * cow_id_field

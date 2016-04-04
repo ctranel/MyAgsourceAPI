@@ -3,7 +3,7 @@ require_once(APPPATH . 'libraries/dhi/HerdAccess.php');
 
 use myagsource\dhi\HerdAccess;
 
-class HTTP_Error extends CI_Controller {
+class HTTP_Error extends MY_Controller {
 
 	function __construct() {
 		parent::__construct();
@@ -16,7 +16,7 @@ class HTTP_Error extends CI_Controller {
 		
 		$this->page_header_data = [
 			'title'=>'Page Not Found',
-			'num_herds'=>$herd_access->getNumAccessibleHerds($this->session->userdata('user_id'), $this->as_ion_auth->arr_task_permissions(), $this->session->userdata('arr_regions')),
+			'num_herds'=>$herd_access->getNumAccessibleHerds($this->session->userdata('user_id'), $this->permissions->permissionsList(), $this->session->userdata('arr_regions')),
 			'navigation' => $this->load->view('navigation', [], TRUE),
 		];
 		

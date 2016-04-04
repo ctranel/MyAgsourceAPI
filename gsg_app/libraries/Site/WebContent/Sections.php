@@ -64,7 +64,7 @@ class Sections implements iWebContentRepository {
 	 * @access public
 	 **/
 	//if we allow producers to select which sections to allow, we will need to pass that array to this section as well
-	public function loadChildren(iWebContent $section, iWebContentRepository $pages, $user_id, Herd $herd, $arr_task_permissions){ 
+	public function loadChildren(iWebContent $section, iWebContentRepository $pages, $user_id, Herd $herd, $permissions_list){ 
 		//if children have already been loaded
 		$tmp = $section->children();
 		if(isset($tmp)){
@@ -74,7 +74,7 @@ class Sections implements iWebContentRepository {
 		$tmp_array = [];
 
 		//Get Subsections
-		if(in_array('View All Content', $arr_task_permissions)){
+		if(in_array('View All Content', $permissions_list)){
 			$criteria = ['parent_id' => $section->id()];
 			$tmp_array = $this->datasource_sections->getByCriteria($criteria);
 		}
@@ -83,14 +83,14 @@ class Sections implements iWebContentRepository {
 		 * have permission only for subscribed content.  All other scopes are strictly users-based
 		 */
 		else{
-			if(in_array('View Subscriptions', $arr_task_permissions)){
+			if(in_array('View Subscriptions', $permissions_list)){
 				$tmp_array = array_merge($tmp_array, $this->datasource_sections->getSubscribedSections($section->id(), $herd->herdCode()));
 			}
-			if(in_array('View Account', $arr_task_permissions)){
+			if(in_array('View Account', $permissions_list)){
 				$criteria = ['ls.name' => 'View Account', 'parent_id' => $section->id()];
 				$tmp_array = array_merge($tmp_array, $this->datasource_sections->getByCriteria($criteria));
 			}
-			if(in_array('View Admin', $arr_task_permissions)){
+			if(in_array('View Admin', $permissions_list)){
 				$criteria = ['ls.name' => 'View Admin', 'parent_id' => $section->id()];
 				$tmp_array = array_merge($tmp_array, $this->datasource_sections->getByCriteria($criteria));
 			}

@@ -5,10 +5,7 @@ class Page_model extends CI_Model {
 	
 	public function __construct($user_id){
 		parent::__construct();
-		$this->user_id = $user_id;
-		$this->db_group_name = 'default';
-//		$this->db = $this->load->database($this->db_group_name, TRUE);
-		$this->tables = $this->config->item('tables', 'ion_auth');
+		$this->user_id = (int)$user_id;
 	}
 
     /**
@@ -23,7 +20,7 @@ class Page_model extends CI_Model {
 			->where("(p.user_id IS NULL OR p.user_id = " . $this->user_id . ")")
 			->join('users.dbo.lookup_scopes s', 'p.scope_id = s.id', 'inner')
 			->order_by('p.list_order')
-			->get($this->tables['pages'] . ' p')
+			->get('users.dbo.pages p')
 			->result_array();
 	}
 	

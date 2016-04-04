@@ -71,34 +71,6 @@ class Blocks implements iWebContentRepository {
 		}
 		return $blocks;
 	}
-
-	/**
-	 * @method loadChildren()
-	 * @param iWebContent page
-	 * @param iWebContentRepository blocks
-	 * @param int user id
-	 * @param Herd herd
-	 * @param array task permissions
-	 * @return void
-	 * @access public
-	 **/
-	//if we allow producers to select which sections to allow, we will need to pass that array to this section as well
-	public function loadChildren(iWebContent $page, iWebContentRepository $blocks, $user_id, Herd $herd, $arr_task_permissions){ 
-	}
-	
-	/*
-	 * @returns SplObjectStorage
-	public function getByParent($parent_id){
-		$criteria = ['parent_id' => $parent_id];
-		$results = $this->datasource->getByCriteria($criteria);
-		
-		$ret = new \SplObjectStorage();
-		foreach($results as $r){
-			$ret->attach(new Section($this->datasource_sections, $this->datasource_pages, $this->datasource_blocks, $r['id'], $r['parent_id'], $r['name'], $r['description'], $r['scope'], $r['path']));
-		}
-		return $ret;
-	}
-	 */
 }
 
 ?>

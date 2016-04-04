@@ -17,7 +17,7 @@ class Pdf_archive_model extends CI_Model {
     function getHerdArchiveData($herd_code){
         $test_input = (int)$herd_code;
         if (!$test_input || strlen($herd_code) != 8){
-            throw  new Exception('Invalid Herd Code');
+            throw new Exception('Invalid Herd Code');
         }
         // results query
         $q = $this->db->select("p.id, p.test_date, p.report_code, p.filename, r.report_name")

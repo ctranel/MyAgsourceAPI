@@ -52,7 +52,7 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
  * -----------------------------------------------------------------
  */
 
-class Blocks extends CI_Controller {
+class Blocks extends MY_Controller {
 	/**
 	 * herd_access
 	 * @var HerdAccess
@@ -169,7 +169,7 @@ class Blocks extends CI_Controller {
 		}
 		
 		//does logged in user have access to selected herd?
-		$has_herd_access = $this->herd_access->hasAccess($this->session->userdata('user_id'), $this->herd->herdCode(), $this->session->userdata('arr_regions'), $this->ion_auth_model->getTaskPermissions());
+		$has_herd_access = $this->herd_access->hasAccess($this->session->userdata('user_id'), $this->herd->herdCode(), $this->session->userdata('arr_regions'), $this->permissions->permissionsList());
 		if(!$has_herd_access){
 			$this->redirect(site_url('dhi/change_herd/select'),"You do not have permission to access this herd.  Please select another herd and try again.  ");
 		}
@@ -199,14 +199,6 @@ class Blocks extends CI_Controller {
 		}*/
 	}
 
-	//redirects while retaining message and conditionally setting redirect url
-	//@todo: needs to be a part of some kind of authorization class
-	protected function redirect($url, $message = ''){
-		//keep flashdata is in constructor
-		$this->session->set_flashdata('message',  $this->session->flashdata('message') . $message);
-		redirect($url);
-	}
-
 	/*
 	 * ajax_report: Called via AJAX to populate graphs
 	 * @param string page path
@@ -229,7 +221,7 @@ class Blocks extends CI_Controller {
 		//does user have access to current page for selected herd?
 		$this->page = $this->pages->getByPath($path_page_segment, $this->section->id());
 		$this->herd_page_access = new HerdPageAccess($this->page_model, $this->herd, $this->page);
-		$this->page_access = new PageAccess($this->page, $this->as_ion_auth->has_permission("View All Content"));
+		$this->page_access = new PageAccess($this->page, $this->permissions->hasPermission("View All Content"));
 		if(!$this->page_access->hasAccess($this->herd_page_access->hasAccess())) {
 			$this->post_message('You do not have permission to view the requested report for herd ' . $this->herd->herdCode() . '.  Please select a report from the navigation or contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' if you have questions or concerns.');
 			return;

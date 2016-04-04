@@ -1,4 +1,6 @@
 <?php
+require_once('../' . SYSDIR . '/libraries/Session.php');
+
 class MY_Session extends CI_Session {
 	/**
 	* keep_all_flashdata

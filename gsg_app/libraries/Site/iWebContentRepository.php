@@ -13,7 +13,6 @@ use myagsource\dhi\Herd;
 interface iWebContentRepository {
 //	public function childKeyValuePairs();
 	public function getByPath($path, $parent_id = null);
-	public function loadChildren(iWebContent $web_content, iWebContentRepository $child_repos, $user_id, Herd $herd, $arr_task_permissions);
 }
 
 ?>

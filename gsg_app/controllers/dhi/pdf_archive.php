@@ -2,7 +2,7 @@
 
 use \myagsource\AccessLog;
 
-class Pdf_archive extends CI_Controller {
+class Pdf_archive extends MY_Controller {
 
     function __construct(){
         parent::__construct();
@@ -27,6 +27,10 @@ class Pdf_archive extends CI_Controller {
     }
 
     function show($pdf_id){
+        if(!$this->permissions->hasPermission('View All Content') && !$this->permissions->hasPermission('View Archived Reports')){
+            throw new Exception('You do not have permission to view archived reports');
+        }
+
         $this->load->model('dhi/pdf_archive_model');
         try{
             $pdf_data = $this->pdf_archive_model->getPdfData($pdf_id, $this->session->userdata('herd_code')); //herd_code, test_date, report_code, report_name, file_path

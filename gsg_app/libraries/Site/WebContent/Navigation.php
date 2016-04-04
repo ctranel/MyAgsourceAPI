@@ -30,10 +30,10 @@ class Navigation{// implements iWebContentRepository {
 	protected $herd;
 
 	/**
-	 * $arr_task_permissions
-	 * @var Array
+	 * $permissions_list
+	 * @var Array of strings
 	 **/
-	protected $arr_task_permissions;
+	protected $permissions_list;
 
 	/**
 	 * $tree
@@ -41,10 +41,10 @@ class Navigation{// implements iWebContentRepository {
 	 **/
 	protected $tree;
 
-	function __construct(\Navigation_model $datasource_navigation, Herd $herd, $arr_task_permissions) {
+	function __construct(\Navigation_model $datasource_navigation, Herd $herd, $permissions_list) {
 		$this->datasource_navigation = $datasource_navigation;
 		$this->herd = $herd;
-		$this->arr_task_permissions = $arr_task_permissions;
+		$this->permissions_list = $permissions_list;
 		$data = $this->setData();
 		$this->tree = $this->buildTree($data);
 	}
@@ -59,7 +59,7 @@ class Navigation{// implements iWebContentRepository {
 		$scope = ['base'];
 		$tmp_array = [];
 
-		if(in_array('View All Content', $this->arr_task_permissions)){
+		if(in_array('View All Content', $this->permissions_list)){
 			$tmp_array = $this->datasource_navigation->getAllContent();
 		}
 		else{
@@ -67,13 +67,13 @@ class Navigation{// implements iWebContentRepository {
 			 * subscription is different from other scopes in that it fetches content by herd data (i.e. herd output) for users that 
 			 * have permission only for subscribed content.  All other scopes are strictly users-based
 			 */
-			if(in_array('View Subscriptions', $this->arr_task_permissions)){
+			if(in_array('View Subscriptions', $this->permissions_list)){
 				$tmp_array = array_merge($tmp_array, $this->datasource_navigation->getSubscribedContent($this->herd->herdCode()));
 			}
-			if(in_array('View Account', $this->arr_task_permissions)){
+			if(in_array('View Account', $this->permissions_list)){
 				$scope[] = 'account';
 			}
-			if(in_array('View Admin', $this->arr_task_permissions)){
+			if(in_array('View Admin', $this->permissions_list)){
 				$scope[] = 'admin';
 			}
 			if(!empty($scope)){

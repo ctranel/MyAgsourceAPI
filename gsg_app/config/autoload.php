@@ -52,7 +52,7 @@ $autoload['packages'] = array();
 |	$autoload['libraries'] = array('database', 'session', 'xmlrpc');
 */
 
-$autoload['libraries'] = array('database','as_ion_auth','session','carabiner');
+$autoload['libraries'] = array();//'session','database','as_ion_auth','carabiner');
 
 
 /*
@@ -64,7 +64,7 @@ $autoload['libraries'] = array('database','as_ion_auth','session','carabiner');
 |	$autoload['helper'] = array('url', 'file');
 */
 
-$autoload['helper'] = array('url','form','html','error');
+$autoload['helper'] = array();//'url','form','html','error'
 
 
 /*
@@ -109,7 +109,7 @@ $autoload['language'] = array();
 |
 */
 
-$autoload['model'] = array('dhi/herd_model');//,'dm_model');
+$autoload['model'] = array();//'dhi/herd_model','dm_model');
 
 
 

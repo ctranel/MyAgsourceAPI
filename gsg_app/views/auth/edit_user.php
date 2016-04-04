@@ -64,7 +64,7 @@
       <p><?php echo form_label('Confirm Password', 'password_confirm', NULL, $password_confirm) ?><?php echo form_input($password_confirm);?>
       </p>
       
-      <?php if($this->as_ion_auth->has_permission("Assign Sections")): // this is currently tracked in the SQL database
+      <?php if($this->permissions->hasPermission("Assign Sections")): // this is currently tracked in the SQL database
 			if(!empty($section_options)):
 				echo form_fieldset('Sections', array('id' => 'sections-fieldset'));
 				foreach($section_options as $k=>$v):

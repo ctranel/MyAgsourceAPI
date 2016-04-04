@@ -8,7 +8,7 @@ use myagsource\Settings\SessionSettings;
 
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
-class General extends CI_Controller {	
+class General extends MY_Controller {	
 	function __construct(){
 		parent::__construct();
 		$this->session->keep_all_flashdata();

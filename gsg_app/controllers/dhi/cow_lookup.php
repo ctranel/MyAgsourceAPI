@@ -9,7 +9,7 @@ use \myagsource\dhi\Herd;
 use \myagsource\AccessLog;
 use \myagsource\notices\Notifications;
 
-class Cow_lookup extends CI_Controller {
+class Cow_lookup extends MY_Controller {
 	/**
 	 * herd_access
 	 * @var HerdAccess
@@ -57,7 +57,7 @@ class Cow_lookup extends CI_Controller {
 			}
 				
 			//does logged in user have access to selected herd?
-			$has_herd_access = $this->herd_access->hasAccess($this->session->userdata('user_id'), $this->herd->herdCode(), $this->session->userdata('arr_regions'), $this->ion_auth_model->getTaskPermissions());
+			$has_herd_access = $this->herd_access->hasAccess($this->session->userdata('user_id'), $this->herd->herdCode(), $this->session->userdata('arr_regions'), $this->permissions->permissionsList());
 			if(!$has_herd_access){
 				$this->redirect(site_url('dhi/change_herd/select'),"You do not have permission to access this herd.  Please select another herd and try again.  ");
 			}
@@ -66,7 +66,7 @@ class Cow_lookup extends CI_Controller {
 		$this->load->model('access_log_model');
 		$this->access_log = new AccessLog($this->access_log_model);
 				
-		$this->page_header_data['num_herds'] = $this->herd_access->getNumAccessibleHerds($this->session->userdata('user_id'), $this->as_ion_auth->arr_task_permissions(), $this->session->userdata('arr_regions'));
+		$this->page_header_data['num_herds'] = $this->herd_access->getNumAccessibleHerds($this->session->userdata('user_id'), $this->permissions->permissionsList(), $this->session->userdata('arr_regions'));
 		$this->page_header_data['navigation'] = $this->load->view('navigation', [], TRUE);
 
 		//NOTICES
@@ -85,14 +85,6 @@ class Cow_lookup extends CI_Controller {
 		}
 	}
 	
-	//redirects while retaining message and conditionally setting redirect url
-	//@todo: needs to be a part of some kind of authorization class
-	protected function redirect($url, $message = ''){
-		$this->session->set_flashdata('message',  $this->session->flashdata('message') . $message);
-		$this->session->keep_all_flashdata();
-		redirect($url);
-	}
-
 	function index(){
 		//validate form input
 		$this->load->library('form_validation');

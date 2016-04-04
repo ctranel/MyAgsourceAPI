@@ -76,24 +76,5 @@ class Pages implements iWebContentRepository {
 		}
 		return $pages;
 	}
-
-	/**
-	 * @method loadChildren()
-	 * @param iWebContent page
-	 * @param iWebContentRepository blocks
-	 * @param int user id
-	 * @param Herd herd
-	 * @param array task permissions
-	 * @return void
-	 * @access public
-	 **/
-	//if we allow producers to select which sections to allow, we will need to pass that array to this section as well
-	public function loadChildren(iWebContent $page, iWebContentRepository $blocks, $user_id, Herd $herd, $arr_task_permissions){ 
-		
-		//Get child pages
-		
-		
-		
-	}
 }
 ?>

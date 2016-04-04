@@ -690,19 +690,6 @@ SELECT DISTINCT id, name, list_order FROM cteAnchor ORDER BY list_order;";
 	}
 
 	/**
-	 * @method has_permission
-	 * @param string task name
-	 * @return boolean
-	 * @access public
-	 *
-	 **/
-	public function has_permission($task_name){
-		$tmp_array = $this->getTaskPermissions();
-		if(is_array($tmp_array) !== FALSE) return in_array($task_name, $tmp_array);
-		else return FALSE;
-	}
-
-	/**
 	 * @method user_owns_herd by currently logged in user?
 	 * @param string herd_code
 	 * @return boolean
@@ -727,21 +714,22 @@ SELECT DISTINCT id, name, list_order FROM cteAnchor ORDER BY list_order;";
 	/**
 	 * @method getTaskPermissions
 	 *
-	 * @param int section id FOR FUTURE USE
-	 * @return array tasks for which  the group of logged in user has permissions
+	 * @param int group id
+     * @param array of strings report code
+	 * @return array tasks for which the group of logged in user has permissions
 	 * @author ctranel
-	 **/
-	public function getTaskPermissions($section_id = ''){
+	public function getTaskPermissions($group_id, $report_code=null){
 		$this->load->helper('multid_array_helper');
+
 		$results = $this->db->select('name, description')
-		->join($this->tables['groups_tasks'] . ' gt', 't.id = gt.task_id', 'left')
-		->where('group_id', $this->session->userdata('active_group_id'))
-		//->where('section_id', $section_id)
-		//->where('permission', '1')
-		->get($this->tables['tasks'] . ' t')
+        //->where_in("foreign_key", $report_code)
+		->where("foreign_key", $group_id)
+		->get('users.dbo.v_permissions_map')
 		->result_array();
+
 		return array_extract_value_recursive('name', $results);
 	}
+**/
 
 	/**
 	 * @method _filter_data

@@ -8,7 +8,7 @@ require_once(APPPATH . 'libraries/dhi/PdfArchives.php');
 
 use myagsource\Benchmarks\Benchmarks;
 use myagsource\report_filters\Filters;
-use myagsource\Products\Products\ProductsFactory;
+use myagsource\Products\Products\Products;
 use myagsource\dhi\Herd;
 use myagsource\dhi\PdfArchives;
 
@@ -27,7 +27,7 @@ class Index extends report_parent {
 			redirect(site_url('auth/login'));
 		}
         $this->herd = new Herd($this->herd_model, $this->session->userdata('herd_code'));
-		$this->page_header_data['num_herds'] = $this->herd_access->getNumAccessibleHerds($this->session->userdata('user_id'), $this->as_ion_auth->arr_task_permissions(), $this->session->userdata('arr_regions'));
+		$this->page_header_data['num_herds'] = $this->herd_access->getNumAccessibleHerds($this->session->userdata('user_id'), $this->permissions->permissionsList(), $this->session->userdata('arr_regions'));
 		$this->page_header_data['navigation'] = $this->load->view('navigation', [], TRUE);
 		
 		$this->load->library('form_validation');
@@ -183,20 +183,25 @@ class Index extends report_parent {
 		];
 
 		//PDF test archives
-        $this->load->model('dhi/pdf_archive_model');
-        try{
-            $PdfArchives = new PdfArchives($this->pdf_archive_model, $this->session->userdata('herd_code'));
-            $pdf_archive_data = $PdfArchives->getHerdArchives();
-            $this->data['widget']['herd'][] = [
-                'content' => $this->load->view('auth/dashboard/past_results', ['tests' => $pdf_archive_data], TRUE),
-                'title' => 'Report Archives (PDF)'
-            ];
-        }
-        catch(\Exception $e){
-            $this->data['widget']['herd'][] = [
-                'content' => $this->load->view('auth/dashboard/error', ['message' => $e->getMessage()], TRUE),
-                'title' => 'Report Archives (PDF)'
-            ];
+        if($this->permissions->hasPermission('View All Content') || $this->permissions->hasPermission('View Archived Reports')){
+
+            $this->load->model('dhi/pdf_archive_model');
+            try{
+                $PdfArchives = new PdfArchives($this->pdf_archive_model, $this->session->userdata('herd_code'));
+                $pdf_archive_data = $PdfArchives->getHerdArchives();
+                if(is_array($pdf_archive_data) && count($pdf_archive_data) > 0){
+                    $this->data['widget']['herd'][] = [
+                        'content' => $this->load->view('auth/dashboard/past_results', ['tests' => $pdf_archive_data], TRUE),
+                        'title' => 'Report Archives (PDF)'
+                    ];
+                }
+            }
+            catch(\Exception $e){
+                $this->data['widget']['herd'][] = [
+                    'content' => $this->load->view('auth/dashboard/error', ['message' => $e->getMessage()], TRUE),
+                    'title' => 'Report Archives (PDF)'
+                ];
+            }
         }
 
         //message
@@ -205,27 +210,32 @@ class Index extends report_parent {
 			'title' => 'Message'
 		];
 
-        $this->load->model('web_content/product_model');
-        $products_factory = new ProductsFactory($this->product_model, $this->herd, $this->as_ion_auth->arr_task_permissions());
+        //other products
+        $this->load->model('product_model');
+        $products_factory = new Products($this->product_model, $this->herd, $this->permissions->permissionsList());
         $missing_products = $products_factory->inaccessibleProducts();
         if(isset($missing_products) && is_a($missing_products, 'splObjectStorage') && $missing_products->count() > 0){
             $this->data['widget']['herd'][] = [
                 'content' => $this->load->view('auth/dashboard/other_products', ['products' => $missing_products], true),
-                'title' => 'Maximize your profitability'
+                'title' => 'Maximize Your Profitability'
             ];
         }
 
-        $this->load->model('setting_model');
-		$this->load->model('benchmark_model');
-		$this->benchmarks = new Benchmarks($this->session->userdata('user_id'), $this->input->post('herd_code'), $this->herd_model->header_info($this->herd->herdCode()), $this->setting_model, $this->benchmark_model, $this->session->userdata('benchmarks'));
-		$arr_benchmark_data = $this->benchmarks->getFormData($this->session->userdata('benchmarks')); 
-		if(isset($arr_benchmark_data)){
-			$this->data['widget']['herd'][] = [
-				'content' => $this->load->view('dhi/settings/benchmarks', $arr_benchmark_data, TRUE),
-				'title' => 'Benchmarks',
-				'id' => 'benhmarks',
-			];
-		}
+        if($this->permissions->hasPermission("Set Benchmarks")) {
+            $this->load->model('setting_model');
+            $this->load->model('benchmark_model');
+            $this->benchmarks = new Benchmarks($this->session->userdata('user_id'), $this->input->post('herd_code'),
+                $this->herd_model->header_info($this->herd->herdCode()), $this->setting_model, $this->benchmark_model,
+                $this->session->userdata('benchmarks'));
+            $arr_benchmark_data = $this->benchmarks->getFormData($this->session->userdata('benchmarks'));
+            if (isset($arr_benchmark_data)) {
+                $this->data['widget']['herd'][] = [
+                    'content' => $this->load->view('dhi/settings/benchmarks', $arr_benchmark_data, true),
+                    'title' => 'Benchmarks',
+                    'id' => 'benhmarks',
+                ];
+            }
+        }
 		
 		//filters	
 		$report_filter_path = 'filters';
@@ -254,7 +264,7 @@ class Index extends report_parent {
 		}
 		
 
-		if($this->as_ion_auth->has_permission('Update SG Access')){
+		if($this->permissions->hasPermission('Update SG Access')){
 			$consultants_by_status = $this->as_ion_auth->getConsultantsByHerd($this->session->userdata('herd_code'));
 			if(isset($consultants_by_status['open']) && is_array($consultants_by_status['open'])){
 				$this->data['widget']['herd'][] = [

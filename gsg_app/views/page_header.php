@@ -88,11 +88,11 @@ header('X-UA-Compatible: IE=edge,chrome=1');
 				<li><?php echo anchor('', 'Dashboard'); ?></li>
 				<?php 
 					$class = 'first';
-					if($this->as_ion_auth->has_permission("Add All Users") || $this->as_ion_auth->has_permission("Add Users In Region")): ?>
+					if($this->permissions->hasPermission("Add All Users") || $this->permissions->hasPermission("Add Users In Region")): ?>
 						<li class="<?php echo $class; ?>"><?php echo anchor('auth/create_user','Add Account', 'class="teal_banner"') ?></li>
 				<?php	$class = '';
 					endif; 
-					if($this->as_ion_auth->has_permission("Edit All Users") || $this->as_ion_auth->has_permission("Edit Users In Region")): ?>
+					if($this->permissions->hasPermission("Edit All Users") || $this->permissions->hasPermission("Edit Users In Region")): ?>
 						<li><?php echo anchor('auth/list_accounts','List Accounts', 'class="teal_banner"') ?></li>
 				<?php	$class = '';
 					endif; ?>
@@ -100,10 +100,10 @@ header('X-UA-Compatible: IE=edge,chrome=1');
 						<li class="<?php echo $class; ?>"><?php echo anchor('auth/edit_user','Edit Account', 'class="teal_banner"') ?></li>
 				<?php	$class = '';
 					endif; ?>
-					<?php if(false && $this->as_ion_auth->has_permission("View Access Log")): ?>
+					<?php if(false && $this->permissions->hasPermission("View Access Log")): ?>
 						<li class="<?php echo $class; ?>"><?php echo anchor('access_log/display', 'Access Log', 'class="teal_banner"'); ?></li>
 					<?php endif; ?>
-				<?php if($this->as_ion_auth->has_permission("View Assign w permission")): ?>
+				<?php if($this->permissions->hasPermission("View Assign w permission")): ?>
 					<li><?php echo anchor('auth/service_grp_manage_herds', 'Manage Herd Access'); ?></li>
 					<li><?php echo anchor('auth/service_grp_request', 'Request Herd Access'); ?></li>
 				<?php endif; ?>
@@ -111,10 +111,10 @@ header('X-UA-Compatible: IE=edge,chrome=1');
 					<li><?php echo anchor('auth/manage_service_grp', 'Manage Consultant Access'); ?></li>
 					<!-- <li><?php echo anchor('auth/service_grp_access', 'Grant Herd Access'); ?></li> -->
 				<?php endif; ?>
-				<?php if($this->as_ion_auth->has_permission("Select Herd") && isset($num_herds) && $num_herds > 1): ?>
+				<?php if($this->permissions->hasPermission("Select Herd") && isset($num_herds) && $num_herds > 1): ?>
 					<li><?php echo anchor('dhi/change_herd/select', 'Change Herd'); ?></li>
 				<?php endif; ?>
-				<?php if($this->as_ion_auth->has_permission("Request Herd")): ?>
+				<?php if($this->permissions->hasPermission("Request Herd")): ?>
 					<li><?php echo anchor('dhi/change_herd/request', 'Request Herd'); ?></li>
 				<?php endif; ?>
 			<?php elseif($this->router->fetch_method() != 'login'): ?>

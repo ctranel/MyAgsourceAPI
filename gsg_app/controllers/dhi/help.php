@@ -4,7 +4,7 @@ require_once(APPPATH . 'libraries' . FS_SEP . 'dhi' . FS_SEP . 'HerdAccess.php')
 
 use myagsource\dhi\HerdAccess;
 
-class Help extends CI_Controller{
+class Help extends MY_Controller{
 	protected $section_id;
 	protected $page_header_data;
 
@@ -16,7 +16,7 @@ class Help extends CI_Controller{
 			$this->session->keep_all_flashdata();
 			redirect('auth/login');
 		}
-		$this->page_header_data['num_herds'] = $herd_access->getNumAccessibleHerds($this->session->userdata('user_id'), $this->as_ion_auth->arr_task_permissions(), $this->session->userdata('arr_regions'));
+		$this->page_header_data['num_herds'] = $herd_access->getNumAccessibleHerds($this->session->userdata('user_id'), $this->permissions->permissionsList(), $this->session->userdata('arr_regions'));
 		$this->page_header_data['navigation'] = $this->load->view('navigation', [], TRUE);
 		/* Load the profile.php config file if it exists
 		if (ENVIRONMENT == 'development' || ENVIRONMENT == 'localhost') {

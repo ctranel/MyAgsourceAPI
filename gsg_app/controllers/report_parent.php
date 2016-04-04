@@ -45,7 +45,7 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
  * -----------------------------------------------------------------
  */
 
-abstract class report_parent extends CI_Controller {
+abstract class report_parent extends MY_Controller {
 	/**
 	 * herd_access
 	 * @var HerdAccess
@@ -149,7 +149,7 @@ abstract class report_parent extends CI_Controller {
 			}
 			
 			//does logged in user have access to selected herd?
-			$has_herd_access = $this->herd_access->hasAccess($this->session->userdata('user_id'), $this->herd->herdCode(), $this->session->userdata('arr_regions'), $this->ion_auth_model->getTaskPermissions());
+			$has_herd_access = $this->herd_access->hasAccess($this->session->userdata('user_id'), $this->herd->herdCode(), $this->session->userdata('arr_regions'), $this->permissions->permissionsList());
 			if(!$has_herd_access){
 				$this->redirect(site_url('dhi/change_herd/select'),"You do not have permission to access this herd.  Please select another herd and try again.  ");
 			}
@@ -174,7 +174,7 @@ abstract class report_parent extends CI_Controller {
 		//load sections
 		$this->section = $sections->getByPath($class . '/');
 		$this->session->set_userdata('section_id', $this->section->id());
-		$sections->loadChildren($this->section, $this->pages, $this->session->userdata('user_id'), $this->herd, $this->ion_auth_model->getTaskPermissions());
+		$sections->loadChildren($this->section, $this->pages, $this->session->userdata('user_id'), $this->herd, $this->permissions->permissionsList());
 
 		$path = uri_string();
 
@@ -205,16 +205,16 @@ abstract class report_parent extends CI_Controller {
 
 		//does user have access to current page for selected herd?
 		$this->herd_page_access = new HerdPageAccess($this->page_model, $this->herd, $this->page);
-		$this->page_access = new PageAccess($this->page, ($this->as_ion_auth->has_permission("View All Content") || $this->as_ion_auth->has_permission("View All Content-Billed")));
+		$this->page_access = new PageAccess($this->page, ($this->permissions->hasPermission("View All Content") || $this->permissions->hasPermission("View All Content-Billed")));
 		if(!$this->page_access->hasAccess($this->herd_page_access->hasAccess())) {
             $this->redirect(site_url(), 'You do not have permission to view the requested report for herd ' . $this->herd->herdCode() . '.  Please select a report from the navigation or contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' if you have questions or concerns.');
 		}
         //the user can access this page for this herd, but do they have to pay?
-        if($this->as_ion_auth->has_permission("View All Content-Billed")){
+        if($this->permissions->hasPermission("View All Content-Billed")){
             $this->message[] = 'Herd ' . $this->herd->herdCode() . ' is not paying for this product.  You will be billed a monthly fee for any month in which you view content for which the herd is not paying.';
         }
 
-		$this->page_header_data['num_herds'] = $this->herd_access->getNumAccessibleHerds($this->session->userdata('user_id'), $this->as_ion_auth->arr_task_permissions(), $this->session->userdata('arr_regions'));
+		$this->page_header_data['num_herds'] = $this->herd_access->getNumAccessibleHerds($this->session->userdata('user_id'), $this->permissions->permissionsList(), $this->session->userdata('arr_regions'));
 				
 		/* Load the profile.php config file if it exists*/
 		if (ENVIRONMENT == 'development' || ENVIRONMENT == 'localhost') {
@@ -225,14 +225,6 @@ abstract class report_parent extends CI_Controller {
 		}
 	}
 	
-	//redirects while retaining message and conditionally setting redirect url
-	//@todo: needs to be a part of some kind of authorization class
-	protected function redirect($url, $message = ''){
-		$this->session->keep_all_flashdata();
-		$this->session->set_flashdata('message',  $this->session->flashdata('message') . '<br>' . $message);
-		redirect($url);
-	}
-
 	function index(){
 		$this->redirect(site_url($this->report_path));
 	}
@@ -431,11 +423,7 @@ abstract class report_parent extends CI_Controller {
 			$this->page_header_data['arr_headjs_line'][] = 'function(){' . $tmp_js . ';}';
 		}
 		//unset($this->{$this->primary_model_name}->arr_messages); //clear message var once it is displayed
-		$this->load->model('setting_model');
-		$this->load->model('benchmark_model');
-		
-		$this->benchmarks = new Benchmarks($this->session->userdata('user_id'), $this->input->post('herd_code'), $this->herd_model->header_info($this->herd->herdCode()), $this->setting_model, $this->benchmark_model, $this->session->userdata('benchmarks'));
-		$arr_benchmark_data = $this->benchmarks->getFormData($this->session->userdata('benchmarks')); 
+
 		$arr_nav_data = [
 			'section_path' => $this->full_section_path,
 			'curr_page' => $this->page->path(),
@@ -474,12 +462,19 @@ abstract class report_parent extends CI_Controller {
 		$page_supp = $supp_factory->getPageSupplemental($this->page->id(), $this->supplemental_model, site_url());
 		$data['page_supplemental'] = $page_supp->getContent();
 
-		if(isset($arr_benchmark_data)){
-			$collapse_data['content'] = $this->load->view('dhi/settings/benchmarks', $arr_benchmark_data, TRUE);
-			$collapse_data['title'] = 'Set Benchmarks';
-			$collapse_data['id'] = 'bench-div';
-			$data['benchmarks'] = $this->load->view('collapsible', $collapse_data, TRUE);
-		}
+        if($this->permissions->hasPermission("Set Benchmarks")){
+            $this->load->model('setting_model');
+            $this->load->model('benchmark_model');
+
+            $this->benchmarks = new Benchmarks($this->session->userdata('user_id'), $this->input->post('herd_code'), $this->herd_model->header_info($this->herd->herdCode()), $this->setting_model, $this->benchmark_model, $this->session->userdata('benchmarks'));
+            $arr_benchmark_data = $this->benchmarks->getFormData($this->session->userdata('benchmarks'));
+            if(isset($arr_benchmark_data)){
+                $collapse_data['content'] = $this->load->view('dhi/settings/benchmarks', $arr_benchmark_data, TRUE);
+                $collapse_data['title'] = 'Set Benchmarks';
+                $collapse_data['id'] = 'bench-div';
+                $data['benchmarks'] = $this->load->view('collapsible', $collapse_data, TRUE);
+            }
+        }
 
 		$this->_record_access(90, 'web', $this->herd_page_access->reportCode());
 		$this->load->view('report', $data);

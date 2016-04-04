@@ -403,7 +403,7 @@ class Ion_auth_parent_model extends CI_Model
 	 * @return void
 	 * @author Mathew
 	 **/
-	public function deactivate($id = NULL)
+	public function deactivate($id = NULL, $record_messages = true)
 	{
 		$this->trigger_events('deactivate');
 
@@ -425,9 +425,9 @@ class Ion_auth_parent_model extends CI_Model
 		$this->db->update($this->tables['users'], $data, array('id' => $id));
 
 		$return = $this->db->affected_rows() == 1;
-		if ($return)
+		if ($return && $record_messages)
 			$this->set_message('deactivate_successful');
-		else
+		elseif($record_messages)
 			$this->set_error('deactivate_unsuccessful');
 
 		return $return;

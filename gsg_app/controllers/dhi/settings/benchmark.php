@@ -8,7 +8,7 @@ use \myagsource\Benchmarks\Benchmarks;
 
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
-class Benchmark extends CI_Controller {	
+class Benchmark extends MY_Controller {	
 	function __construct(){
 		parent::__construct();
 		

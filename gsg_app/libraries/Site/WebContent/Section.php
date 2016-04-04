@@ -158,49 +158,6 @@ class Section implements iWebContent
 	public function loadPages(\SplObjectStorage $pages){
 		$this->pages = $pages;
 	}
-	
-	
-	/**
-	 * @method loadChildren()
-	 * @param int user id
-	 * @param Herd herd
-	 * @param array task permissions
-	 * @return void
-	 * @access public
-	//if we allow producers to select which sections to allow, we will need to pass that array to this section as well
-	public function loadChildren($user_id, $herd, $arr_task_permissions){ 
-		if(isset($this->children)){
-			return;
-		}
-		$tmp_array = [];
-		if(in_array('View All Content', $arr_task_permissions)){
-			$criteria = ['parent_id' => $this->id];
-			$tmp_array = $this->datasource_sections->getByCriteria($criteria);
-		}
-		//subscription is different in that it fetches content by herd data (i.e. herd output) for users that 
-		//have permission only for subscribed content.  All other scopes are strictly users-based
-		else{
-			if(in_array('View Subscriptions', $arr_task_permissions)){
-				$tmp_array = array_merge($tmp_array, $this->datasource_sections->getSubscribedSections($this->id, $herd->herdCode()));
-			}
-			if(in_array('View Account', $arr_task_permissions)){
-				$criteria = ['ls.name' => 'View Account', 'parent_id' => $this->id];
-				$tmp_array = array_merge($tmp_array, $this->datasource_sections->getByCriteria($criteria));
-			}
-			if(in_array('View Admin', $arr_task_permissions)){
-				$criteria = ['ls.name' => 'View Admin', 'parent_id' => $this->id];
-				$tmp_array = array_merge($tmp_array, $this->datasource_sections->getByCriteria($criteria));
-			}
-		}
-		
-		if(is_array($tmp_array) && !empty($tmp_array)){
-			$this->children = new \SplObjectStorage();
-			foreach($tmp_array as $k => $v){
-				$this->children->attach(new Section($this->datasource_sections, $this->datasource_pages, $this->datasource_blocks, $v['id'], $v['parent_id'], $v['name'], $v['description'], $v['scope'], $v['active'], $v['path']));
-			}
-		}
-	}
-	 **/
 }
 
 

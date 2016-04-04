@@ -15,5 +15,5 @@ interface iProducts {
     //public function allProducts();
     public function accessibleProducts();
     public function inaccessibleProducts();
-    public function getProduct($product_code);
+    //public function getProduct($product_code);
 }
