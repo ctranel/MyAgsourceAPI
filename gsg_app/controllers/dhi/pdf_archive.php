@@ -39,7 +39,6 @@ class Pdf_archive extends MY_Controller {
             $this->session->set_flashdata('message',  $this->session->flashdata('message') . '<br>' . $e->getMessage());
             redirect('/');
         }
-//var_dump($pdf_data);
         $file = $this->config->item('pdf_path') . $pdf_data['herd_code'] . '/' . str_replace('-', '', $pdf_data['test_date']) . '/' . $pdf_data['filename'];
 
         if(!file_exists($file)){
@@ -47,11 +46,12 @@ class Pdf_archive extends MY_Controller {
             redirect('/');
         }
 
-        //$filename = 'filename.pdf';
+        $filename = $pdf_data['herd_code'] . '_' . str_replace('-', '', $pdf_data['test_date']) . '_' . str_replace(' ', '-', $pdf_data['report_name']);
+
         $this->_record_access(96);
 
         header('Content-type: application/pdf');
-        //header('Content-Disposition: inline; filename="' . $filename . '"');
+        header('Content-Disposition: inline; filename="' . $filename . '"');
         header('Content-Transfer-Encoding: binary');
         header('Accept-Ranges: bytes');
         @readfile($file);
