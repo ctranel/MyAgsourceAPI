@@ -205,9 +205,9 @@ class Index extends report_parent {
         }
 
         //message
-		$this->data['widget']['herd'][] = [
+		$this->data['widget']['full_width_top'][] = [
 			'content' => $this->load->view('auth/dashboard/message', null, true),
-			'title' => 'Message'
+			'title' => 'New Reports'
 		];
 
         //other products

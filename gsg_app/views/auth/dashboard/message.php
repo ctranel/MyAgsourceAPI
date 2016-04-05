@@ -1,3 +1,4 @@
-<p>
-With the rapid adoption of sexed semen, genomic testing and breeding to beef,  a herd has more means to speed up genetic improvement and profitability. To make sure you take full advantage, the Genetic Summary Report takes an in-depth look at the genetic composition of your herd, measuring the degree of inbreeding and making direct comparisons of your herd's genetic values to similar AgSource herds and the national dairy herd. It lists the top twelve sires in your herd based on performance of milking daughters. If you are a MyAgSource subscriber <a href="dhi/reports/genetics/gen_over" >click here</a> to review your herd's information. Visit <a href="http://www.agsource.com/GSR" target="_blank">www.agsource.com/GSR</a> to learn more.
-</p>
+<ul>
+    <li><a href="/dhi/reports/id/gen_verif">Genomic Verified Animals</a> under the ID-Inventory menu lists all the animals that have been gnomically tested.</li>
+    <li><a href="/dhi/reports/lab/bulk_scc">Bulk Tank SCC Contribution</a> under the Lab Results menu displays the current test Cow SCC data that was found on AgSource Alert.</li>
+</ul>

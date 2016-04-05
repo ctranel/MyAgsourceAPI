@@ -4,6 +4,19 @@ if (!empty($page_heading)) echo heading($page_heading);
 if(isset($herd_code) && $herd_code == $this->config->item('default_herd')): ?>
 	<p class="important-message">This is sample herd data, please <?php echo anchor('auth/login', 'login'); ?> or <?php echo anchor('auth/create_user', 'register'); ?> to see your herd's data.</p>
 <?php endif; ?>
+<?php if(isset($widget['full_width_top'])): ?>
+	<div id="d-full-width" class="col-sm-12">
+		<?php foreach($widget['full_width_top'] as $w): ?>
+			<div class="box">
+				<h2><?php echo $w['title']; ?></h2>
+				<?php if(isset($w['subtitle'])): ?>
+					<h3><?php echo $w['subtitle']; ?></h3>
+				<?php endif; ?>
+				<div class="widget-content"><?php echo $w['content']; ?></div>
+			</div>
+		<?php endforeach; ?>
+	</div>
+<?php endif; ?>
 <div id="d-herd" class="col-sm-3">
 	<?php if(isset($widget['herd'])): 
 		foreach($widget['herd'] as $w): ?>
@@ -44,9 +57,9 @@ if(isset($herd_code) && $herd_code == $this->config->item('default_herd')): ?>
 	endif; ?>
 </div>
 
-<?php if(isset($widget['full_width'])): ?>
+<?php if(isset($widget['full_width_bot'])): ?>
 	<div id="d-full-width" class="col-sm-12">
-		<?php foreach($widget['full_width'] as $w): ?>
+		<?php foreach($widget['full_width_bot'] as $w): ?>
 			<div class="box">
 				<h2><?php echo $w['title']; ?></h2>
 				<?php if(isset($w['subtitle'])): ?>
