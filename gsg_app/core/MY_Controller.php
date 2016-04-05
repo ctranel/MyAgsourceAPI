@@ -74,6 +74,9 @@ class MY_Controller extends CI_Controller
     //redirects while retaining message and conditionally setting redirect url
     //@todo: needs to be a part of some kind of authorization class
     protected function redirect($url, $message = ''){
+        if(is_array($message)){
+            $message = implode('<br>', $message);
+        }
         $this->session->set_flashdata('message',  $this->session->flashdata('message') . $message);
         redirect($url);
     }
