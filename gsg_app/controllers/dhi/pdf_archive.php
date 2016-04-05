@@ -46,7 +46,7 @@ class Pdf_archive extends MY_Controller {
             redirect('/');
         }
 
-        $filename = $pdf_data['herd_code'] . '_' . str_replace('-', '', $pdf_data['test_date']) . '_' . str_replace(' ', '-', $pdf_data['report_name']);
+        $filename = $pdf_data['herd_code'] . '_' . str_replace('-', '', $pdf_data['test_date']) . '_' . str_replace(' ', '-', $pdf_data['report_name']) . '.pdf';
 
         $this->_record_access(96);
 
