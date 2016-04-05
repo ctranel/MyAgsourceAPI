@@ -39,8 +39,9 @@ class Pdf_archive extends MY_Controller {
             $this->session->set_flashdata('message',  $this->session->flashdata('message') . '<br>' . $e->getMessage());
             redirect('/');
         }
+//var_dump($pdf_data);
+        $file = $this->config->item('pdf_path') . $pdf_data['herd_code'] . '/' . str_replace('-', '', $pdf_data['test_date']) . '/' . $pdf_data['filename'];
 
-        $file = '/opt/data/agsource/' . $pdf_data['filename'] . '.pdf';
         if(!file_exists($file)){
             $this->session->set_flashdata('message',  $this->session->flashdata('message') . '<br>Could not find PDF file.');
             redirect('/');
