@@ -152,8 +152,9 @@ class Products implements iProducts{
             if(in_array('View Admin', $this->arr_group_permissions)){
                 $scope[] = 'admin';
             }
+
             if(!empty($scope)){
-                $tmp = array_merge($tmp, $this->datasource->getProductsByScope($scope));
+                $tmp = array_merge($tmp, $this->datasource->getProductsByScope($scope, $this->herd->herdCode()));
             }
 
             $tmp = array_map("unserialize", array_unique(array_map("serialize", $tmp)));

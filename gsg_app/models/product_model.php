@@ -2,7 +2,6 @@
 class Product_model extends CI_Model {
 	public function __construct(){
 		parent::__construct();
-		$this->tables = $this->config->item('tables', 'ion_auth');
 	}
 
 	/**
@@ -33,8 +32,10 @@ class Product_model extends CI_Model {
 	 * @param array $scope names
 	 * @return array of product data for given user
 	 * @author ctranel
+	 *
+	 * @todo: escape scopes text before putting in query
 	 **/
-	public function getProductsByScope($scopes) {
+	public function getProductsByScope($scopes, $herd_code) {
 		if(empty($scopes)){
 			return false;
 		}
@@ -47,6 +48,7 @@ class Product_model extends CI_Model {
 			FROM users.dbo.pages p
 				INNER JOIN users.dbo.lookup_scopes ls ON p.scope_id = ls.id
 				INNER JOIN users.dbo.pages_reports pr ON p.id = pr.page_id
+				INNER JOIN herd.dbo.herd_output ho ON pr.report_code = ho.report_code AND ho.herd_code = '" . $herd_code . "' AND ho.activity_code IN('A', 'E')
 				INNER JOIN dhi_tables.dbo.report_catalog r ON pr.report_code = r.report_code
 			WHERE p.active = 1 AND ls.name IN(" . $scope_text . ")
 		";

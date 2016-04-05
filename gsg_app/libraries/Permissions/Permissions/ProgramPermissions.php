@@ -27,28 +27,13 @@ class ProgramPermissions implements iPermissions{
     protected $datasource;
 
     /**
-     * $group_id
-     * @var id
-    protected $group_id;
-**/
-
-    /**
      * $permissions_list
      * @var Array
      **/
     protected $permissions_list;
 
-    /**
-     * $products
-     * @var Products
-    protected $products;
-**/
-
     function __construct(\Permissions_model $datasource, $group_permissions_list, $accessible_product_codes) {
         $this->datasource = $datasource;
-        //$this->group_id = $group_id;
-        //$this->products = $products;
-
         $rep = $this->getProductPermissionsList($accessible_product_codes);
         $this->permissions_list = array_unique(array_merge($group_permissions_list, $rep));
     }
