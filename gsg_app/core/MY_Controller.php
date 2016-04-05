@@ -74,9 +74,14 @@ class MY_Controller extends CI_Controller
     //@todo: needs to be a part of some kind of authorization class
     protected function redirect($url, $message = ''){
         if(is_array($message)){
-            $message = implode('<br>', $message);
+            $message = urlencode(implode('<br>', $message));
         }
-        $this->session->set_flashdata('message',  $this->session->flashdata('message') . $message);
+        if(isset($message) && !empty($message)){
+            $this->session->set_flashdata('message',  $this->session->flashdata('message') . '<br>' . $message);
+        }
+        else{
+            $this->session->keep_flashdata('message');
+        }
         redirect($url);
     }
 

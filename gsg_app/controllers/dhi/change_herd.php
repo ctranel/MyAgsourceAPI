@@ -49,7 +49,6 @@ class Change_herd extends MY_Controller {
 			}
 			$this->redirect(site_url('auth/login'));
 		}
-
 		$this->load->model('access_log_model');
 		$this->access_log = new AccessLog($this->access_log_model);
 		$this->load->model('notice_model');

@@ -20,13 +20,13 @@ class MY_Session extends CI_Session {
     /**
      * clear_flashdata
      * @return  void
-     */
 	function clear_flashdata(){
-var_dump($this->userdata);
+var_dump($this->userdata); die;
 		foreach($this->all_userdata() as $key => $val){
 			if(strpos($key,'flash:old:') > -1){ // key is flashdata
 				$item = substr($key , strlen('flash:old:'));
 			}
 		}
 	}
+*/
 }
