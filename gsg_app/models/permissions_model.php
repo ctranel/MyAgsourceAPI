@@ -44,7 +44,9 @@ class Permissions_Model extends CI_Model
      * @author ctranel
      **/
     public function getProductPermissionsData($report_codes){
-        $results = $this->db->select('name, description')
+        $results = $this->db
+            ->select('name, description')
+            ->distinct()
             ->join('users.dbo.reports_tasks rt', 't.id = rt.task_id', 'inner')
             ->where_in('rt.report_code', $report_codes)
             ->get('users.dbo.tasks t')

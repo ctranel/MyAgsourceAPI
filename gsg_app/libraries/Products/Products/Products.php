@@ -38,6 +38,30 @@ class Products implements iProducts{
     protected $arr_group_permissions;
 
     /**
+     * accessible_products
+     * @var Array or Product objects
+     **/
+    protected $accessible_products;
+
+    /**
+     * inaccessible_products
+     * @var Array or Product objects
+     **/
+    protected $inaccessible_products;
+
+    /**
+     * accessible_products
+     * @var Array or strings
+     **/
+    protected $accessible_product_codes;
+
+    /**
+     * inaccessible_products
+     * @var Array or strings
+     **/
+    protected $inaccessible_product_codes;
+
+    /**
      * $tree
      * @var Array
     protected $tree;
@@ -50,26 +74,8 @@ class Products implements iProducts{
     }
 
     /**
-     * @method allProducts()
-     * @return \SplObjectStorage of Product objects
-     * @access public
-
-    protected function allProducts(){
-        $ret = new \SplObjectStorage();
-        $tmp = $this->datasource->getAllProducts();
-
-        if(!isset($tmp) || empty($tmp) || !is_array($tmp)){
-            return $ret;
-        }
-
-        $ret = $this->datasetToObjectStorage($tmp);
-
-        return $ret;
-    }
-**/
-    /**
      * @method allProductsData()
-     * @return array of product objects
+     * @return array of raw product data
      * @access protected
      **/
     protected function allProductsData(){
@@ -78,21 +84,46 @@ class Products implements iProducts{
     }
 
     /**
-     * @method accessibleProducts()
-     * @return \SplObjectStorage of Product objects
-     * @access public
+     * @method setAccessibleProducts()
+     * @return void
+     * @access protected
      **/
-    public function accessibleProducts(){
-        $ret = new \SplObjectStorage();
+    protected function setAccessibleProducts(){
+        $ret = [];
         $tmp = $this->accessibleProductsData();
 
         if(!isset($tmp) || empty($tmp) || !is_array($tmp)){
             return $ret;
         }
 
-        $ret = $this->datasetToObjectStorage($tmp);
+        $this->accessible_product_codes = array_column($tmp, 'product_code');
+        $this->accessible_products = $this->datasetToObjects($tmp);
+    }
+    
+    /**
+     * @method accessibleProducts()
+     * @return array of Product objects
+     * @access public
+     **/
+    public function accessibleProducts(){
+        if(!isset($this->accessible_products)){
+            $this->setAccessibleProducts();
+        }
 
-        return $ret;
+        return $this->accessible_products;
+    }
+
+    /**
+     * @method accessibleReportCodes()
+     * @return array of strings
+     * @access public
+     **/
+    public function accessibleProductCodes(){
+        if(!isset($this->accessible_product_codes)){
+            $this->setAccessibleProducts();
+        }
+
+        return $this->accessible_product_codes;
     }
 
     /**
@@ -133,21 +164,50 @@ class Products implements iProducts{
     }
 
     /**
+     * @method setInaccessibleProducts()
+     * @return void
+     * @access protected
+     **/
+    protected function setInaccessibleProducts(){
+        $ret = [];
+        $accessible = $this->accessibleProductsData();
+        $accessible_product_codes = array_column($accessible, 'product_code');
+
+        $upsell_data = $this->datasource->getUpsellProducts($accessible_product_codes);
+
+        if(isset($upsell_data) && !empty($upsell_data) && is_array($upsell_data)){
+            $this->inaccessible_products = $this->datasetToObjects($upsell_data);
+        }
+
+        $this->inaccessible_product_codes = array_column($upsell_data, 'report_code');
+        $this->inaccessible_products = $this->datasetToObjects($upsell_data);;
+    }
+
+
+    /**
      * @method inaccessibleProducts()
-     * @return \SplObjectStorage of Product objects
+     * @return array of Product objects
      * @access public
      **/
     public function inaccessibleProducts(){
-        $ret = new \SplObjectStorage();
-        $accessible = $this->accessibleProductsData();
-        $accessible_report_codes = \array_extract_value_recursive('product_code', $accessible);
-
-        $upsell_data = $this->datasource->getUpsellProducts($accessible_report_codes);
-
-        if(isset($upsell_data) && !empty($upsell_data) && is_array($upsell_data)){
-            $ret = $this->datasetToObjectStorage($upsell_data);
+        if(!isset($this->inaccessible_products)){
+            $this->setInaccessibleProducts();
         }
-        return $ret;
+
+        return $this->inaccessible_products;
+    }
+
+    /**
+     * @method inaccessibleReportCodes()
+     * @return array of strings
+     * @access public
+     **/
+    public function inaccessibleProductCodes(){
+        if(!isset($this->inaccessible_product_codes)){
+            $this->setInaccessibleProducts();
+        }
+
+        return $this->inaccessible_product_codes;
     }
 
     /**
@@ -155,13 +215,13 @@ class Products implements iProducts{
      * @return \SplObjectStorage of Product objects
      * @access protected
      **/
-    protected function datasetToObjectStorage($dataset){
-        $ret = new \SplObjectStorage();
+    protected function datasetToObjects($dataset){
+        $ret = [];
         if(!isset($dataset) || empty($dataset) || !is_array($dataset)){
             return $ret;
         }
         foreach($dataset as $k => $v){
-            $ret->attach(new Product($this->datasource, $v['product_code'], $v['name'], $v['description']));
+            $ret[] = new Product($this->datasource, $v['product_code'], $v['name'], $v['description']);
         }
 
         return $ret;
