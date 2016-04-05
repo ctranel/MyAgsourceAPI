@@ -24,7 +24,7 @@ class Pdf_archive_model extends CI_Model {
             ->from('herd.dbo.herd_pdf_report_log p')
             ->join('dhi_tables.dbo.report_catalog r', 'p.report_code=r.report_code', 'inner')
             ->join(
-                "(SELECT max(id) AS id, herd_code, test_date, report_code FROM herd.dbo.herd_pdf_report_log GROUP BY herd_code, test_date, report_code) ts",
+                "(SELECT max(id) AS id, herd_code, test_date, report_code FROM herd.dbo.herd_pdf_report_log WHERE herd_code = '$herd_code' GROUP BY herd_code, test_date, report_code) ts",
                 'p.id = ts.id',
                 'inner'
             )
