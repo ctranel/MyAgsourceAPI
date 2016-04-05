@@ -1,7 +1,6 @@
 <?php
 namespace myagsource\Products\Products;
 
-//require_once(APPPATH . 'helpers/multid_array_helper.php');
 require_once(APPPATH . 'libraries/Products/iProducts.php');
 require_once(APPPATH . 'libraries/Products/Products/Product.php');
 
@@ -12,8 +11,9 @@ use myagsource\Products\iProducts;
 /**
  * Constructs permission-and-herd-based navigation
  *
+ * @todo: has evolved into more of a Product Access class than Products
  *
- * @name Navigation
+ * @name Products
  * @author ctranel
  *
  *

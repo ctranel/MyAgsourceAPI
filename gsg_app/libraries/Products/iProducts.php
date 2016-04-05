@@ -12,8 +12,8 @@ namespace myagsource\Products;
  */
 
 interface iProducts {
-    //public function allProducts();
     public function accessibleProducts();
+    public function accessibleProductCodes();
     public function inaccessibleProducts();
-    //public function getProduct($product_code);
+    public function inaccessibleProductCodes();
 }

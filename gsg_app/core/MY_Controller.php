@@ -55,7 +55,7 @@ class MY_Controller extends CI_Controller
         $this->herd_access = new HerdAccess($this->herd_model);
         $blocks = new Blocks($this->block_model);
         $pages = new Pages($this->page_model, $blocks);
-        $sections = new Sections($this->section_model, $pages);
+        //$sections = new Sections($this->section_model, $pages);
         $herd = new Herd($this->herd_model, $this->session->userdata('herd_code'));
 
         if($this->session->userdata('active_group_id')) {
