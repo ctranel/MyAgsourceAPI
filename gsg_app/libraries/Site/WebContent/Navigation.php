@@ -81,9 +81,10 @@ class Navigation{// implements iWebContentRepository {
 			}
 
 			$tmp_array = array_map("unserialize", array_unique(array_map("serialize", $tmp_array)));
-
-			usort($tmp_array, \sort_by_key_value_comp('list_order'));
 		}
+
+		usort($tmp_array, \sort_by_key_value_comp('list_order'));
+
 		return $tmp_array;
 	}
 
