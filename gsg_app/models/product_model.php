@@ -49,8 +49,9 @@ class Product_model extends CI_Model {
 				INNER JOIN users.dbo.lookup_scopes ls ON p.scope_id = ls.id
 				INNER JOIN users.dbo.pages_reports pr ON p.id = pr.page_id
 				INNER JOIN herd.dbo.herd_output ho ON pr.report_code = ho.report_code AND ho.herd_code = '" . $herd_code . "' AND ho.activity_code IN('A', 'E')
+				INNER JOIN users.dbo.v_user_status_info ui ON ho.herd_code = ui.herd_code AND ho.report_code = ui.report_code
 				INNER JOIN dhi_tables.dbo.report_catalog r ON pr.report_code = r.report_code
-			WHERE p.active = 1 AND ls.name IN(" . $scope_text . ")
+			WHERE p.active = 1 AND ls.name IN(" . $scope_text . ") AND (ui.herd_is_paying = 1 OR ui.herd_is_active_trial = 1)
 		";
 
         $tmp_arr_sections = $this->db

@@ -1,6 +1,7 @@
 <?php
 namespace myagsource\Products\Products;
 
+//require_once(APPPATH . 'helpers/multid_array_helper.php');
 require_once(APPPATH . 'libraries/Products/iProducts.php');
 require_once(APPPATH . 'libraries/Products/Products/Product.php');
 
@@ -11,9 +12,8 @@ use myagsource\Products\iProducts;
 /**
  * Constructs permission-and-herd-based navigation
  *
- * @todo: has evolved into more of a Product Access class than Products
  *
- * @name Products
+ * @name P
  * @author ctranel
  *
  *
@@ -152,9 +152,8 @@ class Products implements iProducts{
             if(in_array('View Admin', $this->arr_group_permissions)){
                 $scope[] = 'admin';
             }
-
             if(!empty($scope)){
-                $tmp = array_merge($tmp, $this->datasource->getProductsByScope($scope, $this->herd->herdCode()));
+                $tmp = array_merge($tmp, $this->datasource->getProductsByScope($scope));
             }
 
             $tmp = array_map("unserialize", array_unique(array_map("serialize", $tmp)));
