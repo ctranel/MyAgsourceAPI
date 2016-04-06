@@ -140,18 +140,18 @@ abstract class report_parent extends MY_Controller {
 		//is someone logged in?
 		if($this->herd->herdCode() != $this->config->item('default_herd')){
 			if(!$this->as_ion_auth->logged_in()) {
-				$this->redirect(site_url('auth/login'), "Please log in.  ");
+				$this->redirect(site_url('auth/login'), "Please log in.");
 			}
 			
 			//is a herd selected?
 			if(!$this->herd->herdCode() || $this->herd->herdCode() == ''){
-				$this->redirect(site_url('dhi/change_herd/select'), "Please select a herd and try again.  ");
+				$this->redirect(site_url('dhi/change_herd/select'), "Please select a herd and try again.");
 			}
 			
 			//does logged in user have access to selected herd?
 			$has_herd_access = $this->herd_access->hasAccess($this->session->userdata('user_id'), $this->herd->herdCode(), $this->session->userdata('arr_regions'), $this->permissions->permissionsList());
 			if(!$has_herd_access){
-				$this->redirect(site_url('dhi/change_herd/select'),"You do not have permission to access this herd.  Please select another herd and try again.  ");
+				$this->redirect(site_url('dhi/change_herd/select'),"You do not have permission to access this herd.  Please select another herd and try again.");
 			}
 		}
 		$this->load->model('web_content/section_model');

@@ -9,9 +9,6 @@
 		elseif(!is_array($message)): ?>
 			<div id="info-message"><?php echo $message;?></div>
 <?php 	endif;
-	elseif($this->session->flashdata('message') != ''): ?>
-			<div id="info-message"><?php echo $this->session->flashdata('message');?></div>
-<?php
 	endif;
 
 	 echo form_open('auth/reset_password/' . $code);?>

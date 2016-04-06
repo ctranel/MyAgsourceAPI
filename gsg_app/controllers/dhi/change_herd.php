@@ -40,12 +40,12 @@ class Change_herd extends MY_Controller {
 		$this->herd_access = new HerdAccess($this->herd_model);
 		if(!isset($this->as_ion_auth)){
 			$this->session->keep_all_flashdata();
-			$this->redirect('auth/login', $this->session->flashdata('message') . '<br>Please log in');
+			$this->redirect('auth/login', $this->session->flashdata('message') + ['Please log in']);
 		}
 		if((!$this->as_ion_auth->logged_in())){
 			$this->session->keep_all_flashdata();
-			if(strpos($this->session->flashdata('message'), 'Please log in.') === FALSE){
-				$this->session->set_flashdata('message',  $this->session->flashdata('message') . '<br>Please log in.');
+			if(array_search('Please log in.', $this->session->flashdata('message')) === FALSE){
+				$this->session->set_flashdata('message',  $this->session->flashdata('message') + ['Please log in.']);
 			}
 			$this->redirect(site_url('auth/login'));
 		}
@@ -75,7 +75,7 @@ class Change_herd extends MY_Controller {
 		}
 		else {
 			$this->session->keep_all_flashdata();
-			$this->redirect(site_url($this->session->userdata('redirect_url')), $this->session->flashdata('message') . '<br>You do not have permissions to request herds.');
+			$this->redirect(site_url($this->session->userdata('redirect_url')), ['You do not have permissions to request herds.']);
 		}
 	}
 
@@ -95,7 +95,7 @@ class Change_herd extends MY_Controller {
 
 		if(!$this->permissions->hasPermission("Select Herd")){
 			$this->session->keep_all_flashdata();
-			$this->redirect(site_url($this->session->userdata('redirect_url')), $this->session->flashdata('message') . '<br>You do not have permissions to select herds.');
+			$this->redirect(site_url($this->session->userdata('redirect_url')), ['You do not have permissions to select herds.']);
 			exit();
 		}
 		//validate form input
@@ -208,7 +208,7 @@ class Change_herd extends MY_Controller {
 				);
 			}
 			$this->page_footer_data = [];
-			$this->page_header_data['message'] = compose_error($err, validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages());
+			$this->page_header_data['message'] = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $err);
 			$this->data['page_header'] = $this->load->view('page_header', $this->page_header_data, TRUE);
 			$this->data['page_heading'] = 'Select Herd - ' . $this->config->item('product_name');
 			$this->data['page_footer'] = $this->load->view('page_footer', $this->page_footer_data, TRUE);
@@ -232,7 +232,7 @@ class Change_herd extends MY_Controller {
 		}
 		if(!$this->permissions->hasPermission("Request Herd")){
 			$this->session->keep_all_flashdata();
-			$this->redirect(site_url($this->session->userdata('redirect_url')), $this->session->flashdata('message') . '<br>You do not have permissions to request herds.');
+			$this->redirect(site_url($this->session->userdata('redirect_url')), ['You do not have permissions to request herds.']);
 		}
 
 		//validate form input
@@ -246,7 +246,7 @@ class Change_herd extends MY_Controller {
 			$error = $this->herd_model->herd_authorization_error($herd_code, $herd_release_code);
 			if($error){
 				$this->session->keep_all_flashdata();
-				$this->redirect(site_url('dhi/change_herd/request'), $this->session->flashdata('message') . '<br>Invalid data submitted: ' . $error);
+				$this->redirect(site_url('dhi/change_herd/request'), ['Invalid data submitted: ' . $error]);
 			}
 		}
 

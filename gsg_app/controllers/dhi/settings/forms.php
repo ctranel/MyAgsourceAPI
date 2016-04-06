@@ -103,7 +103,7 @@ class Forms extends MY_Controller {
 				]
 			]
 		);
-		$this->page_header_data['message'] = compose_error($err, validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages());
+		$this->page_header_data['message'] = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $err);
 		$this->page_header_data['page_heading'] = 'General DHI Settings for Herd ' . $this->session->userdata('herd_code');
 		
 		//put it all together
@@ -143,7 +143,7 @@ class Forms extends MY_Controller {
 				]
 			]
 		);
-		$this->page_header_data['message'] = compose_error($err, validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages());
+		$this->page_header_data['message'] = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $err);
 		$this->page_header_data['page_heading'] = 'Benchmark Settings for Herd ' . $this->session->userdata('herd_code');
 		
 		//put it all together

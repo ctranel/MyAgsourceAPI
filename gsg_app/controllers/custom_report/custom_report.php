@@ -229,11 +229,6 @@ class Custom_report extends CI_Controller {
 				$this->load->view('custom_report/custom_report_form', $this->data);
 			}
        	} 
-       	//else {
-		//	$this->session->keep_all_flashdata();
-       //		$this->session->set_flashdata('message', "You do not have permission to edit the requested account.");
-       	//	redirect(site_url());
-       	//}
 	}
 	
 	/***********  AJAX FUNCTIONS  **********************/

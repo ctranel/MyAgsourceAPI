@@ -3,22 +3,6 @@ class Download extends MY_Controller {
 	
 	function __construct(){
 		parent::__construct();
-/*		if(!isset($this->as_ion_auth)){
-			$this->session->keep_all_flashdata();
-			redirect('auth/login', 'refresh');
-		}
-		if((!$this->as_ion_auth->logged_in())){
-			$this->session->keep_all_flashdata();
-			$redirect_url = set_redirect_url($this->uri->uri_string(), $this->session->flashdata('redirect_url'));
-			$this->session->set_userdata('redirect_url', $redirect_url);
-			if(strpos($this->session->flashdata('message'), 'Please log in.') === FALSE){
-				$this->session->set_flashdata('message',  $this->session->flashdata('message') . 'Please log in.');
-			}
-			else{
-				$this->session->keep_flashdata('message');
-			}
-			redirect(site_url('auth/login'));
-		} */
 	}
 
 	function bench_all(){

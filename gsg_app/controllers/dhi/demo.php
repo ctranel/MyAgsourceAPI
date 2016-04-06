@@ -37,11 +37,11 @@ class Demo extends MY_Controller {
 		
 		if($this->as_ion_auth->login('support@myagsource.com', 'AQECTGBUZI', false)){ //if the login is successful
 			//$this->_record_access(1); //1 is the page code for login for the user management section
-			$this->session->set_flashdata('message', $this->as_ion_auth->messages());
+			$this->session->set_flashdata('message', [$this->as_ion_auth->messages()]);
 			redirect(site_url('dhi/change_herd/select'));
 		}
 		else{ //if the login was un-successful
-			$this->session->set_flashdata('message', 'Sorry, we could not log in the guest user.  Please contact customer service for assistance: 1-800-236-4995');
+			$this->session->set_flashdata('message', ['Sorry, we could not log in the guest user.  Please contact customer service for assistance: 1-800-236-4995']);
 			redirect(site_url('auth/login')); //use redirects instead of loading views for compatibility with MY_Controller libraries
 		}
 	}

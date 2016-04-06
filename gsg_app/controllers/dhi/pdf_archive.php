@@ -36,13 +36,13 @@ class Pdf_archive extends MY_Controller {
             $pdf_data = $this->pdf_archive_model->getPdfData($pdf_id, $this->session->userdata('herd_code')); //herd_code, test_date, report_code, report_name, file_path
         }
         catch(\Exception $e){
-            $this->session->set_flashdata('message',  $this->session->flashdata('message') . '<br>' . $e->getMessage());
+            $this->session->set_flashdata('message',  $this->session->flashdata('message') + [$e->getMessage()]);
             redirect('/');
         }
         $file = $this->config->item('pdf_path') . $pdf_data['herd_code'] . '/' . str_replace('-', '', $pdf_data['test_date']) . '/' . $pdf_data['filename'];
 
         if(!file_exists($file)){
-            $this->session->set_flashdata('message',  $this->session->flashdata('message') . '<br>Could not find PDF file.');
+            $this->session->set_flashdata('message',  $this->session->flashdata('message') + ['Could not find PDF file.']);
             redirect('/');
         }
 

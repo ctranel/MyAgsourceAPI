@@ -140,7 +140,7 @@ class blocks extends MY_Controller {
 		//Check for valid herd_code
 		if(!$this->herd){
 			//keep flashdata is in constructor
-			$this->session->set_flashdata('message', 'Please select a valid herd.');
+			$this->session->set_flashdata('message', ['Please select a valid herd.']);
 			redirect(site_url($this->report_path));
 		}
 		

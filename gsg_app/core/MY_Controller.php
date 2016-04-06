@@ -71,16 +71,17 @@ class MY_Controller extends CI_Controller
     }
 
     //redirects while retaining message and conditionally setting redirect url
-    //@todo: needs to be a part of some kind of authorization class
+    //@todo: needs to be a part of some kind of authorization class?
     protected function redirect($url, $message = ''){
-        if(is_array($message)){
-            $message = urlencode(implode('<br>', $message));
+        if(!is_array($message) && !empty($message)){
+            $message = [$message];
         }
-        if(isset($message) && !empty($message)){
-            $this->session->set_flashdata('message',  $this->session->flashdata('message') . '<br>' . $message);
+        if($this->session->flashdata('message')){
+            $message = $message + $this->session->flashdata('message');
+            $this->session->set_flashdata('message', $message);
         }
-        else{
-            $this->session->keep_flashdata('message');
+        elseif(isset($message) && !empty($message)){
+            $this->session->set_flashdata('message', $message);
         }
         redirect($url);
     }

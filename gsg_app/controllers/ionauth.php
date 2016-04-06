@@ -32,7 +32,7 @@ class Ionauth extends CI_Controller {
 		else
 		{
 			//set the flash data error message if there is one
-			$this->data['message'] = (validation_errors()) ? validation_errors() : $this->session->flashdata('message');
+			$this->data['message'] = validation_errors();
 
 			//list the users
 			$this->data['users'] = $this->ion_auth->users()->result();
@@ -63,20 +63,20 @@ class Ionauth extends CI_Controller {
 			if ($this->ion_auth->login($this->input->post('identity'), $this->input->post('password'), $remember))
 			{ //if the login is successful
 				//redirect them back to the home page
-				$this->session->set_flashdata('message', $this->ion_auth->messages());
+				$this->session->set_flashdata('message', [$this->ion_auth->messages()]);
 				redirect($this->config->item('base_url'), 'refresh');
 			}
 			else
 			{ //if the login was un-successful
 				//redirect them back to the login page
-				$this->session->set_flashdata('message', $this->ion_auth->errors());
+				$this->session->set_flashdata('message', [$this->ion_auth->errors()]);
 				redirect(site_url('auth/login'), 'refresh'); //use redirects instead of loading views for compatibility with MY_Controller libraries
 			}
 		}
 		else
 		{  //the user is not logging in so display the login page
 			//set the flash data error message if there is one
-			$this->data['message'] = (validation_errors()) ? validation_errors() : $this->session->flashdata('message');
+			$this->data['message'] = validation_errors();
 
 			$this->data['identity'] = array('name' => 'identity',
 				'id' => 'identity',
@@ -121,7 +121,7 @@ class Ionauth extends CI_Controller {
 		if ($this->form_validation->run() == false)
 		{ //display the form
 			//set the flash data error message if there is one
-			$this->data['message'] = (validation_errors()) ? validation_errors() : $this->session->flashdata('message');
+			$this->data['message'] = validation_errors();
 
 			$this->data['min_password_length'] = $this->config->item('min_password_length', 'ion_auth');
 			$this->data['old_password'] = array(
@@ -159,12 +159,12 @@ class Ionauth extends CI_Controller {
 
 			if ($change)
 			{ //if the password was successfully changed
-				$this->session->set_flashdata('message', $this->ion_auth->messages());
+				$this->session->set_flashdata('message', [$this->ion_auth->messages()]);
 				$this->logout();
 			}
 			else
 			{
-				$this->session->set_flashdata('message', $this->ion_auth->errors());
+				$this->session->set_flashdata('message', [$this->ion_auth->errors()]);
 				redirect(site_url('auth/change_password'), 'refresh');
 			}
 		}
@@ -181,7 +181,7 @@ class Ionauth extends CI_Controller {
 				'id' => 'email',
 			);
 			//set any errors and display the form
-			$this->data['message'] = (validation_errors()) ? validation_errors() : $this->session->flashdata('message');
+			$this->data['message'] = validation_errors();
 			$this->load->view('auth/forgot_password', $this->data);
 		}
 		else
@@ -191,12 +191,12 @@ class Ionauth extends CI_Controller {
 
 			if ($forgotten)
 			{ //if there were no errors
-				$this->session->set_flashdata('message', $this->ion_auth->messages());
+				$this->session->set_flashdata('message', [$this->ion_auth->messages()]);
 				redirect(site_url("auth/login"), 'refresh'); //we should display a confirmation page here instead of the login page
 			}
 			else
 			{
-				$this->session->set_flashdata('message', $this->ion_auth->errors());
+				$this->session->set_flashdata('message', [$this->ion_auth->errors()]);
 				redirect(site_url("auth/forgot_password"), 'refresh');
 			}
 		}
@@ -221,7 +221,7 @@ class Ionauth extends CI_Controller {
 			if ($this->form_validation->run() == false)
 			{//display the form
 				//set the flash data error message if there is one
-				$this->data['message'] = (validation_errors()) ? validation_errors() : $this->session->flashdata('message');
+				$this->data['message'] = validation_errors();
 
 				$this->data['min_password_length'] = $this->config->item('min_password_length', 'ion_auth');
 				$this->data['new_password'] = array(
@@ -266,12 +266,12 @@ class Ionauth extends CI_Controller {
 
 					if ($change)
 					{ //if the password was successfully changed
-						$this->session->set_flashdata('message', $this->ion_auth->messages());
+						$this->session->set_flashdata('message', [$this->ion_auth->messages()]);
 						$this->logout();
 					}
 					else
 					{
-						$this->session->set_flashdata('message', $this->ion_auth->errors());
+						$this->session->set_flashdata('message', [$this->ion_auth->errors()]);
 						redirect(site_url('auth/reset_password/' . $code), 'refresh');
 					}
 				}
@@ -279,7 +279,7 @@ class Ionauth extends CI_Controller {
 		}
 		else
 		{ //if the code is invalid then send them back to the forgot password page
-			$this->session->set_flashdata('message', $this->ion_auth->errors());
+			$this->session->set_flashdata('message', [$this->ion_auth->errors()]);
 			redirect(site_url("auth/forgot_password"), 'refresh');
 		}
 	}
@@ -296,13 +296,13 @@ class Ionauth extends CI_Controller {
 		if ($activation)
 		{
 			//redirect them to the auth page
-			$this->session->set_flashdata('message', $this->ion_auth->messages());
+			$this->session->set_flashdata('message', [$this->ion_auth->messages()]);
 			redirect(site_url("auth"), 'refresh');
 		}
 		else
 		{
 			//redirect them to the forgot password page
-			$this->session->set_flashdata('message', $this->ion_auth->errors());
+			$this->session->set_flashdata('message', [$this->ion_auth->errors()]);
 			redirect(site_url("auth/forgot_password"), 'refresh');
 		}
 	}
@@ -383,13 +383,13 @@ class Ionauth extends CI_Controller {
 		if ($this->form_validation->run() == true && $this->ion_auth->register($username, $password, $email, $additional_data))
 		{ //check to see if we are creating the user
 			//redirect them back to the admin page
-			$this->session->set_flashdata('message', "User Created");
+			$this->session->set_flashdata('message', ["User Created"]);
 			redirect(site_url("auth"), 'refresh');
 		}
 		else
 		{ //display the create user form
 			//set the flash data error message if there is one
-			$this->data['message'] = (validation_errors() ? validation_errors() : ($this->ion_auth->errors() ? $this->ion_auth->errors() : $this->session->flashdata('message')));
+			$this->data['message'] = (validation_errors() ? [validation_errors()] : ($this->ion_auth->errors() ? [$this->ion_auth->errors()] : []));
 
 			$this->data['first_name'] = array('name' => 'first_name',
 				'id' => 'first_name',

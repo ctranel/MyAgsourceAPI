@@ -167,7 +167,7 @@ class Cow_lookup extends MY_Controller {
 		$this->carabiner->css('report.css');
 		$this->carabiner->css('cow_page.css');
 		$page_footer_data = array();
-		$this->page_header_data['message'] = compose_error($err, validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages());
+		$this->page_header_data['message'] = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $err);
 		$this->page_header_data['page_heading'] = 'Cow Lookup';
 		$page_data['page_header'] = $this->load->view('page_header', $this->page_header_data, TRUE);
 		$page_data['page_footer'] = $this->load->view('page_footer', $page_footer_data, TRUE);

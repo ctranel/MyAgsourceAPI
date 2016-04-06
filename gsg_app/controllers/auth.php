@@ -64,16 +64,17 @@ class Auth extends Ionauth {
 	}
 
     //redirects while retaining message and conditionally setting redirect url
-    //@todo: needs to be a part of some kind of authorization class
-    protected function redirect($url, $message = ''){
-		if(is_array($message)){
-			$message = urlencode(implode('<br>', $message));
+    //@todo: needs to be a part of some kind of authorization class?
+    protected function redirect($url, $message = []){
+		if(!is_array($message) && !empty($message)){
+			$message = [$message];
 		}
-		if(isset($message) && !empty($message)){
-            $this->session->set_flashdata('message',  $this->session->flashdata('message') . '<br>' . $message);
+		if($this->session->flashdata('message')){
+            $message = $message + $this->session->flashdata('message');
+            $this->session->set_flashdata('message', $message);
         }
-        else{
-            $this->session->keep_flashdata('message');
+        elseif(isset($message) && !empty($message)){
+            $this->session->set_flashdata('message', $message);
         }
         redirect($url);
     }
@@ -1139,7 +1140,7 @@ class Auth extends Ionauth {
 		$this->form_validation->set_rules('phone1', 'First Part of Phone', 'exact_length[3]|required');
 		$this->form_validation->set_rules('phone2', 'Second Part of Phone', 'exact_length[3]|required');
 		$this->form_validation->set_rules('phone3', 'Third Part of Phone', 'exact_length[4]|required');
-		$this->form_validation->set_rules('best_time', 'Best Time to Call', 'max_length[10]');
+		$this->form_validation->set_rules('best_time', 'Best Time to Call', 'max_length[10]|required');
 		$this->form_validation->set_rules('password', 'Password', 'trim|min_length[' . $this->config->item('min_password_length', 'ion_auth') . ']|max_length[' . $this->config->item('max_password_length', 'ion_auth') . ']|matches[password_confirm]');
 		$this->form_validation->set_rules('password_confirm', 'Password Confirmation', 'trim');
 		$this->form_validation->set_rules('group_id[]', 'Name of Account Group');
@@ -1386,7 +1387,7 @@ class Auth extends Ionauth {
 			$this->session->set_userdata('active_group_id', (int)$group_id);
 		}
 		else {
-			$this->session->set_flashdata('message', "You do not have rights to the requested group.");
+			$this->session->set_flashdata('message', ["You do not have rights to the requested group."]);
 		}
 		$this->redirect(site_url($this->session->userdata('redirect_url')));
 	}

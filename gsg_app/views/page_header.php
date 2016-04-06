@@ -148,8 +148,14 @@ header('X-UA-Compatible: IE=edge,chrome=1');
 		elseif(!is_array($message)): ?>
 			<div id="info-message"><?php echo $message;?></div>
 <?php 	endif;
-	elseif($this->session->flashdata('message') != ''): ?>
-			<div id="info-message"><?php echo $this->session->flashdata('message');?></div>
-<?php
+	elseif(!empty($this->session->flashdata('message'))):
+	 	$message = $this->session->flashdata('message');
+	 	if (is_array($message) && !empty($message)):
+			foreach($message as $m) {?>
+				<div id="info-message"><?php echo $m;?></div>
+			<?php }
+		elseif(!is_array($message)): ?>
+			<div id="info-message"><?php echo $message;?></div>
+<?php 	endif;
 	endif;
 	
