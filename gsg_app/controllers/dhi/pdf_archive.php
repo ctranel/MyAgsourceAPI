@@ -28,8 +28,7 @@ class Pdf_archive extends MY_Controller {
 
     function show($pdf_id){
         if(!$this->permissions->hasPermission('View All Content') && !$this->permissions->hasPermission('View Archived Reports')){
-            $this->session->set_flashdata('message',  $this->session->flashdata('message') + ['You do not have permission to view archived reports.']);
-            redirect('/');
+            $this->redirect('/', 'You do not have permission to view archived reports.');
         }
 
         $this->load->model('dhi/pdf_archive_model');
@@ -37,15 +36,13 @@ class Pdf_archive extends MY_Controller {
             $pdf_data = $this->pdf_archive_model->getPdfData($pdf_id, $this->session->userdata('herd_code')); //herd_code, test_date, report_code, report_name, file_path
         }
         catch(\Exception $e){
-            $this->session->set_flashdata('message',  $this->session->flashdata('message') + [$e->getMessage()]);
-            redirect('/');
+            $this->redirect('/', $e->getMessage());
         }
         $file = $this->config->item('pdf_path') . $pdf_data['herd_code'] . '/' . str_replace('-', '', $pdf_data['test_date']) . '/' . $pdf_data['filename'];
-var_dump(get_current_user(), file_exists('/opt/data/agsource/all_pdf_reports'),file_exists($file), $file); die;
+//var_dump(get_current_user(), file_exists('/opt/data/agsource/all_pdf_reports'),file_exists($file), $file); die;
 
         if(!file_exists($file)){
-            $this->session->set_flashdata('message',  $this->session->flashdata('message') + ['Could not find PDF file.']);
-            redirect('/');
+            $this->redirect('/', 'Could not find PDF file.');
         }
 
         $filename = $pdf_data['herd_code'] . '_' . str_replace('-', '', $pdf_data['test_date']) . '_' . str_replace(' ', '-', $pdf_data['report_name']) . '.pdf';
