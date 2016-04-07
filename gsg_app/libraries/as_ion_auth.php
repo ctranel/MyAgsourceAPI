@@ -194,12 +194,14 @@ class As_ion_auth extends \Ion_auth {
 	public function get_group_dropdown_data($active_group_id){
 		$arr_groups = array();
 		$ret_array = array();
-		if($this->permissions->hasPermission('Add All Users')){
-			$arr_groups = $this->ion_auth_model->get_active_groups()->result_array();
-		}
-		elseif($this->logged_in()){
-			if($this->permissions->hasPermission('Add Users In Region')){
-				$arr_groups = $this->ion_auth_model->get_editable_groups($active_group_id);
+		if(isset($this->permissions)){
+			if($this->permissions->hasPermission('Add All Users')){
+				$arr_groups = $this->ion_auth_model->get_active_groups()->result_array();
+			}
+			elseif($this->logged_in()){
+				if($this->permissions->hasPermission('Add Users In Region')){
+					$arr_groups = $this->ion_auth_model->get_editable_groups($active_group_id);
+				}
 			}
 		}
 		if(empty($arr_groups)){

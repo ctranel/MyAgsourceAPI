@@ -27,6 +27,7 @@ class Auth extends Ionauth {
         $this->load->library('carabiner');
         $this->load->helper('error');
         $this->load->helper('html');
+        $this->load->model('dhi/herd_model');
 
         //instantiate in case noone is logged in
         if(!$this->session->userdata('user_id')) {
@@ -36,7 +37,6 @@ class Auth extends Ionauth {
 
         //instantiate as_ion_auth with permissions
         if($this->session->userdata('active_group_id')) {
-            $this->load->model('dhi/herd_model');
             $herd = new Herd($this->herd_model, $this->session->userdata('herd_code'));
 
             $this->load->model('permissions_model');
@@ -893,21 +893,23 @@ class Auth extends Ionauth {
 			$herd_release_code = NULL;
 
 			//Set variables that depend on group(s) selected
-			if($this->permissions->hasPermission("Add All Users") || $this->permissions->hasPermission("Add Users In Region")){
-				$arr_posted_group_id = $this->input->post('group_id');
-				if(!$this->as_ion_auth->group_assignable($arr_posted_group_id)){
-					$this->redirect(site_url("auth/create_user"), 'You do not have permissions to add a user with the user group you selected.  Please try again, or contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . '.');
-					exit();
-				}
-				$assoc_acct_num = $this->input->post('assoc_acct_num');
-				$supervisor_acct_num = $this->input->post('supervisor_acct_num');
-				if(empty($assoc_acct_num)){
-					$assoc_acct_num = NULL;
-				}
-				if(empty($supervisor_acct_num)){
-					$supervisor_acct_num = NULL;
-				}
-			}
+			if(isset($this->permissions)){
+                if($this->permissions->hasPermission("Add All Users") || $this->permissions->hasPermission("Add Users In Region")){
+                    $arr_posted_group_id = $this->input->post('group_id');
+                    if(!$this->as_ion_auth->group_assignable($arr_posted_group_id)){
+                        $this->redirect(site_url("auth/create_user"), 'You do not have permissions to add a user with the user group you selected.  Please try again, or contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . '.');
+                        exit();
+                    }
+                    $assoc_acct_num = $this->input->post('assoc_acct_num');
+                    $supervisor_acct_num = $this->input->post('supervisor_acct_num');
+                    if(empty($assoc_acct_num)){
+                        $assoc_acct_num = NULL;
+                    }
+                    if(empty($supervisor_acct_num)){
+                        $supervisor_acct_num = NULL;
+                    }
+                }
+            }
 			if(in_array(2, $arr_posted_group_id) || in_array(13, $arr_posted_group_id)){ //producers
 				$herd_code = $this->input->post('herd_code') ? $this->input->post('herd_code') : NULL;
 				$herd_release_code = $this->input->post('herd_release_code');
@@ -942,11 +944,13 @@ class Auth extends Ionauth {
 		}
 
         $is_registered = false;
-        try{
-            $is_registered = $this->as_ion_auth->register($username, $password, $email, $additional_data, $arr_posted_group_id, 'AMYA-500');
-        }
-        catch(Exception $e){
-            //will eventually catch registration errors here, but for now they are written to as_ion_auth errors()
+        if($is_validated === true){
+            try{
+                $is_registered = $this->as_ion_auth->register($username, $password, $email, $additional_data, $arr_posted_group_id, 'AMYA-500');
+            }
+            catch(Exception $e){
+                //will eventually catch registration errors here, but for now they are written to as_ion_auth errors()
+            }
         }
 
     	if ($is_validated === true && $is_registered === true) { //check to see if we are creating the user
@@ -986,38 +990,42 @@ class Auth extends Ionauth {
 			$this->data['group_options'] = $this->as_ion_auth->get_group_dropdown_data($this->session->userdata('active_group_id'));
 			if(count($this->data['group_options']) > 1){ // if $this->data['group_id'] is not set, the field will not appear on the form
 				$this->data['group_id'] = 'id="group_id" class = "require"';
-				if($this->permissions->hasPermission("Edit All Users") || $this->permissions->hasPermission("Edit Users In Region")){
-					$this->data['group_id'] .= ' multiple size="4"';
+				if(isset($this->permissions)){
+                    if($this->permissions->hasPermission("Edit All Users") || $this->permissions->hasPermission("Edit Users In Region")) {
+                        $this->data['group_id'] .= ' multiple size="4"';
+                    }
 				}
 			}
-				
-			if($this->permissions->hasPermission("Add All Users")){
-				$this->data['assoc_acct_options'] = $this->as_ion_auth->get_assoc_dropdown_data(array_keys($this->session->userdata('arr_regions')));
-				$this->data['assoc_acct_selected'] = $this->form_validation->set_value('assoc_acct_num[]');
-				$this->data['assoc_acct_num'] = 'class = "require"';
-			}
-			elseif($this->permissions->hasPermission("Add Users In Region")){
-				$this->data['assoc_acct_num'] = array('name' => 'assoc_acct_num[]',
-					'id' => 'assoc_acct_num',
-					'type' => 'hidden',
-					'class' => 'require',
-					'value' => $this->session->userdata('assoc_acct_num'),
-				);
-			}
-			
-			if($this->permissions->hasPermission("Add All Users") || $this->permissions->hasPermission("Add Users In Region")){
-				$arr_form_assoc_acct_num = $this->form_validation->set_value('assoc_acct_num[]', array_keys($this->session->userdata('arr_regions')));
-				$arr_tech_obj = $this->ion_auth_model->get_dhi_supervisor_acct_nums_by_association($arr_form_assoc_acct_num);
-				$this->data['supervisor_acct_num_options'] = !empty($arr_form_assoc_acct_num)?$this->as_ion_auth->get_dhi_supervisor_dropdown_data($arr_tech_obj):array();
-				$this->data['supervisor_acct_num_selected'] = $this->form_validation->set_value('supervisor_acct_num');
-				$this->data['supervisor_acct_num'] = 'class = "require"';
-			}
-				
-			if($this->permissions->hasPermission("Assign Sections")){
-				$this->data['section_selected'] = $this->form_validation->set_value('section_id[]', array());
-				$this->data['section_id'] = 'id="section_id"';
-				$this->data['section_options'] = $this->as_ion_auth->ion_auth_model(array('subscription'));
-			}
+
+            if(isset($this->permissions)) {
+                if ($this->permissions->hasPermission("Add All Users")) {
+                    $this->data['assoc_acct_options'] = $this->as_ion_auth->get_assoc_dropdown_data(array_keys($this->session->userdata('arr_regions')));
+                    $this->data['assoc_acct_selected'] = $this->form_validation->set_value('assoc_acct_num[]');
+                    $this->data['assoc_acct_num'] = 'class = "require"';
+                } elseif ($this->permissions->hasPermission("Add Users In Region")) {
+                    $this->data['assoc_acct_num'] = array(
+                        'name' => 'assoc_acct_num[]',
+                        'id' => 'assoc_acct_num',
+                        'type' => 'hidden',
+                        'class' => 'require',
+                        'value' => $this->session->userdata('assoc_acct_num'),
+                    );
+                }
+
+                if($this->permissions->hasPermission("Add All Users") || $this->permissions->hasPermission("Add Users In Region")){
+                    $arr_form_assoc_acct_num = $this->form_validation->set_value('assoc_acct_num[]', array_keys($this->session->userdata('arr_regions')));
+                    $arr_tech_obj = $this->ion_auth_model->get_dhi_supervisor_acct_nums_by_association($arr_form_assoc_acct_num);
+                    $this->data['supervisor_acct_num_options'] = !empty($arr_form_assoc_acct_num)?$this->as_ion_auth->get_dhi_supervisor_dropdown_data($arr_tech_obj):array();
+                    $this->data['supervisor_acct_num_selected'] = $this->form_validation->set_value('supervisor_acct_num');
+                    $this->data['supervisor_acct_num'] = 'class = "require"';
+                }
+
+                if($this->permissions->hasPermission("Assign Sections")){
+                    $this->data['section_selected'] = $this->form_validation->set_value('section_id[]', array());
+                    $this->data['section_id'] = 'id="section_id"';
+                    $this->data['section_options'] = $this->as_ion_auth->ion_auth_model(array('subscription'));
+                }
+            }
 
 			$this->data['herd_code'] = array('name' => 'herd_code',
 				'id' => 'herd_code',

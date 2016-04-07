@@ -79,17 +79,20 @@
       <p><?php echo form_label('Confirm Password', 'password_confirm', NULL, $password_confirm) ?><?php echo form_input($password_confirm);?>
       </p>
       
-      <?php if($this->permissions->hasPermission("Assign Sections")): // this is currently tracked in the SQL database only
-		if(!empty($section_options)):
-			echo form_fieldset('Sections', array('id' => 'sections-fieldset'));
-			foreach($section_options as $k=>$v):
-				if(!empty($k)): ?>
-						<span class="form-checkbox"><?php echo form_checkbox('section_id[]', $k, in_array($k, $sections_selected) !== false, 'class = "section-checkbox"'); echo $v; ?></span>
-				<?php endif;
-			endforeach;
-			echo form_fieldset_close();
-		endif; ?>
-      <?php endif; ?>
+      <?php
+	  if(isset($this->permissions)):
+          if($this->permissions->hasPermission("Assign Sections")): // this is currently tracked in the SQL database only
+              if(!empty($section_options)):
+                  echo form_fieldset('Sections', array('id' => 'sections-fieldset'));
+                  foreach($section_options as $k=>$v):
+                      if(!empty($k)): ?>
+                          <span class="form-checkbox"><?php echo form_checkbox('section_id[]', $k, in_array($k, $sections_selected) !== false, 'class = "section-checkbox"'); echo $v; ?></span>
+                      <?php endif;
+                  endforeach;
+                  echo form_fieldset_close();
+              endif; ?>
+          <?php endif;
+      endif; ?>
       <p><?php echo form_checkbox('terms', 'Y', set_checkbox('terms','Y'), 'class="required"')?> By checking this box, I confirm that I have read and understand the <?php echo anchor(site_url('auth/ajax_terms'), 'terms of use', 'title="terms of use" class="popup-ajax"')?> for the requested reports.</p>
       <p><?php echo form_submit('submit', 'Create User', 'class="button"');?></p>
    <?php echo form_close();?>

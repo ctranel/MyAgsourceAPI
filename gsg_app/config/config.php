@@ -15,7 +15,7 @@
 		case 'development':
 			$config['base_url']	= "https://" . $_SERVER['HTTP_HOST'] . "/";
 			$config['base_url_assets']	= "https://" . $_SERVER['HTTP_HOST'] . "/";
-			$config['pdf_path']	= "/var/www/asset_cache/all_pdf_reports/";
+			$config['pdf_path']	= "/var/www//asset_cache/all_pdf_reports/";
 		break;
 		case 'localhost':
 			$config['base_url']	= "http://localhost/MyAgSource/";

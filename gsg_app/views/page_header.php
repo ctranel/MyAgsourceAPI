@@ -69,7 +69,7 @@ header('X-UA-Compatible: IE=edge,chrome=1');
 <div class="container" id="container">
 	<div id="header">
 		<a href="https://myagsource.com/"><div class="header-link">&nbsp;</div></a>
-		<?php echo $navigation?>
+		<?php if(isset($navigation)) echo $navigation; ?>
 	</div> <!-- header -->
 	<div id="main-content">
 		<ul id="session-nav" class="dropdown">
