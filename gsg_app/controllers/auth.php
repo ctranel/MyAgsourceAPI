@@ -29,6 +29,8 @@ class Auth extends Ionauth {
         $this->load->helper('html');
         $this->load->model('dhi/herd_model');
 
+        $this->page_header_data['navigation'] = $this->load->view('navigation', [], TRUE);
+
         //instantiate in case noone is logged in
         if(!$this->session->userdata('user_id')) {
             $this->as_ion_auth = new As_ion_auth(null);
@@ -49,8 +51,7 @@ class Auth extends Ionauth {
 
         $herd_access = new HerdAccess($this->herd_model);
 		$this->page_header_data['num_herds'] = $herd_access->getNumAccessibleHerds($this->session->userdata('user_id'), $this->permissions->permissionsList(), $this->session->userdata('arr_regions'));
-		$this->page_header_data['navigation'] = $this->load->view('navigation', [], TRUE);
-		//load necessary files
+        //load necessary files
 		$this->load->library('form_validation');
 		//$this->load->helper('cookie');
 

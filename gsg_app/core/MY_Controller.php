@@ -58,6 +58,7 @@ class MY_Controller extends CI_Controller
         //$sections = new Sections($this->section_model, $pages);
         $herd = new Herd($this->herd_model, $this->session->userdata('herd_code'));
 
+        $this->permissions = null;
         if($this->session->userdata('active_group_id')) {
             $this->load->model('permissions_model');
             $this->load->model('product_model');
