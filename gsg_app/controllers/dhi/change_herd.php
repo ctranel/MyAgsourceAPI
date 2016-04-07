@@ -40,14 +40,15 @@ class Change_herd extends MY_Controller {
 		$this->herd_access = new HerdAccess($this->herd_model);
 		if(!isset($this->as_ion_auth)){
 			$this->session->keep_all_flashdata();
-			$this->redirect('auth/login', $this->session->flashdata('message') + ['Please log in']);
+			$this->redirect('auth/login', 'Please log in');
 		}
 		if((!$this->as_ion_auth->logged_in())){
 			$this->session->keep_all_flashdata();
+			$msg = '';
 			if(array_search('Please log in.', $this->session->flashdata('message')) === FALSE){
-				$this->session->set_flashdata('message',  $this->session->flashdata('message') + ['Please log in.']);
+				$msg = 'Please log in.';
 			}
-			$this->redirect(site_url('auth/login'));
+			$this->redirect(site_url('auth/login'), $msg);
 		}
 		$this->load->model('access_log_model');
 		$this->access_log = new AccessLog($this->access_log_model);
