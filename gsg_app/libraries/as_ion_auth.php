@@ -416,7 +416,7 @@ class As_ion_auth extends \Ion_auth {
 		$arr_sgs = [];
 		foreach($sgs as $h){
 			$exp_date = new \DateTime($h['exp_date']);
-			if($h['request_status'] === 'grant' && $h['exp_date'] !== null && new \DateTime($h['exp_date']) < new DateTime()){
+			if($h['request_status'] === 'grant' && $h['exp_date'] !== null && $exp_date < new \DateTime()){
 				$arr_sgs['expired'][] = $h;
 			}
 			else {
