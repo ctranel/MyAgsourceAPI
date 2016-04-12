@@ -84,6 +84,21 @@ class Products implements iProducts{
     }
 
     /**
+     * allHerdProductCodes
+     * 
+     * returns an array of all active product codes associated with a herd, 
+     * regardless of whether the logged in user can see those reports
+     * 
+     * @method allHerdProductCodes()
+     * @return array of product codes
+     * @access public
+     **/
+    public function allHerdProductCodes(){
+        $tmp = $this->datasource->getSubscribedProducts($this->herd->herdCode());
+        return array_column($tmp, 'product_code');
+    }
+
+    /**
      * @method setAccessibleProducts()
      * @return void
      * @access protected

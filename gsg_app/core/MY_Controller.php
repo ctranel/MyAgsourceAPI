@@ -63,7 +63,7 @@ class MY_Controller extends CI_Controller
             $this->load->model('product_model');
             $group_permissions = ProgramPermissions::getGroupPermissionsList($this->permissions_model, $this->session->userdata('active_group_id'));
             $products = new Products($this->product_model, $herd, $group_permissions);
-            $this->permissions = new ProgramPermissions($this->permissions_model, $group_permissions, $products->accessibleProductCodes());
+            $this->permissions = new ProgramPermissions($this->permissions_model, $group_permissions, $products->allHerdProductCodes());
         }
         else{
             $this->permissions = null;

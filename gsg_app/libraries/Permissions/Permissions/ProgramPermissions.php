@@ -32,9 +32,9 @@ class ProgramPermissions implements iPermissions{
      **/
     protected $permissions_list;
 
-    function __construct(\Permissions_model $datasource, $group_permissions_list, $accessible_product_codes) {
+    function __construct(\Permissions_model $datasource, $group_permissions_list, $active_product_codes) {
         $this->datasource = $datasource;
-        $rep = $this->getProductPermissionsList($accessible_product_codes);
+        $rep = $this->getProductPermissionsList($active_product_codes);
         $this->permissions_list = array_unique(array_merge($group_permissions_list, $rep));
     }
 
@@ -56,12 +56,12 @@ class ProgramPermissions implements iPermissions{
      * @return array of string permission task names
      * @access protected
      **/
-    protected function getProductPermissionsList($accessible_product_codes){
-        if(empty($accessible_product_codes)){
+    protected function getProductPermissionsList($active_product_codes){
+        if(empty($active_product_codes)){
             return [];
         }
         
-        $tmp = $this->datasource->getProductPermissionsData($accessible_product_codes);
+        $tmp = $this->datasource->getProductPermissionsData($active_product_codes);
         $tmp = array_column($tmp, 'name');
         return $tmp;
     }

@@ -45,7 +45,7 @@ class Auth extends Ionauth {
             $this->load->model('product_model');
             $group_permissions = ProgramPermissions::getGroupPermissionsList($this->permissions_model, $this->session->userdata('active_group_id'));
             $products = new Products($this->product_model, $herd, $group_permissions);
-            $this->permissions = new ProgramPermissions($this->permissions_model, $group_permissions, $products->accessibleProductCodes());
+            $this->permissions = new ProgramPermissions($this->permissions_model, $group_permissions, $products->allHerdProductCodes());
         }
         $this->as_ion_auth = new As_ion_auth($this->permissions);
 
