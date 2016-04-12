@@ -39,7 +39,6 @@ class Pdf_archive extends MY_Controller {
             $this->redirect('/', $e->getMessage());
         }
         $file = $this->config->item('pdf_path') . $pdf_data['herd_code'] . '/' . str_replace('-', '', $pdf_data['test_date']) . '/' . $pdf_data['filename'];
-//var_dump(get_current_user(), file_exists('/opt/data/agsource/all_pdf_reports'),file_exists($file), $file); die;
 
         if(!file_exists($file)){
             $this->redirect('/', 'Could not find PDF file.');

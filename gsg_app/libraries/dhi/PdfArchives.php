@@ -43,19 +43,41 @@ class PdfArchives
         $this->datasource = $datasource;
     }
 
+
     /**
-     * __construct
+     * getAllHerdArchives
      *
      * @return array reflecting structure of pdf archives (test_date-->report)
      * @author ctranel
      **/
-    public function getHerdArchives(){
-        $tests = [];
+    public function getAllHerdArchives(){
         $archives = $this->datasource->getHerdArchiveData($this->herd_code);
-        
+        return $this->getHerdArchives($archives);
+    }
+
+    /**
+     * getSubscribedHerdArchives
+     *
+     * @return array reflecting structure of pdf archives (test_date-->report)
+     * @author ctranel
+     **/
+    public function getSubscribedHerdArchives(){
+        $archives = $this->datasource->getSubscribedHerdArchiveData($this->herd_code);
+        return $this->getHerdArchives($archives);
+    }
+
+    /**
+     * getHerdArchives
+     *
+     * @param array raw dataset
+     * @return array reflecting structure of pdf archives (test_date-->report)
+     * @author ctranel
+     **/
+    protected function getHerdArchives($data){
+        $tests = [];
         $prev_test_date = '';
         $reports = [];
-        foreach ($archives as $a) {
+        foreach ($data as $a) {
             if($prev_test_date !== $a['test_date']){
                 if($prev_test_date !== ''){
                     $tests[] = [

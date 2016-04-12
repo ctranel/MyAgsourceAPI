@@ -10,6 +10,19 @@ class Pdf_archive_model extends CI_Model {
     /**
      * @method getHerdArchiveData()
      * @param string herd_code
+     * @param boolean subscription only
+     * @return array of data for the rdf report file
+     * @access public
+     *
+     **/
+    function getSubscribedHerdArchiveData($herd_code){
+        $this->db->where('p.is_viewable_by_herd', 1);
+        return $this->getHerdArchiveData($herd_code);
+    }
+
+    /**
+     * @method getHerdArchiveData()
+     * @param string herd_code
      * @return array of data for the rdf report file
      * @access public
      *
@@ -31,6 +44,7 @@ class Pdf_archive_model extends CI_Model {
             ->where('p.herd_code',$herd_code)
             ->distinct()
             ->order_by('p.test_date DESC, r.report_name ASC');
+
         $ret = $q->get()->result_array();
 
         return $ret;

@@ -188,7 +188,12 @@ class Index extends report_parent {
             $this->load->model('dhi/pdf_archive_model');
             try{
                 $PdfArchives = new PdfArchives($this->pdf_archive_model, $this->session->userdata('herd_code'));
-                $pdf_archive_data = $PdfArchives->getHerdArchives();
+                if($this->permissions->hasPermission('View All Content')){
+					$pdf_archive_data = $PdfArchives->getAllHerdArchives();
+				}
+				else{
+					$pdf_archive_data = $PdfArchives->getSubscribedHerdArchives();
+				}
                 if(is_array($pdf_archive_data) && count($pdf_archive_data) > 0){
                     $this->data['widget']['herd'][] = [
                         'content' => $this->load->view('auth/dashboard/past_results', ['tests' => $pdf_archive_data], TRUE),
