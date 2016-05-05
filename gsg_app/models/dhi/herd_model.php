@@ -119,6 +119,24 @@ class Herd_model extends CI_Model {
 	}
 
 	/**
+	 * @method getHerdsBySupervisor
+	 *
+	 * @param int user id
+	 * @param mixed limit
+	 * @return simple array of herd codes
+	 *         empty array if no herds found.
+	 * @author ctranel
+	 **/
+	public function getHerdsBySupervisor($user_id, $limit = false){
+		if(!$user_id){
+			$user_id = $this->session->userdata('user_id');
+		}
+		$this->db->join('users.dbo.users_dhi_supervisors us', 'CONCAT(\'SP\', h.supervisor_num) = us.supervisor_acct_num', 'inner')
+			->where('us.user_id', $user_id);
+		return $this->getHerds($limit,null);
+	}
+
+	/**
 	 * getHerdsByCriteria
 	 *
 	 * @param array criteria (field=>value pairs)

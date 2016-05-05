@@ -109,8 +109,9 @@ class HerdAccess
 		}
 		$arr_return_reg = [];
 		$arr_return_user = [];
+		$arr_return_supervisor = [];
 		$arr_return_permission = [];
-	
+
 		if(in_array('View All Herds', $arr_permissions)){
 			return $this->datasource->getHerds();
 		}
@@ -125,10 +126,13 @@ class HerdAccess
 		if(in_array('View Assigned Herds', $arr_permissions)){
 			$arr_return_user = $this->datasource->getHerdsByUser($user_id, $limit_in);
 		}
+		if(in_array('View Supervised Herds', $arr_permissions)){
+			$arr_return_supervisor = $this->datasource->getHerdsBySupervisor($user_id, $limit_in);
+		}
 		if(in_array('View Assign w permission', $arr_permissions)){
 			$arr_return_permission = $this->datasource->getHerdsByPermissionGranted($limit_in);
 		}
-		return array_merge($arr_return_reg, $arr_return_user, $arr_return_permission);
+		return array_merge($arr_return_reg, $arr_return_user, $arr_return_supervisor, $arr_return_permission);
 	}
 	
 	/**
