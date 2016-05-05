@@ -785,6 +785,7 @@ SELECT DISTINCT id, name, list_order FROM cteAnchor ORDER BY list_order;";
 		return $this->db
 		->where($this->tables['dhi_supervisors'] . '.status_code', 'A')
 		->where($this->tables['dhi_supervisors'] . '.termination_date IS NULL')
+		->where($this->tables['dhi_supervisors'] . '.supervisor_type_code', 2)
 		->get($this->tables['dhi_supervisors']);
 	}
 
