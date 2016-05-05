@@ -53,6 +53,9 @@ class HerdAccess
 		if(in_array('View Assigned Herds', $arr_permissions)){
 			array_merge($arr_herds, $this->datasource->getHerdCodesByUser($user_id));
 		}
+		if(in_array('View Supervised Herds', $arr_permissions)){
+			array_merge($arr_herds, $this->datasource->getHerdCodesBySupervisor($user_id));
+		}
 		if(in_array('View Assign w permission', $arr_permissions)){
 			array_merge($arr_herds, $this->datasource->getHerdCodesByPermissionGranted($user_id));
 		}
@@ -83,6 +86,11 @@ class HerdAccess
 		}
 		if(in_array('View Assigned Herds', $arr_permissions)){
 			if(in_array($herd_code, $this->datasource->getHerdCodesByUser($user_id))){
+				return true;
+			}
+		}
+		if(in_array('View Supervised Herds', $arr_permissions)){
+			if(in_array($herd_code, $this->datasource->getHerdCodesBySupervisor($user_id))){
 				return true;
 			}
 		}
@@ -150,6 +158,7 @@ class HerdAccess
 		}
 		$arr_return_reg = [];
 		$arr_return_user = [];
+		$arr_return_supervisor = [];
 		$arr_return_permission = [];
 	
 		if(in_array('View All Herds', $arr_permissions)){
@@ -166,10 +175,13 @@ class HerdAccess
 		if(in_array('View Assigned Herds', $arr_permissions)){
 			$arr_return_user = $this->datasource->getHerdCodesByUser($user_id, $limit_in);
 		}
+		if(in_array('View Supervised Herds', $arr_permissions)){
+			$arr_return_supervisor = $this->datasource->getHerdCodesBySupervisor($user_id, $limit_in);
+		}
 		if(in_array('View Assign w permission', $arr_permissions)){
 			$arr_return_permission = $this->datasource->getHerdCodesByPermissionGranted($limit_in);
 		}
-		return array_merge($arr_return_reg, $arr_return_user, $arr_return_permission);
+		return array_merge($arr_return_reg, $arr_return_user, $arr_return_supervisor, $arr_return_permission);
 	}
 	
 	/**
