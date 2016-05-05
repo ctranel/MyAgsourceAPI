@@ -48,7 +48,7 @@
 		  forum_id: 240012,
 		  support_tab_name: 'Report a bug',
 		  feedback_tab_name: 'Request a new feature',
-		  tab_label: 'Features & Bugs',
+		  tab_label: 'Requests',
 		  tab_color: '#006d73',
 		  tab_position: 'bottom-right',
 		  tab_inverted: false
