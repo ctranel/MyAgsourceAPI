@@ -41,7 +41,7 @@ function toggle_fields() {
 		document.getElementById('herd').style.display = "block";
 		$('#herd').addClass('required');
 	}
-	if (($.inArray('3', arr_group_id) >= 0 || $.inArray('10', arr_group_id) >= 0) && document.getElementById('association') != null && document.getElementById('region') != null) {
+	if (($.inArray('3', arr_group_id) >= 0 || $.inArray('10', arr_group_id) >= 0 || $.inArray('8', arr_group_id) >= 0 || $.inArray('15', arr_group_id) >= 0) && document.getElementById('association') != null && document.getElementById('region') != null) {
 		document.getElementById('association').style.display = "block";
 		document.getElementById('region').style.display = "block";
 		$('#region').addClass('required');
@@ -50,7 +50,7 @@ function toggle_fields() {
 		document.getElementById('sg').style.display = "block";
 		$('#sg').addClass('required');
 	}
-	if (($.inArray('5', arr_group_id) >= 0 || $.inArray('12', arr_group_id) >= 0 || $.inArray('8', arr_group_id) >= 0) && document.getElementById('region') != null && document.getElementById('tech') != null && document.getElementById('association') != null) {
+	if (($.inArray('5', arr_group_id) >= 0 || $.inArray('12', arr_group_id) >= 0) && document.getElementById('region') != null && document.getElementById('tech') != null && document.getElementById('association') != null) {
 		document.getElementById('association').style.display = "block";
 		document.getElementById('region').style.display = "block";
 		document.getElementById('tech').style.display = "block";
@@ -60,7 +60,7 @@ function toggle_fields() {
 		$('#tech').addClass('required');
 	}
 	//if the logged in user does not have permission to edit associations, but does have permission to edit techs:
-	else if(($.inArray('5', arr_group_id) >= 0 || $.inArray('12', arr_group_id) >= 0 || $.inArray('8', arr_group_id) >= 0) && document.getElementById('tech') != null && document.getElementById('association') != null) {
+	else if(($.inArray('5', arr_group_id) >= 0 || $.inArray('12', arr_group_id) >= 0) && document.getElementById('tech') != null && document.getElementById('association') != null) {
 		document.getElementById('association').style.display = "block";
 		document.getElementById('tech').style.display = "block";
 		$('#tech').addClass('required');

@@ -21,7 +21,10 @@
 					<td>
 						<?php $arr_groups = explode(',', $user['arr_groups']);
 						foreach ($arr_groups as $group): ?>
-							<?php echo $arr_group_lookup[(int)$group]; ?><br />
+							<?php //if user has inactive group, we don't want to list it
+							if(isset($arr_group_lookup[(int)$group])){
+								echo $arr_group_lookup[(int)$group];
+							} ?><br />
 		                <?php endforeach?>
 					</td>
 					<td><?php echo ($user['active']) ? anchor("auth/deactivate/".$user['id'], 'Active') : anchor("auth/activate/". $user['id'], 'Inactive');?></td>

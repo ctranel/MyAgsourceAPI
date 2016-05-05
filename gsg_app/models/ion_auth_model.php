@@ -291,7 +291,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 		if(!isset($assoc_acct_num)) return FALSE;
 		if(!is_array($assoc_acct_num)) $assoc_acct_num = array($assoc_acct_num);
 		$this->db
-			->join($this->tables['users_associations'] . ' ua',  'u.id = ua.user_id')
+			->join($this->tables['users_associations'] . ' ua',  'users.id = ua.user_id')
 			->join($this->tables['regions'] . ' r', 'ua.assoc_acct_num = r.account_num')
 			->where_in('r.account_num', $assoc_acct_num);
 		$this->users();
