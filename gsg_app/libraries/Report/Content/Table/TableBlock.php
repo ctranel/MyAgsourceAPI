@@ -108,7 +108,6 @@ class TableBlock extends Block {
 	/**
 	 * getTableHeaderCsv
 	 * 
-	 * @param int report count
 	 * @return array of output data for block
 	 * @access public
 	 *
