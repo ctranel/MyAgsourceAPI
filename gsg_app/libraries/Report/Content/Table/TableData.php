@@ -63,7 +63,16 @@ class TableData extends BlockData {
     public function getData($criteria_key_value){
 		//$report_datasource->populate_field_meta_arrays($arr_this_block['id']);
 		$arr_field_list = $this->block->getFieldlistArray();
-		$criteria_key_value = $this->whereCriteria($criteria_key_value);
+        //ensure results are most recent results\
+        $this->block->sorts()->rewind();
+        if($this->block->maxRows() > 0 && $this->block->sorts()->current()){
+            $tmp_field = $this->block->sorts()->current()->fieldName();
+            $criteria_key_value[$tmp_field]['dbfrom'] = $this->report_datasource->getStartDate($this->block->primaryTableName(), $tmp_field, $this->block->maxRows(), 'MM-dd-yyyy');
+            $criteria_key_value[$tmp_field]['dbto'] = $this->report_datasource->getRecentDates($this->block->primaryTableName(), $tmp_field, 1, 'MM-dd-yyyy')[0];
+            unset($tmp_field);
+        }
+
+        $criteria_key_value = $this->whereCriteria($criteria_key_value);
 		$select_fields = $this->block->getSelectFields();
 		$results = $this->report_datasource->search($this->block, $select_fields, $criteria_key_value);
 		if($this->block->hasBenchmark() && isset($this->benchmarks)){
