@@ -1,17 +1,18 @@
 <?php 
 header('strict-transport-security: max-age=31536000; includeSubdomains');
-header("Content-Security-Policy:"
+/*header("Content-Security-Policy:"
 	. " default-src https://" . $_SERVER['HTTP_HOST'] . " https://*." . $_SERVER['HTTP_HOST'] . " https://myagsource.com feweb.verona.crinet https://maxcdn.bootstrapcdn.com https://*.uservoice.com https://www.google-analytics.com http://*.uservoice.com;"
 	. " script-src 'unsafe-inline' 'unsafe-eval' https://" . $_SERVER['HTTP_HOST'] . " https://*." . $_SERVER['HTTP_HOST'] . " feweb.verona.crinet https://cdnjs.cloudflare.com https://ajax.googleapis.com https://netdna.bootstrapcdn.com https://cloud.github.com https://code.highcharts.com https://cdn.jsdelivr.net https://*.uservoice.com https://www.google-analytics.com http://*.uservoice.com http://www.google-analytics.com;"
 	. " style-src 'unsafe-inline' https://" . $_SERVER['HTTP_HOST'] . " https://*." . $_SERVER['HTTP_HOST'] . " feweb.verona.crinet https://maxcdn.bootstrapcdn.com https://cdn.jsdelivr.net;"
 	. " frame-src https://*.uservoice.com;"
 	. " frame-ancestors 'none';"		
-);
+);*/
 header('x-frame-options: SAMEORIGIN');
-header('X-XSS-Protection: 1; mode=block');
+//header('X-XSS-Protection: 1; mode=block');
 header('Content-Type: text/html;charset=UTF-8');
 header('X-Content-Type-Options: nosniff');
 header('X-UA-Compatible: IE=edge,chrome=1');
+
 ?>
 <!doctype html>
 <html lang="en">

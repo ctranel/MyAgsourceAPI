@@ -708,6 +708,23 @@ class Auth extends Ionauth {
 	//CDT overrides built-in function to allow us to redirect user to the original page they requested after login in
 	function login()
 	{
+        header("Content-type: application/json"); //being sent as json
+        header("Cache-Control: no-cache, must-revalidate, max-age=0");
+        header("Cache-Control: post-check=0, pre-check=0", false);
+        header("Pragma: no-cache");
+        header("Expires: -1");
+
+        //CORS headers
+        header("Access-Control-Allow-Origin: *"); //@todo: nneds to be more specific for production (actually won't be used for production)
+        header('Access-Control-Allow-Credentials: true');
+        header('Access-Control-Allow-Methods: GET, POST, PUT');
+
+        echo json_encode(['herd_code' => 'fake code']);
+        die;
+
+
+
+
 		$this->data['title'] = "Login";
 		$this->data['trial_days'] = $this->config->item('trial_period');
 
