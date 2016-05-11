@@ -467,7 +467,26 @@ abstract class Block implements iBlock {
 		
 		return $ret;
 	}
-	
+
+	/**
+	 * getSortDateFieldName()
+	 *
+	 * returns field-name-keyed array of sort orders
+	 *
+	 * @return string field name
+	 * @access public
+	 * */
+	public function getSortDateFieldName(){
+		if(isset($this->sorts) && count($this->sorts) > 0){
+			foreach($this->sorts as $s){
+				if($s->isDate()){
+					return $s->fieldName();
+				}
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * getSortArray()
 	 * 

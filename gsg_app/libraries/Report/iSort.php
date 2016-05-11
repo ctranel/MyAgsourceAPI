@@ -19,6 +19,7 @@ interface iSort {
 	function order();
 	function sortText($is_first);
 	function sortTextBrief($is_first);
+	function isDate();
 }
 
 ?>

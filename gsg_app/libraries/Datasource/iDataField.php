@@ -18,6 +18,7 @@ interface iDataField {
 			$datatype, $max_length, $decimal_scale, $unit_of_measure, $is_timespan, $is_foreign_key, $is_nullable, $is_natural_sort);
 	
 	function dbFieldName();
+	function dataType();
 }
 
 ?>
