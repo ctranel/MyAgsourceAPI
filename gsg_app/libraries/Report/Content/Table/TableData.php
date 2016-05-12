@@ -61,15 +61,15 @@ class TableData extends BlockData {
      * @todo: when moving away from html being sent from server, split this into "setData" and "getData", so that "prepData" can optionally be called in between
 	 **/
     public function getData($criteria_key_value){
-		//$report_datasource->populate_field_meta_arrays($arr_this_block['id']);
 		$arr_field_list = $this->block->getFieldlistArray();
-        //ensure results are most recent results\
-        $this->block->sorts()->rewind();
-        if($this->block->maxRows() > 0 && $this->block->sorts()->current()){
-            $tmp_field = $this->block->sorts()->current()->fieldName();
-            $criteria_key_value[$tmp_field]['dbfrom'] = $this->report_datasource->getStartDate($this->block->primaryTableName(), $tmp_field, $this->block->maxRows(), 'MM-dd-yyyy');
-            $criteria_key_value[$tmp_field]['dbto'] = $this->report_datasource->getRecentDates($this->block->primaryTableName(), $tmp_field, 1, 'MM-dd-yyyy')[0];
-            unset($tmp_field);
+        //if getting a subset, ensure results are most recent results
+        if($this->block->maxRows() > 0){
+            $sort_field = $this->block->getSortDateFieldName();
+             if($sort_field){
+                $criteria_key_value[$sort_field]['dbfrom'] = $this->report_datasource->getStartDate($this->block->primaryTableName(), $sort_field, $this->block->maxRows(), 'MM-dd-yyyy');
+                $criteria_key_value[$sort_field]['dbto'] = $this->report_datasource->getRecentDates($this->block->primaryTableName(), $sort_field, 1, 'MM-dd-yyyy')[0];
+            }
+            unset($sort_field);
         }
 
         $criteria_key_value = $this->whereCriteria($criteria_key_value);

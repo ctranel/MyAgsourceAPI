@@ -66,6 +66,21 @@ class Sort implements iSort {
 	}
 
 	/* -----------------------------------------------------------------
+	*  isDate
+
+	*  Returns name of field in sort
+
+	*  @author: ctranel
+	*  @date: 5/11/2016
+	*  @return boolean
+	*  @throws: 
+	* -----------------------------------------------------------------
+	\*/
+	public function isDate(){
+		return strpos($this->datafield->dataType(), 'date') !== false;
+	}
+
+	/* -----------------------------------------------------------------
 	*  order
 
 	*  Returns sort order (ASC or DESC)

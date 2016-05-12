@@ -75,7 +75,7 @@ class ChartData extends BlockData{
 	 *@todo: criteria param should be removed when filter data is included in object
 	 **/
 	public function getData($criteria_key_value){
-		if(isset($this->x_axis_dbfield_name)){
+		if(isset($this->x_axis_dbfield_name) && isset($this->x_axis_dbfield_name)){
 			$criteria_key_value[$this->x_axis_dbfield_name]['dbfrom'] = $this->report_datasource->getStartDate($this->block->primaryTableName(), $this->x_axis_dbfield_name, $this->block->maxRows(), 'MM-dd-yyyy');
 			$criteria_key_value[$this->x_axis_dbfield_name]['dbto'] = $this->report_datasource->getRecentDates($this->block->primaryTableName(), $this->x_axis_dbfield_name, 1, 'MM-dd-yyyy')[0];
 		}
