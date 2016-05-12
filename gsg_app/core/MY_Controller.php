@@ -66,7 +66,7 @@ class MY_Controller extends CI_Controller
             $this->permissions = new ProgramPermissions($this->permissions_model, $group_permissions, $products->allHerdProductCodes());
         }
         else{
-            $this->permissions = null;
+            $this->permissions = new ProgramPermissions($this->permissions_model, [], []);
         }
         $this->as_ion_auth = new as_ion_auth($this->permissions);
         
