@@ -251,9 +251,10 @@ class report_block extends MY_Controller {
 		if(isset($json_filter_data)){
 			$section = $this->section;
 			$arr_params = (array)json_decode(urldecode($json_filter_data));
+/* @todo: backend csrf was blocking CORS, so we need to turn it off for development
 			if(isset($arr_params['csrf_test_name']) && $arr_params['csrf_test_name'] != $this->security->get_csrf_hash()){
 				die("I don't recognize your browser session, your session may have expired, or you may have cookies turned off.");
-			}
+			} */
 			unset($arr_params['csrf_test_name']);
 		
 			//prep data for filter library
@@ -267,12 +268,22 @@ class report_block extends MY_Controller {
 					['herd_code' => $this->session->userdata('herd_code')] + $arr_params
 			);
 
+            /*
+             * myagsource special case: if PAGE filters or params contain only a pstring of 0, and the block is not a summary
+            * Needed for pages that contain both cow level and summary reports.
+			*/
+           if($filters->criteriaExists('pstring') && !$block->isSummary()){
+                $p_value = $filters->getCriteriaValueByKey('pstring');
+                if(count($p_value) === 1 && $p_value[0] === 0){
+                    $filters->removeCriteria('pstring');
+                }
+           }
+
 			/*
 			 * If this is a cow level block, and the filter is set to 0 (pstring), remove filter
 			 * Needed for pages that contain both cow level and summary reports.
-			*/
 			foreach($arr_params as $k => $v){
-				if(!$block->isSummary()){
+                if(!$block->isSummary()){
 					if(is_array($v)){
 						$tmp = array_filter($arr_params[$k], function($v){
 							return (!empty($v) || $v === 0 || $v === '0');
@@ -286,6 +297,7 @@ class report_block extends MY_Controller {
 					}
 				}
 			}
+            */
 		}
 		$block->setFilters($filters);
 		//END FILTERS

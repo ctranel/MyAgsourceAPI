@@ -290,7 +290,9 @@ class Criteria{
 			}
 			//if it is a range
 			elseif(key($val) === 'dbfrom' || key($val) === 'dbto'){
-				$this->log_filter_text = $this->label . ': Between ' . $val['dbfrom'] . ' and ' . $val['dbto'];
+				if(isset($val['dbfrom']) && isset($val['dbto'])){
+                    $this->log_filter_text = $this->label . ': Between ' . $val['dbfrom'] . ' and ' . $val['dbto'];
+                }
 			}
 			else{
 				$this->log_filter_text = $this->label . ': ' . implode(', ', $val);
