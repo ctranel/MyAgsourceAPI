@@ -1,6 +1,10 @@
 <?php
 namespace myagsource\Products\Products;
 
+use myagsource\Products\iProduct;
+
+require_once(APPPATH . 'libraries/Products/iProduct.php');
+
 /**
  * Object representing internal report options
  *
@@ -10,7 +14,8 @@ namespace myagsource\Products\Products;
  *
  *
  */
-class Product{
+class Product implements iProduct
+{
     /**
      * $datasource
      * @var \Product_model

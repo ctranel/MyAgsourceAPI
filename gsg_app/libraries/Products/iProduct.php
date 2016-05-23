@@ -10,10 +10,10 @@ namespace myagsource\Products;
  */
 
 interface iProduct{
-    public function product_code();
+    public function productCode();
     public function name();
     public function description();
     //public function isSubscribed();
-    public function subscribe();
-    public function unsubscribe();
+    //public function subscribe();
+    //public function unsubscribe();
 }
