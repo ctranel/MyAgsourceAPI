@@ -142,7 +142,32 @@ class HerdAccess
 		}
 		return array_merge($arr_return_reg, $arr_return_user, $arr_return_supervisor, $arr_return_permission);
 	}
-	
+
+	/**
+	 * @method getAccessibleHerdOptions()
+	 * @param int user_id
+	 * @param int region_num (need to accept array?)
+	 * @return mixed array of herd data or boolean
+	 * @access public
+	 *
+	 **/
+
+	public function getAccessibleHerdOptions($user_id, $arr_permissions, $arr_regions = false, $limit_in = NULL){
+		if(!$user_id || !$arr_permissions){
+			return false;
+		}
+
+		$ret = [];
+		$res = $this->getAccessibleHerdsData($user_id, $arr_permissions, $arr_regions, $limit_in);
+		if(is_array($res)){
+            foreach($res as $r){
+                $ret[] = ['herd_owner' => $r['herd_owner'], 'farm_name' => $r['farm_name'], 'herd_code' => $r['herd_code']];
+            }
+        }
+
+		return $ret;
+	}
+
 	/**
 	 * @method getAccessibleHerdCodes()
 	 * @param int user_id

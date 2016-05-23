@@ -16,4 +16,6 @@ interface iResponse {
     public function errorNotFound($msg = null);
     public function errorUnauthorized($msg = null);
     public function errorBadRequest($msg = null);
+    public function message($msg = null);
+    public function redirect($uri);
 }

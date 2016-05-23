@@ -75,6 +75,22 @@ class Response implements iResponse
         }
         return $this->errorResponse('Request Not Understood');
     }
+    
+    public function message($msg = null){
+        return [
+            'message' => [
+                'text' => $msg,
+            ],
+        ];
+    }
+
+    public function redirect($uri){
+        return [
+            'redirect' => [
+                'uri' => $uri,
+            ],
+        ];
+    }
 
     protected function errorResponse($msg){
         return [

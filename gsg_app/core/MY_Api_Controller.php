@@ -6,6 +6,7 @@
  */
 require_once APPPATH . 'libraries/dhi/Herd.php';
 require_once APPPATH . 'libraries/Ion_auth.php';
+require_once APPPATH . 'libraries/Api/Response/Response.php';
 require_once APPPATH . 'libraries/AccessLog.php';
 require_once APPPATH . 'libraries/Site/WebContent/Sections.php';
 require_once APPPATH . 'libraries/Site/WebContent/Pages.php';
@@ -17,6 +18,7 @@ require_once(APPPATH . 'libraries/Permissions/Permissions/ProgramPermissions.php
 
 use \myagsource\AccessLog;
 use \myagsource\Site\WebContent\Sections;
+use \myagsource\Api\Response\Response;
 use \myagsource\Site\WebContent\Pages;
 use \myagsource\Site\WebContent\Blocks;
 use \myagsource\dhi\Herd;
@@ -38,6 +40,14 @@ class MY_Api_Controller extends CI_Controller
 
 
     public function __construct() {
+        header("Content-type: application/json"); //being sent as json
+        header("Cache-Control: no-cache, must-revalidate, max-age=0");
+        header("Cache-Control: post-check=0, pre-check=0", false);
+        header("Pragma: no-cache");
+        header("Expires: -1");
+        header('Access-Control-Allow-Origin: http://localhost:3000');
+        header('Access-Control-Allow-Credentials: true');
+        header('Access-Control-Allow-Methods: GET, POST, PUT');
         // Execute CI_Controller Constructor
         parent::__construct();
 
@@ -50,7 +60,7 @@ class MY_Api_Controller extends CI_Controller
         $this->load->model('dhi/herd_model');
         $this->load->helper('url');
         $this->load->helper('form');
-        $this->load->helper('html');
+//        $this->load->helper('html');
         $this->load->helper('error');
         $this->herd_access = new HerdAccess($this->herd_model);
         $blocks = new Blocks($this->block_model);
@@ -74,20 +84,30 @@ class MY_Api_Controller extends CI_Controller
     }
 
     //redirects while retaining message and conditionally setting redirect url
-    //@todo: needs to be a part of some kind of authorization class?
-    protected function redirect($url, $message = ''){
-        if(!is_array($message) && !empty($message)){
-            $message = [$message];
+    protected function sendResponse($http_code, $message = null, $payload = null){
+        $response = new Response();
+        http_response_code($http_code);
+
+        switch($http_code){
+            case 500:
+                echo json_encode($response->errorInternal($message));
+                break;
+            case 403:
+                echo json_encode($response->errorForbidden($message));
+                break;
+            case 404:
+                echo json_encode($response->errorNotFound($message));
+                break;
+            case 401:
+                echo json_encode($response->errorUnauthorized($message));
+                break;
+            case 400:
+                echo json_encode($response->errorBadRequest($message));
+                break;
+            case 200:
+                echo json_encode(array_merge($response->message($message), ['data'=>$payload]));
+                break;
         }
-        if($this->session->flashdata('message')){
-            $message = $message + $this->session->flashdata('message');
-            $this->session->set_flashdata('message', $message);
-        }
-        elseif(isset($message) && !empty($message)){
-            $this->session->set_flashdata('message', $message);
-        }
-        redirect($url);
+        exit;
     }
-
-
 }

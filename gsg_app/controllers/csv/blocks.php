@@ -242,9 +242,10 @@ class Blocks extends MY_Controller {
 		$filters = new Filters($this->filter_model);
 		if(isset($json_filter_data)){
 			$arr_params = (array)json_decode(urldecode($json_filter_data));
+			/* @todo: backend csrf was blocking CORS, so we need to turn it off for development
 			if(isset($arr_params['csrf_test_name']) && $arr_params['csrf_test_name'] != $this->security->get_csrf_hash()){
 				die("I don't recognize your browser session, your session may have expired, or you may have cookies turned off.");
-			}
+			} */
 			unset($arr_params['csrf_test_name']);
 		
 			$this->load->helper('multid_array_helper');

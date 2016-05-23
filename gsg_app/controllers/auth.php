@@ -731,16 +731,7 @@ class Auth extends Ionauth {
 			if ($this->ion_auth->login($this->input->post('identity'), $this->input->post('password'), $remember))
 			{ //if the login is successful
 				$this->_record_access(1); //1 is the page code for login for the user management section
-                //$this->redirect(site_url('dhi/change_herd/select'), $this->as_ion_auth->messages());
-                header("Content-type: application/json"); //being sent as json
-                header("Cache-Control: no-cache, must-revalidate, max-age=0");
-                header("Cache-Control: post-check=0, pre-check=0", false);
-                header("Pragma: no-cache");
-                header("Expires: -1");
-                header('Access-Control-Allow-Origin: *');
-                header('Access-Control-Allow-Credentials: true');
-                header('Access-Control-Allow-Methods: GET, POST, PUT');
-                echo json_encode(['herd_code' => $this->session->userdata('herd_code')]);
+                $this->redirect(site_url('dhi/change_herd/select'), $this->as_ion_auth->messages());
 			}
 			else
 			{ //if the login was un-successful
