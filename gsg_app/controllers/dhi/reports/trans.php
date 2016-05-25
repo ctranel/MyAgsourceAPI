@@ -67,5 +67,4 @@ class Trans extends report_parent {
         $this->product_name = 'Management MUN - Recent';
         parent::display($block_in, $display_format);
     }
-    
 }

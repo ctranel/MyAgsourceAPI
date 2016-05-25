@@ -52,5 +52,14 @@ class Prod extends report_parent {
         $this->product_name = 'ME Lactation Rankings';
         parent::display($block_in, $display_format, isset($sort_by) ? urldecode($sort_by) : NULL, isset($sort_order) ? urldecode($sort_order) : NULL, isset($json_filter_data) ? urldecode($json_filter_data) : NULL);
     }
-        
+
+    function mun_curr($block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
+        $this->product_name = 'Management MUN - Current';
+        parent::display($block_in, $display_format);
+    }
+
+    function mun_recent($block_in = NULL, $display_format = NULL, $sort_by = NULL, $sort_order = NULL){
+        $this->product_name = 'Management MUN - Recent';
+        parent::display($block_in, $display_format);
+    }
 }

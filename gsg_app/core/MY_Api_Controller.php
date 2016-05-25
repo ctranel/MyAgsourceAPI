@@ -40,6 +40,8 @@ class MY_Api_Controller extends CI_Controller
 
 
     public function __construct() {
+        $request_headers = apache_request_headers();
+
         header("Content-type: application/json"); //being sent as json
         header("Cache-Control: no-cache, must-revalidate, max-age=0");
         header("Cache-Control: post-check=0, pre-check=0", false);
@@ -48,6 +50,13 @@ class MY_Api_Controller extends CI_Controller
         header('Access-Control-Allow-Origin: http://localhost:3000');
         header('Access-Control-Allow-Credentials: true');
         header('Access-Control-Allow-Methods: GET, POST, PUT');
+        header('Access-Control-Allow-Headers: Content-Type, Authorization');
+
+        //if OPTIONS request, header is all we need
+        if($_SERVER['REQUEST_METHOD'] === 'OPTIONS'){
+            die();
+        }
+
         // Execute CI_Controller Constructor
         parent::__construct();
 

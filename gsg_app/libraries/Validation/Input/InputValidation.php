@@ -26,19 +26,17 @@ class InputValidation// implements iSupplemental
 	protected $_error_suffix		= '</p>';
 	protected $error_string			= '';
 	protected $_safe_form_data		= FALSE;
+	protected $_lang					= [];
+	
+	
 
 	/**
 	 * Constructor
 	 */
 	public function __construct($rules = array())
 	{
-		$this->CI =& get_instance();
-
 		// Validation rules can be stored in a config file.
 		$this->_config_rules = $rules;
-
-		// Automatically load the form helper
-		$this->CI->load->helper('form');
 
 		// Set the character encoding in MB.
 		if (function_exists('mb_internal_encoding'))
@@ -46,8 +44,29 @@ class InputValidation// implements iSupplemental
 			mb_internal_encoding($this->CI->config->item('charset'));
 		}
 
-		log_message('debug', "Form Validation Class Initialized");
-	}
+		$this->_lang['required']			= "The %s field is required.";
+		$this->_lang['isset']				= "The %s field must have a value.";
+		$this->_lang['valid_email']		= "The %s field must contain a valid email address.";
+		$this->_lang['valid_emails']		= "The %s field must contain all valid email addresses.";
+		$this->_lang['valid_url']			= "The %s field must contain a valid URL.";
+		$this->_lang['valid_ip']			= "The %s field must contain a valid IP.";
+		$this->_lang['min_length']			= "The %s field must be at least %s characters in length.";
+		$this->_lang['max_length']			= "The %s field can not exceed %s characters in length.";
+		$this->_lang['exact_length']		= "The %s field must be exactly %s characters in length.";
+		$this->_lang['alpha']				= "The %s field may only contain alphabetical characters.";
+		$this->_lang['alpha_numeric']		= "The %s field may only contain alpha-numeric characters.";
+		$this->_lang['alpha_dash']			= "The %s field may only contain alpha-numeric characters, underscores, and dashes.";
+		$this->_lang['numeric']			= "The %s field must contain only numbers.";
+		$this->_lang['is_numeric']			= "The %s field must contain only numeric characters.";
+		$this->_lang['integer']			= "The %s field must contain an integer.";
+		$this->_lang['regex_match']		= "The %s field is not in the correct format.";
+		$this->_lang['matches']			= "The %s field does not match the %s field.";
+		$this->_lang['is_unique'] 			= "The %s field must contain a unique value.";
+		$this->_lang['is_natural']			= "The %s field must contain only positive numbers.";
+		$this->_lang['is_natural_no_zero']	= "The %s field must contain a number greater than zero.";
+		$this->_lang['decimal']			= "The %s field must contain a decimal number.";
+		$this->_lang['less_than']			= "The %s field must contain a number less than %s.";
+		$this->_lang['greater_than']		= "The %s field must contain a number greater than %s.";	}
 
 	// --------------------------------------------------------------------
 
@@ -153,34 +172,12 @@ class InputValidation// implements iSupplemental
 	 * @param	string
 	 * @return	string
 	 */
-	public function set_message($lang, $val = '')
-	{
-		if ( ! is_array($lang))
-		{
-			$lang = array($lang => $val);
+	public function set_message($this->_lang, $val = '') {
+		if ( ! is_array($this->_lang)) {
+			$this->_lang = array($this->_lang => $val);
 		}
 
-		$this->_error_messages = array_merge($this->_error_messages, $lang);
-
-		return $this;
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Set The Error Delimiter
-	 *
-	 * Permits a prefix/suffix to be added to each error message
-	 *
-	 * @access	public
-	 * @param	string
-	 * @param	string
-	 * @return	void
-	 */
-	public function set_error_delimiters($prefix = '<p>', $suffix = '</p>')
-	{
-		$this->_error_prefix = $prefix;
-		$this->_error_suffix = $suffix;
+		$this->_error_messages = array_merge($this->_error_messages, $this->_lang);
 
 		return $this;
 	}
@@ -196,24 +193,12 @@ class InputValidation// implements iSupplemental
 	 * @param	string	the field name
 	 * @return	void
 	 */
-	public function error($field = '', $prefix = '', $suffix = '')
-	{
-		if ( ! isset($this->_field_data[$field]['error']) OR $this->_field_data[$field]['error'] == '')
-		{
+	public function error($field = '') {
+		if ( ! isset($this->_field_data[$field]['error']) OR $this->_field_data[$field]['error'] == '') {
 			return '';
 		}
 
-		if ($prefix == '')
-		{
-			$prefix = $this->_error_prefix;
-		}
-
-		if ($suffix == '')
-		{
-			$suffix = $this->_error_suffix;
-		}
-
-		return $prefix.$this->_field_data[$field]['error'].$suffix;
+		return $this->_field_data[$field]['error'];
 	}
 
 	// --------------------------------------------------------------------
@@ -224,35 +209,19 @@ class InputValidation// implements iSupplemental
 	 * Returns the error messages as a string, wrapped in the error delimiters
 	 *
 	 * @access	public
-	 * @param	string
-	 * @param	string
 	 * @return	str
 	 */
-	public function error_string($prefix = '', $suffix = '')
-	{
-		// No errrors, validation passes!
-		if (count($this->_error_array) === 0)
-		{
+	public function error_string() {
+		// No errors, validation passes!
+		if (count($this->_error_array) === 0) {
 			return '';
-		}
-
-		if ($prefix == '')
-		{
-			$prefix = $this->_error_prefix;
-		}
-
-		if ($suffix == '')
-		{
-			$suffix = $this->_error_suffix;
 		}
 
 		// Generate the error string
 		$str = '';
-		foreach ($this->_error_array as $val)
-		{
-			if ($val != '')
-			{
-				$str .= $prefix.$val.$suffix."\n";
+		foreach ($this->_error_array as $val) {
+			if ($val != '') {
+				$str .= $val."\n";
 			}
 		}
 
@@ -269,62 +238,51 @@ class InputValidation// implements iSupplemental
 	 * @access	public
 	 * @return	bool
 	 */
-	public function run($group = '')
-	{
+	public function run($group = '') {
 		// Do we even have any data to process?  Mm?
-		if (count($_POST) == 0)
-		{
+		if (count($_POST) == 0) {
 			return FALSE;
 		}
 
 		// Does the _field_data array containing the validation rules exist?
 		// If not, we look to see if they were assigned via a config file
-		if (count($this->_field_data) == 0)
-		{
+		if (count($this->_field_data) == 0) {
 			// No validation rules?  We're done...
-			if (count($this->_config_rules) == 0)
-			{
+			if (count($this->_config_rules) == 0) {
 				return FALSE;
 			}
 
 			// Is there a validation rule for the particular URI being accessed?
 			$uri = ($group == '') ? trim($this->CI->uri->ruri_string(), '/') : $group;
 
-			if ($uri != '' AND isset($this->_config_rules[$uri]))
-			{
+			if ($uri != '' AND isset($this->_config_rules[$uri])) {
 				$this->set_rules($this->_config_rules[$uri]);
 			}
-			else
-			{
+			else {
 				$this->set_rules($this->_config_rules);
 			}
 
 			// We're we able to set the rules correctly?
-			if (count($this->_field_data) == 0)
-			{
+			if (count($this->_field_data) == 0) {
 				log_message('debug', "Unable to find validation rules");
 				return FALSE;
 			}
 		}
 
 		// Load the language file containing error messages
-		$this->CI->lang->load('form_validation');
+		$this->_lang->load('form_validation');
 
 		// Cycle through the rules for each field, match the
 		// corresponding $_POST item and test for errors
-		foreach ($this->_field_data as $field => $row)
-		{
+		foreach ($this->_field_data as $field => $row) {
 			// Fetch the data from the corresponding $_POST array and cache it in the _field_data array.
 			// Depending on whether the field name is an array or a string will determine where we get it from.
 
-			if ($row['is_array'] == TRUE)
-			{
+			if ($row['is_array'] == TRUE) {
 				$this->_field_data[$field]['postdata'] = $this->_reduce_array($_POST, $row['keys']);
 			}
-			else
-			{
-				if (isset($_POST[$field]) AND $_POST[$field] != "")
-				{
+			else {
+				if (isset($_POST[$field]) AND $_POST[$field] != "") {
 					$this->_field_data[$field]['postdata'] = $_POST[$field];
 				}
 			}
@@ -335,8 +293,7 @@ class InputValidation// implements iSupplemental
 		// Did we end up with any errors?
 		$total_errors = count($this->_error_array);
 
-		if ($total_errors > 0)
-		{
+		if ($total_errors > 0) {
 			$this->_safe_form_data = TRUE;
 		}
 
@@ -344,8 +301,7 @@ class InputValidation// implements iSupplemental
 		$this->_reset_post_array();
 
 		// No errors, validation passes!
-		if ($total_errors == 0)
-		{
+		if ($total_errors == 0) {
 			return TRUE;
 		}
 
@@ -364,23 +320,17 @@ class InputValidation// implements iSupplemental
 	 * @param	integer
 	 * @return	mixed
 	 */
-	protected function _reduce_array($array, $keys, $i = 0)
-	{
-		if (is_array($array))
-		{
-			if (isset($keys[$i]))
-			{
-				if (isset($array[$keys[$i]]))
-				{
+	protected function _reduce_array($array, $keys, $i = 0) {
+		if (is_array($array)) {
+			if (isset($keys[$i])) {
+				if (isset($array[$keys[$i]])) {
 					$array = $this->_reduce_array($array[$keys[$i]], $keys, ($i+1));
 				}
-				else
-				{
+				else {
 					return NULL;
 				}
 			}
-			else
-			{
+			else {
 				return $array;
 			}
 		}
@@ -396,49 +346,37 @@ class InputValidation// implements iSupplemental
 	 * @access	private
 	 * @return	null
 	 */
-	protected function _reset_post_array()
-	{
-		foreach ($this->_field_data as $field => $row)
-		{
-			if ( ! is_null($row['postdata']))
-			{
-				if ($row['is_array'] == FALSE)
-				{
-					if (isset($_POST[$row['field']]))
-					{
+	protected function _reset_post_array(){
+		foreach ($this->_field_data as $field => $row) {
+			if ( ! is_null($row['postdata'])) {
+				if ($row['is_array'] == FALSE) {
+					if (isset($_POST[$row['field']])) {
 						$_POST[$row['field']] = $this->prep_for_form($row['postdata']);
 					}
 				}
-				else
-				{
+				else {
 					// start with a reference
 					$post_ref =& $_POST;
 
 					// before we assign values, make a reference to the right POST key
-					if (count($row['keys']) == 1)
-					{
+					if (count($row['keys']) == 1) {
 						$post_ref =& $post_ref[current($row['keys'])];
 					}
-					else
-					{
-						foreach ($row['keys'] as $val)
-						{
+					else {
+						foreach ($row['keys'] as $val) {
 							$post_ref =& $post_ref[$val];
 						}
 					}
 
-					if (is_array($row['postdata']))
-					{
+					if (is_array($row['postdata'])) {
 						$array = array();
-						foreach ($row['postdata'] as $k => $v)
-						{
+						foreach ($row['postdata'] as $k => $v) {
 							$array[$k] = $this->prep_for_form($v);
 						}
 
 						$post_ref = $array;
 					}
-					else
-					{
+					else {
 						$post_ref = $this->prep_for_form($row['postdata']);
 					}
 				}
@@ -458,13 +396,10 @@ class InputValidation// implements iSupplemental
 	 * @param	integer
 	 * @return	mixed
 	 */
-	protected function _execute($row, $rules, $postdata = NULL, $cycles = 0)
-	{
+	protected function _execute($row, $rules, $postdata = NULL, $cycles = 0) {
 		// If the $_POST data is an array we will run a recursive call
-		if (is_array($postdata))
-		{
-			foreach ($postdata as $key => $val)
-			{
+		if (is_array($postdata)) {
+			foreach ($postdata as $key => $val) {
 				$this->_execute($row, $rules, $val, $cycles);
 				$cycles++;
 			}
@@ -476,16 +411,13 @@ class InputValidation// implements iSupplemental
 
 		// If the field is blank, but NOT required, no further tests are necessary
 		$callback = FALSE;
-		if ( ! in_array('required', $rules) AND is_null($postdata))
-		{
+		if ( ! in_array('required', $rules) AND is_null($postdata)) {
 			// Before we bail out, does the rule contain a callback?
-			if (preg_match("/(callback_\w+(\[.*?\])?)/", implode(' ', $rules), $match))
-			{
+			if (preg_match("/(callback_\w+(\[.*?\])?)/", implode(' ', $rules), $match)) {
 				$callback = TRUE;
 				$rules = (array('1' => $match[1]));
 			}
-			else
-			{
+			else {
 				return;
 			}
 		}
@@ -493,22 +425,17 @@ class InputValidation// implements iSupplemental
 		// --------------------------------------------------------------------
 
 		// Isset Test. Typically this rule will only apply to checkboxes.
-		if (is_null($postdata) AND $callback == FALSE)
-		{
-			if (in_array('isset', $rules, TRUE) OR in_array('required', $rules))
-			{
+		if (is_null($postdata) AND $callback == FALSE) {
+			if (in_array('isset', $rules, TRUE) OR in_array('required', $rules)) {
 				// Set the message type
 				$type = (in_array('required', $rules)) ? 'required' : 'isset';
 
-				if ( ! isset($this->_error_messages[$type]))
-				{
-					if (FALSE === ($line = $this->CI->lang->line($type)))
-					{
+				if ( ! isset($this->_error_messages[$type])) {
+					if (FALSE === ($line = $this->_lang->line($type))) {
 						$line = 'The field was not set';
 					}
 				}
-				else
-				{
+				else {
 					$line = $this->_error_messages[$type];
 				}
 
@@ -518,8 +445,7 @@ class InputValidation// implements iSupplemental
 				// Save the error message
 				$this->_field_data[$row['field']]['error'] = $message;
 
-				if ( ! isset($this->_error_array[$row['field']]))
-				{
+				if ( ! isset($this->_error_array[$row['field']])) {
 					$this->_error_array[$row['field']] = $message;
 				}
 			}
@@ -530,26 +456,22 @@ class InputValidation// implements iSupplemental
 		// --------------------------------------------------------------------
 
 		// Cycle through each rule and run it
-		foreach ($rules As $rule)
-		{
+		foreach ($rules As $rule) {
 			$_in_array = FALSE;
 
 			// We set the $postdata variable with the current data in our master array so that
 			// each cycle of the loop is dealing with the processed data from the last cycle
-			if ($row['is_array'] == TRUE AND is_array($this->_field_data[$row['field']]['postdata']))
-			{
+			if ($row['is_array'] == TRUE AND is_array($this->_field_data[$row['field']]['postdata'])) {
 				// We shouldn't need this safety, but just in case there isn't an array index
 				// associated with this cycle we'll bail out
-				if ( ! isset($this->_field_data[$row['field']]['postdata'][$cycles]))
-				{
+				if ( ! isset($this->_field_data[$row['field']]['postdata'][$cycles])) {
 					continue;
 				}
 
 				$postdata = $this->_field_data[$row['field']]['postdata'][$cycles];
 				$_in_array = TRUE;
 			}
-			else
-			{
+			else {
 				$postdata = $this->_field_data[$row['field']]['postdata'];
 			}
 
@@ -557,8 +479,7 @@ class InputValidation// implements iSupplemental
 
 			// Is the rule a callback?
 			$callback = FALSE;
-			if (substr($rule, 0, 9) == 'callback_')
-			{
+			if (substr($rule, 0, 9) == 'callback_') {
 				$rule = substr($rule, 9);
 				$callback = TRUE;
 			}
@@ -566,17 +487,14 @@ class InputValidation// implements iSupplemental
 			// Strip the parameter (if exists) from the rule
 			// Rules can contain a parameter: max_length[5]
 			$param = FALSE;
-			if (preg_match("/(.*?)\[(.*)\]/", $rule, $match))
-			{
+			if (preg_match("/(.*?)\[(.*)\]/", $rule, $match)) {
 				$rule	= $match[1];
 				$param	= $match[2];
 			}
 
 			// Call the function that corresponds to the rule
-			if ($callback === TRUE)
-			{
-				if ( ! method_exists($this->CI, $rule))
-				{
+			if ($callback === TRUE) {
+				if ( ! method_exists($this->CI, $rule)) {
 					continue;
 				}
 
@@ -584,42 +502,33 @@ class InputValidation// implements iSupplemental
 				$result = $this->CI->$rule($postdata, $param);
 
 				// Re-assign the result to the master data array
-				if ($_in_array == TRUE)
-				{
+				if ($_in_array == TRUE) {
 					$this->_field_data[$row['field']]['postdata'][$cycles] = (is_bool($result)) ? $postdata : $result;
 				}
-				else
-				{
+				else {
 					$this->_field_data[$row['field']]['postdata'] = (is_bool($result)) ? $postdata : $result;
 				}
 
 				// If the field isn't required and we just processed a callback we'll move on...
-				if ( ! in_array('required', $rules, TRUE) AND $result !== FALSE)
-				{
+				if ( ! in_array('required', $rules, TRUE) AND $result !== FALSE) {
 					continue;
 				}
 			}
-			else
-			{
-				if ( ! method_exists($this, $rule))
-				{
+			else {
+				if ( ! method_exists($this, $rule)) {
 					// If our own wrapper function doesn't exist we see if a native PHP function does.
 					// Users can use any native PHP function call that has one param.
-					if (function_exists($rule))
-					{
+					if (function_exists($rule)) {
 						$result = $rule($postdata);
 
-						if ($_in_array == TRUE)
-						{
+						if ($_in_array == TRUE) {
 							$this->_field_data[$row['field']]['postdata'][$cycles] = (is_bool($result)) ? $postdata : $result;
 						}
-						else
-						{
+						else {
 							$this->_field_data[$row['field']]['postdata'] = (is_bool($result)) ? $postdata : $result;
 						}
 					}
-					else
-					{
+					else {
 						log_message('debug', "Unable to find validation rule: ".$rule);
 					}
 
@@ -643,7 +552,7 @@ class InputValidation// implements iSupplemental
 			{
 				if ( ! isset($this->_error_messages[$rule]))
 				{
-					if (FALSE === ($line = $this->CI->lang->line($rule)))
+					if (FALSE === ($line = $this->_lang->line($rule)))
 					{
 						$line = 'Unable to access an error message corresponding to your field name.';
 					}
@@ -695,7 +604,7 @@ class InputValidation// implements iSupplemental
 			$line = substr($fieldname, 5);
 
 			// Were we able to translate the field name?  If not we use $line
-			if (FALSE === ($fieldname = $this->CI->lang->line($line)))
+			if (FALSE === ($fieldname = $this->_lang->line($line)))
 			{
 				return $line;
 			}
@@ -927,24 +836,6 @@ class InputValidation// implements iSupplemental
 		$field = $_POST[$field];
 
 		return ($str !== $field) ? FALSE : TRUE;
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Match one field to another
-	 *
-	 * @access	public
-	 * @param	string
-	 * @param	field
-	 * @return	bool
-	 */
-	public function is_unique($str, $field)
-	{
-		list($table, $field)=explode('.', $field);
-		$query = $this->CI->db->limit(1)->get_where($table, array($field => $str));
-
-		return $query->num_rows() === 0;
 	}
 
 	// --------------------------------------------------------------------
@@ -1363,7 +1254,7 @@ class InputValidation// implements iSupplemental
 	 */
 	public function encode_php_tags($str)
 	{
-		return str_replace(array('<?php', '<?PHP', '<?', '?>'),  array('&lt;?php', '&lt;?PHP', '&lt;?', '?&gt;'), $str);
+		return str_replace(['<?php', '<?PHP', '<?', '?>'],  ['&lt;?php', '&lt;?PHP', '&lt;?', '?&gt;'], $str);
 	}
 
 }

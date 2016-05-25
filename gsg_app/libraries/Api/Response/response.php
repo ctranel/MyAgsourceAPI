@@ -97,6 +97,7 @@ class Response implements iResponse
             'error' => [
                 'http_status' => $this->http_status,
                 'message' => $msg,
+                'level' => 'error',
             ],
         ];
     }

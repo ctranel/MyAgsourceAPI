@@ -130,7 +130,7 @@ if (defined('ENVIRONMENT'))
 			exit('The project environment is not set correctly.');
 	}
 }
-			
+
 /*
  *---------------------------------------------------------------
  * PROJECT FOLDER NAME
