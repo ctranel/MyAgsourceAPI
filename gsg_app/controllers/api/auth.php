@@ -58,11 +58,11 @@ class Auth extends MY_Api_Controller {
 	}
 
 	function product_info_request(){
-		$arr_inquiry = $this->input->post('products');
+		$arr_inquiry = $this->input->userInput('products');
         $arr_user = $this->ion_auth_model->user($this->session->userdata('user_id'))->result_array()[0];
 
 		if(isset($arr_inquiry) && is_array($arr_inquiry)){
-			if($this->as_ion_auth->recordProductInquiry($arr_user['first_name'] . ' ' . $arr_user['last_name'], $arr_user['email'],$this->session->userdata('herd_code'), $arr_inquiry, $this->input->post('comments'))){
+			if($this->as_ion_auth->recordProductInquiry($arr_user['first_name'] . ' ' . $arr_user['last_name'], $arr_user['email'],$this->session->userdata('herd_code'), $arr_inquiry, $this->input->userInput('comments'))){
                 $this->sendResponse(200, 'Thank you for your interest.  Your request for more information has been sent.');
 			}
 			else{
@@ -81,64 +81,63 @@ class Auth extends MY_Api_Controller {
         if((!$this->as_ion_auth->logged_in())){
             $this->sendResponse(401);
         }
-        //@todo: replace reference to group with permission-based condition
-		if($this->session->userdata('active_group_id') != 2) {
-            $this->sendResponse(403, 'Only producers can manage consultant access to their herd data.');
+		if($this->permissions->hasPermission('Update SG Access') === false) {
+            $this->sendResponse(403, 'You do not have permission to manage consultant access to this herd.');
 		}
 		
 		$this->form_validation->set_rules('modify', 'Herd Selection');
+		if($this->form_validation->run() === false){
+            $this->sendResponse(400, validation_errors());
+        }
 
-		if ($this->form_validation->run() == TRUE) {
-			$action = $this->input->post('submit');
-			$arr_modify_id = $this->input->post('modify');
-			if(isset($arr_modify_id) && is_array($arr_modify_id)){
-				//@todo: should have sep controller for consultant access, and sep path for each of these actions
-                switch ($action) {
-					case 'Remove Access':
-						if($this->ion_auth_model->batch_herd_revoke($arr_modify_id)) {
-							$this->_record_access(41);
-                            $this->sendResponse(200, 'Consultant access adjusted successfully.');
-						}
-						else{
-                            $this->sendResponse(500, 'Consultant access adjustment failed.  Please try again.');
-                        }
-					break;
-					case 'Grant Access':
-						if($this->ion_auth_model->batch_grant_consult($arr_modify_id)) {
-							$this->_record_access(34);
-                            $this->sendResponse(200, 'Consultant access adjusted successfully.');
-						}
-						else{
-                            $this->sendResponse(500, 'Consultant access adjustment failed.  Please try again.');
-                        }
-					break;
-					case 'Deny Access':
-						if($this->ion_auth_model->batch_deny_consult($arr_modify_id)) {
-							$this->_record_access(42);
-                            $this->sendResponse(200, 'Consultant access adjusted successfully.');
-						}
-						else{
-                            $this->sendResponse(500, 'Consultant access adjustment failed.  Please try again.');
-                        }
-					break;
-					case 'Remove Expiration Date':
-						if($this->ion_auth_model->batch_remove_consult_expire($arr_modify_id)) {
-							$this->_record_access(43);
-                            $this->sendResponse(200, 'Consultant access adjusted successfully.');
-						}
-						else{
-                            $this->sendResponse(500, 'Consultant access adjustment failed.  Please try again.');
-                        }
-					break;
-					default:
+        $action = $this->input->userInput('submit');
+        $arr_modify_id = $this->input->userInput('modify');
+        if(isset($arr_modify_id) && is_array($arr_modify_id)){
+            //@todo: should have sep controller for consultant access, and sep path for each of these actions?
+            switch ($action) {
+                case 'Remove Access':
+                    if($this->ion_auth_model->batch_herd_revoke($arr_modify_id)) {
+                        $this->_record_access(41);
+                        $this->sendResponse(200, 'Consultant access adjusted successfully.');
+                    }
+                    else{
                         $this->sendResponse(500, 'Consultant access adjustment failed.  Please try again.');
-					break;
-				}
-			}
-		}
-		
-        $msg = compose_error(validation_errors(), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
-        $this->sendResponse(400, $msg);
+                    }
+                break;
+                case 'Grant Access':
+                    if($this->ion_auth_model->batch_grant_consult($arr_modify_id)) {
+                        $this->_record_access(34);
+                        $this->sendResponse(200, 'Consultant access adjusted successfully.');
+                    }
+                    else{
+                        $this->sendResponse(500, 'Consultant access adjustment failed.  Please try again.');
+                    }
+                break;
+                case 'Deny Access':
+                    if($this->ion_auth_model->batch_deny_consult($arr_modify_id)) {
+                        $this->_record_access(42);
+                        $this->sendResponse(200, 'Consultant access adjusted successfully.');
+                    }
+                    else{
+                        $this->sendResponse(500, 'Consultant access adjustment failed.  Please try again.');
+                    }
+                break;
+                case 'Remove Expiration Date':
+                    if($this->ion_auth_model->batch_remove_consult_expire($arr_modify_id)) {
+                        $this->_record_access(43);
+                        $this->sendResponse(200, 'Consultant access adjusted successfully.');
+                    }
+                    else{
+                        $this->sendResponse(500, 'Consultant access adjustment failed.  Please try again.');
+                    }
+                break;
+                default:
+                    $this->sendResponse(500, 'Consultant access adjustment failed.  Please try again.');
+                break;
+            }
+        }
+
+        $this->sendResponse(400, $this->as_ion_auth->messages() + $this->as_ion_auth->errors());
     }
 	
 	/*
@@ -148,7 +147,7 @@ class Auth extends MY_Api_Controller {
         if((!$this->as_ion_auth->logged_in())){
             $this->sendResponse(401);
         }
-		if($this->permissions->hasPermission('View Assign w permission') !== TRUE) {
+		if($this->permissions->hasPermission('View Assign w permission') !== true) {
             $this->sendResponse(403, 'You do not have permission to view non-owned herds.');
 		}
 
@@ -158,8 +157,8 @@ class Auth extends MY_Api_Controller {
             $this->sendResponse(400, validation_errors());
         }
 
-        $action = $this->input->post('submit');
-        $arr_modify_id = $this->input->post('modify');
+        $action = $this->input->userInput('submit');
+        $arr_modify_id = $this->input->userInput('modify');
         if(isset($arr_modify_id) && is_array($arr_modify_id)){
             //@todo: should have sep controller for consultant access, and sep path for each of these actions
             switch ($action) {
@@ -231,17 +230,17 @@ class Auth extends MY_Api_Controller {
         }
 
         $arr_relationship_data = array(
-            'sg_user_id' => (int)$this->input->post('sg_user_id'),
+            'sg_user_id' => (int)$this->input->userInput('sg_user_id'),
             'herd_code' => $this->session->userdata('herd_code'),
-            'write_data' => (int)$this->input->post('write_data'),
+            'write_data' => (int)$this->input->userInput('write_data'),
             'active_date' => date('Y-m-d'),
             'active_user_id' => $this->session->userdata('user_id'),
         );
-        $post_request_status_id = $this->input->post('request_status_id');
+        $post_request_status_id = $this->input->userInput('request_status_id');
         if(isset($post_request_status_id) && !empty($post_request_status_id)){
             $arr_relationship_data['request_status_id'] = (int)$post_request_status_id;
         }
-        $tmp = human_to_mysql($this->input->post('exp_date'));
+        $tmp = human_to_mysql($this->input->userInput('exp_date'));
         if(isset($tmp) && !empty($tmp)) {
             $arr_relationship_data['exp_date'] = $tmp;
         }
@@ -250,7 +249,7 @@ class Auth extends MY_Api_Controller {
         }
 
         //convert submitted section id values to int
-        $arr_post_section_id = $this->input->post('section_id');
+        $arr_post_section_id = $this->input->userInput('section_id');
         if(isset($arr_post_section_id) && is_array($arr_post_section_id)){
             array_walk($arr_post_section_id, function (&$value) { $value = (int)$value; });
         }
@@ -282,49 +281,45 @@ class Auth extends MY_Api_Controller {
 		$this->form_validation->set_rules('disclaimer', 'Confirmation of Understanding', 'required');
 
 		$is_validated = $this->form_validation->run();
-		if ($is_validated === TRUE) {
-			$herd_code = $this->input->post('herd_code');
-			$herd_release_code = $this->input->post('herd_release_code');
-			$error = $this->herd_model->herd_authorization_error($herd_code, $herd_release_code);
-			
-			if($this->ion_auth_model->get_consult_relationship_id($this->session->userdata('user_id'), $herd_code) !== FALSE){
-				$error = 'relationship_exists';
-			}
-			if($error){
-				$this->as_ion_auth->set_error($error);
-				$is_validated = false;
-			}
-			$arr_relationship_data = array(
-				'herd_code' => $herd_code,
-				'sg_user_id' => $this->session->userdata('user_id'),
-				'service_grp_request' => 1, //bit - did a service group request
-				'write_data' => (int)$this->input->post('write_data'),
-				'request_status_id' => 7, //7 is the id for open request
-				'active_date' => date('Y-m-d'),
-				'active_user_id' => $this->session->userdata('user_id'),
-			);
-			$tmp = human_to_mysql($this->input->post('exp_date'));
-			if(isset($tmp) && !empty($tmp)) $arr_relationship_data['exp_date'] = $tmp;
+		if ($is_validated === false) {
+            $this->sendResponse(400, validation_errors());
+        }
+    
+        $herd_code = $this->input->userInput('herd_code');
+        $herd_release_code = $this->input->userInput('herd_release_code');
+        $error = $this->herd_model->herd_authorization_error($herd_code, $herd_release_code);
+        
+        if($this->ion_auth_model->get_consult_relationship_id($this->session->userdata('user_id'), $herd_code) !== FALSE){
+            $error = 'Relationship already exists';
+        }
+        if($error){
+            $this->sendResponse(400, $error);
+        }
+        
+        //passed initial checks, now prep submission data
+        $arr_relationship_data = [
+            'herd_code' => $herd_code,
+            'sg_user_id' => $this->session->userdata('user_id'),
+            'service_grp_request' => 1, //bit - did a service group request
+            'write_data' => (int)$this->input->userInput('write_data'),
+            'request_status_id' => 7, //7 is the id for open request
+            'active_date' => date('Y-m-d'),
+            'active_user_id' => $this->session->userdata('user_id'),
+        ];
+        $tmp = human_to_mysql($this->input->userInput('exp_date'));
+        if(isset($tmp) && !empty($tmp)) $arr_relationship_data['exp_date'] = $tmp;
 
-			//convert submitted section id values to int
-/*			$arr_post_section_id = $this->input->post('section_id');
-			array_walk($arr_post_section_id, function (&$value) { $value = (int)$value; });
+        //convert submitted section id values to int
+/*			$arr_post_section_id = $this->input->userInput('section_id');
+        array_walk($arr_post_section_id, function (&$value) { $value = (int)$value; });
 */			$arr_post_section_id = array();
-			
-			if ($is_validated === TRUE && $this->as_ion_auth->service_grp_request($arr_relationship_data, $arr_post_section_id, $this->config->item('cust_serv_email'))) {
-				$this->_record_access(35);
-				$msg = compose_error(validation_errors(), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
-                $this->sendResponse(200, $msg); //  to manage access page
-			}
-			else { //if the request was un-successful
-				$msg = compose_error(validation_errors(), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
-                $this->sendResponse(500, $msg);
-			}
-		}
-		else {
-            //set the flash data error message if there is one
-            $msg = compose_error(validation_errors(), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
-            $this->sendResponse(400, $msg);
+        
+        if ($this->as_ion_auth->service_grp_request($arr_relationship_data, $arr_post_section_id, $this->config->item('cust_serv_email'))) {
+            $this->_record_access(35);
+            $this->sendResponse(200, $this->as_ion_auth->messages() + $this->as_ion_auth->errors()); //  to manage access page
+        }
+        else { //if the request was un-successful
+            $this->sendResponse(500, $this->as_ion_auth->messages() + $this->as_ion_auth->errors());
         }
 	}
 
@@ -344,46 +339,43 @@ class Auth extends MY_Api_Controller {
 		$this->form_validation->set_rules('identity', 'Email Address', 'trim|required|valid_email');
 		$this->form_validation->set_rules('password', 'Password', 'trim|required');
 
-		if ($this->form_validation->run() == TRUE){ //check to see if the user is logging in
-			//check for "remember me"
-			$remember = (bool) $this->input->post('remember');
-			//Clear out herd code in case user was browsing demo herd before logging in.
-			$this->session->unset_userdata('herd_code');
-			$this->session->unset_userdata('arr_pstring');
-			$this->session->unset_userdata('pstring');
-			$this->session->unset_userdata('arr_tstring');
-			$this->session->unset_userdata('tstring');
-			//$this->session->sess_destroy();
-			//$this->session->sess_create();
-		
-			if ($this->as_ion_auth->login($this->input->post('identity'), $this->input->post('password'), $remember)){ //if the login is successful
-				$this->_record_access(1); //1 is the page code for login for the user management section
-                //get permissions (also in constuctor, put in function/class somewhere)
-                $this->load->model('permissions_model');
-                $this->load->model('product_model');
-                $herd = new Herd($this->herd_model, $this->session->userdata('herd_code'));
-                $group_permissions = ProgramPermissions::getGroupPermissionsList($this->permissions_model, $this->session->userdata('active_group_id'));
-                $products = new Products($this->product_model, $herd, $group_permissions);
-                $this->permissions = new ProgramPermissions($this->permissions_model, $group_permissions, $products->allHerdProductCodes());
+		if ($this->form_validation->run() === false) {
+            $this->sendResponse(400, validation_errors());
+        }
+        //check to see if the user is logging in
+        //check for "remember me"
+        $remember = (bool) $this->input->userInput('remember');
+        //Clear out herd code in case user was browsing demo herd before logging in.
+        $this->session->unset_userdata('herd_code');
+        $this->session->unset_userdata('arr_pstring');
+        $this->session->unset_userdata('pstring');
+        $this->session->unset_userdata('arr_tstring');
+        $this->session->unset_userdata('tstring');
+        //$this->session->sess_destroy();
+        //$this->session->sess_create();
+    
+        if ($this->as_ion_auth->login($this->input->userInput('identity'), $this->input->userInput('password'), $remember)){ //if the login is successful
+            $this->_record_access(1); //1 is the page code for login for the user management section
+            //get permissions (also in constuctor, put in function/class somewhere)
+            $this->load->model('permissions_model');
+            $this->load->model('product_model');
+            $herd = new Herd($this->herd_model, $this->session->userdata('herd_code'));
+            $group_permissions = ProgramPermissions::getGroupPermissionsList($this->permissions_model, $this->session->userdata('active_group_id'));
+            $products = new Products($this->product_model, $herd, $group_permissions);
+            $this->permissions = new ProgramPermissions($this->permissions_model, $group_permissions, $products->allHerdProductCodes());
 
-                //get herd list
-                $tmp_arr = $this->herd_access->getAccessibleHerdOptions($this->session->userdata('user_id'), $this->permissions->permissionsList(), $this->session->userdata('arr_regions'));
-                //@todo: handle if there is only 1 herd (or 0)
-				if(count($tmp_arr) === 0){
-                    $this->sendResponse(404);
-                }
+            //get herd list
+            $tmp_arr = $this->herd_access->getAccessibleHerdOptions($this->session->userdata('user_id'), $this->permissions->permissionsList(), $this->session->userdata('arr_regions'));
+            //@todo: handle if there is only 1 herd (or 0)
+            if(count($tmp_arr) === 0){
+                $this->sendResponse(404);
+            }
 
-                //send response
-                $this->sendResponse(200, 'Login Successful', ['herd_codes' => $tmp_arr]);
-			}
-			else{ //if the login was un-successful
-                $this->sendResponse(401, $this->as_ion_auth->errors());
-			}
-		}
-		else{
-            $msg = compose_error(validation_errors(), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
-            $this->sendResponse(400, $msg);
-		}
+            //send response
+            $this->sendResponse(200, 'Login Successful', ['herd_codes' => $tmp_arr]);
+        }
+
+        $this->sendResponse(401, $this->as_ion_auth->errors() + $this->as_ion_auth->messages());
 	}
 
 	//log the user out
@@ -404,22 +396,21 @@ class Auth extends MY_Api_Controller {
             $this->sendResponse(401);
         }
 
-        $user = $this->as_ion_auth->user()->row();
+        //$user = $this->as_ion_auth->user()->row();
 
-        if ($this->form_validation->run()) {
-            $identity = $this->session->userdata($this->config->item('identity', 'ion_auth'));
-
-            $change = $this->as_ion_auth->change_password($identity, $this->input->post('old'), $this->input->post('new'));
-
-            if ($change) { //if the password was successfully changed
-                $this->as_ion_auth->logout();
-                $this->sendResponse(200, $this->as_ion_auth->messages());
-            }
-            else {
-                $this->sendResponse(500, $this->as_ion_auth->errors());
-            }
+        if ($this->form_validation->run() === false) {
+            $this->sendResponse(400, validation_errors());
         }
-        $this->sendResponse(400, validation_errors());
+        $identity = $this->session->userdata($this->config->item('identity', 'ion_auth'));
+
+        $change = $this->as_ion_auth->change_password($identity, $this->input->userInput('old'), $this->input->userInput('new'));
+
+        if ($change) { //if the password was successfully changed
+            $this->as_ion_auth->logout();
+            $this->sendResponse(200, $this->as_ion_auth->messages());
+        }
+
+        $this->sendResponse(500, $this->as_ion_auth->errors());
 	}
 
 	//forgot password
@@ -427,7 +418,7 @@ class Auth extends MY_Api_Controller {
         $this->form_validation->set_rules('email', 'Email Address', 'required');
         if ($this->form_validation->run()){
             //run the forgotten password method to email an activation code to the user
-            $forgotten = $this->as_ion_auth->forgotten_password($this->input->post('email'));
+            $forgotten = $this->as_ion_auth->forgotten_password($this->input->userInput('email'));
 
             if ($forgotten) { //if there were no errors
                 $this->sendResponse(200, $this->as_ion_auth->messages());
@@ -440,8 +431,7 @@ class Auth extends MY_Api_Controller {
 	}
 
 	//reset password - final step for forgotten password
-	public function reset_password($code = NULL)
-    {
+	public function reset_password($code = NULL) {
         if (!$code) {
             $this->sendResponse(400, 'Invalid or expired reset code.  Please restart process.');
         }
@@ -458,7 +448,7 @@ class Auth extends MY_Api_Controller {
 
             if ($this->form_validation->run()){
                 // do we have a valid request?
-                if ($this->_valid_csrf_nonce() === FALSE || $user->id != $this->input->post('user_id')) {
+                if ($this->_valid_csrf_nonce() === FALSE || $user->id != $this->input->userInput('user_id')) {
                     //something fishy might be up
                     $this->as_ion_auth->clear_forgotten_password_code($code);
                     $this->sendResponse(400);
@@ -467,7 +457,7 @@ class Auth extends MY_Api_Controller {
                     // finally change the password
                     $identity = $user->{$this->config->item('identity', 'ion_auth')};
 
-                    $change = $this->as_ion_auth->reset_password($identity, $this->input->post('new'));
+                    $change = $this->as_ion_auth->reset_password($identity, $this->input->userInput('new'));
 
                     if ($change) { //if the password was successfully changed
                         $this->as_ion_auth->logout();
@@ -514,9 +504,9 @@ class Auth extends MY_Api_Controller {
 
         if ($this->form_validation->run()) {
             // do we really want to deactivate?
-            if ($this->input->post('confirm') == 'yes') {
+            if ($this->input->userInput('confirm') == 'yes') {
                 // do we have a valid request?
-                if ($this->_valid_csrf_nonce() === FALSE || $id != $this->input->post('id')) {
+                if ($this->_valid_csrf_nonce() === FALSE || $id != $this->input->userInput('id')) {
                     $this->sendResponse(400, 'User not specified.');
                 }
 
@@ -535,15 +525,12 @@ class Auth extends MY_Api_Controller {
 
     function create_user(){
 		//validate form input
-		$this->form_validation->set_rules('first_name', 'First Name', 'trim|required');
+/*		$this->form_validation->set_rules('first_name', 'First Name', 'trim|required');
 		$this->form_validation->set_rules('last_name', 'Last Name', 'trim|required');
 		$this->form_validation->set_rules('email', 'Email Address', 'trim|required|valid_email');
 		$this->form_validation->set_rules('supervisor_acct_num', 'Field Technician Account Number', 'max_length[8]');
 		$this->form_validation->set_rules('sg_acct_num', 'Service Group Account Number', 'max_length[8]');
 		$this->form_validation->set_rules('assoc_acct_num[]', 'Association Account Number', 'max_length[8]');
-		$this->form_validation->set_rules('phone1', 'First Part of Phone', 'exact_length[3]|required');
-		$this->form_validation->set_rules('phone2', 'Second Part of Phone', 'exact_length[3]|required');
-		$this->form_validation->set_rules('phone3', 'Third Part of Phone', 'exact_length[4]|required');
 		$this->form_validation->set_rules('best_time', 'Best Time to Call', 'max_length[10]|required');
 		$this->form_validation->set_rules('password', 'Password', 'trim|required|min_length[' . $this->config->item('min_password_length', 'ion_auth') . ']|max_length[' . $this->config->item('max_password_length', 'ion_auth') . ']|matches[password_confirm]');
 		$this->form_validation->set_rules('password_confirm', 'Password Confirmation', 'trim|required');
@@ -556,10 +543,13 @@ class Auth extends MY_Api_Controller {
        if($this->form_validation->run() === false){
             $this->sendResponse(400, validation_errors());
         }
-
-        $arr_posted_group_id = $this->form_validation->set_value('group_id[]');
+*/
+        $arr_posted_group_id = $this->input->userInput('group_id');//$this->form_validation->set_value('group_id[]');
+        if(!is_array($arr_posted_group_id)){
+            $arr_posted_group_id = [$arr_posted_group_id];
+        }
         if(!$this->as_ion_auth->group_assignable($arr_posted_group_id)){
-            $this->sendResponse(403, 'You do not have permissions to create a user with the user group you selected.  Please try again, or contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . '.');
+            $this->sendResponse(403, 'You do not have permissions to create a user with the user group you selected.');
         }
 
         //start with nothing
@@ -572,12 +562,12 @@ class Auth extends MY_Api_Controller {
         //Set variables that depend on group(s) selected
         if(isset($this->permissions)){
             if($this->permissions->hasPermission("Add All Users") || $this->permissions->hasPermission("Add Users In Region")){
-                $arr_posted_group_id = $this->input->post('group_id');
+                $arr_posted_group_id = $this->input->userInput('group_id');
                 if(!$this->as_ion_auth->group_assignable($arr_posted_group_id)){
-                    $this->sendResponse(403, 'You do not have permissions to add a user with the user group you selected.  Please try again, or contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . '.');
+                    $this->sendResponse(403, 'You do not have permissions to add a user with the user group you selected.');
                 }
-                $assoc_acct_num = $this->input->post('assoc_acct_num');
-                $supervisor_acct_num = $this->input->post('supervisor_acct_num');
+                $assoc_acct_num = $this->input->userInput('assoc_acct_num');
+                $supervisor_acct_num = $this->input->userInput('supervisor_acct_num');
                 if(empty($assoc_acct_num)){
                     $assoc_acct_num = NULL;
                 }
@@ -587,35 +577,35 @@ class Auth extends MY_Api_Controller {
             }
         }
         if(in_array(2, $arr_posted_group_id) || in_array(13, $arr_posted_group_id)){ //producers
-            $herd_code = $this->input->post('herd_code') ? $this->input->post('herd_code') : NULL;
-            $herd_release_code = $this->input->post('herd_release_code');
+            $herd_code = $this->input->userInput('herd_code') ? $this->input->userInput('herd_code') : NULL;
+            $herd_release_code = $this->input->userInput('herd_release_code');
             $error = $this->herd_model->herd_authorization_error($herd_code, $herd_release_code);
             if($error){
                 $this->sendResponse(403, $error);
             }
         }
         if(in_array(9, $arr_posted_group_id)){ //service groups
-            $sg_acct_num = $this->input->post('sg_acct_num');
+            $sg_acct_num = $this->input->userInput('sg_acct_num');
             if(!$this->as_ion_auth->service_grp_exists($sg_acct_num)){
-                $this->sendResponse(400, 'The service group entered does not exist. Please try again, or contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . '.');
+                $this->sendResponse(400, 'The service group entered does not exist.');
             }
         }
 
-        $username = substr(strtolower($this->input->post('first_name')) . ' ' . strtolower($this->input->post('last_name')),0,15);
-        $email = $this->input->post('email');
-        $password = $this->input->post('password');
-        $additional_data = array('first_name' => $this->input->post('first_name'),
+        $username = substr(strtolower($this->input->userInput('first_name')) . ' ' . strtolower($this->input->userInput('last_name')),0,15);
+        $email = $this->input->userInput('email');
+        $password = $this->input->userInput('password');
+        $additional_data = array('first_name' => $this->input->userInput('first_name'),
             'herd_code' => $herd_code,
-            'last_name' => $this->input->post('last_name'),
+            'last_name' => $this->input->userInput('last_name'),
             'supervisor_acct_num' => $supervisor_acct_num,
             'sg_acct_num' => $sg_acct_num,
             'assoc_acct_num' => $assoc_acct_num,
-            'phone' => $this->input->post('phone1') . '-' . $this->input->post('phone2') . '-' . $this->input->post('phone3'),
-            'best_time' => $this->input->post('best_time'),
+//            'phone' => $this->input->userInput('phone1') . '-' . $this->input->userInput('phone2') . '-' . $this->input->userInput('phone3'),
+            'best_time' => $this->input->userInput('best_time'),
             'group_id' => $arr_posted_group_id,
-            'section_id' => $this->input->post('section_id')
+            'section_id' => $this->input->userInput('section_id')
         );
-        if($additional_data['phone'] == '--') $additional_data['phone'] = '';
+ //       if($additional_data['phone'] == '--') $additional_data['phone'] = '';
 
         try{
             $is_registered = $this->as_ion_auth->register($username, $password, $email, $additional_data, $arr_posted_group_id, 'AMYA-500');
@@ -623,9 +613,13 @@ class Auth extends MY_Api_Controller {
                 //$this->as_ion_auth->activate();
                 $this->sendResponse(200, 'Your account has been created.  You will be receiving an email shortly that will confirm your registration and allow you to activate your account.');
             }
+            else{
+                $this->sendResponse(400, $this->as_ion_auth->messages() + $this->as_ion_auth->errors());
+            }
         }
         catch(Exception $e){
             //will eventually catch registration errors here, but for now they are written to as_ion_auth errors()
+            $this->sendResponse(400, $e->getMessage());
         }
 
         $this->sendResponse(500, 'Registration was not successful.');
@@ -643,9 +637,8 @@ class Auth extends MY_Api_Controller {
             $this->sendResponse(403, 'You do not have permission to edit the requested account.');
         }
 
-        $this->data['title'] = "Edit Account";
 		//validate form input
-		$this->form_validation->set_rules('first_name', 'First Name', 'trim|required');
+/*		$this->form_validation->set_rules('first_name', 'First Name', 'trim|required');
 		$this->form_validation->set_rules('last_name', 'Last Name', 'trim|required');
 		$this->form_validation->set_rules('email', 'Email Address', 'trim|required|valid_email');
 		$this->form_validation->set_rules('supervisor_acct_num', 'Field Technician Number', 'exact_length[8]');
@@ -659,37 +652,37 @@ class Auth extends MY_Api_Controller {
 		$this->form_validation->set_rules('group_id[]', 'Name of Account Group');
 		//$this->form_validation->set_rules('herd_code', 'Herd Code', 'exact_length[8]');
 		$this->form_validation->set_rules('section_id[]', 'Section');
-		
-		$email_in = $this->input->post('email');
+*/		
+		$email_in = $this->input->userInput('email');
 		if(empty($email_in)){
             $this->sendResponse(400, 'Form data not found.');
         }
 
-        if($this->form_validation->run() === false){
+/*        if($this->form_validation->run() === false){
             $this->sendResponse(400, validation_errors());
         }
-
+*/
         //populate data fields for specific group choices
         //start with the minimum
-        $user_id = $this->input->post('user_id');
+        $user_id = $this->input->userInput('user_id');
         $arr_posted_group_id = FALSE;
         $assoc_acct_num = NULL;
         $supervisor_acct_num = NULL;
 
         //Set variables that depend on group(s) selected
         if($this->permissions->hasPermission("Edit All Users") || $this->permissions->hasPermission("Edit Users In Region")){
-            $arr_posted_group_id = $this->input->post('group_id');
+            $arr_posted_group_id = $this->input->userInput('group_id');
             if(!$this->as_ion_auth->group_assignable($arr_posted_group_id)){
                 $this->sendResponse(403, 'You do not have permissions to edit a user with the user group you selected.');
             }
-            $assoc_acct_num = $this->input->post('assoc_acct_num');
-            $supervisor_acct_num = $this->input->post('supervisor_acct_num');
+            $assoc_acct_num = $this->input->userInput('assoc_acct_num');
+            $supervisor_acct_num = $this->input->userInput('supervisor_acct_num');
         }
 
         $obj_user = $this->ion_auth_model->user($user_id)->row();
-        /*if($this->input->post('herd_code') && $this->input->post('herd_code') != $obj_user->herd_code){
-            $herd_code = $this->input->post('herd_code') ? $this->input->post('herd_code') : NULL;
-            $herd_release_code = $this->input->post('herd_release_code');
+        /*if($this->input->userInput('herd_code') && $this->input->userInput('herd_code') != $obj_user->herd_code){
+            $herd_code = $this->input->userInput('herd_code') ? $this->input->userInput('herd_code') : NULL;
+            $herd_release_code = $this->input->userInput('herd_release_code');
             $error = $this->herd_model->herd_authorization_error($herd_code, $herd_release_code);
             if($error){
                 $this->as_ion_auth->set_error($error);
@@ -698,22 +691,22 @@ class Auth extends MY_Api_Controller {
         }*/
 
         //populate
-        $username = substr(strtolower($this->input->post('first_name')) . ' ' . strtolower($this->input->post('last_name')),0,15);
-        $email = $this->input->post('email');
+        $username = substr(strtolower($this->input->userInput('first_name')) . ' ' . strtolower($this->input->userInput('last_name')),0,15);
+        $email = $this->input->userInput('email');
         $data = array('username' => $username,
             'email' => $email,
-            'first_name' => $this->input->post('first_name'),
-            'last_name' => $this->input->post('last_name'),
-            'phone' => $this->input->post('phone1') . '-' . $this->input->post('phone2') . '-' . $this->input->post('phone3'),
-            'best_time' => $this->input->post('best_time'),
+            'first_name' => $this->input->userInput('first_name'),
+            'last_name' => $this->input->userInput('last_name'),
+//            'phone' => $this->input->userInput('phone1') . '-' . $this->input->userInput('phone2') . '-' . $this->input->userInput('phone3'),
+            'best_time' => $this->input->userInput('best_time'),
             'group_id' => $arr_posted_group_id,
             'supervisor_acct_num' => $supervisor_acct_num,
             'assoc_acct_num' => $assoc_acct_num,
-            'herd_code' => $this->input->post('herd_code') ? $this->input->post('herd_code') : NULL
+            'herd_code' => $this->input->userInput('herd_code') ? $this->input->userInput('herd_code') : NULL
         );
         if($data['phone'] == '--') $data['phone'] = '';
-        if(isset($_POST['section_id'])) $data['section_id'] = $this->input->post('section_id');
-        $password = $this->input->post('password');
+        if(isset($_POST['section_id'])) $data['section_id'] = $this->input->userInput('section_id');
+        $password = $this->input->userInput('password');
         if(!empty($password)) $data['password'] = $password;
 
 		$arr_curr_group_ids = array_keys($this->session->userdata('arr_groups'));

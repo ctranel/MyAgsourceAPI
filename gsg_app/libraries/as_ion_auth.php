@@ -55,7 +55,7 @@ class As_ion_auth extends \Ion_auth {
 		$id = parent::register($username, $password, $email, $additional_data, $group_name);
 
         if(!$id){
-            throw new \Exception('Recording of registration failed: ' . $this->errors());
+            throw new \Exception('Recording of registration failed: ' . implode(', ', $this->errors()));
         }
 
 		$herd_code = $additional_data['herd_code'];
@@ -75,7 +75,7 @@ class As_ion_auth extends \Ion_auth {
             'group'=> implode(', ', $group_name),
             'email'     => $email,
             'herd_code'	=> $herd_code,
-            'phone'		=> $additional_data['phone'],
+//            'phone'		=> $additional_data['phone'],
             'best_time'	=> $additional_data['best_time'],
             'arr_herd'	=> $this->herd_model->get_herd($herd_code),
             'arr_tech'	=> $this->tech_model->get_tech_by_herd($herd_code),
@@ -531,7 +531,6 @@ class As_ion_auth extends \Ion_auth {
 	 * @param date expiration date for access
 	 * @return boolean
 	 * @access public
-	 * @todo remove "die" before uploading to server
 	 **/
 	function send_consultant_request($arr_relationship_data, $relationship_id, $cust_serv_email){
 		//send e-mail
@@ -569,7 +568,6 @@ class As_ion_auth extends \Ion_auth {
 			}
 		}
 		$this->set_error('consultant_status_email_unsuccessful');
-//die($message);
 		return FALSE;
 	}
 }
