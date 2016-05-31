@@ -272,16 +272,16 @@ class report_block extends MY_Controller {
              * myagsource special case: if PAGE filters or params contain only a pstring of 0, and the block is not a summary
             * Needed for pages that contain both cow level and summary reports.
 			*/
-           if($filters->criteriaExists('pstring') && !$block->isSummary()){
+            if($filters->criteriaExists('pstring') && !$block->isSummary()){
                 $p_value = $filters->getCriteriaValueByKey('pstring');
                 if(count($p_value) === 1 && $p_value[0] === 0){
                     $filters->removeCriteria('pstring');
                 }
-           }
+            }
 
-			/*
-			 * If this is a cow level block, and the filter is set to 0 (pstring), remove filter
-			 * Needed for pages that contain both cow level and summary reports.
+            /*
+             * If this is a cow level block, and the filter is set to 0 (pstring), remove filter
+             * Needed for pages that contain both cow level and summary reports.
 			foreach($arr_params as $k => $v){
                 if(!$block->isSummary()){
 					if(is_array($v)){
