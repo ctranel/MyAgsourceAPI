@@ -24,6 +24,8 @@ class Herd_model extends CI_Model {
 		//check herd_release_code against herd_code
 		$db_tmp_obj = $this->db->select('account_password')
 		->where('herd_code', $herd_code)
+        ->where('member_status_code', 'A')
+        ->where('dhi_quit_date IS NULL')
 		->get('herd.dbo.herd_id')
 		->row();
 		$db_herd_release_code = '';
