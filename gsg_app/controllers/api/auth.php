@@ -57,6 +57,10 @@ class Auth extends MY_Api_Controller {
 		}*/
 	}
 
+    function c(){
+        $this->sendResponse(200, 'success', ['user' => $this->session->userdata('user_id')]);
+    }
+
 	function product_info_request(){
 		$arr_inquiry = $this->input->userInput('products');
         $arr_user = $this->ion_auth_model->user($this->session->userdata('user_id'))->result_array()[0];
@@ -339,9 +343,9 @@ class Auth extends MY_Api_Controller {
 		$this->form_validation->set_rules('identity', 'Email Address', 'trim|required|valid_email');
 		$this->form_validation->set_rules('password', 'Password', 'trim|required');
 
-		if ($this->form_validation->run() === false) {
+		/*if ($this->form_validation->run() === false) {
             $this->sendResponse(400, validation_errors());
-        }
+        } */
         //check to see if the user is logging in
         //check for "remember me"
         $remember = (bool) $this->input->userInput('remember');
@@ -368,11 +372,11 @@ class Auth extends MY_Api_Controller {
             $tmp_arr = $this->herd_access->getAccessibleHerdOptions($this->session->userdata('user_id'), $this->permissions->permissionsList(), $this->session->userdata('arr_regions'));
             //@todo: handle if there is only 1 herd (or 0)
             if(count($tmp_arr) === 0){
-                $this->sendResponse(404);
+                $this->sendResponse(404, 'No herds found.');
             }
 
             //send response
-            $this->sendResponse(200, 'Login Successful', ['herd_codes' => $tmp_arr]);
+            $this->sendResponse(200, 'Login Successful', ['herd_codes' => []]);//$tmp_arr]);
         }
 
         $this->sendResponse(401, $this->as_ion_auth->errors() + $this->as_ion_auth->messages());
@@ -397,10 +401,10 @@ class Auth extends MY_Api_Controller {
         }
 
         //$user = $this->as_ion_auth->user()->row();
-
+/*
         if ($this->form_validation->run() === false) {
             $this->sendResponse(400, validation_errors());
-        }
+        } */
         $identity = $this->session->userdata($this->config->item('identity', 'ion_auth'));
 
         $change = $this->as_ion_auth->change_password($identity, $this->input->userInput('old'), $this->input->userInput('new'));
@@ -416,18 +420,17 @@ class Auth extends MY_Api_Controller {
 	//forgot password
 	function forgot_password(){
         $this->form_validation->set_rules('email', 'Email Address', 'required');
-        if ($this->form_validation->run()){
-            //run the forgotten password method to email an activation code to the user
-            $forgotten = $this->as_ion_auth->forgotten_password($this->input->userInput('email'));
+        /*if ($this->form_validation->run() === false) {
+            $this->sendResponse(400, validation_errors());
+        }*/
+        //run the forgotten password method to email an activation code to the user
+        $forgotten = $this->as_ion_auth->forgotten_password($this->input->userInput('email'));
 
-            if ($forgotten) { //if there were no errors
-                $this->sendResponse(200, $this->as_ion_auth->messages());
-            }
-            else {
-                $this->sendResponse(500, $this->as_ion_auth->errors());
-            }
+        if ($forgotten) { //if there were no errors
+            $this->sendResponse(200, $this->as_ion_auth->messages());
         }
-        $this->sendResponse(400, validation_errors());
+
+        $this->sendResponse(500, $this->as_ion_auth->errors());
 	}
 
 	//reset password - final step for forgotten password
@@ -438,38 +441,34 @@ class Auth extends MY_Api_Controller {
 
         $user = $this->as_ion_auth->forgotten_password_check($code);
 
-        if ($user) {  //if the code is valid then display the password reset form
-
-            $this->form_validation->set_rules('new', 'New Password',
-                'required|min_length[' . $this->config->item('min_password_length',
-                    'ion_auth') . ']|max_length[' . $this->config->item('max_password_length',
-                    'ion_auth') . ']|matches[new_confirm]');
-            $this->form_validation->set_rules('new_confirm', 'Confirm New Password', 'required');
-
-            if ($this->form_validation->run()){
-                // do we have a valid request?
-                if ($this->_valid_csrf_nonce() === FALSE || $user->id != $this->input->userInput('user_id')) {
-                    //something fishy might be up
-                    $this->as_ion_auth->clear_forgotten_password_code($code);
-                    $this->sendResponse(400);
-                }
-                else {
-                    // finally change the password
-                    $identity = $user->{$this->config->item('identity', 'ion_auth')};
-
-                    $change = $this->as_ion_auth->reset_password($identity, $this->input->userInput('new'));
-
-                    if ($change) { //if the password was successfully changed
-                        $this->as_ion_auth->logout();
-                        $this->sendResponse(200, $this->as_ion_auth->messages());
-                    }
-                    else {
-                        $this->sendResponse(500, $this->ion_auth->errors(), ['reset_code' => $code]);
-                    }
-                }
-            }
-            $this->sendResponse(400, validation_errors());
+        if($user === false){
+            $this->sendResponse(404, 'User not found.');
         }
+
+        $this->form_validation->set_rules('new', 'New Password',
+            'required|min_length[' . $this->config->item('min_password_length',
+                'ion_auth') . ']|max_length[' . $this->config->item('max_password_length',
+                'ion_auth') . ']|matches[new_confirm]');
+        $this->form_validation->set_rules('new_confirm', 'Confirm New Password', 'required');
+
+        /*if ($this->form_validation->run() === false) {
+            $this->sendResponse(400, validation_errors());
+        }*/
+        // do we have a valid request?
+        if ($this->_valid_csrf_nonce() === FALSE || $user->id != $this->input->userInput('user_id')) {
+            //something fishy might be up
+            $this->as_ion_auth->clear_forgotten_password_code($code);
+            $this->sendResponse(400);
+        }
+
+        // finally change the password
+        $identity = $user->{$this->config->item('identity', 'ion_auth')};
+        if ($this->as_ion_auth->reset_password($identity, $this->input->userInput('new'))) { //if the password was successfully changed
+            $this->as_ion_auth->logout();
+            $this->sendResponse(200, $this->as_ion_auth->messages());
+        }
+
+        $this->sendResponse(500, $this->ion_auth->errors(), ['reset_code' => $code]);
     }
 
     //activate the user
@@ -525,7 +524,7 @@ class Auth extends MY_Api_Controller {
 
     function create_user(){
 		//validate form input
-/*		$this->form_validation->set_rules('first_name', 'First Name', 'trim|required');
+		$this->form_validation->set_rules('first_name', 'First Name', 'trim|required');
 		$this->form_validation->set_rules('last_name', 'Last Name', 'trim|required');
 		$this->form_validation->set_rules('email', 'Email Address', 'trim|required|valid_email');
 		$this->form_validation->set_rules('supervisor_acct_num', 'Field Technician Account Number', 'max_length[8]');
@@ -540,10 +539,10 @@ class Auth extends MY_Api_Controller {
 		$this->form_validation->set_rules('herd_release_code', 'Release Code', 'trim|exact_length[10]');
 		$this->form_validation->set_rules('section_id[]', 'Section');
 
-       if($this->form_validation->run() === false){
+       /*if($this->form_validation->run() === false){
             $this->sendResponse(400, validation_errors());
-        }
-*/
+        }*/
+
         $arr_posted_group_id = $this->input->userInput('group_id');//$this->form_validation->set_value('group_id[]');
         if(!is_array($arr_posted_group_id)){
             $arr_posted_group_id = [$arr_posted_group_id];
