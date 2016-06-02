@@ -24,6 +24,28 @@ parent::__construct();
     }
 */
     /**
+     * Fetch full input array.  Data for all sources is cleaned when class is instantiated
+     *
+     * @access	public
+     * @param	string	The index key
+     * @param	bool	XSS cleaning
+     * @return	string
+     */
+    function userInputArray() {
+        if(count($_POST) > 0) {
+            return $_POST;
+        }
+        elseif(count($this->json_request) > 0){
+            return $this->json_request;
+        }
+        elseif(count($_GET) > 0) {
+            return $_GET;
+        }
+    }
+
+    // --------------------------------------------------------------------
+
+    /**
      * Fetch an item from either the GET or POST globals, or the json_request property
      *
      * @access	public
