@@ -1156,42 +1156,4 @@ SELECT DISTINCT id, name, list_order FROM cteAnchor ORDER BY list_order;";
 		 $ret = array_flatten($results);
 		return $ret;
 	}
-
-	/**
-	 * errors
-	 *
-	 * Get the error message
-	 *
-	 * @return void
-	 * @author Ben Edmunds
-	 **/
-	public function errors(){
-		$_output = [];
-		foreach ($this->errors as $k => $error) {
-			$errorLang = $this->lang->line($error) ? $this->lang->line($error) : '##' . $error . '##';
-			$_output[] = $errorLang;
-		}
-
-		return $_output;
-	}
-
-	/**
-	 * errors
-	 *
-	 * Get the error message
-	 *
-	 * @return void
-	 * @author Ben Edmunds
-	 **/
-	public function messages(){
-        $_output = [];
-        foreach ($this->messages as $message) {
-            $messageLang = $this->lang->line($message) ? $this->lang->line($message) : '##' . $message . '##';
-            $_output[] = $messageLang;
-        }
-
-        return $_output;
-	}
-
-
 }

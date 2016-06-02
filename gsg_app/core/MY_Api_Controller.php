@@ -7,6 +7,7 @@
 require_once APPPATH . 'libraries/dhi/Herd.php';
 require_once APPPATH . 'libraries/Ion_auth.php';
 require_once APPPATH . 'libraries/Api/Response/Response.php';
+require_once(APPPATH . 'libraries/Api/Response/ResponseMessage.php');
 require_once APPPATH . 'libraries/AccessLog.php';
 require_once APPPATH . 'libraries/Site/WebContent/Sections.php';
 require_once APPPATH . 'libraries/Site/WebContent/Pages.php';
@@ -17,7 +18,7 @@ require_once(APPPATH . 'libraries/Products/Products/Products.php');
 require_once(APPPATH . 'libraries/Permissions/Permissions/ProgramPermissions.php');
 
 use \myagsource\AccessLog;
-use \myagsource\Site\WebContent\Sections;
+//use \myagsource\Site\WebContent\Sections;
 use \myagsource\Api\Response\Response;
 use \myagsource\Site\WebContent\Pages;
 use \myagsource\Site\WebContent\Blocks;
@@ -92,29 +93,32 @@ class MY_Api_Controller extends CI_Controller
         //$tmp_uri= $this->uri->uri_string();
     }
 
-    //redirects while retaining message and conditionally setting redirect url
-    protected function sendResponse($http_code, $message = null, $payload = null){
+    
+    protected function sendResponse($http_code, $messages = null, $payload = null){
         $response = new Response();
         http_response_code($http_code);
+        if(isset($messages) && !is_array($messages)){
+            $messages = [$messages];
+        }
 
         switch($http_code){
             case 500:
-                echo json_encode($response->errorInternal($message));
+                echo json_encode(['messages'=>$response->errorInternal($messages)]);
                 break;
             case 403:
-                echo json_encode($response->errorForbidden($message));
+                echo json_encode(['messages'=>$response->errorForbidden($messages)]);
                 break;
             case 404:
-                echo json_encode($response->errorNotFound($message));
+                echo json_encode(['messages'=>$response->errorNotFound($messages)]);
                 break;
             case 401:
-                echo json_encode($response->errorUnauthorized($message));
+                echo json_encode(['messages'=>$response->errorUnauthorized($messages)]);
                 break;
             case 400:
-                echo json_encode($response->errorBadRequest($message));
+                echo json_encode(['messages'=>$response->errorBadRequest($messages)]);
                 break;
             case 200:
-                echo json_encode(array_merge($response->message($message), ['data'=>$payload]));
+                echo json_encode(array_merge(['messages'=>$response->message($messages)], ['data'=>$payload]));
                 break;
         }
         exit;

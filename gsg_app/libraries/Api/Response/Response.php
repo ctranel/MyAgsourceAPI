@@ -2,8 +2,10 @@
 namespace myagsource\Api\Response;
 
 use myagsource\Api\iResponse;
+use myagsource\Api\Response\ResponseMessage;
 
 require_once(APPPATH . 'libraries/Api/iResponse.php');
+require_once(APPPATH . 'libraries/Api/Response/ResponseMessage.php');
 
 /**
  * Name:  Api
@@ -25,7 +27,7 @@ class Response implements iResponse
      * $http_status
      * @var int
      **/
-    protected $http_status;
+    //protected $http_status;
 
     /**
      * __construct
@@ -37,51 +39,58 @@ class Response implements iResponse
     }
 
     public function errorInternal($msg = null){
-        $this->http_status = 500;
+        //$this->http_status = 500;
         if($msg){
-            return $this->errorResponse($msg);
+            return $this->message($msg);
         }
-        return $this->errorResponse('Internal Server Error');
+        return $this->message(new ResponseMessage('Internal Server Error', 'error'));
     }
 
     public function errorForbidden($msg = null){
-        $this->http_status = 403;
+        //$this->http_status = 403;
         if($msg){
-            return $this->errorResponse($msg);
+            return $this->message($msg);
         }
-        return $this->errorResponse('Content Is Forbidden');
+        return $this->message(new ResponseMessage('Content Is Forbidden', 'error'));
     }
 
     public function errorNotFound($msg = null){
-        $this->http_status = 404;
+        //$this->http_status = 404;
         if($msg){
-            return $this->errorResponse($msg);
+            return $this->message($msg);
         }
-        return $this->errorResponse('Content Not Found');
+        return $this->message(new ResponseMessage('Content Not Found', 'error'));
     }
 
     public function errorUnauthorized($msg = null){
-        $this->http_status = 401;
+        //$this->http_status = 401;
         if($msg){
-            return $this->errorResponse($msg);
+            return $this->message($msg);
         }
-        return $this->errorResponse('Unauthorized');
+        return $this->message(new ResponseMessage('Unauthorized', 'error'));
     }
 
     public function errorBadRequest($msg = null){
-        $this->http_status = 400;
+        //$this->http_status = 400;
         if($msg){
-            return $this->errorResponse($msg);
+            return $this->message($msg);
         }
-        return $this->errorResponse('Request Not Understood');
+        return $this->message(new ResponseMessage('Request Not Understood', 'error'));
     }
 
-    public function message($msg = null){
-        return [
-            'message' => [
-                'text' => $msg,
-            ],
-        ];
+    /*
+     * message
+     *
+     * @param array of ResponseMessage objects
+     * @return multi-dimensional array representing an array of Error data
+     *
+     */
+    public function message($msgs = null){
+        $ret = [];
+        foreach($msgs as $m){
+            $ret[] = $m->toArray();
+        }
+        return $ret;
     }
 
     public function redirect($uri){
@@ -92,13 +101,18 @@ class Response implements iResponse
         ];
     }
 
-    protected function errorResponse($msg){
-        return [
-            'error' => [
-                'http_status' => $this->http_status,
-                'text' => $msg,
-                'level' => 'error',
-            ],
-        ];
+    /*
+     * errorResponse
+     *
+     * @param array of ResponseMessage objects
+     * @return multi-dimensional array representing an array of Error data
+     *
+    protected function errorResponse($msgs){
+        $ret = [];
+        foreach($msgs as $m){
+            $ret[] = $m->toArray();
+        }
+        return $ret;
     }
+    */
 }

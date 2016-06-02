@@ -5,6 +5,7 @@ require_once(APPPATH . 'core/MY_Api_Controller.php');
 require_once(APPPATH . 'libraries/as_ion_auth.php');
 require_once(APPPATH . 'libraries/Products/Products/Products.php');
 require_once(APPPATH . 'libraries/Permissions/Permissions/ProgramPermissions.php');
+require_once(APPPATH . 'libraries/Notifications/Notifications.php');
 
 use \myagsource\AccessLog;
 use \myagsource\dhi\Herd;
@@ -12,6 +13,8 @@ use \myagsource\dhi\HerdAccess;
 use \myagsource\As_ion_auth;
 use \myagsource\Products\Products\Products;
 use \myagsource\Permissions\Permissions\ProgramPermissions;
+use \myagsource\notices\Notifications;
+use \myagsource\Api\Response\ResponseMessage;
 
 
 defined('BASEPATH') OR exit('No direct script access allowed');
@@ -58,7 +61,7 @@ class Auth extends MY_Api_Controller {
 	}
 
     function c(){
-        $this->sendResponse(200, 'success', ['user' => $this->session->userdata('user_id')]);
+        $this->sendResponse(200, new ResponseMessage('success', 'message'), ['user' => $this->session->userdata('user_id')]);
     }
 
 	function product_info_request(){
@@ -67,14 +70,14 @@ class Auth extends MY_Api_Controller {
 
 		if(isset($arr_inquiry) && is_array($arr_inquiry)){
 			if($this->as_ion_auth->recordProductInquiry($arr_user['first_name'] . ' ' . $arr_user['last_name'], $arr_user['email'],$this->session->userdata('herd_code'), $arr_inquiry, $this->input->userInput('comments'))){
-                $this->sendResponse(200, 'Thank you for your interest.  Your request for more information has been sent.');
+                $this->sendResponse(200, new ResponseMessage('Thank you for your interest.  Your request for more information has been sent.', 'message'));
 			}
 			else{
-                $this->sendResponse(500, 'We encountered a problem sending your request.  Please try again or contact us at ' . $this->config->item("cust_serv_email") . ' or ' . $this->config->item("cust_serv_phone") . '.');
+                $this->sendResponse(500, new ResponseMessage('We encountered a problem sending your request.', 'error'));
 			}
 		}
 		else {
-            $this->sendResponse(400, 'Please select one or more products and resubmit your request.');
+            $this->sendResponse(400, new ResponseMessage('Please select one or more products and resubmit your request.', 'error'));
 		}
 	}
 
@@ -86,12 +89,12 @@ class Auth extends MY_Api_Controller {
             $this->sendResponse(401);
         }
 		if($this->permissions->hasPermission('Update SG Access') === false) {
-            $this->sendResponse(403, 'You do not have permission to manage consultant access to this herd.');
+            $this->sendResponse(403, new ResponseMessage('You do not have permission to manage consultant access to this herd.', 'error'));
 		}
 		
 		$this->form_validation->set_rules('modify', 'Herd Selection');
 		if($this->form_validation->run() === false){
-            $this->sendResponse(400, validation_errors());
+            $this->sendResponse(400, new ResponseMessage(validation_errors(), 'error'));
         }
 
         $action = $this->input->userInput('submit');
@@ -102,46 +105,46 @@ class Auth extends MY_Api_Controller {
                 case 'Remove Access':
                     if($this->ion_auth_model->batch_herd_revoke($arr_modify_id)) {
                         $this->_record_access(41);
-                        $this->sendResponse(200, 'Consultant access adjusted successfully.');
+                        $this->sendResponse(200, new ResponseMessage('Consultant access adjusted successfully.', 'message'));
                     }
                     else{
-                        $this->sendResponse(500, 'Consultant access adjustment failed.  Please try again.');
+                        $this->sendResponse(500, new ResponseMessage('Consultant access adjustment failed.  Please try again.', 'error'));
                     }
                 break;
                 case 'Grant Access':
                     if($this->ion_auth_model->batch_grant_consult($arr_modify_id)) {
                         $this->_record_access(34);
-                        $this->sendResponse(200, 'Consultant access adjusted successfully.');
+                        $this->sendResponse(200, new ResponseMessage('Consultant access adjusted successfully.', 'error'));
                     }
                     else{
-                        $this->sendResponse(500, 'Consultant access adjustment failed.  Please try again.');
+                        $this->sendResponse(500, new ResponseMessage('Consultant access adjustment failed.  Please try again.', 'error'));
                     }
                 break;
                 case 'Deny Access':
                     if($this->ion_auth_model->batch_deny_consult($arr_modify_id)) {
                         $this->_record_access(42);
-                        $this->sendResponse(200, 'Consultant access adjusted successfully.');
+                        $this->sendResponse(200, new ResponseMessage('Consultant access adjusted successfully.'));
                     }
                     else{
-                        $this->sendResponse(500, 'Consultant access adjustment failed.  Please try again.');
+                        $this->sendResponse(500, new ResponseMessage('Consultant access adjustment failed.  Please try again.', 'error'));
                     }
                 break;
                 case 'Remove Expiration Date':
                     if($this->ion_auth_model->batch_remove_consult_expire($arr_modify_id)) {
                         $this->_record_access(43);
-                        $this->sendResponse(200, 'Consultant access adjusted successfully.');
+                        $this->sendResponse(200, new ResponseMessage('Consultant access adjusted successfully.', 'error'));
                     }
                     else{
-                        $this->sendResponse(500, 'Consultant access adjustment failed.  Please try again.');
+                        $this->sendResponse(500, new ResponseMessage('Consultant access adjustment failed.  Please try again.', 'error'));
                     }
                 break;
                 default:
-                    $this->sendResponse(500, 'Consultant access adjustment failed.  Please try again.');
+                    $this->sendResponse(500, new ResponseMessage('Consultant access adjustment failed.  Please try again.', 'error'));
                 break;
             }
         }
 
-        $this->sendResponse(400, $this->as_ion_auth->messages() + $this->as_ion_auth->errors());
+        $this->sendResponse(400, new ResponseMessage($this->as_ion_auth->errors(), 'error'));
     }
 	
 	/*
@@ -152,13 +155,13 @@ class Auth extends MY_Api_Controller {
             $this->sendResponse(401);
         }
 		if($this->permissions->hasPermission('View Assign w permission') !== true) {
-            $this->sendResponse(403, 'You do not have permission to view non-owned herds.');
+            $this->sendResponse(403, new ResponseMessage('You do not have permission to view non-owned herds.', 'error'));
 		}
 
 		$this->form_validation->set_rules('modify', 'Herd Selection');
 
         if($this->form_validation->run() == false){
-            $this->sendResponse(400, validation_errors());
+            $this->sendResponse(400, new ResponseMessage(validation_errors(), 'error'));
         }
 
         $action = $this->input->userInput('submit');
@@ -169,10 +172,10 @@ class Auth extends MY_Api_Controller {
                 case 'Remove Access':
                     if($this->ion_auth_model->batch_herd_revoke($arr_modify_id)) {
                         $this->_record_access(41);
-                        $this->sendResponse(200, 'Consultant access adjusted successfully.');
+                        $this->sendResponse(200, new ResponseMessage('Consultant access adjusted successfully.', 'error'));
                     }
                     else{
-                        $this->sendResponse(500, 'Consultant access adjustment failed.  Please try again.');
+                        $this->sendResponse(500, new ResponseMessage('Consultant access adjustment failed.  Please try again.', 'error'));
                     }
                     break;
                 case 'Restore Access':
@@ -184,10 +187,10 @@ class Auth extends MY_Api_Controller {
                     }
                     if(!empty($arr_modify_id) && $this->ion_auth_model->batch_grant_consult($arr_modify_id)) {
                         $this->_record_access(34);
-                        $this->sendResponse(200, 'Consultant access adjusted successfully.');
+                        $this->sendResponse(200, new ResponseMessage('Consultant access adjusted successfully.', 'message'));
                     }
                     else{
-                        $this->sendResponse(500, 'Consultant access adjustment failed.  Please try again.');
+                        $this->sendResponse(500, new ResponseMessage('Consultant access adjustment failed.  Please try again.', 'error'));
                     }
                 break;
                 case 'Resend Request Email':
@@ -195,20 +198,20 @@ class Auth extends MY_Api_Controller {
                         $arr_relationship_data = $this->ion_auth_model->get_consult_relationship_by_id($id);
                         if ($this->as_ion_auth->send_consultant_request($arr_relationship_data, $id, $this->config->item('cust_serv_email'))) {
                             $this->_record_access(35);
-                            $this->sendResponse(200, $this->as_ion_auth->messages());
+                            $this->sendResponse(200, new ResponseMessage($this->as_ion_auth->messages(), 'message'));
                         }
                         else {
-                            $this->sendResponse(400, $this->as_ion_auth->errors());
+                            $this->sendResponse(400, new ResponseMessage($this->as_ion_auth->errors(), 'error'));
                         }
                     }
                 break;
                 default:
-                    $this->sendResponse(500, 'Consultant access adjustment failed.  Please try again.');
+                    $this->sendResponse(500, new ResponseMessage('Consultant access adjustment failed.  Please try again.', 'error'));
                 break;
             }
         }
 
-        $this->sendResponse(400, $this->as_ion_auth->messages() + $this->as_ion_auth->errors());
+        $this->sendResponse(400, new ResponseMessage($this->as_ion_auth->errors(), 'error'));
     }
 	
 	//Producers only, give consultant permission to view herd
@@ -218,7 +221,7 @@ class Auth extends MY_Api_Controller {
         }
         //@todo: replace reference to group with permission-based condition
 		if($this->session->userdata('active_group_id') != 2) {
-            $this->sendResponse(403, 'Only producers can manage consultant access to their herd data.');
+            $this->sendResponse(403, new ResponseMessage('Only producers can manage consultant access to their herd data.', 'error'));
 		}
 		
 		//validate form input
@@ -230,7 +233,7 @@ class Auth extends MY_Api_Controller {
 		$this->form_validation->set_rules('disclaimer', 'Confirmation of Understanding', 'required');
 
         if ($this->form_validation->run() === false) {
-            $this->sendResponse(400, validation_errors());
+            $this->sendResponse(400, new ResponseMessage(validation_errors(), 'error'));
         }
 
         $arr_relationship_data = array(
@@ -260,10 +263,10 @@ class Auth extends MY_Api_Controller {
 
         if ($this->as_ion_auth->allow_service_grp($arr_relationship_data, $arr_post_section_id)) { //if permission is granted successfully
             $this->_record_access(34);
-            $this->sendResponse(200, 'Permission is granted successfully');
+            $this->sendResponse(200, new ResponseMessage('Permission is granted successfully', 'message'));
         }
 
-        $this->sendResponse(400, $this->as_ion_auth->messages() + $this->as_ion_auth->errors());
+        $this->sendResponse(400, new ResponseMessage($this->as_ion_auth->errors(), 'error'));
 	}
 
 	//Consultants only, request permission to view herd
@@ -272,7 +275,7 @@ class Auth extends MY_Api_Controller {
             $this->sendResponse(401);
         }
 		if(!$this->permissions->hasPermission('View Assign w permission')) {
-            $this->sendResponse(403, 'You do not have permission to request the data of a herd you do not own.');
+            $this->sendResponse(403, new ResponseMessage('You do not have permission to request the data of a herd you do not own.', 'error'));
 		}
 
 		//validate form input
@@ -284,9 +287,8 @@ class Auth extends MY_Api_Controller {
 //		$this->form_validation->set_rules('request_status_id', '', '');
 		$this->form_validation->set_rules('disclaimer', 'Confirmation of Understanding', 'required');
 
-		$is_validated = $this->form_validation->run();
-		if ($is_validated === false) {
-            $this->sendResponse(400, validation_errors());
+		if ($this->form_validation->run() === false) {
+            $this->sendResponse(400, new ResponseMessage(validation_errors(), 'error'));
         }
     
         $herd_code = $this->input->userInput('herd_code');
@@ -297,7 +299,7 @@ class Auth extends MY_Api_Controller {
             $error = 'Relationship already exists';
         }
         if($error){
-            $this->sendResponse(400, $error);
+            $this->sendResponse(400, new ResponseMessage($error, 'error'));
         }
         
         //passed initial checks, now prep submission data
@@ -320,16 +322,16 @@ class Auth extends MY_Api_Controller {
         
         if ($this->as_ion_auth->service_grp_request($arr_relationship_data, $arr_post_section_id, $this->config->item('cust_serv_email'))) {
             $this->_record_access(35);
-            $this->sendResponse(200, $this->as_ion_auth->messages() + $this->as_ion_auth->errors()); //  to manage access page
+            $this->sendResponse(200, new ResponseMessage($this->as_ion_auth->messages(), 'message')); //  to manage access page
         }
         else { //if the request was un-successful
-            $this->sendResponse(500, $this->as_ion_auth->messages() + $this->as_ion_auth->errors());
+            $this->sendResponse(500, new ResponseMessage($this->as_ion_auth->errors(), 'error'));
         }
 	}
 
 	function list_accounts(){
 		if(!$this->permissions->hasPermission("Edit All Users") && !$this->permissions->hasPermission("Edit Users In Region")){
-            $this->sendResponse(403, 'You do not have permission to edit user accounts.');
+            $this->sendResponse(403, new ResponseMessage('You do not have permission to edit user accounts.', 'error'));
 		}
 		//list the users
 		$this->data['users'] = $this->as_ion_auth->get_editable_users();
@@ -344,7 +346,7 @@ class Auth extends MY_Api_Controller {
 		$this->form_validation->set_rules('password', 'Password', 'trim|required');
 
 		/*if ($this->form_validation->run() === false) {
-            $this->sendResponse(400, validation_errors());
+            $this->sendResponse(400, new ResponseMessage(validation_errors(), 'error'));
         } */
         //check to see if the user is logging in
         //check for "remember me"
@@ -372,14 +374,24 @@ class Auth extends MY_Api_Controller {
             $tmp_arr = $this->herd_access->getAccessibleHerdOptions($this->session->userdata('user_id'), $this->permissions->permissionsList(), $this->session->userdata('arr_regions'));
             //@todo: handle if there is only 1 herd (or 0)
             if(count($tmp_arr) === 0){
-                $this->sendResponse(404, 'No herds found.');
+                $this->sendResponse(404, new ResponseMessage('No herds found.', 'error'));
             }
 
+            $this->load->model('notice_model');
+            $this->notifications = new Notifications($this->notice_model);
+            $this->notifications->populateNotices();
+            $notices = $this->notifications->getNoticesTexts();
+            $msgs = [];
+            foreach($notices as $n){
+                $msgs[] = new ResponseMessage($n, 'message');
+            }
+            //we want the success message to be first, so we create a temp var and merge with that as the first value
+            $tmp = new ResponseMessage('Login Successful', 'message');
             //send response
-            $this->sendResponse(200, 'Login Successful', ['herd_codes' => []]);//$tmp_arr]);
+            $this->sendResponse(200, array_merge([$tmp], $msgs), ['herd_codes' => []]);
         }
 
-        $this->sendResponse(401, $this->as_ion_auth->errors() + $this->as_ion_auth->messages());
+        $this->sendResponse(401, new ResponseMessage($this->as_ion_auth->errors(), 'error'));
 	}
 
 	//log the user out
@@ -403,7 +415,7 @@ class Auth extends MY_Api_Controller {
         //$user = $this->as_ion_auth->user()->row();
 /*
         if ($this->form_validation->run() === false) {
-            $this->sendResponse(400, validation_errors());
+            $this->sendResponse(400, new ResponseMessage(validation_errors(), 'error'));
         } */
         $identity = $this->session->userdata($this->config->item('identity', 'ion_auth'));
 
@@ -411,38 +423,38 @@ class Auth extends MY_Api_Controller {
 
         if ($change) { //if the password was successfully changed
             $this->as_ion_auth->logout();
-            $this->sendResponse(200, $this->as_ion_auth->messages());
+            $this->sendResponse(200, new ResponseMessage($this->as_ion_auth->messages(), 'message'));
         }
 
-        $this->sendResponse(500, $this->as_ion_auth->errors());
+        $this->sendResponse(500, new ResponseMessage($this->as_ion_auth->errors(), 'error'));
 	}
 
 	//forgot password
 	function forgot_password(){
         $this->form_validation->set_rules('email', 'Email Address', 'required');
         /*if ($this->form_validation->run() === false) {
-            $this->sendResponse(400, validation_errors());
+            $this->sendResponse(400, new ResponseMessage(validation_errors(), 'error'));
         }*/
         //run the forgotten password method to email an activation code to the user
         $forgotten = $this->as_ion_auth->forgotten_password($this->input->userInput('email'));
 
         if ($forgotten) { //if there were no errors
-            $this->sendResponse(200, $this->as_ion_auth->messages());
+            $this->sendResponse(200, new ResponseMessage($this->as_ion_auth->messages(), 'message'));
         }
 
-        $this->sendResponse(500, $this->as_ion_auth->errors());
+        $this->sendResponse(400, new ResponseMessage($this->as_ion_auth->errors(), 'error'));
 	}
 
 	//reset password - final step for forgotten password
 	public function reset_password($code = NULL) {
         if (!$code) {
-            $this->sendResponse(400, 'Invalid or expired reset code.  Please restart process.');
+            $this->sendResponse(400, new ResponseMessage('Invalid or expired reset code.  Please restart process.', 'error'));
         }
 
         $user = $this->as_ion_auth->forgotten_password_check($code);
 
         if($user === false){
-            $this->sendResponse(404, 'User not found.');
+            $this->sendResponse(404, new ResponseMessage('User not found.', 'error'));
         }
 
         $this->form_validation->set_rules('new', 'New Password',
@@ -451,9 +463,9 @@ class Auth extends MY_Api_Controller {
                 'ion_auth') . ']|matches[new_confirm]');
         $this->form_validation->set_rules('new_confirm', 'Confirm New Password', 'required');
 
-        /*if ($this->form_validation->run() === false) {
-            $this->sendResponse(400, validation_errors());
-        }*/
+        if ($this->form_validation->run() === false) {
+            $this->sendResponse(400, new ResponseMessage(validation_errors(), 'error'));
+        }
         // do we have a valid request?
         if ($this->_valid_csrf_nonce() === FALSE || $user->id != $this->input->userInput('user_id')) {
             //something fishy might be up
@@ -465,17 +477,17 @@ class Auth extends MY_Api_Controller {
         $identity = $user->{$this->config->item('identity', 'ion_auth')};
         if ($this->as_ion_auth->reset_password($identity, $this->input->userInput('new'))) { //if the password was successfully changed
             $this->as_ion_auth->logout();
-            $this->sendResponse(200, $this->as_ion_auth->messages());
+            $this->sendResponse(200, new ResponseMessage($this->as_ion_auth->messages(), 'message'));
         }
 
-        $this->sendResponse(500, $this->ion_auth->errors(), ['reset_code' => $code]);
+        $this->sendResponse(500, new ResponseMessage($this->ion_auth->errors(), 'error', ['reset_code' => $code]));
     }
 
     //activate the user
     function activate($id, $code=false)
     {
         if($code === false && !$this->ion_auth->is_admin()){
-            $this->sendResponse(400, 'Invalid or expired reset code.  Please restart process.');
+            $this->sendResponse(400, new ResponseMessage('Invalid or expired reset code.  Please restart process.', 'error'));
         }
         if ($this->ion_auth->is_admin()){
             $activation = $this->as_ion_auth->activate($id);
@@ -485,10 +497,10 @@ class Auth extends MY_Api_Controller {
         }
 
         if ($activation) {
-            $this->sendResponse(200, $this->ion_auth->messages());
+            $this->sendResponse(200, new ResponseMessage($this->ion_auth->messages(), 'message'));
         }
         else {
-            $this->sendResponse(400, $this->ion_auth->errors());
+            $this->sendResponse(400, new ResponseMessage($this->ion_auth->errors(), 'error'));
         }
     }
 
@@ -506,7 +518,7 @@ class Auth extends MY_Api_Controller {
             if ($this->input->userInput('confirm') == 'yes') {
                 // do we have a valid request?
                 if ($this->_valid_csrf_nonce() === FALSE || $id != $this->input->userInput('id')) {
-                    $this->sendResponse(400, 'User not specified.');
+                    $this->sendResponse(400, new ResponseMessage('User not specified.', 'error'));
                 }
 
                 // do we have the right userlevel?
@@ -515,11 +527,11 @@ class Auth extends MY_Api_Controller {
                         $this->sendResponse(200);
                     }
                 }
-                $this->sendResponse(500);
+                $this->sendResponse(500, new ResponseMessage($this->as_ion_auth->errors(), 'error'));
             }
-            $this->sendResponse(400, 'Invalid submission.');
+            $this->sendResponse(400, new ResponseMessage('Invalid submission.', 'error'));
         }
-        $this->sendResponse(400, validation_errors());
+        $this->sendResponse(400, new ResponseMessage(validation_errors(), 'error'));
     }
 
     function create_user(){
@@ -539,16 +551,16 @@ class Auth extends MY_Api_Controller {
 		$this->form_validation->set_rules('herd_release_code', 'Release Code', 'trim|exact_length[10]');
 		$this->form_validation->set_rules('section_id[]', 'Section');
 
-       /*if($this->form_validation->run() === false){
-            $this->sendResponse(400, validation_errors());
-        }*/
+       if($this->form_validation->run() === false){
+            $this->sendResponse(400, new ResponseMessage(validation_errors(), 'error'));
+        }
 
         $arr_posted_group_id = $this->input->userInput('group_id');//$this->form_validation->set_value('group_id[]');
         if(!is_array($arr_posted_group_id)){
             $arr_posted_group_id = [$arr_posted_group_id];
         }
         if(!$this->as_ion_auth->group_assignable($arr_posted_group_id)){
-            $this->sendResponse(403, 'You do not have permissions to create a user with the user group you selected.');
+            $this->sendResponse(403, new ResponseMessage('You do not have permissions to create a user with the user group you selected.', 'error'));
         }
 
         //start with nothing
@@ -563,7 +575,7 @@ class Auth extends MY_Api_Controller {
             if($this->permissions->hasPermission("Add All Users") || $this->permissions->hasPermission("Add Users In Region")){
                 $arr_posted_group_id = $this->input->userInput('group_id');
                 if(!$this->as_ion_auth->group_assignable($arr_posted_group_id)){
-                    $this->sendResponse(403, 'You do not have permissions to add a user with the user group you selected.');
+                    $this->sendResponse(403, new ResponseMessage('You do not have permissions to add a user with the user group you selected.', 'error'));
                 }
                 $assoc_acct_num = $this->input->userInput('assoc_acct_num');
                 $supervisor_acct_num = $this->input->userInput('supervisor_acct_num');
@@ -580,13 +592,13 @@ class Auth extends MY_Api_Controller {
             $herd_release_code = $this->input->userInput('herd_release_code');
             $error = $this->herd_model->herd_authorization_error($herd_code, $herd_release_code);
             if($error){
-                $this->sendResponse(403, $error);
+                $this->sendResponse(403, new ResponseMessage($error, 'error'));
             }
         }
         if(in_array(9, $arr_posted_group_id)){ //service groups
             $sg_acct_num = $this->input->userInput('sg_acct_num');
             if(!$this->as_ion_auth->service_grp_exists($sg_acct_num)){
-                $this->sendResponse(400, 'The service group entered does not exist.');
+                $this->sendResponse(400, new ResponseMessage('The service group entered does not exist.', 'error'));
             }
         }
 
@@ -610,18 +622,18 @@ class Auth extends MY_Api_Controller {
             $is_registered = $this->as_ion_auth->register($username, $password, $email, $additional_data, $arr_posted_group_id, 'AMYA-500');
             if ($is_registered === true) { //check to see if we are creating the user
                 //$this->as_ion_auth->activate();
-                $this->sendResponse(200, 'Your account has been created.  You will be receiving an email shortly that will confirm your registration and allow you to activate your account.');
+                $this->sendResponse(200, new ResponseMessage('Your account has been created.  You will be receiving an email shortly that will confirm your registration and allow you to activate your account.', 'message'));
             }
             else{
-                $this->sendResponse(400, $this->as_ion_auth->messages() + $this->as_ion_auth->errors());
+                $this->sendResponse(400, new ResponseMessage($this->as_ion_auth->errors(), 'error'));
             }
         }
         catch(Exception $e){
             //will eventually catch registration errors here, but for now they are written to as_ion_auth errors()
-            $this->sendResponse(400, $e->getMessage());
+            $this->sendResponse(400, new ResponseMessage($e->getMessage(), 'error'));
         }
 
-        $this->sendResponse(500, 'Registration was not successful.');
+        $this->sendResponse(500, new ResponseMessage('Registration was not successful.', 'error'));
 	}
 
 	function edit_user($user_id = FALSE) {
@@ -630,37 +642,34 @@ class Auth extends MY_Api_Controller {
 		}
 		//does the logged in user have permission to edit this user?
 		if (!$this->as_ion_auth->logged_in()) {
-            $this->sendResponse(401, 'Please log in and try again.');
+            $this->sendResponse(401, new ResponseMessage('Please log in and try again.', 'error'));
         }
         if(!$this->as_ion_auth->is_editable_user($user_id, $this->session->userdata('user_id'))){
-            $this->sendResponse(403, 'You do not have permission to edit the requested account.');
+            $this->sendResponse(403, new ResponseMessage('You do not have permission to edit the requested account.', 'error'));
         }
 
 		//validate form input
-/*		$this->form_validation->set_rules('first_name', 'First Name', 'trim|required');
+		$this->form_validation->set_rules('first_name', 'First Name', 'trim|required');
 		$this->form_validation->set_rules('last_name', 'Last Name', 'trim|required');
 		$this->form_validation->set_rules('email', 'Email Address', 'trim|required|valid_email');
 		$this->form_validation->set_rules('supervisor_acct_num', 'Field Technician Number', 'exact_length[8]');
 		$this->form_validation->set_rules('assoc_acct_num[]', 'Association/Region Account Number', 'exact_length[8]');
-		$this->form_validation->set_rules('phone1', 'First Part of Phone', 'exact_length[3]|required');
-		$this->form_validation->set_rules('phone2', 'Second Part of Phone', 'exact_length[3]|required');
-		$this->form_validation->set_rules('phone3', 'Third Part of Phone', 'exact_length[4]|required');
 		$this->form_validation->set_rules('best_time', 'Best Time to Call', 'max_length[10]|required');
 		$this->form_validation->set_rules('password', 'Password', 'trim|min_length[' . $this->config->item('min_password_length', 'ion_auth') . ']|max_length[' . $this->config->item('max_password_length', 'ion_auth') . ']|matches[password_confirm]');
 		$this->form_validation->set_rules('password_confirm', 'Password Confirmation', 'trim');
 		$this->form_validation->set_rules('group_id[]', 'Name of Account Group');
 		//$this->form_validation->set_rules('herd_code', 'Herd Code', 'exact_length[8]');
 		$this->form_validation->set_rules('section_id[]', 'Section');
-*/		
+
 		$email_in = $this->input->userInput('email');
 		if(empty($email_in)){
-            $this->sendResponse(400, 'Form data not found.');
+            $this->sendResponse(400, new ResponseMessage('Form data not found.', 'error'));
         }
 
-/*        if($this->form_validation->run() === false){
-            $this->sendResponse(400, validation_errors());
+        if($this->form_validation->run() === false){
+            $this->sendResponse(400, new ResponseMessage(validation_errors(), 'error'));
         }
-*/
+
         //populate data fields for specific group choices
         //start with the minimum
         $user_id = $this->input->userInput('user_id');
@@ -672,7 +681,7 @@ class Auth extends MY_Api_Controller {
         if($this->permissions->hasPermission("Edit All Users") || $this->permissions->hasPermission("Edit Users In Region")){
             $arr_posted_group_id = $this->input->userInput('group_id');
             if(!$this->as_ion_auth->group_assignable($arr_posted_group_id)){
-                $this->sendResponse(403, 'You do not have permissions to edit a user with the user group you selected.');
+                $this->sendResponse(403, new ResponseMessage('You do not have permissions to edit a user with the user group you selected.', 'error'));
             }
             $assoc_acct_num = $this->input->userInput('assoc_acct_num');
             $supervisor_acct_num = $this->input->userInput('supervisor_acct_num');
@@ -710,10 +719,10 @@ class Auth extends MY_Api_Controller {
 
 		$arr_curr_group_ids = array_keys($this->session->userdata('arr_groups'));
 		if ($this->ion_auth_model->update($user_id, $data, $this->session->userdata('active_group_id'), $arr_curr_group_ids)) { //check to see if we are creating the user
-            $this->sendResponse(200, "Account Edited");
+            $this->sendResponse(200, new ResponseMessage($this->as_ion_auth->messages(), 'message'));
 		}
 
-        $this->sendResponse(400, $this->as_ion_auth->messages() + $this->as_ion_auth->errors());
+        $this->sendResponse(400, new ResponseMessage($this->as_ion_auth->errors(), 'error'));
 	}
 		
 	function ajax_techs($assoc_acct_num){
@@ -730,12 +739,12 @@ class Auth extends MY_Api_Controller {
 	function set_role($group_id){
 		if(array_key_exists($group_id, $this->session->userdata('arr_groups'))){
 			$this->session->set_userdata('active_group_id', (int)$group_id);
-            $this->sendResponse(200, 'Active group has been set');
+            $this->sendResponse(200, new ResponseMessage('Active group has been set', 'message'));
 		}
 		else {
-            $this->sendResponse(403, 'You do not have rights to the requested group.');
+            $this->sendResponse(403, new ResponseMessage('You do not have rights to the requested group.', 'error'));
 		}
-        $this->sendResponse(500, 'Request was unsuccessful.');
+        $this->sendResponse(500, new ResponseMessage('Request was unsuccessful.', 'error'));
 	}
 	
 	protected function _record_access($event_id){
