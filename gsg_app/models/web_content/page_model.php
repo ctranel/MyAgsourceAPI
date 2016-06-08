@@ -51,22 +51,25 @@ class Page_model extends CI_Model {
 	 * @return array of report product ids that are linked to given page
 	 * @author ctranel
 	 **/
-	public function getReport($page_id, $herd_code) {
+	public function getAccessibleReports($page_id, $herd_code) {
 		$results = $this->db
 			->select('si.report_code, si.herd_is_active_trial, si.herd_is_paying')
+			->distinct()
 			->where('si.herd_is_on_test', 1)
+            ->where('si.herd_is_on_report', 1)
+            ->where('(si.herd_is_paying = 1 OR si.herd_is_active_trial = 1)')
 			->where('si.herd_code', $herd_code)
 			->where('pr.page_id', $page_id)
 			->join('users.dbo.pages_reports pr', 'si.report_code = pr.report_code','inner')
 			//sorting and taking top row could be considered business logic, but this seems like
 			//a clean way to handle it
-			->order_by('si.herd_is_paying', 'desc')
-			->order_by('si.herd_is_active_trial', 'desc')
+			//->order_by('si.herd_is_paying', 'desc')
+			//->order_by('si.herd_is_active_trial', 'desc')
 			->get('users.dbo.v_user_status_info si')
 			->result_array();
-		
+
 		if(isset($results) && is_array($results) && count($results) > 0){
-			return $results[0];
+			return $results;
 		}
 		return null;
 	}

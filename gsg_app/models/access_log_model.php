@@ -7,18 +7,32 @@ class Access_log_model extends CI_Model {
 	}
 	
 	/**
-	 * write_entry
+	 * writeEntry
 	 *
 	 * @param array of access log data
+	 * @return in inserted record id
+	 * @author ctranel
+	 **/
+	function writeEntry($data){
+        $this->db->insert($this->tables['access_log'], $data);
+        return $this->db->insert_id();
+	}
+
+	/**
+	 * writeProducts
+	 *
+     * @param 2d array of report data
 	 * @return boolean
 	 * @author ctranel
 	 **/
-	function write_entry_to_db($data){
-		if(isset($data['product_code'])){
-			$data['report_code'] = $data['product_code'];
-			unset($data['product_code']);
+	function writeProducts($report_data){
+		if(!isset($report_data) || !is_array($report_data[0])){
+			return;
 		}
-		return $this->db->insert($this->tables['access_log'], $data);
+        foreach($report_data as $rd){
+            $this->db->insert('access_log_reports', $rd);
+        }
+		return true;
 	}
 
 	/**
@@ -31,7 +45,6 @@ class Access_log_model extends CI_Model {
 	 * @param string test date (defaults to null)
 	 * @return boolean
 	 * @author ctranel
-	 **/
 	function sgHasAccessedTest($sg_acct_num, $herd_code, $report_code, $test_date = NULL){
 		if(isset($test_date)){
 			$this->db->where('recent_test_date', $test_date);
@@ -45,6 +58,7 @@ class Access_log_model extends CI_Model {
 			->get('users.dbo.v_user_status_info' . ' al')
 			->result_array();
 	}
+**/
 
 	/* -----------------------------------------------------------------
 	 * returns the first date that the given user accessed the given report/product

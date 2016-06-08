@@ -482,13 +482,12 @@ class Herd_model extends CI_Model {
 	}
 	
 	/**
-	 * get_herd_output
+	 * getHerdEnrollmentData
 	 * @param string herd code
 	 * @param string or array of report codes
 	 * @return array of herd output data arrays
 	 * @author ctranel
-	 **/
-	public function get_herd_output($herd_code, $report_code = NULL){
+	public function getHerdEnrollmentData($herd_code, $report_code = NULL){
 		if(isset($report_code)){
 			if(!is_array($report_code)){
 				$report_code = array($report_code);
@@ -511,6 +510,7 @@ class Herd_model extends CI_Model {
 		}
 		return [];
 	}
+**/
 
 	/**
 	 * addHerdOutput

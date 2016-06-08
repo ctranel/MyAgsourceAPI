@@ -127,17 +127,17 @@ class Herd
 	 * @return string recent test date
 	 * @access public
 	 *
-	 **/
-	public function getHerdEnrollStatus($report_code = NULL){
+	public function getHerdEnrollStatus($report_code){
 		$ret = 1;
 
-        if(isset($report_code)){
-			if(!is_array($report_code)){
-				$report_code = [$report_code];
-			}
+        if(!isset($report_code)){
+			throw new \Exception('No report code given.');
 		}
+        if(!is_array($report_code)){
+            $report_code = [$report_code];
+        }
 
-        $herd_output = $this->herd_model->get_herd_output($this->herd_code, $report_code);
+        $herd_output = $this->herd_model->getHerdEnrollmentData($this->herd_code, $report_code);
         if(!$herd_output || count($herd_output) == 0){
             return 1;
         }
@@ -155,6 +155,7 @@ class Herd
 		}
         return $ret;
 	}
+**/
 	
 	/* -----------------------------------------------------------------
 	*  Returns number of days since the initial access for herds that

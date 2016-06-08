@@ -107,7 +107,6 @@ class Change_herd extends MY_Controller {
 
 		if ($this->form_validation->run() == TRUE) { //successful submission
 			$this->herd = new Herd($this->herd_model, $this->input->post('herd_code'));
-			$herd_enroll_status_id = $this->herd->getHerdEnrollStatus();
 			if($this->session->userdata('active_group_id') == 2){ //user is a producer
 				$trials = $this->herd->getTrialData();
 				if(isset($trials) && is_array($trials)){
@@ -128,11 +127,8 @@ class Change_herd extends MY_Controller {
 						}
 					}
 				}
-				if($herd_enroll_status_id === 1){ //herd is not signed up at all
-					$msg[] = 'Herd ' . $this->input->post('herd_code') . ' is not signed up for any eligible MyAgSource report products. Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' to enroll.';
-				}
 			}
-			$this->set_herd_session_data($herd_enroll_status_id);
+			$this->set_herd_session_data();
 
 			$this->_record_access(2); //2 is the page code for herd change
 
@@ -152,7 +148,6 @@ class Change_herd extends MY_Controller {
 			if(is_array($tmp_arr) && !empty($tmp_arr)){
 				if(count($tmp_arr) === 1){
 					$this->herd = new Herd($this->herd_model, $tmp_arr[0]['herd_code']);
-					$herd_enroll_status_id = $this->herd->getHerdEnrollStatus();
 					if($this->session->userdata('active_group_id') == 2){ //user is a producer
 						$trials = $this->herd->getTrialData();
 						if(isset($trials) && is_array($trials)){
@@ -172,11 +167,8 @@ class Change_herd extends MY_Controller {
 								}
 							}
 						}
-						if($herd_enroll_status_id === 1){ //herd is not signed up at all
-							$msg[] = 'Herd ' . $this->herd->herdCode() . ' is not signed up for any eligible MyAgSource report products. Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' to enroll.';
-						}
 					}
-					$this->set_herd_session_data($herd_enroll_status_id);
+					$this->set_herd_session_data();
 //die;
 					$this->redirect(site_url($this->session->userdata('redirect_url')), $msg);
 					exit();
@@ -253,7 +245,6 @@ class Change_herd extends MY_Controller {
 
 		if ($this->form_validation->run() == TRUE) { //if validation is successful
 			$this->herd = new Herd($this->herd_model, $this->input->post('herd_code'));
-			$herd_enroll_status_id = $this->herd->getHerdEnrollStatus();
 			if($this->session->userdata('active_group_id') == 2){ //user is a producer
 				$msg = [];
 				$trials = $this->herd->getTrialData();
@@ -271,11 +262,8 @@ class Change_herd extends MY_Controller {
 						}
 					}
 				}
-				if($herd_enroll_status_id === 1){ //herd is not signed up at all
-					$msg[] = 'Herd ' . $this->input->post('herd_code') . ' is not signed up for any eligible MyAgSource report products. Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' to enroll.';
-				}
 			}
-			$this->set_herd_session_data($herd_enroll_status_id);
+			$this->set_herd_session_data();
 
 			$this->_record_access(2); //2 is the page code for herd change
 			$this->redirect(site_url($this->session->userdata('redirect_url')));
@@ -311,7 +299,7 @@ class Change_herd extends MY_Controller {
 			$this->load->view('dhi/herd_request', $this->data);
 		}
 	}
-
+/*
 	public function ajax_herd_enrolled($herd_code){
 		//determines type of access for service groups
 		if($this->permissions->hasPermission('View Assign w permission') === FALSE) {
@@ -332,15 +320,14 @@ class Change_herd extends MY_Controller {
 		header("Expires: -1");
 		$this->load->view('echo.php', ['text' => json_encode(['enroll_status' => $enroll_status, 'new_test' => !$has_accessed])]);
 	}
-
-	protected function set_herd_session_data($herd_enroll_status_id){
+*/
+	protected function set_herd_session_data(){
 		$this->session->set_userdata('herd_code', $this->herd->herdCode());
 //		$this->session->set_userdata('pstring', 0);
 //		$this->session->set_userdata('arr_pstring', $this->herd_model->get_pstring_array($this->herd->herdCode()));
 //		$arr_breeds = $this->herd_model->get_breed_array($this->herd->herdCode());
 //		$this->session->set_userdata('arr_breeds', $arr_breeds);
 //		$this->session->set_userdata('breed_code', $arr_breeds[0]['breed_code']);
-		$this->session->set_userdata('herd_enroll_status_id', $herd_enroll_status_id);
 		$this->session->set_userdata('recent_test_date', $this->herd->getRecentTest());
 		//load new benchmarks
 		$this->load->model('setting_model');
@@ -357,16 +344,14 @@ class Change_herd extends MY_Controller {
 			return FALSE;
 		}
 		$herd_code = $this->session->userdata('herd_code');
-		$herd_enroll_status_id = empty($herd_code) ? NULL : $this->session->userdata('herd_enroll_status_id');
 		$recent_test = $this->session->userdata('recent_test_date');
 		$recent_test = empty($recent_test) ? NULL : $recent_test;
 
-		$this->access_log->write_entry(
+		$this->access_log->writeEntry(
 				$this->as_ion_auth->is_admin(),
 				$event_id,
 				$herd_code,
 				$recent_test,
-				$herd_enroll_status_id,
 				$this->session->userdata('user_id'),
 				$this->session->userdata('active_group_id')
 		);
