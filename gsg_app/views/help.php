@@ -5,7 +5,7 @@ endif; ?>
 	<h1>Support</h1>
 	<h2>How to reach us</h2>
 		<ul>
-		    <li>Click <a href="http://feweb.verona.crinet/MyAgSource_Help.pdf">here</a> for instructions on using the MyAgSource web site and it's features.</li>
+		    <li>Click <a href="<?php echo $this->config->item('base_url'); ?>MyAgSource_Help.pdf">here</a> for instructions on using the MyAgSource web site and it's features.</li>
 			<li>Uservoice: <a href="http://myagsource.uservoice.com">myagsource.uservoice.com</a><br />
 				Please visit our uservoice site and vote on features others have
 				proposed there. You can also post about a bug you believe may be

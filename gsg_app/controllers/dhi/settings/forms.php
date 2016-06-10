@@ -154,7 +154,7 @@ class Forms extends MY_Controller {
    	}
 	
    	function log_page(){
-		echo $this->access_log_model->write_entry();
+		echo $this->access_log_model->writeEntry();
 		exit;
 	}
 }

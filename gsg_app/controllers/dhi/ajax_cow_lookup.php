@@ -159,19 +159,17 @@ class Ajax_cow_lookup extends MY_Controller {
 			return FALSE;
 		}
 		$herd_code = $this->session->userdata('herd_code');
-		$herd_enroll_status_id = empty($herd_code) ? NULL : $this->session->userdata('herd_enroll_status_id');
 		$recent_test = $this->session->userdata('recent_test_date');
 		$recent_test = empty($recent_test) ? NULL : $recent_test;
 		
 		$this->load->model('access_log_model');
 		$access_log = new AccessLog($this->access_log_model);
 				
-		$access_log->write_entry(
+		$access_log->writeEntry(
 			$this->as_ion_auth->is_admin(),
 			$event_id,
 			$herd_code,
 			$recent_test,
-			$herd_enroll_status_id,
 			$this->session->userdata('user_id'),
 			$this->session->userdata('active_group_id'),
 			null //no report code for cow lookup

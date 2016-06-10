@@ -12,7 +12,7 @@ use myagsource\Site\iPage;
 *  
 * Created:  12-12-2014
 *
-* Description:  Provides information about a herd's access to pages (AKA reports).
+* Description:  Provides information about a herd's accessible pages (AKA reports).
 *
 * Requirements: PHP5 or above
 */
@@ -38,10 +38,10 @@ class HerdPageAccess
 	protected $page;
 
 	/**
-	 * report_code
-	 * @var string
+	 * reports
+	 * @var 2-d array of report data
 	 **/
-	protected $report_code;
+	protected $reports;
 
 	/**
 	 * herd_is_paying
@@ -65,23 +65,36 @@ class HerdPageAccess
 		$this->datasource_pages = $datasource_pages;
 		$this->herd = $herd;
 		$this->page = $page;
-		
-		$report_data = $this->datasource_pages->getReport($this->page->id(), $this->herd->herdCode());
-		$this->report_code = $report_data['report_code'];
-		$this->herd_is_paying = $report_data['herd_is_paying'];
-		$this->herd_is_active_trial = $report_data['herd_is_active_trial'];
+
+		$report_data = $this->datasource_pages->getAccessibleReports($this->page->id(), $this->herd->herdCode());
+
+		if(is_array($report_data)){
+            $this->reports = $report_data;
+            //if any qualifying reports
+            $this->herd_is_paying = in_array(1, array_column($report_data, 'herd_is_paying'));
+            $this->herd_is_active_trial = in_array(1, array_column($report_data, 'herd_is_active_trial'));
+        }
 	}
 
 	/**
-	 * @method reportCode()
-	 * @return boolean
+	 * @method reportCodes()
+	 * @return array of strings
 	 * @access public
 	 **/
-	public function reportCode(){
-		return $this->report_code;
+	public function reportCodes(){
+		return array_column($this->reports, 'report_code');
 	}
-	
-	/**
+
+    /**
+     * @method reports()
+     * @return 2-d array of report data
+     * @access public
+     **/
+    public function reports(){
+        return $this->reports;
+    }
+
+    /**
 	 * @method hasAccess()
 	 * @return boolean
 	 * @access public
