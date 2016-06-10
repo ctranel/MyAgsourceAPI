@@ -156,7 +156,6 @@ class Change_herd extends MY_Api_Controller {
     protected function _loadSessionHerd($herd_code){
         $msg = [];
         $this->herd = new Herd($herd_code);
-        $herd_enroll_status_id = $this->herd->getHerdEnrollStatus();
         if($this->session->userdata('active_group_id') == 2){ //user is a producer
             $trials = $this->herd->getTrialData();
             if(isset($trials) && is_array($trials)){
@@ -176,17 +175,13 @@ class Change_herd extends MY_Api_Controller {
                     }
                 }
             }
-            if($herd_enroll_status_id === 1){ //herd is not signed up at all
-                $msg[] = new ResponseMessage('Herd ' . $this->herd->herdCode() . ' is not signed up for any eligible MyAgSource report products. Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' to enroll.', 'error');
-            }
         }
-        $this->_setSessionHerdData($herd_enroll_status_id);
+        $this->_setSessionHerdData();
         return $msg;
     }
 
-	protected function _setSessionHerdData($herd_enroll_status_id){
+	protected function _setSessionHerdData(){
 		$this->session->set_userdata('herd_code', $this->herd->herdCode());
-		$this->session->set_userdata('herd_enroll_status_id', $herd_enroll_status_id);
 		$this->session->set_userdata('recent_test_date', $this->herd->getRecentTest());
 		//load new benchmarks
 		$this->load->model('setting_model');
@@ -203,18 +198,16 @@ class Change_herd extends MY_Api_Controller {
 			return FALSE;
 		}
 		$herd_code = $this->session->userdata('herd_code');
-		$herd_enroll_status_id = empty($herd_code) ? NULL : $this->session->userdata('herd_enroll_status_id');
 		$recent_test = $this->session->userdata('recent_test_date');
 		$recent_test = empty($recent_test) ? NULL : $recent_test;
 
-		$this->access_log->write_entry(
-				$this->as_ion_auth->is_admin(),
-				$event_id,
-				$herd_code,
-				$recent_test,
-				$herd_enroll_status_id,
-				$this->session->userdata('user_id'),
-				$this->session->userdata('active_group_id')
+		$this->access_log->writeEntry(
+			$this->as_ion_auth->is_admin(),
+			$event_id,
+			$herd_code,
+			$recent_test,
+			$this->session->userdata('user_id'),
+			$this->session->userdata('active_group_id')
 		);
 	}
 }

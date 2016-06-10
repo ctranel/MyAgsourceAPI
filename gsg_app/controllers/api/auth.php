@@ -752,10 +752,6 @@ class Auth extends MY_Api_Controller {
 			return FALSE;
 		}
 		$herd_code = $this->session->userdata('herd_code');
-		$herd_enroll_status_id = $this->session->userdata('herd_enroll_status_id');
-        if(!$herd_enroll_status_id){
-            $herd_enroll_status_id = null;
-        }
 		$recent_test = $this->session->userdata('recent_test_date');
 		$recent_test = empty($recent_test) ? NULL : $recent_test;
 
@@ -767,7 +763,6 @@ class Auth extends MY_Api_Controller {
 			$event_id,
 			$herd_code,
 			$recent_test,
-			$herd_enroll_status_id,
 			$this->session->userdata('user_id'),
 			$this->session->userdata('active_group_id')
 		);
