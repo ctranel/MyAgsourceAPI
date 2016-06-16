@@ -45,7 +45,7 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
  * -----------------------------------------------------------------
  */
 
-abstract class report_parent extends MY_Controller {
+abstract class page extends MY_Controller {
 	/**
 	 * herd_access
 	 * @var HerdAccess
@@ -250,51 +250,6 @@ abstract class report_parent extends MY_Controller {
 		//only use default criteria on initial page loads, when filter form is submitted, it reloads each individual block
 		$this->filters->setCriteria($this->section->id(), $this->page->path(), ['herd_code' =>	$this->herd->herdCode()]); //filter form submissions never trigger a new page load (i.e., this function is never fired by a form submission)
 		//END FILTERS
-/*
-		if ($display_format == 'pdf' && !is_null($arr_block_in)) {
-			$ci_pdf = new Ci_pdf();
-			$pdf = new Pdf($ci_pdf);
-			//@todo: parameters
-			$table_header = new TableHeader();
-			$data = array();
-			$herd_data = $this->herd_model->header_info($this->herd->herdCode());
-			$i = 0;
-
-			if(isset($arr_blocks) && is_array($arr_blocks)){
-				foreach($arr_blocks as $pb){
-					if($pb['display_type'] == 'table'){
-						continue;
-					}
-					if(($arr_block_in !== NULL && in_array($pb->path(), $arr_block_in)) || $arr_block_in == NULL){
-					//SORT
-						if(isset($sort_by) && isset($sort_order)){
-							$this->arr_sort_by = array_values(explode('|', $sort_by));
-							$this->arr_sort_order = array_values(explode('|', $sort_order));
-						}
-						else {
-							$tmp = $pb->get_default_sort($pb->path());
-							$this->arr_sort_by = $tmp['arr_sort_by'];
-							$this->arr_sort_order = $tmp['arr_sort_order'];
-							$sort_by = implode('|', $this->arr_sort_by);
-							$sort_order = implode('|', $this->arr_sort_order);
-						}
-
-						$this->{$this->primary_model_name}->populate_field_meta_arrays($pb['id']);
-						$block[$i]['data'] = $this->ajax_report(urlencode($this->page->path()), urlencode($pb->path()), urlencode($sort_by), $sort_order, 'pdf', NULL);
-						$tmp_pdf_width = $this->{$this->primary_model_name}->get_pdf_widths(); 
-						$block[$i]['arr_pdf_widths'] = $tmp_pdf_width;
-						$arr_header_data = $this->{$this->primary_model_name}->get_fields(); // was $model
-						$block[$i]['header_structure'] = $this->table_header->get_table_header_array($arr_header_data, $tmp_pdf_width);
-						$block[$i]['title'] = $pb['description'];
-						$i++;
-					}
-				}
-			}
-			$this->_record_access(90, 'pdf', $this->herd_page_access->reportCodes());
-			$this->reports->create_pdf($block, $this->product_name, NULL, $herd_data, 'P');
-			exit;
-		}
-*/
 		// render page
 		//get_herd_data
 		$herd_data = $this->herd_model->header_info($this->herd->herdCode());
@@ -358,18 +313,6 @@ abstract class report_parent extends MY_Controller {
 			}
 		}
 		
-		//set up page header
-		$this->carabiner->css('chart.css');
-		$this->carabiner->css('boxes.css');
-		$this->carabiner->css('https://cdn.jsdelivr.net/qtip2/2.2.0/jquery.qtip.min.css', 'screen');
-		$this->carabiner->css('tooltip.css');
-		$this->carabiner->css('popup.css');
-		$this->carabiner->css('tabs.css');
-		$this->carabiner->css('report.css');
-		$this->carabiner->css('expandable.css');
-		$this->carabiner->css('chart.css', 'print');
-		$this->carabiner->css('report.css', 'print');
-		$this->carabiner->css($this->full_section_path . '.css', 'screen');
 		if($this->filters->displayFilters()){
 			//$this->carabiner->css('filters.css', 'screen');
 			$this->carabiner->css('agsource.datepick.css', 'screen');
@@ -382,69 +325,11 @@ abstract class report_parent extends MY_Controller {
 			$this->carabiner->css('hide_benchmarks.css', 'screen');
 		}
 		
-		if(is_array($this->page_header_data)){
-			$arr_blocks->rewind();
 
-			$this->page_header_data = array_merge($this->page_header_data,
-				[
-					'title'=>$this->product_name . ' - ' . $this->config->item('site_title'),
-					'description'=>$this->product_name . ' - ' . $this->config->item('site_title'),
-					'message' => $this->message,// + $this->{$this->primary_model_name}->arr_messages,
-					'navigation' => $this->load->view('navigation', [], TRUE),
-					'page_heading' => $this->product_name . " for Herd " . $this->herd->herdCode(),
-					'arr_head_line' => array(
-						'<script type="text/javascript">',
-						'	var page = "' . $this->page->path() . '";',
-						'	var page_url = "' . $this->report_path . '";',
-						'	var site_url = "' . site_url() . '";',
-						'	var herd_code = "' . $this->herd->herdCode() . '";',
-						'	var block = "' . $arr_blocks->current()->name()	. '"',
-						'</script>'
-					),
-					'arr_headjs_line'=>array(
-						'{highcharts: "https://code.highcharts.com/4.1.7/highcharts.js"}',
-						'{highcharts_more: "https://code.highcharts.com/4.1.7/highcharts-more.js"}',
-						'{exporting: "https://code.highcharts.com/4.1.7/modules/exporting.js"}',
-						'{regression: "' . $this->config->item("base_url_assets") . 'js/charts/high_regression.js"}',
-						'{popup: "' . $this->config->item("base_url_assets") . 'js/jquery/popup.min.js"}',
-						'{chart_options: "' . $this->config->item("base_url_assets") . 'js/charts/chart_options.js"}',
-						'{graph_helper: "' . $this->config->item("base_url_assets") . 'js/charts/graph_helper.js"}',
-						'{report_helper: "' . $this->config->item("base_url_assets") . 'js/report_helper.js"}',
-						'{table_sort: "' . $this->config->item("base_url_assets") . 'js/jquery/stupidtable.min.js"}',
-						'{tooltip: "https://cdn.jsdelivr.net/qtip2/2.2.0/jquery.qtip.min.js"}',
-						'{datepick: "' . $this->config->item("base_url_assets") . 'js/jquery/jquery.datepick.min.js"}'
-					)
-				]
-			);
-			//load the report-specific js file if it exists
-			if(file_exists(PROJ_DIR . '/' . 'js' . '/' . $this->full_section_path . '_helper.js')){
-				$this->page_header_data['arr_headjs_line'][] = '{inv_helper: "' . $this->config->item("base_url_assets") . 'js/' . $this->full_section_path . '_helper.js"}';
-			}
-			$this->page_header_data['arr_headjs_line'][] = 'function(){' . $tmp_js . ';}';
-		}
-		//unset($this->{$this->primary_model_name}->arr_messages); //clear message var once it is displayed
-
-		$arr_nav_data = [
-			'section_path' => $this->full_section_path,
-			'curr_page' => $this->page->path(),
-			'obj_pages' => $this->section->pages(),
-		];
-
-		$this->page_footer_data = [];
 		$report_filter_path = 'filters';
 		if(file_exists(APPPATH . 'views/' . $this->full_section_path . '/filters.php')){
 			$report_filter_path =  $this->full_section_path . '/filters' . $report_filter_path;
 		}
-
-		$data = [
-			'page_header' => $this->load->view('page_header', $this->page_header_data, TRUE),
-			'herd_code' => $this->herd->herdCode(),
-			'herd_data' => $this->load->view('dhi/herd_info', $herd_data, TRUE),
-			'page_footer' => $this->load->view('page_footer', $this->page_footer_data, TRUE),
-			'blocks' => $arr_view_blocks,
-			'print_all' => $this->print_all,
-			'report_path' => $this->report_path
-		];
 		
 		$arr_filter_data = [
 			//'arr_filters' => $this->filters->filter_list(),
@@ -477,7 +362,6 @@ abstract class report_parent extends MY_Controller {
         }
 
 		$this->_record_access(90, 'web', $this->herd_page_access->reports());
-		$this->load->view('report', $data);
 	}
 
 	protected function _record_access($event_id, $format, $product_code = null){

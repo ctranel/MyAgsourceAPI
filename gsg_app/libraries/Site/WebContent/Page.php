@@ -5,10 +5,14 @@ require_once APPPATH . 'libraries/Site/iPage.php';
 require_once APPPATH . 'libraries/Site/iWebContent.php';
 require_once APPPATH . 'libraries/Site/iWebContentRepository.php';
 
+use myagsource\Benchmarks\Benchmarks;
+use myagsource\report_filters\Filters;
 use myagsource\Site\iPage;
 use myagsource\Site\iWebContent;
 use myagsource\Site\iWebContentRepository;
 use myagsource\dhi\Herd;
+use myagsource\Supplemental\Content\SupplementalFactory;
+
 /**
 * Name:  Page
 *
@@ -65,8 +69,50 @@ class Page implements iWebContent, iPage {
 	 * @var string
 	 **/
 	protected $path;
-	
+
+    /**
+     * page route
+     * @var string
+     **/
+    protected $route;
+
+    /**
+     * Source for page data
+     * @var page_model
+     **/
+    protected $datasource;
+
+    /**
+	 * Factory for supplemental objects
+	 * @var SupplementalFactory
+	 **/
+	protected $supplemental_factory;
+
 	/**
+	 * report blocks
+	 * @var Blocks
+	 **/
+	protected $blocks;
+
+	/**
+	 * forms
+	 * @var Forms
+	 **/
+	protected $forms;
+
+	/**
+	 * report filters
+	 * @var Filters
+	 **/
+	protected $filters;
+
+    /**
+     * report benchmarks
+     * @var Benchmarks
+     **/
+    protected $benchmarks;
+
+    /**
 	 * collection of iWebContent objects
 	 * @var SplObjectStorage
 	 **/
@@ -77,15 +123,33 @@ class Page implements iWebContent, iPage {
 	 *
 	 * @return void
 	 * @author ctranel
+	 * 
+	 * @todo: may need to add herd header info too
 	 **/
-	public function __construct($id, $section_id, $name, $description, $scope, $active, $path) {
-		$this->section_id = $section_id;
+	public function __construct($id, $datasource, SupplementalFactory $supplemental_factory, Blocks $blocks, Forms $forms, Filters $filters, Benchmarks $benchmarks) {
+		$this->datasource = $datasource;
+        $page_data = $this->datasource->getPage($id);
+
+        $this->section_id = $section_id;
 		$this->name = $name;
 		$this->description = $description;
 		$this->scope = $scope;
 		$this->active = $active;
 		$this->path = $path;
+
+
 		$this->id = $id;
+		$this->supplemental_factory = $supplemental_factory;
+		$this->blocks = $blocks;
+		$this->forms = $forms;
+		$this->filters = $filters;
+        $this->benchmarks = $benchmarks;
+	}
+	
+	public function toJson(){
+		json_encode(
+			
+		);
 	}
 	
 	public function id(){

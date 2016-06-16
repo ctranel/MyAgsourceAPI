@@ -23,9 +23,26 @@ class Page_model extends CI_Model {
 			->get('users.dbo.pages p')
 			->result_array();
 	}
-	
 
-	/**
+    /**
+     * @method getPage
+     * @param id of requested page
+     * @return array of page data
+     * @author ctranel
+     **/
+    public function getPage($id) {
+        $this->db
+            ->where('p.id', $id)
+            ->limit(1);
+        
+        $res = $this->getPages();
+        if(is_array($res)){
+            return $res[0];
+        }
+    }
+
+
+    /**
 	 * getPagesByCriteria
 	 * @param associative array of criteria
 	 * @param 2d array of joins ('table', 'condition')

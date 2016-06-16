@@ -25,7 +25,7 @@ class Setting_model extends CI_Model {
 	 * @return string category
 	 * @author ctranel
 	 **/
-	public function getSettingsByCategory($category, $user_id, $herd_code) {
+	public function getSettingsByPage($page_id, $user_id, $herd_code) {
 		if(isset($user_id) && $user_id !== FALSE){
 			$this->db
 				->join('users.dbo.set_user_herd_settings uhs', "s.id = uhs.setting_id AND uhs.user_id = " . $user_id . " AND uhs.herd_code = '" . $herd_code . "'", 'left')
@@ -38,12 +38,13 @@ class Setting_model extends CI_Model {
 		}
 		$results = $this->db
 		->select('s.id, t.name AS type, c.name AS category, g.name AS [group], s.name, s.description, s.default_value, uhs.value')
+		->join('users.frm.forms f', "pf.form_id = f.id AND pf.page_id = " . $page_id, 'inner')
+        ->join('users.setng.forms_settings fs', "f.id = fs.form_id", 'inner')
+		->join('users.dbo.settings s', "fs.setting_id = s.id", 'inner')
 		->join('users.dbo.set_lookup_types t', "s.type_id = t.id", 'inner')
-		->join('users.dbo.set_lookup_categories c', "s.category_id = c.id", 'inner')
 		->join('users.dbo.set_lookup_groups g', "s.group_id = g.id", 'inner')
-		->where('c.name', $category)
 		->where("(uhs.herd_code = '" . $herd_code . "' OR uhs.herd_code IS NULL)")
-		->get('users.dbo.set_settings s')
+		->get('users.frm.pages_forms pf')
 		->result_array();
 		return $results;
 	}
