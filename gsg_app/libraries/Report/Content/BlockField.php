@@ -179,7 +179,7 @@ abstract class BlockField {
 
 	public function dataSupplementalProperties() {
 		if(isset($this->data_supp)){
-			return $this->data_supp->getProperties();
+			return $this->data_supp->toArray();
 		}
 	}
 

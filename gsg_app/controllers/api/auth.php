@@ -61,7 +61,7 @@ class Auth extends MY_Api_Controller {
 	}
 
     function c(){
-        $this->sendResponse(200, new ResponseMessage('success', 'message'), ['user' => $this->session->userdata('user_id')]);
+        $this->sendResponse(200, new ResponseMessage('message', 'success'), ['user' => $this->session->userdata('user_id')]);
     }
 
 	function product_info_request(){
@@ -758,7 +758,7 @@ class Auth extends MY_Api_Controller {
 		$this->load->model('access_log_model');
 		$access_log = new AccessLog($this->access_log_model);
 				
-		$access_log->write_entry(
+		$access_log->writeEntry(
 			$this->as_ion_auth->is_admin(),
 			$event_id,
 			$herd_code,

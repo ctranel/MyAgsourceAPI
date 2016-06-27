@@ -2,10 +2,10 @@
 
 namespace myagsource\Report\Content;
 
-require_once APPPATH . 'libraries/Report/Content/Block.php';
+require_once APPPATH . 'libraries/Report/iBlock.php';
 require_once APPPATH . 'libraries/Report/iBlockData.php';
 
-use \myagsource\Report\Content\Block;
+use \myagsource\Report\iBlock;
 use \myagsource\Report\iBlockData;
 
 /**
@@ -23,7 +23,7 @@ abstract class BlockData implements iBlockData{
 	 * block
 	 *
 	 * report block
-	 * @var myagsource\Report\Content\Block
+	 * @var \myagsource\Report\iBlock
 	 **/
 	protected $block;
 	
@@ -47,7 +47,7 @@ abstract class BlockData implements iBlockData{
 	/**
 	 * @todo: add filter data
 	 */
-	function __construct(Block $block, \Report_data_model $report_datasource) {//, Benchmarks $benchmarks, DbTable $db_table
+	function __construct(iBlock $block, \Report_data_model $report_datasource) {//, Benchmarks $benchmarks, DbTable $db_table
 		$this->block = $block;
 		$this->report_datasource = $report_datasource;
 	}

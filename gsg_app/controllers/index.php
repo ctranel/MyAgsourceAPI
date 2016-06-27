@@ -45,14 +45,9 @@ class Index extends report_parent {
 		//FILTERS
 		//load required libraries
 		$this->load->model('filter_model');
-		$this->filters = new Filters($this->filter_model);
+		$this->filters = new Filters($this->filter_model, $this->page->id(), ['herd_code' =>	$this->session->userdata('herd_code')]);
 		$recent_test_date = isset($primary_table) ? $this->{$this->primary_model_name}->getRecentDates() : NULL;
-		$this->filters->setCriteria(
-				$this->section->id(),
-				$this->page->path(),
-				['herd_code' =>	$this->session->userdata('herd_code')], //filter form submissions never trigger a new page load (i.e., this function is never fired by a form submission)
-				'herd_code'
-		);
+		$this->filters->setCriteria();
 		//END FILTERS
 
         $this->page_header_data['message'] = $this->session->flashdata('message');
@@ -219,7 +214,7 @@ class Index extends report_parent {
         $this->load->model('product_model');
         $products_factory = new Products($this->product_model, $this->herd, $this->permissions->permissionsList());
         $missing_products = $products_factory->inaccessibleProducts();
-        if(isset($missing_products) && is_a($missing_products, 'splObjectStorage') && $missing_products->count() > 0){
+        if(isset($missing_products) && is_array($missing_products) && count($missing_products) > 0){
             $this->data['widget']['herd'][] = [
                 'content' => $this->load->view('auth/dashboard/other_products', ['products' => $missing_products], true),
                 'title' => 'Maximize Your Profitability'
@@ -227,7 +222,7 @@ class Index extends report_parent {
         }
 
         if($this->permissions->hasPermission("Set Benchmarks")) {
-            $this->load->model('setting_model');
+            $this->load->model('setting_model', null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
             $this->load->model('benchmark_model');
             $this->benchmarks = new Benchmarks($this->session->userdata('user_id'), $this->input->post('herd_code'),
                 $this->herd_model->header_info($this->herd->herdCode()), $this->setting_model, $this->benchmark_model,

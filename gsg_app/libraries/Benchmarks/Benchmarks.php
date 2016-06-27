@@ -64,7 +64,7 @@ class Benchmarks extends SessionSettings
 	 **/
 	public function __construct($user_id, $herd_code, $herd_info, \setting_model $setting_model, \Benchmark_model $benchmark_model, $session_benchmarks)
 	{
-		parent::__construct($user_id, $herd_code, $setting_model, 'benchmarks');
+		parent::__construct($user_id, $herd_code, $setting_model, 83); //83 is the id of benchmarks setting form page--need to retrive this based on settings name in controller
 		
 		$this->benchmark_model = $benchmark_model;
 		$this->session_data = $session_benchmarks;

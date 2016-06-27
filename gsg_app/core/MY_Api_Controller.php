@@ -48,7 +48,7 @@ class MY_Api_Controller extends CI_Controller
         header("Cache-Control: post-check=0, pre-check=0", false);
         header("Pragma: no-cache");
         header("Expires: -1");
-        header('Access-Control-Allow-Origin: http://localhost:3000');
+        header('Access-Control-Allow-Origin: https://localhost:3000');
         header('Access-Control-Allow-Credentials: true');
         header('Access-Control-Allow-Methods: GET, POST, PUT');
         header('Access-Control-Allow-Headers: Content-Type, Authorization');
@@ -73,8 +73,8 @@ class MY_Api_Controller extends CI_Controller
 //        $this->load->helper('html');
         $this->load->helper('error');
         $this->herd_access = new HerdAccess($this->herd_model);
-        $blocks = new Blocks($this->block_model);
-        $pages = new Pages($this->page_model, $blocks);
+        //$blocks = new Blocks($this->block_model);
+        //$pages = new Pages($this->page_model, $blocks);
         //$sections = new Sections($this->section_model, $pages);
         $herd = new Herd($this->herd_model, $this->session->userdata('herd_code'));
 
@@ -118,7 +118,7 @@ class MY_Api_Controller extends CI_Controller
                 echo json_encode(['messages'=>$response->errorBadRequest($messages)]);
                 break;
             case 200:
-                echo json_encode(array_merge(['messages'=>$response->message($messages)], ['data'=>$payload]));
+                echo json_encode(array_merge(['messages'=>$response->message($messages)], $payload));
                 break;
         }
         exit;

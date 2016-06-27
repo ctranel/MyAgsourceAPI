@@ -1,20 +1,18 @@
 <?php
 namespace myagsource\Report\Content;
 
+require_once APPPATH . 'libraries/Site/iBlock.php';
 require_once APPPATH . 'libraries/Report/iBlock.php';
 require_once APPPATH . 'libraries/Report/Content/Sort.php';
 require_once APPPATH . 'libraries/Report/Content/WhereGroup.php';
 require_once APPPATH . 'libraries/Datasource/DbObjects/DbField.php';
-//require_once APPPATH . 'libraries/Site/iWebContentRepository.php';
 
-use \myagsource\Report\iBlock;
-use \myagsource\dhi\Herd;
-use \myagsource\Report\Content\Sort;
-use \myagsource\Report\Content\WhereGroup;
+use \myagsource\Report\iBlock as iReportBlock;
 use \myagsource\Datasource\DbObjects\DbField;
 use \myagsource\Supplemental\Content\SupplementalFactory;
 use \myagsource\Datasource\iDataField;
 use \myagsource\report_filters\Filters;
+use \myagsource\Site\WebContent\Block as SiteBlock;
 
 /**
 * Name:  Block
@@ -27,7 +25,8 @@ use \myagsource\report_filters\Filters;
 *
 */
 
-abstract class Block implements iBlock {
+abstract class Block implements iReportBlock {
+//START SITE/WEBCONTENT/BLOCK PROPERTIES    
 	/**
 	 * block id
 	 * @var int
@@ -57,10 +56,35 @@ abstract class Block implements iBlock {
 	 * @var string
 	 **/
 	protected $path;
-	
+
 	/**
-	 * collection of ReportField objects
-	 * @var SplObjectStorage
+	 * display_type
+	 * @var string
+	 **/
+	protected $display_type;
+
+	/**
+	 * scope
+	 * @var string
+	 **/
+	protected $scope;
+
+	/**
+	 * active
+	 * @var boolean
+	 **/
+	protected $active;
+//END SITE/WEBCONTENT/BLOCK PROPERTIES    
+
+    /**
+     * SiteBlock object which contains properties and methods related to the block context within the site
+     * @var SiteBlock
+     **/
+    protected $site_block;
+
+    /**
+	 * array of ReportField objects
+	 * @var ReportField[]
 	 **/
 	protected $report_fields;
 	
@@ -71,20 +95,20 @@ abstract class Block implements iBlock {
 	protected $addl_select_field_names;
 
 	/**
-	 * collection of WhereGroup objects
-	 * @var SplObjectStorage
+	 * array of WhereGroup objects
+	 * @var WhereGroup[]
 	 **/
 	protected $where_groups;
 	
 	/**
-	 * collection of Sort objects
-	 * @var SplObjectStorage
+	 * array of Sort objects
+	 * @var Sort[]
 	 **/
 	protected $default_sorts;
 	
 	/**
-	 * collection of Sort objects
-	 * @var SplObjectStorage
+	 * array of Sort objects
+	 * @var Sort[]
 	 **/
 	protected $sorts;
 	
@@ -125,12 +149,6 @@ abstract class Block implements iBlock {
 	protected $bench_row;
 	
 	/**
-	 * display_type
-	 * @var string
-	 **/
-	protected $display_type;
-	
-	/**
 	 * is_summary
 	 * @var boolean
 	 **/
@@ -141,18 +159,6 @@ abstract class Block implements iBlock {
 	 * @var boolean
 	 **/
 	protected $has_aggregate;
-	
-	/**
-	 * scope
-	 * @var string
-	 **/
-	protected $scope;
-	
-	/**
-	 * active
-	 * @var boolean
-	 **/
-	protected $active;
 	
 	//@todo: below should be in BlockData?
 	/**
@@ -201,16 +207,10 @@ abstract class Block implements iBlock {
 	 * @return void
 	 * @author ctranel
 	 **/
-	public function __construct($block_datasource, $id, $page_id, $name, $description, $scope, $active, $path, $max_rows, $cnt_row, 
-			$sum_row, $avg_row, $bench_row, $is_summary, $display_type, SupplementalFactory $supp_factory = null, $field_groups = null) {
+	public function __construct($block_datasource, SiteBlock $site_block, $max_rows, $cnt_row, 
+			$sum_row, $avg_row, $bench_row, $is_summary, $display_type, SupplementalFactory $supp_factory = null, $field_groups = null) {//$id, $page_id, $name, $description, $scope, $active, $path, 
 		$this->datasource = $block_datasource;
-		$this->id = $id;
-		$this->page_id = $page_id;
-		$this->name = $name;
-		$this->description = $description;
-		$this->scope = $scope;
-		$this->active = $active;
-		$this->path = $path;
+        $this->site_block = $site_block;
 		$this->max_rows = $max_rows;
 		$this->cnt_row = $cnt_row;
 		$this->sum_row = $sum_row;
@@ -251,26 +251,26 @@ abstract class Block implements iBlock {
 	 */
 	
 	public function id(){
-		return $this->id;
+		return $this->site_block->id();
 	}
 
 	public function path(){
-		return $this->path;
+		return $this->site_block->path();
 	}
 
 	public function title(){
-		return $this->name;
+		return $this->site_block->name();
 	}
 	public function maxRows(){
 		return $this->max_rows;
 	}
 /*
 	public function name(){
-		return $this->name;
+		return $this->site_block->name();
 	}
 
 	public function description(){
-		return $this->description;
+		return $this->site_block->description();
 	}
 */
 	public function pivotFieldName(){
@@ -384,11 +384,11 @@ abstract class Block implements iBlock {
 	 **/
 	public function getOutputData(){
 		return [
-			'name' => $this->name,
-			'description' => $this->name,
+			'name' => $this->site_block->name(),
+			'description' => $this->site_block->name(),
 			'filter_text' => $this->filters->get_filter_text(),
 			'client_data' => [
-				'block' => $this->path, //original program included sort_by, sort_order, graph_order but couldn't find anywhere it was used
+				'block' => $this->site_block->path(), //original program included sort_by, sort_order, graph_order but couldn't find anywhere it was used
 				
 			],
 		];
@@ -402,10 +402,10 @@ abstract class Block implements iBlock {
 	 * @todo: implement child/nested groups
 	 **/
 	protected function setWhereGroups(){
-		$this->where_groups = new \SplObjectStorage();
-		$criteria = new \SplObjectStorage();
+		$this->where_groups = [];
+		$criteria = [];
 		$arr_ret = [];
-		$arr_res = $this->datasource->getWhereData($this->id);
+		$arr_res = $this->datasource->getWhereData($this->site_block->id());
 		if(!is_array($arr_res) || empty($arr_res)){
 			return;
 		}
@@ -414,18 +414,18 @@ abstract class Block implements iBlock {
 		if(is_array($arr_res)){
 			foreach($arr_res as $s){
 				if($prev_group != $s['where_group_id']){
-					$this->where_groups->attach(new WhereGroup($prev_op, $criteria));
-					$criteria = new \SplObjectStorage();
+					$this->where_groups[] = new WhereGroup($prev_op, $criteria);
+					$criteria = [];
 				}
 				$criteria_datafield = new DbField($s['db_field_id'], $s['db_table_id'], $s['db_field_name'], $s['name'], $s['description'], $s['pdf_width'], $s['default_sort_order'],
 						 $s['datatype'], $s['max_length'], $s['decimal_scale'], $s['unit_of_measure'], $s['is_timespan'], $s['is_foreign_key'], $s['is_nullable'], $s['is_natural_sort']);
-				$criteria->attach(new WhereCriteria($criteria_datafield, $s['condition']));
+				$criteria[] = new WhereCriteria($criteria_datafield, $s['condition']);
 
 				$prev_group = $s['where_group_id'];
 				$prev_op = $s['operator'];
 			}
 			//add the last item
-			$this->where_groups->attach(new WhereGroup($s['operator'], $criteria));
+			$this->where_groups[] = new WhereGroup($s['operator'], $criteria);
 		}
 	}
 	
@@ -437,10 +437,10 @@ abstract class Block implements iBlock {
 	 **/
 	public function getWhereGroupArray(){
 		$ret = [];
-		if(!is_a($this->where_groups, 'SplObjectStorage')){
+		if(!is_array($this->where_groups) || empty($this->where_groups)){
 			$this->where_groups = $this->setWhereGroups();
 		}
-		if($this->where_groups->count() === 0){
+		if(count($this->where_groups) === 0){
 			return;
 		}
 
@@ -458,7 +458,7 @@ abstract class Block implements iBlock {
 	public function sortText($is_verbose = false){
 		$ret = '';
 		$is_first = true;
-		if(isset($this->sorts) && $this->sorts->count() > 0){
+		if(isset($this->sorts) && count($this->sorts) > 0){
 			foreach($this->sorts as $s){
 				$ret .= $is_verbose ? $s->sortText($is_first) : $s->sortTextBrief($is_first);
 				$is_first = false;
@@ -518,24 +518,13 @@ abstract class Block implements iBlock {
 	
 	/**
 	 * @method addSort()
-	 * @param SplObjectStorage of Sort objects
+	 * @param array of Sort objects
 	 * @return void
 	 * @access public
 	* */
 	public function addSort(Sort $sort){
-		$this->sorts->attach($sort);
+		$this->sorts[] = $sort;
 	}
-	
-	/**
-	 * @method addSortField()
-	 * @param iDataField sort field
-	 * @param string sort order
-	 * @return void
-	 * @access public
-	public function addSortField(iDataField $datafield, $sort_order){
-		$this->sorts->attach(new Sort($datafield, $sort_order));
-	}
-	* */
 	
 	/**
 	 * @method setDefaultSort()
@@ -543,14 +532,14 @@ abstract class Block implements iBlock {
 	 * @author ctranel
 	 **/
 	public function setDefaultSort(){
-		$this->default_sorts = new \SplObjectStorage();
+		$this->default_sorts = [];
 		$arr_ret = [];
-		$arr_res = $this->datasource->getSortData($this->id);
+		$arr_res = $this->datasource->getSortData($this->site_block->id());
 		if(is_array($arr_res)){
 			foreach($arr_res as $s){
 				$datafield = new DbField($s['db_field_id'], $s['db_table_id'], $s['db_field_name'], $s['name'], $s['description'], $s['pdf_width'], $s['default_sort_order'],
 						 $s['datatype'], $s['max_length'], $s['decimal_scale'], $s['unit_of_measure'], $s['is_timespan'], $s['is_foreign_key'], $s['is_nullable'], $s['is_natural_sort']);
-				$this->default_sorts->attach(new Sort($datafield, $s['sort_order']));
+				$this->default_sorts[] = new Sort($datafield, $s['sort_order']);
 			}
 		}
 		$this->sorts = $this->default_sorts;
@@ -681,7 +670,7 @@ abstract class Block implements iBlock {
 	
 	/**
 	 * @method getGroupBy()
-	 * //@param SplObjectStorage of GroupBy objects
+	 * //@param array of GroupBy objects
 	 * @return void
 	 * @access public
 	* */

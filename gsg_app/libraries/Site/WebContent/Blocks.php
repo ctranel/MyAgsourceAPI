@@ -56,10 +56,10 @@ class Blocks implements iWebContentRepository {
 	 * 
 	 * @param int page_id
 	 * @author ctranel
-	 * @returns SplObjectStorage of Blocks
+	 * @returns Blocks[]
 	 */
 	public function getByPage($page_id){
-		$blocks = new \SplObjectStorage();
+		$blocks = [];
 		$criteria = ['page_id' => $page_id];
 //		$join = [['table' => 'pages_blocks pb', 'condition' => 'b.id = pb.block_id AND pb.page_id = ' . $page_id]];
 		$results = $this->datasource_blocks->getByCriteria($criteria);
@@ -67,7 +67,7 @@ class Blocks implements iWebContentRepository {
 			return false;
 		}
 		foreach($results as $r){
-			$blocks->attach(new Block($r['id'], $r['page_id'], $r['name'], $r['description'], $r['display_type'], $r['scope'], $r['active'], $r['path'], $r['bench_row']));
+			$blocks[] = new Block($r['id'], $r['page_id'], $r['name'], $r['description'], $r['display_type'], $r['scope'], $r['active'], $r['path'], $r['bench_row']);
 		}
 		return $blocks;
 	}

@@ -36,7 +36,7 @@ class Page_model extends CI_Model {
             ->limit(1);
         
         $res = $this->getPages();
-        if(is_array($res)){
+        if(is_array($res) ){
             return $res[0];
         }
     }

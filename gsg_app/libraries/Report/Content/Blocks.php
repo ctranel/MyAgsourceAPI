@@ -15,6 +15,7 @@ use \myagsource\Report\iBlock;
 use \myagsource\dhi\Herd;
 use myagsource\Supplemental\Content\SupplementalFactory;
 use myagsource\Datasource\DbObjects\DbField;
+use \myagsource\Site\WebContent\Blocks as SiteBlocksFactory;
 
 /**
  * A repository? for report block objects
@@ -43,13 +44,37 @@ class Blocks {// implements iReportContentRepository {
 	 * @var SupplementalFactory
 	 **/
 	protected $supplemental_factory;
-	
-	function __construct(\report_block_model $datasource_blocks, \db_field_model $datasource_dbfield, SupplementalFactory $supplemental_factory = null) {
+
+    /**
+     * site_blocks_factory
+     * @var SiteBlocksFactory
+     **/
+    protected $site_blocks_factory;
+
+    function __construct(\report_block_model $datasource_blocks, \db_field_model $datasource_dbfield, SupplementalFactory $supplemental_factory = null, SiteBlocksFactory $site_blocks) {
 		$this->datasource_blocks = $datasource_blocks;
 		$this->datasource_dbfield = $datasource_dbfield;
 		$this->supplemental_factory = $supplemental_factory;
 	}
-	
+
+	/*
+	 * getBlock
+	 * 
+	 * @param int block id
+	 * @author ctranel
+	 * @returns \myagsource\Report\iBlock
+	 */
+	public function getBlock($id){
+		$criteria = ['id' => $id];
+		$results = $this->datasource_blocks->getByCriteria($criteria);
+		if(empty($results)){
+			return false;
+		}
+
+		$r = $results[0];
+		return $this->dataToObject($r);
+	}
+
 	/*
 	 * getByPath
 	 * 
@@ -58,7 +83,6 @@ class Blocks {// implements iReportContentRepository {
 	 * @returns \myagsource\Report\iBlock
 	 */
 	public function getByPath($path, $parent_id = null){
-		$block = null;
 		$criteria = ['path' => $path];
 		if(isset($parent_id)){
 			$criteria['page_id'] = $parent_id;
@@ -70,7 +94,7 @@ class Blocks {// implements iReportContentRepository {
 
 		//$sort = 
 		$r = $results[0];
-		return $this->getBlock($r);
+		return $this->dataToObject($r);
 	}
 
 	/*
@@ -78,10 +102,10 @@ class Blocks {// implements iReportContentRepository {
 	 * 
 	 * @param int page_id
 	 * @author ctranel
-	 * @returns SplObjectStorage of Blocks
+	 * @returns array of Blocks
 	 */
 	public function getByPage($page_id){
-		$blocks = new \SplObjectStorage();
+		$blocks = [];
 		
 		$criteria = ['page_id' => $page_id];
 //		$join = [['table' => 'pages_blocks pb', 'condition' => 'b.id = pb.block_id AND pb.page_id = ' . $page_id]];
@@ -90,7 +114,7 @@ class Blocks {// implements iReportContentRepository {
 			return false;
 		}
 		foreach($results as $r){
-			$blocks->attach($this->getBlock($r));
+			$blocks[] = $this->dataToObject($r);
 		}
 		return $blocks;
 	}
@@ -102,7 +126,7 @@ class Blocks {// implements iReportContentRepository {
 	 * @author ctranel
 	 * @returns \myagsource\Report\iBlock
 	 */
-	protected function getBlock($report){
+	protected function dataToObject($report){
 		$field_groups = $this->datasource_blocks->getFieldGroupData($report['id']);
 		$field_groups = $this->keyFieldGroupData($field_groups);
 		

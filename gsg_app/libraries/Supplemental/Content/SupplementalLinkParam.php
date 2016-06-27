@@ -14,7 +14,7 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 *
 */
 
-class SupplementalLinkParam extends \SplObjectStorage
+class SupplementalLinkParam
 {
 	/**
 	 * link id
@@ -43,11 +43,9 @@ class SupplementalLinkParam extends \SplObjectStorage
 	/**
 	 * __construct
 	 *
-	 * @param: string href
-	 * @param: string rel
-	 * @param: string title
-	 * @param: string class
-	 * @param: SupplementalLinkParams
+	 * @param: string name
+	 * @param: string value
+	 * @param: string field name from which value is derived
 	 * @return void
 	 * @author ctranel
 	 **/
@@ -56,7 +54,16 @@ class SupplementalLinkParam extends \SplObjectStorage
 		$this->value_db_field_name = $value_db_field_name;
 		$this->value = $value;
 	}
-	
+
+	public function toArray(){
+		$ret = [
+            'name' => $this->name,
+            'value_db_field_name' => $this->value_db_field_name,
+            'value' => $this->value,
+		];
+		return $ret;
+	}
+
 	/* -----------------------------------------------------------------
 	 *  returns href
 
@@ -139,14 +146,14 @@ class SupplementalLinkParam extends \SplObjectStorage
 	 *  @throws: 
 	 * -----------------------------------------------------------------*/
 	 public static function datasetToObjects($dataset) {
-	 	$ret = new \SplObjectStorage();
+	 	$ret = [];
 		if(isset($dataset) && is_array($dataset)){
 			foreach($dataset as $r){
-				$ret->attach(new SupplementalLinkParam(
+				$ret[] = new SupplementalLinkParam(
 					$r['name'],
 					$r['value'],
 					$r['value_db_field_name']
-				));
+				);
 			}
 		}
 		return $ret;

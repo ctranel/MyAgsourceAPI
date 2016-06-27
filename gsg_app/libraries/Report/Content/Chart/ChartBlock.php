@@ -38,20 +38,20 @@ class ChartBlock extends Block {
 	protected $categories;
 
 	/**
-	 * collection of XAxis objects
-	 * @var SplObjectStorage
+	 * array of XAxis objects
+	 * @var XAxis[]
 	 **/
 	protected $x_axes;
 
 	/**
-	 * collection of YAxis objects
-	 * @var SplObjectStorage
+	 * array of YAxis objects
+	 * @var YAxis[]
 	 **/
 	protected $y_axes;
 
 	/**
-	 * collection of series objects
-	 * @var SplObjectStorage
+	 * array of series objects
+	 * @var Series[]
 	 **/
 	protected $series;
 
@@ -73,8 +73,8 @@ class ChartBlock extends Block {
 		
 		$this->keep_nulls = $keep_nulls;
 		$this->chart_type = $chart_type;
-		$this->x_axes = new \SplObjectStorage();
-		$this->y_axes = new \SplObjectStorage();
+		$this->x_axes = [];
+		$this->y_axes = [];
 		$this->setChartAxes();
 		$this->setSeries();
 	}
@@ -112,7 +112,7 @@ class ChartBlock extends Block {
 	public function setReportFields(){
 		$arr_table_ref_cnt = [];
 		$this->has_aggregate = false;
-		$this->report_fields = new \SplObjectStorage();
+		$this->report_fields = [];
 			
 		$arr_ret = array();
 		$arr_res = $this->datasource->getFieldData($this->id);
@@ -134,7 +134,7 @@ class ChartBlock extends Block {
 				$arr_table_ref_cnt[$s['table_name']] = isset($arr_table_ref_cnt[$s['table_name']]) ? ($arr_table_ref_cnt[$s['table_name']] + 1) : 1;
 				$datafield = new DbField($s['db_field_id'], $s['table_name'], $s['db_field_name'], $s['name'], $s['description'], $s['pdf_width'], $s['default_sort_order'],
 						 $s['datatype'], $s['max_length'], $s['decimal_scale'], $s['unit_of_measure'], $s['is_timespan'], $s['is_foreign_key'], $s['is_nullable'], $s['is_natural_sort']);
-				$this->report_fields->attach(new ChartField($s['id'], $s['name'], $datafield, $s['category_id'], $s['is_displayed'], $s['display_format'], $s['aggregate'], $s['is_sortable'], $s['chart_type'], $s['axis_index'], $s['trend_type'], $s['field_group'], $header_supp, $data_supp, $s['field_group'], $s['field_group_ref_key']));
+				$this->report_fields[] = new ChartField($s['id'], $s['name'], $datafield, $s['category_id'], $s['is_displayed'], $s['display_format'], $s['aggregate'], $s['is_sortable'], $s['chart_type'], $s['axis_index'], $s['trend_type'], $s['field_group'], $header_supp, $data_supp, $s['field_group'], $s['field_group_ref_key']);
 			}
 			$this->primary_table_name = array_search(max($arr_table_ref_cnt), $arr_table_ref_cnt);
 			//set up arr_fields hierarchy
@@ -170,7 +170,7 @@ class ChartBlock extends Block {
 				//add fields as a report field so it is included in the select statement
 				$display_format = $a['data_type'] === 'datetime' ? 'MM-dd-yy' : null;
 				//@todo: this probably shouldn't be in report_fields.  Have prep select function pull fields from x axis objects?
-				$this->report_fields->attach(new ChartField($a['id'], $a['name'], $datafield, null, false, $display_format, null, true, null, null, null, null));
+				$this->report_fields[] = new ChartField($a['id'], $a['name'], $datafield, null, false, $display_format, null, true, null, null, null, null);
 			}
 			if($a['x_or_y'] === 'x'){
 				//if($a['data_type'] === 'datetime' || $a['data_type'] === 'date'){
@@ -179,10 +179,10 @@ class ChartBlock extends Block {
 				if(isset($a['category']) && !empty($a['category'])){
 					$this->categories[] = $a['category'];
 				}
-				$this->x_axes->attach(new XAxis($a['min'], $a['max'], $a['opposite'], $datafield, $a['data_type'], $a['text'], $a['category']));
+				$this->x_axes[] = new XAxis($a['min'], $a['max'], $a['opposite'], $datafield, $a['data_type'], $a['text'], $a['category']);
 			}
 			if($a['x_or_y'] === 'y'){
-				$this->y_axes->attach(new YAxis($a['min'], $a['max'], $a['opposite'], $a['text'], $datafield));
+				$this->y_axes[] = new YAxis($a['min'], $a['max'], $a['opposite'], $a['text'], $datafield);
 			}
 		}
 	}
@@ -196,7 +196,7 @@ class ChartBlock extends Block {
 	protected function getXAxisOutput(){
 		$ret = [];
 		$cnt = 0;
-		if($this->x_axes->count() === 0){
+		if(count($this->x_axes) === 0){
 			return;
 		}
 		foreach($this->x_axes as $a){
@@ -220,7 +220,7 @@ class ChartBlock extends Block {
 	protected function getYAxisOutput(){
 		$ret = [];
 		$cnt = 0;
-		if($this->y_axes->count() === 0){
+		if(count($this->y_axes) === 0){
 			return;
 		}
 
@@ -241,10 +241,10 @@ class ChartBlock extends Block {
 	public function getOutputData(){//$cnt_datapoints){
 		$ret = parent::getOutputData();
 		$ret['chart_type'] = $this->chart_type;
-		if($this->x_axes->count() > 0){
+		if(count($this->x_axes) > 0){
 			$ret['arr_axes']['x'] = $this->getXAxisOutput();
 		}
-		if($this->y_axes->count() > 0){
+		if(count($this->y_axes) > 0){
 			$ret['arr_axes']['y'] = $this->getYAxisOutput();
 		}
 		if(isset($this->series) && !empty($this->series)){
@@ -317,7 +317,7 @@ class ChartBlock extends Block {
 			}
 		}
 		if(empty($series)){
-			return $this->report_fields->count();
+			return count($this->report_fields);
 		}
 		return count($series);
 	}
@@ -334,7 +334,7 @@ class ChartBlock extends Block {
 	protected function deriveSeries(){
 		$return_val = [];
 		$cat_cnt_divisor = count($this->categories) === 0 ? 1 : count($this->categories);
-		$field_cnt = (int)$this->report_fields->count() / $cat_cnt_divisor;
+		$field_cnt = (int)(count($this->report_fields) / $cat_cnt_divisor);
 
 		$c = 0;
 		foreach($this->report_fields as $f){
@@ -383,7 +383,7 @@ class ChartBlock extends Block {
 	 * */
 	public function getSelectFields(){
 		$ret = parent::getSelectFields();
-		if(isset($this->x_axes) && is_a($this->x_axes, 'SplObjectStorage')){
+		if(isset($this->x_axes) && is_array($this->x_axes)){
 			foreach($this->x_axes as $a){
 				$type = $a->dataType();
 				if(strpos($type, 'date') !== false || strpos($type, 'time') !== false){

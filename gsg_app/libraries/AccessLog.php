@@ -41,6 +41,7 @@ class AccessLog
 	 * @param string herd code
 	 * @param string most recent test date for herd
 	 * @param int user_id
+     * @param string product codes
 	 * @param int group_id
 	 * @param string format (web, pdf or csv) defaults to web
 	 * @param string sort order (NULL, ASC or DESC) defaults to NULL

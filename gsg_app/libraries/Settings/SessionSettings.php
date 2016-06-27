@@ -28,11 +28,13 @@ class SessionSettings {
 	protected $herd_code;
 		
 	/**
-	 * use a separate object for each category
+	 * page_id
+	 *
+	 * Pages are used to categorize settings
 	 * 
 	 * @var int
 	 */
-	protected $category;
+	protected $page_id;
 		
 	/**
 	 * array of settings objects
@@ -56,14 +58,24 @@ class SessionSettings {
 	 */
 	
 	
-	function __construct($user_id, $herd_code, $setting_model, $category, $session_values = NULL) {
+	function __construct($user_id, $herd_code, $setting_model, $page_id, $session_values = NULL) {
 		$this->user_id = $user_id;
 		$this->herd_code = $herd_code;
 		$this->setting_model = $setting_model;
-		$this->category = $category;
+		$this->page_id = $page_id;
 		$this->loadSettings($session_values);
 		//$this->session_values = $session_values;
 	}
+
+	public function toArray(){
+        $ret = [];
+        if(isset($this->arr_settings) && is_array($this->arr_settings) && !empty($this->arr_settings)){
+            foreach($this->arr_settings as $k=>$set){
+                $ret[$k] = $set->toArray();
+            }
+        }
+        return $ret;
+    }
 
 	/* -----------------------------------------------------------------
 	*  Returns array of setting objects for the object
@@ -125,7 +137,7 @@ class SessionSettings {
 	* -----------------------------------------------------------------
 	*/
 	protected function loadSettings(){
-		$setting_data = $this->setting_model->getSettingsByCategory($this->category, $this->user_id, $this->herd_code);
+		$setting_data = $this->setting_model->getSettingsByPage($this->page_id);
 		foreach($setting_data as $s){
 			$this->arr_settings[$s['name']] = new Setting($s, $this->setting_model);
 		}
@@ -272,7 +284,7 @@ class SessionSettings {
 				$v = implode('|', $v);
 			}
 			
-			$arr_data[] = "SELECT '" . $this->user_id . "' AS user_id, '" . $this->herd_code . "' AS herd_code, '" . $this->arr_settings[$k]->getSettingID() . "' AS setting_id, '" . $v . "' AS value";
+			$arr_data[] = "SELECT '" . $user_id . "' AS user_id, '" . $this->herd_code . "' AS herd_code, '" . $this->arr_settings[$k]->id() . "' AS setting_id, '" . $v . "' AS value";
 		}
 		$this->setting_model->mergeUserHerdSettings($arr_data);
 	}

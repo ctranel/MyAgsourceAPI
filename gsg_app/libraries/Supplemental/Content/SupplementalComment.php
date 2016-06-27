@@ -13,10 +13,10 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 *
 */
 
-class SupplementalComment// extends \SplObjectStorage
+class SupplementalComment
 {
 	/**
-	 * link href
+	 * comment
 	 * @var string
 	 **/
 	protected $comment;
@@ -47,21 +47,20 @@ class SupplementalComment// extends \SplObjectStorage
 	}
 
 	/* -----------------------------------------------------------------
-	 *  returns propertiesArray
+	 *  toArray
 
-	 *  returns propertiesArray
+	 *  returns array representation of object
 
-	 *  @since: version
 	 *  @author: ctranel
-	 *  @date: Feb 12, 2016
-	 *  @return: array of properties
+	 *  @date: 6/22/2016
+	 *  @return: array
 	 *  @throws:
 	 * -----------------------------------------------------------------*/
-	public function propertiesArray() {
-		return [
-			'comment' => $this->comment
-		];
+	public function toArray(){
+		$ret = ['comment' => $this->comment];
+		return $ret;
 	}
+
 
 	/* -----------------------------------------------------------------
 	 *  Factory function, takes a dataset and returns supplemental comment objects
@@ -77,10 +76,10 @@ class SupplementalComment// extends \SplObjectStorage
 	 *  @throws: 
 	 * -----------------------------------------------------------------*/
 	 public static function datasetToObjects($dataset) {
-		$ret = new \SplObjectStorage();
+		$ret = [];
 	 	if(isset($dataset) && is_array($dataset)){
 			foreach($dataset as $r){
-				$ret->attach(new SupplementalComment($r['comment']));
+				$ret[] = new SupplementalComment($r['comment']);
 			}
 		}
 		return $ret;

@@ -15,7 +15,7 @@ require_once(APPPATH . 'libraries/Supplemental/Content/SupplementalLinkParam.php
 *
 */
 
-class SupplementalLink //extends \SplObjectStorage
+class SupplementalLink
 {
 	/**
 	 * link id
@@ -54,8 +54,8 @@ class SupplementalLink //extends \SplObjectStorage
 	protected $a_class;
 
 	/**
-	 * collection of supplemental_link_param objects
-	 * @var SplObjectStorage
+	 * array of supplemental_link_param objects
+	 * @var SupplementalLinkParam[]
 	 **/
 	protected $params;
 
@@ -66,13 +66,13 @@ class SupplementalLink //extends \SplObjectStorage
 	 * @param: string rel
 	 * @param: string title
 	 * @param: string class
-	 * @param: SupplementalLinkParams
+	 * @param: SupplementalLinkParams[]
 	 * @return void
 	 * @author ctranel
 	 **/
-	public function __construct($site_url, $id, $href, $rel, $title, $class, \SplObjectStorage $params = null){
+	public function __construct($site_url, $id, $href, $rel, $title, $class, $params = null){
+        $this->id = $id;
 		$this->site_url = $site_url;
-		$this->id = $id;
 		$this->href = $href;
 		$this->rel = $rel;
 		$this->title = $title;
@@ -148,7 +148,7 @@ class SupplementalLink //extends \SplObjectStorage
 	 *  @since: version
 	 *  @author: ctranel
 	 *  @date: Oct 28, 2014
-	 *  @return: SplObjectStorage
+	 *  @return: array
 	 *  @throws: 
 	 * -----------------------------------------------------------------*/
 	 public function params() {
@@ -156,24 +156,32 @@ class SupplementalLink //extends \SplObjectStorage
 	}
 
 	/* -----------------------------------------------------------------
-	 *  returns propertiesArray
+	 *  toArray
 
-	 *  returns propertiesArray
+	 *  returns array representation of object
 
-	 *  @since: version
 	 *  @author: ctranel
-	 *  @date: Feb 12, 2016
-	 *  @return: array of properties
+	 *  @date: 6/22/2016
+	 *  @return: array
 	 *  @throws:
 	 * -----------------------------------------------------------------*/
-	public function propertiesArray() {
-		return [
-			'href' => $this->href,
-			'rel' => $this->rel,
-			'title' => $this->title,
-			'a_class' => $this->a_class,
-			'params' => $this->params
+	public function toArray(){
+		$ret = [
+            'site_url' => $this->site_url,
+            'href' => $this->href,
+            'rel' => $this->rel,
+            'title' => $this->title,
+            'a_class' => $this->a_class,
 		];
+		if(isset($this->params) && is_array($this->params) && !empty($this->params)){
+			$params = [];
+			foreach($this->params as $p){
+				$params[] = $p->toArray();
+			}
+			$ret['params'] = $params;
+			unset($params);
+		}
+		return $ret;
 	}
 
 	/* -----------------------------------------------------------------
@@ -233,12 +241,12 @@ class SupplementalLink //extends \SplObjectStorage
 	 *  @throws: 
 	 * -----------------------------------------------------------------*/
 	 public static function datasetToObjects($site_url, $dataset, \supplemental_model $supplemental_datasource) {
-	 	$ret = new \SplObjectStorage();
+	 	$ret = [];
 		if(isset($dataset) && is_array($dataset)){
 			foreach($dataset as $r){
 				$param_data = $supplemental_datasource->getLinkParams($r['id']);
 				$params = SupplementalLinkParam::datasetToObjects($param_data);
-				$ret->attach(new SupplementalLink(
+				$ret[] = new SupplementalLink(
 					$site_url,
 					$r['id'],
 					$r['a_href'],
@@ -246,7 +254,7 @@ class SupplementalLink //extends \SplObjectStorage
 					$r['a_title'],
 					$r['a_class'],
 					$params
-				));
+				);
 			}
 		}
 		return $ret;

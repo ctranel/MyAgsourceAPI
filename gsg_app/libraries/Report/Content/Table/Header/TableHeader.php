@@ -51,8 +51,8 @@ class TableHeader {
 	/**
 	 * columns - leafs of header structure
 	 * 
-	 * container of Report\Content\Table\TableField objects, used in cases where table is not pivoted
-	 * @var \SplObjectStorage
+	 * array of Report\Content\Table\TableField objects, used in cases where table is not pivoted
+	 * @var TableField[]
 	 **/
 	protected $columns;
 	
@@ -74,8 +74,8 @@ class TableHeader {
 	/**
 	 * rows
 	 * 
-	 * container of TableHeaderRow objects
-	 * @var \SplObjectStorage
+	 * array of TableHeaderRow objects
+	 * @var TableHeaderRow
 	protected $rows;
 	 **/
 	
@@ -99,15 +99,7 @@ class TableHeader {
 	 *  @return int
 	 **/
 	public function columnCount(){
-		/*
-		if(is_a($this->columns, 'SplObjectStorage')){
-			return $this->columns->count();
-		}
-		else{
-			return count($this->arr_columns);
-		}
-		*/
-		return $this->block->reportFields()->count();
+		return count($this->block->reportFields());
 	}
 	
 	/**
@@ -202,7 +194,7 @@ class TableHeader {
 
 		}
 		//add leaves (columns) to structure
-		if(is_a($this->columns, 'splObjectStorage')){ //used when table is not pivoted
+		if(is_array($this->columns)){ //used when table is not pivoted
 			foreach($this->columns as $f){
 				if($f->isDisplayed()){
 					$this->addLeaf($this->header_group_fields, $f->headerGroupId(), ['children' => ['id' => null, 'parent_id' => $f->headerGroupId(), 'db_field_name' => $f->dbFieldName(), 'text' => $f->displayName(), 'pdf_width' => $f->pdfWidth(), 'is_sortable' => $f->isSortable(), 'is_displayed' => $f->isDisplayed(), 'default_sort_order' => $f->defaultSortOrder(), 'supplemental' => $f->headerSupplemental()]]);

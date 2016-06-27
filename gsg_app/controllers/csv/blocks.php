@@ -32,11 +32,9 @@ use \myagsource\Site\WebContent\Sections;
 use \myagsource\Site\WebContent\Pages;
 use \myagsource\Site\WebContent\Blocks as WebBlocks;
 use \myagsource\Report\Content\Blocks as ReportBlocks;
-use \myagsource\Report\Content\Table\Header\TableHeader;
 use \myagsource\Datasource\DbObjects\DbTable;
 use \myagsource\Report\Content\SortBuilder;
 use \myagsource\DataHandler;
-use \myagsource\Report\Content\Table\TableData;
 use \myagsource\Report\Content\Csv;
 use \myagsource\AccessLog;
 
@@ -173,23 +171,24 @@ class Blocks extends MY_Controller {
 		if(!$has_herd_access){
 			$this->redirect(site_url('dhi/change_herd/select'),"You do not have permission to access this herd.  Please select another herd and try again.  ");
 		}
-		
-		// report content
+
+        //set up web content objects
+        $this->load->model('web_content/section_model');
+        $this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
+        $this->load->model('web_content/block_model', 'WebBlockModel');
+        $web_blocks = new WebBlocks($this->WebBlockModel);
+        $form_factory = null;//new FormFactory($this->setting_model, $this->supplemental_factory);
+        $this->pages = new Pages($this->page_model, $web_blocks, $form_factory);
+        $this->sections = new Sections($this->section_model, $this->pages);
+
+        // report content
 		$this->load->model('supplemental_model');
 		$this->load->model('ReportContent/report_block_model');
 		$this->load->model('Datasource/db_field_model');
 //use supp factory in CSV?
 		$this->supp_factory = null;//new SupplementalFactory($this->supplemental_model, site_url());
-		$this->blocks = new ReportBlocks($this->report_block_model, $this->db_field_model, $this->supp_factory);
+		$this->blocks = new ReportBlocks($this->report_block_model, $this->db_field_model, $this->supp_factory, $web_blocks);
 
-		//set up web content objects
-		$this->load->model('web_content/section_model');
-		$this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
-		$this->load->model('web_content/block_model', 'WebBlockModel');
-		$web_blocks = new WebBlocks($this->WebBlockModel);
-		$this->pages = new Pages($this->page_model, $web_blocks);
-		$this->sections = new Sections($this->section_model, $this->pages);
-		
 				/* Load the profile.php config file if it exists
 		if (ENVIRONMENT == 'development' || ENVIRONMENT == 'localhost') {
 			$this->config->load('profiler', false, true);
@@ -239,47 +238,46 @@ class Blocks extends MY_Controller {
 		//prep data for filter library
 		$this->load->model('filter_model');
 		//load required libraries
-		$filters = new Filters($this->filter_model);
-		if(isset($json_filter_data)){
-			$arr_params = (array)json_decode(urldecode($json_filter_data));
-			/* @todo: backend csrf was blocking CORS, so we need to turn it off for development
-			if(isset($arr_params['csrf_test_name']) && $arr_params['csrf_test_name'] != $this->security->get_csrf_hash()){
-				die("I don't recognize your browser session, your session may have expired, or you may have cookies turned off.");
-			} */
-			unset($arr_params['csrf_test_name']);
+		$arr_params = [];
 		
-			$this->load->helper('multid_array_helper');
-			$filters->setCriteria(
-					$this->section->id(),
-					$path_page_segment,
-					['herd_code' => $this->session->userdata('herd_code')] + $arr_params
-			);
+		if(isset($json_filter_data)) {
+            $arr_params = (array)json_decode(urldecode($json_filter_data));
+            /* @todo: backend csrf was blocking CORS, so we need to turn it off for development
+             * if(isset($arr_params['csrf_test_name']) && $arr_params['csrf_test_name'] != $this->security->get_csrf_hash()){
+             * die("I don't recognize your browser session, your session may have expired, or you may have cookies turned off.");
+             * } */
+            unset($arr_params['csrf_test_name']);
+        }
 
-			/*
-			 * If this is a cow level block, and the filter is set to 0 (pstring), remove filter
-			 * Needed for reports that contain both cow level and summary reports.
-			*/
-			foreach($arr_params as $k => $v){
-				if(!$this->block->isSummary()){
-					if(is_array($v)){
-						$tmp = array_filter($arr_params[$k], function($v){
-							return (!empty($v) || $v === 0 || $v === '0');
-						});
-						if(empty($tmp)){
-							$filters->removeCriteria($k);
-						}
-					}
-					elseif(empty($v) && ($v !== 0 || $k === 'pstring')){
-						$filters->removeCriteria($k);
-					}
-				}
-			}
-		}
+        $filters = new Filters($this->filter_model, $this->page->id(), ['herd_code' => $this->session->userdata('herd_code')] + $arr_params);
+        $this->load->helper('multid_array_helper');
+        $filters->setCriteria();
+
+        /*
+         * If this is a cow level block, and the filter is set to 0 (pstring), remove filter
+         * Needed for reports that contain both cow level and summary reports.
+        */
+        foreach($arr_params as $k => $v){
+            if(!$this->block->isSummary()){
+                if(is_array($v)){
+                    $tmp = array_filter($arr_params[$k], function($v){
+                        return (!empty($v) || $v === 0 || $v === '0');
+                    });
+                    if(empty($tmp)){
+                        $filters->removeCriteria($k);
+                    }
+                }
+                elseif(empty($v) && ($v !== 0 || $k === 'pstring')){
+                    $filters->removeCriteria($k);
+                }
+            }
+        }
+
 		$this->block->setFilters($filters);
 		//END FILTERS
 		
 		// benchmarks
-		$this->load->model('setting_model');
+		$this->load->model('setting_model', null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
 		$herd_info = $this->herd_model->header_info($this->herd->herdCode());
 		$this->load->model('benchmark_model');
 		$this->benchmarks = new Benchmarks($this->session->userdata('user_id'), $this->input->post('herd_code'), $herd_info, $this->setting_model, $this->benchmark_model, $this->session->userdata('benchmarks'));

@@ -1,10 +1,10 @@
 <?php
 namespace myagsource\Site\WebContent;
 
-require_once APPPATH . 'libraries/Site/iWebContent.php';
+require_once APPPATH . 'libraries/Site/iBlock.php';
 //require_once APPPATH . 'libraries/Site/iWebContentRepository.php';
 
-use myagsource\Site\iWebContent;
+use myagsource\Site\iBlock;
 use myagsource\Site\iWebContentRepository;
 use myagsource\dhi\Herd;
 /**
@@ -18,7 +18,7 @@ use myagsource\dhi\Herd;
 *
 */
 
-class Block implements iWebContent {
+class Block implements iBlock {
 	/**
 	 * block id
 	 * @var int
@@ -122,13 +122,29 @@ class Block implements iWebContent {
 		return $this->has_benchmark;
 	}
 
+	public function toArray(){
+        $ret = [
+            'page_id' => $this->page_id,
+            'name' => $this->name,
+            'description' => $this->description,
+            'display_type' => $this->display_type,
+            'path' => $this->path,
+            'has_benchmark' => $this->has_benchmark
+        ];
+        return $ret;
+	}
+
+	public function toJson(){
+		return json_encode($this->toArray());
+	}
+
 	/**
 	 * @method loadChildren()
-	 * @param \SplObjectStorage children
+	 * @param iWebContent[]
 	 * @return void
 	 * @access public
 	* */
-	public function loadChildren(\SplObjectStorage $children){
+	public function loadChildren($children){
 		$this->children = $children;
 	}
 	

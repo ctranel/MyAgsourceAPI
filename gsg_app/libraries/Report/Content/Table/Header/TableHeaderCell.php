@@ -103,7 +103,7 @@ class TableHeaderCell {
 	/**
 	 * children
 	 *
-	 * @var \SplObjectStorage of TableHeaderCell objects
+	 * @var TableHeaderCell[]
 	 **/
 	protected $children;
 	
@@ -171,7 +171,7 @@ class TableHeaderCell {
 	}
 	
 	public function hasChildren(){
-		return (bool)$this->children->count() > 0;
+		return (bool)(count($this->children) > 0);
 	}
 
 	/**
@@ -270,6 +270,6 @@ class TableHeaderCell {
 	 *  @return int
 	 **/
 	public function addChild($child){ //sort? href, title, rel?
-		$this->children->attach($child);
+		$this->children[] = $child;
 	}
 }

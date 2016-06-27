@@ -31,13 +31,13 @@ class WhereGroup implements iWhereGroup {
 	
 	/**
 	 * criteria
-	 * @var \SplObjectStorage of WhereCriteria objects
+	 * @var array of WhereCriteria objects
 	 **/
 	protected $criteria;
 	
 	/**
 	 * child_groups
-	 * @var \SplObjectStorage of WhereGroup objects
+	 * @var array of WhereGroup objects
 	 * @todo: implement this fully for nesting groups
 	 **/
 	protected $child_groups;
@@ -57,8 +57,8 @@ class WhereGroup implements iWhereGroup {
 	*  @throws: 
 	* -----------------------------------------------------------------
 	\*/
-	public function __construct($operator, \SplObjectStorage $criteria = null, \SplObjectStorage $child_groups = null) {
-		if(!is_a($criteria, 'SplObjectStorage') && !is_a($child_groups, 'SplObjectStorage')){
+	public function __construct($operator, $criteria = null, $child_groups = null) {
+		if(!is_array($criteria) && !is_array($child_groups)){
 			throw new \InvalidArgumentException('Either criteria or child group is required to initialize WhereGroup');
 		}
 		$this->operator = $operator;
@@ -86,14 +86,14 @@ class WhereGroup implements iWhereGroup {
 	public function criteria(){
 		$ret = ['operator' => $this->operator, 'criteria' => []];
 		//compose array of criteria
-		if(is_a($this->criteria, 'SplObjectStorage')){
+		if(is_array($this->criteria)){
 			foreach($this->criteria as $c){
 				$ret['criteria'][] = $c->criteria();
 			}
 		}
 		
 		//add child groups to criteria
-		if(is_a($this->child_groups, 'SplObjectStorage')){
+		if(is_array($this->child_groups)){
 			foreach($this->child_groups as $cg){
 				$ret['criteria'][] = $this->cg->criteria();
 			}

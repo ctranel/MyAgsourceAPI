@@ -14,7 +14,7 @@ namespace myagsource\Report;
 interface iWhereGroup {
 	/**
 	 */
-	function __construct($operator, \SplObjectStorage $criteria = null, \SplObjectStorage $child_groups = null);
+	function __construct($operator, $criteria = null, $child_groups = null);
 //	function operator();
 	function criteria();
 //	function criteriaArray();

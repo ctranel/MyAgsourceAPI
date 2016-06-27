@@ -11,7 +11,7 @@ interface iSupplemental {
 	function supplementalLinks();
 	function supplementalComments();
 	function getContent();
-	function getProperties();
+	function toArray();
 }
 
 ?>

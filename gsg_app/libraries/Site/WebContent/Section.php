@@ -87,14 +87,14 @@ class Section implements iWebContent
 	protected $default_page_path;
 	
 	/**
-	 * collection of iWebContent objects
-	 * @var SplObjectStorage
+	 * array of iWebContent objects
+	 * @var iWebContent[]
 	 **/
 	protected $children;
 	
 	/**
-	 * collection of iWebContent objects that are the leafs of the navigation tree
-	 * @var SplObjectStorage
+	 * array of iWebContent objects that are the leafs of the navigation tree
+	 * @var iWebContent[]
 	 **/
 	protected $pages;
 	
@@ -141,21 +141,21 @@ class Section implements iWebContent
 	
 	/**
 	 * @method loadChildren()
-	 * @param \SplObjectStorage children
+	 * @param iWebContent[]
 	 * @return void
 	 * @access public
 	* */
-	public function loadChildren(\SplObjectStorage $children){
+	public function loadChildren($children){
 		$this->children = $children;
 	}
 	
 	/**
 	 * @method loadPages()
-	 * @param \SplObjectStorage pages
+	 * @param pages[]
 	 * @return void
 	 * @access public
 	 * */
-	public function loadPages(\SplObjectStorage $pages){
+	public function loadPages($pages){
 		$this->pages = $pages;
 	}
 }

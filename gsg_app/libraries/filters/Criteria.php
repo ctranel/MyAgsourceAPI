@@ -14,7 +14,7 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 * Requirements: PHP5 or above
 *
 */
-
+//@todo: extends FormControl
 class Criteria{
 	private $type;
 	private $field_name;

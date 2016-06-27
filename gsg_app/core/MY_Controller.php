@@ -53,8 +53,8 @@ class MY_Controller extends CI_Controller
         $this->load->helper('html');
         $this->load->helper('error');
         $this->herd_access = new HerdAccess($this->herd_model);
-        $blocks = new Blocks($this->block_model);
-        $pages = new Pages($this->page_model, $blocks);
+        //$blocks = new Blocks($this->block_model);
+        //$pages = new Pages($this->page_model, $blocks);
         //$sections = new Sections($this->section_model, $pages);
         $herd = new Herd($this->herd_model, $this->session->userdata('herd_code'));
 

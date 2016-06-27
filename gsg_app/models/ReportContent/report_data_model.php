@@ -1,15 +1,10 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-require_once(APPPATH . 'libraries/Supplemental/Content/SupplementalFactory.php');
-require_once(APPPATH . 'libraries/Site/WebContent/Sections.php');
-require_once(APPPATH . 'libraries/Site/WebContent/Pages.php');
-require_once(APPPATH . 'libraries/Site/WebContent/Blocks.php');
+//require_once(APPPATH . 'libraries/Supplemental/Content/SupplementalFactory.php');
+//require_once(APPPATH . 'libraries/Site/WebContent/Sections.php');
+//require_once(APPPATH . 'libraries/Site/WebContent/Pages.php');
+//require_once(APPPATH . 'libraries/Site/WebContent/Blocks.php');
 
-use \myagsource\Supplemental\Content\SupplementalFactory;
-use \myagsource\Site\WebContent\Sections;
-use \myagsource\Site\WebContent\Pages;
-use \myagsource\Site\WebContent\Blocks as WebBlocks;
-use \myagsource\Report\Content\Block;
 use \myagsource\Report\iBlock;
 
 /* -----------------------------------------------------------------
@@ -205,7 +200,7 @@ class Report_data_model extends CI_Model {
 	 * @param array sort order--corresponds to first parameter
 	 * @author ctranel
 	 */
-	protected function prep_sort(Block $block){
+	protected function prep_sort(iBlock $block){
 		$sort_array = $block->getSortArray();
 		foreach($sort_array as $f => $o) {
 			$sort_order = (strtoupper($o) === 'DESC') ? 'DESC' : 'ASC';

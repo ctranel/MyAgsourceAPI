@@ -23,27 +23,60 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 */
 
 class Filters{
+    /**
+     * source for filter data
+     * @var filter_model
+     **/
 	private $filter_model; //model object
-	private $arr_criteria; //array of criteria objects
+
+    /**
+     * Array of criteria objects
+     * @var Criteria[]
+     **/
+	private $arr_criteria;
+
+    /**
+     * Associative array of criteria key=>value
+     * @var array
+     **/
 	private $arr_criteria_key_value;
+
+    /**
+     * text describing filters
+     * @var string
+     **/
 	private $log_filter_text;
+
+    /**
+     * page_id
+     * @var int
+     **/
+    protected $page_id;
+
+    /**
+     * associative array of form data
+     * @var array
+     **/
+    protected $form_data;
 	
-	public function __construct(\Filter_model $filter_model){
+	public function __construct(\Filter_model $filter_model, $page_id, $form_data = null){
 		$this->filter_model = $filter_model;
+		$this->page_id = $page_id;
+        $this->form_data = $form_data;
 	}
-	
-	/* -----------------------------------------------------------------
-	*  Returns filter text
 
-	*  Returns filter text
+    /* -----------------------------------------------------------------
+    *  Returns filter text
 
-	*  @since: version 1
-	*  @author: ctranel
-	*  @date: Jun 17, 2014
-	*  @return: string filter text
-	*  @throws: 
-	* -----------------------------------------------------------------
-	*/
+    *  Returns filter text
+
+    *  @since: version 1
+    *  @author: ctranel
+    *  @date: Jun 17, 2014
+    *  @return: string filter text
+    *  @throws:
+    * -----------------------------------------------------------------
+    */
 	public function get_filter_text(){
 		if(empty($this->log_filter_text)){
 			$this->set_filter_text();
@@ -84,17 +117,15 @@ class Filters{
 
 	*  @author: ctranel
 	*  @date: Jun 17, 2014
-	*  @param: array page-level filters
-	*  @param: $arr_params key=>value pairs either hard-coded or from form submission
 	*  @return void
 	*  @throws: 
 	* -----------------------------------------------------------------
 	*/
-	public function setCriteria($sect_id, $page_path, $arr_form_data = null){
+	public function setCriteria(){//$page_id, $arr_form_data = null
 		//get filters from DB for the current page, set other vars
-		$arr_page_filter_data = $this->filter_model->get_page_filters($sect_id, $page_path);
+		$page_filter_data = $this->filter_model->getPageFilters($this->page_id);
 		//set default criteria as base
-		$this->setFilterCriteria($arr_page_filter_data, $arr_form_data);
+		$this->setFilterCriteria($page_filter_data, $this->form_data);
 	}
 
 	/* -----------------------------------------------------------------
@@ -289,9 +320,9 @@ class Filters{
 	*/
 	public function toArray(){
 		if(!isset($this->arr_criteria)){
-			return false;
+			return [];
 		}
-		$arr_return = array();
+		$arr_return = [];
 		foreach($this->arr_criteria as $k=>$c){
 			$arr_return[$k] = $c->toArray();
 		}

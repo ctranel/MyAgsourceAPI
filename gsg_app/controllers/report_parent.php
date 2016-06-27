@@ -10,6 +10,7 @@ require_once(APPPATH . 'libraries/dhi/Herd.php');
 require_once(APPPATH . 'libraries/Site/WebContent/Sections.php');
 require_once(APPPATH . 'libraries/Site/WebContent/Pages.php');
 require_once(APPPATH . 'libraries/Site/WebContent/Blocks.php');
+require_once(APPPATH . 'libraries/Form/Content/FormFactory.php');
 require_once(APPPATH . 'libraries/Site/WebContent/PageAccess.php');
 require_once(APPPATH . 'libraries/Report/Content/Csv.php');
 //require_once(APPPATH . 'libraries/Report/Content/Pdf.php');
@@ -25,6 +26,7 @@ use \myagsource\dhi\Herd;
 use \myagsource\Site\WebContent\Sections;
 use \myagsource\Site\WebContent\Pages;
 use \myagsource\Site\WebContent\Blocks;
+use \myagsource\Form\Content\FormFactory;
 use \myagsource\Site\WebContent\Block as PageBlock;
 use \myagsource\Site\WebContent\PageAccess;
 use \myagsource\Report\Content\Csv;
@@ -97,7 +99,15 @@ abstract class report_parent extends MY_Controller {
 	 * @var blocks
 	 **/
 	protected $blocks;
-	
+
+	/**
+	 * form_factory
+	 *
+	 * Form Factory
+	 * @var FormFactory
+	 **/
+	protected $form_factory;
+
 	/**
 	 * herd
 	 * 
@@ -124,7 +134,8 @@ abstract class report_parent extends MY_Controller {
 	protected $print_all = FALSE;
 	protected $bool_is_summary;
 	protected $supplemental;
-	
+    protected $supplemental_factory;
+
 	function __construct(){
 		parent::__construct();
 		
@@ -157,8 +168,14 @@ abstract class report_parent extends MY_Controller {
 		$this->load->model('web_content/section_model');
 		$this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
 		$this->load->model('web_content/block_model');
+        $this->load->model('setting_model', null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
 		$this->blocks = new Blocks($this->block_model);
-		$this->pages = new Pages($this->page_model, $this->blocks);
+        //supplemental factory
+        $this->load->model('supplemental_model');
+        $this->supplemental_factory = new SupplementalFactory($this->supplemental_model, site_url());
+
+		$this->form_factory = new FormFactory($this->setting_model, $this->supplemental_factory);
+		$this->pages = new Pages($this->page_model, $this->blocks, $this->form_factory);
 		$sections = new Sections($this->section_model, $this->pages);
 		
 		$class_dir = $this->router->fetch_directory(); //this should match the name of this file (minus ".php".  Also used as base for css and js file names and model directory name
@@ -246,9 +263,9 @@ abstract class report_parent extends MY_Controller {
 		//Determine if any report blocks have is_summary flag - will determine if pstring needs to be loaded and filters shown
 		//@todo make pstring 0 work on both cow and summary reports simultaneously
 		$this->load->model('filter_model');
-		$this->filters = new Filters($this->filter_model);
+		$this->filters = new Filters($this->filter_model, $this->page->id(), ['herd_code' =>	$this->herd->herdCode()]);
 		//only use default criteria on initial page loads, when filter form is submitted, it reloads each individual block
-		$this->filters->setCriteria($this->section->id(), $this->page->path(), ['herd_code' =>	$this->herd->herdCode()]); //filter form submissions never trigger a new page load (i.e., this function is never fired by a form submission)
+		$this->filters->setCriteria(); //filter form submissions never trigger a new page load (i.e., this function is never fired by a form submission)
 		//END FILTERS
 /*
 		if ($display_format == 'pdf' && !is_null($arr_block_in)) {
@@ -463,7 +480,7 @@ abstract class report_parent extends MY_Controller {
 		$data['page_supplemental'] = $page_supp->getContent();
 
         if($this->permissions->hasPermission("Set Benchmarks")){
-            $this->load->model('setting_model');
+            $this->load->model('setting_model', null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
             $this->load->model('benchmark_model');
 
             $this->benchmarks = new Benchmarks($this->session->userdata('user_id'), $this->input->post('herd_code'), $this->herd_model->header_info($this->herd->herdCode()), $this->setting_model, $this->benchmark_model, $this->session->userdata('benchmarks'));

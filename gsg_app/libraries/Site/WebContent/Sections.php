@@ -70,7 +70,7 @@ class Sections implements iWebContentRepository {
 		if(isset($tmp)){
 			return;
 		}
-		$children = new \SplObjectStorage();
+		$children = [];
 		$tmp_array = [];
 
 		//Get Subsections
@@ -103,34 +103,20 @@ class Sections implements iWebContentRepository {
 		
 		if(is_array($tmp_array) && !empty($tmp_array)){
 			foreach($tmp_array as $k => $v){
-				$children->attach(new Section($v['id'], $v['parent_id'], $v['name'], $v['description'], $v['scope'], $v['active'], $v['path'], $v['default_page_path']));
+				$children[] = new Section($v['id'], $v['parent_id'], $v['name'], $v['description'], $v['scope'], $v['active'], $v['path'], $v['default_page_path']);
 			}
 		}
 		
-		if($children->count() > 0){
+		if(count($children) > 0){
 			$section->loadChildren($children);
 		}
 		
 		//Load child pages
 		$splPages = $pages->getBySection($section->id());
-		if(is_a($splPages, 'SplObjectStorage')){
+		if(is_array($splPages)){
 			$section->loadPages($splPages);
 		}
 	}
-	
-	/*
-	 * @returns SplObjectStorage
-	public function getByParent($parent_id){
-		$criteria = ['parent_id' => $parent_id];
-		$results = $this->datasource->getByCriteria($criteria);
-		
-		$ret = new \SplObjectStorage();
-		foreach($results as $r){
-			$ret->attach(new Section($r['id'], $r['parent_id'], $r['name'], $r['description'], $r['scope'], $r['active'], $r['path'], $r['default_page_path']));
-		}
-		return $ret;
-	}
-	 */
 }
 
 ?>

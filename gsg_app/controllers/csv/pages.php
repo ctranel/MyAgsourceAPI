@@ -151,9 +151,9 @@ class blocks extends MY_Controller {
 		//Determine if any report blocks have is_summary flag - will determine if pstring needs to be loaded and filters shown
 		//@todo make pstring 0 work on both cow and summary reports simultaneously
 		$this->load->model('filter_model');
-		$this->filters = new Filters($this->filter_model);
+		$this->filters = new Filters($this->filter_model, $this->page->id(), ['herd_code' =>	$this->herd->herdCode()]);
 		//only use default criteria on initial page loads, when filter form is submitted, it reloads each individual block
-		$this->filters->setCriteria($this->section->id(), $this->page->path(), ['herd_code' =>	$this->herd->herdCode()]); //filter form submissions never trigger a new page load (i.e., this function is never fired by a form submission)
+		$this->filters->setCriteria(); //filter form submissions never trigger a new page load (i.e., this function is never fired by a form submission)
 		//END FILTERS
 		$csv = new Csv();
 		$data = array();

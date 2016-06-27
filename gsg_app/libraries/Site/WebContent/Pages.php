@@ -6,6 +6,7 @@ require_once(APPPATH . 'libraries/Site/iWebContentRepository.php');
 require_once(APPPATH . 'libraries/Site/iWebContent.php');
 require_once(APPPATH . 'libraries/dhi/Herd.php');
 
+use \myagsource\Form\Content\FormFactory;
 use \myagsource\Site\iWebContentRepository;
 use \myagsource\Site\iWebContent;
 use \myagsource\Site\WebContent\Page;
@@ -31,10 +32,18 @@ class Pages implements iWebContentRepository {
 	 * $blocks
 	 * @var Blocks
 	 **/
-	protected $Blocks;
+	protected $block_factory;
 
-	function __construct(\Page_model $datasource_pages, Blocks $blocks) {
+	/**
+	 * $blocks
+	 * @var FormFactory
+	 **/
+	protected $form_factory;
+
+	function __construct(\Page_model $datasource_pages, Blocks $block_factory, FormFactory $form_factory) {
 		$this->datasource_pages = $datasource_pages;
+		$this->block_factory = $block_factory;
+		$this->form_factory = $form_factory;
 	}
 	
 	/*
@@ -53,7 +62,7 @@ class Pages implements iWebContentRepository {
 		if(empty($results)){
 			return false;
 		}
-		return new Page($results[0]['id'], $results[0]['section_id'], $results[0]['name'], $results[0]['description'], $results[0]['scope'], $results[0]['active'], $results[0]['path']);
+		return new Page($results[0], $this->block_factory, $this->form_factory);
 	}
 
 	/*
@@ -64,7 +73,7 @@ class Pages implements iWebContentRepository {
 	 * @returns Page
 	 */
 	public function getBySection($section_id){
-		$pages = new \SplObjectStorage();
+		$pages = [];
 		$criteria = ['section_id' => $section_id];
 		$results = $this->datasource_pages->getByCriteria($criteria);
 		
@@ -72,7 +81,8 @@ class Pages implements iWebContentRepository {
 			return false;
 		}
 		foreach($results as $k => $v){
-			$pages->attach(new Page($v['id'], $v['section_id'], $v['name'], $v['description'], $v['scope'], $v['active'], $v['path']));
+//var_dump($this->block_factory);
+			$pages[] = new Page($v, $this->block_factory, $this->form_factory);
 		}
 		return $pages;
 	}

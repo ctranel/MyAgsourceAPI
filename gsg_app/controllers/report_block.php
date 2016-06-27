@@ -28,7 +28,7 @@ use \myagsource\dhi\Herd;
 use \myagsource\Site\WebContent\Sections;
 use \myagsource\Site\WebContent\Pages;
 use \myagsource\Site\WebContent\Blocks as WebBlocks;
-use \myagsource\Report\Content\Blocks;
+use \myagsource\Report\Content\Blocks as ReportBlocks;
 use \myagsource\Report\Content\Chart\ChartData;
 use \myagsource\Report\Content\Table\Header\TableHeader;
 use \myagsource\Datasource\DbObjects\DbTable;
@@ -173,14 +173,7 @@ class report_block extends MY_Controller {
 		if(!$has_herd_access){
 			$this->post_message("You do not have permission to access this herd.  Please select another herd and try again.  ");
 		}
-		
-				
-		// report content
-		$this->load->model('supplemental_model');
-		$this->load->model('ReportContent/report_block_model');
-		$this->load->model('Datasource/db_field_model');
-		$this->supp_factory = new SupplementalFactory($this->supplemental_model, site_url());
-		$this->blocks = new Blocks($this->report_block_model, $this->db_field_model, $this->supp_factory);
+
 
 		//set up web content objects
 		$this->load->model('web_content/section_model');
@@ -189,7 +182,14 @@ class report_block extends MY_Controller {
 		$web_blocks = new WebBlocks($this->WebBlockModel);
 		$this->pages = new Pages($this->page_model, $web_blocks);
 		$this->sections = new Sections($this->section_model, $this->pages);
-		
+
+		// report content
+		$this->load->model('supplemental_model');
+		$this->load->model('ReportContent/report_block_model');
+		$this->load->model('Datasource/db_field_model');
+		$this->supp_factory = new SupplementalFactory($this->supplemental_model, site_url());
+		$this->blocks = new ReportBlocks($this->report_block_model, $this->db_field_model, $this->supp_factory, $web_blocks);
+
 		/* Load the profile.php config file if it exists
 		if (ENVIRONMENT == 'development' || ENVIRONMENT == 'localhost') {
 			$this->config->load('profiler', false, true);
@@ -260,13 +260,9 @@ class report_block extends MY_Controller {
 			//prep data for filter library
 			$this->load->model('filter_model');
 			//load required libraries
-			$filters = new Filters($this->filter_model);
+			$filters = new Filters($this->filter_model, $this->page->id(), ['herd_code' => $this->session->userdata('herd_code')] + $arr_params);
 			$this->load->helper('multid_array_helper');
-			$filters->setCriteria(
-					$section->id(),
-					$path_page_segment,
-					['herd_code' => $this->session->userdata('herd_code')] + $arr_params
-			);
+			$filters->setCriteria();
 
             /*
              * myagsource special case: if PAGE filters or params contain only a pstring of 0, and the block is not a summary
@@ -308,7 +304,7 @@ class report_block extends MY_Controller {
 		//end supplemental
 
 		// benchmarks
-		$this->load->model('setting_model');
+		$this->load->model('setting_model', null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
 		$herd_info = $this->herd_model->header_info($this->herd->herdCode());
 		$this->load->model('benchmark_model');
 		$this->benchmarks = new Benchmarks($this->session->userdata('user_id'), $this->input->post('herd_code'), $herd_info, $this->setting_model, $this->benchmark_model, $this->session->userdata('benchmarks'));

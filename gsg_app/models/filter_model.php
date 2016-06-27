@@ -14,16 +14,18 @@
 
 class Filter_model extends CI_Model {
 	/**
-	 * get_page_filters
+	 * getPageFilters
+	 * 
+	 * @param int page id
 	 * @return array of filter data for given page
 	 * @author ctranel
 	 **/
-	public function get_page_filters($section_id, $page_path) {
+	public function getPageFilters($page_id) {
 		$ret_array = array();
 		$results = $this->db
 		->select('pf.name, pf.type, pf.options_source, pf.options_filter_form_field_name, pf.default_value, df.db_field_name, pf.user_editable')
-		->where('p.section_id', $section_id)
-		->where('p.path', $page_path)
+		//->where('p.section_id', $section_id)
+		->where('p.id', $page_id)
 		->join('users.dbo.pages p', "pf.page_id = p.id", "inner")
 		->join('users.dbo.db_fields df', "pf.field_id = df.id", 'left')
 		->order_by('pf.list_order')

@@ -227,7 +227,7 @@ class Products implements iProducts{
 
     /**
      * @method datasetToObjectStorage()
-     * @return \SplObjectStorage of Product objects
+     * @return Product[]
      * @access protected
      **/
     protected function datasetToObjects($dataset){

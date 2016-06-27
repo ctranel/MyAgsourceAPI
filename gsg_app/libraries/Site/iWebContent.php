@@ -8,12 +8,11 @@ namespace myagsource\Site;
  *        
  */
 interface iWebContent {
-//	public function childKeyValuePairs();
 	public function id();
 	public function path();
 	public function name();
 	public function children();
-	public function loadChildren(\SplObjectStorage $children);
+	public function loadChildren($children);
 }
 
 ?>
