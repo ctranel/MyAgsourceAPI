@@ -101,7 +101,42 @@ class TableHeader {
 	public function columnCount(){
 		return count($this->block->reportFields());
 	}
-	
+
+	/**
+	 * toArray
+	 *
+	 * @return array representation of object
+	 *
+     **/
+	public function toArray(){
+        $ret = [];
+ //var_dump($this->header_structure);
+        foreach($this->header_structure as $k => $h){
+            if(is_array($h)){
+                $ret[$k] = $this->arrayConversion($h);
+            }
+
+            if(is_object($h)){
+                $ret[$k] = $h->toArray();
+            }
+        }
+
+        return $ret;
+	}
+
+    protected function arrayConversion($array){
+        foreach($array as $k => $h){
+            if(is_array($h)){
+                $ret[$k] = arrayConversion($h);
+            }
+
+            if(is_object($h)){
+                $ret[$k] = $h->toArray();
+            }
+        }
+        return $ret;
+    }
+
 	/**
 	 *  @method: get_table_header_array() takes array of data structure and returns and array of menu data including text,
 	 * 		colspan, rowspan and level (to be used to create class names in view) *
@@ -120,7 +155,7 @@ class TableHeader {
 		$depth = 0;
 		$rowspan = 1;
 		$this->setTableHeaderGroups();
-		
+
 		$tot_levels = array_depth($this->header_group_fields);
 		$this->getHeaderLayer($this->header_group_fields, $depth, $rowspan, $tot_levels, []);
 		ksort($this->header_structure);
@@ -135,22 +170,7 @@ class TableHeader {
 	 *  @access public
 	 **/
 	public function getHeaderLeafs($alt_header = null){
-		//pivoted tables will generate their own header
-		if($this->block->hasPivot()){
-			$this->arr_columns = $alt_header;
-		}
-		else{
-			$this->columns = $this->block->reportFields();
-		}
-		
-		$depth = 0;
-		$rowspan = 1;
-		$this->setTableHeaderGroups();
-		
-		$tot_levels = array_depth($this->header_group_fields);
-		$this->getHeaderLayer($this->header_group_fields, $depth, $rowspan, $tot_levels, []);
-		ksort($this->header_structure);
-
+		$this->getTableHeaderStructure($alt_header);
 		$result = [];
 		
 		array_walk_recursive(
@@ -171,7 +191,6 @@ class TableHeader {
 	 * @return void
 	 * @author ctranel
 	 * 
-	 * @todo: pass objects instead of arrays in objects
 	 **/
 	protected function setTableHeaderGroups(){
 		if(is_array($this->header_groups) && !empty($this->header_groups)){
@@ -379,21 +398,19 @@ class TableHeader {
 	 * @author ctranel
 	 */
 	public static function mergeDateIntoHeader($header_groups, $dates){
-		if(isset($header_groups) && is_array($header_groups)){
+		if(isset($header_groups) && is_array($header_groups) && isset($dates) && is_array($dates)){
 			foreach($header_groups as $hk => $hv){
 				$c = 0;
-				if(isset($dates) && is_array($dates)){
-					foreach($dates[0] as $key => $value){
-						if ($key == $hv['text']) {
-							if ($value == '0-0') {
-								$value='No Test (-'.$c.')';
-							}
-							$header_groups[$hk]['text'] = $value;
-							break;
-						}
-						$c++;
-					}
-				}
+                foreach($dates[0] as $key => $value){
+                    if ($key == $hv['text']) {
+                        if ($value == '0-0') {
+                            $value='No Test (-'.$c.')';
+                        }
+                        $header_groups[$hk]['text'] = $value;
+                        break;
+                    }
+                    $c++;
+                }
 			}
 		}
 		return $header_groups;

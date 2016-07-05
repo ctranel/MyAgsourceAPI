@@ -67,6 +67,28 @@ class YAxis {
 			'text' => $this->label_text,
 		];
 	}
+
+	/**
+	 * @method toArray
+	 * @return array of output data for block
+	 * @access public
+	 *
+	 **/
+	public function toArray(){
+		$ret = [
+			'min' => $this->min,
+            'max' => $this->max,
+			'opposite' => $this->opposite,
+			//'data_type' => $this->data_type,
+			'label_text' => $this->label_text,
+		];
+
+		if($this->datafield instanceof iDataField){
+			$ret['datafield'] = $this->datafield->toArray();
+		}
+
+		return $ret;
+	}
 }
 
 ?>

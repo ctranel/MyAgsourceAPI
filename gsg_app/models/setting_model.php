@@ -6,8 +6,8 @@
  *  @author: kmarshall
  *  @date: Nov 19, 2013
  *
- *  @description: Model for Filters -
- *  Accesses page_filters table and appends additions to the where criteria when filters are involved.
+ *  @description: Model for Settings -
+ *  Accesses settings data.
  *
  * -----------------------------------------------------------------
  */

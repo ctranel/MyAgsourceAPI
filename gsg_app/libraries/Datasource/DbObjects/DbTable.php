@@ -5,7 +5,6 @@ require_once(APPPATH . 'libraries/Datasource/iDataTable.php');
 
 use \myagsource\Datasource\iDataTable;
 
-if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /* -----------------------------------------------------------------
  *  Library for db tables
  *
@@ -19,7 +18,8 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
  * -----------------------------------------------------------------
  */
  
- class DbTable implements iDataTable {
+ class DbTable implements iDataTable
+ {
  	/**
 	 * database name
 	 * @var string

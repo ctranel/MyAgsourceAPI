@@ -1,5 +1,5 @@
 <?php
-namespace myagsource\report_filters;
+namespace myagsource\Filters;
 require_once 'Criteria.php';
 
 

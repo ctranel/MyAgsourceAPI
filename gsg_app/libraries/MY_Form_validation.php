@@ -11,7 +11,7 @@ class MY_Form_validation extends CI_Form_validation {
 	 * @param	string
 	 * @return	void
 	 */
-	public function set_value($field = '', $default = '')
+	public function set_value_NOTUSED($field = '', $default = '')
 	{
 		if ( ! isset($this->_field_data[$field]))
 		{
@@ -38,10 +38,9 @@ class MY_Form_validation extends CI_Form_validation {
 	 * @access	public
 	 * @return	bool
 	 */
-	public function run($group = '') {
+	public function run_input($group = '') {
 		// Do we even have any data to process?  Mm?
         $input_data = $this->CI->input->userInputArray();
-
 		if (!isset($input_data) || count($input_data) == 0) {
 			return FALSE;
 		}
@@ -112,6 +111,123 @@ class MY_Form_validation extends CI_Form_validation {
 	}
 
 	// --------------------------------------------------------------------
+
+    /**
+     * Set Rules
+     *
+     * This function takes an array of field names and validation
+     * rules as input, validates the info, and stores it
+     *
+     * @access	public
+     * @param	mixed
+     * @param	string
+     * @return	void
+     */
+    public function set_rules($field, $label = '', $rules = '')
+    {
+        $input_data = $this->CI->input->userInputArray();
+
+        // No reason to set rules if we have no POST data
+        if (count($input_data) == 0)
+        {
+            return $this;
+        }
+
+        // If an array was passed via the first parameter instead of indidual string
+        // values we cycle through it and recursively call this function.
+        if (is_array($field))
+        {
+            foreach ($field as $row)
+            {
+                // Houston, we have a problem...
+                if ( ! isset($row['field']) OR ! isset($row['rules']))
+                {
+                    continue;
+                }
+
+                // If the field label wasn't passed we use the field name
+                $label = ( ! isset($row['label'])) ? $row['field'] : $row['label'];
+
+                // Here we go!
+                $this->set_rules($row['field'], $label, $row['rules']);
+            }
+            return $this;
+        }
+
+        // No fields? Nothing to do...
+        if ( ! is_string($field) OR  ! is_string($rules) OR $field == '')
+        {
+            return $this;
+        }
+
+        // If the field label wasn't passed we use the field name
+        $label = ($label == '') ? $field : $label;
+
+        // Is the field name an array?  We test for the existence of a bracket "[" in
+        // the field name to determine this.  If it is an array, we break it apart
+        // into its components so that we can fetch the corresponding POST data later
+        if (strpos($field, '[') !== FALSE AND preg_match_all('/\[(.*?)\]/', $field, $matches))
+        {
+            // Note: Due to a bug in current() that affects some versions
+            // of PHP we can not pass function call directly into it
+            $x = explode('[', $field);
+            $indexes[] = current($x);
+
+            for ($i = 0; $i < count($matches['0']); $i++)
+            {
+                if ($matches['1'][$i] != '')
+                {
+                    $indexes[] = $matches['1'][$i];
+                }
+            }
+
+            $is_array = TRUE;
+        }
+        else
+        {
+            $indexes	= array();
+            $is_array	= FALSE;
+        }
+
+        // Build our master array
+        $this->_field_data[$field] = array(
+            'field'				=> $field,
+            'label'				=> $label,
+            'rules'				=> $rules,
+            'is_array'			=> $is_array,
+            'keys'				=> $indexes,
+            'postdata'			=> NULL,
+            'error'				=> ''
+        );
+
+        return $this;
+    }
+
+    // --------------------------------------------------------------------
+
+    /**
+     * Match one field to another
+     *
+     * @access	public
+     * @param	string
+     * @param	field
+     * @return	bool
+     */
+    public function matches($str, $field)
+    {
+        $input_data = $this->CI->input->userInputArray();
+
+        if ( ! isset($input_data[$field]))
+        {
+            return FALSE;
+        }
+
+        $field = $input_data[$field];
+
+        return ($str !== $field) ? FALSE : TRUE;
+    }
+
+    // --------------------------------------------------------------------
 
 
 }

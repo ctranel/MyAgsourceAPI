@@ -113,6 +113,7 @@ class Navigation{// implements iWebContentRepository {
 					'id' => $dom_id,//split and take the first element
 					'href' => '/' . $full_path,
 					'scope' => $d['scope'],
+					'route' => $d['route'],
 				];
 				$children = $this->buildTree($data, $d['id'], $full_path);
 				if ($children) {

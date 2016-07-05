@@ -1,5 +1,5 @@
 <?php
-namespace myagsource\report_filters;
+namespace myagsource\Filters;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /**

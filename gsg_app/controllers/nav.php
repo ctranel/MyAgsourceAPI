@@ -66,10 +66,6 @@ class Nav extends MY_Controller {
 	}
 
 	function index(){
-		echo 'Direct access to this page is not allowed.';
-    }
-
-    function ajax_json() {
 		$this->load->model('web_content/navigation_model');
 		$Navigation = new Navigation($this->navigation_model, $this->herd, $this->permissions->permissionsList());
 

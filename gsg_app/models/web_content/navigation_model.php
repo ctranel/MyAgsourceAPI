@@ -19,14 +19,14 @@ class Navigation_model extends CI_Model {
 //don't need scope name here
 		$sql = "
 			SELECT * FROM (
-				SELECT 999999 AS id, p.section_id AS parent_id, p.name, p.description, ls.name AS scope, p.path, p.active, p.path AS default_page_path, p.list_order
+				SELECT 999999 AS id, p.section_id AS parent_id, p.name, p.description, ls.name AS scope, p.path, p.route, p.active, p.path AS default_page_path, p.list_order
 				FROM users.dbo.pages p
 					INNER JOIN users.dbo.lookup_scopes ls ON p.scope_id = ls.id
 				WHERE p.active = 1
 			
 				UNION ALL
 						
-				SELECT s.id, s.parent_id, s.name, s.description, ls.name AS scope, s.path, s.active, s.default_page_path, s.list_order
+				SELECT s.id, s.parent_id, s.name, s.description, ls.name AS scope, s.path, NULL AS route, s.active, s.default_page_path, s.list_order
 				FROM users.dbo.sections s
 					INNER JOIN users.dbo.lookup_scopes ls ON s.scope_id = ls.id
 				WHERE s.active = 1
@@ -76,12 +76,12 @@ class Navigation_model extends CI_Model {
 			)
 						
 			SELECT DISTINCT a.*, ls.name AS scope FROM (
-				SELECT id, parent_id, name, description, scope_id, path, active, default_page_path, list_order
+				SELECT id, parent_id, name, description, scope_id, path, null AS route, active, default_page_path, list_order
 				FROM section_tree
 						
 				UNION
 						 
-				SELECT 999999 AS id, p.section_id AS parent_id, p.name, p.description, p.scope_id, p.path, p.active, p.path, p.list_order
+				SELECT 999999 AS id, p.section_id AS parent_id, p.name, p.description, p.scope_id, p.path, p.route, p.active, p.path, p.list_order
 				FROM users.dbo.pages p
 					INNER JOIN users.dbo.lookup_scopes ls ON p.scope_id = ls.id
 				WHERE p.active = 1 AND ls.name IN(" . $scope_text . ")
@@ -128,12 +128,12 @@ class Navigation_model extends CI_Model {
 			)
 			
 			SELECT a.*, ls.name AS scope FROM (
-				SELECT DISTINCT id, parent_id, name, description, scope_id, path, active, default_page_path, list_order
+				SELECT DISTINCT id, parent_id, name, description, scope_id, path, NULL AS route, active, default_page_path, list_order
 				FROM section_tree
 			
 				UNION
 			 
-				SELECT 999999 AS id, section_id AS parent_id, name, description, scope_id, path, active, path, list_order
+				SELECT 999999 AS id, section_id AS parent_id, name, description, scope_id, path, p.route, active, path, list_order
 				FROM users.dbo.pages p
 					INNER JOIN users.dbo.pages_reports pr ON p.id = pr.page_id AND p.active = 1 AND p.scope_id = 2
 					INNER JOIN users.dbo.v_user_status_info si ON pr.report_code = si.report_code AND si.herd_code = '" . $herd_code . "' AND (si.herd_is_paying = 1 OR si.herd_is_active_trial = 1)

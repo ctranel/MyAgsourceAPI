@@ -96,6 +96,21 @@ class Sort implements iSort {
 	}
 
 	/**
+	 * toArray
+	 *
+	 * @return array representation of object
+	 *
+	 **/
+	public function toArray(){
+		$ret = [
+			'field' => $this->datafield->dbFieldName(),
+            'label' => $this->datafield->label(),
+            'order' => $this->order,
+		];
+		return $ret;
+	}
+	
+	/**
 	 * sortText
 	 *
 	 * sets text description of sort fields and order.

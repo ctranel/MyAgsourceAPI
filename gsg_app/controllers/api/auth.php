@@ -386,9 +386,9 @@ class Auth extends MY_Api_Controller {
                 $msgs[] = new ResponseMessage($n, 'message');
             }
             //we want the success message to be first, so we create a temp var and merge with that as the first value
-            $tmp = new ResponseMessage('Login Successful', 'message');
+            $msgs[] = new ResponseMessage('Login Successful', 'message');
             //send response
-            $this->sendResponse(200, array_merge([$tmp], $msgs), ['herd_codes' => []]);
+            $this->sendResponse(200, $msgs, ['herd_codes' => $tmp_arr]);
         }
 
         $this->sendResponse(401, new ResponseMessage($this->as_ion_auth->errors(), 'error'));

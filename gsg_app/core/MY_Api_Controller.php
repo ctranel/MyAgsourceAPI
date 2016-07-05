@@ -9,19 +9,19 @@ require_once APPPATH . 'libraries/Ion_auth.php';
 require_once APPPATH . 'libraries/Api/Response/Response.php';
 require_once(APPPATH . 'libraries/Api/Response/ResponseMessage.php');
 require_once APPPATH . 'libraries/AccessLog.php';
-require_once APPPATH . 'libraries/Site/WebContent/Sections.php';
-require_once APPPATH . 'libraries/Site/WebContent/Pages.php';
-require_once APPPATH . 'libraries/Site/WebContent/Blocks.php';
+require_once APPPATH . 'libraries/Site/WebContent/SectionFactory.php';
+require_once APPPATH . 'libraries/Site/WebContent/PageFactory.php';
+require_once APPPATH . 'libraries/Site/WebContent/WebBlockFactory.php';
 require_once(APPPATH . 'libraries/dhi/HerdAccess.php');
 require_once(APPPATH . 'libraries/as_ion_auth.php');
 require_once(APPPATH . 'libraries/Products/Products/Products.php');
 require_once(APPPATH . 'libraries/Permissions/Permissions/ProgramPermissions.php');
 
 use \myagsource\AccessLog;
-//use \myagsource\Site\WebContent\Sections;
+use \myagsource\Site\WebContent\SectionFactory;
 use \myagsource\Api\Response\Response;
-use \myagsource\Site\WebContent\Pages;
-use \myagsource\Site\WebContent\Blocks;
+use \myagsource\Site\WebContent\PageFactory;
+use \myagsource\Site\WebContent\WebBlockFactory;
 use \myagsource\dhi\Herd;
 use \myagsource\dhi\HerdAccess;
 use \myagsource\as_ion_auth;
@@ -41,8 +41,13 @@ class MY_Api_Controller extends CI_Controller
 
 
     public function __construct() {
-        $request_headers = apache_request_headers();
+        // Execute CI_Controller Constructor
+        parent::__construct();
+        $this->load->library('session');
+//        $this->load->helper('cookie');
 
+        //$request_headers = apache_request_headers();
+        //header('Set-Cookie: ' . $cookie_name . '=' . $this->input->cookie($cookie_name, TRUE));
         header("Content-type: application/json"); //being sent as json
         header("Cache-Control: no-cache, must-revalidate, max-age=0");
         header("Cache-Control: post-check=0, pre-check=0", false);
@@ -52,14 +57,17 @@ class MY_Api_Controller extends CI_Controller
         header('Access-Control-Allow-Credentials: true');
         header('Access-Control-Allow-Methods: GET, POST, PUT');
         header('Access-Control-Allow-Headers: Content-Type, Authorization');
+        $this->session->set_userdata('test', 'test');
+        $this->session->sess_write();
 
-        //if OPTIONS request, header is all we need
+
+        $cookie_name = $this->config->item('sess_cookie_name');
+//print(json_encode([$cookie_name=>get_cookie($cookie_name)])); die;
+//die;
+        //if OPTIONS request, header is all we need (pre-flight)
         if($_SERVER['REQUEST_METHOD'] === 'OPTIONS'){
             die();
         }
-
-        // Execute CI_Controller Constructor
-        parent::__construct();
 
         $this->load->library('session');
         $this->load->library('carabiner');
@@ -70,14 +78,11 @@ class MY_Api_Controller extends CI_Controller
         $this->load->model('dhi/herd_model');
         $this->load->helper('url');
         $this->load->helper('form');
-//        $this->load->helper('html');
         $this->load->helper('error');
         $this->herd_access = new HerdAccess($this->herd_model);
-        //$blocks = new Blocks($this->block_model);
-        //$pages = new Pages($this->page_model, $blocks);
-        //$sections = new Sections($this->section_model, $pages);
         $herd = new Herd($this->herd_model, $this->session->userdata('herd_code'));
 
+//var_dump($this->session->userdata('user_id'));
         if($this->session->userdata('active_group_id')) {
             $this->load->model('permissions_model');
             $this->load->model('product_model');
@@ -118,7 +123,17 @@ class MY_Api_Controller extends CI_Controller
                 echo json_encode(['messages'=>$response->errorBadRequest($messages)]);
                 break;
             case 200:
-                echo json_encode(array_merge(['messages'=>$response->message($messages)], $payload));
+                $message = $response->message($messages);
+
+                if(is_array($message) && is_array($payload)){
+                    echo json_encode(array_merge(['messages'=>$message], $payload));
+                    break;
+                }
+                if(is_array($message)){
+                    echo json_encode(['messages'=>$message]);
+                    break;
+                }
+                echo json_encode($payload);
                 break;
         }
         exit;

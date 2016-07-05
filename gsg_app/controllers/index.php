@@ -1,13 +1,13 @@
 <?php
 require_once(APPPATH . 'libraries/Benchmarks/Benchmarks.php');
 require_once APPPATH . 'controllers/report_parent.php';
-require_once(APPPATH . 'libraries/filters/Filters.php');
+require_once(APPPATH . 'libraries/Filters/ReportFilters.php');
 require_once(APPPATH . 'libraries/Products/Products/Products.php');
 require_once(APPPATH . 'libraries/dhi/Herd.php');
 require_once(APPPATH . 'libraries/dhi/PdfArchives.php');
 
 use myagsource\Benchmarks\Benchmarks;
-use myagsource\report_filters\Filters;
+use myagsource\Filters\ReportFilters;
 use myagsource\Products\Products\Products;
 use myagsource\dhi\Herd;
 use myagsource\dhi\PdfArchives;
@@ -45,9 +45,8 @@ class Index extends report_parent {
 		//FILTERS
 		//load required libraries
 		$this->load->model('filter_model');
-		$this->filters = new Filters($this->filter_model, $this->page->id(), ['herd_code' =>	$this->session->userdata('herd_code')]);
+		$this->filters = new ReportFilters($this->filter_model, $this->page->id(), ['herd_code' =>	$this->session->userdata('herd_code')]);
 		$recent_test_date = isset($primary_table) ? $this->{$this->primary_model_name}->getRecentDates() : NULL;
-		$this->filters->setCriteria();
 		//END FILTERS
 
         $this->page_header_data['message'] = $this->session->flashdata('message');

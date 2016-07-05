@@ -88,7 +88,7 @@ class SupplementalFactory
 	
 		$comments = $this->datasource->getComments(1, $block_id);
 		$supplemental_comments = SupplementalComment::datasetToObjects($comments);
-		
+
 		$supp = new Supplemental($supplemental_links, $supplemental_comments);
 		return $supp;
 	}

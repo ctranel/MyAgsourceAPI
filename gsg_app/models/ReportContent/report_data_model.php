@@ -1,9 +1,5 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
-
-//require_once(APPPATH . 'libraries/Supplemental/Content/SupplementalFactory.php');
-//require_once(APPPATH . 'libraries/Site/WebContent/Sections.php');
-//require_once(APPPATH . 'libraries/Site/WebContent/Pages.php');
-//require_once(APPPATH . 'libraries/Site/WebContent/Blocks.php');
+require_once(APPPATH . 'helpers/multid_array_helper.php');
 
 use \myagsource\Report\iBlock;
 

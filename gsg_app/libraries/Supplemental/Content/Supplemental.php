@@ -27,13 +27,13 @@ class Supplemental implements iSupplemental
 	 * supplemental link objects
 	 * @var Array of SupplementalLink objects
 	 **/
-	protected $link;
+	protected $links;
 
 	/**
 	 * supplemental comment objects
 	 * @var Array of Supplemental_comment objects
 	 **/
-	protected $comment;
+	protected $comments;
 
 	/**
 	 * __construct

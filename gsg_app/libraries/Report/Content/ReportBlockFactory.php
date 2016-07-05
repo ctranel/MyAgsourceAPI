@@ -11,29 +11,38 @@ require_once(APPPATH . 'libraries/Datasource/DbObjects/DbField.php');
 
 use \myagsource\Report\Content\Table\TableBlock;
 use \myagsource\Report\Content\Chart\ChartBlock;
+use \myagsource\Filters\ReportFilters;
 use \myagsource\Report\iBlock;
 use \myagsource\dhi\Herd;
 use myagsource\Supplemental\Content\SupplementalFactory;
 use myagsource\Datasource\DbObjects\DbField;
-use \myagsource\Site\WebContent\Blocks as SiteBlocksFactory;
+use \myagsource\Datasource\DbObjects\DbTableFactory;
+use \myagsource\DataHandler;
+use \myagsource\Site\WebContent\WebBlockFactory;
 
 /**
  * A repository? for report block objects
  * 
  * 
- * @name Pages
+ * @name ReportBlockFactory
  * @author ctranel
  * 
  *        
  */
-class Blocks {// implements iReportContentRepository {
+class ReportBlockFactory {// implements iReportContentRepository {
 	/**
 	 * datasource_blocks
 	 * @var report_block_model
 	 **/
 	protected $datasource_blocks;
 
-	/**
+    /**
+     * filters
+     * @var ReportFilters
+     **/
+    protected $filters;
+
+    /**
 	 * datasource_dbfield
 	 * @var db_field_model
 	 **/
@@ -46,15 +55,39 @@ class Blocks {// implements iReportContentRepository {
 	protected $supplemental_factory;
 
     /**
-     * site_blocks_factory
-     * @var SiteBlocksFactory
+     * web_block_factory
+     * @var WebBlockFactory
      **/
-    protected $site_blocks_factory;
+    protected $web_block_factory;
 
-    function __construct(\report_block_model $datasource_blocks, \db_field_model $datasource_dbfield, SupplementalFactory $supplemental_factory = null, SiteBlocksFactory $site_blocks) {
+    /**
+     * data_handler
+     * @var DataHandler
+     **/
+    protected $data_handler;
+
+    /**
+     * db_table_factory
+     * @var DbTableFactory
+     **/
+    protected $db_table_factory;
+
+    function __construct(
+		\report_block_model $datasource_blocks, 
+        \db_field_model $datasource_dbfield, 
+        ReportFilters $filters, 
+        SupplementalFactory $supplemental_factory = null, 
+        WebBlockFactory $web_block_factory,
+        DataHandler $data_handler,
+        DbTableFactory $db_table_factory
+    ) {
 		$this->datasource_blocks = $datasource_blocks;
 		$this->datasource_dbfield = $datasource_dbfield;
 		$this->supplemental_factory = $supplemental_factory;
+        $this->web_block_factory = $web_block_factory;
+        $this->filters = $filters;
+        $this->data_handler = $data_handler;
+        $this->db_table_factory = $db_table_factory;
 	}
 
 	/*
@@ -129,9 +162,11 @@ class Blocks {// implements iReportContentRepository {
 	protected function dataToObject($report){
 		$field_groups = $this->datasource_blocks->getFieldGroupData($report['id']);
 		$field_groups = $this->keyFieldGroupData($field_groups);
+        
+        $web_block = $this->web_block_factory->blockFromData($report);
 		
 		if($report['display_type'] === 'table'){
-			$block = new TableBlock($this->datasource_blocks, $report['id'], $report['page_id'], $report['name'], $report['description'], $report['scope'], $report['active'], $report['path'], $report['max_rows'], $report['cnt_row'], $report['sum_row'], $report['avg_row'], $report['bench_row'], $report['is_summary'], $report['display_type'], $this->supplemental_factory, $field_groups);
+			$block = new TableBlock($this->datasource_blocks, $web_block, $report['max_rows'], $report['cnt_row'], $report['sum_row'], $report['avg_row'], $report['bench_row'], $report['is_summary'], $report['display_type'], $this->filters, $this->supplemental_factory, $this->data_handler, $this->db_table_factory, $field_groups);
 			if(isset($report['pivot_db_field'])){
 				$p = $this->datasource_dbfield->getFieldData($report['pivot_db_field']);
 				$pivot_field = new DbField($p['id'], $p['db_table'], $p['db_field_name'], $p['name'], $p['description'], $p['pdf_width'], $p['default_sort_order'], $p['datatype'], $p['max_length'], $p['decimal_scale'], $p['unit_of_measure'], $p['is_timespan'], $p['is_foreign_key'], $p['is_nullable'], $p['is_natural_sort']);
@@ -139,7 +174,7 @@ class Blocks {// implements iReportContentRepository {
 			}
 		}
 		else{
-			$block = new ChartBlock($this->datasource_blocks, $report['id'], $report['page_id'], $report['name'], $report['description'], $report['scope'], $report['active'], $report['path'], $report['max_rows'], $report['cnt_row'], $report['sum_row'], $report['avg_row'], $report['bench_row'], $report['is_summary'], $report['display_type'], $report['chart_type'], $this->supplemental_factory, $field_groups, (bool)$report['keep_nulls']);
+			$block = new ChartBlock($this->datasource_blocks, $web_block, $report['max_rows'], $report['cnt_row'], $report['sum_row'], $report['avg_row'], $report['bench_row'], $report['is_summary'], $report['display_type'], $report['chart_type'], $this->filters, $this->supplemental_factory, $this->data_handler, $this->db_table_factory, $field_groups, (bool)$report['keep_nulls']);
 		}
 		return $block;
 	}

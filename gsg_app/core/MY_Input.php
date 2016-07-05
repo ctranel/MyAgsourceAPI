@@ -60,11 +60,11 @@ parent::__construct();
         elseif(isset($_GET[$index])) {
             return $this->get($index, $xss_clean);
         }
-        elseif(isset($this->json_request->{$index})){
+        elseif(isset($this->json_request[$index])){
             if($xss_clean){
-                return $this->security->xss_clean($this->json_request->{$index});
+                return $this->security->xss_clean($this->json_request[$index]);
             }
-            return $this->json_request->{$index};
+            return $this->json_request[$index];
         }
     }
 
@@ -88,9 +88,9 @@ parent::__construct();
         parent::_sanitize_globals();
         $request_headers = apache_request_headers();
         if(isset($request_headers['Content-Type']) && $request_headers['Content-Type'] === 'application/json'){
-            $this->json_request = json_decode(file_get_contents('php://input'));
+            $this->json_request = json_decode(file_get_contents('php://input'), true);
             // Clean $json_request Data
-            $this->_sanitizeObjectData($this->json_request);
+            $this->_sanitizeJsonData($this->json_request);
         }
     }
 
@@ -101,14 +101,14 @@ parent::__construct();
      *
      * @param $input_obj
      */
-    protected function _sanitizeObjectData(stdClass &$input_obj){
-        if (is_object($input_obj)) {
-            foreach (get_object_vars($input_obj) as $key => $val) {
-                if(is_object($val)){
-                    $this->_sanitizeObjectData($val);
+    protected function _sanitizeJsonData(&$input_obj){
+        if (is_array($input_obj)) {
+            foreach ($input_obj as $key => $val) {
+                if(is_array($val)){
+                    $this->_sanitizeJsonData($val);
                     continue;
                 }
-                $input_obj->{$this->_clean_input_keys($key)} = $this->_clean_input_data($val);
+                $input_obj[$this->_clean_input_keys($key)] = $this->_clean_input_data($val);
             }
         }
     }

@@ -199,6 +199,27 @@ abstract class BlockField {
 		return null;
 	}
 
+    public function toArray(){
+        $ret = [
+            'id' => $this->id,
+            'name' => $this->name,
+            'data_field' => $this->data_field->toArray(), //instance of iDBField
+//            'category_id' => $this->category_id,
+            'is_displayed' => $this->is_displayed,
+            'display_format' => $this->display_format,
+            'aggregate' => $this->aggregate,
+            'is_sortable' => $this->is_sortable,
+        ];
+        if(is_a($this->header_supp, 'Supplemental')){
+            $ret['header_supplemental'] = $this->header_supp->toArray();
+        }
+        if(is_a($this->data_supp, 'Supplemental')){
+            $ret['data_supplemental'] = $this->data_supp->toArray();
+        }
+
+        return $ret;
+    }
+
 	public function selectFieldText() {
 		if(isset($this->display_format) && !empty($this->display_format)){
 			return "FORMAT(" . $this->data_field->dbTableName() . "." . $this->data_field->dbFieldName() . ", '" . $this->display_format . "', 'en-US') AS " . $this->data_field->dbFieldName();

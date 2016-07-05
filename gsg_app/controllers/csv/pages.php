@@ -1,13 +1,13 @@
 <?php
 //namespace myagsource;
-require_once(APPPATH . 'libraries/filters/Filters.php');
+require_once(APPPATH . 'libraries/Filters/ReportFilters.php');
 require_once(APPPATH . 'libraries/Benchmarks/Benchmarks.php');
 require_once(APPPATH . 'libraries/AccessLog.php');
 require_once(APPPATH . 'libraries/Supplemental/Content/SupplementalFactory.php');
 require_once(APPPATH . 'libraries/dhi/HerdAccess.php');
 require_once(APPPATH . 'libraries/dhi/Herd.php');
-require_once(APPPATH . 'libraries/Site/WebContent/Sections.php');
-require_once(APPPATH . 'libraries/Site/WebContent/Pages.php');
+//require_once(APPPATH . 'libraries/Site/WebContent/SectionFactory.php');
+require_once(APPPATH . 'libraries/Site/WebContent/PageFactory.php');
 require_once(APPPATH . 'libraries/Site/WebContent/Blocks.php');
 require_once(APPPATH . 'libraries/Report/Content/Csv.php');
 require_once(APPPATH . 'libraries/Report/Content/Pdf.php');
@@ -15,13 +15,12 @@ require_once(APPPATH . 'libraries/Notifications/Notifications.php');
 
 use \myagsource\Benchmarks\Benchmarks;
 use \myagsource\AccessLog;
-use \myagsource\report_filters\Filters;
+use \myagsource\Filters\ReportFilters;
 use \myagsource\Supplemental\Content\SupplementalFactory;
 use \myagsource\dhi\HerdAccess;
 use \myagsource\dhi\Herd;
-use \myagsource\Site\WebContent\Sections;
-use \myagsource\Site\WebContent\Pages;
-//use \myagsource\Site\WebContent\Blocks;
+//use \myagsource\Site\WebContent\SectionFactory;
+use \myagsource\Site\WebContent\PageFactory;
 use \myagsource\Site\WebContent\Block as PageBlock;
 use \myagsource\Report\Content\Csv;
 use \myagsource\Report\iBlock;
@@ -60,12 +59,12 @@ class blocks extends MY_Controller {
 	protected $section_path;
 	
 	/**
-	 * pages
+	 * page_factory
 	 * 
 	 * page repository
-	 * @var Pages
-	 **/
-	protected $pages;
+	 * @var PageFactory
+	protected $page_factory;
+**/
 	
 	/**
 	 * page
@@ -109,13 +108,8 @@ class blocks extends MY_Controller {
 		$this->session->keep_all_flashdata();
 
 		$this->load->model('herd_model');
-/*		$this->load->model('web_content/section_model');
-		$this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
-		$this->load->model('notice_model');
-*/		$this->load->model('web_content/block_model');
+		$this->load->model('web_content/block_model');
 		$this->blocks = new Blocks($this->block_model);
-//		$this->pages = new Pages($this->page_model, $this->blocks);
-//		$sections = new Sections($this->section_model, $this->pages);
 		$this->herd_access = new HerdAccess($this->herd_model);
 		$this->herd = new Herd($this->herd_model, $this->session->userdata('herd_code'));
 		$this->page_header_data['num_herds'] = $this->herd_access->getNumAccessibleHerds($this->session->userdata('user_id'), $this->permissions->permissionsList(), $this->session->userdata('arr_regions'));
@@ -151,9 +145,7 @@ class blocks extends MY_Controller {
 		//Determine if any report blocks have is_summary flag - will determine if pstring needs to be loaded and filters shown
 		//@todo make pstring 0 work on both cow and summary reports simultaneously
 		$this->load->model('filter_model');
-		$this->filters = new Filters($this->filter_model, $this->page->id(), ['herd_code' =>	$this->herd->herdCode()]);
-		//only use default criteria on initial page loads, when filter form is submitted, it reloads each individual block
-		$this->filters->setCriteria(); //filter form submissions never trigger a new page load (i.e., this function is never fired by a form submission)
+		$this->filters = new ReportFilters($this->filter_model, $this->page->id(), ['herd_code' =>	$this->herd->herdCode()]);
 		//END FILTERS
 		$csv = new Csv();
 		$data = array();

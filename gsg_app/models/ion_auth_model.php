@@ -163,7 +163,6 @@ class Ion_auth_model extends Ion_auth_parent_model
 		}
 		if($session_data['active_group_id']) unset($session_data['herd_code']);
 			
-
 		$this->session->set_userdata($session_data);
 	}
 

@@ -127,12 +127,35 @@ class DbField implements iDataField {
 		$this->is_nullable = $is_nullable;
 		$this->is_natural_sort = $is_natural_sort;
 	}
+
+	public function toArray(){
+        $ret = [
+            'id' => $this->id,
+            'name' => $this->name,
+            'description' => $this->description,
+//            'pdf_width' => $this->pdf_width,
+            'default_sort_order' => $this->default_sort_order,
+            'datatype' => $this->datatype,
+            'max_length' => $this->max_length,
+            'decimal_scale' => $this->decimal_scale,
+            'unit_of_measure' => $this->unit_of_measure,
+            'is_timespan' => $this->is_timespan,
+            'db_field_name' => $this->db_field_name,
+//            'is_nullable' => $this->is_nullable,
+            'is_natural_sort' => $this->is_natural_sort,
+        ];
+        return $ret;
+    }
 	
 	public function dbFieldName(){
 		return $this->db_field_name;
 	}
 
-	public function setDbFieldName($value){
+    public function label(){
+        return $this->name;
+    }
+
+    public function setDbFieldName($value){
 		$this->db_field_name = $value;
 	}
 

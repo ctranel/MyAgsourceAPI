@@ -16,12 +16,12 @@ use \myagsource\dhi\Herd;
  * A repository? for page objects
  * 
  * 
- * @name Pages
+ * @name WebBlockFactory
  * @author ctranel
  * 
  *        
  */
-class Blocks implements iWebContentRepository {
+class WebBlockFactory implements iWebContentRepository {
 	/**
 	 * datasource_blocks
 	 * @var block_model
@@ -37,7 +37,7 @@ class Blocks implements iWebContentRepository {
 	 * 
 	 * @param string path
 	 * @author ctranel
-	 * @returns Page
+	 * @returns Block
 	 */
 	public function getByPath($path, $parent_id = null){
 		$criteria = ['path' => $path];
@@ -52,11 +52,11 @@ class Blocks implements iWebContentRepository {
 	}
 
 	/*
-	 * getBySection
+	 * getByPage
 	 * 
 	 * @param int page_id
 	 * @author ctranel
-	 * @returns Blocks[]
+	 * @returns Block[]
 	 */
 	public function getByPage($page_id){
 		$blocks = [];
@@ -71,6 +71,17 @@ class Blocks implements iWebContentRepository {
 		}
 		return $blocks;
 	}
+
+    /*
+     * blockFromData
+     *
+     * @param associative array of data needed for block creation
+     * @author ctranel
+     * @returns Block
+     */
+    public function blockFromData($data){
+        return new Block($data['id'], $data['page_id'], $data['name'], $data['description'], $data['display_type'], $data['scope'], $data['active'], $data['path'], $data['bench_row']);
+    }
 }
 
 ?>

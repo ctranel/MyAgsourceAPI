@@ -8,20 +8,21 @@ require_once(APPPATH . 'libraries/dhi/Herd.php');
 
 use \myagsource\Form\Content\FormFactory;
 use \myagsource\Site\iWebContentRepository;
-use \myagsource\Site\iWebContent;
-use \myagsource\Site\WebContent\Page;
-use \myagsource\dhi\Herd;
+use \myagsource\Report\Content\ReportBlockFactory;
+//use \myagsource\Site\iWebContent;
+//use \myagsource\Site\WebContent\Page;
+//use \myagsource\dhi\Herd;
 
 /**
  * A factory for page objects
  * 
  * 
- * @name Pages
+ * @name PageFactory
  * @author ctranel
  * 
  *        
  */
-class Pages implements iWebContentRepository {
+class PageFactory implements iWebContentRepository {
 	/**
 	 * datasource_pages
 	 * @var page_model
@@ -30,9 +31,9 @@ class Pages implements iWebContentRepository {
 
 	/**
 	 * $blocks
-	 * @var Blocks
+	 * @var ReportBlockFactory
 	 **/
-	protected $block_factory;
+	protected $report_block_factory;
 
 	/**
 	 * $blocks
@@ -40,9 +41,9 @@ class Pages implements iWebContentRepository {
 	 **/
 	protected $form_factory;
 
-	function __construct(\Page_model $datasource_pages, Blocks $block_factory, FormFactory $form_factory) {
+	function __construct(\Page_model $datasource_pages, ReportBlockFactory $report_block_factory, FormFactory $form_factory) {
 		$this->datasource_pages = $datasource_pages;
-		$this->block_factory = $block_factory;
+		$this->report_block_factory = $report_block_factory;
 		$this->form_factory = $form_factory;
 	}
 	
@@ -62,7 +63,7 @@ class Pages implements iWebContentRepository {
 		if(empty($results)){
 			return false;
 		}
-		return new Page($results[0], $this->block_factory, $this->form_factory);
+		return new Page($results[0], $this->report_block_factory, $this->form_factory);
 	}
 
 	/*
@@ -81,8 +82,8 @@ class Pages implements iWebContentRepository {
 			return false;
 		}
 		foreach($results as $k => $v){
-//var_dump($this->block_factory);
-			$pages[] = new Page($v, $this->block_factory, $this->form_factory);
+//var_dump($this->report_block_factory);
+			$pages[] = new Page($v, $this->report_block_factory, $this->form_factory);
 		}
 		return $pages;
 	}

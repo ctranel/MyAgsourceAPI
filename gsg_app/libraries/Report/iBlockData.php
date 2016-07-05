@@ -14,7 +14,7 @@ use \myagsource\Datasource\iDataField;
  *        
  */
 interface iBlockData {
-	function getData($criteria_key_value);
+	function getData();
 }
 
 ?>

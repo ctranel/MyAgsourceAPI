@@ -1,15 +1,15 @@
 <?php
 //namespace myagsource;
-require_once(APPPATH . 'libraries/filters/Filters.php');
+require_once(APPPATH . 'libraries/Filters/ReportFilters.php');
 require_once(APPPATH . 'libraries/Benchmarks/Benchmarks.php');
 require_once(APPPATH . 'libraries/AccessLog.php');
 require_once(APPPATH . 'libraries/Supplemental/Content/SupplementalFactory.php');
 require_once(APPPATH . 'libraries/dhi/HerdAccess.php');
 require_once(APPPATH . 'libraries/dhi/HerdPageAccess.php');
 require_once(APPPATH . 'libraries/dhi/Herd.php');
-require_once(APPPATH . 'libraries/Site/WebContent/Sections.php');
-require_once(APPPATH . 'libraries/Site/WebContent/Pages.php');
-require_once(APPPATH . 'libraries/Site/WebContent/Blocks.php');
+require_once(APPPATH . 'libraries/Site/WebContent/SectionFactory.php');
+require_once(APPPATH . 'libraries/Site/WebContent/PageFactory.php');
+require_once(APPPATH . 'libraries/Site/WebContent/WebBlockFactory.php');
 require_once(APPPATH . 'libraries/Form/Content/FormFactory.php');
 require_once(APPPATH . 'libraries/Site/WebContent/PageAccess.php');
 require_once(APPPATH . 'libraries/Report/Content/Csv.php');
@@ -18,14 +18,14 @@ require_once(APPPATH . 'libraries/ErrorPage.php');
 
 use \myagsource\Benchmarks\Benchmarks;
 use \myagsource\AccessLog;
-use \myagsource\report_filters\Filters;
+use \myagsource\Filters\ReportFilters;
 use \myagsource\Supplemental\Content\SupplementalFactory;
 use \myagsource\dhi\HerdAccess;
 use \myagsource\dhi\HerdPageAccess;
 use \myagsource\dhi\Herd;
-use \myagsource\Site\WebContent\Sections;
-use \myagsource\Site\WebContent\Pages;
-use \myagsource\Site\WebContent\Blocks;
+use \myagsource\Site\WebContent\SectionFactory;
+use \myagsource\Site\WebContent\PageFactory;
+use \myagsource\Site\WebContent\WebBlockFactory;
 use \myagsource\Form\Content\FormFactory;
 use \myagsource\Site\WebContent\Block as PageBlock;
 use \myagsource\Site\WebContent\PageAccess;
@@ -79,12 +79,12 @@ abstract class report_parent extends MY_Controller {
 	protected $full_section_path;
 	
 	/**
-	 * pages
+	 * page_factory
 	 * 
 	 * page repository
-	 * @var Pages
+	 * @var PageFactory
 	 **/
-	protected $pages;
+	protected $page_factory;
 	
 	/**
 	 * page
@@ -169,14 +169,14 @@ abstract class report_parent extends MY_Controller {
 		$this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
 		$this->load->model('web_content/block_model');
         $this->load->model('setting_model', null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
-		$this->blocks = new Blocks($this->block_model);
+		$this->blocks = new WebBlockFactory($this->block_model);
         //supplemental factory
         $this->load->model('supplemental_model');
         $this->supplemental_factory = new SupplementalFactory($this->supplemental_model, site_url());
 
 		$this->form_factory = new FormFactory($this->setting_model, $this->supplemental_factory);
-		$this->pages = new Pages($this->page_model, $this->blocks, $this->form_factory);
-		$sections = new Sections($this->section_model, $this->pages);
+		$this->page_factory = new PageFactory($this->page_model, $this->blocks, $this->form_factory);
+		$section_factory = new SectionFactory($this->section_model, $this->page_factory);
 		
 		$class_dir = $this->router->fetch_directory(); //this should match the name of this file (minus ".php".  Also used as base for css and js file names and model directory name
 		$class = $this->router->fetch_class();
@@ -189,9 +189,9 @@ abstract class report_parent extends MY_Controller {
 			$this->full_section_path = substr($this->full_section_path, 0, -1);
 		}
 		//load sections
-		$this->section = $sections->getByPath($class . '/');
+		$this->section = $section_factory->getByPath($class . '/');
 		$this->session->set_userdata('section_id', $this->section->id());
-		$sections->loadChildren($this->section, $this->pages, $this->session->userdata('user_id'), $this->herd, $this->permissions->permissionsList());
+		$section_factory->loadChildren($this->section, $this->page_factory, $this->session->userdata('user_id'), $this->herd, $this->permissions->permissionsList());
 
 		$path = uri_string();
 
@@ -203,7 +203,7 @@ abstract class report_parent extends MY_Controller {
 		$page_name = $method;
 		$block_name = '';
 
-		$this->page = $this->pages->getByPath($page_name, $this->section->id());
+		$this->page = $this->page_factory->getByPath($page_name, $this->section->id());
 		//if page is not found, display 404
 		if(!$this->page){
 			$page_header_data = [
@@ -260,12 +260,8 @@ abstract class report_parent extends MY_Controller {
 		$this->page->loadChildren($arr_blocks);
 				
 		//FILTERS
-		//Determine if any report blocks have is_summary flag - will determine if pstring needs to be loaded and filters shown
-		//@todo make pstring 0 work on both cow and summary reports simultaneously
 		$this->load->model('filter_model');
-		$this->filters = new Filters($this->filter_model, $this->page->id(), ['herd_code' =>	$this->herd->herdCode()]);
-		//only use default criteria on initial page loads, when filter form is submitted, it reloads each individual block
-		$this->filters->setCriteria(); //filter form submissions never trigger a new page load (i.e., this function is never fired by a form submission)
+		$this->filters = new ReportFilters($this->filter_model, $this->page->id(), ['herd_code' =>	$this->herd->herdCode()]);
 		//END FILTERS
 /*
 		if ($display_format == 'pdf' && !is_null($arr_block_in)) {

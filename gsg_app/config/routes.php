@@ -41,6 +41,7 @@
 $route['default_controller'] = "index";
 $route['404_override'] = 'http_error';
 
+$route['api/dpage/(:any)'] = 'api/dpage/index/$1';
 
 /* End of file routes.php */
 /* Location: ./application/config/routes.php */

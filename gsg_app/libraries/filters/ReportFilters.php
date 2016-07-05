@@ -1,8 +1,8 @@
 <?php
-namespace myagsource\report_filters;
-require_once 'CriteriaFactory.php';
+namespace myagsource\Filters;
+require_once APPPATH . 'libraries/Filters/CriteriaFactory.php';
 
-use myagsource\report_filters\CriteriaFactory;
+use myagsource\Filters\CriteriaFactory;
 
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
@@ -22,7 +22,7 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 *
 */
 
-class Filters{
+class ReportFilters{
     /**
      * source for filter data
      * @var filter_model
@@ -63,6 +63,8 @@ class Filters{
 		$this->filter_model = $filter_model;
 		$this->page_id = $page_id;
         $this->form_data = $form_data;
+
+        $this->setCriteria();
 	}
 
     /* -----------------------------------------------------------------
@@ -121,7 +123,7 @@ class Filters{
 	*  @throws: 
 	* -----------------------------------------------------------------
 	*/
-	public function setCriteria(){//$page_id, $arr_form_data = null
+	protected function setCriteria(){//$page_id, $arr_form_data = null
 		//get filters from DB for the current page, set other vars
 		$page_filter_data = $this->filter_model->getPageFilters($this->page_id);
 		//set default criteria as base

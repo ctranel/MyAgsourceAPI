@@ -64,6 +64,14 @@ class ChartField extends BlockField {
 	public function trendType(){
 		return $this->trend_type;
 	}
+	
+	public function toArray(){
+        $ret = parent::toArray();
+        $ret['trend_type'] = $this->trend_type;
+        $ret['chart_type'] = $this->chart_type;
+
+        return $ret;
+    }
 }
 
 ?>

@@ -3,10 +3,10 @@
 namespace myagsource\Site\WebContent;
 
 require_once(APPPATH . 'libraries/Site/WebContent/Section.php');
-require_once(APPPATH . 'libraries/Site/WebContent/Pages.php');
+require_once(APPPATH . 'libraries/Site/WebContent/PageFactory.php');
 
 use \myagsource\Site\WebContent\Section;
-use \myagsource\Site\WebContent\Pages;
+use \myagsource\Site\WebContent\PageFactory;
 use \myagsource\Site\iWebContentRepository;
 use \myagsource\Site\iWebContent;
 use \myagsource\dhi\Herd;
@@ -15,12 +15,12 @@ use \myagsource\dhi\Herd;
  * A repository? for section objects
  * 
  * 
- * @name Sections
+ * @name SectionFactory
  * @author ctranel
  * 
  *        
  */
-class Sections implements iWebContentRepository {
+class SectionFactory implements iWebContentRepository {
 	/**
 	 * $datasource_sections
 	 * @var Section_model
@@ -28,14 +28,14 @@ class Sections implements iWebContentRepository {
 	protected $datasource_sections;
 
 	/**
-	 * $pages
-	 * @var Pages
+	 * $page_factory
+	 * @var PageFactory
 	 **/
-	protected $Pages;
+	protected $page_factory;
 
-	function __construct(\Section_model $datasource_sections, Pages $pages) {
+	function __construct(\Section_model $datasource_sections, PageFactory $page_factory) {
 		$this->datasource_sections = $datasource_sections;
-		$this->pages = $pages;
+		$this->page_factory = $page_factory;
 	}
 	
 	/*
@@ -56,7 +56,7 @@ class Sections implements iWebContentRepository {
 	/**
 	 * @method loadChildren()
 	 * @param iWebContent $section
-	 * @param iWebContentRepository $pages
+	 * @param iWebContentRepository $page_factory
 	 * @param int user id
 	 * @param Herd herd
 	 * @param array task permissions
@@ -64,7 +64,7 @@ class Sections implements iWebContentRepository {
 	 * @access public
 	 **/
 	//if we allow producers to select which sections to allow, we will need to pass that array to this section as well
-	public function loadChildren(iWebContent $section, iWebContentRepository $pages, $user_id, Herd $herd, $permissions_list){ 
+	public function loadChildren(iWebContent $section, iWebContentRepository $page_factory, $user_id, Herd $herd, $permissions_list){ 
 		//if children have already been loaded
 		$tmp = $section->children();
 		if(isset($tmp)){
@@ -112,9 +112,9 @@ class Sections implements iWebContentRepository {
 		}
 		
 		//Load child pages
-		$splPages = $pages->getBySection($section->id());
-		if(is_array($splPages)){
-			$section->loadPages($splPages);
+		$pages = $page_factory->getBySection($section->id());
+		if(is_array($pages)){
+			$section->loadPages($pages);
 		}
 	}
 }

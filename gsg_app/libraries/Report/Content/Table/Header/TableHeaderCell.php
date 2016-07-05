@@ -174,6 +174,52 @@ class TableHeaderCell {
 		return (bool)(count($this->children) > 0);
 	}
 
+	public function toArray(){
+        $ret = [
+            'db_field_name' => $this->db_field_name,
+            'colspan' => $this->colspan,
+            'rowspan' => $this->rowspan,
+            'text' => $this->text,
+            'is_sortable' => $this->is_sortable,
+            'default_sort_order' => $this->default_sort_order
+        ];
+
+        if($this->supplemental instanceof iSupplemental){
+            $tmp = array_filter($this->supplemental->toArray());
+            if(is_array($tmp) && !empty($tmp)){
+                $ret['supplemental'] = $tmp;
+            }
+            unset($tmp);
+        }
+
+        return $ret;
+    }
+/*
+    protected function childrenToArray($children){
+        foreach($children as $k => $v){
+            $ret[$k] = [
+                'db_field_name' => $v->dbFieldName(),
+                'colspan' => $v->colspan(),
+                'rowspan' => $v->rowspan(),
+                'text' => $v->text(),
+                'is_sortable' => $v->isSortable(),
+                'default_sort_order' => $v->defaultSortOrder()
+            ];
+
+            $tmp = array_filter($v->supplemental()->toArray());
+            if(is_array($tmp) && !empty($tmp)){
+                $ret[$k]['supplemental'] = $tmp;
+            }
+            unset($tmp);
+
+            $children = $v->children();
+            if(count($children) > 0){
+                $ret[$k]['children'] = $this->childrenToArray($children);
+            }
+        }
+        return $ret;
+    }
+*/
 	/**
 	 *  @method: setLeafFields()
 	 *  @access public

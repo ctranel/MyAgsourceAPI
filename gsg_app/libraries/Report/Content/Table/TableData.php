@@ -60,7 +60,8 @@ class TableData extends BlockData {
 	 *@todo: criteria param should be removed when filter data is included in object
      * @todo: when moving away from html being sent from server, split this into "setData" and "getData", so that "prepData" can optionally be called in between
 	 **/
-    public function getData($criteria_key_value){
+    public function getData(){
+		$criteria_key_value = $this->block->filterKeysValues();
 		$arr_field_list = $this->block->getFieldlistArray();
         //if getting a subset, ensure results are most recent results
         if($this->block->maxRows() > 0){

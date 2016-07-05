@@ -1,16 +1,16 @@
 <?php
 //namespace myagsource;
-require_once(APPPATH . 'libraries/filters/Filters.php');
+require_once(APPPATH . 'libraries/Filters/ReportFilters.php');
 require_once(APPPATH . 'libraries/Benchmarks/Benchmarks.php');
 require_once(APPPATH . 'libraries/Supplemental/Content/SupplementalFactory.php');
 require_once(APPPATH . 'libraries/dhi/HerdAccess.php');
 require_once(APPPATH . 'libraries/dhi/Herd.php');
 require_once(APPPATH . 'libraries/Report/Content/Blocks.php');
-require_once(APPPATH . 'libraries/Site/WebContent/Blocks.php');
-require_once(APPPATH . 'libraries/Site/WebContent/Pages.php');
+require_once(APPPATH . 'libraries/Site/WebContent/WebBlockFactory.php');
+require_once(APPPATH . 'libraries/Site/WebContent/PageFactory.php');
 require_once(APPPATH . 'libraries/Site/WebContent/PageAccess.php');
 require_once(APPPATH . 'libraries/dhi/HerdPageAccess.php');
-require_once(APPPATH . 'libraries/Site/WebContent/Sections.php');
+require_once(APPPATH . 'libraries/Site/WebContent/SectionFactory.php');
 require_once(APPPATH . 'libraries/Datasource/DbObjects/DbTable.php');
 require_once(APPPATH . 'libraries/Report/Content/Chart/ChartData.php');
 require_once(APPPATH . 'libraries/Report/Content/SortBuilder.php');
@@ -19,16 +19,16 @@ require_once(APPPATH . 'libraries/Report/Content/Table/TableData.php');
 require_once(APPPATH . 'libraries/Report/Content/Table/Header/TableHeader.php');
 
 use \myagsource\Benchmarks\Benchmarks;
-use \myagsource\report_filters\Filters;
+use \myagsource\Filters\ReportFilters;
 use \myagsource\Supplemental\Content\SupplementalFactory;
 use \myagsource\dhi\HerdAccess;
 use \myagsource\dhi\HerdPageAccess;
 use \myagsource\Site\WebContent\PageAccess;
 use \myagsource\dhi\Herd;
-use \myagsource\Site\WebContent\Sections;
-use \myagsource\Site\WebContent\Pages;
-use \myagsource\Site\WebContent\Blocks as WebBlocks;
-use \myagsource\Report\Content\Blocks as ReportBlocks;
+use \myagsource\Site\WebContent\SectionFactory;
+use \myagsource\Site\WebContent\PageFactory;
+use \myagsource\Site\WebContent\WebBlockFactory;
+use \myagsource\Report\Content\ReportBlockFactory;
 use \myagsource\Report\Content\Chart\ChartData;
 use \myagsource\Report\Content\Table\Header\TableHeader;
 use \myagsource\Datasource\DbObjects\DbTable;
@@ -63,10 +63,10 @@ class report_block extends MY_Controller {
 	protected $herd_page_access;
 	
 	/**
-	 * sections
-	 * @var Sections
+	 * section_factory
+	 * @var SectionFactory
 	 **/
-	protected $sections;
+	protected $section_factory;
 	
 	/**
 	 * section
@@ -75,12 +75,12 @@ class report_block extends MY_Controller {
 	protected $section;
 	
 	/**
-	 * pages
+	 * page_factory
 	 * 
 	 * page repository
-	 * @var Pages
+	 * @var PageFactory
 	 **/
-	protected $pages;
+	protected $page_factory;
 	
 	/**
 	 * page
@@ -95,8 +95,16 @@ class report_block extends MY_Controller {
 	 * @var blocks
 	 **/
 	protected $blocks;
-	
-	/**
+
+    /**
+     * web_block_factory
+     *
+     * Block factory
+     * @var WebBlockFactory
+     **/
+    protected $web_block_factory;
+
+    /**
 	 * supp_factory
 	 * 
 	 * Supplemental factory
@@ -179,16 +187,15 @@ class report_block extends MY_Controller {
 		$this->load->model('web_content/section_model');
 		$this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
 		$this->load->model('web_content/block_model', 'WebBlockModel');
-		$web_blocks = new WebBlocks($this->WebBlockModel);
-		$this->pages = new Pages($this->page_model, $web_blocks);
-		$this->sections = new Sections($this->section_model, $this->pages);
+		$this->web_block_factory = new WebBlockFactory($this->WebBlockModel);
+		$this->page_factory = new PageFactory($this->page_model, $this->web_block_factory);
+		$this->section_factory = new SectionFactory($this->section_model, $this->page_factory);
 
 		// report content
 		$this->load->model('supplemental_model');
 		$this->load->model('ReportContent/report_block_model');
 		$this->load->model('Datasource/db_field_model');
 		$this->supp_factory = new SupplementalFactory($this->supplemental_model, site_url());
-		$this->blocks = new ReportBlocks($this->report_block_model, $this->db_field_model, $this->supp_factory, $web_blocks);
 
 		/* Load the profile.php config file if it exists
 		if (ENVIRONMENT == 'development' || ENVIRONMENT == 'localhost') {
@@ -227,19 +234,37 @@ class report_block extends MY_Controller {
 		
 		//load section
 		$this->section_path = isset($path_parts[$num_parts - 2]) ? $path_parts[$num_parts - 2] . '/' : '/';
-		$this->section = $this->sections->getByPath($this->section_path);
+		$this->section = $this->section_factory->getByPath($this->section_path);
 		
 		//is container page viewable to this user?
 		//does user have access to current page for selected herd?
-		$this->page = $this->pages->getByPath($path_page_segment, $this->section->id());
+		$this->page = $this->page_factory->getByPath($path_page_segment, $this->section->id());
 		$this->herd_page_access = new HerdPageAccess($this->page_model, $this->herd, $this->page);
 		$this->page_access = new PageAccess($this->page, $this->permissions->hasPermission("View All Content"));
 		if(!$this->page_access->hasAccess($this->herd_page_access->hasAccess())) {
 			$this->post_message('You do not have permission to view the requested report for herd ' . $this->herd->herdCode() . '.  Please select a report from the navigation or contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' if you have questions or concerns.');
 			return;
 		}
-		
-		$block = $this->blocks->getByPath(urldecode($block_name));
+
+        //FILTERS
+        if(isset($json_filter_data)){
+            $section = $this->section;
+            $arr_params = (array)json_decode(urldecode($json_filter_data));
+            /* @todo: backend csrf was blocking CORS, so we need to turn it off for development
+            if(isset($arr_params['csrf_test_name']) && $arr_params['csrf_test_name'] != $this->security->get_csrf_hash()){
+            die("I don't recognize your browser session, your session may have expired, or you may have cookies turned off.");
+            } */
+            unset($arr_params['csrf_test_name']);
+
+            //prep data for filter library
+            $this->load->model('filter_model');
+            $filters = new ReportFilters($this->filter_model, $this->page->id(), ['herd_code' => $this->session->userdata('herd_code')] + $arr_params);
+        }
+        //END FILTERS
+
+        $this->blocks = new Blocks($this->report_block_model, $this->db_field_model, $filters, $this->supp_factory, $this->web_block_factory);
+
+        $block = $this->blocks->getByPath(urldecode($block_name));
 		$output = $block->displayType();
 		
 		//SORT
@@ -247,60 +272,9 @@ class report_block extends MY_Controller {
 		$sort_builder->build($block, $sort_by, $sort_order);
 		//END SORT
 
-		//FILTERS
-		if(isset($json_filter_data)){
-			$section = $this->section;
-			$arr_params = (array)json_decode(urldecode($json_filter_data));
-/* @todo: backend csrf was blocking CORS, so we need to turn it off for development
-			if(isset($arr_params['csrf_test_name']) && $arr_params['csrf_test_name'] != $this->security->get_csrf_hash()){
-				die("I don't recognize your browser session, your session may have expired, or you may have cookies turned off.");
-			} */
-			unset($arr_params['csrf_test_name']);
-		
-			//prep data for filter library
-			$this->load->model('filter_model');
-			//load required libraries
-			$filters = new Filters($this->filter_model, $this->page->id(), ['herd_code' => $this->session->userdata('herd_code')] + $arr_params);
-			$this->load->helper('multid_array_helper');
-			$filters->setCriteria();
-
-            /*
-             * myagsource special case: if PAGE filters or params contain only a pstring of 0, and the block is not a summary
-            * Needed for pages that contain both cow level and summary reports.
-			*/
-            if($filters->criteriaExists('pstring') && !$block->isSummary()){
-                $p_value = $filters->getCriteriaValueByKey('pstring');
-                if(count($p_value) === 1 && $p_value[0] === 0){
-                    $filters->removeCriteria('pstring');
-                }
-            }
-
-            /*
-             * If this is a cow level block, and the filter is set to 0 (pstring), remove filter
-             * Needed for pages that contain both cow level and summary reports.
-			foreach($arr_params as $k => $v){
-                if(!$block->isSummary()){
-					if(is_array($v)){
-						$tmp = array_filter($arr_params[$k], function($v){
-							return (!empty($v) || $v === 0 || $v === '0');
-						});
-						if(empty($tmp)){
-							$filters->removeCriteria($k);
-						}
-					}
-					elseif(empty($v) && ($v !== 0 || $k === 'pstring')){
-						$filters->removeCriteria($k);
-					}
-				}
-			}
-            */
-		}
-		$block->setFilters($filters);
-		//END FILTERS
-		
-		// block-level supplemental data
-		$block_supp = $this->supp_factory->getBlockSupplemental($block->id(), $this->supplemental_model, site_url());
-		$this->supplemental = $block_supp->getContent();
+		// block-level supplemental data  NOW DONE IN BLOCK OBJECT
+		//$block_supp = $this->supp_factory->getBlockSupplemental($block->id());
+		//$this->supplemental = $block_supp->getContent();
 		//end supplemental
 
 		// benchmarks
@@ -317,11 +291,11 @@ class report_block extends MY_Controller {
 
 		// Load the most specific data-handling library that exists
 		$tmp_path = 'libraries/' . $page_path . '/' . $block_name;
-		$data_handler = new DataHandler();
-		$block_data_handler = $data_handler->load($block, $tmp_path, $this->report_data_model, $db_table, $this->benchmarks);
+		$data_handler = new DataHandler($this->report_data_model, $this->benchmarks);
+		$block_data_handler = $data_handler->load($block, $tmp_path);
 		//End load data-handling library
 
-		$results = $block_data_handler->getData($filters->criteriaKeyValue());//$report_count, 
+		$results = $block_data_handler->getData();//$report_count, 
 		// end report data
 		
 		//Handle table headers for table blocks

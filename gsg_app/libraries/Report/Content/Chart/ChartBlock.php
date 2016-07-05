@@ -8,7 +8,11 @@ require_once APPPATH . 'libraries/Report/Content/Chart/YAxis.php';
 require_once APPPATH . 'libraries/Report/Content/Block.php';
 
 use \myagsource\Datasource\DbObjects\DbField;
+use \myagsource\Datasource\DbObjects\DbTableFactory;
+use \myagsource\DataHandler;
+use \myagsource\Filters\ReportFilters;
 use \myagsource\Report\Content\Chart\ChartField;
+use \myagsource\Site\WebContent\Block AS SiteBlock;
 use \myagsource\Report\Content\Block;
 use \myagsource\Supplemental\Content\SupplementalFactory;
 use \myagsource\Report\Content\Chart\XAxis;
@@ -64,10 +68,10 @@ class ChartBlock extends Block {
 	
 	/**
 	 */
-	function __construct($block_datasource, $id, $page_id, $name, $description, $scope, $active, $path, $max_rows, $cnt_row, 
-			$sum_row, $avg_row, $bench_row, $is_summary, $display_type, $chart_type, SupplementalFactory $supp_factory, $field_groups, $keep_nulls) {
-		parent::__construct($block_datasource, $id, $page_id, $name, $description, $scope, $active, $path, $max_rows, $cnt_row, 
-			$sum_row, $avg_row, $bench_row, $is_summary, $display_type, $supp_factory, $field_groups);
+	function __construct($block_datasource, SiteBlock $site_block, $max_rows, $cnt_row, $sum_row, $avg_row, $bench_row, 
+		    $is_summary, $display_type, $chart_type, ReportFilters $filters, SupplementalFactory $supp_factory, DataHandler $data_handler, DbTableFactory $db_table_factory, $field_groups, $keep_nulls) {
+		parent::__construct($block_datasource, $site_block, $max_rows, $cnt_row,
+			$sum_row, $avg_row, $bench_row, $is_summary, $display_type, $filters, $supp_factory, $data_handler, $db_table_factory, $field_groups);
 		
 		$this->setReportFields();
 		
@@ -77,6 +81,7 @@ class ChartBlock extends Block {
 		$this->y_axes = [];
 		$this->setChartAxes();
 		$this->setSeries();
+        $this->setDataset();
 	}
 
 	public function keepNulls(){
@@ -115,7 +120,7 @@ class ChartBlock extends Block {
 		$this->report_fields = [];
 			
 		$arr_ret = array();
-		$arr_res = $this->datasource->getFieldData($this->id);
+		$arr_res = $this->datasource->getFieldData($this->site_block->id());
 		if(is_array($arr_res)){
 			foreach($arr_res as $s){
 				$header_supp = null;
@@ -148,7 +153,42 @@ class ChartBlock extends Block {
 		}
 	}
 
-	/**
+    /**
+     * toArray
+     *
+     * @return array representation of object
+     *
+     **/
+    public function toArray(){
+        $ret = parent::toArray();
+        $ret['keep_nulls'] = $this->keep_nulls;
+        if(is_array($this->categories) && !empty($this->categories)){
+            $ret['categories'] = $this->categories;
+        }
+        $ret['chart_type'] = $this->chart_type;
+
+        $ret['axes'] = [];
+        if(is_array($this->x_axes) && !empty($this->x_axes)){
+            $x = [];
+            foreach($this->x_axes as $s){
+                $x[] = $s->toArray();
+            }
+            $ret['axes']['x'] = $x;
+        }
+        if(is_array($this->y_axes) && !empty($this->y_axes)){
+            $y = [];
+            foreach($this->y_axes as $s){
+                $y[] = $s->toArray();
+            }
+            $ret['axes']['y'] = $y;
+        }
+        if(is_array($this->series) && !empty($this->series)){
+            $ret['series'] = $this->series;
+        }
+        return $ret;
+    }
+
+    /**
 	 * @method setChartAxes - retrieve data for categories, axes, etc.
 	 * @param int block id
 	 * @return void
@@ -156,7 +196,7 @@ class ChartBlock extends Block {
 	 *
 	 **/
 	protected function setChartAxes(){
-		$data = $this->datasource->getChartAxes($this->id);
+		$data = $this->datasource->getChartAxes($this->site_block->id());
 		if(!is_array($data) || empty($data) || count($data) < 1){
 			return false;
 		}

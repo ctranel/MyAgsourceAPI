@@ -2,16 +2,18 @@
 
 namespace myagsource\Report\Content\Table;
 
-//require_once APPPATH . 'libraries/Datasource/DbObjects/DbTable.php';
-require_once APPPATH . 'libraries/Datasource/DbObjects/DbField.php';
+//require_once APPPATH . 'libraries/Datasource/DbObjects/DbField.php';
 require_once APPPATH . 'libraries/Report/Content/Table/TableField.php';
 require_once APPPATH . 'libraries/Report/Content/Block.php';
 require_once(APPPATH . 'libraries/Report/Content/Table/Header/TableHeader.php');
 
-//use \myagsource\Datasource\DbObjects\DbTable;
+use \myagsource\Datasource\DbObjects\DbTableFactory;
+use \myagsource\DataHandler;
 use \myagsource\Datasource\DbObjects\DbField;
 use \myagsource\Report\Content\Table\TableField;
 use \myagsource\Report\Content\Block;
+use \myagsource\Site\WebContent\Block AS SiteBlock;
+use \myagsource\Filters\ReportFilters;
 use \myagsource\Supplemental\Content\SupplementalFactory;
 use \myagsource\Report\Content\Table\Header\TableHeader;
 
@@ -38,12 +40,14 @@ class TableBlock extends Block {
 	 **/
 	protected $top_row;
 	
-	function __construct($block_datasource, $id, $page_id, $name, $description, $scope, $active, $path, $max_rows, $cnt_row, 
-			$sum_row, $avg_row, $bench_row, $is_summary, $display_type, SupplementalFactory $supp_factory = null, $field_groups) {
-		parent::__construct($block_datasource, $id, $page_id, $name, $description, $scope, $active, $path, $max_rows, $cnt_row, 
-			$sum_row, $avg_row, $bench_row, $is_summary, $display_type, $supp_factory, $field_groups);
+	function __construct($block_datasource, SiteBlock $site_block, $max_rows, $cnt_row, $sum_row, $avg_row, $bench_row,
+			$is_summary, $display_type, ReportFilters $filters, SupplementalFactory $supp_factory = null, DataHandler $data_handler, DbTableFactory $db_table_factory, $field_groups) {
+		parent::__construct($block_datasource, $site_block, $max_rows, $cnt_row, 
+			$sum_row, $avg_row, $bench_row, $is_summary, $display_type, $filters, $supp_factory, $data_handler, $db_table_factory, $field_groups);
 		
 		$this->setReportFields();
+        $this->setDataset();
+        $this->setTableHeader();
 	}
 	
 	/**
@@ -54,16 +58,24 @@ class TableBlock extends Block {
 	 * @access public
 	 *
 	 **/
-	public function setTableHeader(&$report_data, SupplementalFactory $supplemental_factory = null, $header_groups){
-		$this->table_header = new TableHeader($this, $header_groups, $supplemental_factory);
+	public function setTableHeader(){//&$report_data, SupplementalFactory $supplemental_factory = null, $header_groups){
+        //new for API refactoring
+        $header_groups = $this->datasource->getHeaderGroups($this->id());
+
+        //@todo: pull this only when needed? move adjustHeaderGroups to TableBlock or TableHeader class
+        $arr_dates = null;//$this->herd_model->get_test_dates_7_short($this->session->userdata('herd_code'));
+        $header_groups = TableHeader::mergeDateIntoHeader($header_groups, $arr_dates);
+        //end new for API refactoring
+
+        $this->table_header = new TableHeader($this, $header_groups, $this->supplemental_factory);
 		
 		$top_row = null;
-		if($this->hasPivot() && is_array($report_data) && !empty($report_data)){
-			reset($report_data);
-			$tmp_key = key($report_data);
+		if($this->hasPivot() && is_array($this->dataset) && !empty($this->dataset)){
+			reset($this->dataset);
+			$tmp_key = key($this->dataset);
 			//add placeholder for column generated from header row
-			$this->top_row = array_merge([''],$report_data[$tmp_key]);
-			unset($report_data[$tmp_key]);
+			$this->top_row = array_merge([''],$this->dataset[$tmp_key]);
+			unset($this->dataset[$tmp_key]);
 		}
 	}
 
@@ -132,6 +144,28 @@ class TableBlock extends Block {
 		return $return_val;
 	}
 
+    /**
+     * toArray
+     *
+     * @return array representation of object
+     *
+     **/
+    public function toArray(){
+        $ret = parent::toArray();
+        if(isset($this->table_header)){
+            $this->table_header->getTableHeaderStructure($this->top_row);
+            $ret['table_header'] = $this->table_header->toArray();
+        }
+        if(is_array($this->report_fields) && !empty($this->report_fields)){
+            $fields = [];
+            foreach($this->report_fields as $k=>$f){
+                $fields[$f->dbFieldName()] = $f->toArray();
+            }
+            $ret['report_fields'] = $fields;
+        }
+        return $ret;
+    }
+
 	/**
 	 * setReportFields
 	 * 
@@ -146,8 +180,7 @@ class TableBlock extends Block {
 		$this->has_aggregate = false;
 		$this->report_fields = [];
 			
-		$arr_ret = array();
-		$arr_res = $this->datasource->getFieldData($this->id);
+		$arr_res = $this->datasource->getFieldData($this->site_block->id());
 		if(is_array($arr_res)){
 			foreach($arr_res as $s){
 				$header_supp = null;

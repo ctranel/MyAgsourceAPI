@@ -7,12 +7,14 @@ require_once(APPPATH . 'libraries/AccessLog.php');
 require_once(APPPATH . 'libraries/Benchmarks/Benchmarks.php');
 require_once(APPPATH . 'libraries/dhi/HerdAccess.php');
 require_once APPPATH . 'libraries/Settings/SessionSettings.php';
+require_once APPPATH . 'libraries/Api/Response/ResponseMessage.php';
 
 use \myagsource\AccessLog;
 use \myagsource\dhi\Herd;
 use \myagsource\Benchmarks\Benchmarks;
 use \myagsource\dhi\HerdAccess;
-use myagsource\Settings\SessionSettings;
+use \myagsource\Settings\SessionSettings;
+use \myagsource\Api\Response\ResponseMessage;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 class Change_herd extends MY_Api_Controller {
@@ -37,6 +39,7 @@ class Change_herd extends MY_Api_Controller {
 
 		$this->load->model('herd_model');
 		$this->herd_access = new HerdAccess($this->herd_model);
+
 		if(!isset($this->as_ion_auth) || !$this->as_ion_auth->logged_in()){
 			$this->sendResponse(401);
 		}
@@ -75,24 +78,40 @@ class Change_herd extends MY_Api_Controller {
 		$this->load->library('form_validation');
 		$this->form_validation->set_rules('herd_code', 'Herd', 'required|max_length[8]');
 		//$this->form_validation->set_rules('herd_code_fill', 'Type Herd Code');
-
-		if($this->form_validation->run_input() === false){
+		if($this->form_validation->run_input() === true){
             //if the user has access to only 1 herd, set them up with that herd regardless of form submission
             $tmp_arr = $this->herd_access->getAccessibleHerdsData($this->session->userdata('user_id'), $this->permissions->permissionsList(), $this->session->userdata('arr_regions'));
             if(is_array($tmp_arr) && !empty($tmp_arr) && count($tmp_arr) === 1) {
-                $msgs = $this->_loadSessionHerd($tmp_arr[0]['herd_code']);
-                $this->sendResponse(200, array_merge($msgs, new ResponseMessage('Herd has been activated', 'message')));
+                try{
+                    $resp_msg = [];
+                    $msg = $this->_loadSessionHerd($tmp_arr[0]['herd_code']);
+                    if(!empty($msg)){
+                        $resp_msg = new ResponseMessage($msg, 'message');
+                    }
+                    $this->_record_access(2); //2 is the page code for herd change
+                    $this->sendResponse(200, $resp_msg);
+                }
+                catch(Exception $e){
+                    $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
+                }
+            }
+
+            //if the user has access to more than 1 herd
+            try{
+                $resp_msg = [];
+                $msg = $this->_loadSessionHerd($this->input->userInput('herd_code'));
+                if(!empty($msg)){
+                    $resp_msg = new ResponseMessage($msg, 'message');
+                }
+                $this->_record_access(2); //2 is the page code for herd change
+                $this->sendResponse(200, $resp_msg);
+            }
+            catch(Exception $e){
+                $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
             }
             //else send error
-			$this->sendResponse(400, new ResponseMessage(validation_errors(), 'error'));
 		}
-
-        $msgs = $this->_loadSessionHerd($this->input->userInput('herd_code'));
-        $this->_record_access(2); //2 is the page code for herd change
-
-        //NOTICES
-        //Get any system notices
-        $this->sendResponse(200, $msgs);
+        $this->sendResponse(400, new ResponseMessage(validation_errors(), 'error'));
 	}
 
 	/**
@@ -126,7 +145,7 @@ class Change_herd extends MY_Api_Controller {
 			}
 		}
 
-        $this->_loadSessionHerd($this->input->post('herd_code'));
+        $this->_loadSessionHerd($this->input->userInput('herd_code'));
         $this->_record_access(2); //2 is the page code for herd change
         $this->sendResponse(200);
 	}
@@ -151,11 +170,13 @@ class Change_herd extends MY_Api_Controller {
      * _setSessionHerd
      * 
      * @param: string herd code
-     * @return array of ResponseMessage objects
+     * @return response text
      */
     protected function _loadSessionHerd($herd_code){
-        $msg = [];
-        $this->herd = new Herd($herd_code);
+        $msg = '';
+        if(!isset($this->herd)){
+            $this->herd = new Herd($this->herd_model, $herd_code);
+        }
         if($this->session->userdata('active_group_id') == 2){ //user is a producer
             $trials = $this->herd->getTrialData();
             if(isset($trials) && is_array($trials)){
@@ -168,10 +189,10 @@ class Change_herd extends MY_Api_Controller {
                     $expire_date = new DateTime($t['herd_trial_expires']);
                     $days_remain = $expire_date->diff($today)->days;
                     if($t['herd_trial_is_expired'] === 1){
-                        $msg[] = new ResponseMessage('The trial period on ' . $t['value_abbrev'] . ' for herd ' . $this->herd->herdCode() . ' has expired. Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' to enroll on ' . $t['value_abbrev'] . ' and get the full benefit of the MyAgSource web site.', 'error');
+                        $msg = 'The trial period on ' . $t['value_abbrev'] . ' for herd ' . $this->herd->herdCode() . ' has expired. Please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' to enroll on ' . $t['value_abbrev'] . ' and get the full benefit of the MyAgSource web site.';
                     }
                     elseif($warn_date <= $today){
-                        $msg[] = new ResponseMessage('Herd ' . $this->herd->herdCode() . ' has ' . $days_remain . ' days remaining on its free trial of ' . $t['value_abbrev'] . '.  To ensure uninterrupted access, please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' to enroll on ' . $t['value_abbrev'] . ' and get the full benefit of the MyAgSource web site.', 'warning');
+                        $msg = 'Herd ' . $this->herd->herdCode() . ' has ' . $days_remain . ' days remaining on its free trial of ' . $t['value_abbrev'] . '.  To ensure uninterrupted access, please contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' to enroll on ' . $t['value_abbrev'] . ' and get the full benefit of the MyAgSource web site.';
                     }
                 }
             }

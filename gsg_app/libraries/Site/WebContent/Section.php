@@ -6,7 +6,7 @@ require_once APPPATH . 'libraries/Site/iWebContent.php';
 use myagsource\Site\iWebContent;
 use myagsource\dhi\Herd;
 /**
-* Name:  Sections
+* Name:  Section
 *
 * Author: ctranel
 *  

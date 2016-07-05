@@ -1,15 +1,15 @@
 <?php
 //namespace myagsource;
-require_once(APPPATH . 'libraries/filters/Filters.php');
+require_once(APPPATH . 'libraries/Filters/ReportFilters.php');
 require_once(APPPATH . 'libraries/Benchmarks/Benchmarks.php');
 //use supp factory in CSV?
 require_once(APPPATH . 'libraries/Supplemental/Content/SupplementalFactory.php');
 require_once(APPPATH . 'libraries/dhi/HerdAccess.php');
 require_once(APPPATH . 'libraries/dhi/Herd.php');
-require_once(APPPATH . 'libraries/Report/Content/Blocks.php');
-require_once(APPPATH . 'libraries/Site/WebContent/Blocks.php');
-require_once(APPPATH . 'libraries/Site/WebContent/Pages.php');
-require_once(APPPATH . 'libraries/Site/WebContent/Sections.php');
+require_once(APPPATH . 'libraries/Report/Content/ReportBlockFactory.php');
+require_once(APPPATH . 'libraries/Site/WebContent/WebBlockFactory.php');
+require_once(APPPATH . 'libraries/Site/WebContent/PageFactory.php');
+require_once(APPPATH . 'libraries/Site/WebContent/SectionFactory.php');
 require_once(APPPATH . 'libraries/Site/WebContent/PageAccess.php');
 require_once(APPPATH . 'libraries/dhi/HerdPageAccess.php');
 require_once(APPPATH . 'libraries/Datasource/DbObjects/DbTable.php');
@@ -21,17 +21,17 @@ require_once(APPPATH . 'libraries/Report/Content/Csv.php');
 require_once(APPPATH . 'libraries/AccessLog.php');
 
 use \myagsource\Benchmarks\Benchmarks;
-use \myagsource\report_filters\Filters;
+use \myagsource\Filters\ReportFilters;
 //use supp factory in CSV?
 use \myagsource\Supplemental\Content\SupplementalFactory;
 use \myagsource\dhi\HerdAccess;
 use \myagsource\dhi\HerdPageAccess;
 use \myagsource\Site\WebContent\PageAccess;
 use \myagsource\dhi\Herd;
-use \myagsource\Site\WebContent\Sections;
-use \myagsource\Site\WebContent\Pages;
-use \myagsource\Site\WebContent\Blocks as WebBlocks;
-use \myagsource\Report\Content\Blocks as ReportBlocks;
+use \myagsource\Site\WebContent\SectionFactory;
+use \myagsource\Site\WebContent\PageFactory;
+use \myagsource\Site\WebContent\WebBlockFactory;
+use \myagsource\Report\Content\ReportBlockFactory;
 use \myagsource\Datasource\DbObjects\DbTable;
 use \myagsource\Report\Content\SortBuilder;
 use \myagsource\DataHandler;
@@ -65,17 +65,17 @@ class Blocks extends MY_Controller {
 	
 	/**
 	 * section
-	 * @var Sections
+	 * @var SectionFactory
 	 **/
-	protected $sections;
+	protected $section_factory;
 	
 	/**
-	 * pages
+	 * page_factory
 	 * 
-	 * page repository
-	 * @var Pages
+	 * page factory
+	 * @var PageFactory
 	 **/
-	protected $pages;
+	protected $page_factory;
 	
 	/**
 	 * page
@@ -84,12 +84,12 @@ class Blocks extends MY_Controller {
 	protected $page;
 	
 	/**
-	 * blocks
+	 * report_block_factory
 	 * 
 	 * Block repository
-	 * @var blocks
+	 * @var report_block_factory
 	 **/
-	protected $blocks;
+	protected $report_block_factory;
 	
 	/**
 	 * block
@@ -176,10 +176,6 @@ class Blocks extends MY_Controller {
         $this->load->model('web_content/section_model');
         $this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
         $this->load->model('web_content/block_model', 'WebBlockModel');
-        $web_blocks = new WebBlocks($this->WebBlockModel);
-        $form_factory = null;//new FormFactory($this->setting_model, $this->supplemental_factory);
-        $this->pages = new Pages($this->page_model, $web_blocks, $form_factory);
-        $this->sections = new Sections($this->section_model, $this->pages);
 
         // report content
 		$this->load->model('supplemental_model');
@@ -187,7 +183,6 @@ class Blocks extends MY_Controller {
 		$this->load->model('Datasource/db_field_model');
 //use supp factory in CSV?
 		$this->supp_factory = null;//new SupplementalFactory($this->supplemental_model, site_url());
-		$this->blocks = new ReportBlocks($this->report_block_model, $this->db_field_model, $this->supp_factory, $web_blocks);
 
 				/* Load the profile.php config file if it exists
 		if (ENVIRONMENT == 'development' || ENVIRONMENT == 'localhost') {
@@ -212,35 +207,31 @@ class Blocks extends MY_Controller {
 		$num_parts = count($path_parts);
 		$path_page_segment = $path_parts[$num_parts - 1];
 
-		//load section
+		//load web site objects/data
 		$this->section_path = isset($path_parts[$num_parts - 2]) ? $path_parts[$num_parts - 2] . '/' : '/';
-		$this->section = $this->sections->getByPath($this->section_path);
+		$this->section = $this->section_factory->getByPath($this->section_path);
+        $web_block_factory = new WebBlockFactory($this->WebBlockModel);
+        $form_factory = null;//new FormFactory($this->setting_model, $this->supplemental_factory);
+        $this->page_factory = new PageFactory($this->page_model, $web_block_factory, $form_factory);
+        $this->section_factory = new SectionFactory($this->section_model, $this->page_factory);
 						
 		//is container page viewable to this user?
 		//does user have access to current page for selected herd?
-		$this->page = $this->pages->getByPath($path_page_segment, $this->section->id());
+		$this->page = $this->page_factory->getByPath($path_page_segment, $this->section->id());
 		$this->herd_page_access = new HerdPageAccess($this->page_model, $this->herd, $this->page);
 		$this->page_access = new PageAccess($this->page, $this->permissions->hasPermission("View All Content"));
 		if(!$this->page_access->hasAccess($this->herd_page_access->hasAccess())) {
 			$this->post_message('You do not have permission to view the requested report for herd ' . $this->herd->herdCode() . '.  Please select a report from the navigation or contact ' . $this->config->item('cust_serv_company') . ' at ' . $this->config->item('cust_serv_email') . ' or ' . $this->config->item('cust_serv_phone') . ' if you have questions or concerns.');
 			return;
 		}
-		
-		$this->block = $this->blocks->getByPath(urldecode($block_name));
-		$output = $this->block->displayType();
-		
-		//SORT
-		$sort_builder = new SortBuilder($this->report_block_model);
-		$sort_builder->build($this->block, $sort_by, $sort_order);
-		//END SORT
-		
-		//FILTERS
-		//prep data for filter library
-		$this->load->model('filter_model');
-		//load required libraries
-		$arr_params = [];
-		
-		if(isset($json_filter_data)) {
+
+        //FILTERS
+        //prep data for filter library
+        $this->load->model('filter_model');
+        //load required libraries
+        $arr_params = [];
+
+        if(isset($json_filter_data)) {
             $arr_params = (array)json_decode(urldecode($json_filter_data));
             /* @todo: backend csrf was blocking CORS, so we need to turn it off for development
              * if(isset($arr_params['csrf_test_name']) && $arr_params['csrf_test_name'] != $this->security->get_csrf_hash()){
@@ -249,9 +240,7 @@ class Blocks extends MY_Controller {
             unset($arr_params['csrf_test_name']);
         }
 
-        $filters = new Filters($this->filter_model, $this->page->id(), ['herd_code' => $this->session->userdata('herd_code')] + $arr_params);
-        $this->load->helper('multid_array_helper');
-        $filters->setCriteria();
+        $filters = new ReportFilters($this->filter_model, $this->page->id(), ['herd_code' => $this->session->userdata('herd_code')] + $arr_params);
 
         /*
          * If this is a cow level block, and the filter is set to 0 (pstring), remove filter
@@ -272,34 +261,47 @@ class Blocks extends MY_Controller {
                 }
             }
         }
+        //should be in report block factory constructor
+        //$this->block->setFilters($filters);
+        //END FILTERS
 
-		$this->block->setFilters($filters);
-		//END FILTERS
+        // benchmarks
+        $this->load->model('setting_model', null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
+        $herd_info = $this->herd_model->header_info($this->herd->herdCode());
+        $this->load->model('benchmark_model');
+        $this->benchmarks = new Benchmarks($this->session->userdata('user_id'), $this->input->post('herd_code'), $herd_info, $this->setting_model, $this->benchmark_model, $this->session->userdata('benchmarks'));
+        // end benchmarks
+
+        //Set report block factory
+        $data_handler = new DataHandler($this->report_data_model, $this->benchmarks);
+        $db_table_factory = new DbTableFactory($this->db_table_model);
+        $this->report_block_factory = new ReportBlockFactory($this->report_block_model, $this->db_field_model, $filters, $this->supp_factory, $data_handler, $db_table_factory, $web_block_factory);
+
+        $this->block = $this->report_block_factory->getByPath(urldecode($block_name));
+		$output = $this->block->displayType();
 		
-		// benchmarks
-		$this->load->model('setting_model', null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
-		$herd_info = $this->herd_model->header_info($this->herd->herdCode());
-		$this->load->model('benchmark_model');
-		$this->benchmarks = new Benchmarks($this->session->userdata('user_id'), $this->input->post('herd_code'), $herd_info, $this->setting_model, $this->benchmark_model, $this->session->userdata('benchmarks'));
-		// end benchmarks
-			
+		//SORT
+		$sort_builder = new SortBuilder($this->report_block_model);
+		$sort_builder->build($this->block, $sort_by, $sort_order);
+		//END SORT
+		
 		// report data
 		$this->load->model('ReportContent/report_data_model');
 		$this->load->model('Datasource/db_table_model');
 		$db_table = new DbTable($this->block->primaryTableName (), $this->db_table_model);
 
 		// Load the most specific data-handling library that exists
-		$tmp_path = $page_path . '/' . $block_name;
-		$data_handler = new DataHandler();
-		$block_data_handler = $data_handler->load($this->block, $tmp_path, $this->report_data_model, $db_table, $this->benchmarks);
+		//$tmp_path = $page_path . '/' . $block_name;
+		//$data_handler = new DataHandler($this->report_data_model, $this->benchmarks);
+		//$block_data_handler = $data_handler->load($this->block, $tmp_path, $this->report_data_model, $db_table, $this->benchmarks);
 		//End load data-handling library
 
-		$results = $block_data_handler->getData($filters->criteriaKeyValue());//$report_count, 
-        $results = $block_data_handler->prepareDisplayData();
+		//$results = $block_data_handler->getData();//$report_count, 
+        //$results = $block_data_handler->prepareDisplayData();
 
-		if(!is_array($results) || empty($results)){
+		//if(!is_array($results) || empty($results)){
 			
-		}
+		//}
 		// end report data
 		
 		//Handle table headers for table blocks

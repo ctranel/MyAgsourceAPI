@@ -5,14 +5,15 @@ require_once APPPATH . 'libraries/Site/iPage.php';
 require_once APPPATH . 'libraries/Site/iWebContent.php';
 require_once APPPATH . 'libraries/Site/iWebContentRepository.php';
 
-use myagsource\Benchmarks\Benchmarks;
-use myagsource\report_filters\Filters;
-use myagsource\Site\iPage;
-use myagsource\Site\iWebContent;
-use myagsource\Site\iWebContentRepository;
-use myagsource\dhi\Herd;
-use myagsource\Form\Content\FormFactory;
-use myagsource\Supplemental\Content\SupplementalFactory;
+use \myagsource\Benchmarks\Benchmarks;
+use \myagsource\Filters\ReportFilters;
+use \myagsource\Site\iPage;
+use \myagsource\Site\iWebContent;
+use \myagsource\Report\Content\ReportBlockFactory;
+use \myagsource\Site\iWebContentRepository;
+use \myagsource\dhi\Herd;
+use \myagsource\Form\Content\FormFactory;
+use \myagsource\Supplemental\Content\SupplementalFactory;
 
 /**
 * Name:  Page
@@ -24,7 +25,6 @@ use myagsource\Supplemental\Content\SupplementalFactory;
 * Description:  Contains properties and methods specific to displaying sections of the website.
 *
 * @todo: this library will be the basis for pages, blocks, etc, and will eventually have an abstract and/or interface to reflect the commonalities
-* @todo: add filters?
 *
 */
 
@@ -109,7 +109,7 @@ class Page implements iPage {//iWebContent,
 
 	/**
 	 * report filters
-	 * @var Filters
+	 * @var ReportFilters
 	 **/
 	protected $filters;
 
@@ -133,7 +133,7 @@ class Page implements iPage {//iWebContent,
 	 * 
 	 * @todo: may need to add herd header info too
 	 **/
-	public function __construct($page_data, Blocks $block_factory, FormFactory $form_factory, SupplementalFactory $supplemental_factory = null, Filters $filters = null, Benchmarks $benchmarks = null) {
+	public function __construct($page_data, ReportBlockFactory $report_blocks_factory, FormFactory $form_factory, SupplementalFactory $supplemental_factory = null, ReportFilters $filters = null, Benchmarks $benchmarks = null) {
         $this->id = $page_data['id'];
         $this->section_id = $page_data['section_id'];
 		$this->name = $page_data['name'];
@@ -142,7 +142,6 @@ class Page implements iPage {//iWebContent,
 		$this->active = $page_data['active'];
 		$this->path = $page_data['path'];
         $this->route = $page_data['route'];
-
         $this->supplemental = $supplemental_factory->getPageSupplemental($this->id);
 
 		//$this->blocks = $blocks;
@@ -150,7 +149,7 @@ class Page implements iPage {//iWebContent,
 		$this->filters = $filters;
         $this->benchmarks = $benchmarks;
         
-        $this->loadChildren($block_factory, $form_factory);
+        $this->loadChildren($report_blocks_factory, $form_factory);
 	}
 
     public function toArray(){

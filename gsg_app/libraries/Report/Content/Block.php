@@ -9,9 +9,11 @@ require_once APPPATH . 'libraries/Datasource/DbObjects/DbField.php';
 
 use \myagsource\Report\iBlock as iReportBlock;
 use \myagsource\Datasource\DbObjects\DbField;
+use \myagsource\Datasource\DbObjects\DbTableFactory;
+use \myagsource\DataHandler;
 use \myagsource\Supplemental\Content\SupplementalFactory;
 use \myagsource\Datasource\iDataField;
-use \myagsource\report_filters\Filters;
+use \myagsource\Filters\ReportFilters;
 use \myagsource\Site\WebContent\Block as SiteBlock;
 
 /**
@@ -26,56 +28,6 @@ use \myagsource\Site\WebContent\Block as SiteBlock;
 */
 
 abstract class Block implements iReportBlock {
-//START SITE/WEBCONTENT/BLOCK PROPERTIES    
-	/**
-	 * block id
-	 * @var int
-	 **/
-	protected $id;
-
-	/**
-	 * page_id
-	 * @var int
-	 **/
-	protected $page_id;
-
-	/**
-	 * block name
-	 * @var string
-	 **/
-	protected $name;
-	
-	/**
-	 * block description
-	 * @var string
-	 **/
-	protected $description;
-	
-	/**
-	 * block path
-	 * @var string
-	 **/
-	protected $path;
-
-	/**
-	 * display_type
-	 * @var string
-	 **/
-	protected $display_type;
-
-	/**
-	 * scope
-	 * @var string
-	 **/
-	protected $scope;
-
-	/**
-	 * active
-	 * @var boolean
-	 **/
-	protected $active;
-//END SITE/WEBCONTENT/BLOCK PROPERTIES    
-
     /**
      * SiteBlock object which contains properties and methods related to the block context within the site
      * @var SiteBlock
@@ -160,11 +112,10 @@ abstract class Block implements iReportBlock {
 	 **/
 	protected $has_aggregate;
 	
-	//@todo: below should be in BlockData?
 	/**
 	 * filters
 	 * 
-	 * @var Filters
+	 * @var ReportFilters
 	 **/
 	protected $filters;
 	
@@ -181,12 +132,6 @@ abstract class Block implements iReportBlock {
 	protected $joins;
 	
 	/**
-	 * supp_factory
-	 * @var SupplementalFactory
-	 **/
-	protected $supp_factory;
-	
-	/**
 	 * supp_param_fieldnames
 	 * @var array
 	 **/
@@ -197,7 +142,37 @@ abstract class Block implements iReportBlock {
 	 * @var numerically keyed array
 	 **/
 	protected $field_groups;
-	
+
+    /**
+     * dataset
+     * @var array
+     **/
+    protected $dataset;
+
+    /**
+     * data_handler
+     * @var DataHandler
+     **/
+   protected $data_handler;
+
+    /**
+     * supplemental
+     * @var Supplemental
+     **/
+    protected $supplemental;
+
+    /**
+     * supplemental_factory
+     * @var SupplementalFactory
+     **/
+    protected $supplemental_factory;
+
+    /**
+     * db_table_factory
+     * @var DbTableFactory
+     **/
+    protected $db_table_factory;
+
     //The count of rows appended to the end of a dataset's rows; the number of these rows: sum_row,avg_row,cnt_row,bench_row
 	protected $appended_rows_count;
 	
@@ -207,8 +182,8 @@ abstract class Block implements iReportBlock {
 	 * @return void
 	 * @author ctranel
 	 **/
-	public function __construct($block_datasource, SiteBlock $site_block, $max_rows, $cnt_row, 
-			$sum_row, $avg_row, $bench_row, $is_summary, $display_type, SupplementalFactory $supp_factory = null, $field_groups = null) {//$id, $page_id, $name, $description, $scope, $active, $path, 
+	public function __construct($block_datasource, SiteBlock $site_block, $max_rows, $cnt_row, $sum_row, $avg_row, $bench_row,
+            $is_summary, $display_type, ReportFilters $filters, SupplementalFactory $supp_factory, DataHandler $data_handler, DbTableFactory $db_table_factory, $field_groups = null) {//$id, $page_id, $name, $description, $scope, $active, $path, 
 		$this->datasource = $block_datasource;
         $this->site_block = $site_block;
 		$this->max_rows = $max_rows;
@@ -221,16 +196,33 @@ abstract class Block implements iReportBlock {
 		//$this->group_by_fields = $group_by_fields;
 		//$this->where_fields = $group_by_fields;
 		$this->display_type = $display_type;
-		$this->supp_factory = $supp_factory;
-		
+        $this->filters = $filters;
+        $this->data_handler = $data_handler;
+        $this->db_table_factory = $db_table_factory;
+
+        /*
+         * myagsource special case: if PAGE filters or params contain only a pstring of 0, and the block is not a summary
+        * Needed for pages that contain both cow level and summary reports.
+         * @todo: should extend base class with MyAgSource-specific class
+        */
+        if($this->filters->criteriaExists('pstring') && !$this->isSummary()){
+            $p_value = $this->filters->getCriteriaValueByKey('pstring');
+            if(count($p_value) === 1 && $p_value[0] === 0){
+                $this->filters->removeCriteria('pstring');
+            }
+        }
+        /* end special case */
+
+        $this->supplemental_factory = $supp_factory;
+        $this->supplemental = $supp_factory->getBlockSupplemental($this->site_block->id());
 		$this->supp_param_fieldnames = [];
 		
 		//load data for remaining fields
 		$this->setWhereGroups();
 		$this->setDefaultSort();
 		//@todo: joins
-		
-		$this->appended_rows_count = 0;
+
+        $this->appended_rows_count = 0;
 		if ($cnt_row) {
 		    $this->appended_rows_count++;
 		}
@@ -243,7 +235,6 @@ abstract class Block implements iReportBlock {
 		if ($bench_row) {
 		    $this->appended_rows_count++;
 		}
-		
 	}
 	
 	/*
@@ -332,11 +323,15 @@ abstract class Block implements iReportBlock {
 	}
 	
 	public function numFields(){
-		return $this->report_fields->count();
+		return count($this->report_fields);
 	}
 
+    public function filterKeysValues(){
+        return $this->filters->criteriaKeyValue();
+    }
+    
 	public function getFieldlistArray(){
-		if(!isset($this->report_fields) || $this->report_fields->count() === 0){
+		if(!isset($this->report_fields) || count($this->report_fields) === 0){
 			return false;
 		}
 		$ret = [];
@@ -347,7 +342,7 @@ abstract class Block implements iReportBlock {
 	}
 
 	public function getDisplayedFieldArray(){
-		if(!isset($this->report_fields) || $this->report_fields->count() === 0){
+		if(!isset($this->report_fields) || count($this->report_fields) === 0){
 			return false;
 		}
 		$ret = [];
@@ -378,6 +373,9 @@ abstract class Block implements iReportBlock {
 
 	/**
 	 * @method getOutputData
+     * 
+     * Returns data needed by original non-API version of site
+     * 
 	 * @return array of output data for block
 	 * @access public
 	 *
@@ -387,13 +385,50 @@ abstract class Block implements iReportBlock {
 			'name' => $this->site_block->name(),
 			'description' => $this->site_block->name(),
 			'filter_text' => $this->filters->get_filter_text(),
-			'client_data' => [
-				'block' => $this->site_block->path(), //original program included sort_by, sort_order, graph_order but couldn't find anywhere it was used
-				
-			],
+			'block' => $this->site_block->path(), //original program included sort_by, sort_order, graph_order but couldn't find anywhere it was used
+			'block_id' => $this->site_block->id(),
 		];
 	}
 
+    /**
+     * toArray
+     *
+     * @return array representation of object
+     *
+     **/
+    public function toArray(){
+        $ret = $this->site_block->toArray();
+        $ret['pivot_field'] = $this->pivot_field;
+        $ret['is_summary'] = $this->is_summary;
+        $ret['display_type'] = $this->display_type;
+        $ret['appended_rows_count'] = $this->appended_rows_count;
+//            'max_rows' => $this->max_rows,
+        $ret['cnt_row'] = $this->cnt_row;
+        $ret['sum_row'] = $this->sum_row;
+        $ret['avg_row'] = $this->avg_row;
+        $ret['bench_row'] = $this->bench_row;
+//            'field_groups' => $this->field_groups,
+
+        if(is_array($this->dataset) && !empty($this->dataset)){
+            $ret['dataset'] = $this->dataset;
+        }
+
+        $tmp = array_filter($this->supplemental->toArray());
+        if(is_array($tmp) && !empty($tmp)){
+            $ret['supplemental'] = $tmp;
+        }
+        unset($tmp);
+
+        if(is_array($this->default_sorts) && !empty($this->default_sorts)){
+            $dsorts = [];
+            foreach($this->default_sorts as $s){
+                $dsorts[] = $s->toArray();
+            }
+            $ret['default_sorts'] = $dsorts;
+        }
+
+        return $ret;
+    }
 	/**
 	 * setWhereGroups()
 	 * 
@@ -511,7 +546,7 @@ abstract class Block implements iReportBlock {
 	 * @access public
 	* */
 	public function resetSort(){
-		if(isset($this->sorts) && $this->sorts->count() > 0){
+		if(isset($this->sorts) && count($this->sorts) > 0){
 			$this->sorts->removeAll($this->sorts);
 		}
 	}
@@ -583,10 +618,10 @@ abstract class Block implements iReportBlock {
 	 * @param Filter object
 	 * @return void
 	 * @access public
-	* */
 	public function setFilters(Filters $filters){
 		$this->filters = $filters;
 	}
+* */
 	
 	/**
 	 * @method getFieldTable()
@@ -705,6 +740,19 @@ abstract class Block implements iReportBlock {
 	public function setPivot(iDataField $pivot_field){
 		$this->pivot_field = $pivot_field;
 	}
+
+    /**
+     * setDataset
+     *
+     * sets the objects dataset property with report data
+     * @access public
+     * */
+    protected function setDataset(){
+        $db_table = $this->db_table_factory->getTable($this->primary_table_name);
+        $tmp_path = 'libraries/DataHandlers/' . $this->path() . '.php';
+        $block_data_handler = $this->data_handler->load($this, $tmp_path, $db_table);
+        $this->dataset = $block_data_handler->getData();
+    }
 }
 
 

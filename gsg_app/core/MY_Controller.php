@@ -7,18 +7,12 @@
 require_once APPPATH . 'libraries/dhi/Herd.php';
 require_once APPPATH . 'libraries/Ion_auth.php';
 require_once APPPATH . 'libraries/AccessLog.php';
-require_once APPPATH . 'libraries/Site/WebContent/Sections.php';
-require_once APPPATH . 'libraries/Site/WebContent/Pages.php';
-require_once APPPATH . 'libraries/Site/WebContent/Blocks.php';
 require_once(APPPATH . 'libraries/dhi/HerdAccess.php');
 require_once(APPPATH . 'libraries/as_ion_auth.php');
 require_once(APPPATH . 'libraries/Products/Products/Products.php');
 require_once(APPPATH . 'libraries/Permissions/Permissions/ProgramPermissions.php');
 
 use \myagsource\AccessLog;
-use \myagsource\Site\WebContent\Sections;
-use \myagsource\Site\WebContent\Pages;
-use \myagsource\Site\WebContent\Blocks;
 use \myagsource\dhi\Herd;
 use \myagsource\dhi\HerdAccess;
 use \myagsource\as_ion_auth;
@@ -53,9 +47,6 @@ class MY_Controller extends CI_Controller
         $this->load->helper('html');
         $this->load->helper('error');
         $this->herd_access = new HerdAccess($this->herd_model);
-        //$blocks = new Blocks($this->block_model);
-        //$pages = new Pages($this->page_model, $blocks);
-        //$sections = new Sections($this->section_model, $pages);
         $herd = new Herd($this->herd_model, $this->session->userdata('herd_code'));
 
         if($this->session->userdata('active_group_id')) {
