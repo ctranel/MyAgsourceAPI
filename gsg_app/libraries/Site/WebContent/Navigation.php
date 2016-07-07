@@ -125,8 +125,28 @@ class Navigation{// implements iWebContentRepository {
 
 		return $branch;
 	}
-	
-	/**
+
+    /**
+     * toArray()
+     *
+     * Returns an array representation of tree
+     *
+     * @return array
+     * @access public
+     **/
+    public function toArray($section = null){
+        if(!isset($this->tree) || !is_array($this->tree) || empty($this->tree)){
+            return false;
+        }
+        if(isset($section)){
+            $tree = self::getSubTree('name', $section, $this->tree);//array_search('Herd Summary', array_column($this->tree, 'name'));
+        }
+        return (isset($tree) ? $tree :$this->tree);
+    }
+
+
+
+    /**
 	 * jsonOutput()
 	 * 
 	 * Returns json string representation of tree
@@ -135,14 +155,7 @@ class Navigation{// implements iWebContentRepository {
 	 * @access public
 	 **/
 	public function jsonOutput($section = null){
-		if(!isset($this->tree) || !is_array($this->tree) || empty($this->tree)){
-			return false;
-		}
-		if(isset($section)){
-			$tree = self::getSubTree('name', $section, $this->tree);//array_search('Herd Summary', array_column($this->tree, 'name'));
-		}
-//var_dump($tree, $section, $this->tree); die;
-		$json = json_encode(isset($tree) ? $tree :$this->tree);
+		$json = json_encode($this->toArray($section));
 		return $json;
 	}
 	

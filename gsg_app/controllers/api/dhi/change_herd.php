@@ -8,6 +8,7 @@ require_once(APPPATH . 'libraries/Benchmarks/Benchmarks.php');
 require_once(APPPATH . 'libraries/dhi/HerdAccess.php');
 require_once APPPATH . 'libraries/Settings/SessionSettings.php';
 require_once APPPATH . 'libraries/Api/Response/ResponseMessage.php';
+require_once APPPATH . 'libraries/Site/WebContent/Navigation.php';
 
 use \myagsource\AccessLog;
 use \myagsource\dhi\Herd;
@@ -15,6 +16,7 @@ use \myagsource\Benchmarks\Benchmarks;
 use \myagsource\dhi\HerdAccess;
 use \myagsource\Settings\SessionSettings;
 use \myagsource\Api\Response\ResponseMessage;
+use \myagsource\Site\WebContent\Navigation;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 class Change_herd extends MY_Api_Controller {
@@ -46,8 +48,8 @@ class Change_herd extends MY_Api_Controller {
 		$this->load->model('access_log_model');
 		$this->access_log = new AccessLog($this->access_log_model);
 
-		$this->page_header_data['num_herds'] = $this->herd_access->getNumAccessibleHerds($this->session->userdata('user_id'), $this->permissions->permissionsList(), $this->session->userdata('arr_regions'));
-		$this->page_header_data['navigation'] = $this->load->view('navigation', [], TRUE);
+//		$this->page_header_data['num_herds'] = $this->herd_access->getNumAccessibleHerds($this->session->userdata('user_id'), $this->permissions->permissionsList(), $this->session->userdata('arr_regions'));
+
 		/* Load the profile.php config file if it exists */
 		if ((ENVIRONMENT == 'development' || ENVIRONMENT == 'localhost') && strpos($this->router->method, 'ajax') === false) {
 			$this->config->load('profiler', false, true);
@@ -60,6 +62,18 @@ class Change_herd extends MY_Api_Controller {
 	function index(){
 		$this->sendResponse(404);
 	}
+
+    function herd_list(){
+        //get herd list
+        $tmp_arr = $this->herd_access->getAccessibleHerdOptions($this->session->userdata('user_id'), $this->permissions->permissionsList(), $this->session->userdata('arr_regions'));
+        //@todo: handle if there is only 1 herd (or 0)
+        if(count($tmp_arr) === 0){
+            $this->sendResponse(404, new ResponseMessage('No herds found.', 'error'));
+        }
+
+        //send response
+        $this->sendResponse(200, [], ['herd_codes' => $tmp_arr]);
+    }
 
 	/**
 	 * @method select() - option list and input field to select a herd (text field auto-selects options list value).
@@ -89,7 +103,10 @@ class Change_herd extends MY_Api_Controller {
                         $resp_msg = new ResponseMessage($msg, 'message');
                     }
                     $this->_record_access(2); //2 is the page code for herd change
-                    $this->sendResponse(200, $resp_msg);
+                    $this->load->model('web_content/navigation_model');
+                    $navigation = new Navigation($this->navigation_model, $this->herd, $this->permissions->permissionsList());
+                    $payload = ['nav' => $navigation->toArray('DHI')];
+                    $this->sendResponse(200, $resp_msg, $payload);
                 }
                 catch(Exception $e){
                     $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
@@ -104,7 +121,10 @@ class Change_herd extends MY_Api_Controller {
                     $resp_msg = new ResponseMessage($msg, 'message');
                 }
                 $this->_record_access(2); //2 is the page code for herd change
-                $this->sendResponse(200, $resp_msg);
+                $this->load->model('web_content/navigation_model');
+                $navigation = new Navigation($this->navigation_model, $this->herd, $this->permissions->permissionsList());
+                $payload = ['nav' => $navigation->toArray('DHI')];
+                $this->sendResponse(200, $resp_msg, $payload);
             }
             catch(Exception $e){
                 $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));

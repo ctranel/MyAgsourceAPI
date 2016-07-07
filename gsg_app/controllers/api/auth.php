@@ -371,12 +371,11 @@ class Auth extends MY_Api_Controller {
             $this->permissions = new ProgramPermissions($this->permissions_model, $group_permissions, $products->allHerdProductCodes());
 
             //get herd list
-            $tmp_arr = $this->herd_access->getAccessibleHerdOptions($this->session->userdata('user_id'), $this->permissions->permissionsList(), $this->session->userdata('arr_regions'));
-            //@todo: handle if there is only 1 herd (or 0)
+/*            $tmp_arr = $this->herd_access->getAccessibleHerdOptions($this->session->userdata('user_id'), $this->permissions->permissionsList(), $this->session->userdata('arr_regions'));
             if(count($tmp_arr) === 0){
                 $this->sendResponse(404, new ResponseMessage('No herds found.', 'error'));
             }
-
+*/
             $this->load->model('notice_model');
             $this->notifications = new Notifications($this->notice_model);
             $this->notifications->populateNotices();
@@ -388,7 +387,7 @@ class Auth extends MY_Api_Controller {
             //we want the success message to be first, so we create a temp var and merge with that as the first value
             $msgs[] = new ResponseMessage('Login Successful', 'message');
             //send response
-            $this->sendResponse(200, $msgs, ['herd_codes' => $tmp_arr]);
+            $this->sendResponse(200, $msgs);
         }
 
         $this->sendResponse(401, new ResponseMessage($this->as_ion_auth->errors(), 'error'));
