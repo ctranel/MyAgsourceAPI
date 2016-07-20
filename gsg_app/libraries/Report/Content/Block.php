@@ -205,6 +205,7 @@ abstract class Block implements iReportBlock {
         * Needed for pages that contain both cow level and summary reports.
          * @todo: should extend base class with MyAgSource-specific class
         */
+
         if($this->filters->criteriaExists('pstring') && !$this->isSummary()){
             $p_value = $this->filters->getCriteriaValueByKey('pstring');
             if(count($p_value) === 1 && $p_value[0] === 0){
@@ -401,7 +402,7 @@ abstract class Block implements iReportBlock {
         $ret['pivot_field'] = $this->pivot_field;
         $ret['is_summary'] = $this->is_summary;
         $ret['display_type'] = $this->display_type;
-        $ret['appended_rows_count'] = $this->appended_rows_count;
+//        $ret['appended_rows_count'] = $this->appended_rows_count;
 //            'max_rows' => $this->max_rows,
         $ret['cnt_row'] = $this->cnt_row;
         $ret['sum_row'] = $this->sum_row;
@@ -409,6 +410,7 @@ abstract class Block implements iReportBlock {
         $ret['bench_row'] = $this->bench_row;
 //            'field_groups' => $this->field_groups,
 
+//if(strpos($ret['display_type'], 'chart') > 0 || true) var_dump('block name', $this->site_block->name(), $this->dataset);
         if(is_array($this->dataset) && !empty($this->dataset)){
             $ret['dataset'] = $this->dataset;
         }

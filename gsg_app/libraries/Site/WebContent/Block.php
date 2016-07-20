@@ -124,7 +124,8 @@ class Block implements iBlock {
 
 	public function toArray(){
         $ret = [
-            'page_id' => $this->page_id,
+            'id' => $this->id,
+            //'page_id' => $this->page_id,
             'name' => $this->name,
             'description' => $this->description,
             'display_type' => $this->display_type,

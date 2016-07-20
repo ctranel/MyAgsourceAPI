@@ -60,10 +60,6 @@ class Auth extends MY_Api_Controller {
 		}*/
 	}
 
-    function c(){
-        $this->sendResponse(200, new ResponseMessage('message', 'success'), ['user' => $this->session->userdata('user_id')]);
-    }
-
 	function product_info_request(){
 		$arr_inquiry = $this->input->userInput('products');
         $arr_user = $this->ion_auth_model->user($this->session->userdata('user_id'))->result_array()[0];

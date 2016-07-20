@@ -161,7 +161,7 @@ class TableBlock extends Block {
             foreach($this->report_fields as $k=>$f){
                 $fields[$f->dbFieldName()] = $f->toArray();
             }
-            $ret['report_fields'] = $fields;
+            //$ret['report_fields'] = $fields;
         }
         return $ret;
     }

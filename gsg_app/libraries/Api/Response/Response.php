@@ -87,8 +87,10 @@ class Response implements iResponse
      */
     public function message($msgs = null){
         $ret = [];
-        foreach($msgs as $m){
-            $ret[] = $m->toArray();
+        if(is_array($msgs)){
+            foreach($msgs as $m){
+                $ret[] = $m->toArray();
+            }
         }
         return $ret;
     }

@@ -84,6 +84,7 @@ class ChartData extends BlockData{
 		$criteria_key_value = $this->whereCriteria($criteria_key_value);
 		$select_fields = $this->block->getSelectFields();
 		$this->dataset = $this->report_datasource->search($this->block, $select_fields, $criteria_key_value);
+//var_dump($this->dataset);
 		$tmp_cat = $this->block->categories();
 
 		//categories

@@ -110,7 +110,7 @@ class Navigation{// implements iWebContentRepository {
 				$dom_id = explode('/', trim($d['path'], '/'))[0];
 				$tmp_array = [
 					'name' => $d['name'],
-					'id' => $dom_id,//split and take the first element
+					'dom_id' => $dom_id,
 					'href' => '/' . $full_path,
 					'scope' => $d['scope'],
 					'route' => $d['route'],

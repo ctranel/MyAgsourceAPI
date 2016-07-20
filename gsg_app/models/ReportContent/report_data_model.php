@@ -13,6 +13,7 @@ class Report_data_model extends CI_Model {
 	
 	public function __construct(){
 		parent::__construct();
+		$this->cnt = 0; //used only for dumping queries
 	}
 
 	protected function get_join_text($primary_table, $join_table){
@@ -54,6 +55,7 @@ class Report_data_model extends CI_Model {
 	 * @author ctranel
 	 **/
 	function search(iBlock $block, $select_fields, $arr_filter_criteria){//, $arr_sort_by = array(''), $arr_sort_order = array(''), $limit = NULL) {
+        $this->cnt++;
 //		$this->load->helper('multid_array_helper');
 		//load data used to build query
 		$where_array = $block->getWhereGroupArray();
@@ -88,7 +90,9 @@ class Report_data_model extends CI_Model {
 		if($block->maxRows() > 0){
 			$this->db->limit($block->maxRows());
 		}
-//$this->db->select('d'); //uncomment to dump search query to screen
+        if($this->cnt === 999){
+            $this->db->select('d');
+        } //uncomment to dump search query to screen
 		$ret = $this->db->get()->result_array();
 		$this->num_results = count($ret);
 		//$ret['arr_unsortable_columns'] = $this->arr_unsortable_columns;

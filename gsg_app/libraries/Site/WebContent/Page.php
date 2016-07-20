@@ -156,7 +156,7 @@ class Page implements iPage {//iWebContent,
         $ret = [
             'section_id' => $this->section_id,
             'name' => $this->name,
-            'descriptions' => $this->description,
+            'description' => $this->description,
             'scope' => $this->scope,
             'path' => $this->path,
             'route' => $this->route,
