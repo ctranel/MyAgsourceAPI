@@ -70,8 +70,8 @@ class Block implements iBlock {
 	/**
 	 * has_benchmark
 	 * @var boolean
-	 **/
 	protected $has_benchmark;
+**/
 	
 	/**
 	 * active
@@ -86,7 +86,7 @@ class Block implements iBlock {
 	 * @return void
 	 * @author ctranel
 	 **/
-	public function __construct($id, $page_id, $name, $description, $display_type, $scope, $active, $path, $has_benchmark) {
+	public function __construct($id, $page_id, $name, $description, $display_type, $scope, $active, $path) { //, $has_benchmark
 		$this->id = $id;
 		$this->page_id = $page_id;
 		$this->name = $name;
@@ -95,7 +95,7 @@ class Block implements iBlock {
 		$this->scope = $scope;
 		$this->active = $active;
 		$this->path = $path;
-		$this->has_benchmark = $has_benchmark;
+//		$this->has_benchmark = $has_benchmark;
 	}
 	
 	public function id(){
@@ -118,10 +118,10 @@ class Block implements iBlock {
 		return $this->report_fields;
 	}
 
-	public function hasBenchmark(){
+/*	public function hasBenchmark(){
 		return $this->has_benchmark;
 	}
-
+*/
 	public function toArray(){
         $ret = [
             'id' => $this->id,
@@ -129,8 +129,8 @@ class Block implements iBlock {
             'name' => $this->name,
             'description' => $this->description,
             'display_type' => $this->display_type,
-            'path' => $this->path,
-            'has_benchmark' => $this->has_benchmark
+            'path' => $this->path
+//            'has_benchmark' => $this->has_benchmark
         ];
         return $ret;
 	}

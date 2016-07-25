@@ -6,9 +6,9 @@ require_once(APPPATH . 'libraries/Site/iWebContentRepository.php');
 require_once(APPPATH . 'libraries/Site/iWebContent.php');
 require_once(APPPATH . 'libraries/dhi/Herd.php');
 
-use \myagsource\Form\Content\FormFactory;
+use \myagsource\Page\Content\Form\FormFactory;
 use \myagsource\Site\iWebContentRepository;
-use \myagsource\Report\Content\ReportBlockFactory;
+use \myagsource\Page\Content\ReportBlockFactory;
 //use \myagsource\Site\iWebContent;
 //use \myagsource\Site\WebContent\Page;
 //use \myagsource\dhi\Herd;

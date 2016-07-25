@@ -2,13 +2,13 @@
 
 namespace myagsource;
 
-require_once(APPPATH . 'libraries/Report/iBlock.php');
-require_once(APPPATH . 'libraries/Report/Content/Table/TableData.php');
-require_once(APPPATH . 'libraries/Report/Content/Chart/ChartData.php');
+require_once(APPPATH . 'libraries/Page/iReportBlock.php');
+require_once(APPPATH . 'libraries/Page/Content/Table/TableData.php');
+require_once(APPPATH . 'libraries/Page/Content/Chart/ChartData.php');
 
-use \myagsource\Report\iBlock;
-use \myagsource\Report\Content\Table\TableData;
-use \myagsource\Report\Content\Chart\ChartData;
+use \myagsource\Report\iReportBlock;
+use \myagsource\Page\Content\Table\TableData;
+use \myagsource\Page\Content\Chart\ChartData;
 use \myagsource\Datasource\DbObjects\DbTable;
 use \myagsource\Benchmarks\Benchmarks;
 
@@ -51,17 +51,17 @@ class DataHandler {
 
 	*  @author: ctranel
 	*  @date: May 13, 2015
-	*  @param: iBlock 
+	*  @param: iReportBlock 
 	*  @param: string path
 	*  @param: report_data_model
 	*  @param: DbTable 
 	*  @param: Benchmarks 
-	*  @return iBlockData
+	*  @return iReportBlock
 	*  @throws: 
 	 * 
 	 */
 	
-	function load(iBlock $block, $path, DbTable $db_table){
+	function load(iReportBlock $block, $path, DbTable $db_table){
         if(file_exists(APPPATH . $path)){
             $data_handler_name = ucwords(substr($path, (strripos($path, '/') + 1)));
             list($data_handler_name, $ext) = explode('.', $data_handler_name);

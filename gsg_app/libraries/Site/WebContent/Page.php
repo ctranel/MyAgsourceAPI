@@ -9,10 +9,10 @@ use \myagsource\Benchmarks\Benchmarks;
 use \myagsource\Filters\ReportFilters;
 use \myagsource\Site\iPage;
 use \myagsource\Site\iWebContent;
-use \myagsource\Report\Content\ReportBlockFactory;
+use \myagsource\Page\Content\ReportBlockFactory;
 use \myagsource\Site\iWebContentRepository;
 use \myagsource\dhi\Herd;
-use \myagsource\Form\Content\FormFactory;
+use \myagsource\Page\Content\Form\FormFactory;
 use \myagsource\Supplemental\Content\SupplementalFactory;
 
 /**
@@ -84,12 +84,6 @@ class Page implements iPage {//iWebContent,
     protected $datasource;
 
     /**
-	 * Factory for supplemental objects
-	 * @var SupplementalFactory
-	 **/
-	//protected $supplemental_factory;
-
-    /**
      * page supplemental object
      * @var Supplemental
      **/
@@ -100,12 +94,6 @@ class Page implements iPage {//iWebContent,
 	 * @var Block[]
 	 **/
 	protected $blocks;
-
-	/**
-	 * forms
-	 * @var Form[]
-	 **/
-	protected $forms;
 
 	/**
 	 * report filters
@@ -171,14 +159,6 @@ class Page implements iPage {//iWebContent,
         if(!empty($this->supplemental->toArray())){
             $ret['supplemental'] = $this->supplemental->toArray();
         }
-        if(isset($this->forms) && is_array($this->forms) && !empty($this->forms)){
-            $forms = [];
-            foreach($this->forms as $f){
-                $forms[] = $f->toArray();
-            }
-            $ret['forms'] = $forms;
-            unset($forms);
-        }
         if(isset($this->blocks) && is_array($this->blocks) && !empty($this->blocks)){
             $blocks = [];
             foreach($this->blocks as $b){
@@ -219,8 +199,10 @@ class Page implements iPage {//iWebContent,
             return false;
         }
         foreach($this->blocks as $b){
-			if($b->hasBenchmark()){
-				return true;
+			if(($b->displayType() === 'table' || strpos($b->displayType(), 'chart') !== false)){
+				if($b->hasBenchmark()){
+                    return true;
+                }
 			}
 		}
 		return false;
@@ -232,11 +214,14 @@ class Page implements iPage {//iWebContent,
 	 * @return void
 	 * @access public
 	* */
-	public function loadChildren($block_factory, $form_factory){
-		//$this->children = $children;
-        //populate forms and report blocks
-        $this->forms = $form_factory->getByPage($this->id);
-        $this->blocks = $block_factory->getByPage($this->id);
+	public function loadChildren($report_block_factory, $form_factory){
+        //get form and report block objects
+        $blocks = $report_block_factory->getByPage($this->id);
+        $forms = $form_factory->getByPage($this->id);
+
+        //merge objects in site block order
+        $this->blocks = $blocks + $forms;
+        ksort($this->blocks);
 	}
 }
 

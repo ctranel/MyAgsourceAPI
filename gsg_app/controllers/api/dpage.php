@@ -2,7 +2,7 @@
 //namespace myagsource;
 require_once(APPPATH . 'core/MY_Api_Controller.php');
 require_once(APPPATH . 'libraries/Filters/ReportFilters.php');
-require_once(APPPATH . 'libraries/Form/Content/FormFactory.php');
+require_once(APPPATH . 'libraries/Page/Content/Form/FormFactory.php');
 require_once(APPPATH . 'libraries/Benchmarks/Benchmarks.php');
 require_once(APPPATH . 'libraries/AccessLog.php');
 require_once(APPPATH . 'libraries/Supplemental/Content/SupplementalFactory.php');
@@ -15,9 +15,9 @@ require_once(APPPATH . 'libraries/Site/WebContent/PageAccess.php');
 require_once(APPPATH . 'libraries/Datasource/DbObjects/DbTableFactory.php');
 require_once(APPPATH . 'libraries/DataHandler.php');
 
-require_once(APPPATH . 'libraries/Report/Content/ReportBlockFactory.php');
-require_once(APPPATH . 'libraries/Report/Content/Chart/ChartBlock.php');
-require_once(APPPATH . 'libraries/Report/Content/Table/TableBlock.php');
+require_once(APPPATH . 'libraries/Page/Content/ReportBlockFactory.php');
+require_once(APPPATH . 'libraries/Page/Content/Chart/ChartBlock.php');
+require_once(APPPATH . 'libraries/Page/Content/Table/TableBlock.php');
 
 
 use \myagsource\Benchmarks\Benchmarks;
@@ -27,15 +27,14 @@ use \myagsource\Supplemental\Content\SupplementalFactory;
 use \myagsource\dhi\HerdAccess;
 use \myagsource\dhi\HerdPageAccess;
 use \myagsource\dhi\Herd;
-use \myagsource\Form\Content\FormFactory;
+use \myagsource\Page\Content\Form\FormFactory;
 use \myagsource\Site\WebContent\Page;
 use \myagsource\Site\WebContent\WebBlockFactory;
 use \myagsource\Site\WebContent\Block as SiteBlock;
 use \myagsource\Site\WebContent\PageAccess;
-use \myagsource\Report\Content\ReportBlockFactory;
+use \myagsource\Page\Content\ReportBlockFactory;
 use \myagsource\DataHandler;
 use \myagsource\Datasource\DbObjects\DbTableFactory;
-use \myagsource\Report\iBlock;
 use \myagsource\Api\Response\ResponseMessage;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
@@ -224,7 +223,7 @@ class dpage extends MY_Api_Controller {
         $db_table_factory = new DbTableFactory($this->db_table_model);
         $this->report_block_factory = new ReportBlockFactory($this->report_block_model, $this->db_field_model, $this->filters, $this->supplemental_factory, $this->web_block_factory, $data_handler, $db_table_factory);
 
-        $this->form_factory = new FormFactory($this->setting_model, $this->supplemental_factory);
+        $this->form_factory = new FormFactory($this->setting_model, $this->web_block_factory, $this->supplemental_factory);
 
         $this->load->model('web_content/page_model');
         $page_data = $this->page_model->getPage($page_id);
@@ -251,9 +250,6 @@ class dpage extends MY_Api_Controller {
         $sort_builder = new SortBuilder($this->report_block_model);
         $sort_builder->build($block, $sort_by, $sort_order);
         //END SORT
-
-        //FILTERS
-        //END FILTERS
 
         // block-level supplemental data
         $block_supp = $this->supp_factory->getBlockSupplemental($block->id(), $this->supplemental_model, site_url());

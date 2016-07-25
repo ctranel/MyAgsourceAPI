@@ -1,7 +1,7 @@
 <?php
-namespace myagsource\Report\Content\Table;
+namespace myagsource\Page\Content\Table;
 
-require_once APPPATH . 'libraries/Report/Content/Table/TableData.php';
+require_once APPPATH . 'libraries/Page/Content/Table/TableData.php';
 
 use \myagsource\Datasource\DbObjects\DbTable;
 //use \myagsource\Benchmarks\Benchmarks;

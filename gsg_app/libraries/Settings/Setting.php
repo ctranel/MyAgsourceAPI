@@ -1,9 +1,9 @@
 <?php
 namespace myagsource\Settings;
 
-require_once(APPPATH . 'libraries/Form/Content/FormControl.php');
+require_once(APPPATH . 'libraries/Page/Content/Form/Control/FormControl.php');
 
-use myagsource\Form\Content\FormControl;
+use myagsource\Page\Content\Form\Control\FormControl;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /**

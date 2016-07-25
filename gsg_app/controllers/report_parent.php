@@ -10,10 +10,10 @@ require_once(APPPATH . 'libraries/dhi/Herd.php');
 require_once(APPPATH . 'libraries/Site/WebContent/SectionFactory.php');
 require_once(APPPATH . 'libraries/Site/WebContent/PageFactory.php');
 require_once(APPPATH . 'libraries/Site/WebContent/WebBlockFactory.php');
-require_once(APPPATH . 'libraries/Form/Content/FormFactory.php');
+require_once(APPPATH . 'libraries/Page/Content/Form/FormFactory.php');
 require_once(APPPATH . 'libraries/Site/WebContent/PageAccess.php');
-require_once(APPPATH . 'libraries/Report/Content/Csv.php');
-//require_once(APPPATH . 'libraries/Report/Content/Pdf.php');
+require_once(APPPATH . 'libraries/Page/Content/Csv.php');
+//require_once(APPPATH . 'libraries/Page/Content/Pdf.php');
 require_once(APPPATH . 'libraries/ErrorPage.php');
 
 use \myagsource\Benchmarks\Benchmarks;
@@ -26,12 +26,10 @@ use \myagsource\dhi\Herd;
 use \myagsource\Site\WebContent\SectionFactory;
 use \myagsource\Site\WebContent\PageFactory;
 use \myagsource\Site\WebContent\WebBlockFactory;
-use \myagsource\Form\Content\FormFactory;
+use \myagsource\Page\Content\Form\FormFactory;
 use \myagsource\Site\WebContent\Block as PageBlock;
 use \myagsource\Site\WebContent\PageAccess;
-use \myagsource\Report\Content\Csv;
-//use \myagsource\Report\Content\Pdf;
-use \myagsource\Report\iBlock;
+use \myagsource\Page\Content\Csv;
 use \myagsource\ErrorPage;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
@@ -174,7 +172,7 @@ abstract class report_parent extends MY_Controller {
         $this->load->model('supplemental_model');
         $this->supplemental_factory = new SupplementalFactory($this->supplemental_model, site_url());
 
-		$this->form_factory = new FormFactory($this->setting_model, $this->supplemental_factory);
+		$this->form_factory = new FormFactory($this->setting_model, $this->blocks, $this->supplemental_factory);
 		$this->page_factory = new PageFactory($this->page_model, $this->blocks, $this->form_factory);
 		$section_factory = new SectionFactory($this->section_model, $this->page_factory);
 		

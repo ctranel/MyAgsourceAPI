@@ -12,14 +12,15 @@ class report_block_model extends CI_Model {
 	 **/
 	public function getBlocks() {
 		$this->db
-			->select('b.id, pb.page_id, b.name,b.[description],b.path,dt.name AS display_type,s.name AS scope,ct.name as chart_type,b.max_rows,b.cnt_row,b.sum_row,b.avg_row,b.pivot_db_field,b.bench_row,b.is_summary,b.active,b.keep_nulls')
+			->select('b.id, pb.page_id, b.name,b.[description],b.path,b.active,dt.name AS display_type,s.name AS scope,ct.name as chart_type,rb.max_rows,rb.cnt_row,rb.sum_row,rb.avg_row,rb.pivot_db_field,rb.bench_row,rb.is_summary,rb.keep_nulls, pb.list_order')
 			->where('b.active', 1)
+			->join('users.dbo.reports rb', 'b.id = rb.block_id', 'inner')
 			->join('users.dbo.lookup_display_types dt', 'b.display_type_id = dt.id', 'inner')
 			->join('users.dbo.lookup_scopes s', 'b.scope_id = s.id', 'inner')
 			->join('users.dbo.pages_blocks pb', 'b.id = pb.block_id', 'inner')
 			->join('users.dbo.lookup_chart_types ct', 'b.chart_type_id = ct.id', 'left')
 			->order_by('list_order', 'asc')
-			->from($this->tables['blocks'] . ' b');
+			->from('users.dbo.blocks' . ' b');
 		return $this->db->get()->result_array();
 	}
 	

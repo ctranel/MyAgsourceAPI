@@ -7,7 +7,8 @@ require_once(APPPATH . 'libraries/Site/iWebContentRepository.php');
 require_once(APPPATH . 'libraries/Site/iWebContent.php');
 require_once(APPPATH . 'libraries/dhi/Herd.php');
 
-use \myagsource\Site\WebContent\Block;
+use myagsource\Page\Content\ReportBlockFactory;
+use \myagsource\Site\WebContent\WebBlockFactory;
 use \myagsource\Site\iWebContentRepository;
 use \myagsource\Site\iWebContent;
 use \myagsource\dhi\Herd;
@@ -28,7 +29,19 @@ class WebBlockFactory implements iWebContentRepository {
 	 **/
 	protected $datasource_blocks;
 
-	function __construct(\Block_model $datasource_blocks) {
+	/**
+	 * web_block_factory
+	 * @var WebBlockFactory
+	 **/
+	protected $web_block_factory;
+
+	/**
+	 * form_block_factory
+	 * @var FormBlockFactory
+	 **/
+	protected $form_block_factory;
+
+	function __construct(\Block_model $datasource_blocks) {//, WebBlockFactory $web_block_factory, FormBlockFactory $form_block_factory
 		$this->datasource_blocks = $datasource_blocks;
 	}
 	
@@ -48,7 +61,7 @@ class WebBlockFactory implements iWebContentRepository {
 		if(empty($results)){
 			return false;
 		}
-		return new Block($results[0]['id'], $results[0]['page_id'], $results[0]['name'], $results[0]['description'], $results[0]['display_type'], $results[0]['scope'], $results[0]['active'], $results[0]['path'], $results[0]['bench_row']);
+		return new Block($results[0]['id'], $results[0]['page_id'], $results[0]['name'], $results[0]['description'], $results[0]['display_type'], $results[0]['scope'], $results[0]['active'], $results[0]['path']);//, $results[0]['bench_row']
 	}
 
 	/*
@@ -67,7 +80,7 @@ class WebBlockFactory implements iWebContentRepository {
 			return false;
 		}
 		foreach($results as $r){
-			$blocks[] = new Block($r['id'], $r['page_id'], $r['name'], $r['description'], $r['display_type'], $r['scope'], $r['active'], $r['path'], $r['bench_row']);
+			$blocks[] = new Block($r['id'], $r['page_id'], $r['name'], $r['description'], $r['display_type'], $r['scope'], $r['active'], $r['path']);//, $r['bench_row']
 		}
 		return $blocks;
 	}
@@ -80,7 +93,7 @@ class WebBlockFactory implements iWebContentRepository {
      * @returns Block
      */
     public function blockFromData($data){
-        return new Block($data['id'], $data['page_id'], $data['name'], $data['description'], $data['display_type'], $data['scope'], $data['active'], $data['path'], $data['bench_row']);
+        return new Block($data['id'], $data['page_id'], $data['name'], $data['description'], $data['display_type'], $data['scope'], $data['active'], $data['path']);//, $data['bench_row']
     }
 }
 

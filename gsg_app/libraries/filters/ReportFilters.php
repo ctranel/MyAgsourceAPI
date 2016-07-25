@@ -36,12 +36,6 @@ class ReportFilters{
 	private $arr_criteria;
 
     /**
-     * Associative array of criteria key=>value
-     * @var array
-     **/
-	private $arr_criteria_key_value;
-
-    /**
      * text describing filters
      * @var string
      **/
@@ -222,13 +216,14 @@ class ReportFilters{
 	* -----------------------------------------------------------------
 	*/
 	public function criteriaKeyValue(){
-		if(!isset($this->arr_criteria)){
-			return false;
-		}
-		if(!isset($this->arr_criteria_key_value)){
-			$this->setCriteriaKeyValue();
-		}
-		return $this->arr_criteria_key_value;
+        $ret = [];
+        if(!isset($this->arr_criteria)){
+            return false;
+        }
+        foreach($this->arr_criteria as $k=>$c){
+            $ret[$k] = $c->getSelectedValue();
+        }
+        return $ret;
 	}
 
 	/* -----------------------------------------------------------------
@@ -248,27 +243,6 @@ class ReportFilters{
 		return $this->arr_criteria[$key]->getSelectedValue();
 	}
 
-	/* -----------------------------------------------------------------
-	*  setCriteriaKeyValue() sets a key=>value array of field_name=>selected_value
-
-	*  Sets a key=>value array of field_name=>selected_value.
-
-	*  @since: version 1
-	*  @author: ctranel
-	*  @date: 10/08/2014
-	*  @return void
-	*  @throws: 
-	* -----------------------------------------------------------------
-	*/
-	protected function setCriteriaKeyValue(){
-		if(!isset($this->arr_criteria)){
-			return false;
-		}
-		foreach($this->arr_criteria as $k=>$c){
-			$this->arr_criteria_key_value[$k] = $c->getSelectedValue();
-		}
-	}
-	
 	/* -----------------------------------------------------------------
 	 *  criteriaExists() checks for the existance of key passed to method
 	

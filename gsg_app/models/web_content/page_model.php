@@ -77,7 +77,7 @@ class Page_model extends CI_Model {
             ->where('(si.herd_is_paying = 1 OR si.herd_is_active_trial = 1)')
 			->where('si.herd_code', $herd_code)
 			->where('pr.page_id', $page_id)
-			->join('users.dbo.pages_reports pr', 'si.report_code = pr.report_code','inner')
+			->join('users.dbo.pages_dhi_reports pr', 'si.report_code = pr.report_code','inner')
 			//sorting and taking top row could be considered business logic, but this seems like
 			//a clean way to handle it
 			//->order_by('si.herd_is_paying', 'desc')

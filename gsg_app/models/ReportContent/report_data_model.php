@@ -1,7 +1,7 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 require_once(APPPATH . 'helpers/multid_array_helper.php');
 
-use \myagsource\Report\iBlock;
+use \myagsource\Report\iReportBlock;
 
 /* -----------------------------------------------------------------
 *  @description: Base data access for database-driven report generation
@@ -54,7 +54,7 @@ class Report_data_model extends CI_Model {
 	 * @return array results of search
 	 * @author ctranel
 	 **/
-	function search(iBlock $block, $select_fields, $arr_filter_criteria){//, $arr_sort_by = array(''), $arr_sort_order = array(''), $limit = NULL) {
+	function search(iReportBlock $block, $select_fields, $arr_filter_criteria){//, $arr_sort_by = array(''), $arr_sort_order = array(''), $limit = NULL) {
         $this->cnt++;
 //		$this->load->helper('multid_array_helper');
 		//load data used to build query
@@ -200,7 +200,7 @@ class Report_data_model extends CI_Model {
 	 * @param array sort order--corresponds to first parameter
 	 * @author ctranel
 	 */
-	protected function prep_sort(iBlock $block){
+	protected function prep_sort(iReportBlock $block){
 		$sort_array = $block->getSortArray();
 		foreach($sort_array as $f => $o) {
 			$sort_order = (strtoupper($o) === 'DESC') ? 'DESC' : 'ASC';
@@ -273,7 +273,7 @@ class Report_data_model extends CI_Model {
 	 * @return array of database results
 	 * @access public
 	 *
-	function getGraphDataset($arr_filters, iBlock $block, $num_dates, $date_field, $block_url){
+	function getGraphDataset($arr_filters, iReportBlock $block, $num_dates, $date_field, $block_url){
 		$data = $this->search($arr_filters['herd_code'], $block_url, $arr_filters, array($date_field), array('ASC'), $num_dates);
 		return $data;
 	}

@@ -41,8 +41,9 @@ class Setting_model extends CI_Model {
      **/
     public function getSettingsByPage($page_id) {
         $this->db
-            ->select('s.id, t.name AS data_type, f.name AS category, g.name AS [group], s.name, s.label, s.default_value, uhs.value') //
-            ->join('users.frm.forms f', "pf.form_id = f.id AND (pf.page_id = " . (int)$page_id . " OR f.dom_id = '" . $page_id . "')", 'inner')
+            ->select('s.id, t.name AS data_type, b.name AS category, g.name AS [group], s.name, s.label, s.default_value, uhs.value')
+            ->join('users.dbo.blocks b', "pb.block_id = b.id AND b.display_type_id = 6 AND (pb.page_id = " . (int)$page_id . ")", 'inner')// . " OR f.dom_id = '" . $page_id
+            ->join('users.frm.forms f', "b.id = f.block_id", 'inner')
             ->join('users.setng.forms_settings fs', "f.id = fs.form_id", 'inner')
             ->join('users.setng.settings s', "fs.setting_id = s.id", 'inner');
 
@@ -60,7 +61,7 @@ class Setting_model extends CI_Model {
         $results = $this->db->join('users.setng.types t', "s.type_id = t.id", 'inner')
             ->join('users.setng.groups g', "s.group_id = g.id", 'inner')
             ->where("(uhs.herd_code = '" . $this->herd_code . "' OR uhs.herd_code IS NULL)")
-            ->get('users.frm.pages_forms pf')
+            ->get('users.dbo.pages_blocks pb')
             ->result_array();
         return $results;
     }
@@ -72,9 +73,13 @@ class Setting_model extends CI_Model {
      **/
     public function getFormsByPage($page_id) {
         $results = $this->db
-            ->select('pf.page_id, f.id, f.name, f.description, f.dom_id, f.action')
-            ->join('users.frm.forms f', "pf.form_id = f.id AND pf.page_id = " . $page_id, 'inner')
-            ->get('users.frm.pages_forms pf')
+            ->select('pb.page_id, b.id, f.id AS form_id, b.name, b.description, dt.name AS display_type, s.name AS scope, b.active, b.path, f.dom_id, f.action, pb.list_order')
+            ->join('users.dbo.blocks b', "pb.block_id = b.id AND b.display_type_id = 6 AND pb.page_id = " . $page_id, 'inner')
+            ->join('users.frm.forms f', "b.id = f.block_id", 'inner')
+            ->join('users.dbo.lookup_display_types dt', 'b.display_type_id = dt.id', 'inner')
+            ->join('users.dbo.lookup_scopes s', 'b.scope_id = s.id', 'inner')
+            ->get('users.dbo.pages_blocks pb')
+//            ->where('')
             ->result_array();
         return $results;
     }
