@@ -1,6 +1,6 @@
 <?php
 
-namespace myagsource\Report;
+namespace myagsource\Page;
 
 require_once APPPATH . 'libraries/Page/Content/Sort.php';
 require_once APPPATH . 'libraries/Datasource/iDataField.php';

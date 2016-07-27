@@ -110,7 +110,11 @@ class Block implements iBlock {
 		return $this->name;
 	}
 
-	public function displayType(){
+    public function description(){
+        return $this->description;
+    }
+
+    public function displayType(){
 		return $this->display_type;
 	}
 

@@ -7,6 +7,8 @@ require_once APPPATH . 'libraries/Page/Content/Chart/XAxis.php';
 require_once APPPATH . 'libraries/Page/Content/Chart/YAxis.php';
 require_once APPPATH . 'libraries/Page/Content/ReportBlock.php';
 
+require_once APPPATH . 'libraries/Page/iReportBlock.php';
+
 use \myagsource\Datasource\DbObjects\DbField;
 use \myagsource\Datasource\DbObjects\DbTableFactory;
 use \myagsource\DataHandler;
@@ -17,6 +19,8 @@ use \myagsource\Page\Content\ReportBlock;
 use \myagsource\Supplemental\Content\SupplementalFactory;
 use \myagsource\Page\Content\Chart\XAxis;
 use \myagsource\Page\Content\Chart\YAxis;
+
+use \myagsource\Page\iReportBlock;
 
 /**
  * Name:  ChartBlock

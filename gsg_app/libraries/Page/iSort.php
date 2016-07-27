@@ -1,5 +1,5 @@
 <?php
-namespace myagsource\Report;
+namespace myagsource\Page;
 
 /**
  * Name:  iSort

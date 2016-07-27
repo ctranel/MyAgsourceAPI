@@ -96,20 +96,20 @@ class Setting_model extends CI_Model {
             ->join('users.setng.forms_settings fs', "f.id = fs.form_id AND f.id = " . $form_id, 'inner')
             ->join('users.setng.settings s', "fs.setting_id = s.id", 'inner');
 
-        if(isset($user_id) && $user_id !== FALSE){
+        if(isset($this->user_id) && $this->user_id != FALSE){
             $this->db
-                ->join('users.setng.user_herd_settings uhs', "s.id = uhs.setting_id AND uhs.user_id = " . $this->user_id . " AND uhs.herd_code = '" . $this->herd_code . "'", 'left')
-                ->where("(uhs.user_id = " . $this->user_id . " OR uhs.user_id IS NULL)");
+                ->join('users.setng.user_herd_settings uhs', "s.id = uhs.setting_id AND (uhs.user_id = " . $this->user_id . " OR uhs.user_id IS NULL) AND (uhs.herd_code = '" . $this->herd_code . "' OR uhs.herd_code IS NULL)", 'left');
+                //->where("(uhs.user_id = " . $this->user_id . " OR uhs.user_id IS NULL)");
         }
         else{
             $this->db
-                ->join('users.setng.user_herd_settings uhs', "s.id = uhs.setting_id AND uhs.user_id IS NULL AND uhs.herd_code = '" . $this->herd_code . "'", 'left')
-                ->where("uhs.user_id IS NULL");
+                ->join('users.setng.user_herd_settings uhs', "s.id = uhs.setting_id AND uhs.user_id IS NULL AND (uhs.herd_code = '" . $this->herd_code . "' OR uhs.herd_code IS NULL)", 'left');
+                //->where("uhs.user_id IS NULL");
         }
 
         $results = $this->db->join('users.setng.types t', "s.type_id = t.id", 'inner')
             ->join('users.setng.groups g', "s.group_id = g.id", 'inner')
-            ->where("(uhs.herd_code = '" . $this->herd_code . "' OR uhs.herd_code IS NULL)")
+            //->where("(uhs.herd_code = '" . $this->herd_code . "' OR uhs.herd_code IS NULL)")
             ->get('users.frm.forms f')
             ->result_array();
         return $results;

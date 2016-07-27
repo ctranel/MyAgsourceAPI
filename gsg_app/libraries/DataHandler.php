@@ -6,7 +6,7 @@ require_once(APPPATH . 'libraries/Page/iReportBlock.php');
 require_once(APPPATH . 'libraries/Page/Content/Table/TableData.php');
 require_once(APPPATH . 'libraries/Page/Content/Chart/ChartData.php');
 
-use \myagsource\Report\iReportBlock;
+use \myagsource\Page\iReportBlock;
 use \myagsource\Page\Content\Table\TableData;
 use \myagsource\Page\Content\Chart\ChartData;
 use \myagsource\Datasource\DbObjects\DbTable;
@@ -69,12 +69,12 @@ class DataHandler {
             require_once APPPATH . $path;
             
             if($block->displayType() == 'table'){
-                $data_handler_name = 'myagsource\\Report\\Content\\Table\\' . $data_handler_name;
+                $data_handler_name = 'myagsource\\Page\\Content\\Table\\' . $data_handler_name;
                 $block_data_handler = new $data_handler_name($block, $this->report_data_datasource, $this->benchmarks, $db_table);
             }
 
             if($block->displayType() == 'trend chart' || $block->displayType() == 'compare chart'){
-                $data_handler_name = 'myagsource\\Report\\Content\\Chart\\' . $data_handler_name;
+                $data_handler_name = 'myagsource\\Page\\Content\\Chart\\' . $data_handler_name;
                 $block_data_handler = new $data_handler_name($block, $this->report_data_datasource);
             }
 		}

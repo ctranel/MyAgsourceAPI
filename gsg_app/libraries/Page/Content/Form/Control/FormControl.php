@@ -100,7 +100,7 @@ class FormControl implements iFormControl
                 $control_data['value'] = $tmp;
             }
             else{
-                $control_data['value'] = [];
+                $control_data['value'] = null;
             }
         }
         //if type is array and value is not an array, wrap it in an array
@@ -287,7 +287,7 @@ class FormControl implements iFormControl
         $options = $this->datasource->getLookupOptions($this->id);
         if(isset($options) && is_array($options)){
             foreach($options as $o){
-                $this->options[$o['value']] = $o['description'];
+                $this->options[] = ['value' => $o['value'], 'text' => $o['description']];
             }
         }
     }

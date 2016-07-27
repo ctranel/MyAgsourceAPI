@@ -7,7 +7,7 @@ require_once APPPATH . 'libraries/Page/Content/Sort.php';
 require_once APPPATH . 'libraries/Page/Content/WhereGroup.php';
 require_once APPPATH . 'libraries/Datasource/DbObjects/DbField.php';
 
-use \myagsource\Report\iReportBlock;
+use \myagsource\Page\iReportBlock;
 use \myagsource\Datasource\DbObjects\DbField;
 use \myagsource\Datasource\DbObjects\DbTableFactory;
 use \myagsource\DataHandler;
@@ -256,15 +256,6 @@ abstract class ReportBlock implements iReportBlock {
 	public function maxRows(){
 		return $this->max_rows;
 	}
-/*
-	public function name(){
-		return $this->site_block->name();
-	}
-
-	public function description(){
-		return $this->site_block->description();
-	}
-*/
 	public function pivotFieldName(){
 		return $this->pivot_field->dbFieldName();
 	}
@@ -282,8 +273,16 @@ abstract class ReportBlock implements iReportBlock {
 		return $this->joins;
 	}
 */
-	
-	public function displayType(){
+
+    public function name(){
+        return $this->site_block->name();
+    }
+
+    public function description(){
+        return $this->site_block->description();
+    }
+
+    public function displayType(){
 		return $this->site_block->displayType();
 	}
 

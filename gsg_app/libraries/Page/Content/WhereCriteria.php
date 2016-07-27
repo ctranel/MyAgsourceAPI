@@ -3,7 +3,7 @@ namespace myagsource\Page\Content;
 
 require_once APPPATH . 'libraries/Page/iWhereCriteria.php';
 
-use \myagsource\Report\iWhereCriteria;
+use \myagsource\Page\iWhereCriteria;
 use \myagsource\Datasource\iDataField;
 //use \myagsource;
 

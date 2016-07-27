@@ -8,7 +8,7 @@ require_once(APPPATH . 'libraries/Page/iReportBlock.php');
 require_once(APPPATH . 'libraries/Page/Content/Sort.php');
 
 use \myagsource\Datasource\DbObjects\DbField;
-use \myagsource\Report\iReportBlock;
+use \myagsource\Page\iReportBlock;
 use \myagsource\Page\Content\Sort;
 
 /**

@@ -3,7 +3,7 @@ namespace myagsource\Page\Content;
 
 require_once APPPATH . 'libraries/Page/iSort.php';
 
-use \myagsource\Report\iSort;
+use \myagsource\Page\iSort;
 use \myagsource\Datasource\iDataField;
 //use \myagsource;
 /**

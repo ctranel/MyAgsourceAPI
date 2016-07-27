@@ -3,7 +3,7 @@ namespace myagsource\Page\Content\Table\Header;
 
 use myagsource\Supplemental\iSupplemental;
 use myagsource\Supplemental\Content\Supplemental;
-use myagsource\Report\iSort;
+use myagsource\Page\iSort;
 
 /**
 * Name:  Table Header Library

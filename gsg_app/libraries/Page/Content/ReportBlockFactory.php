@@ -12,7 +12,7 @@ require_once(APPPATH . 'libraries/Datasource/DbObjects/DbField.php');
 use \myagsource\Page\Content\Table\TableBlock;
 use \myagsource\Page\Content\Chart\ChartBlock;
 use \myagsource\Filters\ReportFilters;
-use \myagsource\Report\iReportBlock;
+use \myagsource\Page\iReportBlock;
 use \myagsource\dhi\Herd;
 use myagsource\Supplemental\Content\SupplementalFactory;
 use myagsource\Datasource\DbObjects\DbField;
@@ -95,7 +95,7 @@ class ReportBlockFactory {// implements iReportContentRepository {
 	 * 
 	 * @param int block id
 	 * @author ctranel
-	 * @returns \myagsource\Report\iReportBlock
+	 * @returns \myagsource\Page\iReportBlock
 	 */
 	public function getBlock($id){
 		$criteria = ['id' => $id];
@@ -113,7 +113,7 @@ class ReportBlockFactory {// implements iReportContentRepository {
 	 * 
 	 * @param string path
 	 * @author ctranel
-	 * @returns \myagsource\Report\iReportBlock
+	 * @returns \myagsource\Page\iReportBlock
 	 */
 	public function getByPath($path, $parent_id = null){
 		$criteria = ['path' => $path];
@@ -157,7 +157,7 @@ class ReportBlockFactory {// implements iReportContentRepository {
 	 * 
 	 * @param array result set row
 	 * @author ctranel
-	 * @returns \myagsource\Report\iReportBlock
+	 * @returns \myagsource\Page\iReportBlock
 	 */
 	protected function dataToObject($report){
 		$field_groups = $this->datasource_blocks->getFieldGroupData($report['id']);

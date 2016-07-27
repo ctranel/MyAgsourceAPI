@@ -5,8 +5,8 @@ namespace myagsource\Page\Content;
 require_once APPPATH . 'libraries/Page/iReportBlock.php';
 require_once APPPATH . 'libraries/Page/iReportData.php';
 
-use \myagsource\Report\iReportBlock;
-use \myagsource\Report\iReportData;
+use \myagsource\Page\iReportBlock;
+use \myagsource\PAge\iReportData;
 
 /**
  * Name:  ReportData
@@ -23,7 +23,7 @@ abstract class ReportData implements iReportData{
 	 * block
 	 *
 	 * report block
-	 * @var \myagsource\Report\iReportBlock
+	 * @var \myagsource\Page\iReportBlock
 	 **/
 	protected $block;
 	

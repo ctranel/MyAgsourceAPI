@@ -1,12 +1,7 @@
 <?php
 
-namespace myagsource\Report;
+namespace myagsource\Page;
 
-require_once APPPATH . 'libraries/Page/Content/Sort.php';
-require_once APPPATH . 'libraries/Datasource/iDataField.php';
-
-use \myagsource\Page\Content\Sort;
-use \myagsource\Datasource\iDataField;
 
 /**
  *
@@ -14,20 +9,22 @@ use \myagsource\Datasource\iDataField;
  *        
  */
 interface iReportBlock {
-//	function childKeyValuePairs();
-	function id();
-	function path();
-	function title();
-	
-	function reportFields();
-	function setReportFields();
-	
-	function resetSort();
-	function addSort(Sort $sort);
+	public function id();
+	public function name();
+	public function description();
+	public function path();
+	public function displayType();
+	public function title();
+
+//	public function reportFields();
+//	public function setReportFields();
+
+//	public function resetSort();
+//	public function addSort(Sort $sort);
 //	function addSortField(iDataField $datafield, $sort_order);
 //	function sorts();
 //	function joins();
-	function setDefaultSort();
+//	public function setDefaultSort();
 }
 
 ?>

@@ -1,7 +1,7 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 require_once(APPPATH . 'helpers/multid_array_helper.php');
 
-use \myagsource\Report\iReportBlock;
+use \myagsource\Page\iReportBlock;
 
 /* -----------------------------------------------------------------
 *  @description: Base data access for database-driven report generation

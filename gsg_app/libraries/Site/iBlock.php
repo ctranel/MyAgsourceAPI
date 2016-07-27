@@ -8,8 +8,11 @@ namespace myagsource\Site;
  *        
  */
 interface iBlock extends iWebContent {
+	public function id();
+	public function name();
+	public function description();
+	public function path();
 	public function displayType();
-	//public function hasBenchmark();
 	public function toArray();
 }
 

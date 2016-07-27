@@ -4,7 +4,7 @@ namespace myagsource\Page\Content;
 require_once APPPATH . 'libraries/Page/iWhereGroup.php';
 require_once APPPATH . 'libraries/Page/Content/WhereCriteria.php';
 
-use \myagsource\Report\iWhereGroup;
+use \myagsource\Page\iWhereGroup;
 use \myagsource\Page\Content\WhereCriteria;
 use \myagsource\Datasource\iDataField;
 use myagsource;

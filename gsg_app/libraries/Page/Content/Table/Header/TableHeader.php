@@ -5,7 +5,7 @@ require_once(APPPATH . 'libraries/Page/Content/Table/Header/TableHeaderCell.php'
 
 use \myagsource\Page\Content\Table\Header\TableHeaderCell;
 //use \myagsource\Supplemental\iSupplemental;
-use \myagsource\Report\iReportBlock;
+use \myagsource\Page\iReportBlock;
 use \myagsource\Supplemental\Content\SupplementalFactory;
 
 /**
