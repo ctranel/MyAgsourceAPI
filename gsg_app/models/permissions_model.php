@@ -47,7 +47,7 @@ class Permissions_Model extends CI_Model
         $results = $this->db
             ->select('name, description')
             ->distinct()
-            ->join('users.dbo.reports_tasks rt', 't.id = rt.task_id', 'inner')
+            ->join('users.dbo.dhi_products_tasks rt', 't.id = rt.task_id', 'inner')
             ->where_in('rt.report_code', $report_codes)
             ->get('users.dbo.tasks t')
             ->result_array();

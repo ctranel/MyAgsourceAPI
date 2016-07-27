@@ -45,7 +45,6 @@ class Block_model extends CI_Model {
 	 * @param int section id
 	 * @return array of block info keyed by path
 	 * @author ctranel
-	 **/
 	public function getCompleteData() {
 		$arr_return = [];
 		if(isset($section_id)) $this->db->where('p.section_id', $section_id);
@@ -103,4 +102,5 @@ class Block_model extends CI_Model {
 		}
 		else return FALSE;
 	}
+**/
 }

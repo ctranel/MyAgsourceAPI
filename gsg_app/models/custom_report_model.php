@@ -61,7 +61,7 @@ class Custom_report_model extends CI_Model {
 	 *
 	 **/
 	function add_header_group($data){
-		$this->db->insert('users.dbo.block_header_groups', $data);
+		$this->db->insert('users.dbo.table_header_groups', $data);
 		if($this->db->affected_rows() <= 0){
 			$this->error = "Could not create report";
 			return FALSE;
@@ -81,7 +81,7 @@ class Custom_report_model extends CI_Model {
 	 *
 	 **/
 	function add_yaxes($data){
-		$this->db->insert_batch('users.dbo.block_axes', $data);
+		$this->db->insert_batch('users.dbo.chart_axes', $data);
 		if($this->db->affected_rows() <= 0){
 			$this->error = "Could not add yaxes to block";
 			return FALSE;
@@ -96,7 +96,7 @@ class Custom_report_model extends CI_Model {
 	 *
 	 **/
 	function add_xaxis($data){
-		$this->db->insert_batch('users.dbo.block_axes', $data);
+		$this->db->insert_batch('users.dbo.chart_axes', $data);
 		if($this->db->affected_rows() <= 0){
 			$this->error = "Could not add xaxes to block";
 			return FALSE;
@@ -111,7 +111,7 @@ class Custom_report_model extends CI_Model {
 	 *
 	 **/
 	function add_columns($data){
-		$this->db->insert_batch('users.dbo.blocks_select_fields', $data);
+		$this->db->insert_batch('users.dbo.reports_select_fields', $data);
 		if($this->db->affected_rows() <= 0){
 			$this->error = "Could not add columns";
 			return FALSE;
@@ -126,7 +126,7 @@ class Custom_report_model extends CI_Model {
 	 *
 	 **/
 	function add_sort_by($data){
-		$this->db->insert_batch('users.dbo.blocks_sort_by', $data);
+		$this->db->insert_batch('users.dbo.reports_sort_by', $data);
 		if($this->db->affected_rows() <= 0){
 			$this->error = "Could not add sort by to block";
 			return FALSE;
@@ -142,7 +142,7 @@ class Custom_report_model extends CI_Model {
 	 **/
 	function add_where($data){
 //need to account for where groups
-		$this->db->insert('users.dbo.blocks_sort_by', $data);
+		$this->db->insert('users.dbo.reports_sort_by', $data);
 		if($this->db->affected_rows() <= 0){
 			$this->error = "Could not add sort by to block";
 			return FALSE;

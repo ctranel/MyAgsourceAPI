@@ -14,7 +14,7 @@ class Product_model extends CI_Model {
 		$sql = "
 			SELECT DISTINCT pr.report_code AS product_code, r.report_name AS name, r.report_description AS [description]
 			FROM users.dbo.pages p
-				INNER JOIN users.dbo.pages_dhi_reports pr ON p.id = pr.page_id
+				INNER JOIN users.dbo.pages_dhi_products pr ON p.id = pr.page_id
 				INNER JOIN dhi_tables.dbo.report_catalog r ON pr.report_code = r.report_code
 			WHERE p.active = 1
 		";
@@ -47,7 +47,7 @@ class Product_model extends CI_Model {
 			SELECT DISTINCT pr.report_code AS product_code, r.report_name AS name, r.report_description AS [description]
 			FROM users.dbo.pages p
 				INNER JOIN users.dbo.lookup_scopes ls ON p.scope_id = ls.id
-				INNER JOIN users.dbo.pages_dhi_reports pr ON p.id = pr.page_id
+				INNER JOIN users.dbo.pages_dhi_products pr ON p.id = pr.page_id
 				INNER JOIN herd.dbo.herd_output ho ON pr.report_code = ho.report_code AND ho.herd_code = '" . $herd_code . "' AND ho.activity_code IN('A', 'E')
 				INNER JOIN users.dbo.v_user_status_info ui ON ho.herd_code = ui.herd_code AND ho.report_code = ui.report_code
 				INNER JOIN dhi_tables.dbo.report_catalog r ON pr.report_code = r.report_code
@@ -75,7 +75,7 @@ class Product_model extends CI_Model {
 			SELECT DISTINCT pr.report_code AS product_code, r.report_name AS name, r.report_description AS [description]
 			FROM users.dbo.pages p
 				INNER JOIN users.dbo.lookup_scopes ls ON p.scope_id = ls.id
-				INNER JOIN users.dbo.pages_dhi_reports pr ON p.id = pr.page_id AND p.active = 1 AND p.scope_id = 2
+				INNER JOIN users.dbo.pages_dhi_products pr ON p.id = pr.page_id AND p.active = 1 AND p.scope_id = 2
 				INNER JOIN users.dbo.v_user_status_info si ON pr.report_code = si.report_code AND si.herd_code = '" . $herd_code . "' AND (si.herd_is_paying = 1 OR si.herd_is_active_trial = 1)
 				INNER JOIN dhi_tables.dbo.report_catalog r ON pr.report_code = r.report_code
 		";
@@ -100,7 +100,7 @@ class Product_model extends CI_Model {
 	public function getUpsellProducts($accessible_report_codes) {
 		$sql = "
 			SELECT DISTINCT pr.report_code AS product_code, r.report_name AS name, r.report_description AS [description]
-			FROM users.dbo.pages_dhi_reports pr
+			FROM users.dbo.pages_dhi_products pr
 			INNER JOIN dhi_tables.dbo.report_catalog r ON pr.report_code = r.report_code
 		";
 		if(isset($accessible_report_codes) && is_array($accessible_report_codes) && !empty($accessible_report_codes)){
@@ -108,7 +108,7 @@ class Product_model extends CI_Model {
 			$sql .= "
 			WHERE pr.page_id NOT IN (
 				SELECT page_id
-				FROM users.dbo.pages_dhi_reports
+				FROM users.dbo.pages_dhi_products
                 WHERE report_code IN($code_string)
             )
             ";

@@ -61,7 +61,7 @@ class Section_model extends CI_Model {
 					WHERE id IN(
 						SELECT DISTINCT p.section_id
 						FROM users.dbo.pages p
-							INNER JOIN users.dbo.pages_dhi_reports pr ON p.id = pr.page_id AND p.active = 1 AND p.scope_id = 2
+							INNER JOIN users.dbo.pages_dhi_products pr ON p.id = pr.page_id AND p.active = 1 AND p.scope_id = 2
 							INNER JOIN users.dbo.v_user_status_info si ON pr.report_code = si.report_code AND si.herd_code = '" . $herd_code . "' AND (si.herd_is_paying = 1 OR si.herd_is_active_trial = 1)
 					)
 			
