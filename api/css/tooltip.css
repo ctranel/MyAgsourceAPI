@@ -1,0 +1,13 @@
+@CHARSET "UTF-8";
+/* tooltip styles */
+.tip-link {font-size: .8em;} */
+a.tooltip {text-decoration: underline;}
+a.tooltip:hover {cursor:pointer;}
+a.qtip-ajax {font-size: .85em;}
+
+.qtip {max-width: 560px;}
+.qtip-content {font-size: 11.5px; line-height: 13px;}
+.qtip-content table {border-collapse: collapse;}
+.qtip-content td {border: solid 1px #000; padding: 4px;}
+a.qtip-button, a.qtip-button:hover {color:#fff;}
+/* end tooltip styles */

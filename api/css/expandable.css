@@ -1,0 +1,45 @@
+@CHARSET "UTF-8";
+.expand-group {
+	float: right;
+	margin-top: 3px;
+	clear: both;
+	overflow: hide;
+}
+
+.expand-group .handle {
+	color:#E6F4F4;
+	background-color:#003C39;
+	padding:4px;
+	margin: 0;
+}
+.expand-group .handle a {
+	font-size:.9em;
+	font-weight:bold;
+	cursor: pointer;
+}
+.expand-group .handle a, .expand-group .handle a:hover, .expand-group .handle a:active {
+	text-decoration:none; color:#fff;
+}
+.expand-group .handle a:before {
+	content: "▼";
+}
+
+.expand {visibility: hidden; height: 0px; background-color: #E6F4F4; position: absolute; border: 3px solid #003C39; padding: 10px 0 0 0; min-width: 33%;}
+
+.expand.expanded{z-index: 10; visibility: visible; float:right; height: auto;}
+.expand-group .expanded a:before {content: "▲";}
+
+.expand-group p {padding: 10px 20px 0px 20px;}
+
+.expand-group fieldset {border: solid 1px #003C39; border-radius: 3px; margin: 0 10px 5px; padding: 5px; font-size: .85em; /*white-space: nowrap;*/}
+.expand-group fieldset .checkbox, .expand-group fieldset .radio {margin: -2px 0 0 0;}
+.expand-group fieldset .checkbox input[type="checkbox"], input[type="radio"] {position: static; margin: 2px 0 0 5px;} */
+.expand-group fieldset fieldset {width:97%; margin: 1px 0 0 1%;}
+
+.expand-group form legend {
+	border: none; width: auto; font-size: inherit; margin-bottom: 0; padding: 0 3px;
+}
+.expand-group p.checkbox {padding:2px 0 2px 40px;}
+.expand-group span.checkbox {white-space:nowrap; display:inline-block;}
+
+.expand-group .submit {margin: 10px 20px;}

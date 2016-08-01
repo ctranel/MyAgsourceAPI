@@ -1,0 +1,56 @@
+@CHARSET "UTF-8";
+.accordion-section {
+	border: solid 1px #003C39;
+    border-radius: 7px 0 7px 0;
+	margin: 0 0 3px;
+}
+
+.accordion h2{
+	border: solid 1px #003C39;
+	border-radius: 3px 0 3px 0;
+	background-color: #003C39;
+    color: #FFFFFF;
+    padding: 4px 0 4px 5px;
+	margin: 0;
+}
+.accordion h2 a{
+	background-color: #003C39;
+    color: #FFFFFF;
+    text-decoration: none;
+}
+.lt-768 .accordion :target h2 + div {
+	padding: 10px;
+	height: auto;
+	overflow: auto;
+}
+.accordion div div, .accordian-section div div {
+	padding: 10px;
+}
+.accordion .accordion-section.large:target h2 + div {
+	overflow: auto;
+}
+.accordion .accordion-section.large:target h2 + div {
+	overflow: auto;
+}
+.lt-768 .accordion h2 a:before{
+    content: "+ ";
+}
+.lt-768 .accordion div div, .lt-768 .accordian-section div div {
+	padding: 0;
+}
+.lt-768 .accordion h2 + div {
+	height: 0;
+	overflow: hidden;
+	-webkit-transition: height 0.3s ease-in;
+	–moz-transition: height 0.3s ease-in;
+	–ms-transition: height 0.3s ease-in;
+	–o-transition: height 0.3s ease-in;
+	transition: height 0.3s ease-in;
+}
+.lt-768 .lt-ie9 .accordion h2 + div {
+	height: auto;
+	margin: 0 0 18px;
+}
+.lt-768 .accordion :target h2 a:before {
+	content: "";
+}
