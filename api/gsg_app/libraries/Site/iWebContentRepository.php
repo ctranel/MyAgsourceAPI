@@ -12,7 +12,6 @@ use myagsource\dhi\Herd;
  */
 interface iWebContentRepository {
 //	public function childKeyValuePairs();
-	public function getByPath($path, $parent_id = null);
 }
 
 ?>

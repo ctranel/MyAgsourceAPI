@@ -40,7 +40,6 @@ class SectionFactory implements iWebContentRepository {
 	
 	/*
 	 * @returns Section
-	 */
 	public function getByPath($path, $parent_id = null){
 		$criteria = ['path' => $path];
 		if(isset($parent_id)){
@@ -52,6 +51,7 @@ class SectionFactory implements iWebContentRepository {
 		}
 		return new Section($results[0]['id'], $results[0]['parent_id'], $results[0]['name'], $results[0]['description'], $results[0]['scope'], $results[0]['active'], $results[0]['path'], $results[0]['default_page_path']);
 	}
+*/
 
 	/**
 	 * @method loadChildren()

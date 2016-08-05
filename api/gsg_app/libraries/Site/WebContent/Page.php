@@ -9,10 +9,8 @@ use \myagsource\Benchmarks\Benchmarks;
 use \myagsource\Filters\ReportFilters;
 use \myagsource\Site\iPage;
 use \myagsource\Site\iWebContent;
-use \myagsource\Page\Content\ReportBlockFactory;
-use \myagsource\Site\iWebContentRepository;
-use \myagsource\dhi\Herd;
-use \myagsource\Page\Content\Form\FormFactory;
+use \myagsource\Page\Content\ReportBlock\ReportBlockFactory;
+use \myagsource\Page\Content\FormBlock\FormBlockFactory;
 use \myagsource\Supplemental\Content\SupplementalFactory;
 
 /**
@@ -121,7 +119,7 @@ class Page implements iPage {//iWebContent,
 	 * 
 	 * @todo: may need to add herd header info too
 	 **/
-	public function __construct($page_data, ReportBlockFactory $report_blocks_factory, FormFactory $form_factory, SupplementalFactory $supplemental_factory = null, ReportFilters $filters = null, Benchmarks $benchmarks = null) {
+	public function __construct($page_data, ReportBlockFactory $report_blocks_factory, FormBlockFactory $form_factory, SupplementalFactory $supplemental_factory = null, ReportFilters $filters = null, Benchmarks $benchmarks = null) {
         $this->id = $page_data['id'];
         $this->section_id = $page_data['section_id'];
 		$this->name = $page_data['name'];

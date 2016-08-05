@@ -9,12 +9,12 @@ namespace myagsource\Page;
  *        
  */
 interface iReportBlock {
-	public function id();
-	public function name();
-	public function description();
-	public function path();
-	public function displayType();
-	public function title();
+	//public function id();
+	//public function name();
+	//public function description();
+	//public function path();
+	//public function displayType();
+	public function toArray();
 
 //	public function reportFields();
 //	public function setReportFields();

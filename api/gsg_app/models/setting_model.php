@@ -86,7 +86,27 @@ class Setting_model extends CI_Model {
 
 
     /**
-     * getFormsByPage
+     * getFormById
+     * @param int form id
+     * @return form data
+     * @author ctranel
+     **/
+    public function getFormById($form_id) {
+        $results = $this->db
+            ->select('b.id, f.id AS form_id, b.name, b.description, dt.name AS display_type, s.name AS scope, b.active, b.path, f.dom_id, f.action')
+            ->join('users.frm.forms f', "b.id = f.block_id AND f.id = " . $form_id, 'inner')
+            ->join('users.dbo.lookup_display_types dt', 'b.display_type_id = dt.id', 'inner')
+            ->join('users.dbo.lookup_scopes s', 'b.scope_id = s.id', 'inner')
+            ->get('users.dbo.blocks b')
+            ->result_array();
+        return $results;
+    }
+
+
+    /**
+     * getFormControlData
+     *
+     * @param int form id
      * @return string category
      * @author ctranel
      **/

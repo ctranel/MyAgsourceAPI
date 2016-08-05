@@ -7,11 +7,7 @@ require_once(APPPATH . 'libraries/Site/iWebContentRepository.php');
 require_once(APPPATH . 'libraries/Site/iWebContent.php');
 require_once(APPPATH . 'libraries/dhi/Herd.php');
 
-use myagsource\Page\Content\ReportBlockFactory;
-use \myagsource\Site\WebContent\WebBlockFactory;
 use \myagsource\Site\iWebContentRepository;
-use \myagsource\Site\iWebContent;
-use \myagsource\dhi\Herd;
 
 /**
  * A repository? for page objects
@@ -51,7 +47,6 @@ class WebBlockFactory implements iWebContentRepository {
 	 * @param string path
 	 * @author ctranel
 	 * @returns Block
-	 */
 	public function getByPath($path, $parent_id = null){
 		$criteria = ['path' => $path];
 		if(isset($parent_id)){
@@ -63,6 +58,7 @@ class WebBlockFactory implements iWebContentRepository {
 		}
 		return new Block($results[0]['id'], $results[0]['page_id'], $results[0]['name'], $results[0]['description'], $results[0]['display_type'], $results[0]['scope'], $results[0]['active'], $results[0]['path']);//, $results[0]['bench_row']
 	}
+*/
 
 	/*
 	 * getByPage
@@ -80,7 +76,7 @@ class WebBlockFactory implements iWebContentRepository {
 			return false;
 		}
 		foreach($results as $r){
-			$blocks[] = new Block($r['id'], $r['page_id'], $r['name'], $r['description'], $r['display_type'], $r['scope'], $r['active'], $r['path']);//, $r['bench_row']
+			$blocks[] = new Block($r['id'], $r['name'], $r['description'], $r['display_type'], $r['scope'], $r['active'], $r['path']);//, $r['bench_row']
 		}
 		return $blocks;
 	}
@@ -93,7 +89,7 @@ class WebBlockFactory implements iWebContentRepository {
      * @returns Block
      */
     public function blockFromData($data){
-        return new Block($data['id'], $data['page_id'], $data['name'], $data['description'], $data['display_type'], $data['scope'], $data['active'], $data['path']);//, $data['bench_row']
+        return new Block($data['id'], $data['name'], $data['description'], $data['display_type'], $data['scope'], $data['active'], $data['path']);//, $data['bench_row']
     }
 }
 

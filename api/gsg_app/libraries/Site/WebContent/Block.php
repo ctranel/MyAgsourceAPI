@@ -28,8 +28,8 @@ class Block implements iBlock {
 	/**
 	 * page_id
 	 * @var int
-	 **/
 	protected $page_id;
+**/
 
 	/**
 	 * block name
@@ -86,9 +86,9 @@ class Block implements iBlock {
 	 * @return void
 	 * @author ctranel
 	 **/
-	public function __construct($id, $page_id, $name, $description, $display_type, $scope, $active, $path) { //, $has_benchmark
+	public function __construct($id, $name, $description, $display_type, $scope, $active, $path) { //, $has_benchmark
 		$this->id = $id;
-		$this->page_id = $page_id;
+		//$this->page_id = $page_id;
 		$this->name = $name;
 		$this->description = $description;
 		$this->display_type = $display_type;

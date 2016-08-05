@@ -2,7 +2,7 @@
 //namespace myagsource;
 require_once(APPPATH . 'core/MY_Api_Controller.php');
 require_once(APPPATH . 'libraries/Filters/ReportFilters.php');
-require_once(APPPATH . 'libraries/Page/Content/Form/FormFactory.php');
+require_once(APPPATH . 'libraries/Page/Content/FormBlock/FormBlockFactory.php');
 require_once(APPPATH . 'libraries/Benchmarks/Benchmarks.php');
 require_once(APPPATH . 'libraries/AccessLog.php');
 require_once(APPPATH . 'libraries/Supplemental/Content/SupplementalFactory.php');
@@ -15,9 +15,9 @@ require_once(APPPATH . 'libraries/Site/WebContent/PageAccess.php');
 require_once(APPPATH . 'libraries/Datasource/DbObjects/DbTableFactory.php');
 require_once(APPPATH . 'libraries/DataHandler.php');
 
-require_once(APPPATH . 'libraries/Page/Content/ReportBlockFactory.php');
-require_once(APPPATH . 'libraries/Page/Content/Chart/ChartBlock.php');
-require_once(APPPATH . 'libraries/Page/Content/Table/TableBlock.php');
+require_once(APPPATH . 'libraries/Report/Content/ReportFactory.php');
+require_once(APPPATH . 'libraries/Page/Content/ReportBlock/ReportBlockFactory.php');
+require_once(APPPATH . 'libraries/Page/Content/ReportBlock/ReportBlock.php');
 
 
 use \myagsource\Benchmarks\Benchmarks;
@@ -27,12 +27,12 @@ use \myagsource\Supplemental\Content\SupplementalFactory;
 use \myagsource\dhi\HerdAccess;
 use \myagsource\dhi\HerdPageAccess;
 use \myagsource\dhi\Herd;
-use \myagsource\Page\Content\Form\FormFactory;
+use \myagsource\Page\Content\FormBlock\FormBlockFactory;
 use \myagsource\Site\WebContent\Page;
 use \myagsource\Site\WebContent\WebBlockFactory;
-use \myagsource\Site\WebContent\Block as SiteBlock;
 use \myagsource\Site\WebContent\PageAccess;
-use \myagsource\Page\Content\ReportBlockFactory;
+use \myagsource\Report\Content\ReportFactory;
+use \myagsource\Page\Content\ReportBlock\ReportBlockFactory;
 use \myagsource\DataHandler;
 use \myagsource\Datasource\DbObjects\DbTableFactory;
 use \myagsource\Api\Response\ResponseMessage;
@@ -70,18 +70,6 @@ class dpage extends MY_Api_Controller {
 	protected $herd_page_access;
 	
 	/**
-	 * section
-	 * @var Section
-	 **/
-	protected $section;
-	
-	/**
-	 * section_path
-	 * @var string
-	 **/
-	protected $full_section_path;
-	
-	/**
 	 * page_factory
 	 * 
 	 * page repository
@@ -98,7 +86,7 @@ class dpage extends MY_Api_Controller {
 	/**
 	 * web_block_factory
 	 * 
-	 * SiteBlock repository
+	 * SiteBlock factory
 	 * @var WebBlockFactory
 	 **/
 	protected $web_block_factory;
@@ -111,13 +99,21 @@ class dpage extends MY_Api_Controller {
      **/
     protected $report_block_factory;
 
-    /**
-     * form factory
+	/**
+	 * report_factory
+	 *
+	 * Report Factory
+	 * @var ReportFactory
+	 **/
+	protected $report_factory;
+
+	/**
+     * FormBlock factory
      *
-     * Form repository
-     * @var FormFactory
+     * FormBlock factory
+     * @var FormBlockFactory
      **/
-    protected $form_factory;
+    protected $form_block_factory;
 
     /**
 	 * herd
@@ -141,16 +137,7 @@ class dpage extends MY_Api_Controller {
      **/
     protected $benchmarks;
 
-	//	protected $report_form_id;
-	protected $arr_sort_by = [];
-	protected $arr_sort_order = [];
-	protected $product_name;
-	protected $report_path;
-	//protected $primary_model_name;
-	protected $page_header_data;
 	protected $filters; //filters object
-	protected $print_all = FALSE;
-	protected $bool_is_summary;
 	protected $supplemental_factory;
 	
 	function __construct(){
@@ -221,13 +208,14 @@ class dpage extends MY_Api_Controller {
         $this->load->model('Datasource/db_table_model');
         $data_handler = new DataHandler($this->report_data_model, $this->benchmarks);
         $db_table_factory = new DbTableFactory($this->db_table_model);
-        $this->report_block_factory = new ReportBlockFactory($this->report_block_model, $this->db_field_model, $this->filters, $this->supplemental_factory, $this->web_block_factory, $data_handler, $db_table_factory);
+		$this->report_factory = new ReportFactory($this->report_block_model, $this->db_field_model, $this->filters, $this->supplemental_factory, $data_handler, $db_table_factory);
+        $this->report_block_factory = new ReportBlockFactory($this->report_block_model, $this->web_block_factory, $this->report_factory, $this->supplemental_factory);
 
-        $this->form_factory = new FormFactory($this->setting_model, $this->web_block_factory, $this->supplemental_factory);
+        $this->form_block_factory = new FormBlockFactory($this->setting_model, $this->web_block_factory, $this->supplemental_factory);
 
         $this->load->model('web_content/page_model');
         $page_data = $this->page_model->getPage($page_id);
-		$this->page = new Page($page_data, $this->report_block_factory, $this->form_factory, $this->supplemental_factory, $this->filters, $this->benchmarks);
+		$this->page = new Page($page_data, $this->report_block_factory, $this->form_block_factory, $this->supplemental_factory, $this->filters, $this->benchmarks);
 
         //does user have access to current page for selected herd?
         $this->herd_page_access = new HerdPageAccess($this->page_model, $this->herd, $this->page);
@@ -242,60 +230,6 @@ class dpage extends MY_Api_Controller {
 
         $this->sendResponse(200, $this->message, $this->page->toArray());
 	}
-
-    protected function reportContent($block_id){ //$json_filter_data, $sort_by, $sort_order
-        $block = $this->report_blocks->getBlock($block_id);
-
-        //SORT
-        $sort_builder = new SortBuilder($this->report_block_model);
-        $sort_builder->build($block, $sort_by, $sort_order);
-        //END SORT
-
-        // block-level supplemental data
-        $block_supp = $this->supp_factory->getBlockSupplemental($block->id(), $this->supplemental_model, site_url());
-        $this->supplemental = $block_supp->getContent();
-        //end supplemental
-
-        // benchmarks
-        $this->load->model('setting_model', null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
-        $herd_info = $this->herd_model->header_info($this->herd->herdCode());
-        $this->load->model('benchmark_model');
-        $this->benchmarks = new Benchmarks($this->session->userdata('user_id'), $this->input->post('herd_code'), $herd_info, $this->setting_model, $this->benchmark_model, $this->session->userdata('benchmarks'));
-        // end benchmarks
-//BLOCK
- 
-        //Handle table headers for table blocks
-        if($block->displayType() == 'table'){
-            //table header
-            $header_groups = $this->report_block_model->getHeaderGroups($block->id());
-
-            //@todo: pull this only when needed? move adjustHeaderGroups to TableBlock or TableHeader class
-            $arr_dates = $this->herd_model->get_test_dates_7_short($this->session->userdata('herd_code'));
-            $header_groups = TableHeader::mergeDateIntoHeader($header_groups, $arr_dates);
-
-            $block->setTableHeader($results, $this->supp_factory, $header_groups);
-            unset($supp_factory);
-        }
-        $this->report_data['herd_code'] = $this->session->userdata('herd_code');
-        if($block->hasBenchmark()){
-            $this->report_data['benchmark_text'] = $this->benchmarks->get_bench_text();
-        }
-
-        $this->report_data['data'] = $results;
-
-        if(isset($this->supplemental) && !empty($this->supplemental)){
-            $this->report_data['supplemental'] = $this->supplemental;
-        }
-
-        if($block->displayType() == 'table'){
-            $this->report_data['table_header'] = $this->load->view('table_header', $block->getTableHeaderData($report_count), TRUE);
-            $this->report_data['html'] = $this->load->view('report_table.php', $this->report_data, TRUE);
-            unset($this->report_data['data'],$this->report_data['table_header']);
-        }
-//END BLOCK
-
-        $return_val = json_encode($this->report_data);
-    }
 
     protected function _record_access($event_id, $format, $product_code = null){
 		if($this->session->userdata('user_id') === FALSE){

@@ -5,12 +5,7 @@
 		if(client_data['block'] == 'risk_group_analysis'){
 			options_in.colors = ['#D18FBA', '#D5EAFF', '#BFBFFF']
 		}
-		if(client_data['block'] == 'weighted_average_scc_-_la'){
-			options_in.legend.enabled = false;
-		}
-		else{
-			options_in.legend.enabled = true;
-		}
+		options_in.legend.enabled = client_data['block'] != 'weighted_average_scc_-_la';
 		return options_in;
 	}
 	

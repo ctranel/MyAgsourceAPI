@@ -92,7 +92,31 @@ class SupplementalFactory
 		$supp = new Supplemental($supplemental_links, $supplemental_comments);
 		return $supp;
 	}
-	
+
+	/* -----------------------------------------------------------------
+	 *  Factory for supplemental objects for reports
+
+	*  Factory for supplemental objects for reports
+
+	*  @since: version
+	*  @author: ctranel
+	*  @date: Oct 28, 2014
+	*  @param: int
+	*  @param: string site url
+	*  @return: Supplemental object
+	*  @throws:
+	* -----------------------------------------------------------------*/
+	public function getReportSupplemental($block_id) {
+		$links = $this->datasource->getLinks(1, $block_id);
+		$supplemental_links = SupplementalLink::datasetToObjects($this->site_url, $links, $this->datasource);
+
+		$comments = $this->datasource->getComments(1, $block_id);
+		$supplemental_comments = SupplementalComment::datasetToObjects($comments);
+
+		$supp = new Supplemental($supplemental_links, $supplemental_comments);
+		return $supp;
+	}
+
 	/* -----------------------------------------------------------------
 	 *  getHeaderGrpSupplemental
 	

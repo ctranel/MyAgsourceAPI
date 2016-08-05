@@ -1,7 +1,7 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 require_once(APPPATH . 'helpers/multid_array_helper.php');
 
-use \myagsource\Page\iReportBlock;
+use \myagsource\Report\iReport;
 
 /* -----------------------------------------------------------------
 *  @description: Base data access for database-driven report generation
@@ -54,18 +54,18 @@ class Report_data_model extends CI_Model {
 	 * @return array results of search
 	 * @author ctranel
 	 **/
-	function search(iReportBlock $block, $select_fields, $arr_filter_criteria){//, $arr_sort_by = array(''), $arr_sort_order = array(''), $limit = NULL) {
+	function search(iReport $report, $select_fields, $arr_filter_criteria){//, $arr_sort_by = array(''), $arr_sort_order = array(''), $limit = NULL) {
         $this->cnt++;
 //		$this->load->helper('multid_array_helper');
 		//load data used to build query
-		$where_array = $block->getWhereGroupArray();
-		$group_by_array = $block->getGroupBy();
+		$where_array = $report->getWhereGroupArray();
+		$group_by_array = $report->getGroupBy();
 		
 		//Start building query
-		$this->db->from($block->primaryTableName());
+		$this->db->from($report->primaryTableName());
 		/*
 		 * @todo: add joins
-		$joins = $block->joins();
+		$joins = $report->joins();
 		if(is_array($joins) && !empty($joins)) {
 			foreach($joins as $j){
 				$this->db->join($j['table'], $j['join_text']);
@@ -78,7 +78,7 @@ class Report_data_model extends CI_Model {
 		}
 
 		$this->db->group_by($group_by_array);
-		$this->prep_sort($block); // the prep_sort function adds the sort field to the active record object
+		$this->prep_sort($report); // the prep_sort function adds the sort field to the active record object
 
 		//add select fields to query
 		//set variable to be used in the query
@@ -87,8 +87,8 @@ class Report_data_model extends CI_Model {
 		}
 
 		$this->db->select($select_fields, FALSE);
-		if($block->maxRows() > 0){
-			$this->db->limit($block->maxRows());
+		if($report->maxRows() > 0){
+			$this->db->limit($report->maxRows());
 		}
         if($this->cnt === 999){
             $this->db->select('d');
@@ -200,14 +200,14 @@ class Report_data_model extends CI_Model {
 	 * @param array sort order--corresponds to first parameter
 	 * @author ctranel
 	 */
-	protected function prep_sort(iReportBlock $block){
-		$sort_array = $block->getSortArray();
+	protected function prep_sort(iReport $report){
+		$sort_array = $report->getSortArray();
 		foreach($sort_array as $f => $o) {
 			$sort_order = (strtoupper($o) === 'DESC') ? 'DESC' : 'ASC';
-			$table = $block->getFieldTable($f);
-			if($block->isSortable($f)){
+			$table = $report->getFieldTable($f);
+			if($report->isSortable($f)){
 				//put the select in an array in case the field includes a function with commas between parameters 
-				if($block->isNaturalSort($f)){
+				if($report->isNaturalSort($f)){
 					$this->db->order_by('users.dbo.naturalize(' . $table . '.' . $f . ')', $sort_order);
 				}
 				else {
@@ -273,7 +273,7 @@ class Report_data_model extends CI_Model {
 	 * @return array of database results
 	 * @access public
 	 *
-	function getGraphDataset($arr_filters, iReportBlock $block, $num_dates, $date_field, $block_url){
+	function getGraphDataset($arr_filters, iReport $report, $num_dates, $date_field, $block_url){
 		$data = $this->search($arr_filters['herd_code'], $block_url, $arr_filters, array($date_field), array('ASC'), $num_dates);
 		return $data;
 	}

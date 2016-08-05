@@ -2,13 +2,15 @@
 
 namespace myagsource;
 
-require_once(APPPATH . 'libraries/Page/iReportBlock.php');
-require_once(APPPATH . 'libraries/Page/Content/Table/TableData.php');
-require_once(APPPATH . 'libraries/Page/Content/Chart/ChartData.php');
+require_once(APPPATH . 'libraries/Report/iReport.php');
+require_once(APPPATH . 'libraries/Report/Content/Table/TableData.php');
+require_once(APPPATH . 'libraries/Report/Content/Chart/ChartData.php');
 
-use \myagsource\Page\iReportBlock;
-use \myagsource\Page\Content\Table\TableData;
-use \myagsource\Page\Content\Chart\ChartData;
+use \myagsource\Report\iReport;
+use \myagsource\Report\Content\Chart\Chart;
+//use \myagsource\Page\iReportBlock;
+use \myagsource\Report\Content\Table\TableData;
+use \myagsource\Report\Content\Chart\ChartData;
 use \myagsource\Datasource\DbObjects\DbTable;
 use \myagsource\Benchmarks\Benchmarks;
 
@@ -61,32 +63,32 @@ class DataHandler {
 	 * 
 	 */
 	
-	function load(iReportBlock $block, $path, DbTable $db_table){
+	function load(iReport $report, $path, DbTable $db_table){
         if(file_exists(APPPATH . $path)){
             $data_handler_name = ucwords(substr($path, (strripos($path, '/') + 1)));
             list($data_handler_name, $ext) = explode('.', $data_handler_name);
             
             require_once APPPATH . $path;
             
-            if($block->displayType() == 'table'){
+            if(is_a($report, '\myagsource\Report\Content\Table\Table')){
                 $data_handler_name = 'myagsource\\Page\\Content\\Table\\' . $data_handler_name;
-                $block_data_handler = new $data_handler_name($block, $this->report_data_datasource, $this->benchmarks, $db_table);
+                $block_data_handler = new $data_handler_name($report, $this->report_data_datasource, $this->benchmarks, $db_table);
             }
 
-            if($block->displayType() == 'trend chart' || $block->displayType() == 'compare chart'){
+            if(is_a($report, '\myagsource\Report\Content\Chart\Chart')){
                 $data_handler_name = 'myagsource\\Page\\Content\\Chart\\' . $data_handler_name;
-                $block_data_handler = new $data_handler_name($block, $this->report_data_datasource);
+                $block_data_handler = new $data_handler_name($report, $this->report_data_datasource);
             }
 		}
 
 		//if no specific data-handling library found, go with the general data-handling library 
 		if(!isset($data_handler_name)){
-			if($block->displayType() == 'table'){
-				$block_data_handler = new TableData($block, $this->report_data_datasource, $this->benchmarks, $db_table);
+			if(is_a($report, '\myagsource\Report\Content\Table\Table')){
+				$block_data_handler = new TableData($report, $this->report_data_datasource, $this->benchmarks, $db_table);
 			}
 			
-			if($block->displayType() == 'trend chart' || $block->displayType() == 'compare chart'){
-				$block_data_handler = new ChartData($block, $this->report_data_datasource);
+			if(is_a($report, '\myagsource\Report\Content\Chart\Chart')){
+				$block_data_handler = new ChartData($report, $this->report_data_datasource);
 			}
 		}
 		return $block_data_handler;

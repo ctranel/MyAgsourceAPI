@@ -12,7 +12,7 @@ require_once(APPPATH . 'libraries/Site/WebContent/PageAccess.php');
 require_once(APPPATH . 'libraries/dhi/HerdPageAccess.php');
 require_once(APPPATH . 'libraries/Site/WebContent/SectionFactory.php');
 require_once(APPPATH . 'libraries/Datasource/DbObjects/DbTable.php');
-require_once(APPPATH . 'libraries/Page/Content/Chart/ChartData.php');
+//require_once(APPPATH . 'libraries/Page/Content/Chart/ChartData.php');
 require_once(APPPATH . 'libraries/Page/Content/SortBuilder.php');
 require_once(APPPATH . 'libraries/DataHandler.php');
 require_once(APPPATH . 'libraries/Page/Content/Table/TableData.php');
@@ -28,13 +28,11 @@ use \myagsource\dhi\Herd;
 use \myagsource\Site\WebContent\SectionFactory;
 use \myagsource\Site\WebContent\PageFactory;
 use \myagsource\Site\WebContent\WebBlockFactory;
-use \myagsource\Page\Content\ReportBlockFactory;
-use \myagsource\Page\Content\Chart\ChartData;
-use \myagsource\Page\Content\Table\Header\TableHeader;
+use \myagsource\Report\Content\Table\Header\TableHeader;
 use \myagsource\Datasource\DbObjects\DbTable;
-use \myagsource\Page\Content\SortBuilder;
+use \myagsource\Report\Content\SortBuilder;
 use \myagsource\DataHandler;
-use \myagsource\Page\Content\Table\TableData;
+use \myagsource\Report\Content\Table\TableData;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 

@@ -44,13 +44,14 @@ class MY_Form_validation extends CI_Form_validation {
 		if (!isset($input_data) || count($input_data) == 0) {
 			return FALSE;
 		}
-
 		// Does the _field_data array containing the validation rules exist?
 		// If not, we look to see if they were assigned via a config file
 		if (count($this->_field_data) == 0) {
 			// No validation rules?  We're done...
+//die(var_dump($this->_field_data));
 			if (count($this->_config_rules) == 0) {
-				return FALSE;
+				//no rules to fail
+				return true;
 			}
 
 			// Is there a validation rule for the particular URI being accessed?

@@ -9,6 +9,9 @@ require_once(APPPATH . 'libraries/dhi/HerdAccess.php');
 require_once APPPATH . 'libraries/Settings/SessionSettings.php';
 require_once APPPATH . 'libraries/Api/Response/ResponseMessage.php';
 require_once APPPATH . 'libraries/Site/WebContent/Navigation.php';
+require_once(APPPATH . 'libraries/Form/FormFactory.php');
+require_once(APPPATH . 'libraries/Site/WebContent/WebBlockFactory.php');
+require_once(APPPATH . 'libraries/Supplemental/Content/SupplementalFactory.php');
 
 use \myagsource\AccessLog;
 use \myagsource\dhi\Herd;
@@ -17,9 +20,12 @@ use \myagsource\dhi\HerdAccess;
 use \myagsource\Settings\SessionSettings;
 use \myagsource\Api\Response\ResponseMessage;
 use \myagsource\Site\WebContent\Navigation;
+use \myagsource\Supplemental\Content\SupplementalFactory;
+use \myagsource\Site\WebContent\WebBlockFactory;
+use \myagsource\Form\FormFactory;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
-class Change_herd extends MY_Api_Controller {
+class dform extends MY_Api_Controller {
 	/* 
 	 * @var Herd object
 	 */
@@ -64,60 +70,46 @@ class Change_herd extends MY_Api_Controller {
 	}
 
 	/**
-	 * @method select() - option list and input field to select a herd (text field auto-selects options list value).
-	 * 			sets session herd code on successful submissions.
+	 * @method settings() - setting submission.
 	 *
 	 * @access	public
 	 * @return	void
 	 */
 	function settings($form_id){
-		if(!$this->permissions->hasPermission("Select Herd")){
-			$this->sendResponse(403, new ResponseMessage('You do not have permission to select a herd.', 'error'));
-		}
-
 		//validate form input
         $this->load->library('herds');
 		$this->load->library('form_validation');
-		$this->form_validation->set_rules('herd_code', 'Herd', 'required|max_length[8]');
+		//$this->form_validation->set_rules('herd_code', 'Herd', 'required|max_length[8]');
 		//$this->form_validation->set_rules('herd_code_fill', 'Type Herd Code');
+//die(var_dump($this->form_validation->run_input()));
 		if($this->form_validation->run_input() === true){
-            //if the user has access to only 1 herd, set them up with that herd regardless of form submission
-            $tmp_arr = $this->herd_access->getAccessibleHerdsData($this->session->userdata('user_id'), $this->permissions->permissionsList(), $this->session->userdata('arr_regions'));
-            if(is_array($tmp_arr) && !empty($tmp_arr) && count($tmp_arr) === 1) {
-                try{
-                    $resp_msg = [];
-                    $msg = $this->_loadSessionHerd($tmp_arr[0]['herd_code']);
-                    if(!empty($msg)){
-                        $resp_msg = new ResponseMessage($msg, 'message');
-                    }
-                    $this->_record_access(2); //2 is the page code for herd change
-                    $this->load->model('web_content/navigation_model');
-                    $navigation = new Navigation($this->navigation_model, $this->herd, $this->permissions->permissionsList());
-                    $payload = ['nav' => $navigation->toArray('DHI')];
-                    $this->sendResponse(200, $resp_msg, $payload);
-                }
-                catch(Exception $e){
-                    $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
-                }
-            }
-
-            //if the user has access to more than 1 herd
             try{
+                //get form object
+                //@todo: split form core from form display (core would be included in display), no need for web content or supplemental here
+                //supplemental factory
+                $this->load->model('supplemental_model');
+                $supplemental_factory = new SupplementalFactory($this->supplemental_model, site_url());
+
+                $this->load->model('setting_model', null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
+                $form_factory = new FormFactory($this->setting_model, $supplemental_factory);
+                
+                $form = $form_factory->getObject($form_id);
+                $form->parseFormData($this->input->userInputArray());
+
                 $resp_msg = [];
-                $msg = $this->_loadSessionHerd($this->input->userInput('herd_code'));
-                if(!empty($msg)){
-                    $resp_msg = new ResponseMessage($msg, 'message');
-                }
+                //$msg = $this->_loadSessionHerd($tmp_arr[0]['herd_code']);
+                //if(!empty($msg)){
+                //    $resp_msg = new ResponseMessage($msg, 'message');
+                //}
                 $this->_record_access(2); //2 is the page code for herd change
 /*                $this->load->model('web_content/navigation_model');
                 $navigation = new Navigation($this->navigation_model, $this->herd, $this->permissions->permissionsList());
-                $payload = ['nav' => $navigation->toArray('DHI')];
-*/                $this->sendResponse(200, $resp_msg); //, $payload
+                $payload = ['nav' => $navigation->toArray('DHI')]; */
+                //$this->sendResponse(200, $resp_msg, $payload);
             }
             catch(Exception $e){
                 $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
             }
-            //else send error
 		}
         $this->sendResponse(400, new ResponseMessage(validation_errors(), 'error'));
 	}
