@@ -1,11 +1,11 @@
 <?php
 namespace myagsource\Api\Response;
 
-use myagsource\Api\iResponse;
-use myagsource\Api\Response\ResponseMessage;
-
 require_once(APPPATH . 'libraries/Api/iResponse.php');
 require_once(APPPATH . 'libraries/Api/Response/ResponseMessage.php');
+
+use myagsource\Api\iResponse;
+use myagsource\Api\iResponseMessage;
 
 /**
  * Name:  Api
@@ -89,7 +89,13 @@ class Response implements iResponse
         $ret = [];
         if(is_array($msgs)){
             foreach($msgs as $m){
-                $ret[] = $m->toArray();
+                if(is_a($m, 'myagsource\Api\iResponseMessage')){
+                    $ret[] = $m->toArray();
+                }
+                else {
+                    var_dump($m);
+                    throw new \UnexpectedValueException('Expected array of type iResponseMessage');
+                }
             }
         }
         return $ret;
