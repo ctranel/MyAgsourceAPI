@@ -335,8 +335,6 @@ class Auth extends MY_Api_Controller {
 	}
 
 	function login() {
-		$this->data['trial_days'] = $this->config->item('trial_period');
-
 		//validate form input
 		$this->form_validation->set_rules('identity', 'Email Address', 'trim|required|valid_email');
 		$this->form_validation->set_rules('password', 'Password', 'trim|required');
@@ -353,9 +351,9 @@ class Auth extends MY_Api_Controller {
         $this->session->unset_userdata('pstring');
         $this->session->unset_userdata('arr_tstring');
         $this->session->unset_userdata('tstring');
-        //$this->session->sess_destroy();
-        //$this->session->sess_create();
-    
+
+        $this->data['trial_days'] = $this->config->item('trial_period');
+
         if ($this->as_ion_auth->login($this->input->userInput('identity'), $this->input->userInput('password'), $remember)){ //if the login is successful
             $this->_record_access(1); //1 is the page code for login for the user management section
             //get permissions (also in constuctor, put in function/class somewhere)
@@ -366,12 +364,6 @@ class Auth extends MY_Api_Controller {
             $products = new Products($this->product_model, $herd, $group_permissions);
             $this->permissions = new ProgramPermissions($this->permissions_model, $group_permissions, $products->allHerdProductCodes());
 
-            //get herd list
-/*            $tmp_arr = $this->herd_access->getAccessibleHerdOptions($this->session->userdata('user_id'), $this->permissions->permissionsList(), $this->session->userdata('arr_regions'));
-            if(count($tmp_arr) === 0){
-                $this->sendResponse(404, new ResponseMessage('No herds found.', 'error'));
-            }
-*/
             $this->load->model('notice_model');
             $this->notifications = new Notifications($this->notice_model);
             $this->notifications->populateNotices();
