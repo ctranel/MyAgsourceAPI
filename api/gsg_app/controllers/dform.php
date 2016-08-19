@@ -91,21 +91,21 @@ class dform extends MY_Api_Controller {
                 $supplemental_factory = new SupplementalFactory($this->supplemental_model, site_url());
 
                 $this->load->model('setting_model', null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
-                $form_factory = new FormFactory($this->setting_model, $supplemental_factory);
+                $form_factory = new FormFactory($this->setting_model);
                 
-                $form = $form_factory->getObject($form_id);
-                $form->parseFormData($this->input->userInputArray());
+                $form = $form_factory->getSettingForm($form_id, $this->session->userdata('user_id'), $this->session->userdata('herd_code'));
+                $form->write($this->input->userInputArray());
 
                 $resp_msg = [];
                 //$msg = $this->_loadSessionHerd($tmp_arr[0]['herd_code']);
                 //if(!empty($msg)){
-                //    $resp_msg = new ResponseMessage($msg, 'message');
+                $resp_msg = new ResponseMessage('Form submission successful', 'message');
                 //}
-                $this->_record_access(2); //2 is the page code for herd change
+                //$this->_record_access(2); //2 is the page code for herd change
 /*                $this->load->model('web_content/navigation_model');
                 $navigation = new Navigation($this->navigation_model, $this->herd, $this->permissions->permissionsList());
                 $payload = ['nav' => $navigation->toArray('DHI')]; */
-                //$this->sendResponse(200, $resp_msg, $payload);
+                $this->sendResponse(200, $resp_msg);
             }
             catch(Exception $e){
                 $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));

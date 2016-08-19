@@ -48,7 +48,8 @@ class Form
      **/
     protected $controls;
 
-    public function __construct(FormControls $form_controls, $dom_id, $action){
+    public function __construct($datasource, FormControls $form_controls, $dom_id, $action){
+        $this->datasource = $datasource;
         $this->form_controls = $form_controls;
 /*        $this->id = $id;
         $this->page_id = $page_id;
@@ -88,7 +89,7 @@ class Form
 *  @throws:
 * -----------------------------------------------------------------
 */
-    public function parseFormData($form_data){
+    protected function parseFormData($form_data){
         $ret_val = [];
         if(!isset($form_data) || !is_array($form_data)){
             throw new \Exception('No form data found');
@@ -100,7 +101,6 @@ class Form
                 }
             }
         }
-        var_dump($ret_val);
         return $ret_val;
     }
 
@@ -109,4 +109,37 @@ class Form
     protected function setControls(){
         $this->controls = $this->form_controls->getControls();
     }
+
+    /* -----------------------------------------------------------------
+*  write
+
+*  write form to datasource
+
+*  @author: ctranel
+*  @date: Jul 1, 2014
+*  @param: array of key=>value pairs that have been processed by the parseFormData static function
+*  @return void
+*  @throws: * -----------------------------------------------------------------
+*/
+    public function write($form_data){
+        if(!isset($form_data) || !is_array($form_data)){
+            throw new \UnexpectedValueException('No form data received');
+        }
+        $form_data = $this->parseFormData($form_data);
+
+        $arr_data = [];
+
+        $user_id = isset($this->user) ? $this->user : null;
+
+        foreach($form_data as $k=>$v){
+            if(is_array($v)){
+                $v = implode('|', $v);
+            }
+
+            $arr_data[] = "SELECT '" . $user_id . "' AS user_id, '" . $this->herd_code . "' AS herd_code, '" . $this->arr_settings[$k]->id() . "' AS setting_id, '" . $v . "' AS value";
+        }
+        $this->datasource->upsert($arr_data);
+    }
+
+
 }

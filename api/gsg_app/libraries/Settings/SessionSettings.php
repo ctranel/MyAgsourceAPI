@@ -286,7 +286,7 @@ class SessionSettings {
 			
 			$arr_data[] = "SELECT '" . $user_id . "' AS user_id, '" . $this->herd_code . "' AS herd_code, '" . $this->arr_settings[$k]->id() . "' AS setting_id, '" . $v . "' AS value";
 		}
-		$this->setting_model->mergeUserHerdSettings($arr_data);
+		$this->setting_model->upsert($arr_data);
 	}
 	
 	/* -----------------------------------------------------------------

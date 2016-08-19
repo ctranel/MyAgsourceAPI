@@ -100,7 +100,7 @@ class FormBlockFactory {
     protected function dataToObject($form_data){
 		$web_block = $this->web_block_factory->blockFromData($form_data);
         $fc = new FormControls($this->datasource, $form_data['form_id']);
-        $f = new Form($fc, $form_data['dom_id'], $form_data['action']);
+        $f = new Form($this->datasource, $fc, $form_data['dom_id'], $form_data['action']);
 		return new FormBlock($web_block, $f);
     }
 

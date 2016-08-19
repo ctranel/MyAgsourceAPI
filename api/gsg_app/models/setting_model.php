@@ -112,7 +112,7 @@ class Setting_model extends CI_Model {
      **/
     public function getFormControlData($form_id) {
         $this->db
-            ->select('s.id, t.name AS data_type, g.name AS [group], s.name, s.label, s.default_value, uhs.value') //, f.name AS category, s.dom_id
+            ->select('s.id, t.name AS data_type, g.name AS [group], s.name, s.label, s.default_value, s.for_user, s.for_herd, uhs.value') //, f.name AS category, s.dom_id
             ->join('users.setng.forms_settings fs', "f.id = fs.form_id AND f.id = " . $form_id, 'inner')
             ->join('users.setng.settings s', "fs.setting_id = s.id", 'inner');
 
@@ -160,22 +160,17 @@ class Setting_model extends CI_Model {
 	}
 	
 	/* -----------------------------------------------------------------
-	*  Short Description
+	*  upsert Description
 
-	*  Long Description
+	*  upsert Description
 
-	*  @since: version 1
 	*  @author: ctranel
-	*  @date: Jul 1, 2014
-	*  @param: int: user id
-	*  @param: string: herd_code
-	*  @param: array using statements (composed in library for access to setting object)
-	*  @param: array of new settings key-value pairs
-	*  @return datatype
+	*  @param: array of strings
+	*  @return void
 	*  @throws: 
 	* -----------------------------------------------------------------
 	*/
-	public function mergeUserHerdSettings($arr_using_stmnts){
+	public function upsert($arr_using_stmnts){
 		if(!isset($arr_using_stmnts) || empty($arr_using_stmnts)){
 			return false;
 		}
@@ -192,4 +187,6 @@ class Setting_model extends CI_Model {
 					VALUES (nd.user_id, nd.herd_code, nd.setting_id, nd.value);";
 		$this->db->query($sql);
 	}
+    
+    
 }
