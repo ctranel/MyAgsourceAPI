@@ -87,7 +87,8 @@ parent::__construct();
     function _sanitize_globals(){
         parent::_sanitize_globals();
         $request_headers = apache_request_headers();
-        if(isset($request_headers['Content-Type']) && $request_headers['Content-Type'] === 'application/json'){
+        $request_headers = array_change_key_case($request_headers, CASE_LOWER);
+        if(isset($request_headers['content-type']) && $request_headers['content-type'] === 'application/json'){
             $this->json_request = json_decode(file_get_contents('php://input'), true);
             // Clean $json_request Data
             $this->_sanitizeJsonData($this->json_request);
