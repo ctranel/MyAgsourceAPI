@@ -93,8 +93,7 @@ class Response implements iResponse
                     $ret[] = $m->toArray();
                 }
                 else {
-                    var_dump($m);
-                    throw new \UnexpectedValueException('Expected array of type iResponseMessage');
+                    throw new \UnexpectedValueException('Expected array of type iResponseMessage, received type ' . gettype($m));
                 }
             }
         }
