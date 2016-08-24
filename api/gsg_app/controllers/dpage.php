@@ -18,6 +18,7 @@ require_once(APPPATH . 'libraries/DataHandler.php');
 require_once(APPPATH . 'libraries/Report/Content/ReportFactory.php');
 require_once(APPPATH . 'libraries/Page/Content/ReportBlock/ReportBlockFactory.php');
 require_once(APPPATH . 'libraries/Page/Content/ReportBlock/ReportBlock.php');
+require_once(APPPATH . 'libraries/Form/Content/FormFactory.php');
 
 
 use \myagsource\Benchmarks\Benchmarks;
@@ -36,7 +37,7 @@ use \myagsource\Page\Content\ReportBlock\ReportBlockFactory;
 use \myagsource\DataHandler;
 use \myagsource\Datasource\DbObjects\DbTableFactory;
 use \myagsource\Api\Response\ResponseMessage;
-
+use \myagsource\Form\Content\FormFactory;
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /* -----------------------------------------------------------------
@@ -211,7 +212,8 @@ class dpage extends MY_Api_Controller {
 		$this->report_factory = new ReportFactory($this->report_block_model, $this->db_field_model, $this->filters, $this->supplemental_factory, $data_handler, $db_table_factory);
         $this->report_block_factory = new ReportBlockFactory($this->report_block_model, $this->web_block_factory, $this->report_factory, $this->supplemental_factory);
 
-        $this->form_block_factory = new FormBlockFactory($this->setting_model, $this->web_block_factory, $this->supplemental_factory);
+        $this->form_factory = new FormFactory($this->setting_model, $this->supplemental_factory);
+		$this->form_block_factory = new FormBlockFactory($this->setting_model, $this->web_block_factory, $this->form_factory, $this->supplemental_factory, $this->session->userdata('user_id'), $this->session->userdata('herd_code'));
 
         $this->load->model('web_content/page_model');
         $page_data = $this->page_model->getPage($page_id);

@@ -3,14 +3,16 @@
 namespace myagsource\Page\Content\FormBlock;
 
 require_once(APPPATH . 'libraries/Page/Content/FormBlock/FormBlock.php');
-require_once(APPPATH . 'libraries/Form/Form.php');
-require_once(APPPATH . 'libraries/Form/Control/FormControls.php');
+require_once(APPPATH . 'libraries/Form/Content/Form.php');
+require_once(APPPATH . 'libraries/Settings/SettingForm.php');
+require_once(APPPATH . 'libraries/Settings/SettingFormControl.php');
 
+use myagsource\Form\Content\FormFactory;
+use myagsource\Settings\SettingForm;
 use \myagsource\Supplemental\Content\SupplementalFactory;
 use \myagsource\Site\WebContent\WebBlockFactory;
-use \myagsource\Form\Control\FormControls;
-use \myagsource\Page\Content\FormBlock\FormBlock;
-use \myagsource\Form\Form;
+use \myagsource\Form\Content\Form;
+use \myagsource\Settings\SettingFormControl;
 
 /**
  * A factory for form objects
@@ -41,17 +43,38 @@ class FormBlockFactory {
 	protected $web_block_factory;
 
 
-	/**
+    /**
+     * form_factory
+     * @var FormFactory
+     **/
+    protected $form_factory;
+
+    /**
 	 * supplemental_factory
 	 * @var SupplementalFactory
 	 **/
 	protected $supplemental_factory;
-	
-	function __construct(\setting_model $datasource, WebBlockFactory $web_block_factory, SupplementalFactory $supplemental_factory = null) {//, \db_field_model $datasource_dbfield
+
+    /**
+     * user_id
+     * @var int
+     **/
+    protected $user_id;
+
+    /**
+     * herd_code
+     * @var string
+     **/
+    protected $herd_code;
+    
+    function __construct(\setting_model $datasource, WebBlockFactory $web_block_factory, FormFactory $form_factory, SupplementalFactory $supplemental_factory = null, $user_id, $herd_code) {//, \db_field_model $datasource_dbfield
 		$this->datasource = $datasource;
 		//$this->datasource_dbfield = $datasource_dbfield;
 		$this->supplemental_factory = $supplemental_factory;
 		$this->web_block_factory = $web_block_factory;
+        $this->form_factory = $form_factory;
+        $this->user_id = $user_id;
+        $this->herd_code = $herd_code;
 	}
 	
 	/*
@@ -99,8 +122,13 @@ class FormBlockFactory {
     */
     protected function dataToObject($form_data){
 		$web_block = $this->web_block_factory->blockFromData($form_data);
-        $fc = new FormControls($this->datasource, $form_data['form_id']);
-        $f = new Form($this->datasource, $fc, $form_data['dom_id'], $form_data['action']);
+
+        if(strpos($form_data['display_type'], 'setting') !== false){
+            $f = $this->form_factory->getSettingForm($form_data['form_id'], $this->user_id, $this->herd_code);
+        }
+        else{
+            $f = $this->form_factory->getForm($form_data['form_id']);
+        }
 		return new FormBlock($web_block, $f);
     }
 
@@ -122,5 +150,3 @@ class FormBlockFactory {
 		return $ret;
 	}
 }
-
-?>

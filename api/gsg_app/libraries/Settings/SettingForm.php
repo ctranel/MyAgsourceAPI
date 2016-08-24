@@ -1,11 +1,10 @@
 <?php
 namespace myagsource\Settings;
 
-require_once APPPATH . 'libraries/Form/Form.php';
-//require_once APPPATH . 'libraries/Settings/SettingFormControls.php';
+require_once APPPATH . 'libraries/Form/Content/Form.php';
 
-//use \myagsource\Settings\SettingFormControls;
-use \myagsource\Form\Form;
+use \myagsource\Form\Content\Form;
+use myagsource\Form\iForm;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /**
@@ -21,7 +20,7 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 *
 */
 
-class SettingForm extends Form {
+class SettingForm extends Form implements iForm {
 	/**
 	 * @var int
 	 */
@@ -32,8 +31,8 @@ class SettingForm extends Form {
 	protected $herd_code;
 		
 	
-	function __construct($datasource, SettingFormControls $form_controls, $dom_id, $action, $user_id, $herd_code) {
-		parent::__construct($datasource, $form_controls, $dom_id, $action);
+	function __construct($datasource, $controls, $dom_id, $action, $user_id, $herd_code) {
+		parent::__construct($datasource, $controls, $dom_id, $action);
         $this->user_id = $user_id;
 		$this->herd_code = $herd_code;
 	}

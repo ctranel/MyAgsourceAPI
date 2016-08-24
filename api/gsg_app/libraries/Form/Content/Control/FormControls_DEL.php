@@ -1,9 +1,10 @@
 <?php
-namespace myagsource\Form\Control;
+namespace myagsource\Form\Content\Control;
 
-require_once APPPATH . 'libraries/Form/Control/FormControl.php';
+//require_once APPPATH . 'libraries/Form/Content/Control/FormControl.php';
 
-use \myagsource\Form\Control\FormControl;
+//use \myagsource\Form\Content\Control\FormControl;
+use myagsource\Form\iFormControls;
 
 /**
  * Created by PhpStorm.
@@ -12,7 +13,7 @@ use \myagsource\Form\Control\FormControl;
  * Time: 11:53 AM
  */
 
-class FormControls
+class FormControls implements iFormControls
 {
     /**
      * datasource
@@ -45,6 +46,6 @@ class FormControls
     }
     
     public function getControl($control_data){
-        return new FormControl($control_data, $this->datasource);
+        return new FormControl($this->datasource, $control_data);
     }
 }

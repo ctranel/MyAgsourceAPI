@@ -1,5 +1,5 @@
 <?php
-namespace myagsource\Form\Control;
+namespace myagsource\Form\Content\Control;
 
 require_once APPPATH . 'libraries/Form/iFormControl.php';
 
@@ -84,7 +84,8 @@ class FormControl implements iFormControl
     protected $datasource;
 
     //@todo: implement validators
-    public function __construct($control_data, $datasource){
+    public function __construct($datasource, $control_data, $subforms = null){
+//var_dump($subforms);
         $this->datasource = $datasource;
         $this->id = $control_data['id'];
         $this->name = $control_data['name'];

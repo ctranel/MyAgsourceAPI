@@ -1,5 +1,5 @@
 <?php
-namespace myagsource\Form;
+namespace myagsource\Form\Content;
 
 /**
  * Form
@@ -12,18 +12,12 @@ namespace myagsource\Form;
  * Time: 11:23 AM
  */
 
-require_once APPPATH . 'libraries/Form/Control/FormControls.php';
+require_once APPPATH . 'libraries/Form/iForm.php';
 
-use \myagsource\Form\Control\FormControls;
+use \myagsource\Form\iForm;
 
-class Form 
+class Form implements iForm
 {
-    /**
-     * form_controls
-     * @var object
-     **/
-    protected $form_controls;
-
     /**
      * datasource
      * @var object
@@ -31,34 +25,28 @@ class Form
     protected $datasource;
 
     /**
-     * block dom_id
+     * form dom_id
      * @var string
      **/
     protected $dom_id;
 
     /**
-     * block action
+     * form action
      * @var string
      **/
     protected $action;
 
     /**
      * array of control objects
-     * @var Controls[]
+     * @var FormControl[]
      **/
     protected $controls;
 
-    public function __construct($datasource, FormControls $form_controls, $dom_id, $action){
+    public function __construct($datasource, $controls, $dom_id, $action){
         $this->datasource = $datasource;
-        $this->form_controls = $form_controls;
-/*        $this->id = $id;
-        $this->page_id = $page_id;
-        $this->name = $name;
-        $this->description = $description;
-*/
+        $this->controls = $controls;
         $this->dom_id = $dom_id;
         $this->action = $action;
-        $this->setControls();
     }
 
     public function toArray(){
@@ -102,12 +90,6 @@ class Form
             }
         }
         return $ret_val;
-    }
-
-
-
-    protected function setControls(){
-        $this->controls = $this->form_controls->getControls();
     }
 
     /* -----------------------------------------------------------------

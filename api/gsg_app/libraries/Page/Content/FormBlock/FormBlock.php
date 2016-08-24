@@ -12,9 +12,9 @@ namespace myagsource\Page\Content\FormBlock;
  * Time: 11:23 AM
  */
 
-require_once APPPATH . 'libraries/Form/Form.php';
+require_once APPPATH . 'libraries/Form/Content/Form.php';
 
-use \myagsource\Form\Form;
+use \myagsource\Form\Content\Form;
 use \myagsource\Site\WebContent\Block as SiteBlock;
 
 class FormBlock

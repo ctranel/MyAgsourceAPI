@@ -9,7 +9,7 @@ require_once(APPPATH . 'libraries/dhi/HerdAccess.php');
 require_once APPPATH . 'libraries/Settings/SessionSettings.php';
 require_once APPPATH . 'libraries/Api/Response/ResponseMessage.php';
 require_once APPPATH . 'libraries/Site/WebContent/Navigation.php';
-require_once(APPPATH . 'libraries/Form/FormFactory.php');
+require_once(APPPATH . 'libraries/Form/Content/FormFactory.php');
 require_once(APPPATH . 'libraries/Site/WebContent/WebBlockFactory.php');
 require_once(APPPATH . 'libraries/Supplemental/Content/SupplementalFactory.php');
 
@@ -22,7 +22,7 @@ use \myagsource\Api\Response\ResponseMessage;
 use \myagsource\Site\WebContent\Navigation;
 use \myagsource\Supplemental\Content\SupplementalFactory;
 use \myagsource\Site\WebContent\WebBlockFactory;
-use \myagsource\Form\FormFactory;
+use \myagsource\Form\Content\FormFactory;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 class dform extends MY_Api_Controller {

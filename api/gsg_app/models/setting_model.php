@@ -40,34 +40,50 @@ class Setting_model extends CI_Model {
      * @author ctranel
      **/
     public function getSettingsByPage($page_id) {
-        $this->db
-            ->select('s.id, t.name AS data_type, b.name AS category, g.name AS [group], s.name, s.label, s.default_value, uhs.value')
-            ->join('users.dbo.blocks b', "pb.block_id = b.id AND b.display_type_id = 6 AND (pb.page_id = " . (int)$page_id . ")", 'inner')// . " OR f.dom_id = '" . $page_id
-            ->join('users.frm.forms f', "b.id = f.block_id", 'inner')
-            ->join('users.setng.forms_settings fs', "f.id = fs.form_id", 'inner')
-            ->join('users.setng.settings s', "fs.setting_id = s.id", 'inner');
-
         if(isset($this->user_id) && $this->user_id !== FALSE){
-            $this->db
-                ->join('users.setng.user_herd_settings uhs', "s.id = uhs.setting_id AND uhs.user_id = " . $this->user_id . " AND uhs.herd_code = '" . $this->herd_code . "'", 'left')
-                ->where("(uhs.user_id = " . $this->user_id . " OR uhs.user_id IS NULL)");
+            $uhs_join_cond = "s.id = uhs.setting_id AND uhs.user_id = " . $this->user_id . " AND uhs.herd_code = '" . $this->herd_code . "'";
+            $uhs_where = "(uhs.user_id = " . $this->user_id . " OR uhs.user_id IS NULL)";
         }
         else{
-            $this->db
-                ->join('users.setng.user_herd_settings uhs', "s.id = uhs.setting_id AND uhs.user_id IS NULL AND uhs.herd_code = '" . $this->herd_code . "'", 'left')
-                ->where("uhs.user_id IS NULL");
+            $uhs_join_cond = "s.id = uhs.setting_id AND uhs.user_id IS NULL AND uhs.herd_code = '" . $this->herd_code . "'";
+            $uhs_where = "uhs.user_id IS NULL";
         }
 
-        $results = $this->db->join('users.setng.types t', "s.type_id = t.id", 'inner')
-            ->join('users.setng.groups g', "s.group_id = g.id", 'inner')
-            ->where("(uhs.herd_code = '" . $this->herd_code . "' OR uhs.herd_code IS NULL)")
-            ->get('users.dbo.pages_blocks pb')
-            ->result_array();
+        $sql =
+            "WITH parentForms AS (
+                SELECT f.id AS form_id, f.block_id, sl.parent_form_id, sl.list_order AS list_order
+                FROM users.frm.forms f
+                LEFT JOIN users.frm.subform_link sl ON f.id = sl.form_id
+                WHERE sl.parent_form_id IS NULL
+            ), cteForms AS (
+                SELECT form_id, block_id, parent_form_id, list_order
+                FROM parentForms
+                UNION all 
+                SELECT sl.form_id, NULL AS block_id, sl.parent_form_id, sl.list_order
+                FROM users.frm.subform_link sl
+                    join cteForms f ON f.form_id = sl.parent_form_id
+            )
+    
+            SELECT s.id, t.name AS data_type, b.name AS category, g.name AS [group], s.name, s.label, s.default_value, uhs.value
+            FROM users.dbo.pages_blocks pb
+                INNER JOIN users.dbo.blocks b ON pb.block_id = b.id AND b.display_type_id = 6 AND (pb.page_id = " . $page_id . ")
+                INNER JOIN users.frm.forms f ON b.id = f.block_id
+                LEFT JOIN cteForms cte ON (f.id = cte.form_id OR f.id = cte.parent_form_id)
+                INNER JOIN users.setng.forms_settings fs ON cte.form_id = fs.form_id
+                INNER JOIN users.setng.settings s ON fs.setting_id = s.id
+                LEFT JOIN users.setng.user_herd_settings uhs ON " . $uhs_join_cond . "
+                INNER JOIN users.setng.types t ON s.type_id = t.id
+                INNER JOIN users.setng.groups g ON s.group_id = g.id
+            WHERE " . $uhs_where . "
+            AND (uhs.herd_code = '" . $this->herd_code . "' OR uhs.herd_code IS NULL)";
+
+        $results = $this->db->query($sql)->result_array();
         return $results;
     }
 
     /**
      * getFormsByPage
+     * @param page_id
      * @return string category
      * @author ctranel
      **/
@@ -81,6 +97,27 @@ class Setting_model extends CI_Model {
             ->get('users.dbo.pages_blocks pb')
 //            ->where('')
             ->result_array();
+        return $results;
+    }
+
+
+    /**
+     * getSubFormsByParentId
+     * @param $parent_form_id
+     * @return string category
+     * @author ctranel
+     **/
+    public function getSubFormsByParentId($parent_form_id) {
+        $results = $this->db
+            ->select('f.id AS form_id, s.name AS scope, f.active, f.dom_id, f.action, sl.list_order, scg.id, scg.parent_id, scg.operator, sc.form_control_name, sc.operator, sc.operand')
+            ->join('users.frm.subform_condition_groups scg', "sl.id = scg.subform_link_id AND sl.parent_form_id = " . $parent_form_id, 'inner')
+            ->join('users.frm.subform_condition sc', "scg.id = sc.condition_group_id", 'inner')
+            ->join('users.frm.forms f', "sl.form_id = f.id", 'inner')
+            ->join('users.dbo.lookup_scopes s', 'f.scope_id = s.id', 'inner')
+            ->order_by('sc.form_control_name, sl.list_order')
+            ->get('users.frm.subform_link sl')
+            ->result_array();
+
         return $results;
     }
 

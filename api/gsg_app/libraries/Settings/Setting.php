@@ -1,9 +1,9 @@
 <?php
 namespace myagsource\Settings;
 
-require_once(APPPATH . 'libraries/Form/Control/FormControl.php');
+require_once(APPPATH . 'libraries/Form/Content/Control/FormControl.php');
 
-use myagsource\Form\Control\FormControl;
+use myagsource\Form\Content\Control\FormControl;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /**
@@ -19,7 +19,7 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 class Setting extends FormControl {
 	public function __construct($control_data, $datasource){
-		parent::__construct($control_data, $datasource);
+		parent::__construct($datasource, $control_data);
 	}
 
     public function setDefaultValue($new_value){

@@ -119,7 +119,7 @@ class Page implements iPage {//iWebContent,
 	 * 
 	 * @todo: may need to add herd header info too
 	 **/
-	public function __construct($page_data, ReportBlockFactory $report_blocks_factory, FormBlockFactory $form_factory, SupplementalFactory $supplemental_factory = null, ReportFilters $filters = null, Benchmarks $benchmarks = null) {
+	public function __construct($page_data, ReportBlockFactory $report_blocks_factory, FormBlockFactory $form_blocks_factory, SupplementalFactory $supplemental_factory = null, ReportFilters $filters = null, Benchmarks $benchmarks = null) {
         $this->id = $page_data['id'];
         $this->section_id = $page_data['section_id'];
 		$this->name = $page_data['name'];
@@ -135,7 +135,7 @@ class Page implements iPage {//iWebContent,
 		$this->filters = $filters;
         $this->benchmarks = $benchmarks;
         
-        $this->loadChildren($report_blocks_factory, $form_factory);
+        $this->loadChildren($report_blocks_factory, $form_blocks_factory);
 	}
 
     public function toArray(){
@@ -212,10 +212,10 @@ class Page implements iPage {//iWebContent,
 	 * @return void
 	 * @access public
 	* */
-	public function loadChildren($report_block_factory, $form_factory){
+	public function loadChildren($report_block_factory, $form_blocks_factory){
         //get form and report block objects
         $blocks = $report_block_factory->getByPage($this->id);
-        $forms = $form_factory->getByPage($this->id);
+        $forms = $form_blocks_factory->getByPage($this->id);
 
         //merge objects in site block order
         $this->blocks = $blocks + $forms;

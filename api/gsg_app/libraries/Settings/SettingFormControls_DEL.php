@@ -1,10 +1,10 @@
 <?php
 namespace myagsource\Settings;
 
-require_once APPPATH . 'libraries/Form/Control/FormControls.php';
+require_once APPPATH . 'libraries/Form/Content/Control/FormControls.php';
 require_once APPPATH . 'libraries/Settings/SettingFormControl.php';
 
-use \myagsource\Form\Control\FormControls;
+use \myagsource\Form\Content\Control\FormControls;
 
 /**
  * Created by PhpStorm.
@@ -16,6 +16,7 @@ use \myagsource\Form\Control\FormControls;
 class SettingFormControls extends FormControls
 {
     public function getControl($control_data){
-        return new SettingFormControl($control_data, $this->datasource);
+        //get subforms here?
+        return new SettingFormControl($this->datasource, $control_data);
     }
 }

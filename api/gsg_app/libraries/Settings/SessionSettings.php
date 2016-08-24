@@ -14,6 +14,8 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 * Created:  2014-06-20
 *
 * Description:  Setting
+ *
+ * @todo: remove all form-related elements
 *
 */
 
