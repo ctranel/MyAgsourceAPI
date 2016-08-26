@@ -116,15 +116,15 @@ class FormFactory {
      */
     protected function createSettingForm($form_data, $user_id, $herd_code){
         $subforms = $this->getSettingSubForms($form_data['form_id'], $user_id, $herd_code);
-        $control_data = $this->datasource->getFormControlData($form_data['id']);
+        $control_data = $this->datasource->getFormControlData($form_data['form_id']);
 
         $fc = [];
         if(is_array($control_data) && !empty($control_data) && is_array($control_data[0])){
             foreach($control_data as $d){
-                $fc[] = new SettingFormControl($this->datasource, $d, $subforms);
+                $sf = isset($subforms[$d['name']]) ? $subforms[$d['name']] : null;
+                $fc[] = new SettingFormControl($this->datasource, $d, $sf);
             }
         }
-var_dump($form_data);
         return new SettingForm($this->datasource, $fc, $form_data['dom_id'], $form_data['action'],$user_id, $herd_code);
     }
 
@@ -138,9 +138,8 @@ var_dump($form_data);
         $subforms = [];
         foreach($results as $k => $r){
             $form = $this->createSettingForm($r, $user_id, $herd_code);
-            $subforms[$r['form_control_name']] = new SubForm($r['operator'], $r['operand'], $form);
+            $subforms[$r['form_control_name']][] = new SubForm($r['operator'], $r['operand'], $form);
         }
-        
         return $subforms;
     }
 }

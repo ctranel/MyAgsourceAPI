@@ -15,10 +15,25 @@ use myagsource\Form\iForm;
 
 class SubForm implements iSubForm
 {
-    public function __construct($operator, $operand2, iForm $form)
+    /**
+     * @var string
+     */
+    protected $operator;
+
+    /**
+     * @var string
+     */
+    protected $operand;
+
+    /**
+     * @var iForm
+     */
+    protected $form;
+
+    public function __construct($operator, $operand, iForm $form)
     {
         $this->operator = $operator;
-        $this->operand = $operand2;
+        $this->operand = $operand;
         $this->form = $form;
     }
     
@@ -26,7 +41,7 @@ class SubForm implements iSubForm
         return [
             'operator' => $this->operator,
             'operand' => $this->operand,
-            'form' => $this->form,
+            'form' => $this->form->toArray(),
         ];
     }
     

@@ -78,6 +78,12 @@ class FormControl implements iFormControl
     protected $validator;
 
     /**
+     * subforms
+     * @var iForm[]
+     **/
+    protected $subforms;
+
+    /**
      * datasource
      * @var CI_Model
      **/
@@ -93,6 +99,7 @@ class FormControl implements iFormControl
         $this->value = $control_data['value'];
         $this->group = $control_data['group'];
         $this->data_type = $control_data['data_type'];
+        $this->subforms = $subforms;
         //handle ranges
         if($this->data_type === 'range'){
             if(strpos($control_data['value'], '|') !== false){
@@ -220,6 +227,12 @@ class FormControl implements iFormControl
 
         if(isset($this->options)){
             $ret['options'] = $this->options;
+        }
+        if(isset($this->subforms) && is_array($this->subforms) && !empty($this->subforms)){
+            $ret['subforms'] = [];
+            foreach($this->subforms as $s){
+                $ret['subforms'][] = $s->toArray();
+            }
         }
         // validator
         if(isset($this->validator) && is_array($this->validator) && !empty($this->validator)){
