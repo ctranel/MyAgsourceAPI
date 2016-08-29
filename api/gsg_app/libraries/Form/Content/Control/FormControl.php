@@ -66,12 +66,6 @@ class FormControl implements iFormControl
     protected $data_type;
 
     /**
-     * group
-     * @var string
-     **/
-    protected $group;
-
-    /**
      * validator
      * @var Validator[]
      **/
@@ -91,13 +85,11 @@ class FormControl implements iFormControl
 
     //@todo: implement validators
     public function __construct($datasource, $control_data, $subforms = null){
-//var_dump($subforms);
         $this->datasource = $datasource;
         $this->id = $control_data['id'];
         $this->name = $control_data['name'];
         $this->label = $control_data['label'];
         $this->value = $control_data['value'];
-        $this->group = $control_data['group'];
         $this->data_type = $control_data['data_type'];
         $this->subforms = $subforms;
         //handle ranges
@@ -220,7 +212,6 @@ class FormControl implements iFormControl
             'name' => $this->name,
             'label' => $this->label,
             'value' => $this->value,
-            'group' => $this->group,
             'data_type' => $this->data_type,
             'default_value' => $this->default_value,
         ];
@@ -334,12 +325,10 @@ class FormControl implements iFormControl
         if($this->data_type === 'data_lookup' || $this->data_type === 'data_lookup_arr'){
             $ret_val['options'] = $this->options;
             $ret_val['selected'] = $this->getCurrValue($session_value);
-            $ret_val['class'] = $this->group;
             return $ret_val;
         }
 //		if($this->data_type === 'range'){
         $ret_val = $this->getCurrValue($session_value);
-        $ret_val['class'] = $this->group;
         return $ret_val;
 //		}
         /*
