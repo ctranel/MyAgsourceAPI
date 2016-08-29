@@ -330,7 +330,7 @@ class Change_herd extends MY_Controller {
 //		$this->session->set_userdata('breed_code', $arr_breeds[0]['breed_code']);
 		$this->session->set_userdata('recent_test_date', $this->herd->getRecentTest());
 		//load new benchmarks
-		$this->load->model('setting_model', null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->herd->herdCode()]);
+		$this->load->model('Forms/setting_model', null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->herd->herdCode()]);
 		$this->load->model('benchmark_model');
 		$benchmarks = new Benchmarks($this->session->userdata('user_id'), $this->herd->herdCode(), $this->herd->header_info($this->herd->herdCode()), $this->setting_model, $this->benchmark_model, []);
 		$this->session->set_userdata('benchmarks', $benchmarks->getSettingKeyValues());

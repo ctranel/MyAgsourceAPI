@@ -276,7 +276,7 @@ class report_block extends MY_Controller {
 		//end supplemental
 
 		// benchmarks
-		$this->load->model('setting_model', null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
+		$this->load->model('Forms/setting_model', null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
 		$herd_info = $this->herd_model->header_info($this->herd->herdCode());
 		$this->load->model('benchmark_model');
 		$this->benchmarks = new Benchmarks($this->session->userdata('user_id'), $this->input->post('herd_code'), $herd_info, $this->setting_model, $this->benchmark_model, $this->session->userdata('benchmarks'));

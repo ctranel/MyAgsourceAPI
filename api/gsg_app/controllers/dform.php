@@ -90,7 +90,7 @@ class dform extends MY_Api_Controller {
                 $this->load->model('supplemental_model');
                 $supplemental_factory = new SupplementalFactory($this->supplemental_model, site_url());
 
-                $this->load->model('setting_model', null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
+                $this->load->model('Forms/setting_model', null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
                 $form_factory = new FormFactory($this->setting_model);
                 
                 $form = $form_factory->getSettingForm($form_id, $this->session->userdata('user_id'), $this->session->userdata('herd_code'));

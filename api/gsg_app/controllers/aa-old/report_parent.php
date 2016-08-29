@@ -166,7 +166,7 @@ abstract class report_parent extends MY_Controller {
 		$this->load->model('web_content/section_model');
 		$this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
 		$this->load->model('web_content/block_model');
-        $this->load->model('setting_model', null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
+        $this->load->model('Forms/setting_model', null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
 		$this->blocks = new WebBlockFactory($this->block_model);
         //supplemental factory
         $this->load->model('supplemental_model');
@@ -474,7 +474,7 @@ abstract class report_parent extends MY_Controller {
 		$data['page_supplemental'] = $page_supp->getContent();
 
         if($this->permissions->hasPermission("Set Benchmarks")){
-            $this->load->model('setting_model', null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
+            $this->load->model('Forms/setting_model', null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
             $this->load->model('benchmark_model');
 
             $this->benchmarks = new Benchmarks($this->session->userdata('user_id'), $this->input->post('herd_code'), $this->herd_model->header_info($this->herd->herdCode()), $this->setting_model, $this->benchmark_model, $this->session->userdata('benchmarks'));

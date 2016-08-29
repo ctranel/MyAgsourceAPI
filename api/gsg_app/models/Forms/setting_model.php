@@ -12,7 +12,10 @@
  * -----------------------------------------------------------------
  */
 
-class Setting_model extends CI_Model {
+require_once(APPPATH . 'models/Forms/iForm_Model.php');
+
+
+class Setting_model extends CI_Model implements iForm_Model {
     /**
      * user_id
      * @var int
@@ -149,9 +152,8 @@ class Setting_model extends CI_Model {
      **/
     public function getFormControlData($form_id) {
         $this->db
-            ->select('s.id, t.name AS data_type, g.name AS [group], s.name, s.label, s.default_value, s.for_user, s.for_herd, uhs.value') //, f.name AS category, s.dom_id
-            ->join('users.setng.forms_settings fs', "f.id = fs.form_id AND f.id = " . $form_id, 'inner')
-            ->join('users.setng.settings s', "fs.setting_id = s.id", 'inner');
+            ->select('s.id, t.name AS data_type, s.name, s.label, s.default_value, s.for_user, s.for_herd, uhs.value') //, f.name AS category, s.dom_id
+            ->join('users.setng.settings s', "fs.setting_id = s.id AND fs.form_id = " . $form_id, 'inner');
 
         if(isset($this->user_id) && $this->user_id != FALSE){
             $this->db
@@ -165,9 +167,9 @@ class Setting_model extends CI_Model {
         }
 
         $results = $this->db->join('users.setng.types t', "s.type_id = t.id", 'inner')
-            ->join('users.setng.groups g', "s.group_id = g.id", 'inner')
+            //->join('users.setng.groups g', "s.group_id = g.id", 'inner')
             //->where("(uhs.herd_code = '" . $this->herd_code . "' OR uhs.herd_code IS NULL)")
-            ->get('users.frm.forms f')
+            ->get('users.setng.forms_settings fs')
             ->result_array();
         return $results;
     }
