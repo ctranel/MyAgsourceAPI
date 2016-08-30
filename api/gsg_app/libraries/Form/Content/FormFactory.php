@@ -3,8 +3,10 @@
 namespace myagsource\Form\Content;
 
 require_once(APPPATH . 'libraries/Settings/SettingForm.php');
+require_once(APPPATH . 'libraries/Settings/SettingFormControl.php');
 require_once(APPPATH . 'libraries/Form/Content/Form.php');
 require_once(APPPATH . 'libraries/Form/Content/SubForm.php');
+require_once(APPPATH . 'models/Forms/iForm_Model.php');
 
 use \myagsource\Form\Content\SubForm;
 use \myagsource\Supplemental\Content\SupplementalFactory;
@@ -27,7 +29,7 @@ class FormFactory {
 	 **/
 	protected $datasource;
 
-	function __construct(\setting_model $datasource, SupplementalFactory $supplemental_factory = null) {//, \db_field_model $datasource_dbfield
+	function __construct(\iForm_Model $datasource, SupplementalFactory $supplemental_factory = null) {//, \db_field_model $datasource_dbfield
 		$this->datasource = $datasource;
 	}
 	
@@ -38,13 +40,13 @@ class FormFactory {
 	 * @author ctranel
 	 * @returns \myagsource\Form\Form
 	 */
-	public function getForm($form_id){
+	public function getForm($form_id, $herd_code){
 		$results = $this->datasource->getFormById($form_id);
 		if(empty($results)){
 			return false;
 		}
 
-		return $this->createForm($results[0]);
+		return $this->createForm($results[0], $herd_code);
 	}
 
 	/*
@@ -54,8 +56,8 @@ class FormFactory {
     * @author ctranel
     * @returns Array of Forms
     */
-    protected function createForm($form_data){
-        $subforms = $this->getSubForms($form_data['id']);
+    protected function createForm($form_data, $herd_code){
+        $subforms = $this->getSubForms($form_data['id'], $herd_code);
 
         $control_data = $this->datasource->getFormControlData($form_data['id']);
 
@@ -65,7 +67,7 @@ class FormFactory {
                 $fc[] = new FormControl($this->datasource, $d, $subforms);
             }
         }
-        return new Form($this->datasource, $fc, $form_data['dom_id'], $form_data['action']);
+        return new Form($this->datasource, $fc, $form_data['dom_id'], $form_data['action'], $herd_code);
     }
 
     protected function getSubForms($parent_form_id){
@@ -141,5 +143,46 @@ class FormFactory {
             $subforms[$r['form_control_name']][] = new SubForm($r['operator'], $r['operand'], $form);
         }
         return $subforms;
+    }
+
+    /*
+     * getByPage
+     *
+     * @param int page_id
+         * @param string herd_code
+         * @param int user_id
+     * @author ctranel
+     * @returns \myagsource\Page\Content\FormBlock\FormBlock[]
+     */
+    public function getByPage($page_id, $herd_code = null, $user_id = null){
+        $forms = [];
+        $results = $this->datasource->getFormsByPage($page_id);
+        if(empty($results)){
+            return [];
+        }
+
+        foreach($results as $r){
+            $forms[$r['list_order']] = $this->dataToObject($r, $herd_code, $user_id);
+        }
+        return $forms;
+    }
+
+    /*
+    * dataToObject
+    *
+    * @param array of form data
+     * @param string herd_code
+     * @param int user_id
+    * @author ctranel
+    * @returns Array of Forms
+    */
+    protected function dataToObject($form_data, $herd_code = null, $user_id = null){
+        if(strpos($form_data['display_type'], 'setting') !== false){
+            $f = $this->getSettingForm($form_data['form_id'], $user_id, $herd_code);
+        }
+        elseif(strpos($form_data['display_type'], 'entry') !== false){
+            $f = $this->getForm($form_data['form_id'], $herd_code);
+        }
+        return $f;
     }
 }

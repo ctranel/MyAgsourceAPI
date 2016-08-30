@@ -11,7 +11,7 @@ class Block_model extends CI_Model {
 	 **/
 	public function getBlocks() {
 		$this->db
-			->select('b.id, pb.page_id, b.name,b.[description],b.path,dt.name AS display_type,s.name AS scope,b.active')//,b.chart_type_id,b.max_rows,b.cnt_row,b.sum_row,b.avg_row,b.pivot_db_field,b.bench_row,b.is_summary
+			->select('b.id, pb.page_id, b.name,b.[description],b.path,dt.name AS display_type,s.name AS scope,b.active, pb.list_order')//,b.chart_type_id,b.max_rows,b.cnt_row,b.sum_row,b.avg_row,b.pivot_db_field,b.bench_row,b.is_summary
 			->where('b.active', 1)
 			->join('users.dbo.lookup_display_types dt', 'b.display_type_id = dt.id', 'inner')
 			->join('users.dbo.lookup_scopes s', 'b.scope_id = s.id', 'inner')

@@ -2,12 +2,10 @@
 namespace myagsource\Site\WebContent;
 
 require_once(APPPATH . 'libraries/Site/WebContent/Page.php');
-require_once(APPPATH . 'libraries/Site/iWebContentRepository.php');
 require_once(APPPATH . 'libraries/Site/iWebContent.php');
 require_once(APPPATH . 'libraries/dhi/Herd.php');
 
 use \myagsource\Page\Content\FormBlock\FormBlockFactory;
-use \myagsource\Site\iWebContentRepository;
 use \myagsource\Page\Content\ReportBlock\ReportBlockFactory;
 //use \myagsource\Site\iWebContent;
 //use \myagsource\Site\WebContent\Page;
@@ -22,7 +20,7 @@ use \myagsource\Page\Content\ReportBlock\ReportBlockFactory;
  * 
  *        
  */
-class PageFactory implements iWebContentRepository {
+class PageFactory {
 	/**
 	 * datasource_pages
 	 * @var page_model

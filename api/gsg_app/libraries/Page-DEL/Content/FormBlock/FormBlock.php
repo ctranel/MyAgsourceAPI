@@ -12,9 +12,9 @@ namespace myagsource\Page\Content\FormBlock;
  * Time: 11:23 AM
  */
 
-require_once APPPATH . 'libraries/Form/Content/Form.php';
+require_once APPPATH . 'libraries/Form/iForm.php';
 
-use \myagsource\Form\Content\Form;
+use \myagsource\Form\iForm;
 use \myagsource\Site\WebContent\Block as SiteBlock;
 
 class FormBlock
@@ -31,7 +31,7 @@ class FormBlock
      **/
     protected $form;
 
-    public function __construct(SiteBlock $site_block, Form $form){
+    public function __construct(SiteBlock $site_block, iForm $form){
         $this->site_block = $site_block;
         $this->form = $form;
     }

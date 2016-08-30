@@ -26,7 +26,7 @@ use \myagsource\DataHandler;
  * 
  *        
  */
-class ReportFactory {// implements iReportContentRepository {
+class ReportFactory {
 	/**
 	 * datasource_reports
 	 * @var report_model
@@ -85,6 +85,7 @@ class ReportFactory {// implements iReportContentRepository {
 	 * @param int page_id
 	 * @author ctranel
 	 * @returns array of Reports
+*/
 	public function getByPage($page_id){
 		$reports = [];
 		
@@ -98,7 +99,6 @@ class ReportFactory {// implements iReportContentRepository {
 		}
 		return $reports;
 	}
-*/
 
 	/*
      * blockFromData

@@ -3,11 +3,8 @@
 namespace myagsource\Site\WebContent;
 
 require_once(APPPATH . 'libraries/Site/WebContent/Block.php');
-require_once(APPPATH . 'libraries/Site/iWebContentRepository.php');
 require_once(APPPATH . 'libraries/Site/iWebContent.php');
 require_once(APPPATH . 'libraries/dhi/Herd.php');
-
-use \myagsource\Site\iWebContentRepository;
 
 /**
  * A repository? for page objects
@@ -18,26 +15,14 @@ use \myagsource\Site\iWebContentRepository;
  * 
  *        
  */
-class WebBlockFactory implements iWebContentRepository {
+class WebBlockFactory {
 	/**
 	 * datasource_blocks
 	 * @var block_model
 	 **/
 	protected $datasource_blocks;
 
-	/**
-	 * web_block_factory
-	 * @var WebBlockFactory
-	 **/
-	protected $web_block_factory;
-
-	/**
-	 * form_block_factory
-	 * @var FormBlockFactory
-	 **/
-	protected $form_block_factory;
-
-	function __construct(\Block_model $datasource_blocks) {//, WebBlockFactory $web_block_factory, FormBlockFactory $form_block_factory
+	function __construct(\Block_model $datasource_blocks) {
 		$this->datasource_blocks = $datasource_blocks;
 	}
 	
@@ -66,7 +51,6 @@ class WebBlockFactory implements iWebContentRepository {
 	 * @param int page_id
 	 * @author ctranel
 	 * @returns Block[]
-	 */
 	public function getByPage($page_id){
 		$blocks = [];
 		$criteria = ['page_id' => $page_id];
@@ -80,6 +64,22 @@ class WebBlockFactory implements iWebContentRepository {
 		}
 		return $blocks;
 	}
+*/
+
+    public function getBlocksFromContent($page_id, $block_content){
+        $blocks = [];
+        $criteria = ['page_id' => $page_id];
+//		$join = [['table' => 'pages_blocks pb', 'condition' => 'b.id = pb.block_id AND pb.page_id = ' . $page_id]];
+        $results = $this->datasource_blocks->getByCriteria($criteria);
+        if(empty($results)){
+            return false;
+        }
+        foreach($results as $r){
+//            var_dump($r); die;
+            $blocks[] = new Block($block_content[$r['list_order']], $r['id'], $r['name'], $r['description'], $r['display_type'], $r['scope'], $r['active'], $r['path']);//, 
+        }
+        return $blocks;
+    }
 
     /*
      * blockFromData
@@ -87,10 +87,10 @@ class WebBlockFactory implements iWebContentRepository {
      * @param associative array of data needed for block creation
      * @author ctranel
      * @returns Block
-     */
     public function blockFromData($data){
         return new Block($data['id'], $data['name'], $data['description'], $data['display_type'], $data['scope'], $data['active'], $data['path']);//, $data['bench_row']
     }
+*/
 }
 
 ?>

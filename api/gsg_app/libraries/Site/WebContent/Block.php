@@ -2,10 +2,10 @@
 namespace myagsource\Site\WebContent;
 
 require_once APPPATH . 'libraries/Site/iBlock.php';
-//require_once APPPATH . 'libraries/Site/iWebContentRepository.php';
+require_once APPPATH . 'libraries/Site/iBlockContent.php';
 
 use myagsource\Site\iBlock;
-use myagsource\Site\iWebContentRepository;
+use myagsource\Site\iBlockContent;
 use myagsource\dhi\Herd;
 /**
 * Name:  Block
@@ -78,15 +78,21 @@ class Block implements iBlock {
 	 * @var boolean
 	 **/
 	protected $active;
-	
-	
-/**
+
+	/**
+	 * block_content
+	 * @var iBlockContent
+	 **/
+	protected $block_content;
+
+
+	/**
 	 * __construct
 	 *
 	 * @return void
 	 * @author ctranel
 	 **/
-	public function __construct($id, $name, $description, $display_type, $scope, $active, $path) { //, $has_benchmark
+	public function __construct($block_content, $id, $name, $description, $display_type, $scope, $active, $path) { //
 		$this->id = $id;
 		//$this->page_id = $page_id;
 		$this->name = $name;
@@ -95,7 +101,7 @@ class Block implements iBlock {
 		$this->scope = $scope;
 		$this->active = $active;
 		$this->path = $path;
-//		$this->has_benchmark = $has_benchmark;
+		$this->block_content = $block_content; //report or form
 	}
 	
 	public function id(){
@@ -122,20 +128,22 @@ class Block implements iBlock {
 		return $this->report_fields;
 	}
 
-/*	public function hasBenchmark(){
-		return $this->has_benchmark;
+	public function hasBenchmark(){
+		return $this->block_content->hasBenchmark();
 	}
-*/
+
 	public function toArray(){
-        $ret = [
-            'id' => $this->id,
+        if($this->block_content instanceof iBlockContent){
+            $ret = $this->block_content->toArray();
+        }
+        $ret['id'] = $this->id;
             //'page_id' => $this->page_id,
-            'name' => $this->name,
-            'description' => $this->description,
-            'display_type' => $this->display_type,
-            'path' => $this->path
+        $ret['name'] = $this->name;
+        $ret['description'] = $this->description;
+        $ret['display_type'] = $this->display_type;
+        $ret['path'] = $this->path;
 //            'has_benchmark' => $this->has_benchmark
-        ];
+;
         return $ret;
 	}
 
@@ -148,11 +156,11 @@ class Block implements iBlock {
 	 * @param iWebContent[]
 	 * @return void
 	 * @access public
-	* */
 	public function loadChildren($children){
 		$this->children = $children;
 	}
-	
+* */
+
 }
 
 

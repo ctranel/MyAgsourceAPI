@@ -1,6 +1,7 @@
 <?php
-
 namespace myagsource\Site;
+
+require_once APPPATH . 'libraries/Site/iWebContent.php';
 
 /**
  *
@@ -13,6 +14,7 @@ interface iBlock extends iWebContent {
 	public function description();
 	public function path();
 	public function displayType();
+	public function hasBenchmark();
 	public function toArray();
 }
 

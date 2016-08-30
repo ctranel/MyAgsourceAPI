@@ -6,7 +6,7 @@ require_once(APPPATH . 'libraries/AccessLog.php');
 require_once(APPPATH . 'libraries/Supplemental/Content/SupplementalFactory.php');
 require_once(APPPATH . 'libraries/dhi/HerdAccess.php');
 require_once(APPPATH . 'libraries/dhi/Herd.php');
-require_once(APPPATH . 'libraries/Site/WebContent/PageFactory.php');
+//require_once(APPPATH . 'libraries/Site/WebContent/PageFactory.php');
 require_once(APPPATH . 'libraries/Site/WebContent/Blocks.php');
 require_once(APPPATH . 'libraries/Page/Content/Csv.php');
 require_once(APPPATH . 'libraries/Page/Content/Pdf.php');
@@ -18,7 +18,7 @@ use \myagsource\Filters\ReportFilters;
 use \myagsource\Supplemental\Content\SupplementalFactory;
 use \myagsource\dhi\HerdAccess;
 use \myagsource\dhi\Herd;
-use \myagsource\Site\WebContent\PageFactory;
+//use \myagsource\Site\WebContent\PageFactory;
 use \myagsource\Page\Content\Csv;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');

@@ -7,7 +7,6 @@ require_once(APPPATH . 'libraries/Site/WebContent/PageFactory.php');
 
 use \myagsource\Site\WebContent\Section;
 use \myagsource\Site\WebContent\PageFactory;
-use \myagsource\Site\iWebContentRepository;
 use \myagsource\Site\iWebContent;
 use \myagsource\dhi\Herd;
 
@@ -20,7 +19,7 @@ use \myagsource\dhi\Herd;
  * 
  *        
  */
-class SectionFactory implements iWebContentRepository {
+class SectionFactory {
 	/**
 	 * $datasource_sections
 	 * @var Section_model
@@ -56,7 +55,6 @@ class SectionFactory implements iWebContentRepository {
 	/**
 	 * @method loadChildren()
 	 * @param iWebContent $section
-	 * @param iWebContentRepository $page_factory
 	 * @param int user id
 	 * @param Herd herd
 	 * @param array task permissions
@@ -64,7 +62,7 @@ class SectionFactory implements iWebContentRepository {
 	 * @access public
 	 **/
 	//if we allow producers to select which sections to allow, we will need to pass that array to this section as well
-	public function loadChildren(iWebContent $section, iWebContentRepository $page_factory, $user_id, Herd $herd, $permissions_list){ 
+	public function loadChildren(iWebContent $section, $page_factory, $user_id, Herd $herd, $permissions_list){ 
 		//if children have already been loaded
 		$tmp = $section->children();
 		if(isset($tmp)){

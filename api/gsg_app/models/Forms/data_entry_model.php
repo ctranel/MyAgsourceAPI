@@ -1,13 +1,12 @@
 <?php
-//namespace myagsource\settings;
 /* -----------------------------------------------------------------
  *	CLASS comments
- *  @file: setting_model.php
- *  @author: kmarshall
- *  @date: Nov 19, 2013
+ *  @file: Data_entry_model.php
+ *  @author: ctranel
+ *  @date: 2016/08/29
  *
  *  @description: Model for Settings -
- *  Accesses settings data.
+ *  Accesses data entry data.
  *
  * -----------------------------------------------------------------
  */
@@ -15,12 +14,12 @@
 require_once(APPPATH . 'models/Forms/iForm_Model.php');
 
 
-class Setting_model extends CI_Model implements iForm_Model {
+class Data_entry_model extends CI_Model implements iForm_Model {
     /**
      * user_id
      * @var int
      **/
-    protected $user_id;
+    //protected $user_id;
 
     /**
      * herd_code
@@ -31,57 +30,9 @@ class Setting_model extends CI_Model implements iForm_Model {
 
     public function __construct($args){
 		parent::__construct();
-        $this->user_id = $args['user_id'];
+        //$this->user_id = $args['user_id'];
         $this->herd_code = $args['herd_code'];
 	}
-
-
-    /**
-     * getSettingsByPage
-     * @param mixed int/string page_id or form name
-     * @return string category
-     * @author ctranel
-     **/
-    public function getSettingsByPage($page_id) {
-        if(isset($this->user_id) && $this->user_id !== FALSE){
-            $uhs_join_cond = "s.id = uhs.setting_id AND uhs.user_id = " . $this->user_id . " AND uhs.herd_code = '" . $this->herd_code . "'";
-            $uhs_where = "(uhs.user_id = " . $this->user_id . " OR uhs.user_id IS NULL)";
-        }
-        else{
-            $uhs_join_cond = "s.id = uhs.setting_id AND uhs.user_id IS NULL AND uhs.herd_code = '" . $this->herd_code . "'";
-            $uhs_where = "uhs.user_id IS NULL";
-        }
-
-        $sql =
-            "WITH parentForms AS (
-                SELECT f.id AS form_id, f.block_id, sl.parent_form_id, sl.list_order AS list_order
-                FROM users.frm.forms f
-                LEFT JOIN users.frm.subform_link sl ON f.id = sl.form_id
-                WHERE sl.parent_form_id IS NULL
-            ), cteForms AS (
-                SELECT form_id, block_id, parent_form_id, list_order
-                FROM parentForms
-                UNION all 
-                SELECT sl.form_id, NULL AS block_id, sl.parent_form_id, sl.list_order
-                FROM users.frm.subform_link sl
-                    join cteForms f ON f.form_id = sl.parent_form_id
-            )
-    
-            SELECT s.id, t.name AS control_type, b.name AS category, s.name, s.label, s.default_value, uhs.value
-            FROM users.dbo.pages_blocks pb
-                INNER JOIN users.dbo.blocks b ON pb.block_id = b.id AND b.display_type_id = 6 AND (pb.page_id = " . $page_id . ")
-                INNER JOIN users.frm.forms f ON b.id = f.block_id
-                LEFT JOIN cteForms cte ON (f.id = cte.form_id OR f.id = cte.parent_form_id)
-                INNER JOIN users.setng.forms_settings fs ON cte.form_id = fs.form_id
-                INNER JOIN users.setng.settings s ON fs.setting_id = s.id
-                LEFT JOIN users.setng.user_herd_settings uhs ON " . $uhs_join_cond . "
-                INNER JOIN users.frm.control_types t ON s.type_id = t.id
-            WHERE " . $uhs_where . "
-            AND (uhs.herd_code = '" . $this->herd_code . "' OR uhs.herd_code IS NULL)";
-
-        $results = $this->db->query($sql)->result_array();
-        return $results;
-    }
 
     /**
      * getFormsByPage
@@ -150,25 +101,75 @@ class Setting_model extends CI_Model implements iForm_Model {
      * @author ctranel
      **/
     public function getFormControlData($form_id) {
-        $this->db
-            ->select('s.id, t.name AS control_type, s.name, s.label, s.default_value, s.for_user, s.for_herd, uhs.value') //, f.name AS category, s.dom_id
-            ->join('users.setng.settings s', "fs.setting_id = s.id AND fs.form_id = " . $form_id, 'inner');
-
-        if(isset($this->user_id) && $this->user_id != FALSE){
-            $this->db
-                ->join('users.setng.user_herd_settings uhs', "s.id = uhs.setting_id AND (uhs.user_id = " . $this->user_id . " OR uhs.user_id IS NULL) AND (uhs.herd_code = '" . $this->herd_code . "' OR uhs.herd_code IS NULL)", 'left');
-                //->where("(uhs.user_id = " . $this->user_id . " OR uhs.user_id IS NULL)");
-        }
-        else{
-            $this->db
-                ->join('users.setng.user_herd_settings uhs', "s.id = uhs.setting_id AND uhs.user_id IS NULL AND (uhs.herd_code = '" . $this->herd_code . "' OR uhs.herd_code IS NULL)", 'left');
-                //->where("uhs.user_id IS NULL");
-        }
-
-        $results = $this->db->join('users.frm.control_types t', "s.type_id = t.id", 'inner')
-            ->get('users.setng.forms_settings fs')
-            ->result_array();
+        return false;
+//need a $k=>$v array for key data (herd_code, serial_num, test_date, pstring, etc)
+       $sql = "
+            DECLARE @dsql NVARCHAR(MAX)
+                ,@psql NVARCHAR(500)
+                
+            
+                ,@id INT
+                ,@db_table_name VARCHAR(100)
+                ,@db_field_name VARCHAR(50)
+            
+            
+            IF OBJECT_ID('tempdb..#valueTable', 'U') IS NOT NULL
+              DROP TABLE #valueTable;
+            
+            CREATE TABLE #valueTable (
+                db_field_id INT,
+                value VARCHAR(MAX),
+                herd_code CHAR(8),
+                test_date SMALLDATETIME,
+                pstring INT
+            )
+            
+            DECLARE Table_Cursor CURSOR FOR
+                select fld.id, CONCAT(db.name, '.',  tbl.db_schema, '.', tbl.name) AS db_table_name,fld.db_field_name--, uhs.value
+                from users.dbo.forms_dbfields fs
+                inner join users.dbo.db_fields fld ON fs.db_field_id = fld.id AND fs.form_id = 4 --THIS IS THE VARIABLE FROM PHP
+                inner join users.dbo.db_tables tbl ON fld.db_table_id = tbl.id --AND allow_update = 1
+                inner join users.dbo.db_databases db ON tbl.database_id = db.id
+            
+            
+            OPEN Table_Cursor;
+            
+            FETCH NEXT FROM Table_Cursor INTO @id, @db_table_name, @db_field_name;
+            
+            WHILE @@FETCH_STATUS = 0
+            BEGIN
+               SET @dsql = CONCAT(N'INSERT INTO #valueTable (db_field_id, herd_code, test_date, pstring, value) SELECT @p_id AS db_field_id, herd_code, test_date, pstring, ' , @db_field_name, N' FROM ', @db_table_name, N' WHERE herd_code = ''21110099'' AND test_date = ''2014-08-22'' AND pstring = 0')
+               SET @psql = N'@p_id INT'
+               EXEC sp_executesql @dsql, @psql, @p_id = @id
+            
+               FETCH NEXT FROM Table_Cursor INTO @id, @db_table_name, @db_field_name;
+            END;
+            
+            CLOSE Table_Cursor;
+            
+            DEALLOCATE Table_Cursor;
+            
+               select fld.id, ct.name AS control_type, fld.name, fld.name AS label, fs.default_value, v.herd_code, v.test_date, v.pstring, v.value
+                from users.dbo.forms_dbfields fs
+                inner join users.dbo.db_fields fld ON fs.db_field_id = fld.id AND fs.form_id = 4
+                inner join users.frm.control_types ct ON fs.control_type_id = ct.id
+                inner join #valueTable v ON fld.id = v.db_field_id;
+        ";
+        $results = $this->db->query($sql)->result_array();
         return $results;
+
+/*        $results = $this->db
+            //get the meta data
+            ->select('fld.id, ct.name AS control_type, fld.name, fld.label, fs.default_value, uhs.value') //, f.name AS category, s.dom_id
+            ->join('users.dbo.db_field fld', "fs.db_field_id = fld.id AND fs.form_id = " . $form_id, 'inner')
+            ->join('users.dbo.db_table tbl', "fld.db_table_id = tbl.id", 'inner')
+            //now get value
+            ->join('users.setng.user_herd_settings uhs', "s.id = uhs.setting_id AND uhs.user_id IS NULL AND (uhs.herd_code = '" . $this->herd_code . "' OR uhs.herd_code IS NULL)", 'left');
+            ->join('users.frm.control_types ct', "s.control_type_id = ct.id", 'inner')
+            //->where("(uhs.herd_code = '" . $this->herd_code . "' OR uhs.herd_code IS NULL)")
+            ->get('users.dbo.forms_dbfields fs')
+            ->result_array();
+        return $results; */
     }
 
 

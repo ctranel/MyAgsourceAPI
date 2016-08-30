@@ -6,7 +6,7 @@ require_once APPPATH . 'libraries/Page/iReportBlock.php';
 
 use \myagsource\Page\iReportBlock;
 use \myagsource\Report\iReport;
-use \myagsource\Site\iBlock as SiteBlock;
+use \myagsource\Site\iBlock;
 use \myagsource\Supplemental\Content\SupplementalFactory;
 
 /**
@@ -22,8 +22,8 @@ use \myagsource\Supplemental\Content\SupplementalFactory;
 
 class ReportBlock implements iReportBlock {
     /**
-     * SiteBlock object which contains properties and methods related to the block context within the site
-     * @var SiteBlock
+     * iBlock object which contains properties and methods related to the block context within the site
+     * @var iBlock
      **/
     protected $site_block;
 
@@ -45,7 +45,7 @@ class ReportBlock implements iReportBlock {
      * @return void
      * @author ctranel
      **/
-    public function __construct(/*$block_datasource, */SiteBlock $site_block, iReport $report, SupplementalFactory $supp_factory){
+    public function __construct(/*$block_datasource, */iBlock $site_block, iReport $report, SupplementalFactory $supp_factory){
         //$this->datasource = $block_datasource;
         $this->site_block = $site_block;
         $this->report = $report;

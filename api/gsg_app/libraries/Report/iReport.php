@@ -2,19 +2,16 @@
 
 namespace myagsource\Report;
 
+use myagsource\Site\iBlockContent;
+
 
 /**
  *
  * @author ctranel
  *        
  */
-interface iReport {
+interface iReport extends iBlockContent {
 	public function id();
-	//public function name();
-	//public function description();
-	//public function path();
-	//public function displayType();
-	//public function title();
 
 	public function maxRows();
 	public function pivotFieldName();

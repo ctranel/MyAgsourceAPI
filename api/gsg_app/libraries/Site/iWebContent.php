@@ -9,10 +9,10 @@ namespace myagsource\Site;
  */
 interface iWebContent {
 	public function id();
-	public function path();
+	//public function path();
 	public function name();
-	public function children();
-	public function loadChildren($children);
+	//public function children();
+	//public function loadChildren($children);
 }
 
 ?>

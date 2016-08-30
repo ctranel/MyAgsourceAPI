@@ -3,8 +3,6 @@ namespace myagsource\Site\WebContent;
 
 require_once(APPPATH . 'helpers/multid_array_helper.php');
 
-//use \myagsource\Site\iWebContentRepository;
-//use \myagsource\Site\iWebContent;
 use \myagsource\dhi\Herd;
 
 /**
@@ -16,7 +14,7 @@ use \myagsource\dhi\Herd;
  * 
  *        
  */
-class Navigation{// implements iWebContentRepository {
+class Navigation{
 	/** 
 	 * $datasource_navigation
 	 * @var navigation_model

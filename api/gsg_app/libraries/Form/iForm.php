@@ -9,8 +9,9 @@
 namespace myagsource\Form;
 
 
-interface iForm
+use myagsource\Site\iBlockContent;
+
+interface iForm extends iBlockContent
 {
-    public function toArray();
     public function write($form_data);
 }

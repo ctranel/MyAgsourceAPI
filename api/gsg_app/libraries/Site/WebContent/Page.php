@@ -3,7 +3,6 @@ namespace myagsource\Site\WebContent;
 
 require_once APPPATH . 'libraries/Site/iPage.php';
 require_once APPPATH . 'libraries/Site/iWebContent.php';
-require_once APPPATH . 'libraries/Site/iWebContentRepository.php';
 
 use \myagsource\Benchmarks\Benchmarks;
 use \myagsource\Filters\ReportFilters;
@@ -88,8 +87,8 @@ class Page implements iPage {//iWebContent,
     protected $supplemental;
 
     /**
-	 * report blocks
-	 * @var Block[]
+	 * content blocks
+	 * @var iBlock[]
 	 **/
 	protected $blocks;
 
@@ -119,7 +118,7 @@ class Page implements iPage {//iWebContent,
 	 * 
 	 * @todo: may need to add herd header info too
 	 **/
-	public function __construct($page_data, ReportBlockFactory $report_blocks_factory, FormBlockFactory $form_blocks_factory, SupplementalFactory $supplemental_factory = null, ReportFilters $filters = null, Benchmarks $benchmarks = null) {
+	public function __construct($page_data, $blocks, SupplementalFactory $supplemental_factory = null, ReportFilters $filters = null, Benchmarks $benchmarks = null) {
         $this->id = $page_data['id'];
         $this->section_id = $page_data['section_id'];
 		$this->name = $page_data['name'];
@@ -129,13 +128,9 @@ class Page implements iPage {//iWebContent,
 		$this->path = $page_data['path'];
         $this->route = $page_data['route'];
         $this->supplemental = $supplemental_factory->getPageSupplemental($this->id);
-
-		//$this->blocks = $blocks;
-		//$this->forms = $forms;
+		$this->blocks = $blocks;
 		$this->filters = $filters;
         $this->benchmarks = $benchmarks;
-        
-        $this->loadChildren($report_blocks_factory, $form_blocks_factory);
 	}
 
     public function toArray(){
@@ -211,7 +206,6 @@ class Page implements iPage {//iWebContent,
 	 * @param iWebContent[]
 	 * @return void
 	 * @access public
-	* */
 	public function loadChildren($report_block_factory, $form_blocks_factory){
         //get form and report block objects
         $blocks = $report_block_factory->getByPage($this->id);
@@ -221,6 +215,7 @@ class Page implements iPage {//iWebContent,
         $this->blocks = $blocks + $forms;
         ksort($this->blocks);
 	}
+* */
 }
 
 

@@ -60,10 +60,10 @@ class FormControl implements iFormControl
 //    protected $dom_id;
 
     /**
-     * data_type
+     * control_type
      * @var string (can handle date, datetime, string, int, decimal)
      **/
-    protected $data_type;
+    protected $control_type;
 
     /**
      * validator
@@ -90,10 +90,10 @@ class FormControl implements iFormControl
         $this->name = $control_data['name'];
         $this->label = $control_data['label'];
         $this->value = $control_data['value'];
-        $this->data_type = $control_data['data_type'];
+        $this->control_type = $control_data['control_type'];
         $this->subforms = $subforms;
         //handle ranges
-        if($this->data_type === 'range'){
+        if($this->control_type === 'range'){
             if(strpos($control_data['value'], '|') !== false){
                 $tmp = [];
                 list($tmp['dbfrom'], $tmp['dbto']) = explode('|', $control_data['value']);
@@ -104,7 +104,7 @@ class FormControl implements iFormControl
             }
         }
         //if type is array and value is not an array, wrap it in an array
-        if(($this->data_type === 'array' || $this->data_type === 'data_lookup_arr') && isset($control_data['value']) && !is_array($control_data['value'])){
+        if(($this->control_type === 'array' || $this->control_type === 'data_lookup_arr') && isset($control_data['value']) && !is_array($control_data['value'])){
             if(strpos($control_data['value'], '|')){
                 $control_data['value'] = explode('|', $control_data['value']);
             }
@@ -117,7 +117,7 @@ class FormControl implements iFormControl
 
         //set default value
         //handle ranges
-        if($this->data_type === 'range'){
+        if($this->control_type === 'range'){
             if(strpos($control_data['default_value'], '|') !== false){
                 $tmp = [];
                 list($tmp['dbfrom'], $tmp['dbto']) = explode('|', $control_data['default_value']);
@@ -128,7 +128,7 @@ class FormControl implements iFormControl
             }
         }
         //if type is array and default_value is not an array, wrap it in an array
-        if(($this->data_type === 'array' || $this->data_type === 'data_lookup_arr') && isset($control_data['default_value']) && !is_array($control_data['default_value'])){
+        if(($this->control_type === 'array' || $this->control_type === 'data_lookup_arr') && isset($control_data['default_value']) && !is_array($control_data['default_value'])){
             if(strpos($control_data['default_value'], '|') !== false){
                 $control_data['default_value'] = explode('|', $control_data['default_value']);
             }
@@ -138,7 +138,7 @@ class FormControl implements iFormControl
         }
         $this->default_value = $control_data['default_value'];
 
-        if($this->data_type === 'data_lookup' || $this->data_type === 'data_lookup_arr'){
+        if($this->control_type === 'data_lookup' || $this->control_type === 'data_lookup_arr'){
             $this->loadLookupOptions();
         }
     }
@@ -157,10 +157,10 @@ class FormControl implements iFormControl
     */
     public function getCurrValue($session_value = null){
         //if a string is sent for array type, insert string into array
-        if(($this->data_type === 'array' || $this->data_type === 'data_lookup_arr') && isset($session_value) && !is_array($session_value)){
+        if(($this->control_type === 'array' || $this->control_type === 'data_lookup_arr') && isset($session_value) && !is_array($session_value)){
             $session_value = [$session_value];
         }
-        if(strpos($this->data_type, 'range') !== false || $this->data_type === 'array' || $this->data_type === 'data_lookup_arr'){
+        if(strpos($this->control_type, 'range') !== false || $this->control_type === 'array' || $this->control_type === 'data_lookup_arr'){
             if(isset($session_value) && is_array($session_value) && !empty($session_value)){
                 return $session_value;
             }
@@ -168,7 +168,7 @@ class FormControl implements iFormControl
         elseif(isset($session_value)){
             return $session_value;
         }
-        if(strpos($this->data_type, 'range') !== false || $this->data_type === 'array' || $this->data_type === 'data_lookup_arr'){
+        if(strpos($this->control_type, 'range') !== false || $this->control_type === 'array' || $this->control_type === 'data_lookup_arr'){
             if(isset($this->value) && is_array($this->value) && !empty($this->value)){
                 return $this->value;
             }
@@ -212,7 +212,7 @@ class FormControl implements iFormControl
             'name' => $this->name,
             'label' => $this->label,
             'value' => $this->value,
-            'data_type' => $this->data_type,
+            'control_type' => $this->control_type,
             'default_value' => $this->default_value,
         ];
 
@@ -251,11 +251,11 @@ class FormControl implements iFormControl
     * -----------------------------------------------------------------
     */
     public function getDisplayText($session_value){
-        if($this->data_type === 'range'){
+        if($this->control_type === 'range'){
             $range = $this->getCurrValue($session_value);
             return 'between ' . $range['dbfrom'] . ' and ' . $range['dbto'];
         }
-        elseif($this->data_type === 'array' || $this->data_type === 'data_lookup_arr'){
+        elseif($this->control_type === 'array' || $this->control_type === 'data_lookup_arr'){
             return implode(', ', $this->getCurrValue($session_value));
         }
         else{
@@ -278,7 +278,7 @@ class FormControl implements iFormControl
      * -----------------------------------------------------------------
      */
     public function getLookupOptions(){
-        if($this->data_type !== 'data_lookup' && $this->data_type !== 'data_lookup_arr'){
+        if($this->control_type !== 'data_lookup' && $this->control_type !== 'data_lookup_arr'){
             return false;
         }
         return $this->options;
@@ -298,7 +298,7 @@ class FormControl implements iFormControl
     * -----------------------------------------------------------------
     */
     protected function loadLookupOptions(){
-        if($this->data_type !== 'data_lookup' && $this->data_type !== 'data_lookup_arr'){
+        if($this->control_type !== 'data_lookup' && $this->control_type !== 'data_lookup_arr'){
             return false;
         }
         $options = $this->datasource->getLookupOptions($this->id);
@@ -322,12 +322,12 @@ class FormControl implements iFormControl
     * -----------------------------------------------------------------
     */
     public function getFormData($session_value = null){
-        if($this->data_type === 'data_lookup' || $this->data_type === 'data_lookup_arr'){
+        if($this->control_type === 'data_lookup' || $this->control_type === 'data_lookup_arr'){
             $ret_val['options'] = $this->options;
             $ret_val['selected'] = $this->getCurrValue($session_value);
             return $ret_val;
         }
-//		if($this->data_type === 'range'){
+//		if($this->control_type === 'range'){
         $ret_val = $this->getCurrValue($session_value);
         return $ret_val;
 //		}
@@ -335,7 +335,7 @@ class FormControl implements iFormControl
          * @todo: add remaining data types
          */
 
-        die("Sorry, I don't recognize the form field data type (" . $this->data_type . ") in Settings\Form");
+        die("Sorry, I don't recognize the form field data type (" . $this->control_type . ") in Settings\Form");
     }
     
     public function parseFormData($value){
@@ -343,7 +343,7 @@ class FormControl implements iFormControl
         if(is_array($value)){
             $ret_val = implode('|', $value);
             //handle range notation
-            //if($this->data_type === 'range'){
+            //if($this->control_type === 'range'){
             //    $ret_val = $value['dbfrom'] . '|' . $value['dbto'];
             //}
         }

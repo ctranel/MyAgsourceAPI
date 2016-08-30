@@ -44,12 +44,18 @@ class FormBlockFactory {
 
 
     /**
-     * form_factory
+     * setting_form_factory
      * @var FormFactory
      **/
-    protected $form_factory;
+    protected $setting_form_factory;
 
-    /**
+	/**
+	 * entry_form_factory
+	 * @var FormFactory
+	 **/
+	protected $entry_form_factory;
+
+	/**
 	 * supplemental_factory
 	 * @var SupplementalFactory
 	 **/
@@ -67,12 +73,13 @@ class FormBlockFactory {
      **/
     protected $herd_code;
     
-    function __construct(\setting_model $datasource, WebBlockFactory $web_block_factory, FormFactory $form_factory, SupplementalFactory $supplemental_factory = null, $user_id, $herd_code) {//, \db_field_model $datasource_dbfield
+    function __construct(\setting_model $datasource, WebBlockFactory $web_block_factory, FormFactory $setting_form_factory, FormFactory $entry_form_factory, SupplementalFactory $supplemental_factory = null, $user_id, $herd_code) {//, \db_field_model $datasource_dbfield
 		$this->datasource = $datasource;
 		//$this->datasource_dbfield = $datasource_dbfield;
 		$this->supplemental_factory = $supplemental_factory;
 		$this->web_block_factory = $web_block_factory;
-        $this->form_factory = $form_factory;
+        $this->setting_form_factory = $setting_form_factory;
+		$this->entry_form_factory = $entry_form_factory;
         $this->user_id = $user_id;
         $this->herd_code = $herd_code;
 	}
@@ -94,7 +101,7 @@ class FormBlockFactory {
 	}
 
 	/*
-	 * getBySection
+	 * getByPage
 	 * 
 	 * @param int page_id
 	 * @author ctranel
@@ -124,11 +131,14 @@ class FormBlockFactory {
 		$web_block = $this->web_block_factory->blockFromData($form_data);
 
         if(strpos($form_data['display_type'], 'setting') !== false){
-            $f = $this->form_factory->getSettingForm($form_data['form_id'], $this->user_id, $this->herd_code);
+            $f = $this->setting_form_factory->getSettingForm($form_data['form_id'], $this->user_id, $this->herd_code);
         }
-        else{
-            $f = $this->form_factory->getForm($form_data['form_id']);
-        }
+		elseif(strpos($form_data['display_type'], 'entry') !== false){
+			$f = $this->emtry_form_factory->getForm($form_data['form_id'], $this->user_id, $this->herd_code);
+		}
+//        else{
+//            $f = $this->form_factory->getForm($form_data['form_id']);
+//        }
 		return new FormBlock($web_block, $f);
     }
 
