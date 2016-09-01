@@ -5,6 +5,7 @@ namespace myagsource\Form\Content;
 require_once(APPPATH . 'libraries/Settings/SettingForm.php');
 require_once(APPPATH . 'libraries/Settings/SettingFormControl.php');
 require_once(APPPATH . 'libraries/Form/Content/Form.php');
+require_once(APPPATH . 'libraries/Form/Content/Control/FormControl.php');
 require_once(APPPATH . 'libraries/Form/Content/SubForm.php');
 require_once(APPPATH . 'models/Forms/iForm_Model.php');
 
@@ -12,6 +13,7 @@ use \myagsource\Form\Content\SubForm;
 use \myagsource\Supplemental\Content\SupplementalFactory;
 use \myagsource\Settings\SettingForm;
 use \myagsource\Settings\SettingFormControl;
+use \myagsource\Form\Content\Control\FormControl;
 
 /**
  * A factory for form objects
@@ -57,9 +59,9 @@ class FormFactory {
     * @returns Array of Forms
     */
     protected function createForm($form_data, $herd_code){
-        $subforms = $this->getSubForms($form_data['id'], $herd_code);
+        $subforms = $this->getSubForms($form_data['form_id'], $herd_code);
 
-        $control_data = $this->datasource->getFormControlData($form_data['id']);
+        $control_data = $this->datasource->getFormControlData($form_data['form_id']);
 
         $fc = [];
         if(is_array($control_data) && !empty($control_data) && is_array($control_data[0])){

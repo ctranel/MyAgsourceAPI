@@ -2,7 +2,6 @@
 //namespace myagsource;
 require_once(APPPATH . 'core/MY_Api_Controller.php');
 require_once(APPPATH . 'libraries/Filters/ReportFilters.php');
-//require_once(APPPATH . 'libraries/Page/Content/FormBlock/FormBlockFactory.php');
 require_once(APPPATH . 'libraries/Benchmarks/Benchmarks.php');
 require_once(APPPATH . 'libraries/AccessLog.php');
 require_once(APPPATH . 'libraries/Supplemental/Content/SupplementalFactory.php');
@@ -16,8 +15,6 @@ require_once(APPPATH . 'libraries/Datasource/DbObjects/DbTableFactory.php');
 require_once(APPPATH . 'libraries/DataHandler.php');
 
 require_once(APPPATH . 'libraries/Report/Content/ReportFactory.php');
-//require_once(APPPATH . 'libraries/Page/Content/ReportBlock/ReportBlockFactory.php');
-//require_once(APPPATH . 'libraries/Page/Content/ReportBlock/ReportBlock.php');
 require_once(APPPATH . 'libraries/Form/Content/FormFactory.php');
 
 
@@ -28,12 +25,10 @@ use \myagsource\Supplemental\Content\SupplementalFactory;
 use \myagsource\dhi\HerdAccess;
 use \myagsource\dhi\HerdPageAccess;
 use \myagsource\dhi\Herd;
-//use \myagsource\Page\Content\FormBlock\FormBlockFactory;
 use \myagsource\Site\WebContent\Page;
 use \myagsource\Site\WebContent\WebBlockFactory;
 use \myagsource\Site\WebContent\PageAccess;
 use \myagsource\Report\Content\ReportFactory;
-//use \myagsource\Page\Content\ReportBlock\ReportBlockFactory;
 use \myagsource\DataHandler;
 use \myagsource\Datasource\DbObjects\DbTableFactory;
 use \myagsource\Api\Response\ResponseMessage;
@@ -171,7 +166,11 @@ class dpage extends MY_Api_Controller {
 		//load factories for block content
 		$report_factory = new ReportFactory($this->report_block_model, $this->db_field_model, $this->filters, $supplemental_factory, $data_handler, $db_table_factory);
 		$setting_form_factory = new FormFactory($this->setting_model, $supplemental_factory);
-		$this->load->model('Forms/Data_entry_model', null, false, ['herd_code'=>$this->session->userdata('herd_code')]);
+
+//this will actually be passed from client
+$params = ['ID' => 2];
+
+        $this->load->model('Forms/Data_entry_model', null, false, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
 		$entry_form_factory = new FormFactory($this->Data_entry_model, $supplemental_factory);
 
         //create block content

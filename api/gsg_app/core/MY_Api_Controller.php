@@ -57,7 +57,6 @@ class MY_Api_Controller extends CI_Controller
         header('Access-Control-Allow-Credentials: true');
         header('Access-Control-Allow-Methods: GET, POST, PUT');
         header('Access-Control-Allow-Headers: Content-Type, Authorization');
-        $this->session->set_userdata('test', 'test');
         $this->session->sess_write();
 
 
