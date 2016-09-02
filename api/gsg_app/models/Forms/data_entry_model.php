@@ -175,15 +175,15 @@ class Data_entry_model extends CI_Model implements iForm_Model {
             CREATE TABLE #valueTable (
                 db_field_id INT,
                 " . $key_field_def_text . "
-                value VARCHAR(MAX),
+                value VARCHAR(MAX) NULL,
             )
-            
+
             DECLARE Table_Cursor CURSOR FOR
                 select fld.id, CONCAT(db.name, '.',  tbl.db_schema, '.', tbl.name) AS db_table_name,fld.db_field_name--, uhs.value
                 from users.frm.form_control_groups cg
                 inner join users.frm.form_controls fc ON cg.id = fc.form_control_group_id AND cg.form_id = " . $form_id . "
                 inner join users.dbo.db_fields fld ON fc.db_field_id = fld.id
-                inner join users.dbo.db_tables tbl ON fld.db_table_id = tbl.id --AND allow_update = 1
+                inner join users.dbo.db_tables tbl ON fld.db_table_id = tbl.id AND allow_update = 1
                 inner join users.dbo.db_databases db ON tbl.database_id = db.id
             
             
@@ -202,13 +202,14 @@ class Data_entry_model extends CI_Model implements iForm_Model {
             CLOSE Table_Cursor;
             
             DEALLOCATE Table_Cursor;
+
                 select fld.id, ct.name AS control_type, fld.name, fld.name AS label, fc.default_value, " . $key_val_field_list_text . " v.value
                 from users.frm.form_control_groups cg
-                inner join users.frm.form_controls fc ON cg.id = fc.form_control_group_id AND cg.form_id = 4
+                inner join users.frm.form_controls fc ON cg.id = fc.form_control_group_id AND cg.form_id = " . $form_id . "
                 inner join users.dbo.db_fields fld ON fc.db_field_id = fld.id
                 inner join users.frm.control_types ct ON fc.control_type_id = ct.id
                 inner join #valueTable v ON fld.id = v.db_field_id;
-        ";
+       ";
 
         $results = $this->db->query($sql)->result_array();
         return $results;
