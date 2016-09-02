@@ -98,9 +98,9 @@ class TableData extends ReportData {
 		if($this->report->hasPivot()){
 			$results = $this->pivot($results);
 		}
-		elseif($this->report->hasCntRow() || $this->report->hasAvgRow() || $this->report->hasSumRow()){
-			$results = $this->addAggregateRows($results);
-		}
+//		elseif($this->report->hasCntRow() || $this->report->hasAvgRow() || $this->report->hasSumRow()){
+//			$results = $this->addAggregateRows($results);
+//		}
 		$this->dataset = $results;
         return $this->dataset;
 	}
