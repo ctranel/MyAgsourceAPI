@@ -159,7 +159,13 @@ abstract class Report implements iReport {
      **/
     protected $supplemental;
 
-    /**
+	/**
+	 * $dataset_supplemental
+	 * @var Supplemental
+	 **/
+	protected $dataset_supplemental;
+
+	/**
      * supplemental_factory
      * @var SupplementalFactory
      **/
@@ -425,6 +431,13 @@ abstract class Report implements iReport {
             $ret['default_sorts'] = $dsorts;
         }
 
+		if(is_array($this->dataset_supplemental) && !empty($this->dataset_supplemental)){
+			$supp = [];
+			foreach($this->dataset_supplemental as $k=>$f){
+				$supp[$k] = $f->toArray();
+			}
+			$ret['dataset_supplemental'] = $supp;
+		}
         return $ret;
     }
 	/**

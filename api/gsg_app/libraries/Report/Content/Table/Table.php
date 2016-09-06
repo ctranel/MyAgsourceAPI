@@ -183,23 +183,24 @@ class Table extends Report {
 		if(is_array($arr_res)){
 			foreach($arr_res as $s){
 				$header_supp = null;
-				$data_supp = null;
+//				$data_supp = null;
 				if(isset($s['aggregate']) && !empty($s['aggregate'])){
 					$this->has_aggregate = true;
 				}
-				if(isset($this->supp_factory)){
+				if(isset($this->supplemental_factory)){
 					if(isset($s['head_supp_id'])){
-						$header_supp = $this->supp_factory->getColHeaderSupplemental($s['head_supp_id'], $s['head_a_href'], $s['head_a_rel'], $s['head_a_title'], $s['head_a_class'], $s['head_comment']);
+						$header_supp = $this->supplemental_factory->getColHeaderSupplemental($s['head_supp_id'], $s['head_a_href'], $s['head_a_rel'], $s['head_a_title'], $s['head_a_class'], $s['head_comment']);
 					}
+
 					if(isset($s['supp_id'])){
-						$data_supp = $this->supp_factory->getColDataSupplemental($s['supp_id'], $s['a_href'], $s['a_rel'], $s['a_title'], $s['a_class']);
-						$this->supp_param_fieldnames = array_unique(array_merge($this->supp_param_fieldnames, $data_supp->getLinkParamFields()));
+						$this->dataset_supplemental[$s['db_field_name']] = $this->supplemental_factory->getColDataSupplemental($s['supp_id'], $s['a_href'], $s['a_rel'], $s['a_title'], $s['a_class']);
+						$this->supp_param_fieldnames = array_unique(array_merge($this->supp_param_fieldnames, $this->dataset_supplemental[$s['db_field_name']]->getLinkParamFields()));
 					}
 				}
 				$arr_table_ref_cnt[$s['table_name']] = isset($arr_table_ref_cnt[$s['table_name']]) ? ($arr_table_ref_cnt[$s['table_name']] + 1) : 1;
 				$datafield = new DbField($s['db_field_id'], $s['table_name'], $s['db_field_name'], $s['name'], $s['description'], $s['pdf_width'], $s['default_sort_order'],
 						 $s['datatype'], $s['max_length'], $s['decimal_scale'], $s['unit_of_measure'], $s['is_timespan'], $s['is_foreign_key'], $s['is_nullable'], $s['is_natural_sort']);
-				$this->report_fields[] = new TableField($s['id'], $s['name'], $datafield, $s['category_id'], $s['is_displayed'], $s['display_format'], $s['aggregate'], $s['is_sortable'], $header_supp, $data_supp, $s['block_header_group_id'], $s['field_group'], $s['field_group_ref_key']);
+				$this->report_fields[] = new TableField($s['id'], $s['name'], $datafield, $s['category_id'], $s['is_displayed'], $s['display_format'], $s['aggregate'], $s['is_sortable'], $header_supp, isset($this->dataset_supplemental[$s['db_field_name']]) ? $this->dataset_supplemental[$s['db_field_name']] : null, $s['block_header_group_id'], $s['field_group'], $s['field_group_ref_key']);
 			}
 			$this->primary_table_name = array_search(max($arr_table_ref_cnt), $arr_table_ref_cnt);
 			//set up arr_fields hierarchy

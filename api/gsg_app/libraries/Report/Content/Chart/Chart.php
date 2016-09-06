@@ -131,12 +131,12 @@ class Chart extends Report {
 				if(isset($s['aggregate']) && !empty($s['aggregate'])){
 					$this->has_aggregate = true;
 				}
-				if(isset($this->supp_factory)){
+				if(isset($this->supplemental_factory)){
 					if(isset($s['head_supp_id'])){
-						$header_supp = $this->supp_factory->getColHeaderSupplemental($s['head_supp_id'], $s['head_a_href'], $s['head_a_rel'], $s['head_a_title'], $s['head_a_class'], $s['head_comment']);
+						$header_supp = $this->supplemental_factory->getColHeaderSupplemental($s['head_supp_id'], $s['head_a_href'], $s['head_a_rel'], $s['head_a_title'], $s['head_a_class'], $s['head_comment']);
 					}
 					if(isset($s['supp_id'])){
-						$data_supp = $this->supp_factory->getColDataSupplemental($s['supp_id'], $s['a_href'], $s['a_rel'], $s['a_title'], $s['a_class']);
+						$data_supp = $this->supplemental_factory->getColDataSupplemental($s['supp_id'], $s['a_href'], $s['a_rel'], $s['a_title'], $s['a_class']);
 					}
 				}
 				$arr_table_ref_cnt[$s['table_name']] = isset($arr_table_ref_cnt[$s['table_name']]) ? ($arr_table_ref_cnt[$s['table_name']] + 1) : 1;
