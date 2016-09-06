@@ -188,7 +188,7 @@ class Setting_model extends CI_Model implements iForm_Model {
 	public function getLookupOptions($setting_id){
 		$sql = "USE users;
 				DECLARE @tbl nvarchar(100), @sql nvarchar(255)
-				SELECT @tbl = table_name FROM users.setng.data_lookup WHERE setting_id = " . $setting_id . "
+				SELECT @tbl = table_name FROM users.frm.data_lookup WHERE setting_id = " . $setting_id . "
 				SELECT @sql = N' SELECT value, description FROM ' + quotename(@tbl) + ' ORDER BY list_order'
 				EXEC sp_executesql @sql";
 		$results = $this->db->query($sql)->result_array();
