@@ -203,7 +203,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
             
             DEALLOCATE Table_Cursor;
 
-                select fld.id, ct.name AS control_type, fld.name, fld.name AS label, fc.default_value, " . $key_val_field_list_text . " v.value
+                select fc.id, ct.name AS control_type, fld.name, fld.name AS label, fc.default_value, " . $key_val_field_list_text . " v.value
                 from users.frm.form_control_groups cg
                 inner join users.frm.form_controls fc ON cg.id = fc.form_control_group_id AND cg.form_id = " . $form_id . "
                 inner join users.dbo.db_fields fld ON fc.db_field_id = fld.id
@@ -224,34 +224,59 @@ class Data_entry_model extends CI_Model implements iForm_Model {
     *  @since: version 1
     *  @author: ctranel
     *  @date: Jun 26, 2014
-    *  @param: int setting id
+    *  @param: int control id
     *  @return array key-value pairs
     *  @throws:
     * -----------------------------------------------------------------
     */
-	public function getLookupOptions($setting_id){
+	public function getLookupOptions($control_id){
 		$sql = "USE users;
 				DECLARE @tbl nvarchar(100), @sql nvarchar(255)
-				SELECT @tbl = table_name FROM users.frm.data_lookup WHERE setting_id = " . $setting_id . "
-				SELECT @sql = N' SELECT value, description FROM ' + quotename(@tbl) + ' ORDER BY list_order'
+				SELECT @tbl = table_name FROM users.frm.data_lookup WHERE control_id = " . $control_id . "
+				SELECT @sql = N' SELECT value, description FROM ' + @tbl + ' ORDER BY list_order'
 				EXEC sp_executesql @sql";
 		$results = $this->db->query($sql)->result_array();
+
 		return $results;
 	}
-	
-	/* -----------------------------------------------------------------
-	*  upsert Description
 
-	*  upsert Description
+    /* -----------------------------------------------------------------
+     *  returns key-value pairs of options for a given lookup field
+ 
+     *  returns key-value pairs of options for a given lookup field
+ 
+     *  @since: version 1
+     *  @author: ctranel
+     *  @date: Jun 26, 2014
+     *  @param: int control id
+     *  @return array key-value pairs
+     *  @throws:
+     * -----------------------------------------------------------------
+     */
+    public function getHerdLookupOptions($control_id){
+        $sql = "USE users;
+				DECLARE @tbl nvarchar(100), @sql nvarchar(255)
+				SELECT @tbl = table_name FROM users.frm.data_lookup WHERE control_id = " . $control_id . "
+				SELECT @sql = N' SELECT value, description FROM ' + quotename(@tbl) + ' WHERE herd_code = " . $this->herd_code . " ORDER BY list_order'
+				EXEC sp_executesql @sql";
+        $results = $this->db->query($sql)->result_array();
+        return $results;
+    }
 
-	*  @author: ctranel
-	*  @param: array of strings
-	*  @return void
-	*  @throws: 
-	* -----------------------------------------------------------------
-	*/
+    /* -----------------------------------------------------------------
+    *  upsert Description
+
+    *  upsert Description
+
+    *  @author: ctranel
+    *  @param: array of strings
+    *  @return void
+    *  @throws: 
+    * -----------------------------------------------------------------
+    */
 	public function upsert($arr_using_stmnts){
-		if(!isset($arr_using_stmnts) || empty($arr_using_stmnts)){
+		die('control upsert');
+        if(!isset($arr_using_stmnts) || empty($arr_using_stmnts)){
 			return false;
 		}
 		$using_stmnt = implode(' UNION ALL ', $arr_using_stmnts);

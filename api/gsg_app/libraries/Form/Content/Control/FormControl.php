@@ -104,7 +104,7 @@ class FormControl implements iFormControl
             }
         }
         //if type is array and value is not an array, wrap it in an array
-        if(($this->control_type === 'array' || $this->control_type === 'data_lookup_arr') && isset($control_data['value']) && !is_array($control_data['value'])){
+        if(strpos($this->control_type, 'array') !== false && isset($control_data['value']) && !is_array($control_data['value'])){
             if(strpos($control_data['value'], '|')){
                 $control_data['value'] = explode('|', $control_data['value']);
             }
@@ -128,7 +128,7 @@ class FormControl implements iFormControl
             }
         }
         //if type is array and default_value is not an array, wrap it in an array
-        if(($this->control_type === 'array' || $this->control_type === 'data_lookup_arr') && isset($control_data['default_value']) && !is_array($control_data['default_value'])){
+        if(strpos($this->control_type, 'array') !== false && isset($control_data['default_value']) && !is_array($control_data['default_value'])){
             if(strpos($control_data['default_value'], '|') !== false){
                 $control_data['default_value'] = explode('|', $control_data['default_value']);
             }
@@ -138,7 +138,7 @@ class FormControl implements iFormControl
         }
         $this->default_value = $control_data['default_value'];
 
-        if($this->control_type === 'data_lookup' || $this->control_type === 'data_lookup_arr'){
+        if(strpos($this->control_type, 'lookup') !== false){
             $this->loadLookupOptions();
         }
     }
@@ -157,10 +157,10 @@ class FormControl implements iFormControl
     */
     public function getCurrValue($session_value = null){
         //if a string is sent for array type, insert string into array
-        if(($this->control_type === 'array' || $this->control_type === 'data_lookup_arr') && isset($session_value) && !is_array($session_value)){
+        if(strpos($this->control_type, 'array') !== false && isset($session_value) && !is_array($session_value)){
             $session_value = [$session_value];
         }
-        if(strpos($this->control_type, 'range') !== false || $this->control_type === 'array' || $this->control_type === 'data_lookup_arr'){
+        if(strpos($this->control_type, 'range') !== false || strpos($this->control_type, 'array') !== false){
             if(isset($session_value) && is_array($session_value) && !empty($session_value)){
                 return $session_value;
             }
@@ -168,7 +168,7 @@ class FormControl implements iFormControl
         elseif(isset($session_value)){
             return $session_value;
         }
-        if(strpos($this->control_type, 'range') !== false || $this->control_type === 'array' || $this->control_type === 'data_lookup_arr'){
+        if(strpos($this->control_type, 'range') !== false || strpos($this->control_type, 'array') !== false){
             if(isset($this->value) && is_array($this->value) && !empty($this->value)){
                 return $this->value;
             }
@@ -208,11 +208,23 @@ class FormControl implements iFormControl
     }
 
     public function toArray(){
+        switch($this->control_type){
+            case 'herd_lookup':
+                $ctl_type = 'data_lookup';
+                break;
+            case 'herd_lookup_array':
+                $ctl_type = 'data_lookup_array';
+                break;
+            default:
+                $ctl_type = $this->control_type;
+                break;
+        }
+
         $ret = [
             'name' => $this->name,
             'label' => $this->label,
             'value' => $this->value,
-            'control_type' => $this->control_type,
+            'control_type' => $ctl_type,
             'default_value' => $this->default_value,
         ];
 
@@ -255,7 +267,7 @@ class FormControl implements iFormControl
             $range = $this->getCurrValue($session_value);
             return 'between ' . $range['dbfrom'] . ' and ' . $range['dbto'];
         }
-        elseif($this->control_type === 'array' || $this->control_type === 'data_lookup_arr'){
+        elseif(strpos($this->control_type, 'array') !== false){
             return implode(', ', $this->getCurrValue($session_value));
         }
         else{
@@ -278,7 +290,7 @@ class FormControl implements iFormControl
      * -----------------------------------------------------------------
      */
     public function getLookupOptions(){
-        if($this->control_type !== 'data_lookup' && $this->control_type !== 'data_lookup_arr'){
+        if(strpos($this->control_type, 'lookup') === false){
             return false;
         }
         return $this->options;
@@ -298,10 +310,15 @@ class FormControl implements iFormControl
     * -----------------------------------------------------------------
     */
     protected function loadLookupOptions(){
-        if($this->control_type !== 'data_lookup' && $this->control_type !== 'data_lookup_arr'){
+        if(strpos($this->control_type, 'lookup') === false){
             return false;
         }
-        $options = $this->datasource->getLookupOptions($this->id);
+        if(strpos($this->control_type, 'data_lookup') !== false){
+            $options = $this->datasource->getLookupOptions($this->id);
+        }
+        if(strpos($this->control_type, 'herd_lookup') !== false){
+            $options = $this->datasource->getHerdLookupOptions($this->id);
+        }
         if(isset($options) && is_array($options)){
             foreach($options as $o){
                 $this->options[] = ['value' => $o['value'], 'text' => $o['description']];
@@ -322,7 +339,7 @@ class FormControl implements iFormControl
     * -----------------------------------------------------------------
     */
     public function getFormData($session_value = null){
-        if($this->control_type === 'data_lookup' || $this->control_type === 'data_lookup_arr'){
+        if(strpos($this->control_type, 'lookup') !== false){
             $ret_val['options'] = $this->options;
             $ret_val['selected'] = $this->getCurrValue($session_value);
             return $ret_val;

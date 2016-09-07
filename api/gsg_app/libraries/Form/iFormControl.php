@@ -13,7 +13,7 @@ namespace myagsource\Form;
 
 interface iFormControl
 {
-    public function __construct($control_data, $datasource);
+    //public function __construct($control_data, $datasource);
     public function getCurrValue($session_value = null);
     public function id();
     public function getDisplayText($session_value);
