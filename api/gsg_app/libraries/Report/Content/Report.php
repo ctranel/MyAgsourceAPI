@@ -371,10 +371,10 @@ abstract class Report implements iReport {
 	 * @return void
 	 * @access public
 	 *
-	 **/
 	public function addFieldName($name){
 		$this->addl_select_field_names[] = $name;
 	}
+**/
 
 	/**
 	 * @method getOutputData

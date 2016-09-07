@@ -144,10 +144,10 @@ class Supplemental implements iSupplemental
 
 	public function getLinkParamFields(){
 		$arr_supplemental = [];
-		if(isset($this->links) && is_object($this->links)){
+		if(isset($this->links) && is_array($this->links)){
 			foreach($this->links as $s){
 				$params = $s->params();
-				if(isset($params) && $params->count() > 0){
+				if(isset($params) && count($params) > 0){
 					foreach($params as $p){
 						$db_field_name = $p->value_db_field_name();
 						if(isset($db_field_name) && !empty($db_field_name)){
