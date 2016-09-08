@@ -8,6 +8,7 @@
 
 namespace myagsource\Form;
 
+require_once(APPPATH . 'libraries/Site/iBlockContent.php');
 
 use myagsource\Site\iBlockContent;
 
