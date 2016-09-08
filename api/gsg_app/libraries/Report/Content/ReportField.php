@@ -200,16 +200,13 @@ abstract class ReportField {
 	}
 
     public function toArray(){
-        $ret = [
-            'id' => $this->id,
-            'name' => $this->name,
-            'data_field' => $this->data_field->toArray(), //instance of iDBField
-//            'category_id' => $this->category_id,
-            'is_displayed' => $this->is_displayed,
-            'display_format' => $this->display_format,
-            'aggregate' => $this->aggregate,
-            'is_sortable' => $this->is_sortable,
-        ];
+        $ret = $this->data_field->toArray();
+		$ret['name'] = $this->name;
+        $ret['is_displayed'] = $this->is_displayed;
+        $ret['display_format'] = $this->display_format;
+        $ret['aggregate'] = $this->aggregate;
+        $ret['is_sortable'] = $this->is_sortable;
+
         if(is_a($this->header_supp, 'Supplemental')){
             $ret['header_supplemental'] = $this->header_supp->toArray();
         }

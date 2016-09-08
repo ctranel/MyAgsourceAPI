@@ -130,7 +130,7 @@ class DbField implements iDataField {
 
 	public function toArray(){
         $ret = [
-            'id' => $this->id,
+//            'id' => $this->id,
             'name' => $this->name,
             'description' => $this->description,
 //            'pdf_width' => $this->pdf_width,

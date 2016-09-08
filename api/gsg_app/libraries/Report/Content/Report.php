@@ -438,6 +438,15 @@ abstract class Report implements iReport {
 			}
 			$ret['dataset_supplemental'] = $supp;
 		}
+
+		if(is_array($this->report_fields) && !empty($this->report_fields)){
+			$data = [];
+			foreach($this->report_fields as $k=>$f){
+				$data[$f->dbFieldName()] = $f->toArray();
+			}
+			$ret['metadata'] = $data;
+		}
+
         return $ret;
     }
 	/**
