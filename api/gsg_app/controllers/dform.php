@@ -81,7 +81,7 @@ class dform extends MY_Api_Controller {
 		$this->load->library('form_validation');
 		//$this->form_validation->set_rules('herd_code', 'Herd', 'required|max_length[8]');
 		//$this->form_validation->set_rules('herd_code_fill', 'Type Herd Code');
-//die(var_dump($this->form_validation->run_input()));
+
 		if($this->form_validation->run_input() === true){
             try{
                 //get form object
@@ -114,7 +114,54 @@ class dform extends MY_Api_Controller {
         $this->sendResponse(400, new ResponseMessage(validation_errors(), 'error'));
 	}
 
-    public function herd_enrolled($herd_code){
+	/**
+	 * @method settings() - setting submission.
+	 *
+	 * @access	public
+	 * @return	void
+	 */
+	function entry($form_id){
+		//validate form input
+		$this->load->library('herds');
+		$this->load->library('form_validation');
+		//$this->form_validation->set_rules('herd_code', 'Herd', 'required|max_length[8]');
+		//$this->form_validation->set_rules('herd_code_fill', 'Type Herd Code');
+
+		if($this->form_validation->run_input() === true){
+			try{
+				//get form object
+				//@todo: split form core from form display (core would be included in display), no need for web content or supplemental here
+				//supplemental factory
+				$this->load->model('supplemental_model');
+				$supplemental_factory = new SupplementalFactory($this->supplemental_model, site_url());
+
+$params = ['pen_num' => 1];
+				$this->load->model('Forms/data_entry_model', null, false, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
+				$form_factory = new FormFactory($this->data_entry_model);
+
+				$form = $form_factory->getForm($form_id, $this->session->userdata('herd_code'));
+//var_dump($form, $this->input->userInputArray()); die;
+				$form->write($this->input->userInputArray());
+
+				$resp_msg = [];
+				//$msg = $this->_loadSessionHerd($tmp_arr[0]['herd_code']);
+				//if(!empty($msg)){
+				$resp_msg = new ResponseMessage('Form submission successful', 'message');
+				//}
+				//$this->_record_access(2); //2 is the page code for herd change
+				/*                $this->load->model('web_content/navigation_model');
+                                $navigation = new Navigation($this->navigation_model, $this->herd, $this->permissions->permissionsList());
+                                $payload = ['nav' => $navigation->toArray('DHI')]; */
+				$this->sendResponse(200, $resp_msg);
+			}
+			catch(Exception $e){
+				$this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
+			}
+		}
+		$this->sendResponse(400, new ResponseMessage(validation_errors(), 'error'));
+	}
+
+	public function herd_enrolled($herd_code){
         //determines type of access for service groups
         if($this->permissions->hasPermission('View Assign w permission') === false) {
             $enroll_status = 0;

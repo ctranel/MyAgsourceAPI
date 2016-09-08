@@ -13,5 +13,5 @@ interface iForm_Model
     public function getFormById($form_id);
     public function getFormControlData($form_id);
     public function getLookupOptions($control_id);
-    public function upsert($arr_using_stmnts);
+    public function upsert($form_id, $form_data);
 }

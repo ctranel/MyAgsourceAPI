@@ -206,7 +206,7 @@ class Setting_model extends CI_Model implements iForm_Model {
 	*  @throws: 
 	* -----------------------------------------------------------------
 	*/
-	public function upsert($arr_using_stmnts){
+	public function upsert($form_id, $arr_using_stmnts){
 		if(!isset($arr_using_stmnts) || empty($arr_using_stmnts)){
 			return false;
 		}

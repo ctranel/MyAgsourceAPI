@@ -31,8 +31,8 @@ class SettingForm extends Form implements iForm {
 	protected $herd_code;
 		
 	
-	function __construct($datasource, $controls, $dom_id, $action, $user_id, $herd_code) {
-		parent::__construct($datasource, $controls, $dom_id, $action);
+	function __construct($id, $datasource, $controls, $dom_id, $action, $user_id, $herd_code) {
+		parent::__construct($id, $datasource, $controls, $dom_id, $action);
         $this->user_id = $user_id;
 		$this->herd_code = $herd_code;
 	}
@@ -57,6 +57,7 @@ class SettingForm extends Form implements iForm {
         $data = [];
 
         $user_id = isset($this->user_id) ? $this->user_id : 'NULL';
+        $herd_code = "'$this->herd_code'";
 
         foreach($this->controls as $c){
             if(isset($form_data[$c->name()])) {
@@ -66,12 +67,9 @@ class SettingForm extends Form implements iForm {
                 if(!$c->forHerd()){
                     $herd_code = 'NULL';
                 }
-                else {
-                    $herd_code = "'$this->herd_code'";
-                }
                 $data[] = "SELECT " . $user_id . " AS user_id, " . $herd_code . " AS herd_code, " . $c->id() . " AS setting_id, '" . $form_data[$c->name()] . "' AS value";
             }
         }
-        $this->datasource->upsert($data);
+        $this->datasource->upsert($this->id, $data);
     }
 }

@@ -27,6 +27,12 @@ class Data_entry_model extends CI_Model implements iForm_Model {
      **/
     protected $herd_code;
 
+    /**
+     * herd_code
+     * @var string
+     **/
+    protected $table_name;
+
 
     public function __construct($args){
 		parent::__construct();
@@ -120,6 +126,34 @@ class Data_entry_model extends CI_Model implements iForm_Model {
     }
 
     /**
+     * getFormKeyMeta
+     *
+     * @param int form id
+     * @return string category
+     * @author ctranel
+     **/
+    protected function getSourceTable($form_id)
+    {
+        $sql = " select DISTINCT CONCAT(db.name, '.',  tbl.db_schema, '.', tbl.name) AS db_table_name
+                from users.frm.form_control_groups cg
+                inner join users.frm.form_controls fc ON cg.id = fc.form_control_group_id AND cg.form_id = " . $form_id . "
+                inner join users.dbo.db_fields fld ON fc.db_field_id = fld.id
+                inner join users.dbo.db_tables tbl ON fld.db_table_id = tbl.id AND allow_update = 1
+                inner join users.dbo.db_databases db ON tbl.database_id = db.id";
+
+        $results = $this->db->query($sql)->result_array();
+
+        if(!$results){
+            throw new Exception('No data found.');
+        }
+
+        if(count($results) > 1){
+            throw new Exception('There must be only one source for form data.');
+        }
+        return $results[0]['db_table_name'];
+    }
+
+    /**
      * getFormControlData
      *
      * @param int form id
@@ -203,7 +237,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
             
             DEALLOCATE Table_Cursor;
 
-                select fc.id, ct.name AS control_type, fld.name, fld.name AS label, fc.default_value, " . $key_val_field_list_text . " v.value
+                select fc.id, ct.name AS control_type, fld.db_field_name AS name, fld.name AS label, fc.default_value, " . $key_val_field_list_text . " v.value
                 from users.frm.form_control_groups cg
                 inner join users.frm.form_controls fc ON cg.id = fc.form_control_group_id AND cg.form_id = " . $form_id . "
                 inner join users.dbo.db_fields fld ON fc.db_field_id = fld.id
@@ -257,8 +291,9 @@ class Data_entry_model extends CI_Model implements iForm_Model {
         $sql = "USE users;
 				DECLARE @tbl nvarchar(100), @sql nvarchar(255)
 				SELECT @tbl = table_name FROM users.frm.data_lookup WHERE control_id = " . $control_id . "
-				SELECT @sql = N' SELECT value, description FROM ' + quotename(@tbl) + ' WHERE herd_code = " . $this->herd_code . " ORDER BY list_order'
+				SELECT @sql = N' SELECT value, description FROM ' + @tbl + ' WHERE herd_code = ''" . $this->herd_code . "'' ORDER BY list_order'
 				EXEC sp_executesql @sql";
+
         $results = $this->db->query($sql)->result_array();
         return $results;
     }
@@ -274,24 +309,51 @@ class Data_entry_model extends CI_Model implements iForm_Model {
     *  @throws: 
     * -----------------------------------------------------------------
     */
-	public function upsert($arr_using_stmnts){
-		die('control upsert');
-        if(!isset($arr_using_stmnts) || empty($arr_using_stmnts)){
-			return false;
-		}
-		$using_stmnt = implode(' UNION ALL ', $arr_using_stmnts);
-		
-		$sql = "MERGE INTO users.setng.user_herd_settings uhs
-				USING ($using_stmnt) nd 
-					ON uhs.user_id = nd.user_id AND uhs.herd_code = nd.herd_code AND uhs.setting_id = nd.setting_id
+	public function upsert($form_id, $form_data){
+        if(!isset($form_data) || empty($form_data)){
+            return false;
+        }
+
+        //get table name
+        $table_name = $this->getSourceTable($form_id);
+        //id key fields
+        $key_meta = $this->getFormKeyMeta($form_id);
+        $key_field_names = array_keys($key_meta);
+        $form_field_names = array_keys($form_data);
+
+        $join_cond = '';
+        if(isset($key_field_names) && is_array($key_field_names)){
+            foreach($key_field_names as $k){
+                $join_cond .= " t." . $k . "=nd." . $k . " AND";
+            }
+        }
+
+        $update_set = '';
+        $value_as_key = '';
+        foreach($form_data as $k=>$v){
+            if(is_array($v)){
+                $v = implode('|', $v);
+            }
+            //string vs numeric, or can we use quotes for both?
+            $update_set .= " t." . $k . "=nd." . $k . ",";
+            if($v === null) {
+                $value_as_key .= "NULL AS " . $k . ",";
+            }
+            else{
+                $value_as_key .= "'" .  $v  . "' AS " . $k . ",";
+            }
+        }
+
+		$sql = "MERGE INTO " . $table_name . " t
+				USING (SELECT " . substr($value_as_key, 0, -1) . ") nd 
+					ON" . substr($join_cond, 0, -4) . "
 				WHEN MATCHED THEN
 					UPDATE
-					SET uhs.setting_id = nd.setting_id, uhs.value = nd.value
+					SET " . substr($update_set, 0, -1) . "
 				WHEN NOT MATCHED BY TARGET THEN
-					INSERT (user_id, herd_code, setting_id, value)
-					VALUES (nd.user_id, nd.herd_code, nd.setting_id, nd.value);";
-		$this->db->query($sql);
+					INSERT (" . implode(', ', $form_field_names) . ")
+					VALUES (nd." . implode(', nd.', $form_field_names) . ");";
+
+		return $this->db->query($sql);
 	}
-    
-    
 }

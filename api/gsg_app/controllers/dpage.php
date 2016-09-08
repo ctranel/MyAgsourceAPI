@@ -186,7 +186,6 @@ $params = ['pen_num' => 1];
         //create blocks for content
         $blocks = $web_block_factory->getBlocksFromContent($page_id, $block_content);
 
-
         $this->load->model('web_content/page_model');
         $page_data = $this->page_model->getPage($page_id);
 		$this->page = new Page($page_data, $blocks, $supplemental_factory, $this->filters, $benchmarks);

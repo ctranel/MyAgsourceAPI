@@ -367,6 +367,9 @@ class FormControl implements iFormControl
         else{
             $ret_val = $value;
         }
+        if(strpos($this->control_type, 'lookup') !== false && empty($ret_val)){
+            $ret_val = null;
+        }
         return $ret_val;
     }
 }

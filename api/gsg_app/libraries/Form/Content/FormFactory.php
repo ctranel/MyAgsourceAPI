@@ -69,7 +69,7 @@ class FormFactory {
                 $fc[] = new FormControl($this->datasource, $d, $subforms);
             }
         }
-        return new Form($this->datasource, $fc, $form_data['dom_id'], $form_data['action'], $herd_code);
+        return new Form($form_data['form_id'], $this->datasource, $fc, $form_data['dom_id'], $form_data['action'], $herd_code);
     }
 
     protected function getSubForms($parent_form_id){
@@ -129,7 +129,7 @@ class FormFactory {
                 $fc[] = new SettingFormControl($this->datasource, $d, $sf);
             }
         }
-        return new SettingForm($this->datasource, $fc, $form_data['dom_id'], $form_data['action'],$user_id, $herd_code);
+        return new SettingForm($form_data['form_id'], $this->datasource, $fc, $form_data['dom_id'], $form_data['action'],$user_id, $herd_code);
     }
 
     protected function getSettingSubForms($parent_form_id, $user_id, $herd_code){

@@ -19,6 +19,12 @@ use \myagsource\Form\iForm;
 class Form implements iForm
 {
     /**
+     * id
+     * @var int
+     **/
+    protected $id;
+
+    /**
      * datasource
      * @var object
      **/
@@ -42,7 +48,8 @@ class Form implements iForm
      **/
     protected $controls;
 
-    public function __construct($datasource, $controls, $dom_id, $action){
+    public function __construct($id, $datasource, $controls, $dom_id, $action){
+        $this->id = $id;
         $this->datasource = $datasource;
         $this->controls = $controls;
         $this->dom_id = $dom_id;
@@ -108,19 +115,7 @@ class Form implements iForm
             throw new \UnexpectedValueException('No form data received');
         }
         $form_data = $this->parseFormData($form_data);
-
-        $arr_data = [];
-
-        $user_id = isset($this->user) ? $this->user : null;
-
-        foreach($form_data as $k=>$v){
-            if(is_array($v)){
-                $v = implode('|', $v);
-            }
-
-            $arr_data[] = "SELECT '" . $user_id . "' AS user_id, '" . $this->herd_code . "' AS herd_code, '" . $this->arr_settings[$k]->id() . "' AS setting_id, '" . $v . "' AS value";
-        }
-        $this->datasource->upsert($arr_data);
+        $this->datasource->upsert($this->id, $form_data);
     }
 
 
