@@ -135,7 +135,9 @@ class dform extends MY_Api_Controller {
 				$this->load->model('supplemental_model');
 				$supplemental_factory = new SupplementalFactory($this->supplemental_model, site_url());
 
-$params = ['pen_num' => 1];
+//this will actually be passed from client
+//$params = ['pen_num' => 1];
+$params = ['key_value' => 1];
 				$this->load->model('Forms/data_entry_model', null, false, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
 				$form_factory = new FormFactory($this->data_entry_model);
 

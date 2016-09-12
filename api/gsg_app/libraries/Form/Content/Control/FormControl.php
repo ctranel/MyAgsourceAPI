@@ -321,9 +321,15 @@ class FormControl implements iFormControl
         }
         if(isset($options) && is_array($options)){
             foreach($options as $o){
-                $this->options[] = ['value' => $o['value'], 'text' => $o['description']];
+                if(isset($o['value'])){
+                    $this->options[] = ['value' => $o['value'], 'text' => $o['description']];
+                }
+                else{
+                    $this->options[] = ['value' => $o['key_value'], 'text' => $o['description']];
+                }
             }
         }
+//        var_dump($this->options);
     }
 
     /* -----------------------------------------------------------------

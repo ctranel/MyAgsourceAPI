@@ -213,7 +213,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
             )
 
             DECLARE Table_Cursor CURSOR FOR
-                select fld.id, CONCAT(db.name, '.',  tbl.db_schema, '.', tbl.name) AS db_table_name,fld.db_field_name--, uhs.value
+                select fld.id, CONCAT(db.name, '.',  tbl.db_schema, '.', tbl.name) AS db_table_name,fld.db_field_name
                 from users.frm.form_control_groups cg
                 inner join users.frm.form_controls fc ON cg.id = fc.form_control_group_id AND cg.form_id = " . $form_id . "
                 inner join users.dbo.db_fields fld ON fc.db_field_id = fld.id
@@ -237,14 +237,14 @@ class Data_entry_model extends CI_Model implements iForm_Model {
             
             DEALLOCATE Table_Cursor;
 
-                select fc.id, ct.name AS control_type, fld.db_field_name AS name, fld.name AS label, fc.default_value, " . $key_val_field_list_text . " v.value
+                select fc.id, ct.name AS control_type, fld.db_field_name AS name, fld.name AS label, fc.default_value, " . $key_val_field_list_text . " v.value AS value
                 from users.frm.form_control_groups cg
                 inner join users.frm.form_controls fc ON cg.id = fc.form_control_group_id AND cg.form_id = " . $form_id . "
                 inner join users.dbo.db_fields fld ON fc.db_field_id = fld.id
                 inner join users.frm.control_types ct ON fc.control_type_id = ct.id
                 inner join #valueTable v ON fld.id = v.db_field_id;
        ";
-
+//print($sql);
         $results = $this->db->query($sql)->result_array();
         return $results;
     }
@@ -267,10 +267,11 @@ class Data_entry_model extends CI_Model implements iForm_Model {
 		$sql = "USE users;
 				DECLARE @tbl nvarchar(100), @sql nvarchar(255)
 				SELECT @tbl = table_name FROM users.frm.data_lookup WHERE control_id = " . $control_id . "
-				SELECT @sql = N' SELECT value, description FROM ' + @tbl + ' ORDER BY list_order'
+				SELECT @sql = N' SELECT key_value, description FROM ' + @tbl + ' ORDER BY list_order'
 				EXEC sp_executesql @sql";
 		$results = $this->db->query($sql)->result_array();
 
+//print($sql);
 		return $results;
 	}
 
@@ -291,7 +292,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
         $sql = "USE users;
 				DECLARE @tbl nvarchar(100), @sql nvarchar(255)
 				SELECT @tbl = table_name FROM users.frm.data_lookup WHERE control_id = " . $control_id . "
-				SELECT @sql = N' SELECT value, description FROM ' + @tbl + ' WHERE herd_code = ''" . $this->herd_code . "'' ORDER BY list_order'
+				SELECT @sql = N' SELECT key_value, description FROM ' + @tbl + ' WHERE herd_code = ''" . $this->herd_code . "'' ORDER BY list_order'
 				EXEC sp_executesql @sql";
 
         $results = $this->db->query($sql)->result_array();
