@@ -52,18 +52,18 @@ class Cow_lookup extends MY_API_Controller {
     	$data = [
 			'serial_num'=>$serial_num
     		,'cow_id'=>$events_data[$this->cow_id_field]
-			,'events_content' => $this->load->view('dhi/cow_lookup/events', $events_data, true)
+			,'events_content' => $events_data
     		,'tab' => $tab
     	];
     	$this->_record_access(93);
-    	$this->load->view('dhi/cow_lookup/land', $data);
+    	$this->load->view('dhi/cow_lookup/land', ['animal_data' => $data]);
 	}
 	
 	function events($serial_num, $show_all_events = 0){
 		$this->_loadObjVars($serial_num);
 		$this->load->model('dhi/cow_lookup/events_model');
-    	$data = $this->events_model->getCowArray($this->session->userdata('herd_code'), $serial_num);
-    	$data['serial_num'] = $serial_num;
+    	$data['animal_data'] = $this->events_model->getCowArray($this->session->userdata('herd_code'), $serial_num);
+    	$data['animal_data']['serial_num'] = $serial_num;
      	$data['show_all_events'] = (bool)$show_all_events;
    		$data['events'] = $this->events_model->getEventsArray($this->session->userdata('herd_code'), $serial_num, $this->curr_calving_date, (bool)$show_all_events);
 
@@ -74,7 +74,7 @@ class Cow_lookup extends MY_API_Controller {
 		$this->load->model('dhi/cow_lookup/id_model');
     	$data = $this->id_model->getCowArray($this->session->userdata('herd_code'), $serial_num);
 
-        $this->sendResponse(200, null, $data);
+        $this->sendResponse(200, null, ['animal_data' => $data]);
 	}
 
 	function dam($serial_num){
@@ -86,15 +86,15 @@ class Cow_lookup extends MY_API_Controller {
 		$tab = array();
 		if(isset($data['dam']['dam_serial_num']) && !empty($data['dam']['dam_serial_num'])){
 			$subdata['arr_lacts'] = $this->lactations_model->getLactationsArray($this->session->userdata('herd_code'), $data['dam']['dam_serial_num']);
-			$tab['lact_table'] = $this->load->view('dhi/cow_lookup/lactations_table', $subdata, true);
+			$tab['lact_table'] = $subdata;
 			$subdata['arr_offspring'] = $this->lactations_model->getOffspringArray($this->session->userdata('herd_code'), $data['dam']['dam_serial_num']);
-			$tab['offspring_table'] = $this->load->view('dhi/cow_lookup/offspring_table', $subdata, true);
+			$tab['offspring_table'] = $subdata;
 			unset($subdata);
 		}
-		$data['lact_tables'] = $this->load->view('dhi/cow_lookup/lactations', $tab, true);
+		$data['lact_tables'] = $tab;
 		unset($tab);
 
-        $this->sendResponse(200, null, $data);
+        $this->sendResponse(200, null, ['animal_data' => $data]);
 	}
 	
 	function sire($serial_num){
@@ -102,7 +102,7 @@ class Cow_lookup extends MY_API_Controller {
     	$data = $this->sire_model->getCowArray($this->session->userdata('herd_code'), $serial_num);
     	$test_empty = array_filter($data);
     	if(!empty($test_empty)){
-            $this->sendResponse(200, null, $data);
+            $this->sendResponse(200, null, ['animal_data' => $data]);
     	}
     	else{
             $resp_msg = new ResponseMessage('Sire data not found', 'message');
@@ -126,7 +126,7 @@ class Cow_lookup extends MY_API_Controller {
 			,'curr_lact_num' => $this->curr_lact_num
 		];
 
-        $this->sendResponse(200, null, $data);
+        $this->sendResponse(200, null, ['animal_data' => $data]);
 	}
 	
 	function lactations($serial_num){
@@ -134,7 +134,7 @@ class Cow_lookup extends MY_API_Controller {
     	$data['lactations'] = $this->lactations_model->getLactationsArray($this->session->userdata('herd_code'), $serial_num);
     	$data['offspring'] = $this->lactations_model->getOffspringArray($this->session->userdata('herd_code'), $serial_num);
 
-        $this->sendResponse(200, null, $data);
+        $this->sendResponse(200, null, ['animal_data' => $data]);
 	}
 	
 	function graphs($serial_num, $lact_num=NULL){
