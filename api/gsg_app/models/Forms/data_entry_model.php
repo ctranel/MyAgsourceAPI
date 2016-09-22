@@ -28,7 +28,13 @@ class Data_entry_model extends CI_Model implements iForm_Model {
     protected $herd_code;
 
     /**
-     * herd_code
+     * serial_num
+     * @var int
+     **/
+    protected $serial_num;
+
+    /**
+     * table_name
      * @var string
      **/
     protected $table_name;
@@ -38,6 +44,9 @@ class Data_entry_model extends CI_Model implements iForm_Model {
 		parent::__construct();
         $this->criteria = $args;
         $this->herd_code = $args['herd_code'];
+        if(isset($args['serial_num'])){
+            $this->serial_num = $args['serial_num'];
+        }
 	}
 
     /**
@@ -49,8 +58,8 @@ class Data_entry_model extends CI_Model implements iForm_Model {
     public function getFormsByPage($page_id) {
         $results = $this->db
             ->select('pb.page_id, b.id, f.id AS form_id, b.name, b.description, dt.name AS display_type, s.name AS scope, b.active, b.path, f.dom_id, f.action, pb.list_order')
-            ->join('users.dbo.blocks b', "pb.block_id = b.id AND b.display_type_id = 7 AND pb.page_id = " . $page_id, 'inner')
-            ->join('users.frm.forms f', "b.id = f.block_id", 'inner')
+            ->join('users.dbo.blocks b', "pb.block_id = b.id AND b.display_type_id = 7 AND pb.page_id = " . $page_id . ' AND b.active = 1', 'inner')
+            ->join('users.frm.forms f', "b.id = f.block_id AND f.active = 1", 'inner')
             //the following gets only data-entry form data
             //->join('users.frm.form_control_groups cg', "f.id = cg.form_id", 'inner')
             ->join('users.dbo.lookup_display_types dt', 'b.display_type_id = dt.id', 'inner')
@@ -71,9 +80,14 @@ class Data_entry_model extends CI_Model implements iForm_Model {
     public function getSubFormsByParentId($parent_form_id) {
         $results = $this->db
             ->select('f.id AS form_id, s.name AS scope, f.active, f.dom_id, f.action, sl.list_order, scg.id, scg.parent_id, scg.operator, sc.form_control_name, sc.operator, sc.operand')
-            ->join('users.frm.subform_condition_groups scg', "sl.id = scg.subform_link_id AND sl.parent_form_id = " . $parent_form_id, 'inner')
+            ->join('users.frm.subform_condition_groups scg', "sl.id = scg.subform_link_id", 'inner')
             ->join('users.frm.subform_condition sc', "scg.id = sc.condition_group_id", 'inner')
-            ->join('users.frm.forms f', "sl.form_id = f.id", 'inner')
+
+            ->join('users.frm.form_controls fc', 'sl.parent_control_id = fc.id', 'inner')
+            ->join('users.frm.form_control_groups fcg', 'fc.form_control_group_id = fcg.id AND fcg.form_id = ' . $parent_form_id, 'inner')
+
+            ->join('users.frm.forms f', "sl.form_id = f.id AND f.active = 1", 'inner')
+
             ->join('users.dbo.lookup_scopes s', 'f.scope_id = s.id', 'inner')
             ->order_by('sc.form_control_name, sl.list_order')
             ->get('users.frm.subform_link sl')
@@ -104,16 +118,24 @@ class Data_entry_model extends CI_Model implements iForm_Model {
      * getFormKeyMeta
      *
      * @param int form id
+     * @param array of ints $ancestor_form_ids
      * @return string category
      * @author ctranel
      **/
-    protected function getFormKeyMeta($form_id)
+    protected function getFormKeyMeta($form_id, $ancestor_form_ids = null)
     {
         $ret = [];
 
+        if(is_array($ancestor_form_ids)){
+            $form_ids = $ancestor_form_ids + [$form_id];
+        }
+        else{
+            $form_ids = [$form_id];
+        }
+
         $results = $this->db
             ->select('fld.db_field_name, fld.data_type, fld.max_length')
-            ->join('users.frm.form_controls fc', 'cg.id = fc.form_control_group_id AND cg.form_id = ' . $form_id)
+            ->join('users.frm.form_controls fc', 'cg.id = fc.form_control_group_id AND cg.form_id IN(' . implode(',', $form_ids) . ')')
             ->join('users.dbo.db_fields fld', 'fc.db_field_id = fld.id AND fld.is_fk_field = 1')
             ->get('users.frm.form_control_groups cg')
             ->result_array();
@@ -126,7 +148,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
     }
 
     /**
-     * getFormKeyMeta
+     * getSourceTable
      *
      * @param int form id
      * @return string category
@@ -157,12 +179,13 @@ class Data_entry_model extends CI_Model implements iForm_Model {
      * getFormControlData
      *
      * @param int form id
+     * @param array of ints $ancestor_form_ids
      * @return string category
      * @author ctranel
      **/
-    public function getFormControlData($form_id) {
+    public function getFormControlData($form_id, $ancestor_form_ids = null) {
         $keys = array_keys($this->criteria);
-        $key_meta = $this->getFormKeyMeta($form_id);
+        $key_meta = $this->getFormKeyMeta($form_id, $ancestor_form_ids);
 
         $key_field_list_text = '';
         $key_field_def_text = '';
@@ -171,6 +194,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
         $declare_key_var_text = '';
         $set_key_var_text = '';
 
+//var_dump($keys, $key_meta);
         foreach($keys as $k){
             $key_field_def_text .= $k . " " . $key_meta[$k]['data_type'];
             $declare_key_var_text .= ", @" . $k . " " . $key_meta[$k]['data_type'];
@@ -264,10 +288,13 @@ class Data_entry_model extends CI_Model implements iForm_Model {
     * -----------------------------------------------------------------
     */
 	public function getLookupOptions($control_id){
-		$sql = "USE users;
-				DECLARE @tbl nvarchar(100), @sql nvarchar(255)
-				SELECT @tbl = table_name FROM users.frm.data_lookup WHERE control_id = " . $control_id . "
-				SELECT @sql = N' SELECT key_value, description FROM ' + @tbl + ' ORDER BY list_order'
+		$sql = "--USE users;
+				DECLARE @tbl nvarchar(100), @value_col nvarchar(32), @desc_col nvarchar(32), @code_type nvarchar(15), @sql nvarchar(255)
+				SELECT @tbl = table_name, @value_col = value_column, @desc_col = desc_column, @code_type = codetype FROM users.frm.data_lookup WHERE control_id = " . $control_id . "
+                IF @code_type IS NOT NULL
+				    SELECT @sql = N' SELECT ' + @value_col + ', ' + @desc_col + ' FROM ' + @tbl + ' WHERE codetype = ''' + @code_type + ''' AND isactive = 1 ORDER BY list_order'
+				ELSE
+				    SELECT @sql = N' SELECT ' + @value_col + ', ' + @desc_col + ' FROM ' + @tbl + ' WHERE isactive = 1 ORDER BY list_order'
 				EXEC sp_executesql @sql";
 		$results = $this->db->query($sql)->result_array();
 
@@ -289,13 +316,41 @@ class Data_entry_model extends CI_Model implements iForm_Model {
      * -----------------------------------------------------------------
      */
     public function getHerdLookupOptions($control_id){
-        $sql = "USE users;
-				DECLARE @tbl nvarchar(100), @sql nvarchar(255)
-				SELECT @tbl = table_name FROM users.frm.data_lookup WHERE control_id = " . $control_id . "
-				SELECT @sql = N' SELECT key_value, description FROM ' + @tbl + ' WHERE herd_code = ''" . $this->herd_code . "'' ORDER BY list_order'
+        $sql = "--USE users;
+				DECLARE @tbl nvarchar(100), @value_col nvarchar(32), @desc_col nvarchar(32), @sql nvarchar(255)
+				SELECT @tbl = table_name, @value_col = value_column, @desc_col = desc_column FROM users.frm.data_lookup WHERE control_id = " . $control_id . "
+				SELECT @sql = N' SELECT ' + @value_col + ', ' + @desc_col + ' FROM ' + @tbl + ' WHERE herd_code = ''" . $this->herd_code . "'' AND isactive = 1 ORDER BY list_order'
 				EXEC sp_executesql @sql";
 
+//echo $sql;
         $results = $this->db->query($sql)->result_array();
+        return $results;
+    }
+
+    /* -----------------------------------------------------------------
+     *  returns key-value pairs of options for a given lookup field
+
+     *  returns key-value pairs of options for a given lookup field
+
+     *  @author: ctranel
+     *  @date: 2016-09-21
+     *  @param: int control id
+     *  @return array key-value pairs
+     *  @throws:
+     * -----------------------------------------------------------------
+     */
+    public function getAnimalLookupOptions($control_id){
+        if(!isset($this->serial_num) || empty($this->serial_num)){
+            throw new Exception('Animal serial number not set in datasource');
+        }
+        $sql = "--USE users;
+				DECLARE @tbl nvarchar(100), @value_col nvarchar(32), @desc_col nvarchar(32), @sql nvarchar(255)
+				SELECT @tbl = table_name, @value_col = value_column, @desc_col = desc_column FROM users.frm.data_lookup WHERE control_id = " . $control_id . "
+				SELECT @sql = N' SELECT ' + @value_col + ', ' + @desc_col + ' FROM ' + @tbl + ' WHERE herd_code = ''" . $this->herd_code . "'' AND (serial_num = " . $this->serial_num . " OR serial_num IS NULL) AND isactive = 1 ORDER BY list_order'
+				EXEC sp_executesql @sql";
+//echo $sql;
+        $results = $this->db->query($sql)->result_array();
+//var_dump($results);
         return $results;
     }
 
@@ -321,6 +376,10 @@ class Data_entry_model extends CI_Model implements iForm_Model {
         $key_meta = $this->getFormKeyMeta($form_id);
         $key_field_names = array_keys($key_meta);
         $form_field_names = array_keys($form_data);
+        //can't insert values on identity fields
+        //if($key = array_search('key_value', $form_field_names) !== false){
+        //    unset($form_field_names[$key]);
+        //}
 
         $join_cond = '';
         if(isset($key_field_names) && is_array($key_field_names)){
@@ -336,7 +395,10 @@ class Data_entry_model extends CI_Model implements iForm_Model {
                 $v = implode('|', $v);
             }
             //string vs numeric, or can we use quotes for both?
-            $update_set .= " t." . $k . "=nd." . $k . ",";
+            //only update non-key fields
+            if(in_array($k, $key_field_names) === false){
+                $update_set .= " t." . $k . "=nd." . $k . ",";
+            }
             if($v === null) {
                 $value_as_key .= "NULL AS " . $k . ",";
             }

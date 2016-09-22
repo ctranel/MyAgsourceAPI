@@ -55,33 +55,42 @@ class FormFactory {
     * createForm
     *
     * @param array of form data
+    * @param string herd code
+    * @param array of ints ancestor_form_ids
     * @author ctranel
     * @returns Array of Forms
     */
-    protected function createForm($form_data, $herd_code){
-        $subforms = $this->getSubForms($form_data['form_id'], $herd_code);
-
-        $control_data = $this->datasource->getFormControlData($form_data['form_id']);
+    protected function createForm($form_data, $herd_code, $ancestor_form_ids = null){
+        $subforms = $this->getSubForms($form_data['form_id'], $herd_code, $ancestor_form_ids);
+        $control_data = $this->datasource->getFormControlData($form_data['form_id'], $ancestor_form_ids);
 
         $fc = [];
         if(is_array($control_data) && !empty($control_data) && is_array($control_data[0])){
             foreach($control_data as $d){
-                $fc[] = new FormControl($this->datasource, $d, $subforms);
+                $s = isset($subforms[$d['name']]) ? $subforms[$d['name']] : null;
+                $fc[] = new FormControl($this->datasource, $d, $s);
             }
         }
         return new Form($form_data['form_id'], $this->datasource, $fc, $form_data['dom_id'], $form_data['action'], $herd_code);
     }
 
-    protected function getSubForms($parent_form_id){
+    protected function getSubForms($parent_form_id, $herd_code, $ancestor_form_ids = null){
         $results = $this->datasource->getSubFormsByParentId($parent_form_id); //would return control-name-indexed array
         if(empty($results)){
             return false;
         }
 
+        if(is_array($ancestor_form_ids)){
+            $ancestor_form_ids = $ancestor_form_ids + [$parent_form_id];
+        }
+        else{
+            $ancestor_form_ids = [$parent_form_id];
+        }
+
         $subforms = [];
         foreach($results as $k => $r){
-            $form = $this->createForm($r);
-            $subforms[$r['parent_control_name']] = new SubForm($r['operator'], $r['operand'], $form);
+            $form = $this->createForm($r, $herd_code, $ancestor_form_ids);
+            $subforms[$r['form_control_name']][] = new SubForm($r['operator'], $r['operand'], $form);
         }
 
         return $subforms;
@@ -105,10 +114,6 @@ class FormFactory {
 		return $this->createSettingForm($results[0], $user_id, $herd_code);
 	}
 	
-//	public function getSettingSubForms($control_name){
-//        $results = $this->datasource->getFormByControlName($control_name);
-//    }
-
     /*
      * createSettingForm
      *
@@ -118,9 +123,9 @@ class FormFactory {
      * @author ctranel
      * @returns \myagsource\Settings\SettingForm
      */
-    protected function createSettingForm($form_data, $user_id, $herd_code){
-        $subforms = $this->getSettingSubForms($form_data['form_id'], $user_id, $herd_code);
-        $control_data = $this->datasource->getFormControlData($form_data['form_id']);
+    protected function createSettingForm($form_data, $user_id, $herd_code, $ancestor_form_ids = null){
+        $subforms = $this->getSettingSubForms($form_data['form_id'], $user_id, $herd_code, $ancestor_form_ids);
+        $control_data = $this->datasource->getFormControlData($form_data['form_id'], $ancestor_form_ids);
 
         $fc = [];
         if(is_array($control_data) && !empty($control_data) && is_array($control_data[0])){
@@ -132,16 +137,23 @@ class FormFactory {
         return new SettingForm($form_data['form_id'], $this->datasource, $fc, $form_data['dom_id'], $form_data['action'],$user_id, $herd_code);
     }
 
-    protected function getSettingSubForms($parent_form_id, $user_id, $herd_code){
+    protected function getSettingSubForms($parent_form_id, $user_id, $herd_code, $ancestor_form_ids = null){
         $results = $this->datasource->getSubFormsByParentId($parent_form_id); //would return control-name-indexed array
 
         if(empty($results)){
             return false;
         }
-        
+
+        if(is_array($ancestor_form_ids)){
+            $ancestor_form_ids = $ancestor_form_ids + [$parent_form_id];
+        }
+        else{
+            $ancestor_form_ids = [$parent_form_id];
+        }
+
         $subforms = [];
         foreach($results as $k => $r){
-            $form = $this->createSettingForm($r, $user_id, $herd_code);
+            $form = $this->createSettingForm($r, $user_id, $herd_code, $ancestor_form_ids);
             $subforms[$r['form_control_name']][] = new SubForm($r['operator'], $r['operand'], $form);
         }
         return $subforms;

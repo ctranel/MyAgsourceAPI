@@ -168,8 +168,8 @@ class dpage extends MY_Api_Controller {
 		$setting_form_factory = new FormFactory($this->setting_model, $supplemental_factory);
 
 //this will actually be passed from client
-$params = ['key_value' => 1];
-//$params = ['site_num' => 1];
+//$params = ['key_value' => 1];
+$params = ['ID' => 2911100, 'serial_num' => '366']; //for events
 
         $this->load->model('Forms/Data_entry_model', null, false, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
 		$entry_form_factory = new FormFactory($this->Data_entry_model, $supplemental_factory);

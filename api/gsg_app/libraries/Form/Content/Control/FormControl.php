@@ -215,6 +215,12 @@ class FormControl implements iFormControl
             case 'herd_lookup_array':
                 $ctl_type = 'data_lookup_array';
                 break;
+            case 'animal_lookup':
+                $ctl_type = 'data_lookup';
+                break;
+            case 'animal_lookup_array':
+                $ctl_type = 'data_lookup_array';
+                break;
             default:
                 $ctl_type = $this->control_type;
                 break;
@@ -319,14 +325,20 @@ class FormControl implements iFormControl
         if(strpos($this->control_type, 'herd_lookup') !== false){
             $options = $this->datasource->getHerdLookupOptions($this->id);
         }
-        if(isset($options) && is_array($options)){
+        if(strpos($this->control_type, 'animal_lookup') !== false){
+            $options = $this->datasource->getAnimalLookupOptions($this->id);
+        }
+ //var_dump($options);
+//echo $this->name;
+        if(isset($options) && is_array($options) && !empty($options)){
+            $keys = array_keys($options[0]);
             foreach($options as $o){
-                if(isset($o['value'])){
-                    $this->options[] = ['value' => $o['value'], 'text' => $o['description']];
-                }
-                else{
-                    $this->options[] = ['value' => $o['key_value'], 'text' => $o['description']];
-                }
+                //if(isset($o['value'])){
+                    $this->options[] = ['value' => $o[$keys[0]], 'text' => $o[$keys[1]]];
+                //}
+                //else{
+                //    $this->options[] = ['value' => $o['key_value'], 'text' => $o['description']];
+                //}
             }
         }
 //        var_dump($this->options);

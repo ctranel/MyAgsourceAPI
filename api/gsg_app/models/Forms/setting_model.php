@@ -54,31 +54,40 @@ class Setting_model extends CI_Model implements iForm_Model {
 
         $sql =
             "WITH parentForms AS (
-                SELECT f.id AS form_id, f.block_id, sl.parent_form_id, sl.list_order AS list_order
+                SELECT f.id AS form_id, f.block_id, sl.parent_control_id, sl.list_order AS list_order
                 FROM users.frm.forms f
-                LEFT JOIN users.frm.subform_link sl ON f.id = sl.form_id
-                WHERE sl.parent_form_id IS NULL
+                   
+                   --INNER JOIN users.setng.forms_settings fs ON f.id = fs.form_id
+                   --INNER JOIN users.setng.settings s ON fs.form_id = f.id AND f.active = 1
+
+ 
+                    LEFT JOIN users.frm.subform_link sl ON f.id = sl.form_id
+                WHERE sl.parent_control_id IS NULL
             ), cteForms AS (
-                SELECT form_id, block_id, parent_form_id, list_order
+                SELECT form_id, block_id, parent_control_id, list_order
                 FROM parentForms
                 UNION all 
-                SELECT sl.form_id, NULL AS block_id, sl.parent_form_id, sl.list_order
+                SELECT sl.form_id, f.block_id AS block_id, sl.parent_control_id, sl.list_order
                 FROM users.frm.subform_link sl
-                    join cteForms f ON f.form_id = sl.parent_form_id
+                   
+                   INNER JOIN users.setng.settings s ON sl.parent_control_id = s.id
+                   INNER JOIN users.setng.forms_settings fs ON s.id = fs.setting_id
+
+                    join cteForms f ON f.form_id = fs.form_id
             )
     
             SELECT s.id, t.name AS control_type, b.name AS category, s.name, s.label, s.default_value, uhs.value
             FROM users.dbo.pages_blocks pb
                 INNER JOIN users.dbo.blocks b ON pb.block_id = b.id AND b.display_type_id = 6 AND (pb.page_id = " . $page_id . ")
-                INNER JOIN users.frm.forms f ON b.id = f.block_id
-                LEFT JOIN cteForms cte ON (f.id = cte.form_id OR f.id = cte.parent_form_id)
+                INNER JOIN cteForms cte ON b.id = cte.block_id-- OR s.id = cte.parent_control_id)
+                INNER JOIN users.frm.forms f ON cte.block_id = f.block_id
                 INNER JOIN users.setng.forms_settings fs ON cte.form_id = fs.form_id
                 INNER JOIN users.setng.settings s ON fs.setting_id = s.id
-                LEFT JOIN users.setng.user_herd_settings uhs ON " . $uhs_join_cond . "
-                INNER JOIN users.frm.control_types t ON s.type_id = t.id
+                LEFT JOIN users.setng.user_herd_settings uhs ON s.id = uhs.setting_id AND uhs.user_id = 1 AND uhs.herd_code = '35371684'
+                INNER JOIN users.frm.control_types t ON s.type_id = t.id 
             WHERE " . $uhs_where . "
             AND (uhs.herd_code = '" . $this->herd_code . "' OR uhs.herd_code IS NULL)";
-
+//die($sql);
         $results = $this->db->query($sql)->result_array();
         return $results;
     }
@@ -112,9 +121,15 @@ class Setting_model extends CI_Model implements iForm_Model {
     public function getSubFormsByParentId($parent_form_id) {
         $results = $this->db
             ->select('f.id AS form_id, s.name AS scope, f.active, f.dom_id, f.action, sl.list_order, scg.id, scg.parent_id, scg.operator, sc.form_control_name, sc.operator, sc.operand')
-            ->join('users.frm.subform_condition_groups scg', "sl.id = scg.subform_link_id AND sl.parent_form_id = " . $parent_form_id, 'inner')
+            ->join('users.frm.subform_condition_groups scg', "sl.id = scg.subform_link_id", 'inner')
             ->join('users.frm.subform_condition sc', "scg.id = sc.condition_group_id", 'inner')
-            ->join('users.frm.forms f', "sl.form_id = f.id", 'inner')
+
+            ->join('users.setng.settings s', 'sl.parent_control_id = s.id', 'inner')
+            ->join('users.setng.forms_settings fs', 's.id = fs.setting_id AND fs.form_id = ' . $parent_form_id, 'inner')
+
+            ->join('users.frm.forms f', "fs.form_id = f.id AND f.active = 1", 'inner')
+
+
             ->join('users.dbo.lookup_scopes s', 'f.scope_id = s.id', 'inner')
             ->order_by('sc.form_control_name, sl.list_order')
             ->get('users.frm.subform_link sl')
