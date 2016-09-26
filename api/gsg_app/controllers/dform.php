@@ -1,60 +1,16 @@
 <?php
 //namespace myagsource;
 
-require_once(APPPATH . 'core/MY_Api_Controller.php');
-require_once(APPPATH . 'libraries/dhi/Herd.php');
-require_once(APPPATH . 'libraries/AccessLog.php');
-require_once(APPPATH . 'libraries/Benchmarks/Benchmarks.php');
-require_once(APPPATH . 'libraries/dhi/HerdAccess.php');
+require_once(APPPATH . 'controllers/dpage.php');
 require_once APPPATH . 'libraries/Settings/SessionSettings.php';
-require_once APPPATH . 'libraries/Api/Response/ResponseMessage.php';
-require_once APPPATH . 'libraries/Site/WebContent/Navigation.php';
-require_once(APPPATH . 'libraries/Form/Content/FormFactory.php');
-require_once(APPPATH . 'libraries/Site/WebContent/WebBlockFactory.php');
-require_once(APPPATH . 'libraries/Supplemental/Content/SupplementalFactory.php');
-
-use \myagsource\AccessLog;
-use \myagsource\dhi\Herd;
-use \myagsource\Benchmarks\Benchmarks;
-use \myagsource\dhi\HerdAccess;
-use \myagsource\Settings\SessionSettings;
-use \myagsource\Api\Response\ResponseMessage;
-use \myagsource\Site\WebContent\Navigation;
-use \myagsource\Supplemental\Content\SupplementalFactory;
-use \myagsource\Site\WebContent\WebBlockFactory;
-use \myagsource\Form\Content\FormFactory;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
-class dform extends MY_Api_Controller {
-	/* 
-	 * @var Herd object
-	 */
-	protected $herd;
-	/* 
-	 * @var HerdAccess object
-	 */
-	protected $herd_access;
-	/* 
-	 * @var AccessLog object
-	 */
-	protected $access_log;
-
+class dform extends dpage {
 	protected $notifications;
 	protected $notices;
 
 	function __construct(){
 		parent::__construct();
-
-		$this->load->model('herd_model');
-		$this->herd_access = new HerdAccess($this->herd_model);
-
-		if(!isset($this->as_ion_auth) || !$this->as_ion_auth->logged_in()){
-			$this->sendResponse(401);
-		}
-		$this->load->model('access_log_model');
-		$this->access_log = new AccessLog($this->access_log_model);
-
-//		$this->page_header_data['num_herds'] = $this->herd_access->getNumAccessibleHerds($this->session->userdata('user_id'), $this->permissions->permissionsList(), $this->session->userdata('arr_regions'));
 
 		/* Load the profile.php config file if it exists */
 		if ((ENVIRONMENT == 'development' || ENVIRONMENT == 'localhost') && strpos($this->router->method, 'ajax') === false) {
@@ -120,7 +76,7 @@ class dform extends MY_Api_Controller {
 	 * @access	public
 	 * @return	void
 	 */
-	function entry($form_id){
+	function entry($form_id, $json_data = null){
 		//validate form input
 		$this->load->library('herds');
 		$this->load->library('form_validation');
@@ -179,6 +135,7 @@ class dform extends MY_Api_Controller {
         $this->sendResponse(200, null, json_encode(['enroll_status' => $enroll_status, 'new_test' => !$has_accessed]));
     }
 
+/* in parent
 	protected function _record_access($event_id){
 		if($this->session->userdata('user_id') === FALSE){
 			return FALSE;
@@ -195,5 +152,5 @@ class dform extends MY_Api_Controller {
 			$this->session->userdata('user_id'),
 			$this->session->userdata('active_group_id')
 		);
-	}
+	} */
 }

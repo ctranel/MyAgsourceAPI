@@ -33,12 +33,19 @@ use \myagsource\Permissions\Permissions\ProgramPermissions;
 class MY_Api_Controller extends CI_Controller
 {
     /**
+     * herd
+     *
+     * Herd object
+     * @var Herd
+     **/
+    protected $herd;
+
+    /**
      * herd_access
      *
      * @var HerdAccess
      **/
     protected $herd_access;
-
 
     public function __construct() {
         // Execute CI_Controller Constructor
@@ -79,14 +86,14 @@ class MY_Api_Controller extends CI_Controller
         $this->load->helper('form');
         $this->load->helper('error');
         $this->herd_access = new HerdAccess($this->herd_model);
-        $herd = new Herd($this->herd_model, $this->session->userdata('herd_code'));
+        $this->herd = new Herd($this->herd_model, $this->session->userdata('herd_code'));
 
 //var_dump($this->session->userdata('user_id'));
         if($this->session->userdata('active_group_id')) {
             $this->load->model('permissions_model');
             $this->load->model('product_model');
             $group_permissions = ProgramPermissions::getGroupPermissionsList($this->permissions_model, $this->session->userdata('active_group_id'));
-            $products = new Products($this->product_model, $herd, $group_permissions);
+            $products = new Products($this->product_model, $this->herd, $group_permissions);
             $this->permissions = new ProgramPermissions($this->permissions_model, $group_permissions, $products->allHerdProductCodes());
         }
         else{

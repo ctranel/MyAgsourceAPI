@@ -7,7 +7,6 @@ require_once(APPPATH . 'libraries/AccessLog.php');
 require_once(APPPATH . 'libraries/Supplemental/Content/SupplementalFactory.php');
 require_once(APPPATH . 'libraries/dhi/HerdAccess.php');
 require_once(APPPATH . 'libraries/dhi/HerdPageAccess.php');
-require_once(APPPATH . 'libraries/dhi/Herd.php');
 require_once(APPPATH . 'libraries/Site/WebContent/WebBlockFactory.php');
 require_once(APPPATH . 'libraries/Site/WebContent/PageAccess.php');
 require_once(APPPATH . 'libraries/Site/WebContent/Page.php');
@@ -24,7 +23,6 @@ use \myagsource\Filters\ReportFilters;
 use \myagsource\Supplemental\Content\SupplementalFactory;
 use \myagsource\dhi\HerdAccess;
 use \myagsource\dhi\HerdPageAccess;
-use \myagsource\dhi\Herd;
 use \myagsource\Site\WebContent\Page;
 use \myagsource\Site\WebContent\WebBlockFactory;
 use \myagsource\Site\WebContent\PageAccess;
@@ -72,14 +70,6 @@ class dpage extends MY_Api_Controller {
 	protected $page;
 	
     /**
-	 * herd
-	 * 
-	 * Herd object
-	 * @var Herd
-	 **/
-	protected $herd;
-
-    /**
      * filters
      *
      * Filters object
@@ -96,11 +86,6 @@ class dpage extends MY_Api_Controller {
 
 	function __construct(){
 		parent::__construct();
-        //DO WE HAVE A HERD AND AN ACTIVE USER?
-		//set up herd
-		$this->load->model('herd_model');
-		$this->herd_access = new HerdAccess($this->herd_model);
-		$this->herd = new Herd($this->herd_model, $this->session->userdata('herd_code'));
 
 		//is someone logged in?
 		if($this->herd->herdCode() != $this->config->item('default_herd')){
@@ -120,13 +105,13 @@ class dpage extends MY_Api_Controller {
 			}
 		}
 
-		/* Load the profile.php config file if it exists
+		/* Load the profile.php config file if it exists*/
 		if (ENVIRONMENT == 'development' || ENVIRONMENT == 'localhost') {
 			$this->config->load('profiler', false, true);
 			if ($this->config->config['enable_profiler']) {
 				$this->output->enable_profiler(TRUE);
-			} 
-		}*/
+			}
+		}
 	}
 	
 	function index($page_id, $json_filter_data = null){
