@@ -86,9 +86,11 @@ class MY_Api_Controller extends CI_Controller
         $this->load->helper('form');
         $this->load->helper('error');
         $this->herd_access = new HerdAccess($this->herd_model);
-        $this->herd = new Herd($this->herd_model, $this->session->userdata('herd_code'));
 
-//var_dump($this->session->userdata('user_id'));
+        if($this->session->userdata('herd_code')){
+            $this->herd = new Herd($this->herd_model, $this->session->userdata('herd_code'));
+        }
+
         if($this->session->userdata('active_group_id')) {
             $this->load->model('permissions_model');
             $this->load->model('product_model');

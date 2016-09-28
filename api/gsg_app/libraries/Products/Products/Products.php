@@ -29,7 +29,7 @@ class Products implements iProducts{
      * $herd
      * @var Herd
      **/
-    protected $herd;
+    protected $herd_code;
 
     /**
      * $arr_group_permissions
@@ -67,9 +67,12 @@ class Products implements iProducts{
     protected $tree;
      **/
 
-    function __construct(\Product_model $datasource, Herd $herd, $arr_group_permissions) {
+    function __construct(\Product_model $datasource, Herd $herd = null, $arr_group_permissions) {
         $this->datasource = $datasource;
-        $this->herd = $herd;
+        $this->herd_code = '';
+        if(isset($herd)){
+            $this->herd_code = $herd->herdCode();
+        }
         $this->arr_group_permissions = $arr_group_permissions;
     }
 
@@ -94,7 +97,7 @@ class Products implements iProducts{
      * @access public
      **/
     public function allHerdProductCodes(){
-        $tmp = $this->datasource->getSubscribedProducts($this->herd->herdCode());
+        $tmp = $this->datasource->getSubscribedProducts($this->herd_code);
         return array_column($tmp, 'product_code');
     }
 
@@ -159,7 +162,7 @@ class Products implements iProducts{
              * have permission only for subscribed content.  All other scopes are strictly users-based
              */
             if(in_array('View Subscriptions', $this->arr_group_permissions)){
-                $tmp = array_merge($tmp, $this->datasource->getSubscribedProducts($this->herd->herdCode()));
+                $tmp = array_merge($tmp, $this->datasource->getSubscribedProducts($this->herd_code));
             }
             if(in_array('View Account', $this->arr_group_permissions)){
                 $scope[] = 'account';
@@ -168,7 +171,7 @@ class Products implements iProducts{
                 $scope[] = 'admin';
             }
             if(!empty($scope)){
-                $tmp = array_merge($tmp, $this->datasource->getProductsByScope($scope, $this->herd->herdCode()));
+                $tmp = array_merge($tmp, $this->datasource->getProductsByScope($scope, $this->herd_code));
             }
 
             $tmp = array_map("unserialize", array_unique(array_map("serialize", $tmp)));

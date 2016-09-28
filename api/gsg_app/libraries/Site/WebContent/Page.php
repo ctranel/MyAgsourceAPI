@@ -143,7 +143,7 @@ class Page implements iPage {//iWebContent,
             'route' => $this->route,
         ];
 
-        if(!empty($this->filters->toArray())){
+        if(isset($this->filters) && !empty($this->filters->toArray())){
             $ret['filters'] = $this->filters->toArray();
         }
         if($this->hasBenchmark() && !empty($this->benchmarks->toArray())){

@@ -23,7 +23,7 @@ class Change_herd extends MY_Api_Controller {
 	/* 
 	 * @var Herd object
 	 */
-	protected $herd;
+	//protected $herd;
 	/* 
 	 * @var HerdAccess object
 	 */
@@ -194,9 +194,9 @@ class Change_herd extends MY_Api_Controller {
      */
     protected function _loadSessionHerd($herd_code){
         $msg = '';
-        if(!isset($this->herd)){
+        //if(!isset($this->herd)){
             $this->herd = new Herd($this->herd_model, $herd_code);
-        }
+        //}
         if($this->session->userdata('active_group_id') == 2){ //user is a producer
             $trials = $this->herd->getTrialData();
             if(isset($trials) && is_array($trials)){

@@ -69,9 +69,9 @@ class Herd
 	 * @return void
 	 * @author Chris
 	 **/
-	public function __construct($herd_model, $herd_code) {
+	public function __construct(\herd_model $herd_model, $herd_code) {
 		if(empty($herd_code) || strlen($herd_code) != 8){
-			return false;
+			throw new \Exception('Herd could not be loaded.  No herd code passed to constructor.');
 		}
 		$this->herd_code = $herd_code;
 		$this->herd_model = $herd_model;

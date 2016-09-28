@@ -120,7 +120,7 @@ class Setting_model extends CI_Model implements iForm_Model {
      **/
     public function getSubFormsByParentId($parent_form_id) {
         $results = $this->db
-            ->select('f.id AS form_id, s.name AS scope, f.active, f.dom_id, f.action, sl.list_order, scg.id, scg.parent_id, scg.operator, sc.form_control_name, sc.operator, sc.operand')
+            ->select('f.id AS form_id, scp.name AS scope, f.active, f.dom_id, f.action, sl.list_order, scg.id, scg.parent_id, scg.operator, sc.form_control_name, sc.operator, sc.operand')
             ->join('users.frm.subform_condition_groups scg', "sl.id = scg.subform_link_id", 'inner')
             ->join('users.frm.subform_condition sc', "scg.id = sc.condition_group_id", 'inner')
 
@@ -130,7 +130,7 @@ class Setting_model extends CI_Model implements iForm_Model {
             ->join('users.frm.forms f', "fs.form_id = f.id AND f.active = 1", 'inner')
 
 
-            ->join('users.dbo.lookup_scopes s', 'f.scope_id = s.id', 'inner')
+            ->join('users.dbo.lookup_scopes scp', 'f.scope_id = scp.id', 'inner')
             ->order_by('sc.form_control_name, sl.list_order')
             ->get('users.frm.subform_link sl')
             ->result_array();

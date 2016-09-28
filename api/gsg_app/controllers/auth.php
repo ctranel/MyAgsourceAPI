@@ -31,25 +31,7 @@ class Auth extends MY_Api_Controller {
         //$this->load->library('session');
         //$this->load->helper('error');
         $this->load->library('form_validation');
-        $this->load->model('dhi/herd_model');
-
-        //instantiate in case noone is logged in
-        if(!$this->session->userdata('user_id')) {
-            $this->as_ion_auth = new As_ion_auth(null);
-            return;
-        }
-
-        //instantiate as_ion_auth with permissions
-        if($this->session->userdata('active_group_id')) {
-            $herd = new Herd($this->herd_model, $this->session->userdata('herd_code'));
-
-            $this->load->model('permissions_model');
-            $this->load->model('product_model');
-            $group_permissions = ProgramPermissions::getGroupPermissionsList($this->permissions_model, $this->session->userdata('active_group_id'));
-            $products = new Products($this->product_model, $herd, $group_permissions);
-            $this->permissions = new ProgramPermissions($this->permissions_model, $group_permissions, $products->allHerdProductCodes());
-        }
-        $this->as_ion_auth = new As_ion_auth($this->permissions);
+        //$this->load->model('dhi/herd_model');
 
 		/* Load the profile.php config file if it exists
 		if (ENVIRONMENT == 'development' || ENVIRONMENT == 'localhost') {
@@ -359,9 +341,9 @@ class Auth extends MY_Api_Controller {
             //get permissions (also in constuctor, put in function/class somewhere)
             $this->load->model('permissions_model');
             $this->load->model('product_model');
-            $herd = new Herd($this->herd_model, $this->session->userdata('herd_code'));
+            //$herd = new Herd($this->herd_model, $this->session->userdata('herd_code'));
             $group_permissions = ProgramPermissions::getGroupPermissionsList($this->permissions_model, $this->session->userdata('active_group_id'));
-            $products = new Products($this->product_model, $herd, $group_permissions);
+            $products = new Products($this->product_model, $this->herd, $group_permissions);
             $this->permissions = new ProgramPermissions($this->permissions_model, $group_permissions, $products->allHerdProductCodes());
 
             $this->load->model('notice_model');
