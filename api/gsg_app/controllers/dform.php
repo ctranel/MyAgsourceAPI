@@ -78,60 +78,87 @@ class dform extends dpage {
 	}
 
 	/**
-	 * @method settings() - setting submission.
+	 * @method get_entry() - setting submission.
 	 *
+     * @param int form id
+     * @param string json data (key data for retrieving form)
 	 * @access	public
 	 * @return	void
 	 */
-	function entry($form_id, $json_data = null){
+	function get_entry($form_id, $json_data = null){
         $params = [];
         if(isset($json_data)) {
             $params = (array)json_decode(urldecode($json_data));
         }
+
+        if(empty(array_filter($params))){
+            $this->sendResponse(400, new ResponseMessage("No identifying information received", 'error'));
+        }
+
 		//validate form input
 		$this->load->library('herds');
 		$this->load->library('form_validation');
-//this will actually be passed from client
-$params = ['pen_num' => 9];
-//$params = ['key_value' => 1];
-//var_dump($form, $this->input->userInputArray()); die;
+        $this->load->model('Forms/data_entry_model', null, false, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
+        $form_factory = new FormFactory($this->data_entry_model);
+
+        $form = $form_factory->getForm($form_id, $this->session->userdata('herd_code'));
+
+        $this->sendResponse(200, $this->message, $form->toArray());
+	}
+
+    /**
+     * @method get_entry() - setting submission.
+     *
+     * @param int form id
+     * @param string json data (key data for retrieving form)
+     * @access	public
+     * @return	void
+     */
+    function put_entry($form_id, $json_data = null){
+        $params = [];
+        if(isset($json_data)) {
+            $params = (array)json_decode(urldecode($json_data));
+        }
+        //validate form input
+        $this->load->library('herds');
+        $this->load->library('form_validation');
         $this->load->model('Forms/data_entry_model', null, false, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
         $form_factory = new FormFactory($this->data_entry_model);
 
         $form = $form_factory->getForm($form_id, $this->session->userdata('herd_code'));
         $input = $this->input->userInputArray();
-		//$this->form_validation->set_rules('herd_code', 'Herd', 'required|max_length[8]');
-		//$this->form_validation->set_rules('herd_code_fill', 'Type Herd Code');
+        //$this->form_validation->set_rules('herd_code', 'Herd', 'required|max_length[8]');
+        //$this->form_validation->set_rules('herd_code_fill', 'Type Herd Code');
 
-		if($this->form_validation->run_input() === true){
-			try{
-				//get form object
-				//@todo: split form core from form display (core would be included in display), no need for web content or supplemental here
-				//supplemental factory
-				$this->load->model('supplemental_model');
-				$supplemental_factory = new SupplementalFactory($this->supplemental_model, site_url());
 
-				$form->write($input);
-
-				$resp_msg = [];
-				//$msg = $this->_loadSessionHerd($tmp_arr[0]['herd_code']);
-				//if(!empty($msg)){
-				$resp_msg = new ResponseMessage('Form submission successful', 'message');
-				//}
-				//$this->_record_access(2); //2 is the page code for herd change
-				/*                $this->load->model('web_content/navigation_model');
-                                $navigation = new Navigation($this->navigation_model, $this->herd, $this->permissions->permissionsList());
-                                $payload = ['nav' => $navigation->toArray('DHI')]; */
-				$this->sendResponse(200, $resp_msg);
-			}
-			catch(Exception $e){
-				$this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
-			}
-		}
-        elseif(!$input || empty($input)){
-            //$form->getFormByID($form_id);
+        if(!$input || empty($input)){
             $this->sendResponse(200, $this->message, $form->toArray());
         }
-		$this->sendResponse(400, new ResponseMessage(validation_errors(), 'error'));
-	}
+        elseif($this->form_validation->run_input() === true){
+            try{
+                //get form object
+                //@todo: split form core from form display (core would be included in display), no need for web content or supplemental here
+                //supplemental factory
+                $this->load->model('supplemental_model');
+                $supplemental_factory = new SupplementalFactory($this->supplemental_model, site_url());
+
+                $form->write($input);
+
+                $resp_msg = [];
+                //$msg = $this->_loadSessionHerd($tmp_arr[0]['herd_code']);
+                //if(!empty($msg)){
+                $resp_msg = new ResponseMessage('Form submission successful', 'message');
+                //}
+                //$this->_record_access(2); //2 is the page code for herd change
+                /*                $this->load->model('web_content/navigation_model');
+                                $navigation = new Navigation($this->navigation_model, $this->herd, $this->permissions->permissionsList());
+                                $payload = ['nav' => $navigation->toArray('DHI')]; */
+                $this->sendResponse(200, $resp_msg);
+            }
+            catch(Exception $e){
+                $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
+            }
+        }
+        $this->sendResponse(400, new ResponseMessage(validation_errors(), 'error'));
+    }
 }
