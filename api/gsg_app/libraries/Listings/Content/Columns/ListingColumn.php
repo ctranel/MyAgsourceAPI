@@ -60,6 +60,12 @@ class ListingColumn implements iListingColumn
     protected $is_displayed;
 
     /**
+     * is_key
+     * @var boolean
+     **/
+    protected $is_key;
+
+    /**
      * control_type
      * @var string (can handle date, datetime, string, int, decimal)
      **/
@@ -80,6 +86,7 @@ class ListingColumn implements iListingColumn
         //$this->value = $column_data['value'];
         $this->control_type = $column_data['control_type'];
         $this->is_displayed = $column_data['is_displayed'];
+        $this->is_key = $column_data['is_key'];
         //$this->isactive = $column_data['isactive'];
     }
 
@@ -123,6 +130,7 @@ class ListingColumn implements iListingColumn
             //'value' => $this->value,
             'control_type' => $ctl_type,
             'is_displayed' => $this->is_displayed,
+            'is_key' => $this->is_key,
         ];
 
        return $ret;

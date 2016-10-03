@@ -269,8 +269,17 @@ class Data_entry_model extends CI_Model implements iForm_Model {
                 inner join #valueTable v ON fld.id = v.db_field_id;
        ";
 //print($sql);
+        $time_start = microtime(true);
+
         $results = $this->db->query($sql)->result_array();
-        return $results;
+
+        $time_end = microtime(true);
+/*        echo "
+        
+        
+        TIME: " . ($time_end - $time_start);
+        echo $sql;
+*/        return $results;
     }
 
 
@@ -288,7 +297,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
     * -----------------------------------------------------------------
     */
 	public function getLookupOptions($control_id){
-		$sql = "--USE users;
+		$sql = "USE users;
 				DECLARE @tbl nvarchar(100), @value_col nvarchar(32), @desc_col nvarchar(32), @code_type nvarchar(15), @sql nvarchar(255)
 				SELECT @tbl = table_name, @value_col = value_column, @desc_col = desc_column, @code_type = codetype FROM users.frm.data_lookup WHERE control_id = " . $control_id . "
                 IF @code_type IS NOT NULL
@@ -296,17 +305,26 @@ class Data_entry_model extends CI_Model implements iForm_Model {
 				ELSE
 				    SELECT @sql = N' SELECT ' + @value_col + ', ' + @desc_col + ' FROM ' + @tbl + ' WHERE isactive = 1 ORDER BY list_order'
 				EXEC sp_executesql @sql";
-		$results = $this->db->query($sql)->result_array();
+        $time_start = microtime(true);
 
+        $results = $this->db->query($sql)->result_array();
+
+        $time_end = microtime(true);
+/*        echo "
+
+
+        TIME: " . ($time_end - $time_start);
+        echo $sql;
+*/
 //print($sql);
 		return $results;
 	}
 
     /* -----------------------------------------------------------------
      *  returns key-value pairs of options for a given lookup field
- 
+
      *  returns key-value pairs of options for a given lookup field
- 
+
      *  @since: version 1
      *  @author: ctranel
      *  @date: Jun 26, 2014
@@ -316,15 +334,24 @@ class Data_entry_model extends CI_Model implements iForm_Model {
      * -----------------------------------------------------------------
      */
     public function getHerdLookupOptions($control_id){
-        $sql = "--USE users;
+        $sql = "USE users;
 				DECLARE @tbl nvarchar(100), @value_col nvarchar(32), @desc_col nvarchar(32), @sql nvarchar(255)
 				SELECT @tbl = table_name, @value_col = value_column, @desc_col = desc_column FROM users.frm.data_lookup WHERE control_id = " . $control_id . "
 				SELECT @sql = N' SELECT ' + @value_col + ', ' + @desc_col + ' FROM ' + @tbl + ' WHERE herd_code = ''" . $this->herd_code . "'' AND isactive = 1 ORDER BY list_order'
 				EXEC sp_executesql @sql";
 
 //echo $sql;
+        $time_start = microtime(true);
+
         $results = $this->db->query($sql)->result_array();
-        return $results;
+
+        $time_end = microtime(true);
+/*        echo "
+
+
+        TIME: " . ($time_end - $time_start);
+        echo $sql;
+*/        return $results;
     }
 
     /* -----------------------------------------------------------------
@@ -343,14 +370,23 @@ class Data_entry_model extends CI_Model implements iForm_Model {
         if(!isset($this->serial_num) || empty($this->serial_num)){
             throw new Exception('Animal serial number not set in datasource');
         }
-        $sql = "--USE users;
+        $sql = "USE users;
 				DECLARE @tbl nvarchar(100), @value_col nvarchar(32), @desc_col nvarchar(32), @sql nvarchar(255)
 				SELECT @tbl = table_name, @value_col = value_column, @desc_col = desc_column FROM users.frm.data_lookup WHERE control_id = " . $control_id . "
 				SELECT @sql = N' SELECT ' + @value_col + ', ' + @desc_col + ' FROM ' + @tbl + ' WHERE herd_code = ''" . $this->herd_code . "'' AND (serial_num = " . $this->serial_num . " OR serial_num IS NULL) AND isactive = 1 ORDER BY list_order'
 				EXEC sp_executesql @sql";
 //echo $sql;
+        $time_start = microtime(true);
+
         $results = $this->db->query($sql)->result_array();
-//var_dump($results);
+
+        $time_end = microtime(true);
+/*        echo "
+
+
+        TIME: " . ($time_end - $time_start);
+        echo $sql;
+*///var_dump($results);
         return $results;
     }
 
@@ -362,7 +398,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
     *  @author: ctranel
     *  @param: array of strings
     *  @return void
-    *  @throws: 
+    *  @throws:
     * -----------------------------------------------------------------
     */
 	public function upsert($form_id, $form_data){

@@ -87,12 +87,16 @@ class dpage extends MY_Api_Controller {
 	function __construct(){
 		parent::__construct();
 
-		//is someone logged in?
+        if(!$this->as_ion_auth->logged_in()) {
+            $this->sendResponse(401);
+        }
+
+        if(!isset($this->herd)){
+            $this->sendResponse(400,  new ResponseMessage('Please select a herd and try again.', 'error'));
+        }
+
+        //is someone logged in?
 		if($this->herd->herdCode() != $this->config->item('default_herd')){
-			if(!$this->as_ion_auth->logged_in()) {
-                $this->sendResponse(401);
-			}
-			
 			//is a herd selected?
 			if(!$this->herd->herdCode() || $this->herd->herdCode() == ''){
                 $this->sendResponse(400,  new ResponseMessage('Please select a herd and try again.', 'error'));

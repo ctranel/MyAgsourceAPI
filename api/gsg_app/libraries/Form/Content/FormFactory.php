@@ -47,7 +47,6 @@ class FormFactory {
 		if(empty($results)){
 			return false;
 		}
-
 		return $this->createForm($results[0], $herd_code);
 	}
 
@@ -63,6 +62,7 @@ class FormFactory {
     protected function createForm($form_data, $herd_code, $ancestor_form_ids = null){
         $subforms = $this->getSubForms($form_data['form_id'], $herd_code, $ancestor_form_ids);
         $control_data = $this->datasource->getFormControlData($form_data['form_id'], $ancestor_form_ids);
+//var_dump($control_data);
 
         $fc = [];
         if(is_array($control_data) && !empty($control_data) && is_array($control_data[0])){

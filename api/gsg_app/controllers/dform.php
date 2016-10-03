@@ -3,6 +3,9 @@
 
 require_once(APPPATH . 'controllers/dpage.php');
 require_once APPPATH . 'libraries/Settings/SessionSettings.php';
+require_once(APPPATH . 'libraries/Form/Content/FormFactory.php');
+
+use \myagsource\Form\Content\FormFactory;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 class dform extends dpage {
@@ -37,6 +40,11 @@ class dform extends dpage {
 		$this->load->library('form_validation');
 		//$this->form_validation->set_rules('herd_code', 'Herd', 'required|max_length[8]');
 		//$this->form_validation->set_rules('herd_code_fill', 'Type Herd Code');
+        $this->load->model('Forms/setting_model', null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
+        $form_factory = new FormFactory($this->setting_model);
+
+        $form = $form_factory->getSettingForm($form_id, $this->session->userdata('user_id'), $this->session->userdata('herd_code'));
+        $input = $this->input->userInputArray();
 
 		if($this->form_validation->run_input() === true){
             try{
@@ -46,11 +54,7 @@ class dform extends dpage {
                 $this->load->model('supplemental_model');
                 $supplemental_factory = new SupplementalFactory($this->supplemental_model, site_url());
 
-                $this->load->model('Forms/setting_model', null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
-                $form_factory = new FormFactory($this->setting_model);
-                
-                $form = $form_factory->getSettingForm($form_id, $this->session->userdata('user_id'), $this->session->userdata('herd_code'));
-                $form->write($this->input->userInputArray());
+                $form->write($input);
 
                 $resp_msg = [];
                 //$msg = $this->_loadSessionHerd($tmp_arr[0]['herd_code']);
@@ -67,6 +71,9 @@ class dform extends dpage {
                 $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
             }
 		}
+		elseif(!$input || empty($input)){
+            //$form->;
+        }
         $this->sendResponse(400, new ResponseMessage(validation_errors(), 'error'));
 	}
 
@@ -77,9 +84,22 @@ class dform extends dpage {
 	 * @return	void
 	 */
 	function entry($form_id, $json_data = null){
+        $params = [];
+        if(isset($json_data)) {
+            $params = (array)json_decode(urldecode($json_data));
+        }
 		//validate form input
 		$this->load->library('herds');
 		$this->load->library('form_validation');
+//this will actually be passed from client
+$params = ['pen_num' => 9];
+//$params = ['key_value' => 1];
+//var_dump($form, $this->input->userInputArray()); die;
+        $this->load->model('Forms/data_entry_model', null, false, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
+        $form_factory = new FormFactory($this->data_entry_model);
+
+        $form = $form_factory->getForm($form_id, $this->session->userdata('herd_code'));
+        $input = $this->input->userInputArray();
 		//$this->form_validation->set_rules('herd_code', 'Herd', 'required|max_length[8]');
 		//$this->form_validation->set_rules('herd_code_fill', 'Type Herd Code');
 
@@ -91,15 +111,7 @@ class dform extends dpage {
 				$this->load->model('supplemental_model');
 				$supplemental_factory = new SupplementalFactory($this->supplemental_model, site_url());
 
-//this will actually be passed from client
-//$params = ['pen_num' => 1];
-//$params = ['key_value' => 1];
-				$this->load->model('Forms/data_entry_model', null, false, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
-				$form_factory = new FormFactory($this->data_entry_model);
-
-				$form = $form_factory->getForm($form_id, $this->session->userdata('herd_code'));
-//var_dump($form, $this->input->userInputArray()); die;
-				$form->write($this->input->userInputArray());
+				$form->write($input);
 
 				$resp_msg = [];
 				//$msg = $this->_loadSessionHerd($tmp_arr[0]['herd_code']);
@@ -116,41 +128,10 @@ class dform extends dpage {
 				$this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
 			}
 		}
+        elseif(!$input || empty($input)){
+            //$form->getFormByID($form_id);
+            $this->sendResponse(200, $this->message, $form->toArray());
+        }
 		$this->sendResponse(400, new ResponseMessage(validation_errors(), 'error'));
 	}
-
-	public function herd_enrolled($herd_code){
-        //determines type of access for service groups
-        if($this->permissions->hasPermission('View Assign w permission') === false) {
-            $enroll_status = 0;
-            $has_accessed = false;
-        }
-        else{
-            $this->herd = new Herd($this->herd_model, $herd_code);
-            //for now, we want to warn if herd is not enrolled on full product
-            $enroll_status = $this->herd->getHerdEnrollStatus(['AMYA-550', 'AMYA-500', 'APAG-505']);
-            $recent_test = $this->herd->getRecentTest();
-            $has_accessed = $this->access_log->sgHasAccessedTest($this->session->userdata('sg_acct_num'), $herd_code, null, $recent_test);
-        }
-        $this->sendResponse(200, null, json_encode(['enroll_status' => $enroll_status, 'new_test' => !$has_accessed]));
-    }
-
-/* in parent
-	protected function _record_access($event_id){
-		if($this->session->userdata('user_id') === FALSE){
-			return FALSE;
-		}
-		$herd_code = $this->session->userdata('herd_code');
-		$recent_test = $this->session->userdata('recent_test_date');
-		$recent_test = empty($recent_test) ? NULL : $recent_test;
-
-		$this->access_log->writeEntry(
-			$this->as_ion_auth->is_admin(),
-			$event_id,
-			$herd_code,
-			$recent_test,
-			$this->session->userdata('user_id'),
-			$this->session->userdata('active_group_id')
-		);
-	} */
 }

@@ -57,7 +57,7 @@ class ListingFactory implements iListingFactory {
     */
     protected function createListing($listing_data, $herd_code){
         $column_data = $this->datasource->getListingColumnMeta($listing_data['listing_id']);
-        $dataset = $this->datasource->getListingData($listing_data['listing_id']);
+        $dataset = $this->datasource->getListingData($listing_data['listing_id'], implode(', ', array_column($column_data, 'field_name')));
 
         $lc = [];
 //var_dump($column_data);
@@ -67,7 +67,7 @@ class ListingFactory implements iListingFactory {
                 $lc[$d['field_name']] = new ListingColumn($d);
             }
         }
-        return new Listing($listing_data['listing_id'], $lc, $dataset, $listing_data['active']);
+        return new Listing($listing_data['listing_id'], $listing_data['form_id'], $lc, $dataset, $listing_data['active']);
     }
 
     /*

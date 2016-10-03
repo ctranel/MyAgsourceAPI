@@ -43,8 +43,15 @@ class Listing implements iListing
      **/
     protected $columns;
 
-    public function __construct($id, $columns, $dataset, $isactive){
+    /**
+     * form_id
+     * @var int
+     **/
+    protected $form_id;
+
+    public function __construct($id, $form_id, $columns, $dataset, $isactive){
         $this->id = $id;
+        $this->form_id = $form_id;
         $this->isactive = $isactive;
         $this->dataset = $dataset;
         $this->columns = $columns;
@@ -52,6 +59,7 @@ class Listing implements iListing
 
     public function toArray(){
         $ret['isactive'] = $this->isactive;
+        $ret['form_id'] = $this->form_id;
 
         if(isset($this->columns) && is_array($this->columns) && !empty($this->columns)){
             $columns = [];
