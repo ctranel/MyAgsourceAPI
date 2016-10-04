@@ -6,7 +6,7 @@ require_once(APPPATH . 'libraries/dhi/Herd.php');
 require_once(APPPATH . 'libraries/AccessLog.php');
 require_once(APPPATH . 'libraries/Benchmarks/Benchmarks.php');
 require_once(APPPATH . 'libraries/dhi/HerdAccess.php');
-require_once APPPATH . 'libraries/Settings/SessionSettings.php';
+//require_once APPPATH . 'libraries/Settings/Settings.php';
 require_once APPPATH . 'libraries/Api/Response/ResponseMessage.php';
 require_once APPPATH . 'libraries/Site/WebContent/Navigation.php';
 
@@ -14,7 +14,7 @@ use \myagsource\AccessLog;
 use \myagsource\dhi\Herd;
 use \myagsource\Benchmarks\Benchmarks;
 use \myagsource\dhi\HerdAccess;
-use \myagsource\Settings\SessionSettings;
+//use \myagsource\Settings\Settings;
 use \myagsource\Api\Response\ResponseMessage;
 use \myagsource\Site\WebContent\Navigation;
 
@@ -225,12 +225,12 @@ class Change_herd extends MY_Api_Controller {
 		$this->session->set_userdata('herd_code', $this->herd->herdCode());
 		$this->session->set_userdata('recent_test_date', $this->herd->getRecentTest());
 		//load new benchmarks
-		$this->load->model('Forms/setting_model', null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->herd->herdCode()]);
-		$this->load->model('benchmark_model');
-		$benchmarks = new Benchmarks($this->session->userdata('user_id'), $this->herd->herdCode(), $this->herd->header_info($this->herd->herdCode()), $this->setting_model, $this->benchmark_model, []);
+		//$this->load->model('Forms/setting_form_model', null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->herd->herdCode()]);
+		$this->load->model('Settings/benchmark_model', null, false, ['user_id' => $this->session->userdata('user_id'), 'herd_code' => $this->session->userdata('herd_code')]);
+		$benchmarks = new Benchmarks($this->benchmark_model, $this->session->userdata('user_id'), $this->herd->herdCode(), $this->herd->header_info($this->herd->herdCode()), []);
 		$this->session->set_userdata('benchmarks', $benchmarks->getSettingKeyValues());
 
-		//$general_dhi = new SessionSettings($this->session->userdata('user_id'), $this->herd->herdCode(), $this->setting_model, 'general_dhi', []);
+		//$general_dhi = new Settings($this->session->userdata('user_id'), $this->herd->herdCode(), $this->setting_form_model, 'general_dhi', []);
 		//$this->session->set_userdata('general_dhi', $general_dhi->getSettingKeyValues());
 	}
 

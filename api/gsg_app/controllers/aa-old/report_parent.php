@@ -166,13 +166,13 @@ abstract class report_parent extends MY_Controller {
 		$this->load->model('web_content/section_model');
 		$this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
 		$this->load->model('web_content/block_model');
-        $this->load->model('Forms/setting_model', null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
+        $this->load->model('Forms/setting_form_model', null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
 		$this->blocks = new WebBlockFactory($this->block_model);
         //supplemental factory
         $this->load->model('supplemental_model');
         $this->supplemental_factory = new SupplementalFactory($this->supplemental_model, site_url());
 
-		$this->form_factory = new FormFactory($this->setting_model, $this->blocks, $this->supplemental_factory);
+		$this->form_factory = new FormFactory($this->setting_form_model, $this->blocks, $this->supplemental_factory);
 		$this->page_factory = new PageFactory($this->page_model, $this->blocks, $this->form_factory);
 		$section_factory = new SectionFactory($this->section_model, $this->page_factory);
 		
@@ -474,10 +474,10 @@ abstract class report_parent extends MY_Controller {
 		$data['page_supplemental'] = $page_supp->getContent();
 
         if($this->permissions->hasPermission("Set Benchmarks")){
-            $this->load->model('Forms/setting_model', null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
-            $this->load->model('benchmark_model');
+            $this->load->model('Forms/setting_form_model', null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
+            $this->load->model('Settings/benchmark_model');
 
-            $this->benchmarks = new Benchmarks($this->session->userdata('user_id'), $this->input->post('herd_code'), $this->herd_model->header_info($this->herd->herdCode()), $this->setting_model, $this->benchmark_model, $this->session->userdata('benchmarks'));
+            $this->benchmarks = new Benchmarks($this->session->userdata('user_id'), $this->input->post('herd_code'), $this->herd_model->header_info($this->herd->herdCode()), $this->setting_form_model, $this->benchmark_model, $this->session->userdata('benchmarks'));
             $arr_benchmark_data = $this->benchmarks->getFormData($this->session->userdata('benchmarks'));
             if(isset($arr_benchmark_data)){
                 $collapse_data['content'] = $this->load->view('dhi/settings/benchmarks', $arr_benchmark_data, TRUE);

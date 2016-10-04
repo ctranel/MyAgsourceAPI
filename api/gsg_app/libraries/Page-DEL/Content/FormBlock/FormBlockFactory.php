@@ -73,7 +73,7 @@ class FormBlockFactory {
      **/
     protected $herd_code;
     
-    function __construct(\setting_model $datasource, WebBlockFactory $web_block_factory, FormFactory $setting_form_factory, FormFactory $entry_form_factory, SupplementalFactory $supplemental_factory = null, $user_id, $herd_code) {//, \db_field_model $datasource_dbfield
+    function __construct(\setting_form_model $datasource, WebBlockFactory $web_block_factory, FormFactory $setting_form_factory, FormFactory $entry_form_factory, SupplementalFactory $supplemental_factory = null, $user_id, $herd_code) {//, \db_field_model $datasource_dbfield
 		$this->datasource = $datasource;
 		//$this->datasource_dbfield = $datasource_dbfield;
 		$this->supplemental_factory = $supplemental_factory;

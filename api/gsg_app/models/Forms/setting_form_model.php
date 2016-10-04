@@ -2,7 +2,7 @@
 //namespace myagsource\settings;
 /* -----------------------------------------------------------------
  *	CLASS comments
- *  @file: setting_model.php
+ *  @file: setting_form_model.php
  *  @author: kmarshall
  *  @date: Nov 19, 2013
  *
@@ -15,7 +15,7 @@
 require_once(APPPATH . 'models/Forms/iForm_Model.php');
 
 
-class Setting_model extends CI_Model implements iForm_Model {
+class Setting_form_model extends CI_Model implements iForm_Model {
     /**
      * user_id
      * @var int
@@ -121,11 +121,11 @@ class Setting_model extends CI_Model implements iForm_Model {
     public function getSubFormsByParentId($parent_form_id) {
         $results = $this->db
             ->select('f.id AS form_id, scp.name AS scope, f.active, f.dom_id, f.action, sl.list_order, scg.id, scg.parent_id, scg.operator, sc.form_control_name, sc.operator, sc.operand')
-            ->join('users.frm.subform_condition_groups scg', "sl.id = scg.subform_link_id", 'inner')
+            ->join('users.frm.subform_condition_groups scg', "sl.id = scg.subform_link_id AND sl.parent_form_id = " . $parent_form_id, 'inner')
             ->join('users.frm.subform_condition sc', "scg.id = sc.condition_group_id", 'inner')
 
-            ->join('users.setng.settings s', 'sl.parent_control_id = s.id', 'inner')
-            ->join('users.setng.forms_settings fs', 's.id = fs.setting_id AND fs.form_id = ' . $parent_form_id, 'inner')
+            //->join('users.setng.settings s', 'sl.parent_control_id = s.id', 'inner')
+            ->join('users.setng.forms_settings fs', 'sl.form_id = fs.form_id', 'inner')
 
             ->join('users.frm.forms f', "fs.form_id = f.id AND f.active = 1", 'inner')
 

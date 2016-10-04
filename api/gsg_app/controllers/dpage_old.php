@@ -184,13 +184,13 @@ class dpage extends MY_Api_Controller {
         }
         $this->load->model('filter_model');
         $this->filters = new ReportFilters($this->filter_model, $page_id, ['herd_code' => $this->session->userdata('herd_code')] + $params);
-        $this->load->model('Forms/setting_model', null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
+        $this->load->model('Forms/setting_form_model', null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
         //end filters
 
         //benchmarks
         if($this->permissions->hasPermission("Set Benchmarks")){
-            $this->load->model('benchmark_model');
-            $this->benchmarks = new Benchmarks($this->session->userdata('user_id'), $this->herd->herdCode(), $this->herd_model->header_info($this->herd->herdCode()), $this->setting_model, $this->benchmark_model, $this->session->userdata('benchmarks'));
+            $this->load->model('Settings/benchmark_model');
+            $this->benchmarks = new Benchmarks($this->session->userdata('user_id'), $this->herd->herdCode(), $this->herd_model->header_info($this->herd->herdCode()), $this->setting_form_model, $this->benchmark_model, $this->session->userdata('benchmarks'));
         }
 
         // report content
@@ -203,8 +203,8 @@ class dpage extends MY_Api_Controller {
 		$this->report_factory = new ReportFactory($this->report_block_model, $this->db_field_model, $this->filters, $this->supplemental_factory, $data_handler, $db_table_factory);
         $this->report_block_factory = new ReportBlockFactory($this->report_block_model, $this->web_block_factory, $this->report_factory, $this->supplemental_factory);
 
-        $this->form_factory = new FormFactory($this->setting_model, $this->supplemental_factory);
-		$this->form_block_factory = new FormBlockFactory($this->setting_model, $this->web_block_factory, $this->form_factory, $this->supplemental_factory, $this->session->userdata('user_id'), $this->session->userdata('herd_code'));
+        $this->form_factory = new FormFactory($this->setting_form_model, $this->supplemental_factory);
+		$this->form_block_factory = new FormBlockFactory($this->setting_form_model, $this->web_block_factory, $this->form_factory, $this->supplemental_factory, $this->session->userdata('user_id'), $this->session->userdata('herd_code'));
 
         $this->load->model('web_content/page_model');
         $page_data = $this->page_model->getPage($page_id);

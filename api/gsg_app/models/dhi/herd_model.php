@@ -549,7 +549,11 @@ class Herd_model extends CI_Model {
 	 * @author ctranel
 	 **/
 	public function getCowList($herd_code, $id_field){
-		$result = $this->db
+		if(empty($id_field)){
+		    throw new Exception('Cow ID field not specified');
+        }
+
+	    $result = $this->db
 		->select('serial_num')
 		->select($id_field)
 		->where('herd_code', $herd_code)

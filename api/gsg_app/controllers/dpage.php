@@ -135,13 +135,13 @@ class dpage extends MY_Api_Controller {
         }
         $this->load->model('filter_model');
         $this->filters = new ReportFilters($this->filter_model, $page_id, ['herd_code' => $this->session->userdata('herd_code')] + $params);
-        $this->load->model('Forms/setting_model', null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
+        $this->load->model('Forms/setting_form_model', null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
         //end filters
 
         //benchmarks
         if($this->permissions->hasPermission("Set Benchmarks")){
-            $this->load->model('benchmark_model');
-            $benchmarks = new Benchmarks($this->session->userdata('user_id'), $this->herd->herdCode(), $this->herd_model->header_info($this->herd->herdCode()), $this->setting_model, $this->benchmark_model, $this->session->userdata('benchmarks'));
+            $this->load->model('Settings/benchmark_model', null, false, ['user_id' => $this->session->userdata('user_id'), 'herd_code' => $this->session->userdata('herd_code')]);
+            $benchmarks = new Benchmarks($this->benchmark_model, $this->session->userdata('user_id'), $this->herd->herdCode(), $this->herd_model->header_info($this->herd->herdCode()), $this->session->userdata('benchmarks'));
         }
 
         //page content
@@ -154,11 +154,11 @@ class dpage extends MY_Api_Controller {
 
 		//load factories for block content
 		$report_factory = new ReportFactory($this->report_block_model, $this->db_field_model, $this->filters, $supplemental_factory, $data_handler, $db_table_factory);
-		$setting_form_factory = new FormFactory($this->setting_model, $supplemental_factory);
+		$setting_form_factory = new FormFactory($this->setting_form_model, $supplemental_factory);
 
 //this will actually be passed from client
 //$params = ['key_value' => 1];
-$params = ['ID' => 2911100, 'serial_num' => '366']; //for events
+//$params = ['ID' => 2911100, 'serial_num' => '366']; //for events
 
         $this->load->model('Forms/Data_entry_model', null, false, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
 		$entry_form_factory = new FormFactory($this->Data_entry_model, $supplemental_factory);

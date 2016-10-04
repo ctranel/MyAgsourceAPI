@@ -221,10 +221,10 @@ class Index extends report_parent {
         }
 
         if($this->permissions->hasPermission("Set Benchmarks")) {
-            $this->load->model('Forms/setting_model', null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
-            $this->load->model('benchmark_model');
+            $this->load->model('Forms/setting_form_model', null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
+            $this->load->model('Settings/benchmark_model');
             $this->benchmarks = new Benchmarks($this->session->userdata('user_id'), $this->input->post('herd_code'),
-                $this->herd_model->header_info($this->herd->herdCode()), $this->setting_model, $this->benchmark_model,
+                $this->herd_model->header_info($this->herd->herdCode()), $this->setting_form_model, $this->benchmark_model,
                 $this->session->userdata('benchmarks'));
             $arr_benchmark_data = $this->benchmarks->getFormData($this->session->userdata('benchmarks'));
             if (isset($arr_benchmark_data)) {

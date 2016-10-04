@@ -1,8 +1,8 @@
 <?php
 namespace myagsource\Benchmarks;
-require_once APPPATH . 'libraries/Settings/SessionSettings.php';
+require_once APPPATH . 'libraries/Settings/Settings.php';
 
-use myagsource\Settings\SessionSettings;
+use myagsource\Settings\Settings;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /**
@@ -18,7 +18,7 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 *
 */
 
-class Benchmarks extends SessionSettings
+class Benchmarks extends Settings
 {
 	/**
 	 * table object used in benchmarks
@@ -62,9 +62,9 @@ class Benchmarks extends SessionSettings
 	 * @return void
 	 * @author ctranel
 	 **/
-	public function __construct($user_id, $herd_code, $herd_info, \setting_model $setting_model, \Benchmark_model $benchmark_model, $session_benchmarks)
+	public function __construct(\Benchmark_model $benchmark_model, $user_id, $herd_code, $herd_info, $session_benchmarks)
 	{
-		parent::__construct($user_id, $herd_code, $setting_model, 83); //83 is the id of benchmarks setting form page--need to retrive this based on settings name in controller
+		parent::__construct($user_id, $herd_code, $benchmark_model, $session_benchmarks); //83 is the id of benchmarks setting form page--need to retrive this based on settings name in controller
 
 		$this->benchmark_model = $benchmark_model;
 		$this->session_data = $session_benchmarks;
@@ -174,8 +174,7 @@ class Benchmarks extends SessionSettings
 	*  @return void
 	*  @throws:
 	* -----------------------------------------------------------------
-	*/
-	public static function parseFormData($form_data){
+	public function parseFormData($form_data){
 		if($form_data['breed'] !== 'HO'){
 			$form_data['herd_size']['dbfrom'] = '1';
 			$form_data['herd_size']['dbto'] = '100000';
@@ -185,7 +184,8 @@ class Benchmarks extends SessionSettings
 		}
 		return parent::parseFormData($form_data);
 	}
-	
+*/
+
 	/**
 	 * @method addBenchmarkRow
 	 * @description retrieves row(s) of benchmark data into an array

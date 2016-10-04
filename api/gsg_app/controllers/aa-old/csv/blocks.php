@@ -210,7 +210,7 @@ class Blocks extends MY_Controller {
 		$this->section_path = isset($path_parts[$num_parts - 2]) ? $path_parts[$num_parts - 2] . '/' : '/';
 		$this->section = $this->section_factory->getByPath($this->section_path);
         $web_block_factory = new WebBlockFactory($this->WebBlockModel);
-        $form_factory = null;//new FormFactory($this->setting_model, $this->supplemental_factory);
+        $form_factory = null;//new FormFactory($this->setting_form_model, $this->supplemental_factory);
         $this->page_factory = new PageFactory($this->page_model, $web_block_factory, $form_factory);
         $this->section_factory = new SectionFactory($this->section_model, $this->page_factory);
 						
@@ -265,10 +265,10 @@ class Blocks extends MY_Controller {
         //END FILTERS
 
         // benchmarks
-        $this->load->model('Forms/setting_model', null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
+        $this->load->model('Forms/setting_form_model', null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
         $herd_info = $this->herd_model->header_info($this->herd->herdCode());
-        $this->load->model('benchmark_model');
-        $this->benchmarks = new Benchmarks($this->session->userdata('user_id'), $this->input->post('herd_code'), $herd_info, $this->setting_model, $this->benchmark_model, $this->session->userdata('benchmarks'));
+        $this->load->model('Settings/benchmark_model');
+        $this->benchmarks = new Benchmarks($this->session->userdata('user_id'), $this->input->post('herd_code'), $herd_info, $this->setting_form_model, $this->benchmark_model, $this->session->userdata('benchmarks'));
         // end benchmarks
 
         //Set report block factory

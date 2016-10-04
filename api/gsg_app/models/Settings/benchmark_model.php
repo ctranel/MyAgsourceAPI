@@ -8,12 +8,15 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 *  -----------------------------------------------------------------
 */
 
-class Benchmark_model extends CI_Model {
+require_once(APPPATH . 'models/Settings/settings_model.php');
+
+
+class Benchmark_model extends Settings_model {
 	//db object for views
 	protected $bench_criteria_database;
 	
-	public function __construct(){
-		parent::__construct();
+	public function __construct($args){
+		parent::__construct($args);
 	}
 
 	/**

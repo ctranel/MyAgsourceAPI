@@ -58,9 +58,9 @@ class Benchmark extends MY_Controller {
 			
 			//if set default, write to database
 			if($make_default){
-				$this->load->model('Forms/setting_model', null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
-				$this->load->model('benchmark_model');
-				$benchmarks = new Benchmarks($this->session->userdata('user_id'), $this->session->userdata('herd_code'), $this->herd_model->header_info($this->session->userdata('herd_code')), $this->setting_model, $this->benchmark_model, $this->session->userdata('benchmarks'));
+				$this->load->model('Forms/setting_form_model', null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
+				$this->load->model('Settings/benchmark_model');
+				$benchmarks = new Benchmarks($this->session->userdata('user_id'), $this->session->userdata('herd_code'), $this->herd_model->header_info($this->session->userdata('herd_code')), $this->setting_form_model, $this->benchmark_model, $this->session->userdata('benchmarks'));
 				$benchmarks->save_as_default($formatted_form_data);
 			}
 			exit;

@@ -3,10 +3,10 @@ require_once(APPPATH . 'libraries/dhi/HerdAccess.php');
 require_once(APPPATH . 'libraries/dhi/Herd.php');
 require_once(APPPATH . 'libraries/AccessLog.php');
 require_once(APPPATH . 'libraries/Notifications/Notifications.php');
-require_once APPPATH . 'libraries/Settings/SessionSettings.php';
+require_once APPPATH . 'libraries/Settings/Settings.php';
 require_once(APPPATH . 'libraries/Benchmarks/Benchmarks.php');
 
-use myagsource\Settings\SessionSettings;
+use myagsource\Settings\Settings;
 use \myagsource\dhi\HerdAccess;
 use \myagsource\dhi\Herd;
 use \myagsource\AccessLog;
@@ -82,8 +82,8 @@ class Forms extends MY_Controller {
 		//form validation is handled by the controller to which the form is submitted
 		
 		//get setting data and load form
-		$this->load->model('Forms/setting_model', null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
-		$this->settings = new SessionSettings($this->session->userdata('user_id'), $this->session->userdata('herd_code'), $this->setting_model, 'general_dhi', $this->session->userdata('general_dhi')); //last optional param is session_values
+		$this->load->model('Forms/setting_form_model', null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
+		$this->settings = new Settings($this->session->userdata('user_id'), $this->session->userdata('herd_code'), $this->setting_form_model, 'general_dhi', $this->session->userdata('general_dhi')); //last optional param is session_values
 		$settings_data = $this->settings->getFormData($this->session->userdata('dhi_settings')); 
 		
 		if(isset($settings_data)){
@@ -122,9 +122,9 @@ class Forms extends MY_Controller {
 		//form validation is handled by the controller to which the form is submitted
 
 		//get benchmark data and load form
-		$this->load->model('Forms/setting_model', null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
-		$this->load->model('benchmark_model');
-		$this->benchmarks = new Benchmarks($this->session->userdata('user_id'), $this->input->post('herd_code'), $this->herd_model->header_info($this->herd->herdCode()), $this->setting_model, $this->benchmark_model, $this->session->userdata('benchmarks'));
+		$this->load->model('Forms/setting_form_model', null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
+		$this->load->model('Settings/benchmark_model');
+		$this->benchmarks = new Benchmarks($this->session->userdata('user_id'), $this->input->post('herd_code'), $this->herd_model->header_info($this->herd->herdCode()), $this->setting_form_model, $this->benchmark_model, $this->session->userdata('benchmarks'));
 		$arr_benchmark_data = $this->benchmarks->getFormData($this->session->userdata('benchmarks')); 
 		if(isset($arr_benchmark_data)){
 			$page_data['form'] = $this->load->view('dhi/settings/benchmarks', $arr_benchmark_data, TRUE);

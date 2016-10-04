@@ -52,35 +52,19 @@ class listings extends dpage {
         $web_block_factory = new WebBlockFactory($this->block_model);
 
         //filters
-        $params = [];
-        if(isset($json_filter_data)) {
-            $params = (array)json_decode(urldecode($json_filter_data));
-        }
+        //$params = [];
+        //if(isset($json_filter_data)) {
+        //    $params = (array)json_decode(urldecode($json_filter_data));
+        //}
 
         //page content
         $this->load->model('ReportContent/report_block_model');
-        //$this->load->model('Datasource/db_field_model');
-        //$this->load->model('ReportContent/report_data_model');
-        //$this->load->model('Datasource/db_table_model');
-        //$data_handler = new DataHandler($this->report_data_model, null);
-        //$db_table_factory = new DbTableFactory($this->db_table_model);
-
-		//load factories for block content
-		//$report_factory = new ReportFactory($this->report_block_model, $this->db_field_model, $this->filters, $supplemental_factory, $data_handler, $db_table_factory);
-		//$setting_form_factory = new FormFactory($this->setting_model, $supplemental_factory);
 
         $this->load->model('Listings/herd_options_model', null, false, ['herd_code'=>$this->session->userdata('herd_code')]);
 		$option_listing_factory = new ListingFactory($this->herd_options_model);
 
         //create block content
-        //$reports = $report_factory->getByPage($page_id);
-        //$setting_forms = $setting_form_factory->getByPage($page_id);
         $listings = $option_listing_factory->getByPage($page_id);
-
-        //combine and sort
-        //$block_content = $reports + $setting_forms + $entry_forms;
-        //ksort($block_content);
-        //unset($report_factory, $setting_form_factory, $entry_form_factory, $reports, $setting_forms, $entry_forms);
 
         //create blocks for content
         $blocks = $web_block_factory->getBlocksFromContent($page_id, $listings);

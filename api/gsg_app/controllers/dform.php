@@ -2,10 +2,11 @@
 //namespace myagsource;
 
 require_once(APPPATH . 'controllers/dpage.php');
-require_once APPPATH . 'libraries/Settings/SessionSettings.php';
+require_once APPPATH . 'libraries/Settings/Settings.php';
 require_once(APPPATH . 'libraries/Form/Content/FormFactory.php');
 
 use \myagsource\Form\Content\FormFactory;
+use \myagsource\Api\Response\ResponseMessage;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 class dform extends dpage {
@@ -40,8 +41,8 @@ class dform extends dpage {
 		$this->load->library('form_validation');
 		//$this->form_validation->set_rules('herd_code', 'Herd', 'required|max_length[8]');
 		//$this->form_validation->set_rules('herd_code_fill', 'Type Herd Code');
-        $this->load->model('Forms/setting_model', null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
-        $form_factory = new FormFactory($this->setting_model);
+        $this->load->model('Forms/setting_form_model', null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
+        $form_factory = new FormFactory($this->setting_form_model);
 
         $form = $form_factory->getSettingForm($form_id, $this->session->userdata('user_id'), $this->session->userdata('herd_code'));
         $input = $this->input->userInputArray();
@@ -86,10 +87,13 @@ class dform extends dpage {
 	 * @return	void
 	 */
 	function get_entry($form_id, $json_data = null){
+//var_dump(urldecode($json_data));
+//var_dump(json_decode(urldecode($json_data)));
         $params = [];
         if(isset($json_data)) {
             $params = (array)json_decode(urldecode($json_data));
         }
+//var_dump($params);
 
         if(empty(array_filter($params))){
             $this->sendResponse(400, new ResponseMessage("No identifying information received", 'error'));

@@ -2,9 +2,9 @@
 /*
  * Form-processing controller.  Does not load a new page, only gives JSON response to the form submission
  */
-require_once APPPATH . 'libraries/Settings/SessionSettings.php';
+require_once APPPATH . 'libraries/Settings/Settings.php';
 
-use myagsource\Settings\SessionSettings;
+use myagsource\Settings\Settings;
 
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
@@ -43,15 +43,15 @@ class General extends MY_Controller {
 			
 			$make_default = $this->input->post('make_default');
 			
-			$formatted_form_data = SessionSettings::parseFormData($fields);
+			$formatted_form_data = Settings::parseFormData($fields);
 	
 				//set session benchmarks
 			$this->session->set_userdata('general_dhi', $formatted_form_data);
 			
 			//if set default, write to database
 			if($make_default){
-				$this->load->model('Forms/setting_model', null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
-				$settings = new SessionSettings($this->session->userdata('user_id'), $this->session->userdata('herd_code'), $this->setting_model, 'general_dhi_settings', $this->session->userdata('general_dhi'));
+				$this->load->model('Forms/setting_form_model', null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
+				$settings = new Settings($this->session->userdata('user_id'), $this->session->userdata('herd_code'), $this->setting_form_model, 'general_dhi_settings', $this->session->userdata('general_dhi'));
 				$settings->save_as_default($formatted_form_data);
 			}
 	

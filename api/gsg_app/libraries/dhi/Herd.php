@@ -246,8 +246,9 @@ class Herd
 		}
 		$return = [];
 		foreach($cows as $c){
-			$return[$c['serial_num']] = $c[$value_field];
+			$return[] = (Object)[$c['serial_num'] => $c[$value_field]];
 		}
+//		var_dump($return);
 		return $return;
 	}
 }

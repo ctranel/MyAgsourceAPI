@@ -54,8 +54,8 @@ class Demo extends MY_Controller {
 //		$this->session->set_userdata('arr_breeds', $this->herd_model->breedArray($this->herd->getHerdCode()));
 		$this->session->set_userdata('recent_test_date', $this->herd->getRecentTest());
 		//load new benchmarks
-		$this->load->model('setting_model');
-		$benchmarks_lib = new Benchmarks($this->session->userdata('user_id'), $this->input->post('herd_code'), $this->herd->header_info($this->input->post('herd_code')), $this->setting_model);
+		$this->load->model('setting_form_model');
+		$benchmarks_lib = new Benchmarks($this->session->userdata('user_id'), $this->input->post('herd_code'), $this->herd->header_info($this->input->post('herd_code')), $this->setting_form_model);
 		$this->session->set_userdata('benchmarks', $benchmarks_lib->getSettingKeyValues());
 	} */
 }
