@@ -7,6 +7,7 @@ require_once(APPPATH . 'libraries/Form/Content/FormFactory.php');
 
 use \myagsource\Form\Content\FormFactory;
 use \myagsource\Api\Response\ResponseMessage;
+use \myagsource\Supplemental\Content\SupplementalFactory;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 class dform extends dpage {
@@ -39,10 +40,14 @@ class dform extends dpage {
 		//validate form input
         $this->load->library('herds');
 		$this->load->library('form_validation');
-		//$this->form_validation->set_rules('herd_code', 'Herd', 'required|max_length[8]');
+        //supplemental factory
+        $this->load->model('supplemental_model');
+        $supplemental_factory = new SupplementalFactory($this->supplemental_model, site_url());
+
+        //$this->form_validation->set_rules('herd_code', 'Herd', 'required|max_length[8]');
 		//$this->form_validation->set_rules('herd_code_fill', 'Type Herd Code');
-        $this->load->model('Forms/setting_form_model', null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
-        $form_factory = new FormFactory($this->setting_form_model);
+        $this->load->model('Forms/setting_form_model');//, null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
+        $form_factory = new FormFactory($this->setting_form_model, $supplemental_factory, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
 
         $form = $form_factory->getSettingForm($form_id, $this->session->userdata('user_id'), $this->session->userdata('herd_code'));
         $input = $this->input->userInputArray();
@@ -51,10 +56,6 @@ class dform extends dpage {
             try{
                 //get form object
                 //@todo: split form core from form display (core would be included in display), no need for web content or supplemental here
-                //supplemental factory
-                $this->load->model('supplemental_model');
-                $supplemental_factory = new SupplementalFactory($this->supplemental_model, site_url());
-
                 $form->write($input);
 
                 $resp_msg = [];
@@ -87,23 +88,22 @@ class dform extends dpage {
 	 * @return	void
 	 */
 	function get_entry($form_id, $json_data = null){
-//var_dump(urldecode($json_data));
-//var_dump(json_decode(urldecode($json_data)));
         $params = [];
         if(isset($json_data)) {
             $params = (array)json_decode(urldecode($json_data));
         }
-//var_dump($params);
 
         if(empty(array_filter($params))){
             $this->sendResponse(400, new ResponseMessage("No identifying information received", 'error'));
         }
 
 		//validate form input
+        $this->load->model('supplemental_model');
+        $supplemental_factory = new SupplementalFactory($this->supplemental_model, site_url());
 		$this->load->library('herds');
 		$this->load->library('form_validation');
-        $this->load->model('Forms/data_entry_model', null, false, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
-        $form_factory = new FormFactory($this->data_entry_model);
+        $this->load->model('Forms/data_entry_model');
+        $form_factory = new FormFactory($this->data_entry_model, $supplemental_factory, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
 
         $form = $form_factory->getForm($form_id, $this->session->userdata('herd_code'));
 
@@ -124,10 +124,12 @@ class dform extends dpage {
             $params = (array)json_decode(urldecode($json_data));
         }
         //validate form input
+        $this->load->model('supplemental_model');
+        $supplemental_factory = new SupplementalFactory($this->supplemental_model, site_url());
         $this->load->library('herds');
         $this->load->library('form_validation');
-        $this->load->model('Forms/data_entry_model', null, false, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
-        $form_factory = new FormFactory($this->data_entry_model);
+        $this->load->model('Forms/data_entry_model');//, null, false, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
+        $form_factory = new FormFactory($this->data_entry_model, $supplemental_factory, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
 
         $form = $form_factory->getForm($form_id, $this->session->userdata('herd_code'));
         $input = $this->input->userInputArray();

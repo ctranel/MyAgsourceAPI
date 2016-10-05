@@ -29,15 +29,6 @@ class Settings {
 	protected $herd_code;
 		
 	/**
-	 * page_id
-	 *
-	 * Pages are used to categorize settings
-	 * 
-	 * @var int
-	 */
-	//protected $page_id;
-		
-	/**
 	 * array of settings objects
 	 * 
 	 * @var object
@@ -55,17 +46,16 @@ class Settings {
 	 * array session_values
 	 *
 	 * @var array
+     */
 	protected $session_values;
-	 */
-	
+
 	
 	function __construct($user_id, $herd_code, $setting_model, $session_values = NULL) {
 		$this->user_id = $user_id;
 		$this->herd_code = $herd_code;
 		$this->setting_model = $setting_model;
-		//$this->page_id = $page_id;
 		$this->loadSettings($session_values);
-		//$this->session_values = $session_values;
+		$this->session_values = $session_values;
 	}
 
 	public function toArray(){
@@ -138,7 +128,7 @@ class Settings {
 	* -----------------------------------------------------------------
 	*/
 	protected function loadSettings(){
-		$setting_data = $this->setting_model->getSettingsData();
+		$setting_data = $this->setting_model->getSettingsData($this->user_id, $this->herd_code);
 		foreach($setting_data as $s){
 			$this->arr_settings[$s['name']] = new Setting($s, $this->setting_model);
 		}

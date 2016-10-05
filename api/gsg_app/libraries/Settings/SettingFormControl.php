@@ -30,8 +30,8 @@ class SettingFormControl extends FormControl {
     protected $for_herd;
 
 
-    function __construct($datasource, $control_data, $subforms = null) {
-        parent::__construct($datasource, $control_data, $subforms);
+    function __construct($control_data, $options = null, $subforms = null) {
+        parent::__construct($control_data, $options, $subforms);
         $this->for_user = (boolean)$control_data['for_user'];
         $this->for_herd = (boolean)$control_data['for_herd'];
     }

@@ -9,22 +9,9 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 */
 
 class Settings_model extends CI_Model {
-    /**
-     * user_id
-     * @var int
-     **/
-    protected $user_id;
 
-    /**
-     * herd_code
-     * @var string
-     **/
-    protected $herd_code;
-
-    public function __construct($args){
+    public function __construct(){
 		parent::__construct();
-        $this->user_id = $args['user_id'];
-        $this->herd_code = $args['herd_code'];
 	}
 
 	/**
@@ -34,14 +21,14 @@ class Settings_model extends CI_Model {
 	 * @access protected
 	 *
 	 **/
-	public function getSettingsData(){
-        if(isset($this->user_id) && $this->user_id != FALSE){
+	public function getSettingsData($user_id, $herd_code){
+        if(isset($user_id) && $user_id != FALSE){
             $this->db
-                ->join('users.setng.user_herd_settings uhs', "s.id = uhs.setting_id AND (uhs.user_id = " . $this->user_id . " OR uhs.user_id IS NULL) AND (uhs.herd_code = '" . $this->herd_code . "' OR uhs.herd_code IS NULL)", 'left');
+                ->join('users.setng.user_herd_settings uhs', "s.id = uhs.setting_id AND (uhs.user_id = " . $user_id . " OR uhs.user_id IS NULL) AND (uhs.herd_code = '" . $herd_code . "' OR uhs.herd_code IS NULL)", 'left');
         }
         else{
             $this->db
-                ->join('users.setng.user_herd_settings uhs', "s.id = uhs.setting_id AND uhs.user_id IS NULL AND (uhs.herd_code = '" . $this->herd_code . "' OR uhs.herd_code IS NULL)", 'left');
+                ->join('users.setng.user_herd_settings uhs', "s.id = uhs.setting_id AND uhs.user_id IS NULL AND (uhs.herd_code = '" . $herd_code . "' OR uhs.herd_code IS NULL)", 'left');
         }
 		$ret = $this->db
             ->select('s.id, s.name, s.label, uhs.value, s.default_value, c.name AS control_type')

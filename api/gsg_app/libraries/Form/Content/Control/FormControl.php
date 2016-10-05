@@ -77,43 +77,35 @@ class FormControl implements iFormControl
      **/
     protected $subforms;
 
-    /**
-     * datasource
-     * @var CI_Model
-     **/
-    protected $datasource;
-
     //@todo: implement validators
-    public function __construct($datasource, $control_data, $subforms = null){
-        $this->datasource = $datasource;
+    public function __construct($control_data, $options = null, $subforms = null){
         $this->id = $control_data['id'];
         $this->name = $control_data['name'];
         $this->label = $control_data['label'];
-        $this->value = $control_data['value'];
+        $this->value = isset($control_data['value']) ? $control_data['value'] : $control_data['default_value'];
         $this->control_type = $control_data['control_type'];
+        $this->options = $options;
         $this->subforms = $subforms;
         //handle ranges
         if($this->control_type === 'range'){
-            if(strpos($control_data['value'], '|') !== false){
+            if(strpos($this->value, '|') !== false){
                 $tmp = [];
-                list($tmp['dbfrom'], $tmp['dbto']) = explode('|', $control_data['value']);
-                $control_data['value'] = $tmp;
+                list($tmp['dbfrom'], $tmp['dbto']) = explode('|', $this->value);
+                $this->value = $tmp;
             }
             else{
-                $control_data['value'] = null;
+                $this->value = null;
             }
         }
         //if type is array and value is not an array, wrap it in an array
-        if(strpos($this->control_type, 'array') !== false && isset($control_data['value']) && !is_array($control_data['value'])){
-            if(strpos($control_data['value'], '|')){
-                $control_data['value'] = explode('|', $control_data['value']);
+        if(strpos($this->control_type, 'array') !== false && isset($this->value) && !is_array($this->value)){
+            if(strpos($this->value, '|')){
+                $this->value = explode('|', $this->value);
             }
             else{
-                $control_data['value'] = [$control_data['value']];
+                $this->value = [$this->value];
             }
         }
-        $this->value = $control_data['value'];
-
 
         //set default value
         //handle ranges
@@ -137,10 +129,6 @@ class FormControl implements iFormControl
             }
         }
         $this->default_value = $control_data['default_value'];
-
-        if(strpos($this->control_type, 'lookup') !== false){
-            $this->loadLookupOptions();
-        }
     }
 
     /* -----------------------------------------------------------------
@@ -300,48 +288,6 @@ class FormControl implements iFormControl
             return false;
         }
         return $this->options;
-    }
-
-    /* -----------------------------------------------------------------
-    *  Loads all options
-    
-    *  Returns all options
-    
-    *  @since: version 1
-    *  @author: ctranel
-    *  @date: Jun 26, 2014
-    *  @param: string setting name
-    *  @return array of key=>value pairs
-    *  @throws:
-    * -----------------------------------------------------------------
-    */
-    protected function loadLookupOptions(){
-        if(strpos($this->control_type, 'lookup') === false){
-            return false;
-        }
-        if(strpos($this->control_type, 'data_lookup') !== false){
-            $options = $this->datasource->getLookupOptions($this->id);
-        }
-        if(strpos($this->control_type, 'herd_lookup') !== false){
-            $options = $this->datasource->getHerdLookupOptions($this->id);
-        }
-        if(strpos($this->control_type, 'animal_lookup') !== false){
-            $options = $this->datasource->getAnimalLookupOptions($this->id);
-        }
- //var_dump($options);
-//echo $this->name;
-        if(isset($options) && is_array($options) && !empty($options)){
-            $keys = array_keys($options[0]);
-            foreach($options as $o){
-                //if(isset($o['value'])){
-                    $this->options[] = ['value' => $o[$keys[0]], 'text' => $o[$keys[1]]];
-                //}
-                //else{
-                //    $this->options[] = ['value' => $o['key_value'], 'text' => $o['description']];
-                //}
-            }
-        }
-//        var_dump($this->options);
     }
 
     /* -----------------------------------------------------------------

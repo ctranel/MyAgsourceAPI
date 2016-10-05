@@ -210,7 +210,7 @@ class Blocks extends MY_Controller {
 		$this->section_path = isset($path_parts[$num_parts - 2]) ? $path_parts[$num_parts - 2] . '/' : '/';
 		$this->section = $this->section_factory->getByPath($this->section_path);
         $web_block_factory = new WebBlockFactory($this->WebBlockModel);
-        $form_factory = null;//new FormFactory($this->setting_form_model, $this->supplemental_factory);
+        $form_factory = null;//new FormFactory($this->setting_form_model, $this->supplemental_factory, $params);
         $this->page_factory = new PageFactory($this->page_model, $web_block_factory, $form_factory);
         $this->section_factory = new SectionFactory($this->section_model, $this->page_factory);
 						

@@ -226,7 +226,7 @@ class Herd_options_model extends CI_Model {
 
             SELECT TOP 1 @db_table_name = CONCAT(db.name, '.',  tbl.db_schema, '.', tbl.name)
                 from users.options.listings_columns lc
-                inner join users.dbo.db_fields fld ON lc.db_field_id = fld.id AND lc.listing_id = 1
+                inner join users.dbo.db_fields fld ON lc.db_field_id = fld.id AND lc.listing_id = " . $listing_id . "
                 inner join users.dbo.db_tables tbl ON fld.db_table_id = tbl.id AND allow_update = 1
                 inner join users.dbo.db_databases db ON tbl.database_id = db.id
 

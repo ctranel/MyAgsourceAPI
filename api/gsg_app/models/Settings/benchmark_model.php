@@ -15,8 +15,8 @@ class Benchmark_model extends Settings_model {
 	//db object for views
 	protected $bench_criteria_database;
 	
-	public function __construct($args){
-		parent::__construct($args);
+	public function __construct(){
+		parent::__construct();
 	}
 
 	/**

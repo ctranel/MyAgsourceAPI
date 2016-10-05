@@ -31,8 +31,15 @@ class FormFactory {
 	 **/
 	protected $datasource;
 
-	function __construct(\iForm_Model $datasource, SupplementalFactory $supplemental_factory = null) {//, \db_field_model $datasource_dbfield
+    /**
+     * params for identify data that populates form
+     * @var array
+     **/
+    protected $key_params;
+
+    function __construct(\iForm_Model $datasource, SupplementalFactory $supplemental_factory = null, $key_params = null) {//, \db_field_model $datasource_dbfield
 		$this->datasource = $datasource;
+        $this->key_params = $key_params;
 	}
 	
 	/*
@@ -61,17 +68,68 @@ class FormFactory {
     */
     protected function createForm($form_data, $herd_code, $ancestor_form_ids = null){
         $subforms = $this->getSubForms($form_data['form_id'], $herd_code, $ancestor_form_ids);
-        $control_data = $this->datasource->getFormControlData($form_data['form_id'], $ancestor_form_ids);
-//var_dump($control_data);
+
+        //this function depends on an existing record
+        $control_data = $this->datasource->getFormControlData($form_data['form_id'], $this->key_params, $ancestor_form_ids);
 
         $fc = [];
         if(is_array($control_data) && !empty($control_data) && is_array($control_data[0])){
             foreach($control_data as $d){
                 $s = isset($subforms[$d['name']]) ? $subforms[$d['name']] : null;
-                $fc[] = new FormControl($this->datasource, $d, $s);
+                $options = null;
+                if(strpos($d['control_type'], 'lookup') !== false){
+                    $options = $this->getLookupOptions($d['id'], $d['control_type']);
+                }
+                $fc[] = new FormControl($d, $options, $s);
             }
         }
         return new Form($form_data['form_id'], $this->datasource, $fc, $form_data['dom_id'], $form_data['action'], $herd_code);
+    }
+
+    /* -----------------------------------------------------------------
+*  getLookupOptions
+
+*  Returns all options
+
+*  @since: version 1
+*  @author: ctranel
+*  @date: Jun 26, 2014
+*  @param: string setting name
+*  @return array of key=>value pairs
+*  @throws:
+* -----------------------------------------------------------------
+*/
+    protected function getLookupOptions($control_id, $control_type){
+        if(strpos($control_type, 'lookup') === false){
+            return false;
+        }
+
+        if(strpos($control_type, 'data_lookup') !== false){
+            $options = $this->datasource->getLookupOptions($control_id);
+        }
+        $herd_code = isset($this->key_params['herd_code']) ? $this->key_params['herd_code'] : null;
+        if(strpos($control_type, 'herd_lookup') !== false && isset($herd_code)){
+            $options = $this->datasource->getHerdLookupOptions($control_id, $herd_code);
+        }
+        $serial_num = isset($this->key_params['serial_num']) ? $this->key_params['serial_num'] : null;
+        if(strpos($control_type, 'animal_lookup') !== false && isset($herd_code) && isset($serial_num)){
+            $options = $this->datasource->getAnimalLookupOptions($control_id, $herd_code, $serial_num);
+        }
+        $ret = [];
+
+        if(isset($options) && is_array($options) && !empty($options)){
+            $keys = array_keys($options[0]);
+            foreach($options as $o){
+                //if(isset($o['value'])){
+                $ret[] = ['value' => $o[$keys[0]], 'text' => $o[$keys[1]]];
+                //}
+                //else{
+                //    $this->options[] = ['value' => $o['key_value'], 'text' => $o['description']];
+                //}
+            }
+        }
+
+        return $ret;
     }
 
     protected function getSubForms($parent_form_id, $herd_code, $ancestor_form_ids = null){
@@ -125,13 +183,17 @@ class FormFactory {
      */
     protected function createSettingForm($form_data, $user_id, $herd_code, $ancestor_form_ids = null){
         $subforms = $this->getSettingSubForms($form_data['form_id'], $user_id, $herd_code, $ancestor_form_ids);
-        $control_data = $this->datasource->getFormControlData($form_data['form_id'], $ancestor_form_ids);
+        $control_data = $this->datasource->getFormControlData($form_data['form_id'], $this->key_params, $ancestor_form_ids);
 
         $fc = [];
         if(is_array($control_data) && !empty($control_data) && is_array($control_data[0])){
             foreach($control_data as $d){
                 $sf = isset($subforms[$d['name']]) ? $subforms[$d['name']] : null;
-                $fc[] = new SettingFormControl($this->datasource, $d, $sf);
+                $options = null;
+                if(strpos($d['control_type'], 'lookup') !== false){
+                    $options = $this->getLookupOptions($d['id'], $d['control_type']);
+                }
+                $fc[] = new SettingFormControl($d, $options, $sf);
             }
         }
         return new SettingForm($form_data['form_id'], $this->datasource, $fc, $form_data['dom_id'], $form_data['action'],$user_id, $herd_code);

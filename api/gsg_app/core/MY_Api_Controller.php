@@ -20,8 +20,8 @@ require_once(APPPATH . 'libraries/Permissions/Permissions/ProgramPermissions.php
 
 use \myagsource\AccessLog;
 //use \myagsource\Site\WebContent\SectionFactory;
-use \myagsource\Api\Response\Response;
 use \myagsource\Settings\Settings;
+use \myagsource\Api\Response\Response;
 //use \myagsource\Site\WebContent\PageFactory;
 //use \myagsource\Site\WebContent\WebBlockFactory;
 use \myagsource\dhi\Herd;
@@ -88,7 +88,7 @@ class MY_Api_Controller extends CI_Controller
 
         $this->load->library('session');
         $this->load->library('carabiner');
-        $this->load->model('Settings/settings_model', null, false, ['user_id' => $this->session->userdata('user_id'), 'herd_code' => $this->session->userdata('herd_code')]);
+        $this->load->model('Settings/settings_model', null, false, ['user-id' => $this->session->userdata('user_id'), 'herd_code' => $this->session->userdata('herd_code')]);
         $this->load->model('web_content/section_model');
         $this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
         $this->load->model('web_content/block_model');
@@ -100,7 +100,7 @@ class MY_Api_Controller extends CI_Controller
         $this->herd_access = new HerdAccess($this->herd_model);
 
         $this->settings = new Settings($this->session->userdata('user_id'), $this->session->userdata('herd_code'), $this->settings_model);
-//var_dump($this->settings->getSettings());
+
         if($this->session->userdata('herd_code')){
             $this->herd = new Herd($this->herd_model, $this->session->userdata('herd_code'));
         }

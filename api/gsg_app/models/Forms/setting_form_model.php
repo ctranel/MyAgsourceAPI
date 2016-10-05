@@ -16,23 +16,9 @@ require_once(APPPATH . 'models/Forms/iForm_Model.php');
 
 
 class Setting_form_model extends CI_Model implements iForm_Model {
-    /**
-     * user_id
-     * @var int
-     **/
-    protected $user_id;
 
-    /**
-     * herd_code
-     * @var string
-     **/
-    protected $herd_code;
-
-
-    public function __construct($args){
+    public function __construct(){
 		parent::__construct();
-        $this->user_id = $args['user_id'];
-        $this->herd_code = $args['herd_code'];
 	}
 
 
@@ -41,14 +27,13 @@ class Setting_form_model extends CI_Model implements iForm_Model {
      * @param mixed int/string page_id or form name
      * @return string category
      * @author ctranel
-     **/
-    public function getSettingsByPage($page_id) {
-        if(isset($this->user_id) && $this->user_id !== FALSE){
-            $uhs_join_cond = "s.id = uhs.setting_id AND uhs.user_id = " . $this->user_id . " AND uhs.herd_code = '" . $this->herd_code . "'";
-            $uhs_where = "(uhs.user_id = " . $this->user_id . " OR uhs.user_id IS NULL)";
+    public function getSettingsByPage($page_id, $user_id, $herd_code) {
+        if(isset($user_id) && $user_id !== FALSE){
+            $uhs_join_cond = "s.id = uhs.setting_id AND uhs.user_id = " . $user_id . " AND uhs.herd_code = '" . $herd_code . "'";
+            $uhs_where = "(uhs.user_id = " . $user_id . " OR uhs.user_id IS NULL)";
         }
         else{
-            $uhs_join_cond = "s.id = uhs.setting_id AND uhs.user_id IS NULL AND uhs.herd_code = '" . $this->herd_code . "'";
+            $uhs_join_cond = "s.id = uhs.setting_id AND uhs.user_id IS NULL AND uhs.herd_code = '" . $herd_code . "'";
             $uhs_where = "uhs.user_id IS NULL";
         }
 
@@ -86,11 +71,12 @@ class Setting_form_model extends CI_Model implements iForm_Model {
                 LEFT JOIN users.setng.user_herd_settings uhs ON s.id = uhs.setting_id AND uhs.user_id = 1 AND uhs.herd_code = '35371684'
                 INNER JOIN users.frm.control_types t ON s.type_id = t.id 
             WHERE " . $uhs_where . "
-            AND (uhs.herd_code = '" . $this->herd_code . "' OR uhs.herd_code IS NULL)";
+            AND (uhs.herd_code = '" . $herd_code . "' OR uhs.herd_code IS NULL)";
 //die($sql);
         $results = $this->db->query($sql)->result_array();
         return $results;
     }
+**/
 
     /**
      * getFormsByPage
@@ -164,19 +150,21 @@ class Setting_form_model extends CI_Model implements iForm_Model {
      * @return string category
      * @author ctranel
      **/
-    public function getFormControlData($form_id) {
+    public function getFormControlData($form_id, $key_params) {
+        $herd_code = $key_params['herd_code'];
+
         $this->db
             ->select('s.id, t.name AS control_type, s.name, s.label, s.default_value, s.for_user, s.for_herd, uhs.value') //, f.name AS category, s.dom_id
             ->join('users.setng.settings s', "fs.setting_id = s.id AND fs.form_id = " . $form_id, 'inner');
 
-        if(isset($this->user_id) && $this->user_id != FALSE){
+        if(isset($user_id) && $user_id != FALSE){
             $this->db
-                ->join('users.setng.user_herd_settings uhs', "s.id = uhs.setting_id AND (uhs.user_id = " . $this->user_id . " OR uhs.user_id IS NULL) AND (uhs.herd_code = '" . $this->herd_code . "' OR uhs.herd_code IS NULL)", 'left');
-                //->where("(uhs.user_id = " . $this->user_id . " OR uhs.user_id IS NULL)");
+                ->join('users.setng.user_herd_settings uhs', "s.id = uhs.setting_id AND (uhs.user_id = " . $user_id . " OR uhs.user_id IS NULL) AND (uhs.herd_code = '" . $herd_code . "' OR uhs.herd_code IS NULL)", 'left');
+                //->where("(uhs.user_id = " . $user_id . " OR uhs.user_id IS NULL)");
         }
         else{
             $this->db
-                ->join('users.setng.user_herd_settings uhs', "s.id = uhs.setting_id AND uhs.user_id IS NULL AND (uhs.herd_code = '" . $this->herd_code . "' OR uhs.herd_code IS NULL)", 'left');
+                ->join('users.setng.user_herd_settings uhs', "s.id = uhs.setting_id AND uhs.user_id IS NULL AND (uhs.herd_code = '" . $herd_code . "' OR uhs.herd_code IS NULL)", 'left');
                 //->where("uhs.user_id IS NULL");
         }
 
