@@ -86,7 +86,7 @@ class ListingFactory implements iListingFactory {
         }
 
         foreach($results as $r){
-            $listings[$r['list_order']] = $this->dataToObject($r, $herd_code);
+            $listings[$r['list_order']] = $this->createListing($r, $herd_code);
         }
         return $listings;
     }
