@@ -52,10 +52,12 @@ class listings extends dpage {
         $web_block_factory = new WebBlockFactory($this->block_model);
 
         //filters
-        //$params = [];
-        //if(isset($json_filter_data)) {
-        //    $params = (array)json_decode(urldecode($json_filter_data));
-        //}
+        $params = [];
+        if(isset($json_filter_data)) {
+            $params = (array)json_decode(urldecode($json_filter_data));
+        }
+
+        $serial_num = isset($params['serial_num']) ? $params['serial_num'] : null;
 
         //page content
         $this->load->model('ReportContent/report_block_model');
@@ -64,7 +66,7 @@ class listings extends dpage {
 		$option_listing_factory = new ListingFactory($this->herd_options_model);
 
         //create block content
-        $listings = $option_listing_factory->getByPage($page_id);
+        $listings = $option_listing_factory->getByPage($page_id, $this->session->userdata('herd_code'), $serial_num);
 
         //create blocks for content
         $blocks = $web_block_factory->getBlocksFromContent($page_id, $listings);

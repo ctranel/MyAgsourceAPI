@@ -32,6 +32,12 @@ class Listing implements iListing
     protected $isactive;
 
     /**
+     * add_presets
+     * @var array of
+     **/
+    protected $add_presets;
+
+    /**
      * dataset
      * @var array
      **/
@@ -49,10 +55,11 @@ class Listing implements iListing
      **/
     protected $form_id;
 
-    public function __construct($id, $form_id, $columns, $dataset, $isactive){
+    public function __construct($id, $form_id, $columns, $dataset, $isactive, $add_presets){
         $this->id = $id;
         $this->form_id = $form_id;
         $this->isactive = $isactive;
+        $this->add_presets = $add_presets;
         $this->dataset = $dataset;
         $this->columns = $columns;
     }
@@ -60,6 +67,7 @@ class Listing implements iListing
     public function toArray(){
         $ret['isactive'] = $this->isactive;
         $ret['form_id'] = $this->form_id;
+        $ret['add_presets'] = $this->add_presets;
 
         if(isset($this->columns) && is_array($this->columns) && !empty($this->columns)){
             $columns = [];
