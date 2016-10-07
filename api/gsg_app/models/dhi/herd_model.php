@@ -625,5 +625,19 @@ class Herd_model extends CI_Model {
 			->get('users.dbo.v_user_status_info si')->result_array();
 		return $r;
 	}
-	
+
+    /**
+     * getEventMap
+     * @param string herd code
+     * @return array of section data
+     * @author ctranel
+     **/
+    public function getEventMap($herd_code) {
+        $r = $this->db
+            ->select('event_cat, event_cd')
+            ->where('herd_code', $herd_code)
+            ->get('td.herd.events')->result_array();
+        return $r;
+    }
+
 }

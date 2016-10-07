@@ -251,4 +251,24 @@ class Herd
 //		var_dump($return);
 		return $return;
 	}
+
+    /* -----------------------------------------------------------------
+     *  getCowOptions
+
+     *  Returns array of general herd information used in header and other locations
+
+     *  @author: ctranel
+     *  @date: Sept 15, 2015
+     *  @return: array
+     *  @throws:
+     * -----------------------------------------------------------------*/
+    public function getEventMap() {
+        $events = $this->herd_model->getEventMap($this->herd_code);
+        $return = [];
+        foreach($events as $e){
+            $return[] = [(int)$e['event_cd'] => $e['event_cat']];
+        }
+
+        return $return;
+    }
 }

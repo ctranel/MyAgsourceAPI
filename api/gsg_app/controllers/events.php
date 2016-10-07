@@ -1,0 +1,52 @@
+<?php
+//namespace myagsource;
+require_once(APPPATH . 'controllers/dpage.php');
+require_once APPPATH . 'libraries/Site/WebContent/WebBlockFactory.php';
+require_once APPPATH . 'libraries/Listings/Content/ListingFactory.php';
+require_once(APPPATH . 'libraries/Supplemental/Content/SupplementalFactory.php');
+require_once(APPPATH . 'libraries/Site/WebContent/Page.php');
+require_once(APPPATH . 'libraries/dhi/HerdPageAccess.php');
+require_once(APPPATH . 'libraries/Site/WebContent/PageAccess.php');
+
+use \myagsource\Site\WebContent\WebBlockFactory;
+use \myagsource\Listings\Content\ListingFactory;
+use \myagsource\Supplemental\Content\SupplementalFactory;
+use \myagsource\Site\WebContent\Page;
+use \myagsource\dhi\HerdPageAccess;
+use \myagsource\Site\WebContent\PageAccess;
+
+if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+
+/* -----------------------------------------------------------------
+ *	CLASS comments
+ *  @file: events.php
+ *  @author: ctranel
+ *
+ *  @description: Parent abstract class that drives report page generation.  All database driven report pages 
+ *  	extend this class.
+ *
+ * -----------------------------------------------------------------
+ */
+
+class events extends dpage {
+	function __construct(){
+		parent::__construct();
+
+		/* Load the profile.php config file if it exists*/
+		if (ENVIRONMENT == 'development' || ENVIRONMENT == 'localhost') {
+			$this->config->load('profiler', false, true);
+			if ($this->config->config['enable_profiler']) {
+				$this->output->enable_profiler(TRUE);
+			}
+		}
+	}
+	
+	function code_map(){
+	    //var_dump($this->settings);
+        $events = $this->herd->getEventMap();
+        if(empty(array_filter($events))) {
+            $this->sendResponse(404, new ResponseMessage('No animals found for herd ' . $this->herd->herdCode() . '.  Please select a report from the navigation', 'error'));
+        }
+        $this->sendResponse(200, null, ['event_map' => $events]);
+	}
+}
