@@ -1,19 +1,20 @@
 <?php
 
-namespace myagsource\Form\Content;
+namespace myagsource\Settings\Form;
 
 require_once(APPPATH . 'libraries/Settings/SettingForm.php');
 require_once(APPPATH . 'libraries/Settings/SettingFormControl.php');
-require_once(APPPATH . 'libraries/Form/Content/Form.php');
-require_once(APPPATH . 'libraries/Form/Content/Control/FormControl.php');
-require_once(APPPATH . 'libraries/Form/Content/SubForm.php');
+//require_once(APPPATH . 'libraries/Form/Content/Form.php');
+//require_once(APPPATH . 'libraries/Form/Content/Control/FormControl.php');
+//require_once(APPPATH . 'libraries/Form/Content/SubForm.php');
 require_once(APPPATH . 'libraries/Form/iFormFactory.php');
 require_once(APPPATH . 'models/Forms/iForm_Model.php');
 
 use \myagsource\Form\iFormFactory;
 use \myagsource\Form\Content\SubForm;
 use \myagsource\Supplemental\Content\SupplementalFactory;
-use \myagsource\Form\Content\Control\FormControl;
+use \myagsource\Settings\SettingForm;
+use \myagsource\Settings\SettingFormControl;
 
 /**
  * A factory for form objects
@@ -24,7 +25,7 @@ use \myagsource\Form\Content\Control\FormControl;
  * 
  *        
  */
-class FormFactory implements iFormFactory{
+class SettingsFormFactory implements iFormFactory {
 	/**
 	 * datasource_blocks
 	 * @var form_model
@@ -51,7 +52,7 @@ class FormFactory implements iFormFactory{
      * @author ctranel
      * @returns \myagsource\Page\Content\FormBlock\FormBlock[]
      */
-    public function getByPage($page_id, $herd_code){
+    public function getByPage($page_id, $herd_code = null, $user_id = null){
         $forms = [];
         $results = $this->datasource->getFormsByPage($page_id);
         if(empty($results)){
@@ -59,55 +60,59 @@ class FormFactory implements iFormFactory{
         }
 
         foreach($results as $r){
-            $forms[$r['list_order']] = $this->createForm($r, $herd_code);
+            $forms[$r['list_order']] = $this->createForm($r, $user_id, $herd_code);
         }
         return $forms;
     }
-	/*
-	 * getForm
-	 * 
-	 * @param int form id
-	 * @author ctranel
-	 * @returns \myagsource\Form\Form
-	 */
-	public function getForm($form_id, $herd_code){
+
+    /*
+     * getForm
+     *
+     * @param int form id
+     * @param int user id
+     * @param string herd_code
+     * @author ctranel
+     * @returns \myagsource\Settings\SettingForm
+     */
+	public function getForm($form_id, $herd_code, $user_id = null){
 		$results = $this->datasource->getFormById($form_id);
 		if(empty($results)){
 			return false;
 		}
-		return $this->createForm($results[0], $herd_code);
+
+		return $this->createForm($results[0], $user_id, $herd_code);
 	}
-
-	/*
-    * createForm
-    *
-    * @param array of form data
-    * @param string herd code
-    * @param array of ints ancestor_form_ids
-    * @author ctranel
-    * @returns Array of Forms
-    */
-    protected function createForm($form_data, $herd_code, $ancestor_form_ids = null){
-        $subforms = $this->getSubForms($form_data['form_id'], $herd_code, $ancestor_form_ids);
-
-        //this function depends on an existing record
+	
+    /*
+     * createForm
+     *
+     * @param array form data
+	 * @param int user id
+	 * @param string herd_code
+     * @author ctranel
+     * @returns \myagsource\Settings\SettingForm
+     */
+    protected function createForm($form_data, $user_id, $herd_code, $ancestor_form_ids = null){
+        $subforms = $this->getSubForms($form_data['form_id'], $user_id, $herd_code, $ancestor_form_ids);
         $control_data = $this->datasource->getFormControlData($form_data['form_id'], $this->key_params, $ancestor_form_ids);
+
         $fc = [];
         if(is_array($control_data) && !empty($control_data) && is_array($control_data[0])){
             foreach($control_data as $d){
-                $s = isset($subforms[$d['name']]) ? $subforms[$d['name']] : null;
+                $sf = isset($subforms[$d['name']]) ? $subforms[$d['name']] : null;
                 $options = null;
                 if(strpos($d['control_type'], 'lookup') !== false){
                     $options = $this->getLookupOptions($d['id'], $d['control_type']);
                 }
-                $fc[] = new FormControl($d, $options, $s);
+                $fc[] = new SettingFormControl($d, $options, $sf);
             }
         }
-        return new Form($form_data['form_id'], $this->datasource, $fc, $form_data['dom_id'], $form_data['action'], $herd_code);
+        return new SettingForm($form_data['form_id'], $this->datasource, $fc, $form_data['dom_id'], $form_data['action'],$user_id, $herd_code);
     }
 
-    protected function getSubForms($parent_form_id, $herd_code, $ancestor_form_ids = null){
+    protected function getSubForms($parent_form_id, $user_id, $herd_code, $ancestor_form_ids = null){
         $results = $this->datasource->getSubFormsByParentId($parent_form_id); //would return control-name-indexed array
+
         if(empty($results)){
             return false;
         }
@@ -121,10 +126,9 @@ class FormFactory implements iFormFactory{
 
         $subforms = [];
         foreach($results as $k => $r){
-            $form = $this->createForm($r, $herd_code, $ancestor_form_ids);
+            $form = $this->createForm($r, $user_id, $herd_code, $ancestor_form_ids);
             $subforms[$r['form_control_name']][] = new SubForm($r['operator'], $r['operand'], $form);
         }
-
         return $subforms;
     }
 

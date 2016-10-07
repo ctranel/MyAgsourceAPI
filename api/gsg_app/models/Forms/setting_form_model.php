@@ -152,6 +152,7 @@ class Setting_form_model extends CI_Model implements iForm_Model {
      **/
     public function getFormControlData($form_id, $key_params) {
         $herd_code = $key_params['herd_code'];
+        $user_id = $key_params['user_id'];
 
         $this->db
             ->select('s.id, t.name AS control_type, s.name, s.label, s.default_value, s.for_user, s.for_herd, uhs.value') //, f.name AS category, s.dom_id
@@ -224,6 +225,7 @@ class Setting_form_model extends CI_Model implements iForm_Model {
 				WHEN NOT MATCHED BY TARGET THEN
 					INSERT (user_id, herd_code, setting_id, value)
 					VALUES (nd.user_id, nd.herd_code, nd.setting_id, nd.value);";
+//die($sql);
 		$this->db->query($sql);
 	}
     

@@ -2,9 +2,11 @@
 //namespace myagsource;
 
 require_once(APPPATH . 'controllers/dpage.php');
-require_once APPPATH . 'libraries/Settings/Settings.php';
+require_once(APPPATH . 'libraries/Settings/Settings.php');
+require_once(APPPATH . 'libraries/Settings/Form/SettingsFormFactory.php');
 require_once(APPPATH . 'libraries/Form/Content/FormFactory.php');
 
+use \myagsource\Settings\Form\SettingsFormFactory;
 use \myagsource\Form\Content\FormFactory;
 use \myagsource\Api\Response\ResponseMessage;
 use \myagsource\Supplemental\Content\SupplementalFactory;
@@ -47,9 +49,9 @@ class dform extends dpage {
         //$this->form_validation->set_rules('herd_code', 'Herd', 'required|max_length[8]');
 		//$this->form_validation->set_rules('herd_code_fill', 'Type Herd Code');
         $this->load->model('Forms/setting_form_model');//, null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
-        $form_factory = new FormFactory($this->setting_form_model, $supplemental_factory, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
+        $setting_form_factory = new SettingsFormFactory($this->setting_form_model, $supplemental_factory, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
 
-        $form = $form_factory->getSettingForm($form_id, $this->session->userdata('user_id'), $this->session->userdata('herd_code'));
+        $form = $setting_form_factory->getForm($form_id, $this->session->userdata('herd_code'), $this->session->userdata('user_id'));
         $input = $this->input->userInputArray();
 
 		if($this->form_validation->run_input() === true){

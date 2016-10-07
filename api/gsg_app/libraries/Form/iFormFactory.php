@@ -11,6 +11,6 @@ namespace myagsource\Form;
 
 interface iFormFactory
 {
-    public function getObject($form_id);
-    public function getSettingForm($form_id, $user_id, $herd_code);
+    public function getByPage($page_id, $herd_code);
+    public function getForm($form_id, $herd_code);
 }

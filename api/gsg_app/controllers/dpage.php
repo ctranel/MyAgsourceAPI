@@ -15,6 +15,7 @@ require_once(APPPATH . 'libraries/DataHandler.php');
 
 require_once(APPPATH . 'libraries/Report/Content/ReportFactory.php');
 require_once(APPPATH . 'libraries/Form/Content/FormFactory.php');
+require_once(APPPATH . 'libraries/Settings/Form/SettingsFormFactory.php');
 
 
 use \myagsource\Benchmarks\Benchmarks;
@@ -30,6 +31,7 @@ use \myagsource\Report\Content\ReportFactory;
 use \myagsource\DataHandler;
 use \myagsource\Datasource\DbObjects\DbTableFactory;
 use \myagsource\Api\Response\ResponseMessage;
+use \myagsource\Settings\Form\SettingsFormFactory;
 use \myagsource\Form\Content\FormFactory;
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
@@ -158,7 +160,7 @@ class dpage extends MY_Api_Controller {
 
         //load factories for block content
 		$report_factory = new ReportFactory($this->report_block_model, $this->db_field_model, $this->filters, $supplemental_factory, $data_handler, $db_table_factory);
-		$setting_form_factory = new FormFactory($this->setting_form_model, $supplemental_factory, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
+		$setting_form_factory = new SettingsFormFactory($this->setting_form_model, $supplemental_factory, $params + ['herd_code'=>$this->session->userdata('herd_code'), 'user_id'=>$this->session->userdata('user_id')]);
 
         $this->load->model('Forms/Data_entry_model');//, null, false, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
 		$entry_form_factory = new FormFactory($this->Data_entry_model, $supplemental_factory, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
@@ -166,7 +168,7 @@ class dpage extends MY_Api_Controller {
         //create block content
         $reports = $report_factory->getByPage($page_id);
         $setting_forms = $setting_form_factory->getByPage($page_id);
-        $entry_forms = $entry_form_factory->getByPage($page_id);
+        $entry_forms = $entry_form_factory->getByPage($page_id, $this->session->userdata('herd_code'));
 
         //combine and sort
         $block_content = $reports + $setting_forms + $entry_forms;
