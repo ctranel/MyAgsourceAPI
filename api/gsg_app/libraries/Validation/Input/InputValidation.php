@@ -1,11 +1,6 @@
 <?php
 namespace myagsource\Validation\Input;
 
-//require_once(APPPATH . 'libraries/Supplemental/Content/SupplementalComment.php');
-
-//use \myagsource\Supplemental\iSupplemental;
-
-if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /**
 * Contains properties and methods specific to validation of input (e.g., form) data.
 * 
@@ -16,7 +11,7 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 *
 */
 
-class InputValidation// implements iSupplemental
+class Validator
 {
 	protected $_field_data			= array();
 	protected $_config_rules		= array();
@@ -50,9 +45,9 @@ class InputValidation// implements iSupplemental
 		$this->_lang['valid_emails']		= "The %s field must contain all valid email addresses.";
 		$this->_lang['valid_url']			= "The %s field must contain a valid URL.";
 		$this->_lang['valid_ip']			= "The %s field must contain a valid IP.";
-		$this->_lang['min_length']			= "The %s field must be at least %s characters in length.";
-		$this->_lang['max_length']			= "The %s field can not exceed %s characters in length.";
-		$this->_lang['exact_length']		= "The %s field must be exactly %s characters in length.";
+		$this->_lang['minLength']			= "The %s field must be at least %s characters in length.";
+		$this->_lang['maxLength']			= "The %s field can not exceed %s characters in length.";
+		$this->_lang['exactLength']		= "The %s field must be exactly %s characters in length.";
 		$this->_lang['alpha']				= "The %s field may only contain alphabetical characters.";
 		$this->_lang['alpha_numeric']		= "The %s field may only contain alpha-numeric characters.";
 		$this->_lang['alpha_dash']			= "The %s field may only contain alpha-numeric characters, underscores, and dashes.";
@@ -65,8 +60,8 @@ class InputValidation// implements iSupplemental
 		$this->_lang['is_natural']			= "The %s field must contain only positive numbers.";
 		$this->_lang['is_natural_no_zero']	= "The %s field must contain a number greater than zero.";
 		$this->_lang['decimal']			= "The %s field must contain a decimal number.";
-		$this->_lang['less_than']			= "The %s field must contain a number less than %s.";
-		$this->_lang['greater_than']		= "The %s field must contain a number greater than %s.";	}
+		$this->_lang['maxValue']			= "The %s field must contain a number less than or equal to %s.";
+		$this->_lang['minValue']		= "The %s field must contain a number greater than or equal to %s.";	}
 
 	// --------------------------------------------------------------------
 
@@ -848,7 +843,7 @@ class InputValidation// implements iSupplemental
 	 * @param	value
 	 * @return	bool
 	 */
-	public function min_length($str, $val)
+	public function minLength($str, $val)
 	{
 		if (preg_match("/[^0-9]/", $val))
 		{
@@ -873,7 +868,7 @@ class InputValidation// implements iSupplemental
 	 * @param	value
 	 * @return	bool
 	 */
-	public function max_length($str, $val)
+	public function maxLength($str, $val)
 	{
 		if (preg_match("/[^0-9]/", $val))
 		{
@@ -898,7 +893,7 @@ class InputValidation// implements iSupplemental
 	 * @param	value
 	 * @return	bool
 	 */
-	public function exact_length($str, $val)
+	public function exactLength($str, $val)
 	{
 		if (preg_match("/[^0-9]/", $val))
 		{
@@ -1077,13 +1072,13 @@ class InputValidation// implements iSupplemental
 	 * @param	string
 	 * @return	bool
 	 */
-	public function greater_than($str, $min)
+	public function minValue($str, $min)
 	{
 		if ( ! is_numeric($str))
 		{
 			return FALSE;
 		}
-		return $str > $min;
+		return $str >= $min;
 	}
 
 	// --------------------------------------------------------------------
@@ -1095,13 +1090,13 @@ class InputValidation// implements iSupplemental
 	 * @param	string
 	 * @return	bool
 	 */
-	public function less_than($str, $max)
+	public function maxValue($str, $max)
 	{
 		if ( ! is_numeric($str))
 		{
 			return FALSE;
 		}
-		return $str < $max;
+		return $str <= $max;
 	}
 
 	// --------------------------------------------------------------------

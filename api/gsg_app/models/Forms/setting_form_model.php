@@ -156,6 +156,15 @@ class Setting_form_model extends CI_Model implements iForm_Model {
 
         $this->db
             ->select('s.id, t.name AS control_type, s.name, s.label, s.default_value, s.for_user, s.for_herd, uhs.value') //, f.name AS category, s.dom_id
+            ->select("(CAST(
+                  (SELECT STUFF((
+                      SELECT '|', CONCAT(v.name, ':', v.value) AS [data()] 
+                      FROM (SELECT sv.setting_id, val.name, cv.value FROM users.setng.settings_validators sv INNER JOIN users.frm.validators val ON sv.validator_id = val.id) AS v
+                      WHERE v.setting_id = s.id 
+                      FOR xml path('')
+                    ), 1, 1, ''))
+                 AS VARCHAR(100))) AS validators
+            ")
             ->join('users.setng.settings s', "fs.setting_id = s.id AND fs.form_id = " . $form_id, 'inner');
 
         if(isset($user_id) && $user_id != FALSE){

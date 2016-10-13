@@ -8,12 +8,14 @@ require_once(APPPATH . 'libraries/Form/Content/Form.php');
 require_once(APPPATH . 'libraries/Form/Content/Control/FormControl.php');
 require_once(APPPATH . 'libraries/Form/Content/SubForm.php');
 require_once(APPPATH . 'libraries/Form/iFormFactory.php');
+require_once(APPPATH . 'libraries/Validation/Input/Validator.php');
 require_once(APPPATH . 'models/Forms/iForm_Model.php');
 
 use \myagsource\Form\iFormFactory;
 use \myagsource\Form\Content\SubForm;
 use \myagsource\Supplemental\Content\SupplementalFactory;
 use \myagsource\Form\Content\Control\FormControl;
+use myagsource\Validation\Input\Validator;
 
 /**
  * A factory for form objects
@@ -92,15 +94,26 @@ class FormFactory implements iFormFactory{
 
         //this function depends on an existing record
         $control_data = $this->datasource->getFormControlData($form_data['form_id'], $this->key_params, $ancestor_form_ids);
+
         $fc = [];
         if(is_array($control_data) && !empty($control_data) && is_array($control_data[0])){
             foreach($control_data as $d){
+                $validators = null;
+                if(isset($d['validators'])){
+                    $validators = [];
+                    $valids = explode('|', $d['validators']);
+                    foreach($valids as $v){
+                        list($name, $comparison_value) = explode(':', $v);
+                        $validators[] = new Validator($name, $comparison_value);
+                    }
+                }
+
                 $s = isset($subforms[$d['name']]) ? $subforms[$d['name']] : null;
                 $options = null;
                 if(strpos($d['control_type'], 'lookup') !== false){
                     $options = $this->getLookupOptions($d['id'], $d['control_type']);
                 }
-                $fc[] = new FormControl($d, $options, $s);
+                $fc[] = new FormControl($d, $validators, $options, $s);
             }
         }
         return new Form($form_data['form_id'], $this->datasource, $fc, $form_data['dom_id'], $form_data['action'], $herd_code);

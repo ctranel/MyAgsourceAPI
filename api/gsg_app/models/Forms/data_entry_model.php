@@ -223,7 +223,6 @@ class Data_entry_model extends CI_Model implements iForm_Model {
             return $results;
         }
 
-//var_dump($common, $keys,$params); die;
         $key_meta = $this->getFormKeyMeta($form_id, $ancestor_form_ids);
 
         $key_field_list_text = '';

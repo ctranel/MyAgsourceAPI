@@ -78,10 +78,10 @@ class FormControl implements iFormControl
     protected $is_key;
 
     /**
-     * validator
+     * validators
      * @var Validator[]
      **/
-    protected $validator;
+    protected $validators;
 
     /**
      * subforms
@@ -90,7 +90,7 @@ class FormControl implements iFormControl
     protected $subforms;
 
     //@todo: implement validators
-    public function __construct($control_data, $options = null, $subforms = null){
+    public function __construct($control_data, $validators = null, $options = null, $subforms = null){
         $this->id = $control_data['id'];
         $this->name = $control_data['name'];
         $this->label = $control_data['label'];
@@ -98,6 +98,7 @@ class FormControl implements iFormControl
         $this->control_type = $control_data['control_type'];
         $this->is_editable = (bool)$control_data['is_editable'];
         $this->is_key = (bool)$control_data['is_key'];
+        $this->validators = $validators;
         $this->options = $options;
         $this->subforms = $subforms;
         //handle ranges
@@ -268,6 +269,7 @@ class FormControl implements iFormControl
         if(isset($this->options)){
             $ret['options'] = $this->options;
         }
+
         if(isset($this->subforms) && is_array($this->subforms) && !empty($this->subforms)){
             $ret['subforms'] = [];
             foreach($this->subforms as $s){
@@ -275,12 +277,12 @@ class FormControl implements iFormControl
             }
         }
         // validator
-        if(isset($this->validator) && is_array($this->validator) && !empty($this->validator)){
+        if(isset($this->validators) && is_array($this->validators) && !empty($this->validators)){
             $validator = [];
-            foreach($this->validator as $v){
+            foreach($this->validators as $v){
                 $validator[] = $v->toArray();
             }
-            $ret['validator'] = $validator;
+            $ret['validators'] = $validator;
             unset($validator);
         }
         return $ret;
@@ -363,11 +365,12 @@ class FormControl implements iFormControl
     }
     
     public function parseFormData($value){
+ //@todo: check validators (also in getCurrValue?)
         $ret_val = null;
         if(is_array($value)){
+            //if($this->control_type === 'range'){
             $ret_val = implode('|', $value);
             //handle range notation
-            //if($this->control_type === 'range'){
             //    $ret_val = $value['dbfrom'] . '|' . $value['dbto'];
             //}
         }

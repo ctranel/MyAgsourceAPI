@@ -148,62 +148,6 @@ class Herd_options_model extends CI_Model {
      * @param int listing id
      * @return array column data
      * @author ctranel
-    public function getListingData($listing_id, $field_list) {
-        $keys = array_keys($this->criteria);
-        $key_meta = $this->getListingKeyMeta($listing_id);
-
-        $key_condition_text = '';
-        $declare_key_var_text = '';
-        $set_key_var_text = '';
-
-//var_dump($keys, $key_meta);
-        foreach($keys as $k){
-            $declare_key_var_text .= ", @" . $k . " " . $key_meta[$k]['data_type'];
-            if(strpos($key_meta[$k]['data_type'], 'char') !== false){
-                $declare_key_var_text .= '(' .  $key_meta[$k]['max_length'] . ')';
-                $key_condition_text .= "'" . $k . " = ''" . $this->criteria[$k] . "''' AND ',";
-            }
-            else {
-                $key_condition_text .= "'" . $k . " = " . $this->criteria[$k] . " AND ', ";
-            }
-            $set_key_var_text .= "SET @" . $k . " = '" . $this->criteria[$k] . "';";
-        }
-
-        $sql = "
-            DECLARE 
-                @dsql NVARCHAR(MAX)
-                ,@db_table_name VARCHAR(100)
-            
-            IF OBJECT_ID('tempdb..##valueTable', 'U') IS NOT NULL
-              DROP TABLE ##valueTable;
-            
-            SELECT TOP 1 @db_table_name = CONCAT(db.name, '.',  tbl.db_schema, '.', tbl.name)
-                from users.options.listings_columns lc
-                inner join users.dbo.db_fields fld ON lc.db_field_id = fld.id AND lc.listing_id = 1
-                inner join users.dbo.db_tables tbl ON fld.db_table_id = tbl.id AND allow_update = 1
-                inner join users.dbo.db_databases db ON tbl.database_id = db.id
-            
-            SET @dsql = CONCAT(N'SELECT *
-			    INTO ##valueTable
-			    FROM ', @db_table_name, ' WHERE ', " . substr($key_condition_text, 0, -7) . ")
-
-            EXEC sp_executesql @dsql
-            
-            SELECT " . $field_list . " FROM ##valueTable;
-       ";
-//print($sql);
-        $results = $this->db->query($sql)->result_array();
-//var_dump($results);
-        return $results;
-    }
-**/
-
-    /**
-     * getListingData
-     *
-     * @param int listing id
-     * @return array column data
-     * @author ctranel
      **/
     public function getListingData($listing_id) {
         $keys = array_keys($this->criteria);
@@ -237,7 +181,6 @@ class Herd_options_model extends CI_Model {
        ";
         //print($sql);
         $results = $this->db->query($sql)->result_array();
-        //var_dump($results);
         return $results;
     }
 

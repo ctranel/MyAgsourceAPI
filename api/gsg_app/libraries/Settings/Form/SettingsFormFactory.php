@@ -8,6 +8,7 @@ require_once(APPPATH . 'libraries/Settings/SettingFormControl.php');
 //require_once(APPPATH . 'libraries/Form/Content/Control/FormControl.php');
 //require_once(APPPATH . 'libraries/Form/Content/SubForm.php');
 require_once(APPPATH . 'libraries/Form/iFormFactory.php');
+require_once(APPPATH . 'libraries/Validation/Input/Validator.php');
 require_once(APPPATH . 'models/Forms/iForm_Model.php');
 
 use \myagsource\Form\iFormFactory;
@@ -15,6 +16,7 @@ use \myagsource\Form\Content\SubForm;
 use \myagsource\Supplemental\Content\SupplementalFactory;
 use \myagsource\Settings\SettingForm;
 use \myagsource\Settings\SettingFormControl;
+use myagsource\Validation\Input\Validator;
 
 /**
  * A factory for form objects
@@ -99,12 +101,22 @@ class SettingsFormFactory implements iFormFactory {
         $fc = [];
         if(is_array($control_data) && !empty($control_data) && is_array($control_data[0])){
             foreach($control_data as $d){
+                $validators = null;
+                if(isset($d['validators'])){
+                    $validators = [];
+                    $valids = explode('|', $d['validators']);
+                    foreach($valids as $v){
+                        list($name, $comparison_value) = explode(':', $v);
+                        $validators[] = new Validator($name, $comparison_value);
+                    }
+                }
+
                 $sf = isset($subforms[$d['name']]) ? $subforms[$d['name']] : null;
                 $options = null;
                 if(strpos($d['control_type'], 'lookup') !== false){
                     $options = $this->getLookupOptions($d['id'], $d['control_type']);
                 }
-                $fc[] = new SettingFormControl($d, $options, $sf);
+                $fc[] = new SettingFormControl($d, $validators, $options, $sf);
             }
         }
         return new SettingForm($form_data['form_id'], $this->datasource, $fc, $form_data['dom_id'], $form_data['action'],$user_id, $herd_code);

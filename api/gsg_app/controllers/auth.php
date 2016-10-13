@@ -374,7 +374,7 @@ class Auth extends MY_Api_Controller {
 	//change password
 	function change_password(){
         $this->form_validation->set_rules('old', 'Old password', 'required');
-        $this->form_validation->set_rules('new', 'New Password', 'required|min_length[' . $this->config->item('min_password_length', 'ion_auth') . ']|max_length[' . $this->config->item('max_password_length', 'ion_auth') . ']|matches[new_confirm]');
+        $this->form_validation->set_rules('new', 'New Password', 'required|minLength[' . $this->config->item('min_password_length', 'ion_auth') . ']|maxLength[' . $this->config->item('max_password_length', 'ion_auth') . ']|matches[new_confirm]');
         $this->form_validation->set_rules('new_confirm', 'Confirm New Password', 'required');
 
         if (!$this->as_ion_auth->logged_in()){
@@ -427,8 +427,8 @@ class Auth extends MY_Api_Controller {
         }
 
         $this->form_validation->set_rules('new', 'New Password',
-            'required|min_length[' . $this->config->item('min_password_length',
-                'ion_auth') . ']|max_length[' . $this->config->item('max_password_length',
+            'required|minLength[' . $this->config->item('min_password_length',
+                'ion_auth') . ']|maxLength[' . $this->config->item('max_password_length',
                 'ion_auth') . ']|matches[new_confirm]');
         $this->form_validation->set_rules('new_confirm', 'Confirm New Password', 'required');
 
@@ -508,16 +508,16 @@ class Auth extends MY_Api_Controller {
 		$this->form_validation->set_rules('first_name', 'First Name', 'trim|required');
 		$this->form_validation->set_rules('last_name', 'Last Name', 'trim|required');
 		$this->form_validation->set_rules('email', 'Email Address', 'trim|required|valid_email');
-		$this->form_validation->set_rules('supervisor_acct_num', 'Field Technician Account Number', 'max_length[8]');
-		$this->form_validation->set_rules('sg_acct_num', 'Service Group Account Number', 'max_length[8]');
-		$this->form_validation->set_rules('assoc_acct_num[]', 'Association Account Number', 'max_length[8]');
-		$this->form_validation->set_rules('best_time', 'Best Time to Call', 'max_length[10]|required');
-		$this->form_validation->set_rules('password', 'Password', 'trim|required|min_length[' . $this->config->item('min_password_length', 'ion_auth') . ']|max_length[' . $this->config->item('max_password_length', 'ion_auth') . ']|matches[password_confirm]');
+		$this->form_validation->set_rules('supervisor_acct_num', 'Field Technician Account Number', 'maxLength[8]');
+		$this->form_validation->set_rules('sg_acct_num', 'Service Group Account Number', 'maxLength[8]');
+		$this->form_validation->set_rules('assoc_acct_num[]', 'Association Account Number', 'maxLength[8]');
+		$this->form_validation->set_rules('best_time', 'Best Time to Call', 'maxLength[10]|required');
+		$this->form_validation->set_rules('password', 'Password', 'trim|required|minLength[' . $this->config->item('min_password_length', 'ion_auth') . ']|maxLength[' . $this->config->item('max_password_length', 'ion_auth') . ']|matches[password_confirm]');
 		$this->form_validation->set_rules('password_confirm', 'Password Confirmation', 'trim|required');
 		$this->form_validation->set_rules('group_id[]', 'Name of User Group');
-		$this->form_validation->set_rules('terms', 'Terms of Use Acknowledgement', 'required|exact_length[1]');
-		$this->form_validation->set_rules('herd_code', 'Herd Code', 'exact_length[8]');
-		$this->form_validation->set_rules('herd_release_code', 'Release Code', 'trim|exact_length[10]');
+		$this->form_validation->set_rules('terms', 'Terms of Use Acknowledgement', 'required|exactLength[1]');
+		$this->form_validation->set_rules('herd_code', 'Herd Code', 'exactLength[8]');
+		$this->form_validation->set_rules('herd_release_code', 'Release Code', 'trim|exactLength[10]');
 		$this->form_validation->set_rules('section_id[]', 'Section');
 
        if($this->form_validation->run() === false){
@@ -621,10 +621,10 @@ class Auth extends MY_Api_Controller {
 		$this->form_validation->set_rules('first_name', 'First Name', 'trim|required');
 		$this->form_validation->set_rules('last_name', 'Last Name', 'trim|required');
 		$this->form_validation->set_rules('email', 'Email Address', 'trim|required|valid_email');
-		$this->form_validation->set_rules('supervisor_acct_num', 'Field Technician Number', 'exact_length[8]');
-		$this->form_validation->set_rules('assoc_acct_num[]', 'Association/Region Account Number', 'exact_length[8]');
-		$this->form_validation->set_rules('best_time', 'Best Time to Call', 'max_length[10]|required');
-		$this->form_validation->set_rules('password', 'Password', 'trim|min_length[' . $this->config->item('min_password_length', 'ion_auth') . ']|max_length[' . $this->config->item('max_password_length', 'ion_auth') . ']|matches[password_confirm]');
+		$this->form_validation->set_rules('supervisor_acct_num', 'Field Technician Number', 'exactLength[8]');
+		$this->form_validation->set_rules('assoc_acct_num[]', 'Association/Region Account Number', 'exactLength[8]');
+		$this->form_validation->set_rules('best_time', 'Best Time to Call', 'maxLength[10]|required');
+		$this->form_validation->set_rules('password', 'Password', 'trim|minLength[' . $this->config->item('min_password_length', 'ion_auth') . ']|maxLength[' . $this->config->item('max_password_length', 'ion_auth') . ']|matches[password_confirm]');
 		$this->form_validation->set_rules('password_confirm', 'Password Confirmation', 'trim');
 		$this->form_validation->set_rules('group_id[]', 'Name of Account Group');
 		//$this->form_validation->set_rules('herd_code', 'Herd Code', 'exact_length[8]');
