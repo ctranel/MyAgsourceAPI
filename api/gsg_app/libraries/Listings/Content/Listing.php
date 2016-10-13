@@ -66,7 +66,8 @@ class Listing implements iListing
 
     public function toArray(){
         $ret['isactive'] = $this->isactive;
-        $ret['form_id'] = $this->form_id;
+//@todo: pull path from form data
+        $ret['form_id'] = $this->form_id; //'api/dform/put_entry/' .
         $ret['add_presets'] = $this->add_presets;
 
         if(isset($this->columns) && is_array($this->columns) && !empty($this->columns)){

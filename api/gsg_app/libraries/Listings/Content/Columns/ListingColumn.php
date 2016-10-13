@@ -30,10 +30,10 @@ class ListingColumn implements iListingColumn
     protected $label;
 
     /**
-     * field_name
+     * name
      * @var string
      **/
-    protected $field_name;
+    protected $name;
 
     /**
      * value
@@ -81,9 +81,9 @@ class ListingColumn implements iListingColumn
         //$this->datasource = $datasource;
         $this->id = $column_data['id'];
         $this->label = $column_data['label'];
-        $this->field_name = $column_data['field_name'];
+        $this->name = $column_data['name'];
         //$this->description = $column_data['description'];
-        //$this->value = $column_data['value'];
+        $this->default_value = $column_data['default_value'];
         $this->control_type = $column_data['control_type'];
         $this->is_displayed = $column_data['is_displayed'];
         $this->is_key = $column_data['is_key'];
@@ -125,9 +125,9 @@ class ListingColumn implements iListingColumn
 
         $ret = [
             'label' => $this->label,
-            'field_name' => $this->field_name,
+            'name' => $this->name,
             //'description' => $this->description,
-            //'value' => $this->value,
+            'default_value' => $this->default_value,
             'control_type' => $ctl_type,
             'is_displayed' => $this->is_displayed,
             'is_key' => $this->is_key,

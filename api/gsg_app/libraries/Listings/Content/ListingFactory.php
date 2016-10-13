@@ -57,12 +57,12 @@ class ListingFactory implements iListingFactory {
     */
     protected function createListing($listing_data, $herd_code, $serial_num){
         $column_data = $this->datasource->getListingColumnMeta($listing_data['listing_id']);
-        $dataset = $this->datasource->getListingData($listing_data['listing_id'], implode(', ', array_column($column_data, 'field_name')));
+        $dataset = $this->datasource->getListingData($listing_data['listing_id'], implode(', ', array_column($column_data, 'name')));
 
         $lc = [];
         if(is_array($column_data) && !empty($column_data) && is_array($column_data[0])){
             foreach($column_data as $d){
-                $lc[$d['field_name']] = new ListingColumn($d);
+                $lc[$d['name']] = new ListingColumn($d);
             }
         }
 

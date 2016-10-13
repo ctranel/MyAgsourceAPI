@@ -82,13 +82,13 @@ class Herd_options_model extends CI_Model {
         $ret = [];
 
         $results = $this->db
-            ->select('fld.db_field_name, fld.data_type, fld.max_length')
+            ->select('fld.db_field_name AS name, fld.data_type, fld.max_length')
             ->join('users.dbo.db_fields fld', 'lc.db_field_id = fld.id AND fld.is_fk_field = 1 AND lc.listing_id = ' . $listing_id)
             ->get('users.options.listings_columns lc')
             ->result_array();
         if(is_array($results)){
             foreach($results as $r){
-                $ret[$r['db_field_name']] = $r;
+                $ret[$r['name']] = $r;
             }
         }
         return $ret;
@@ -129,7 +129,7 @@ class Herd_options_model extends CI_Model {
      * @author ctranel
      **/
     public function getListingColumnMeta($listing_id) {
-        $sql = " select lc.id, ct.name AS control_type, lc.label, lc.is_displayed, fld.is_fk_field AS is_key, lc.db_field_id , fld.db_field_name AS field_name
+        $sql = " select lc.id, ct.name AS control_type, lc.label, lc.is_displayed, fld.is_fk_field AS is_key, lc.db_field_id , fld.db_field_name AS name, '' AS default_value
                 from users.options.listings_columns lc
                 inner join users.dbo.db_fields fld ON lc.db_field_id = fld.id AND lc.listing_id = " . $listing_id . "
                 inner join users.frm.control_types ct ON lc.control_type_id = ct.id";
