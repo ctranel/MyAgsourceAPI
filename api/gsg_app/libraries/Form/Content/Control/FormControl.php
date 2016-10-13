@@ -66,6 +66,18 @@ class FormControl implements iFormControl
     protected $control_type;
 
     /**
+     * is_editable
+     * @var boolean
+     **/
+    protected $is_editable;
+
+    /**
+     * is_key
+     * @var boolean
+     **/
+    protected $is_key;
+
+    /**
      * validator
      * @var Validator[]
      **/
@@ -84,6 +96,8 @@ class FormControl implements iFormControl
         $this->label = $control_data['label'];
         $this->value = isset($control_data['value']) ? $control_data['value'] : $control_data['default_value'];
         $this->control_type = $control_data['control_type'];
+        $this->is_editable = (bool)$control_data['is_editable'];
+        $this->is_key = (bool)$control_data['is_key'];
         $this->options = $options;
         $this->subforms = $subforms;
         //handle ranges
@@ -195,6 +209,34 @@ class FormControl implements iFormControl
         return $this->name;
     }
 
+    /* -----------------------------------------------------------------
+    *  Returns true if control is editable, else false
+
+    *  Returns true if control is editable, else false
+
+    *  @author: ctranel
+    *  @return boolean
+    *  @throws:
+    * -----------------------------------------------------------------
+    */
+    public function isEditable(){
+        return $this->is_editable;
+    }
+
+    /* -----------------------------------------------------------------
+    *  Returns true if control is editable, else false
+
+    *  Returns true if control is editable, else false
+
+    *  @author: ctranel
+    *  @return boolean
+    *  @throws:
+    * -----------------------------------------------------------------
+    */
+    public function isKey(){
+        return $this->is_key;
+    }
+
     public function toArray(){
         switch($this->control_type){
             case 'herd_lookup':
@@ -219,6 +261,7 @@ class FormControl implements iFormControl
             'label' => $this->label,
             'value' => $this->value,
             'control_type' => $ctl_type,
+            'is_editable' => $this->is_editable,
             'default_value' => $this->default_value,
         ];
 

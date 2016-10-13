@@ -179,11 +179,21 @@ class Data_entry_model extends CI_Model implements iForm_Model {
      * @author ctranel
      **/
     public function getFormControlMeta($form_id, $ancestor_form_ids = null) {
-        $result = $this->db->select('fc.id, ct.name AS control_type, fld.db_field_name AS name, fld.name AS label, fc.default_value')
+        $result = $this->db->select('fc.id, ct.name AS control_type, fld.db_field_name AS name, fld.name AS label, fld.is_editable, fld.is_fk_field AS is_key, fc.default_value')
+            ->select("(CAST(
+                  (SELECT STUFF((
+                      SELECT '|', CONCAT(v.name, ':', v.value) AS [data()] 
+                      FROM (SELECT cv.form_control_id, val.name, cv.value FROM users.frm.controls_validators cv INNER JOIN users.frm.validators val ON cv.validator_id = val.id) AS v
+                      WHERE v.form_control_id = fc.id 
+                      FOR xml path('')
+                    ), 1, 1, ''))
+                 AS VARCHAR(100))) AS validators
+            ")
             ->from('users.frm.form_control_groups cg')
             ->join('users.frm.form_controls fc', "cg.id = fc.form_control_group_id AND cg.form_id = " . $form_id, 'inner')
             ->join('users.dbo.db_fields fld', 'fc.db_field_id = fld.id', 'inner')
             ->join('users.frm.control_types ct', 'fc.control_type_id = ct.id', 'inner')
+
             ->get()
             ->result_array();
         return $result;
@@ -203,7 +213,14 @@ class Data_entry_model extends CI_Model implements iForm_Model {
         $common = array_intersect(['herd_code', 'serial_num'], $keys);
 
         if(count($common) === count($keys)){ //no key fields besides herd_code and serial num
-            return $this->getFormControlMeta($form_id, $ancestor_form_ids);
+            $results = $this->getFormControlMeta($form_id, $ancestor_form_ids);
+            //add passed param values back in to data
+            foreach($results as &$r){
+                if(in_array($r['name'], $keys)){
+                    $r['value'] = $params[$r['name']];
+                }
+            }
+            return $results;
         }
 
 //var_dump($common, $keys,$params); die;
@@ -264,7 +281,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
                 inner join users.dbo.db_fields fld ON fc.db_field_id = fld.id
                 inner join users.dbo.db_tables tbl ON fld.db_table_id = tbl.id AND allow_update = 1
                 inner join users.dbo.db_databases db ON tbl.database_id = db.id
-            
+
             
             OPEN Table_Cursor;
             
@@ -282,7 +299,15 @@ class Data_entry_model extends CI_Model implements iForm_Model {
             
             DEALLOCATE Table_Cursor;
 
-                select fc.id, ct.name AS control_type, fld.db_field_name AS name, fld.name AS label, fc.default_value, " . $key_val_field_list_text . " v.value AS value
+                select fc.id, ct.name AS control_type, fld.db_field_name AS name, fld.name AS label, fld.is_editable, fld.is_fk_field AS is_key, fc.default_value, " . $key_val_field_list_text . " v.value AS value,
+                    (CAST(
+                        (SELECT STUFF((
+                          SELECT '|', CONCAT(v.name, ':', v.value) AS [data()] 
+                          FROM (SELECT cv.form_control_id, val.name, cv.value FROM users.frm.controls_validators cv INNER JOIN users.frm.validators val ON cv.validator_id = val.id) AS v
+                          WHERE v.form_control_id = fc.id 
+                          FOR xml path('')
+                        ), 1, 1, ''))
+                     AS VARCHAR(100))) AS validators
                 from users.frm.form_control_groups cg
                 inner join users.frm.form_controls fc ON cg.id = fc.form_control_group_id AND cg.form_id = " . $form_id . "
                 inner join users.dbo.db_fields fld ON fc.db_field_id = fld.id
@@ -423,11 +448,11 @@ class Data_entry_model extends CI_Model implements iForm_Model {
     *  @throws:
     * -----------------------------------------------------------------
     */
-	public function upsert($form_id, $form_data){
+	public function upsert($form_id, $form_data, $keys = null){
         if(!isset($form_data) || empty($form_data)){
             return false;
         }
-
+//When editing, key fields (i.e., uneditable fields) do not get passed with form data)
         //get table name
         $table_name = $this->getSourceTable($form_id);
         //id key fields
@@ -446,8 +471,12 @@ class Data_entry_model extends CI_Model implements iForm_Model {
             }
         }
 
-        $update_set = '';
         $value_as_key = '';
+        foreach($keys as $k => $v){
+            $value_as_key .= "'" .  $v  . "' AS " . $k . ",";
+        }
+
+        $update_set = '';
         foreach($form_data as $k=>$v){
             if(is_array($v)){
                 $v = implode('|', $v);
@@ -474,7 +503,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
 				WHEN NOT MATCHED BY TARGET THEN
 					INSERT (" . implode(', ', $form_field_names) . ")
 					VALUES (nd." . implode(', nd.', $form_field_names) . ");";
-
+//die($sql);
 		return $this->db->query($sql);
 	}
 }

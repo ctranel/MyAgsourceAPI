@@ -71,34 +71,6 @@ class Form implements iForm
         return $ret;
     }
 
-/* -----------------------------------------------------------------
- *  parses form data according to data type conventions.
-
-*  Parses form data according to data type conventions.
-
-*  @since: version 1
-*  @author: ctranel
-*  @date: July 1, 2014
-*  @param array of key-value pairs from form submission
-*  @return void
-*  @throws:
-* -----------------------------------------------------------------
-*/
-    protected function parseFormData($form_data){
-        $ret_val = [];
-        if(!isset($form_data) || !is_array($form_data)){
-            throw new \Exception('No form data found');
-        }
-        foreach($this->controls as $c){
-            foreach($form_data as $k=>$v){
-                if($c->name() === $k){
-                    $ret_val[$k] = $c->parseFormData($v);
-                }
-            }
-        }
-        return $ret_val;
-    }
-
     /* -----------------------------------------------------------------
 *  write
 
@@ -114,9 +86,59 @@ class Form implements iForm
         if(!isset($form_data) || !is_array($form_data)){
             throw new \UnexpectedValueException('No form data received');
         }
+        $form_keys = $this->getEntityKeys($form_data);
         $form_data = $this->parseFormData($form_data);
-        $this->datasource->upsert($this->id, $form_data);
+        //SEND KEY FIELDS AND VALUES
+        $this->datasource->upsert($this->id, $form_data, $form_keys);
     }
 
+    /* -----------------------------------------------------------------
+     *  parses form data according to data type conventions.
 
+    *  Parses form data according to data type conventions.
+
+    *  @since: version 1
+    *  @author: ctranel
+    *  @date: July 1, 2014
+    *  @param array of key-value pairs from form submission
+    *  @return array of formatted key-value pairs from form submission
+    *  @throws:
+    * -----------------------------------------------------------------
+    */
+    protected function parseFormData($form_data){
+        $ret_val = [];
+        if(!isset($form_data) || !is_array($form_data)){
+            throw new \Exception('No form data found');
+        }
+        foreach($this->controls as $c){
+            if($c->isEditable() || $form_data['is_edited'] != 1){
+                $ret_val[$c->name()] = $c->parseFormData($form_data[$c->name()]);
+            }
+        }
+        return $ret_val;
+    }
+    /* -----------------------------------------------------------------
+    *  extracts keys
+
+    *  extracts keys and corresponding values from submitted form data
+
+    *  @author: ctranel
+    *  @date: 2016-10-13
+    *  @param array of key-value pairs from form submission
+    *  @return key-value pairs
+    *  @throws:
+    * -----------------------------------------------------------------
+    */
+    protected function getEntityKeys($form_data){
+        $ret_val = [];
+        if(!isset($form_data) || !is_array($form_data)){
+            throw new \Exception('No form data found');
+        }
+        foreach($this->controls as $c){
+            if($c->isKey()){
+                $ret_val[$c->name()] = $c->parseFormData($form_data[$c->name()]);
+            }
+        }
+        return $ret_val;
+    }
 }

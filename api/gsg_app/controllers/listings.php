@@ -42,10 +42,6 @@ class listings extends dpage {
 	}
 	
 	function index($page_id, $json_filter_data = null){
-        //supplemental factory
-        $this->load->model('supplemental_model');
-        $supplemental_factory = new SupplementalFactory($this->supplemental_model, site_url());
-
         //Set up site content objects
         $this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
         $this->load->model('web_content/block_model');
@@ -70,6 +66,10 @@ class listings extends dpage {
 
         //create blocks for content
         $blocks = $web_block_factory->getBlocksFromContent($page_id, $listings);
+
+        //supplemental factory
+        $this->load->model('supplemental_model');
+        $supplemental_factory = new SupplementalFactory($this->supplemental_model, site_url());
 
         $this->load->model('web_content/page_model');
         $page_data = $this->page_model->getPage($page_id);
