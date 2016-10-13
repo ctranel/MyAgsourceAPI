@@ -113,7 +113,7 @@ class TableHeaderCell {
 		$this->db_field_name = $db_field_name;
 		$this->text = $text;
 		$this->pdf_width = $pdf_width;
-		if(isset($supplemental)){
+		if($supplemental instanceof iSupplemental){
 			$this->supplemental = $supplemental;
 		}
 	}
@@ -159,7 +159,7 @@ class TableHeaderCell {
 	}
 
 	public function supplementalLink(){
-		if($this->supplemental instanceof iSupplemental){
+		if(isset($this->supplemental)){
 			$tmp = $this->supplemental->getContent();
 			return isset($tmp['links'][0]) ? $tmp['links'][0] : null;
 		}
@@ -183,7 +183,7 @@ class TableHeaderCell {
             'default_sort_order' => $this->default_sort_order
         ];
 
-        if($this->supplemental instanceof iSupplemental){
+        if(isset($this->supplemental)){
             $tmp = array_filter($this->supplemental->toArray());
             if(is_array($tmp) && !empty($tmp)){
                 $ret['supplemental'] = $tmp;

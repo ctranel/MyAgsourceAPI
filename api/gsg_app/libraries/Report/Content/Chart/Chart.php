@@ -115,9 +115,9 @@ class Chart extends Report {
 	 * 
 	 * @method setReportFields()
 	 * @return void
-	 * @access public
+	 * @access protected
 	 **/
-	public function setReportFields(){
+	protected function setReportFields(){
 		$arr_table_ref_cnt = [];
 		$this->has_aggregate = false;
 		$this->report_fields = [];
