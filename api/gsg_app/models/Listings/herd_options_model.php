@@ -156,10 +156,10 @@ class Herd_options_model extends CI_Model {
 
         foreach($keys as $k){
             if(strpos($key_meta[$k]['data_type'], 'char') !== false){
-                $key_condition_text .= "N'" . $k . " = ''" . $this->criteria[$k] . "''' AND ',";
+                $key_condition_text .= $k . " = ''" . $this->criteria[$k] . "'' AND ";
             }
             else {
-                $key_condition_text .= "N'" . $k . " = " . $this->criteria[$k] . " AND ', ";
+                $key_condition_text .= $k . " = " . $this->criteria[$k] . " AND ";
             }
         }
 
@@ -175,7 +175,7 @@ class Herd_options_model extends CI_Model {
                 inner join users.dbo.db_databases db ON tbl.database_id = db.id
 
             SET @dsql = CONCAT(N'SELECT *
-			    FROM ', @db_table_name, N' WHERE ', " . substr($key_condition_text, 0, -7) . ")
+			    FROM ', @db_table_name, N' WHERE " . $key_condition_text . "isactive = 1')
 
             EXEC (@dsql)
        ";
