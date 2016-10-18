@@ -179,7 +179,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
      * @author ctranel
      **/
     public function getFormControlMeta($form_id, $ancestor_form_ids = null) {
-        $result = $this->db->select('fc.id, ct.name AS control_type, fld.db_field_name AS name, fld.name AS label, fld.is_editable, fld.is_fk_field AS is_key, fc.default_value')
+        $result = $this->db->select('fc.id, ct.name AS control_type, fld.db_field_name AS name, fld.name AS label, fld.is_editable, fld.is_generated, fld.is_fk_field AS is_key, fc.default_value')
             ->select("(CAST(
                   (SELECT STUFF((
                       SELECT '|', CONCAT(v.name, ':', v.value) AS [data()] 
@@ -298,7 +298,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
             
             DEALLOCATE Table_Cursor;
 
-                select fc.id, ct.name AS control_type, fld.db_field_name AS name, fld.name AS label, fld.is_editable, fld.is_fk_field AS is_key, fc.default_value, " . $key_val_field_list_text . " v.value AS value,
+                select fc.id, ct.name AS control_type, fld.db_field_name AS name, fld.name AS label, fld.is_editable, fld.is_generated, fld.is_fk_field AS is_key, fc.default_value, " . $key_val_field_list_text . " v.value AS value,
                     (CAST(
                         (SELECT STUFF((
                           SELECT '|', CONCAT(v.name, ':', v.value) AS [data()] 
@@ -447,11 +447,14 @@ class Data_entry_model extends CI_Model implements iForm_Model {
     *  @throws:
     * -----------------------------------------------------------------
     */
-	public function upsert($form_id, $form_data, $keys = null){
+	public function upsert($form_id, $form_data, $generated_cols = null){
         if(!isset($form_data) || empty($form_data)){
             return false;
         }
-//When editing, key fields (i.e., uneditable fields) do not get passed with form data)
+//var_dump($form_data, $keys);
+
+
+        //When editing, key fields (i.e., uneditable fields) do not get passed with form data)
         //get table name
         $table_name = $this->getSourceTable($form_id);
         //id key fields
@@ -471,7 +474,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
         }
 
         $value_as_key = '';
-        foreach($keys as $k => $v){
+        foreach($generated_cols as $k => $v){
             $value_as_key .= "'" .  $v  . "' AS " . $k . ",";
         }
 

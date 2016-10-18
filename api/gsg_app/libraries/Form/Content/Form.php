@@ -86,10 +86,10 @@ class Form implements iForm
         if(!isset($form_data) || !is_array($form_data)){
             throw new \UnexpectedValueException('No form data received');
         }
-        $form_keys = $this->getEntityKeys($form_data);
+        $generated_cols = $this->getGeneratedCols($form_data);
         $form_data = $this->parseFormData($form_data);
         //SEND KEY FIELDS AND VALUES
-        $this->datasource->upsert($this->id, $form_data, $form_keys);
+        $this->datasource->upsert($this->id, $form_data, $generated_cols);
     }
 
     /* -----------------------------------------------------------------
@@ -111,12 +111,39 @@ class Form implements iForm
             throw new \Exception('No form data found');
         }
         foreach($this->controls as $c){
-            if($c->isEditable() || $form_data['is_edited'] != 1){
+            if(!$c->isGenerated()){
                 $ret_val[$c->name()] = $c->parseFormData($form_data[$c->name()]);
             }
         }
         return $ret_val;
     }
+
+    /* -----------------------------------------------------------------
+    *  extracts generated column data
+
+    *  extracts generated column data from submitted form data, as it is not included in the form data sent to datasource,
+    * but is needed for
+
+    *  @author: ctranel
+    *  @date: 2016-10-13
+    *  @param array of key-value pairs from form submission
+    *  @return key-value pairs
+    *  @throws:
+    * -----------------------------------------------------------------
+    */
+    protected function getGeneratedCols($form_data){
+        $ret_val = [];
+        if(!isset($form_data) || !is_array($form_data)){
+            throw new \Exception('No form data found');
+        }
+        foreach($this->controls as $c){
+            if($c->isGenerated()){
+                $ret_val[$c->name()] = $c->parseFormData($form_data[$c->name()]);
+            }
+        }
+        return $ret_val;
+    }
+
     /* -----------------------------------------------------------------
     *  extracts keys
 
@@ -128,7 +155,6 @@ class Form implements iForm
     *  @return key-value pairs
     *  @throws:
     * -----------------------------------------------------------------
-    */
     protected function getEntityKeys($form_data){
         $ret_val = [];
         if(!isset($form_data) || !is_array($form_data)){
@@ -141,4 +167,5 @@ class Form implements iForm
         }
         return $ret_val;
     }
+*/
 }
