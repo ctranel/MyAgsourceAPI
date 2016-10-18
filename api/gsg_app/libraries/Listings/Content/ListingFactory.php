@@ -94,17 +94,4 @@ class ListingFactory implements iListingFactory {
         }
         return $listings;
     }
-
-    /*
-    * dataToObject
-    *
-    * @param array of listing data
-     * @param string herd_code
-    * @author ctranel
-    * @returns Array of Listings
-    */
-    protected function dataToObject($listing_data, $herd_code = null){
-        $f = $this->getListing($listing_data['listing_id'], $herd_code);
-        return $f;
-    }
 }

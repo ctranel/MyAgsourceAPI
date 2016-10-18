@@ -12,7 +12,7 @@ require_once(APPPATH . 'models/Listings/iListing_model.php');
  * -----------------------------------------------------------------
  */
 
-class Herd_options_model extends CI_Model implements iListing_model  {
+class Event_listing_model extends CI_Model implements iListing_model  {
     /**
      * herd_code
      * @var string
@@ -20,16 +20,16 @@ class Herd_options_model extends CI_Model implements iListing_model  {
     protected $herd_code;
 
     /**
-     * table_name
-     * @var string
+     * serial_num
+     * @var int
      **/
-    protected $table_name;
-
+    protected $serial_num;
 
     public function __construct($args){
 		parent::__construct();
         $this->criteria = $args;
         $this->herd_code = $args['herd_code'];
+        $this->serial_num = $args['serial_num'];
 	}
 
     /**
@@ -174,7 +174,7 @@ class Herd_options_model extends CI_Model implements iListing_model  {
                 inner join users.dbo.db_databases db ON tbl.database_id = db.id
 
             SET @dsql = CONCAT(N'SELECT *
-			    FROM ', @db_table_name, N' WHERE " . $key_condition_text . "isactive = 1')
+			    FROM ', @db_table_name, N' WHERE " . substr($key_condition_text, 0, -5). "')
 
             EXEC (@dsql)
        ";

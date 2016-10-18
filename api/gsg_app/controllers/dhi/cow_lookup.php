@@ -1,11 +1,14 @@
 <?php
-require_once(APPPATH . 'core/MY_Api_Controller.php');
+require_once(APPPATH . 'controllers/dpage.php');
+require_once APPPATH . 'libraries/Site/WebContent/WebBlockFactory.php';
+require_once APPPATH . 'libraries/Listings/Content/ListingFactory.php';
 
 use \myagsource\AccessLog;
-use \myagsource\dhi\HerdAccess;
+use \myagsource\Site\WebContent\WebBlockFactory;
+use \myagsource\Listings\Content\ListingFactory;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
-class Cow_lookup extends MY_API_Controller {
+class Cow_lookup extends dpage {
 	
 	/**
 	 * cow_id_field
@@ -19,18 +22,8 @@ class Cow_lookup extends MY_API_Controller {
 	
 	function __construct(){
 		parent::__construct();
-		//$this->session->keep_all_flashdata();
 
-		$this->load->model('herd_model');
-		$this->herd_access = new HerdAccess($this->herd_model);
-
-		if(!isset($this->as_ion_auth) || !$this->as_ion_auth->logged_in()){
-			$this->sendResponse(401);
-		}
-		$this->load->model('access_log_model');
-		$this->access_log = new AccessLog($this->access_log_model);
-
-		$this->cow_id_field = 'control_num';//$this->session->userdata('general_dhi')['cow_id_field'];
+		$this->cow_id_field = $this->settings->getValue('cow_id_field');
 		//$herd_code = $this->session->userdata('herd_code');
 
 		/* Load the profile.php config file if it exists
@@ -64,10 +57,34 @@ class Cow_lookup extends MY_API_Controller {
 		$this->load->model('dhi/cow_lookup/events_model');
     	$data['animal_data'] = $this->events_model->getCowArray($this->session->userdata('herd_code'), $serial_num);
     	$data['animal_data']['serial_num'] = $serial_num;
-     	$data['show_all_events'] = (bool)$show_all_events;
-   		$data['events'] = $this->events_model->getEventsArray($this->session->userdata('herd_code'), $serial_num, $this->curr_calving_date, (bool)$show_all_events);
+     	//$data['show_all_events'] = (bool)$show_all_events;
+   		//$data['events'] = $this->events_model->getEventsArray($this->session->userdata('herd_code'), $serial_num, $this->curr_calving_date, (bool)$show_all_events);
 
-		$this->sendResponse(200, null, $data);
+//temporary
+$page_id = 79;
+
+        //Set up site content objects
+        $this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
+        $this->load->model('web_content/block_model');
+        $web_block_factory = new WebBlockFactory($this->block_model);
+
+        //page content
+        $this->load->model('ReportContent/report_block_model');
+
+        $this->load->model('Listings/event_listing_model', null, false, ['herd_code'=>$this->session->userdata('herd_code'), 'serial_num'=>$serial_num]);
+        $option_listing_factory = new ListingFactory($this->event_listing_model);
+
+        //create block content
+        $listings = $option_listing_factory->getByPage($page_id, $this->session->userdata('herd_code'), $serial_num);
+
+        //create blocks for content
+        $blocks = $web_block_factory->getBlocksFromContent($page_id, $listings);
+        if(is_array($blocks)){
+            foreach($blocks as $b){
+                $data['blocks'][] = $b->toArray();
+            }
+        }
+        $this->sendResponse(200, null, $data);
 	}
 	
 	function id($serial_num){
