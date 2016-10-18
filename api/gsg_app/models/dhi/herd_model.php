@@ -1,6 +1,8 @@
 <?php
 require_once APPPATH . 'libraries/MssqlUtility.php';
 
+use \myagsource\MssqlUtility;
+
 class Herd_model extends CI_Model {
 
 	protected $tables;

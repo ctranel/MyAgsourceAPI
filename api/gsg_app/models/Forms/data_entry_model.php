@@ -1,4 +1,9 @@
 <?php
+require_once APPPATH . 'libraries/MssqlUtility.php';
+require_once(APPPATH . 'models/Forms/iForm_Model.php');
+
+use \myagsource\MssqlUtility;
+
 /* -----------------------------------------------------------------
  *	CLASS comments
  *  @file: Data_entry_model.php
@@ -11,7 +16,6 @@
  * -----------------------------------------------------------------
  */
 
-require_once(APPPATH . 'models/Forms/iForm_Model.php');
 
 
 class Data_entry_model extends CI_Model implements iForm_Model {
@@ -39,6 +43,11 @@ class Data_entry_model extends CI_Model implements iForm_Model {
      **/
     protected $table_name;
 
+    /**
+     * mssql_utility
+     * @var mssql_utility
+     **/
+    protected $mssql_utility;
 
     public function __construct(){
 		parent::__construct();
@@ -51,6 +60,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
      * @author ctranel
      **/
     public function getFormsByPage($page_id) {
+        $page_id = (int)$page_id;
         $results = $this->db
             ->select('pb.page_id, b.id, f.id AS form_id, b.name, b.description, dt.name AS display_type, s.name AS scope, b.active, b.path, f.dom_id, f.action, pb.list_order')
             ->join('users.dbo.blocks b', "pb.block_id = b.id AND b.display_type_id = 7 AND pb.page_id = " . $page_id . ' AND b.active = 1', 'inner')
@@ -73,6 +83,8 @@ class Data_entry_model extends CI_Model implements iForm_Model {
      * @author ctranel
      **/
     public function getSubFormsByParentId($parent_form_id) {
+        $parent_form_id = (int)$parent_form_id;
+
         $results = $this->db
             ->select('f.id AS form_id, s.name AS scope, f.active, f.dom_id, f.action, sl.list_order, scg.id, scg.parent_id, scg.operator, sc.form_control_name, sc.operator, sc.operand')
             ->join('users.frm.subform_condition_groups scg', "sl.id = scg.subform_link_id AND sl.parent_form_id = " . $parent_form_id, 'inner')
@@ -99,6 +111,8 @@ class Data_entry_model extends CI_Model implements iForm_Model {
      * @author ctranel
      **/
     public function getFormById($form_id) {
+        $form_id = (int)$form_id;
+
         $results = $this->db
             ->select('b.id, f.id AS form_id, b.name, b.description, dt.name AS display_type, s.name AS scope, b.active, b.path, f.dom_id, f.action')
             ->join('users.frm.forms f', "b.id = f.block_id AND f.id = " . $form_id, 'inner')
@@ -117,8 +131,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
      * @return string category
      * @author ctranel
      **/
-    protected function getFormKeyMeta($form_id, $ancestor_form_ids = null)
-    {
+    protected function getFormKeyMeta($form_id, $ancestor_form_ids = null) {
         $ret = [];
 
         if(is_array($ancestor_form_ids)){
@@ -179,6 +192,13 @@ class Data_entry_model extends CI_Model implements iForm_Model {
      * @author ctranel
      **/
     public function getFormControlMeta($form_id, $ancestor_form_ids = null) {
+        $form_id = (int)$form_id;
+        if(isset($ancestor_form_ids) && is_array($ancestor_form_ids)){
+            //have not yet tested with multiple level nesting
+            //var_dump($ancestor_form_ids);
+            array_walk_recursive($ancestor_form_ids, function(&$v, $k){return (int)$v;});
+            //var_dump($ancestor_form_ids);
+        }
         $result = $this->db->select('fc.id, ct.name AS control_type, fld.db_field_name AS name, fld.name AS label, fld.is_editable, fld.is_generated, fld.is_fk_field AS is_key, fc.default_value')
             ->select("(CAST(
                   (SELECT STUFF((
@@ -204,11 +224,20 @@ class Data_entry_model extends CI_Model implements iForm_Model {
      * getFormControlData
      *
      * @param int form id
+     * @param int form id
      * @param array of ints $ancestor_form_ids
      * @return string category
      * @author ctranel
      **/
     public function getFormControlData($form_id, $params, $ancestor_form_ids = null) {
+        $form_id = (int)$form_id;
+        if(isset($params) && is_array($params)){
+            array_walk_recursive($params, function(&$v, $k){return MssqlUtility::escape($v);});
+        }
+        if(isset($ancestor_form_ids) && is_array($ancestor_form_ids)){
+            array_walk_recursive($ancestor_form_ids, function(&$v, $k){return (int)$v;});
+        }
+
         $keys = array_keys($params);
         $common = array_intersect(['herd_code', 'serial_num'], $keys);
 
@@ -342,7 +371,9 @@ class Data_entry_model extends CI_Model implements iForm_Model {
     * -----------------------------------------------------------------
     */
 	public function getLookupOptions($control_id){
-		$sql = "USE users;
+        $control_id = (int)$control_id;
+
+	    $sql = "USE users;
 				DECLARE @tbl nvarchar(100), @value_col nvarchar(32), @desc_col nvarchar(32), @code_type nvarchar(15), @sql nvarchar(255)
 				SELECT @tbl = table_name, @value_col = value_column, @desc_col = desc_column, @code_type = codetype FROM users.frm.data_lookup WHERE control_id = " . $control_id . "
                 IF @code_type IS NOT NULL
@@ -379,6 +410,9 @@ class Data_entry_model extends CI_Model implements iForm_Model {
      * -----------------------------------------------------------------
      */
     public function getHerdLookupOptions($control_id, $herd_code){
+        $control_id = (int)$control_id;
+        $herd_code = MssqlUtility::escape($herd_code);
+
         $sql = "USE users;
 				DECLARE @tbl nvarchar(100), @value_col nvarchar(32), @desc_col nvarchar(32), @sql nvarchar(255)
 				SELECT @tbl = table_name, @value_col = value_column, @desc_col = desc_column FROM users.frm.data_lookup WHERE control_id = " . $control_id . "
@@ -412,6 +446,10 @@ class Data_entry_model extends CI_Model implements iForm_Model {
      * -----------------------------------------------------------------
      */
     public function getAnimalLookupOptions($control_id, $herd_code, $serial_num){
+        $control_id = (int)$control_id;
+        $herd_code = MssqlUtility::escape($herd_code);
+        $serial_num = (int)$serial_num;
+
         if(!isset($serial_num) || empty($serial_num)){
             return $this->getHerdLookupOptions($control_id, $herd_code);
             //throw new Exception('Animal serial number not set in datasource');
@@ -448,11 +486,17 @@ class Data_entry_model extends CI_Model implements iForm_Model {
     * -----------------------------------------------------------------
     */
 	public function upsert($form_id, $form_data, $generated_cols = null){
-        if(!isset($form_data) || empty($form_data)){
+        $form_id = (int)$form_id;
+        if(isset($params) && is_array($params)){
+            array_walk_recursive($params, function(&$v, $k){return MssqlUtility::escape($v);});
+        }
+        if(isset($params) && is_array($params)){
+            array_walk_recursive($params, function(&$v, $k){return MssqlUtility::escape($v);});
+        }
+
+	    if(!isset($form_data) || empty($form_data)){
             return false;
         }
-//var_dump($form_data, $keys);
-
 
         //When editing, key fields (i.e., uneditable fields) do not get passed with form data)
         //get table name

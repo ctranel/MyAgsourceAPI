@@ -1,5 +1,9 @@
 <?php  
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+require_once APPPATH . 'libraries/MssqlUtility.php';
+
+use \myagsource\MssqlUtility;
+
 /* -----------------------------------------------------------------
 *  @description: Benchmark data access
 *  @author: ctranel
@@ -28,6 +32,11 @@ class Benchmark_model extends Settings_model {
 	 *
 	 **/
 	public function get_benchmark_fields($db_table, $arr_excluded_fields = NULL){
+        $db_table = MssqlUtility::escape($db_table);
+        if(isset($arr_excluded_fields) && is_array($arr_excluded_fields)){
+            array_walk_recursive($arr_excluded_fields, function(&$v, $k){return MssqlUtility::escape($v);});
+        }
+
 		list($db, $schema, $tbl) = explode('.', $db_table);
 		$sql = "USE " . $db . "
 		 SELECT CAST ((select ',AVG(CAST('+quotename(C.name)+' AS DECIMAL(12,4))) AS '+quotename(C.name)
@@ -43,20 +52,43 @@ class Benchmark_model extends Settings_model {
 	}
 	
 	public function getBenchmarkData($bench_sql){
+        $bench_sql = MssqlUtility::escape($bench_sql);
+
 		$arr_benchmarks = $this->db->query($bench_sql)->result_array();
 		return $arr_benchmarks;
 	}
 	
 	/**
 	 * @description builds sql based on object variables
-	 * @param object report_model
-	 * @param string arr_fields_to_exclude
+	 * @param db_table object
+	 * @param string sql for avg fields
+     * @param array of criteria
+     * @param string db table name of benchmark pool
+     * @param string metric
+     * @param int herd size floor
+     * @param int herd size ceiling
+     * @param array of strings (breeds)
 	 * @param array of strings arr_group_by (db field names)
 	 * @return string
 	 * @author ctranel
 	 **/
 	public function build_benchmark_query($db_table, $avg_fields, $arr_criteria_data, $herd_benchmark_pool_table, $metric, $herd_size_floor, $herd_size_ceiling, $arr_breeds, $arr_group_by = NULL){
-		$sql = '';
+        $avg_fields = MssqlUtility::escape($avg_fields);
+        if(isset($arr_criteria_data) && is_array($arr_criteria_data)){
+            array_walk_recursive($arr_criteria_data, function(&$v, $k){return MssqlUtility::escape($v);});
+        }
+        $herd_benchmark_pool_table = MssqlUtility::escape($herd_benchmark_pool_table);
+        $metric = MssqlUtility::escape($metric);
+        $herd_size_floor = (int)$herd_size_floor;
+        $herd_size_ceiling = (int)$herd_size_ceiling;
+        if(isset($arr_breeds) && is_array($arr_breeds)){
+            array_walk_recursive($arr_breeds, function(&$v, $k){return MssqlUtility::escape($v);});
+        }
+        if(isset($arr_group_by) && is_array($arr_group_by)){
+            array_walk_recursive($arr_group_by, function(&$v, $k){return MssqlUtility::escape($v);});
+        }
+
+        $sql = '';
 		$cte = '';
 		$addl_select_fields = '';
 		$from = '';

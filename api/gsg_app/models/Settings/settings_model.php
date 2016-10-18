@@ -1,5 +1,9 @@
 <?php  
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+require_once APPPATH . 'libraries/MssqlUtility.php';
+
+use \myagsource\MssqlUtility;
+
 /* -----------------------------------------------------------------
 *  @description: Benchmark data access
 *  @author: ctranel
@@ -22,7 +26,10 @@ class Settings_model extends CI_Model {
 	 *
 	 **/
 	public function getSettingsData($user_id, $herd_code){
-        if(isset($user_id) && $user_id != FALSE){
+        $user_id = (int)$user_id;
+        $herd_code = MssqlUtility::escape($herd_code);
+
+	    if(isset($user_id) && $user_id != FALSE){
             $this->db
                 ->join('users.setng.user_herd_settings uhs', "s.id = uhs.setting_id AND (uhs.user_id = " . $user_id . " OR uhs.user_id IS NULL) AND (uhs.herd_code = '" . $herd_code . "' OR uhs.herd_code IS NULL)", 'left');
         }
