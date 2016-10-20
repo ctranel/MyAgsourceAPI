@@ -48,4 +48,8 @@ class SubForm implements iSubForm
     public function write($form_data)    {
         $this->form->write($form_data);
     }
+
+    public function action(){
+        return $this->form->action();
+    }
 }

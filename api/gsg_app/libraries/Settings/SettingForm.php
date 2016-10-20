@@ -44,7 +44,7 @@ class SettingForm extends Form implements iForm {
 
 *  @author: ctranel
 *  @date: Jul 1, 2014
-*  @param: array of key=>value pairs that have been processed by the parseFormData static function
+*  @param: array of key=>value pairs
 *  @return void
 *  @throws: * -----------------------------------------------------------------
 */
@@ -52,10 +52,10 @@ class SettingForm extends Form implements iForm {
         if(!isset($form_data) || !is_array($form_data)){
             throw new \UnexpectedValueException('No form data received');
         }
+
         $form_data = $this->parseFormData($form_data);
 
         $data = [];
-
         $user_id = isset($this->user_id) ? $this->user_id : 'NULL';
         $herd_code = "'$this->herd_code'";
 
@@ -70,6 +70,7 @@ class SettingForm extends Form implements iForm {
                 $data[] = "SELECT " . $user_id . " AS user_id, " . $herd_code . " AS herd_code, " . $c->id() . " AS setting_id, '" . $form_data[$c->name()] . "' AS value";
             }
         }
+
         $this->datasource->upsert($this->id, $data);
     }
 

@@ -159,7 +159,7 @@ class Setting_form_model extends CI_Model implements iForm_Model {
             ->select("(CAST(
                   (SELECT STUFF((
                       SELECT '|', CONCAT(v.name, ':', v.value) AS [data()] 
-                      FROM (SELECT sv.setting_id, val.name, cv.value FROM users.setng.settings_validators sv INNER JOIN users.frm.validators val ON sv.validator_id = val.id) AS v
+                      FROM (SELECT sv.setting_id, val.name, sv.value FROM users.setng.settings_validators sv INNER JOIN users.frm.validators val ON sv.validator_id = val.id) AS v
                       WHERE v.setting_id = s.id 
                       FOR xml path('')
                     ), 1, 1, ''))
@@ -234,7 +234,7 @@ class Setting_form_model extends CI_Model implements iForm_Model {
 				WHEN NOT MATCHED BY TARGET THEN
 					INSERT (user_id, herd_code, setting_id, value)
 					VALUES (nd.user_id, nd.herd_code, nd.setting_id, nd.value);";
-//die($sql);
+//print($sql);
 		$this->db->query($sql);
 	}
     

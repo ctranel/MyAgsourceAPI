@@ -56,6 +56,10 @@ class Form implements iForm
         $this->action = $action;
     }
 
+    public function action(){
+        return $this->action;
+    }
+
     public function toArray(){
        $ret['dom_id'] = $this->dom_id;
         $ret['action'] = $this->action;
@@ -86,8 +90,10 @@ class Form implements iForm
         if(!isset($form_data) || !is_array($form_data)){
             throw new \UnexpectedValueException('No form data received');
         }
+
         $generated_cols = $this->getGeneratedCols($form_data);
         $form_data = $this->parseFormData($form_data);
+        //$form_data['logID'] =
         //SEND KEY FIELDS AND VALUES
         $this->datasource->upsert($this->id, $form_data, $generated_cols);
     }
@@ -113,6 +119,8 @@ class Form implements iForm
         foreach($this->controls as $c){
             if(!$c->isGenerated()){
                 $ret_val[$c->name()] = $c->parseFormData($form_data[$c->name()]);
+                //@todo: not the right place to write subforms, but it will do for now
+                $c->writeSubforms($form_data);
             }
         }
         return $ret_val;

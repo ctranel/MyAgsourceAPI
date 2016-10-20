@@ -125,7 +125,7 @@ class dform extends dpage {
         if(isset($json_data)) {
             $params = (array)json_decode(urldecode($json_data));
         }
-        //validate form input
+            //validate form input
         $this->load->model('supplemental_model');
         $supplemental_factory = new SupplementalFactory($this->supplemental_model, site_url());
         $this->load->library('herds');
@@ -147,8 +147,13 @@ class dform extends dpage {
                 //get form object
                 //@todo: split form core from form display (core would be included in display), no need for web content or supplemental here
                 //supplemental factory
-                $this->load->model('supplemental_model');
-                $supplemental_factory = new SupplementalFactory($this->supplemental_model, site_url());
+                //$this->load->model('supplemental_model');
+                //$supplemental_factory = new SupplementalFactory($this->supplemental_model, site_url());
+
+                //add field values for logging
+                $input['logID'] = $this->session->userdata('user_id');
+                $date = new DateTime("now");
+                $input['logdttm'] = $date->format("Y-m-d H:i:s");
 
                 $form->write($input);
 

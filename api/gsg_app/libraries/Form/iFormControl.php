@@ -19,5 +19,6 @@ interface iFormControl
     public function getDisplayText($session_value);
     //public function setDefaultValue($new_value);
     public function getLookupOptions();
-    public function getFormData($session_value = null);
+    public function parseFormData($form_data);
+    public function writeSubforms($form_data);
 }

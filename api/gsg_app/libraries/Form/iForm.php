@@ -15,4 +15,5 @@ use myagsource\Site\iBlockContent;
 interface iForm extends iBlockContent
 {
     public function write($form_data);
+    public function action();
 }

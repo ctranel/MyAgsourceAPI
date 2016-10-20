@@ -102,9 +102,9 @@ class FormControl implements iFormControl
         $this->label = $control_data['label'];
         $this->value = isset($control_data['value']) ? $control_data['value'] : $control_data['default_value'];
         $this->control_type = $control_data['control_type'];
-        $this->is_editable = (bool)$control_data['is_editable'];
-        $this->is_generated = (bool)$control_data['is_generated'];
-        $this->is_key = (bool)$control_data['is_key'];
+        $this->is_editable = (bool)(isset($control_data['is_editable']) ? $control_data['is_editable'] : true);
+        $this->is_generated = (bool)(isset($control_data['is_generated']) ? $control_data['is_generated'] : false);
+        $this->is_key = (bool)(isset($control_data['is_key']) ? $control_data['is_key'] : false);
         $this->validators = $validators;
         $this->options = $options;
         $this->subforms = $subforms;
@@ -353,7 +353,6 @@ class FormControl implements iFormControl
     *  @return mixed
     *  @throws: 
     * -----------------------------------------------------------------
-    */
     public function getFormData($session_value = null){
         if(strpos($this->control_type, 'lookup') !== false){
             $ret_val['options'] = $this->options;
@@ -364,16 +363,17 @@ class FormControl implements iFormControl
         $ret_val = $this->getCurrValue($session_value);
         return $ret_val;
 //		}
-        /*
-         * @todo: add remaining data types
-         */
+
+        //@todo: add remaining data types
 
         die("Sorry, I don't recognize the form field data type (" . $this->control_type . ") in Settings\Form");
     }
-    
+*/
+
     public function parseFormData($value){
  //@todo: check validators (also in getCurrValue?)
         $ret_val = null;
+
         if(is_array($value)){
             //if($this->control_type === 'range'){
             $ret_val = implode('|', $value);
@@ -388,5 +388,15 @@ class FormControl implements iFormControl
             $ret_val = null;
         }
         return $ret_val;
+    }
+
+    public function writeSubforms($form_data){
+        if(isset($this->subforms) && is_array($this->subforms)){
+            foreach($this->subforms as $s){
+                if($s->action() === null){
+                    $s->write($form_data);
+                }
+            }
+        }
     }
 }
