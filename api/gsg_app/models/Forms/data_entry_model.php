@@ -172,7 +172,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
             array_walk_recursive($ancestor_form_ids, function(&$v, $k){return (int)$v;});
             //var_dump($ancestor_form_ids);
         }
-        $result = $this->db->select('fc.id, ct.name AS control_type, fld.db_field_name AS name, fld.name AS label, fld.is_editable, fld.is_generated, fld.is_fk_field AS is_key, fc.default_value')
+        $result = $this->db->select('fc.id, ct.name AS control_type, fld.db_field_name AS name, fld.name AS label, fld.is_editable, fld.is_generated, fld.is_fk_field AS is_key, fc.biz_validation_url, fc.default_value')
             ->select("(CAST(
                   (SELECT STUFF((
                       SELECT '|', CONCAT(v.name, ':', v.value) AS [data()] 
@@ -300,7 +300,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
             
             DEALLOCATE Table_Cursor;
 
-                select fc.id, ct.name AS control_type, fld.db_field_name AS name, fld.name AS label, fld.is_editable, fld.is_generated, fld.is_fk_field AS is_key, fc.default_value, " . $key_val_field_list_text . " v.value AS value,
+                select fc.id, ct.name AS control_type, fld.db_field_name AS name, fld.name AS label, fld.is_editable, fld.is_generated, fld.is_fk_field AS is_key, fc.biz_validation_url, fc.default_value, " . $key_val_field_list_text . " v.value AS value,
                     (CAST(
                         (SELECT STUFF((
                           SELECT '|', CONCAT(v.name, ':', v.value) AS [data()] 

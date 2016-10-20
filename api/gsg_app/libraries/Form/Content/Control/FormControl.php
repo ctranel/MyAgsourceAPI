@@ -84,6 +84,12 @@ class FormControl implements iFormControl
     protected $is_key;
 
     /**
+     * biz_validation_url
+     * @var string
+     **/
+    protected $biz_validation_url;
+
+    /**
      * validators
      * @var Validator[]
      **/
@@ -105,6 +111,7 @@ class FormControl implements iFormControl
         $this->is_editable = (bool)(isset($control_data['is_editable']) ? $control_data['is_editable'] : true);
         $this->is_generated = (bool)(isset($control_data['is_generated']) ? $control_data['is_generated'] : false);
         $this->is_key = (bool)(isset($control_data['is_key']) ? $control_data['is_key'] : false);
+        $this->biz_validation_url = (isset($control_data['biz_validation_url']) ? $control_data['biz_validation_url'] : null);
         $this->validators = $validators;
         $this->options = $options;
         $this->subforms = $subforms;
@@ -271,6 +278,7 @@ class FormControl implements iFormControl
             'control_type' => $ctl_type,
             'is_editable' => $this->is_editable,
             'default_value' => $this->default_value,
+            'biz_validation_url' => $this->biz_validation_url,
         ];
 
         if(isset($this->options)){
