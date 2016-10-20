@@ -52,4 +52,18 @@ class SubForm implements iSubForm
     public function action(){
         return $this->form->action();
     }
+
+    public function conditionsMet($control_value){
+        switch($this->operator){
+            case "=":
+                return $control_value === $this->operand;
+            case "!=":
+                return $control_value !== $this->operand;
+            case ">":
+                return $control_value > $this->operand;
+            case "<":
+                return $control_value < $this->operand;
+        }
+        return false;
+    }
 }

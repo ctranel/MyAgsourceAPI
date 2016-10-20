@@ -393,7 +393,8 @@ class FormControl implements iFormControl
     public function writeSubforms($form_data){
         if(isset($this->subforms) && is_array($this->subforms)){
             foreach($this->subforms as $s){
-                if($s->action() === null){
+                //only subforms that do not have an action of their own are written with their parent form
+                if($s->action() === null && $s->conditionsMet($form_data[$this->name])){
                     $s->write($form_data);
                 }
             }
