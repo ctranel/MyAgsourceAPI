@@ -19,35 +19,6 @@ use \myagsource\MssqlUtility;
 
 
 class Data_entry_model extends CI_Model implements iForm_Model {
-    /**
-     * user_id
-     * @var int
-     **/
-    protected $criteria;
-
-    /**
-     * herd_code
-     * @var string
-     **/
-    protected $herd_code;
-
-    /**
-     * serial_num
-     * @var int
-     **/
-    protected $serial_num;
-
-    /**
-     * table_name
-     * @var string
-     **/
-    protected $table_name;
-
-    /**
-     * mssql_utility
-     * @var mssql_utility
-     **/
-    protected $mssql_utility;
 
     public function __construct(){
 		parent::__construct();
@@ -164,6 +135,8 @@ class Data_entry_model extends CI_Model implements iForm_Model {
      **/
     protected function getSourceTable($form_id)
     {
+        $form_id = (int)$form_id;
+
         $sql = " select DISTINCT CONCAT(db.name, '.',  tbl.db_schema, '.', tbl.name) AS db_table_name
                 from users.frm.form_control_groups cg
                 inner join users.frm.form_controls fc ON cg.id = fc.form_control_group_id AND cg.form_id = " . $form_id . "

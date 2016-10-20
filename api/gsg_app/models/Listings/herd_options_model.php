@@ -102,6 +102,8 @@ class Herd_options_model extends CI_Model implements iListing_model  {
      **/
     protected function getSourceTable($listing_id)
     {
+        $listing_id = (int)$listing_id;
+
         $sql = " select DISTINCT CONCAT(db.name, '.',  tbl.db_schema, '.', tbl.name) AS db_table_name
                 from users.options.listings_columns lc
                 inner join users.dbo.db_fields fld ON lc.db_field_id = fld.id AND lc.listing_id = " . $listing_id . "
