@@ -1,19 +1,11 @@
 <?php
 //namespace myagsource;
 require_once(APPPATH . 'controllers/dpage.php');
-require_once APPPATH . 'libraries/Site/WebContent/WebBlockFactory.php';
-require_once APPPATH . 'libraries/Listings/Content/ListingFactory.php';
-require_once(APPPATH . 'libraries/Supplemental/Content/SupplementalFactory.php');
-require_once(APPPATH . 'libraries/Site/WebContent/Page.php');
-require_once(APPPATH . 'libraries/dhi/HerdPageAccess.php');
-require_once(APPPATH . 'libraries/Site/WebContent/PageAccess.php');
+require_once(APPPATH . 'libraries/dhi/AnimalEvent.php');
 
-use \myagsource\Site\WebContent\WebBlockFactory;
-use \myagsource\Listings\Content\ListingFactory;
-use \myagsource\Supplemental\Content\SupplementalFactory;
-use \myagsource\Site\WebContent\Page;
-use \myagsource\dhi\HerdPageAccess;
-use \myagsource\Site\WebContent\PageAccess;
+
+use \myagsource\Api\Response\ResponseMessage;
+use \myagsource\dhi\AnimalEvent;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
@@ -45,8 +37,45 @@ class events extends dpage {
 	    //var_dump($this->settings);
         $events = $this->herd->getEventMap();
         if(empty(array_filter($events))) {
-            $this->sendResponse(404, new ResponseMessage('No animals found for herd ' . $this->herd->herdCode() . '.  Please select a report from the navigation', 'error'));
+            $this->sendResponse(404, new ResponseMessage('No events found for herd ' . $this->herd->herdCode() . '.', 'error'));
         }
         $this->sendResponse(200, null, ['event_map' => $events]);
 	}
+
+	function is_eligible(){
+        $input = $this->input->userInputArray();
+        if(empty($input) || count($input) == 0){
+            $this->sendResponse(400, new ResponseMessage('No data sent with request.', 'error'));
+        }
+
+        if(!isset($input['event_cd']) || empty($input['event_cd'])){
+            $this->sendResponse(204);
+        }
+
+        $this->load->model('dhi/events_model');
+        try{
+            $animal_event = new AnimalEvent($this->events_model, $input['herd_code'], (int)$input['serial_num']);
+            $is_eligible = $animal_event->isEligible((int)$input['event_cd'], $input['event_dt']);
+        }
+        catch(exception $e){
+            $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
+        }
+
+        //processed successfully, no errors
+        if($is_eligible){
+            $this->sendResponse(202);
+        }
+
+        //if there are errors
+        try {
+            $errors = $animal_event->eligibleMessage();
+            array_walk($errors, function (&$v, $k) {
+                $v = new ResponseMessage($v, 'error');
+            });
+        }
+        catch(exception $e){
+            $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
+        }
+        $this->sendResponse(200, $errors);
+    }
 }
