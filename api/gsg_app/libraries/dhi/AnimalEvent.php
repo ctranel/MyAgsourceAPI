@@ -81,6 +81,72 @@ class AnimalEvent
     }
 
     /* -----------------------------------------------------------------
+     *  isValidDateChange
+
+     *
+
+     *  @author: ctranel
+     *  @date: 2016-10-24
+     *  @return: boolean
+     *  @throws:
+     * -----------------------------------------------------------------*/
+    protected function isValidDateChange($event_id, $event_dt){
+        $data = $this->datasource->eventData($event_id);
+
+        if(!isset($data) || !is_array($data)){
+            throw new \Exception("Could not find an existing event matching submitted event.");
+        }
+        $original_event_dt = $data['event_dt'];
+        $dtEvent_dt = new \DateTime($event_dt);
+        $dtOriginal_event_dt = new \DateTime($original_event_dt);
+
+        if($dtOriginal_event_dt->format('Y-m-d') === $dtEvent_dt->format('Y-m-d')) {
+            return true;
+        }
+
+        if($dtOriginal_event_dt > $dtEvent_dt){
+            $early = $event_dt;
+            $late = $original_event_dt;
+        }
+        else{
+            $early = $original_event_dt;
+            $late = $event_dt;
+        }
+
+        $repro_events = $this->datasource->getEventsBetweenDates($this->herd_code, $this->serial_num, $early, $late, [33,34,40,30,31,32,36,39]);
+        if(!is_array($repro_events) || count($repro_events) === 0){
+            return true;
+        }
+        return false;
+    }
+
+    /* -----------------------------------------------------------------
+     *  isValidDateChange
+
+     *
+
+     *  @author: ctranel
+     *  @date: 2016-10-24
+     *  @return: boolean
+     *  @throws:
+     * -----------------------------------------------------------------*/
+    protected function inCurrentLactation($event_dt){
+        $lact_date = $this->datasource->currentLactationStartDate($this->herd_code, $this->serial_num);
+
+        if(!isset($lact_date)){
+            throw new \Exception("Could not validate current lactation date.");
+        }
+        $dtEvent_dt = new \DateTime($event_dt);
+        $dtLact_date = new \DateTime($lact_date);
+
+        if($dtEvent_dt < $dtLact_date){
+            return false;
+        }
+
+        return true;
+    }
+
+    /* -----------------------------------------------------------------
      *  isEligible
 
      *
@@ -91,8 +157,31 @@ class AnimalEvent
      *  @throws:
      * -----------------------------------------------------------------*/
 
-    public function isEligible($event_cd, $event_dt){
-        $data = $this->datasource->eventEligibilityData($this->herd_code, $this->serial_num);
+    public function isEligible($event_cd, $event_dt, $event_id = null){
+        //if an event is being edited (event id is already set)
+        if(isset($event_id) && !empty($event_id)){
+            //if a fresh event is being edited (event is fresh or abort)
+            if(in_array($event_cd, [1,2,5])){
+                if(!$this->isValidDateChange($event_id, $event_dt)){
+                    $this->eligible_messages[] = "Fresh event date change conflicts with existing reproductive events.";
+                    return false;
+                }
+            }
+
+            if(!$this->inCurrentLactation($event_dt)){
+                $this->eligible_messages[] = "Cannot edit events outside of current lactation.";
+                return false;
+            }
+
+            //if sold or died event is selected
+            if(isset($event_id) && !empty($event_id) && in_array($event_cd, [21,22,23,24,25,26,27,28])){
+                $this->eligible_messages[] = "Cannot edit sold or died events.";
+                return false;
+            }
+
+        }
+
+        $data = $this->datasource->eventEligibilityData($this->herd_code, $this->serial_num, $event_dt);
         $now = new \DateTime();
         $event_dt = new \DateTime($event_dt);
 
