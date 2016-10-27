@@ -460,28 +460,14 @@ class Data_entry_model extends CI_Model implements iForm_Model {
     */
 	public function upsert($form_id, $form_data, $generated_cols = null){
         $form_id = (int)$form_id;
-        if(isset($params) && is_array($params)){
-            array_walk_recursive($params, function(&$v, $k){return MssqlUtility::escape($v);});
-        }
-        if(isset($params) && is_array($params)){
-            array_walk_recursive($params, function(&$v, $k){return MssqlUtility::escape($v);});
-        }
+        $form_data = MssqlUtility::escape($form_data);
 
-	    if(!isset($form_data) || empty($form_data)){
-            return false;
-        }
-
-        //When editing, key fields (i.e., uneditable fields) do not get passed with form data)
         //get table name
         $table_name = $this->getSourceTable($form_id);
         //id key fields
         $key_meta = $this->getFormKeyMeta($form_id);
         $key_field_names = array_keys($key_meta);
         $form_field_names = array_keys($form_data);
-        //can't insert values on identity fields
-        //if($key = array_search('key_value', $form_field_names) !== false){
-        //    unset($form_field_names[$key]);
-        //}
 
         $join_cond = '';
         if(isset($key_field_names) && is_array($key_field_names)){
