@@ -85,6 +85,8 @@ class Setting_form_model extends CI_Model implements iForm_Model {
      * @author ctranel
      **/
     public function getFormsByPage($page_id) {
+        $page_id = (int)$page_id;
+
         $results = $this->db
             ->select('pb.page_id, b.id, f.id AS form_id, b.name, b.description, dt.name AS display_type, s.name AS scope, b.active, b.path, f.dom_id, f.action, pb.list_order')
             ->join('users.dbo.blocks b', "pb.block_id = b.id AND b.display_type_id = 6 AND pb.page_id = " . $page_id, 'inner')
@@ -104,7 +106,9 @@ class Setting_form_model extends CI_Model implements iForm_Model {
      * @return string category
      * @author ctranel
      **/
-    public function getSubFormsByParentId($parent_form_id) {
+    public function getSubFormsByParentId($parent_form_id){
+        $parent_form_id = (int)$parent_form_id;
+
         $results = $this->db
             ->select('f.id AS form_id, scp.name AS scope, f.active, f.dom_id, f.action, sl.list_order, scg.id, scg.parent_id, scg.operator, sc.form_control_name, sc.operator, sc.operand')
             ->join('users.frm.subform_condition_groups scg', "sl.id = scg.subform_link_id AND sl.parent_form_id = " . $parent_form_id, 'inner')
@@ -132,6 +136,8 @@ class Setting_form_model extends CI_Model implements iForm_Model {
      * @author ctranel
      **/
     public function getFormById($form_id) {
+        $form_id = (int)$form_id;
+
         $results = $this->db
             ->select('b.id, f.id AS form_id, b.name, b.description, dt.name AS display_type, s.name AS scope, b.active, b.path, f.dom_id, f.action')
             ->join('users.frm.forms f', "b.id = f.block_id AND f.id = " . $form_id, 'inner')
@@ -151,6 +157,9 @@ class Setting_form_model extends CI_Model implements iForm_Model {
      * @author ctranel
      **/
     public function getFormControlData($form_id, $key_params) {
+        $form_id = (int)$form_id;
+        $key_params = MssqlUtility::escape($key_params);
+
         $herd_code = $key_params['herd_code'];
         $user_id = $key_params['user_id'];
 
@@ -199,7 +208,9 @@ class Setting_form_model extends CI_Model implements iForm_Model {
     * -----------------------------------------------------------------
     */
 	public function getLookupOptions($setting_id){
-		$sql = "USE users;
+		$setting_id = (int)$setting_id;
+
+	    $sql = "USE users;
 				DECLARE @tbl nvarchar(100), @sql nvarchar(255)
 				SELECT @tbl = table_name FROM users.setng.data_lookup WHERE setting_id = " . $setting_id . "
 				SELECT @sql = N' SELECT value, description FROM ' + quotename(@tbl) + ' ORDER BY list_order'
@@ -207,7 +218,26 @@ class Setting_form_model extends CI_Model implements iForm_Model {
 		$results = $this->db->query($sql)->result_array();
 		return $results;
 	}
-	
+
+    /* -----------------------------------------------------------------
+    *  composeSettingSelect
+
+    *  compose sql insert statements to be used in the "using" clause in the upsert function
+
+    *  @author: ctranel
+    *  @param: int user id
+     * @param: string herd code
+     * @param: int setting id
+     * @param: string setting value
+    *  @return void
+    *  @throws:
+    * -----------------------------------------------------------------
+    */
+    public static function composeSettingSelect($user_id, $herd_code, $setting_id, $setting_value){
+        $ret = "SELECT " . $user_id . " AS user_id, " . $herd_code . " AS herd_code, " . $setting_id . " AS setting_id, '" . $setting_value . "' AS value";
+        return $ret;
+    }
+
 	/* -----------------------------------------------------------------
 	*  upsert Description
 
@@ -220,6 +250,9 @@ class Setting_form_model extends CI_Model implements iForm_Model {
 	* -----------------------------------------------------------------
 	*/
 	public function upsert($form_id, $arr_using_stmnts){
+        $form_id = (int)$form_id;
+        //data in $arr_using_stmnts was cleaned when statements were composed
+
 		if(!isset($arr_using_stmnts) || empty($arr_using_stmnts)){
 			return false;
 		}

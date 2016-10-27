@@ -67,7 +67,7 @@ class SettingForm extends Form implements iForm {
                 if(!$c->forHerd()){
                     $herd_code = 'NULL';
                 }
-                $data[] = "SELECT " . $user_id . " AS user_id, " . $herd_code . " AS herd_code, " . $c->id() . " AS setting_id, '" . $form_data[$c->name()] . "' AS value";
+                $data[] = $this->datasource->composeSettingSelect($user_id, $herd_code, $c->id(), $form_data[$c->name()]);
             }
         }
 
