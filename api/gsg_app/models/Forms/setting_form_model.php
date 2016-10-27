@@ -13,7 +13,9 @@
  */
 
 require_once(APPPATH . 'models/Forms/iForm_Model.php');
+require_once APPPATH . 'libraries/MssqlUtility.php';
 
+use \myagsource\MssqlUtility;
 
 class Setting_form_model extends CI_Model implements iForm_Model {
 
@@ -234,6 +236,12 @@ class Setting_form_model extends CI_Model implements iForm_Model {
     * -----------------------------------------------------------------
     */
     public static function composeSettingSelect($user_id, $herd_code, $setting_id, $setting_value){
+        $user_id = (int)$user_id;
+        $herd_code = MssqlUtility::escape($herd_code);
+        $setting_id = (int)$setting_id;
+        $setting_value = MssqlUtility::escape($setting_value);
+
+
         $ret = "SELECT " . $user_id . " AS user_id, " . $herd_code . " AS herd_code, " . $setting_id . " AS setting_id, '" . $setting_value . "' AS value";
         return $ret;
     }
