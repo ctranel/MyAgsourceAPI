@@ -17,5 +17,5 @@ interface iListing_model {
     public function getListingsByPage($page_id);
     public function getListingById($listing_id);
     public function getListingColumnMeta($listing_id);
-    public function getListingData($listing_id);
+    public function getListingData($listing_id, $order_by, $sort_order);
 }

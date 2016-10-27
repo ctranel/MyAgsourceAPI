@@ -1,6 +1,9 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 require_once(APPPATH . 'models/Listings/iListing_model.php');
+require_once APPPATH . 'libraries/MssqlUtility.php';
+
+use \myagsource\MssqlUtility;
 
 
 /* -----------------------------------------------------------------
@@ -27,6 +30,9 @@ class Event_listing_model extends CI_Model implements iListing_model  {
 
     public function __construct($args){
 		parent::__construct();
+        if(isset($args) && is_array($args)){
+            array_walk($args, function(&$v, $k){return MssqlUtility::escape($v);});
+        }
         $this->criteria = $args;
         $this->herd_code = $args['herd_code'];
         $this->serial_num = $args['serial_num'];
@@ -39,10 +45,18 @@ class Event_listing_model extends CI_Model implements iListing_model  {
      * @author ctranel
      **/
     public function getListingsByPage($page_id) {
+        $page_id = (int)$page_id;
+
         $results = $this->db
-            ->select('pb.page_id, b.id, l.id AS listing_id, b.name, b.description, dt.name AS display_type, s.name AS scope, l.form_id, b.active, b.path, pb.list_order')
+            ->select('pb.page_id, b.id, l.id AS listing_id, b.name, b.description, dt.name AS display_type, s.name AS scope, srt.db_field_name AS order_by, l.sort_order, l.form_id, b.active, b.path, pb.list_order')
             ->join('users.dbo.blocks b', "pb.block_id = b.id AND b.display_type_id = 8 AND pb.page_id = " . $page_id . ' AND b.active = 1', 'inner')
             ->join('users.options.listings l', "b.id = l.block_id AND l.isactive = 1", 'inner')
+            ->join("(
+                    SELECT lci.id, f.db_field_name 
+                    FROM users.options.listings_columns lci 
+                        INNER JOIN users.dbo.db_fields f ON lci.db_field_id = f.id
+                ) srt", 'l.order_by = srt.id', 'left'
+            )
             ->join('users.dbo.lookup_display_types dt', 'b.display_type_id = dt.id', 'inner')
             ->join('users.dbo.lookup_scopes s', 'b.scope_id = s.id', 'inner')
             ->get('users.dbo.pages_blocks pb')
@@ -59,9 +73,17 @@ class Event_listing_model extends CI_Model implements iListing_model  {
      * @author ctranel
      **/
     public function getListingById($listing_id) {
+        $listing_id = (int)$listing_id;
+
         $results = $this->db
-            ->select('b.id, l.id AS listing_id, b.name, b.description, dt.name AS display_type, s.name AS scope, l.form_id, b.active, b.path')
+            ->select('b.id, l.id AS listing_id, b.name, b.description, dt.name AS display_type, s.name AS scope, srt.db_field_name AS order_by, l.sort_order, l.form_id, b.active, b.path')
             ->join('users.options.listings l', "b.id = l.block_id AND l.id = " . $listing_id, 'inner')
+            ->join("(
+                    SELECT lci.id, f.db_field_name 
+                    FROM users.options.listings_columns lci 
+                        INNER JOIN users.dbo.db_fields f ON lci.db_field_id = f.id
+                ) srt", 'l.order_by = srt.id', 'left'
+            )
             ->join('users.dbo.lookup_display_types dt', 'b.display_type_id = dt.id', 'inner')
             ->join('users.dbo.lookup_scopes s', 'b.scope_id = s.id', 'inner')
             ->get('users.dbo.blocks b')
@@ -102,6 +124,8 @@ class Event_listing_model extends CI_Model implements iListing_model  {
      **/
     protected function getSourceTable($listing_id)
     {
+        $listing_id = (int)$listing_id;
+
         $sql = " select DISTINCT CONCAT(db.name, '.',  tbl.db_schema, '.', tbl.name) AS db_table_name
                 from users.options.listings_columns lc
                 inner join users.dbo.db_fields fld ON lc.db_field_id = fld.id AND lc.listing_id = " . $listing_id . "
@@ -128,6 +152,8 @@ class Event_listing_model extends CI_Model implements iListing_model  {
      * @author ctranel
      **/
     public function getListingColumnMeta($listing_id) {
+        $listing_id = (int)$listing_id;
+
         $sql = " select lc.id, ct.name AS control_type, lc.label, lc.is_displayed, fld.is_fk_field AS is_key, lc.db_field_id , fld.db_field_name AS name, '' AS default_value
                 from users.options.listings_columns lc
                 inner join users.dbo.db_fields fld ON lc.db_field_id = fld.id AND lc.listing_id = " . $listing_id . "
@@ -148,7 +174,11 @@ class Event_listing_model extends CI_Model implements iListing_model  {
      * @return array column data
      * @author ctranel
      **/
-    public function getListingData($listing_id) {
+    public function getListingData($listing_id, $order_by, $sort_order) {
+        $listing_id = (int)$listing_id;
+        $order_by = MssqlUtility::escape($order_by);
+        $sort_order = MssqlUtility::escape($sort_order);
+
         $keys = array_keys($this->criteria);
         $key_meta = $this->getListingKeyMeta($listing_id);
         $key_condition_text = '';
@@ -174,7 +204,12 @@ class Event_listing_model extends CI_Model implements iListing_model  {
                 inner join users.dbo.db_databases db ON tbl.database_id = db.id
 
             SET @dsql = CONCAT(N'SELECT *
-			    FROM ', @db_table_name, N' WHERE " . substr($key_condition_text, 0, -5). "')
+			    FROM ', @db_table_name, N' WHERE " . substr($key_condition_text, 0, -5);
+
+        if(isset($order_by) && isset($sort_order)) {
+            $sql .= " ORDER BY " . $order_by . " " . $sort_order;
+        }
+        $sql .= "')
 
             EXEC (@dsql)
        ";
@@ -182,6 +217,4 @@ class Event_listing_model extends CI_Model implements iListing_model  {
         $results = $this->db->query($sql)->result_array();
         return $results;
     }
-
-
 }

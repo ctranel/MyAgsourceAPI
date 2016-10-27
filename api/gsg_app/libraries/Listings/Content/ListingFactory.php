@@ -57,7 +57,7 @@ class ListingFactory implements iListingFactory {
     */
     protected function createListing($listing_data, $herd_code, $serial_num){
         $column_data = $this->datasource->getListingColumnMeta($listing_data['listing_id']);
-        $dataset = $this->datasource->getListingData($listing_data['listing_id'], implode(', ', array_column($column_data, 'name')));
+        $dataset = $this->datasource->getListingData($listing_data['listing_id'], $listing_data['order_by'], $listing_data['sort_order']);//, implode(', ', array_column($column_data, 'name')));
 
         $lc = [];
         if(is_array($column_data) && !empty($column_data) && is_array($column_data[0])){

@@ -75,8 +75,7 @@ class WebBlockFactory {
             return false;
         }
         foreach($results as $r){
-//            var_dump($r); die;
-            $blocks[] = new Block($block_content[$r['list_order']], $r['id'], $r['name'], $r['description'], $r['display_type'], $r['scope'], $r['active'], $r['path']);//, 
+            $blocks[] = new Block($block_content[$r['list_order']], $r['id'], $r['name'], $r['description'], $r['display_type'], $r['scope'], $r['active'], $r['path']);//,
         }
         return $blocks;
     }
