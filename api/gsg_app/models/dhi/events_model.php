@@ -133,7 +133,7 @@ class Events_model extends CI_Model {
                 ,species_cd
                 ,sex_cd
                 ,birth_dt
-                ,curr_lact_num
+                ,CASE WHEN [TopFreshDate] IS NULL THEN 1 ELSE 0 END AS is_youngstock
                 ,CASE WHEN earliest_dry_date IS NULL THEN NULL
                     ELSE (SELECT Max(v) FROM (VALUES (earliest_dry_date), (DATEADD(day, 1, [TopStatusDate]))) AS value(v))
                     END AS earliest_dry_eligible_date
@@ -164,7 +164,6 @@ class Events_model extends CI_Model {
                   ,id.species_cd
                   ,id.sex_cd
                   ,id.birth_dt
-                  ,id.curr_lact_num
                   ,CASE
                     WHEN id.is_active = 0 OR te.[TopSoldDiedDate] IS NOT NULL THEN NULL
                     WHEN te.[TopFreshDate] IS NOT NULL THEN --cow

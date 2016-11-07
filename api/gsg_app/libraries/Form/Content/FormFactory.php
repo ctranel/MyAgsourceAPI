@@ -75,7 +75,7 @@ class FormFactory implements iFormFactory{
 	public function getForm($form_id, $herd_code){
 		$results = $this->datasource->getFormById($form_id);
 		if(empty($results)){
-			return false;
+			throw new Exception('No data found for requested form.');
 		}
 		return $this->createForm($results[0], $herd_code);
 	}
@@ -142,6 +142,26 @@ class FormFactory implements iFormFactory{
     }
 
     /* -----------------------------------------------------------------
+*  getControlOptionsById
+
+*  Returns all options
+
+*  @since: version 1
+*  @author: ctranel
+*  @date: Jun 26, 2014
+*  @param: int control id
+*  @return array of control meta data
+*  @throws:
+* -----------------------------------------------------------------
+*/
+    public function getControlOptionsById($control_id){
+        $control_meta = $this->datasource->getControlMetaById($control_id);
+
+        return $this->getLookupOptions($control_meta['id'], $control_meta['control_type']);
+    }
+
+
+    /* -----------------------------------------------------------------
 *  getLookupOptions
 
 *  Returns all options
@@ -176,10 +196,10 @@ class FormFactory implements iFormFactory{
             $keys = array_keys($options[0]);
             foreach($options as $o){
                 //if(isset($o['value'])){
-                $ret[] = ['value' => $o[$keys[0]], 'text' => $o[$keys[1]]];
+                $ret[] = ['value' => $o[$keys[0]], 'label' => $o[$keys[1]]];
                 //}
                 //else{
-                //    $this->options[] = ['value' => $o['key_value'], 'text' => $o['description']];
+                //    $this->options[] = ['value' => $o['key_value'], 'label' => $o['description']];
                 //}
             }
         }

@@ -174,4 +174,19 @@ class dform extends dpage {
         }
         $this->sendResponse(400, new ResponseMessage(validation_errors(), 'error'));
     }
+
+    public function animal_options($herd_code, $serial_num, $control_id){
+        $this->load->model('Forms/data_entry_model');
+        try {
+            $form_factory = new FormFactory($this->data_entry_model, null, ['herd_code'=>$herd_code, 'serial_num'=>$serial_num]);
+
+            $options = $form_factory->getControlOptionsById($control_id);
+
+//var_dump($options);
+            $this->sendResponse(200, null, ['options' => $options]);
+        }
+        catch(Exception $e){
+            $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
+        }
+    }
 }

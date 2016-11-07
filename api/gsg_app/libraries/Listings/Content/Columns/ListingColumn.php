@@ -105,30 +105,12 @@ class ListingColumn implements iListingColumn
     }
 
     public function toArray(){
-        switch($this->control_type){
-            case 'herd_lookup':
-                $ctl_type = 'data_lookup';
-                break;
-            case 'herd_lookup_array':
-                $ctl_type = 'data_lookup_array';
-                break;
-            case 'animal_lookup':
-                $ctl_type = 'data_lookup';
-                break;
-            case 'animal_lookup_array':
-                $ctl_type = 'data_lookup_array';
-                break;
-            default:
-                $ctl_type = $this->control_type;
-                break;
-        }
-
         $ret = [
             'label' => $this->label,
             'name' => $this->name,
             //'description' => $this->description,
             'default_value' => $this->default_value,
-            'control_type' => $ctl_type,
+            'control_type' => $this->control_type,
             'is_displayed' => $this->is_displayed,
             'is_key' => $this->is_key,
         ];

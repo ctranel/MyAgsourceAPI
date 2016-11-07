@@ -153,6 +153,29 @@ class Form implements iForm
     }
 
     /* -----------------------------------------------------------------
+    *  animalOptions
+
+    *  returns an array of animal options contained in form keyed by field name of control.
+
+    *  @author: ctranel
+    *  @date: 2016-11-02
+    *  @return array animal options
+    *  @throws:
+    * -----------------------------------------------------------------
+    */
+    public function animalOptions(){
+        $ret_val = [];
+
+        foreach($this->controls as $c){
+            if($c->controlType() === "animal_lookup"){
+                $ret_val[$c->name()] = $c->options();
+            }
+        }
+
+        return $ret_val;
+    }
+
+    /* -----------------------------------------------------------------
     *  extracts keys
 
     *  extracts keys and corresponding values from submitted form data

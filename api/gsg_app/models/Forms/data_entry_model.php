@@ -192,6 +192,41 @@ class Data_entry_model extends CI_Model implements iForm_Model {
         return $result;
     }
 
+    /**
+     * getControlMetaById
+     *
+     * @param int control id
+     * @return array
+     * @author ctranel
+     **/
+    public function getControlMetaById($control_id) {
+        $control_id = (int)$control_id;
+
+        $result = $this->db->select('fc.id, ct.name AS control_type, fld.db_field_name AS name, fld.name AS label, fld.is_editable, fld.is_generated, fld.is_fk_field AS is_key, fc.biz_validation_url, fc.default_value')
+            ->select("(CAST(
+                  (SELECT STUFF((
+                      SELECT '|', CONCAT(v.name, ':', v.value) AS [data()] 
+                      FROM (
+                        SELECT cv.form_control_id, val.name, cv.value 
+                        FROM users.frm.controls_validators cv 
+                            INNER JOIN users.frm.validators val ON cv.validator_id = val.id
+                      ) AS v
+                      WHERE v.form_control_id = fc.id 
+                      FOR xml path('')
+                    ), 1, 1, ''))
+                 AS VARCHAR(100))) AS validators
+            ")
+            ->from('users.frm.form_controls fc')
+            ->join('users.dbo.db_fields fld', "fc.db_field_id = fld.id AND fc.id = '" . $control_id . "'", 'inner')
+            ->join('users.frm.control_types ct', 'fc.control_type_id = ct.id', 'inner')
+
+            ->get()
+            ->result_array();
+
+        if(isset($result) && is_array($result) && isset($result[0])){
+            return $result[0];
+        }
+    }
 
     /**
      * getFormControlData

@@ -184,9 +184,8 @@ class AnimalEvent
         $data = $this->datasource->eventEligibilityData($this->herd_code, $this->serial_num, $event_dt);
         $now = new \DateTime();
         $event_dt = new \DateTime($event_dt);
-
-        if($data['is_active'] == false){
-            $this->eligible_messages[] = "Cannot enter events for inactive animals.";
+        if($data['is_active'] == false || $data['TopSoldDiedDate'] !== null){
+            $this->eligible_messages[] = "Cannot enter events for inactive, sold or dead animals.";
         }
         if($event_cd == 22 || $event_cd == 23 || $event_cd == 24 || $event_cd == 29){
             $this->eligible_messages[] = "Event entered is an internal event and cannot be keyed.";
@@ -205,18 +204,18 @@ class AnimalEvent
                 $this->eligible_messages[] = "This animal is not eligible for a fresh event.  Current status is " . $data['current_status'] . ", and the animal must be dry.";
             }
             elseif($event_cd == 1){
-                if($data['curr_lact_num'] === 0){
+                if($data['is_youngstock']){
                     $this->eligible_messages[] = "Heifers are not eligible for the cow fresh event.";
                 }
-                if($earliest > $now && isset($event_dt) && !empty($event_dt)){
+                if(isset($event_dt) && !empty($event_dt) && $earliest > $event_dt){
                     $this->eligible_messages[] = "This animal is not eligible for a fresh event until " . $data['earliest_fresh_eligible_date'] . ".  Last fresh date was " . $data['TopFreshDate'] . ".";
                 }
             }
             elseif($event_cd == 2) {
-                if($data['curr_lact_num'] > 0){
+                if(!$data['is_youngstock']){
                     $this->eligible_messages[] = "Mature cows are not eligible for the heifer fresh event.";
                 }
-                if($earliest > $now && isset($event_dt) && !empty($event_dt)){
+                if(isset($event_dt) && !empty($event_dt) && $earliest > $event_dt){
                     $this->eligible_messages[] = "This animal is not eligible for a fresh event until " . $data['earliest_fresh_eligible_date'] . ".  Birth date is " . $data['birth_dt'] . ".";
                 }
             }
@@ -233,7 +232,7 @@ class AnimalEvent
                     $this->eligible_messages[] = "This animal is not eligible for an abort event.  Current status is " . $data['current_status'] . ".";
                 }
             }
-            elseif($earliest > $now && isset($event_dt) && !empty($event_dt)){
+            elseif(isset($event_dt) && !empty($event_dt) && $earliest > $event_dt){
                 $this->eligible_messages[] = "This animal is not eligible for an abort event until " . $data['earliest_abort_eligible_date'] . ".  Animal was last bred on " . $data['TopBredDate'] . ".";
             }
         }
@@ -244,7 +243,7 @@ class AnimalEvent
             if($data['earliest_dry_eligible_date'] === null){
                 $this->eligible_messages[] = "This animal is not eligible for a dry event.  Current status is " . $data['current_status'] . ".";
             }
-            elseif($earliest > $now && isset($event_dt) && !empty($event_dt)){
+            elseif(isset($event_dt) && !empty($event_dt) && $earliest > $event_dt){
                 $this->eligible_messages[] = "This animal is not eligible for a dry event until " . $data['earliest_dry_eligible_date'] . ".  Animal last freshened on " . $data['TopFreshDate'] . ".";
             }
         }
@@ -256,8 +255,8 @@ class AnimalEvent
             if($data['earliest_repro_eligible_date'] === null){
                 $this->eligible_messages[] = "This animal is not eligible for a repro event.  Current status is " . $data['current_status'] . ".";
             }
-            elseif($earliest > $now && isset($event_dt) && !empty($event_dt)){
-                if($data['curr_lact_num'] === 0){
+            elseif(isset($event_dt) && !empty($event_dt) && $earliest > $event_dt){
+                if($data['is_youngstock']){
                     $this->eligible_messages[] = "This animal is not eligible for a reproductive event until " . $data['earliest_repro_eligible_date'] . ".  Animal was born on " . $data['birth_dt'] . ".";
                 }
                 else{
@@ -277,7 +276,7 @@ class AnimalEvent
                     $this->eligible_messages[] = "This animal is not eligible for a pregnancy event.  Current status is " . $data['current_status'] . ".";
                 }
             }
-            elseif($earliest > $now && isset($event_dt) && !empty($event_dt)){
+            elseif(isset($event_dt) && !empty($event_dt) && $earliest > $event_dt){
                 $this->eligible_messages[] = "This animal is not eligible for a pregnancy event until " . $data['earliest_preg_eligible_date'] . ".  Animal was last bred on " . $data['TopBredDate'] . ".";
             }
         }

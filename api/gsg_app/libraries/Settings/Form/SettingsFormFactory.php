@@ -179,10 +179,10 @@ class SettingsFormFactory implements iFormFactory {
             $keys = array_keys($options[0]);
             foreach($options as $o){
                 //if(isset($o['value'])){
-                $ret[] = ['value' => $o[$keys[0]], 'text' => $o[$keys[1]]];
+                $ret[] = ['value' => $o[$keys[0]], 'label' => $o[$keys[1]]];
                 //}
                 //else{
-                //    $this->options[] = ['value' => $o['key_value'], 'text' => $o['description']];
+                //    $this->options[] = ['value' => $o['key_value'], 'label' => $o['description']];
                 //}
             }
         }
