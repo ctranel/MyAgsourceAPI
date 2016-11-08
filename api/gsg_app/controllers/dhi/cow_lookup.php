@@ -35,33 +35,21 @@ class Cow_lookup extends dpage {
 		} */
 	}
 	
-    function index($serial_num, $tab = 'events'){
-		$this->_loadObjVars($serial_num);
-    	$this->load->model('dhi/cow_lookup/events_model');
-    	$events_data = $this->events_model->getCowArray($this->session->userdata('herd_code'), $serial_num);
-    	$events_data['serial_num'] = $serial_num;
-    	$events_data['show_all_events'] = false;
-    	$events_data['arr_events'] = $this->events_model->getEventsArray($this->session->userdata('herd_code'), $serial_num, $this->curr_calving_date, false);
-    	$data = [
-			'serial_num'=>$serial_num
-    		,'cow_id'=>$events_data[$this->cow_id_field]
-			,'events_content' => $events_data
-    		,'tab' => $tab
-    	];
-    	$this->_record_access(93);
-    	$this->load->view('dhi/cow_lookup/land', ['animal_data' => $data]);
+    function index($serial_num, $show_all_events = 0){
+        $this->events($serial_num, $show_all_events);
 	}
-	
+
+	/* only the events tab uses the dynamic page infrastructure of the site.  If we want to use this for the other tabs,
+	 *   we would have to create a page within the database for each tab
+	*/
 	function events($serial_num, $show_all_events = 0){
+        $page_id = 79;
+
 		$this->_loadObjVars($serial_num);
 		$this->load->model('dhi/cow_lookup/events_model');
     	$data['animal_data'] = $this->events_model->getCowArray($this->session->userdata('herd_code'), $serial_num);
-    	$data['animal_data']['serial_num'] = $serial_num;
-     	//$data['show_all_events'] = (bool)$show_all_events;
-   		//$data['events'] = $this->events_model->getEventsArray($this->session->userdata('herd_code'), $serial_num, $this->curr_calving_date, (bool)$show_all_events);
-
-//temporary
-$page_id = 79;
+    	$data['animal_data']['chosen_id'] = $data['animal_data'][$this->cow_id_field];
+        $data['animal_data']['serial_num'] = $serial_num;
 
         //Set up site content objects
         $this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
@@ -90,6 +78,7 @@ $page_id = 79;
 	function id($serial_num){
 		$this->load->model('dhi/cow_lookup/id_model');
     	$data = $this->id_model->getCowArray($this->session->userdata('herd_code'), $serial_num);
+        $data['chosen_id'] = $data[$this->cow_id_field];
 
         $this->sendResponse(200, null, ['animal_data' => $data]);
 	}
@@ -111,13 +100,17 @@ $page_id = 79;
 		$data['lact_tables'] = $tab;
 		unset($tab);
 
+        $data['chosen_id'] = $data['dam'][$this->cow_id_field];
+
         $this->sendResponse(200, null, ['animal_data' => $data]);
 	}
 	
 	function sire($serial_num){
 		$this->load->model('dhi/cow_lookup/sire_model');
     	$data = $this->sire_model->getCowArray($this->session->userdata('herd_code'), $serial_num);
-    	$test_empty = array_filter($data);
+        $data['chosen_id'] = $data[$this->cow_id_field];
+
+        $test_empty = array_filter($data);
     	if(!empty($test_empty)){
             $this->sendResponse(200, null, ['animal_data' => $data]);
     	}
@@ -134,6 +127,9 @@ $page_id = 79;
 		if(!isset($lact_num)){
 			$lact_num = $this->curr_lact_num;
 		}
+        $this->load->model('dhi/cow_model');
+        $cow_data = $this->cow_model->cowIdData($this->session->userdata('herd_code'), $serial_num);
+
 		$this->load->model('dhi/cow_lookup/tests_model');
 		$data = [
 			'arr_tests' => $this->tests_model->getTests($this->session->userdata('herd_code'), $serial_num, $lact_num)
@@ -143,13 +139,20 @@ $page_id = 79;
 			,'curr_lact_num' => $this->curr_lact_num
 		];
 
+        $data['chosen_id'] = $cow_data[$this->cow_id_field];
+
         $this->sendResponse(200, null, ['animal_data' => $data]);
 	}
 	
 	function lactations($serial_num){
+        $this->load->model('dhi/cow_model');
+        $cow_data = $this->cow_model->cowIdData($this->session->userdata('herd_code'), $serial_num);
+
 		$this->load->model('dhi/cow_lookup/lactations_model');
     	$data['lactations'] = $this->lactations_model->getLactationsArray($this->session->userdata('herd_code'), $serial_num);
     	$data['offspring'] = $this->lactations_model->getOffspringArray($this->session->userdata('herd_code'), $serial_num);
+
+        $data['chosen_id'] = $cow_data[$this->cow_id_field];
 
         $this->sendResponse(200, null, ['animal_data' => $data]);
 	}
@@ -161,6 +164,10 @@ $page_id = 79;
 		if(!isset($lact_num)){
 			$lact_num = $this->curr_lact_num;
 		}
+
+        $this->load->model('dhi/cow_model');
+        $cow_data = $this->cow_model->cowIdData($this->session->userdata('herd_code'), $serial_num);
+
 		$this->load->model('dhi/cow_lookup/graphs_model');
 		$this->load->library('chart');
 		$data = array(
@@ -170,7 +177,10 @@ $page_id = 79;
 			,'lact_num' => $lact_num
 			,'curr_lact_num' => $this->curr_lact_num
 		);
+
+
 		$ret = $this->load->view('dhi/cow_lookup/graphs', $data, true);
+        $ret['chosen_id'] = $cow_data[$this->cow_id_field];
 
         $this->sendResponse(200, null, $ret);
 	}
