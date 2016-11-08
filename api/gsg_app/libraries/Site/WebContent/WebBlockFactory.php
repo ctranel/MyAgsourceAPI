@@ -67,10 +67,14 @@ class WebBlockFactory {
 */
 
     public function getBlocksFromContent($page_id, $block_content){
+        if(empty($block_content)){
+            throw new \Exception('No content found for specified block.');
+        }
         $blocks = [];
         $criteria = ['page_id' => $page_id];
 //		$join = [['table' => 'pages_blocks pb', 'condition' => 'b.id = pb.block_id AND pb.page_id = ' . $page_id]];
         $results = $this->datasource_blocks->getByCriteria($criteria);
+
         if(empty($results)){
             return false;
         }

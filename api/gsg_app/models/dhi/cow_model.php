@@ -32,7 +32,7 @@ class Cow_model extends CI_Model {
             ->select('serial_num, control_num, list_order_num, visible_id, barn_name, cow_id, ear_tag_num, rf_id_usain')
             ->where('herd_code', $herd_code)
             ->where('serial_num', $serial_num)
-            ->get('[animal].[dbo].[cow_id]')
+            ->get('[TD].[animal].[id]')
             ->result_array();
         if(is_array($result) && isset($result[0]) && is_array($result[0])){
             return $result[0];
