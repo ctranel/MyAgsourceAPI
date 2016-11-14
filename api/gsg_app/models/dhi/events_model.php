@@ -89,6 +89,32 @@ class Events_model extends CI_Model {
         }
     }
 
+    public function getEligibleAnimals($herd_code, $conditions){
+        $herd_code = MssqlUtility::escape($herd_code);
+        if(isset($conditions) && is_array($conditions)){
+            array_walk($conditions, function(&$v, $k){
+                //var_dump();
+                $v = 'e.' . MssqlUtility::escape($v[0]) . ' ' . MssqlUtility::escape($v[1]) . ' ' . MssqlUtility::escape($v[2]);
+            });
+        }
+
+        $conditions = implode(' AND ', $conditions);
+
+
+        $res = $this->db
+            ->select('id.serial_num, id.chosen_id')
+            ->from('TD.animal.vma_animal_options id')
+            ->join('TD.animal.animal_event_eligibility e', 'id.herd_code = e.herd_code AND id.serial_num = e.serial_num', 'inner')
+            ->where('id.herd_code', $herd_code)
+            ->where($conditions)
+            ->get()
+            ->result_array();
+
+        if(isset($res) && is_array($res)){
+            return $res;
+        }
+    }
+
     /**
 	 * @method eventEligibilityData()
 	 * @param string herd code

@@ -194,6 +194,7 @@ class AnimalEvent
             $this->eligible_messages[] = "Cannot enter events with date or time in the future.";
         }
         if($data['sex_cd'] === 2 && ($event_cd < 21 && $event_cd > 28)){
+            //@todo: custom events need to be allowed
             $this->eligible_messages[] = "Can only enter sold or died events for males.";
         }
 

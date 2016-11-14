@@ -29,7 +29,7 @@ class Cow_model extends CI_Model {
         }
 
         $result = $this->db
-            ->select('serial_num, control_num, list_order_num, visible_id, barn_name, cow_id, ear_tag_num, rf_id_usain')
+            ->select('serial_num, control_num, list_order AS list_order_num, visible_id, barn_name')
             ->where('herd_code', $herd_code)
             ->where('serial_num', $serial_num)
             ->get('[TD].[animal].[id]')
