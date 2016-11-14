@@ -16,33 +16,33 @@ use myagsource\Form\iForm;
 class SubForm implements iSubForm
 {
     /**
-     * @var string
+     * @var array of SubFormConditionGroup objects
      */
-    protected $operator;
-
-    /**
-     * @var string
-     */
-    protected $operand;
+    protected $condition_groups;
 
     /**
      * @var iForm
      */
     protected $form;
 
-    public function __construct($operator, $operand, iForm $form)
+    public function __construct($condition_groups, iForm $form)
     {
-        $this->operator = $operator;
-        $this->operand = $operand;
+//var_dump($this->condition_groups);
+        $this->condition_groups = $condition_groups;
         $this->form = $form;
     }
     
     public function toArray(){
-        return [
-            'operator' => $this->operator,
-            'operand' => $this->operand,
-            'form' => $this->form->toArray(),
-        ];
+        $ret['form'] = $this->form->toArray();
+
+        if(isset($this->condition_groups) && is_array($this->condition_groups) && !empty($this->condition_groups)){
+            $ret['condition_groups'] = [];
+            foreach($this->condition_groups as $s){
+                $ret['condition_groups'][] = $s->toArray();
+            }
+        }
+
+        return $ret;
     }
     
     public function write($form_data)    {
@@ -52,7 +52,7 @@ class SubForm implements iSubForm
     public function action(){
         return $this->form->action();
     }
-
+/*
     public function conditionsMet($control_value){
         switch($this->operator){
             case "=":
@@ -66,4 +66,5 @@ class SubForm implements iSubForm
         }
         return false;
     }
+*/
 }

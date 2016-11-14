@@ -137,12 +137,95 @@ class SettingsFormFactory implements iFormFactory {
         }
 
         $subforms = [];
+
+        //get and organize all condition data for form
+        $subform_data = $this->structureSubFormCondData($results);
+
+        //parse each subform separately
         foreach($results as $k => $r){
-            $form = $this->createForm($r, $user_id, $herd_code, $ancestor_form_ids);
-            $subforms[$r['form_control_name']][] = new SubForm($r['operator'], $r['operand'], $form);
+            if(!isset($subforms[$r['form_control_name']][$r['form_id']])){
+                $form = $this->createForm($r, $herd_code, $ancestor_form_ids);
+                $subform_groups = $this->extractConditionGroups($subform_data[$r['form_control_name']][$r['form_id']]);
+                $subforms[$r['form_control_name']][$r['form_id']] = new SubForm($subform_groups, $form);
+            }
         }
+
         return $subforms;
     }
+
+    /*
+    * extractConditionGroups
+     *
+    *
+    * @param array of hierarchical subform condition data
+    * @author ctranel
+    * @returns Array condition group objects keyed by group id
+    */
+    protected function extractConditionGroups($condition_data){
+        if(!isset($condition_data) || !is_array($condition_data)){
+            return;
+        }
+
+        $ret = [];
+
+        foreach($condition_data['groups'] as $grp_id => $grp){
+            $subgroups = null;
+            $conditions = null;
+
+            if(isset($grp['conditions']) && is_array($grp['conditions']) && !empty($grp['conditions'])) {
+                foreach($grp['conditions'] as $cond_id => $cond) {
+                    //$ret[$cond['form_control_name']][$cond['form_id']][$cond['group_id']][$cond['condition_id']] = new SubFormCondition($cond['operator'], $cond['operand']);
+                    $conditions[] = new SubFormCondition($cond['operator'], $cond['operand']);
+                }
+            }
+            if (isset($grp['groups']) && is_array($grp['groups']) && !empty($grp['groups'])) {
+                $subgroups = $this->extractConditionGroups($grp);
+
+
+            }
+            $ret[$grp_id] = new SubFormConditionGroup($grp['group_operator'], $subgroups, $conditions);
+        }
+
+        return $ret;
+    }
+
+    /*
+    * structureSubFormCondData
+     *
+     * parses flat data from datasource into a hierarchical structure of condition groups with control name and form id as keys
+    *
+    * @param array condition data
+    * @author ctranel
+    * @returns array of hierarchical subform condition data
+    */
+    protected function structureSubFormCondData($condition_data){
+        if(!isset($condition_data) || !is_array($condition_data)){
+            return;
+        }
+
+        $conditions_data = [];
+
+        foreach($condition_data as $k=>$v){
+            if(isset($v['group_parent_id']) && !empty($v['group_parent_id'])){
+                $parent_id = $v['group_parent_id'];
+                $v['group_parent_id'] = null;
+                $conditions_data[$v['form_control_name']][$v['form_id']]['groups'][$parent_id]['groups'][$v['group_id']]['conditions'][$v['condition_id']]
+                    = $this->structureSubFormCondData([$v], $v['group_operator'])[$v['form_control_name']][$v['form_id']]['groups'][$v['group_id']]['conditions'][$v['condition_id']];
+                $conditions_data[$v['form_control_name']][$v['form_id']]['groups'][$parent_id]['groups'][$v['group_id']]['group_operator'] = $v['group_operator'];
+
+                //need to get the group operator from the parent group
+                $parent_key = array_search($parent_id, array_column($condition_data, 'group_id'));
+                $conditions_data[$v['form_control_name']][$v['form_id']]['groups'][$parent_id]['group_operator'] = $condition_data[$parent_key]['group_operator'];
+            }
+            else{
+                $conditions_data[$v['form_control_name']][$v['form_id']]['groups'][$v['group_id']]['conditions'][$v['condition_id']] = $v;
+                $conditions_data[$v['form_control_name']][$v['form_id']]['groups'][$v['group_id']]['group_operator'] = $v['group_operator'];
+            }
+        }
+
+        return $conditions_data;
+    }
+
 
     /* -----------------------------------------------------------------
 *  getLookupOptions

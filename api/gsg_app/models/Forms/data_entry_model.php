@@ -57,11 +57,12 @@ class Data_entry_model extends CI_Model implements iForm_Model {
         $parent_form_id = (int)$parent_form_id;
 
         $results = $this->db
-            ->select('f.id AS form_id, s.name AS scope, f.active, f.dom_id, f.action, sl.list_order, scg.id, scg.parent_id, scg.operator, sc.form_control_name, sc.operator, sc.operand')
+            ->select('f.id AS form_id, s.name AS scope, f.active, f.dom_id, f.action, sl.list_order, scg.id AS group_id, scg.parent_id AS group_parent_id, scg.operator AS group_operator, sc.id AS condition_id, sc.operator, sc.operand, fld.db_field_name AS form_control_name') //, sc.form_control_name
             ->join('users.frm.subform_condition_groups scg', "sl.id = scg.subform_link_id AND sl.parent_form_id = " . $parent_form_id, 'inner')
             ->join('users.frm.subform_condition sc', "scg.id = sc.condition_group_id", 'inner')
 
             ->join('users.frm.form_controls fc', 'sl.parent_control_id = fc.id', 'inner')
+            ->join('users.dbo.db_fields fld', 'fc.db_field_id = fld.id', 'inner')
             ->join('users.frm.form_control_groups fcg', 'fc.form_control_group_id = fcg.id', 'inner')
 
             ->join('users.frm.forms f', "sl.form_id = f.id AND f.active = 1", 'inner')
