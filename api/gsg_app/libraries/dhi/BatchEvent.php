@@ -168,8 +168,23 @@ class BatchEvent
         }
         //END BUILD QUERY
 
-        $this->datasource->getEligibleAnimals($this->herd_code, $conditions);
-        //if error message is set, animal is not eligible for this event
-        return (isset($this->eligible_messages) && count($this->eligible_messages) > 0) ? false : true;
+        //if error message is set, no animals are eligible for this event
+        if(isset($this->eligible_messages) && count($this->eligible_messages) > 0){
+            return false;
+        };
+
+        $animals = $this->datasource->getEligibleAnimals($this->herd_code, $conditions);
+
+        if(!$animals || count($animals) < 1){
+            $this->eligible_messages[] = "No animals are eligible for the selected event on the selected date.";
+            return false;
+        }
+
+        $return = [];
+        foreach($animals as $c){
+            $return[] = (Object)[$c['serial_num'] => $c['chosen_id']];
+        }
+
+        return $return;
     }
 }
