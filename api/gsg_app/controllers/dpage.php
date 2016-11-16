@@ -89,7 +89,7 @@ class dpage extends MY_Api_Controller {
 	function __construct(){
 		parent::__construct();
 
-        if(!$this->as_ion_auth->logged_in()) {
+        if(!$this->session->userdata('user_id')) {
             $this->sendResponse(401);
         }
 

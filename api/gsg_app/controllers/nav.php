@@ -8,6 +8,7 @@ require_once(APPPATH . 'core/MY_Api_Controller.php');
 use \myagsource\Site\WebContent\Navigation;
 use \myagsource\dhi\Herd;
 use \myagsource\dhi\HerdAccess;
+use \myagsource\Api\Response\ResponseMessage;
 //use \myagsource\Products\Products\Products;
 
 class Nav extends MY_Api_Controller {
@@ -36,7 +37,12 @@ class Nav extends MY_Api_Controller {
 	function index(){
 		$this->load->model('web_content/navigation_model');
         $this->load->model('dhi/herd_model');
-		$herd = new Herd($this->herd_model, $this->session->userdata('herd_code'));
+
+		if(!$this->session->userdata('herd_code')){
+            $this->sendResponse(400,  new ResponseMessage('A herd code is required to generate navigation.', 'error'));
+        }
+
+        $herd = new Herd($this->herd_model, $this->session->userdata('herd_code'));
 		$Navigation = new Navigation($this->navigation_model, $herd, $this->permissions->permissionsList());
 
 		echo $Navigation->jsonOutput('DHI');
