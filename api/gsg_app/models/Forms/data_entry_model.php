@@ -390,17 +390,9 @@ class Data_entry_model extends CI_Model implements iForm_Model {
 				ELSE
 				    SELECT @sql = N' SELECT ' + @value_col + ', ' + @desc_col + ' FROM ' + @tbl + ' WHERE isactive = 1 ORDER BY list_order'
 				EXEC sp_executesql @sql";
-        $time_start = microtime(true);
 
         $results = $this->db->query($sql)->result_array();
 
-        $time_end = microtime(true);
-/*        echo "
-
-
-        TIME: " . ($time_end - $time_start);
-        echo $sql;
-*/
 //print($sql);
 		return $results;
 	}
@@ -429,17 +421,9 @@ class Data_entry_model extends CI_Model implements iForm_Model {
 				EXEC sp_executesql @sql";
 
 //echo $sql;
-        $time_start = microtime(true);
-
         $results = $this->db->query($sql)->result_array();
 
-        $time_end = microtime(true);
-/*        echo "
-
-
-        TIME: " . ($time_end - $time_start);
-        echo $sql;
-*/        return $results;
+        return $results;
     }
 
     /* -----------------------------------------------------------------

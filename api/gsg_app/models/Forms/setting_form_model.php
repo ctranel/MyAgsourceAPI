@@ -73,7 +73,8 @@ class Setting_form_model extends CI_Model implements iForm_Model {
                 LEFT JOIN users.setng.user_herd_settings uhs ON s.id = uhs.setting_id AND uhs.user_id = 1 AND uhs.herd_code = '35371684'
                 INNER JOIN users.frm.control_types t ON s.type_id = t.id 
             WHERE " . $uhs_where . "
-            AND (uhs.herd_code = '" . $herd_code . "' OR uhs.herd_code IS NULL)";
+            AND (uhs.herd_code = '" . $herd_code . "' OR uhs.herd_code IS NULL)
+            ORDER BY pb.list_order, fs.list_order";
 //die($sql);
         $results = $this->db->query($sql)->result_array();
         return $results;
@@ -175,7 +176,8 @@ class Setting_form_model extends CI_Model implements iForm_Model {
                     ), 1, 1, ''))
                  AS VARCHAR(100))) AS validators
             ")
-            ->join('users.setng.settings s', "fs.setting_id = s.id AND fs.form_id = " . $form_id, 'inner');
+            ->join('users.setng.settings s', "fs.setting_id = s.id AND fs.form_id = " . $form_id, 'inner')
+            ->order_by('fs.list_order');
 
         if(isset($user_id) && $user_id != FALSE){
             $this->db
@@ -212,13 +214,79 @@ class Setting_form_model extends CI_Model implements iForm_Model {
 		$setting_id = (int)$setting_id;
 
 	    $sql = "USE users;
-				DECLARE @tbl nvarchar(100), @sql nvarchar(255)
-				SELECT @tbl = table_name FROM users.setng.data_lookup WHERE setting_id = " . $setting_id . "
-				SELECT @sql = N' SELECT value, description FROM ' + quotename(@tbl) + ' ORDER BY list_order'
+				DECLARE @tbl nvarchar(100), @value_col nvarchar(32), @desc_col nvarchar(32), @code_type nvarchar(15), @sql nvarchar(255)
+				SELECT @tbl = table_name, @value_col = value_column, @desc_col = desc_column, @code_type = codetype FROM users.setng.data_lookup WHERE setting_id = " . $setting_id . "
+                IF @code_type IS NOT NULL
+				    SELECT @sql = N' SELECT ' + @value_col + ', ' + @desc_col + ' FROM ' + @tbl + ' WHERE codetype = ''' + @code_type + ''' ORDER BY list_order'
+				ELSE
+				    SELECT @sql = N' SELECT ' + @value_col + ', ' + @desc_col + ' FROM ' + @tbl + ' ORDER BY list_order'
 				EXEC sp_executesql @sql";
+        //die($sql);
 		$results = $this->db->query($sql)->result_array();
 		return $results;
 	}
+
+    /* -----------------------------------------------------------------
+     *  returns key-value pairs of options for a given lookup field
+
+     *  returns key-value pairs of options for a given lookup field
+
+     *  @since: version 1
+     *  @author: ctranel
+     *  @date: Jun 26, 2014
+     *  @param: int control id
+     *  @return array key-value pairs
+     *  @throws:
+     * -----------------------------------------------------------------
+     */
+    public function getHerdLookupOptions($setting_id, $herd_code){
+        $setting_id = (int)$setting_id;
+        $herd_code = MssqlUtility::escape($herd_code);
+
+        $sql = "USE users;
+				DECLARE @tbl nvarchar(100), @value_col nvarchar(32), @desc_col nvarchar(32), @sql nvarchar(255)
+				SELECT @tbl = table_name, @value_col = value_column, @desc_col = desc_column FROM users.setng.data_lookup WHERE setting_id = " . $setting_id . "
+				SELECT @sql = N' SELECT ' + @value_col + ', ' + @desc_col + ' FROM ' + @tbl + ' WHERE herd_code = ''" . $herd_code . "'' ORDER BY list_order'
+				EXEC sp_executesql @sql";
+
+//echo $sql;
+        $results = $this->db->query($sql)->result_array();
+
+        return $results;
+    }
+
+    /* -----------------------------------------------------------------
+     *  returns key-value pairs of options for a given lookup field
+
+     *  returns key-value pairs of options for a given lookup field
+
+     *  @author: ctranel
+     *  @date: 2016-09-21
+     *  @param: int control id
+     *  @return array key-value pairs
+     *  @throws:
+     * -----------------------------------------------------------------
+     */
+    public function getAnimalLookupOptions($setting_id, $herd_code, $serial_num){
+        $setting_id = (int)$setting_id;
+        $herd_code = MssqlUtility::escape($herd_code);
+        $serial_num = (int)$serial_num;
+
+        if(!isset($serial_num) || empty($serial_num)){
+            return $this->getHerdLookupOptions($setting_id, $herd_code);
+            //throw new Exception('Animal serial number not set in datasource');
+        }
+        $sql = "USE users;
+				DECLARE @tbl nvarchar(100), @value_col nvarchar(32), @desc_col nvarchar(32), @sql nvarchar(255)
+				SELECT @tbl = table_name, @value_col = value_column, @desc_col = desc_column FROM users.setng.data_lookup WHERE setting_id = " . $setting_id . "
+				SELECT @sql = N' SELECT ' + @value_col + ', ' + @desc_col + ' FROM ' + @tbl + ' WHERE herd_code = ''" . $herd_code . "'' AND (serial_num = " . $serial_num . " OR serial_num IS NULL) ORDER BY list_order'
+				EXEC sp_executesql @sql";
+//echo $sql;
+
+        $results = $this->db->query($sql)->result_array();
+
+        return $results;
+    }
 
     /* -----------------------------------------------------------------
     *  composeSettingSelect
