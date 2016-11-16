@@ -192,7 +192,6 @@ class Setting_form_model extends CI_Model implements iForm_Model {
 
         $results = $this->db->join('users.frm.control_types t', "s.type_id = t.id", 'inner')
             ->get('users.setng.forms_settings fs')
-            ->order_by('fs.list_order')
             ->result_array();
         return $results;
     }
