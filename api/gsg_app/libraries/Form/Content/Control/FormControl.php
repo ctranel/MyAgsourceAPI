@@ -37,13 +37,13 @@ class FormControl implements iFormControl
 
     /**
      * value
-     * @var string
+     * @var mixed
      **/
     protected $value;
 
     /**
      * default_value
-     * @var string
+     * @var mixed
      **/
     protected $default_value;
 
@@ -107,6 +107,7 @@ class FormControl implements iFormControl
         $this->name = $control_data['name'];
         $this->label = $control_data['label'];
         $this->value = isset($control_data['value']) ? $control_data['value'] : $control_data['default_value'];
+        $this->default_value = $control_data['default_value'];
         $this->control_type = $control_data['control_type'];
         $this->is_editable = (bool)(isset($control_data['is_editable']) ? $control_data['is_editable'] : true);
         $this->is_generated = (bool)(isset($control_data['is_generated']) ? $control_data['is_generated'] : false);
@@ -125,39 +126,44 @@ class FormControl implements iFormControl
             else{
                 $this->value = null;
             }
+            if(strpos($this->default_value, '|') !== false){
+                $tmp = [];
+                list($tmp['dbfrom'], $tmp['dbto']) = explode('|', $this->default_value);
+                $this->default_value = $tmp;
+            }
+            else{
+                $this->default_value = null;
+            }
         }
         //if type is array and value is not an array, wrap it in an array
         if(strpos($this->control_type, 'array') !== false && isset($this->value) && !is_array($this->value)){
-            if(strpos($this->value, '|')){
-                $this->value = explode('|', $this->value);
+            if(isset($this->value) && !is_array($this->value)){
+                if(strpos($this->value, '|')){
+                    $this->value = explode('|', $this->value);
+                }
+                else{
+                    $this->value = [$this->value];
+                }
             }
-            else{
-                $this->value = [$this->value];
+            if(isset($this->default_value) && !is_array($this->default_value)){
+                if(strpos($this->default_value, '|')){
+                    $this->default_value = explode('|', $this->default_value);
+                }
+                else{
+                    $this->default_value = [$this->default_value];
+                }
             }
         }
 
-        //set default value
-        //handle ranges
-        if($this->control_type === 'range'){
-            if(strpos($control_data['default_value'], '|') !== false){
-                $tmp = [];
-                list($tmp['dbfrom'], $tmp['dbto']) = explode('|', $control_data['default_value']);
-                $control_data['default_value'] = $tmp;
-            }
-            else{
-                $control_data['default_value'] = [];
-            }
+        if($this->control_type === 'boolean' || $this->control_type === 'integer'){
+            $this->value = (int)$this->value;
+            $this->default_value = (int)$this->default_value;
         }
-        //if type is array and default_value is not an array, wrap it in an array
-        if(strpos($this->control_type, 'array') !== false && isset($control_data['default_value']) && !is_array($control_data['default_value'])){
-            if(strpos($control_data['default_value'], '|') !== false){
-                $control_data['default_value'] = explode('|', $control_data['default_value']);
-            }
-            else{
-                $control_data['default_value'] = [$control_data['default_value']];
-            }
+
+        if($this->control_type === 'currency' || $this->control_type === 'decimal'){
+            $this->value = (float)$this->value;
+            $this->default_value = (float)$this->default_value;
         }
-        $this->default_value = $control_data['default_value'];
     }
 
     /* -----------------------------------------------------------------
