@@ -173,7 +173,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
             array_walk_recursive($ancestor_form_ids, function(&$v, $k){return (int)$v;});
             //var_dump($ancestor_form_ids);
         }
-        $result = $this->db->select('fc.id, ct.name AS control_type, fld.db_field_name AS name, fld.name AS label, fld.is_editable, fld.is_generated, fld.is_fk_field AS is_key, fc.biz_validation_url, fc.default_value')
+        $result = $this->db->select('fc.id, ct.name AS control_type, fld.db_field_name AS name, fc.label, fld.is_editable, fld.is_generated, fld.is_fk_field AS is_key, fc.biz_validation_url, fc.default_value')
             ->select("(CAST(
                   (SELECT STUFF((
                       SELECT '|', CONCAT(v.name, ':', v.value) AS [data()] 
@@ -187,6 +187,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
             ->join('users.frm.form_controls fc', "cg.id = fc.form_control_group_id AND cg.form_id = " . $form_id, 'inner')
             ->join('users.dbo.db_fields fld', 'fc.db_field_id = fld.id', 'inner')
             ->join('users.frm.control_types ct', 'fc.control_type_id = ct.id', 'inner')
+            ->order_by('fc.list_order')
 
             ->get()
             ->result_array();
@@ -203,7 +204,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
     public function getControlMetaById($control_id) {
         $control_id = (int)$control_id;
 
-        $result = $this->db->select('fc.id, ct.name AS control_type, fld.db_field_name AS name, fld.name AS label, fld.is_editable, fld.is_generated, fld.is_fk_field AS is_key, fc.biz_validation_url, fc.default_value')
+        $result = $this->db->select('fc.id, ct.name AS control_type, fld.db_field_name AS name, fc.label, fld.is_editable, fld.is_generated, fld.is_fk_field AS is_key, fc.biz_validation_url, fc.default_value')
             ->select("(CAST(
                   (SELECT STUFF((
                       SELECT '|', CONCAT(v.name, ':', v.value) AS [data()] 
@@ -220,6 +221,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
             ->from('users.frm.form_controls fc')
             ->join('users.dbo.db_fields fld', "fc.db_field_id = fld.id AND fc.id = '" . $control_id . "'", 'inner')
             ->join('users.frm.control_types ct', 'fc.control_type_id = ct.id', 'inner')
+            ->order_by('fc.list_order')
 
             ->get()
             ->result_array();
@@ -336,7 +338,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
             
             DEALLOCATE Table_Cursor;
 
-                select fc.id, ct.name AS control_type, fld.db_field_name AS name, fld.name AS label, fld.is_editable, fld.is_generated, fld.is_fk_field AS is_key, fc.biz_validation_url, fc.default_value, " . $key_val_field_list_text . " v.value AS value,
+                select fc.id, ct.name AS control_type, fld.db_field_name AS name, fc.label, fld.is_editable, fld.is_generated, fld.is_fk_field AS is_key, fc.biz_validation_url, fc.default_value, " . $key_val_field_list_text . " v.value AS value,
                     (CAST(
                         (SELECT STUFF((
                           SELECT '|', CONCAT(v.name, ':', v.value) AS [data()] 
@@ -349,7 +351,8 @@ class Data_entry_model extends CI_Model implements iForm_Model {
                 inner join users.frm.form_controls fc ON cg.id = fc.form_control_group_id AND cg.form_id = " . $form_id . "
                 inner join users.dbo.db_fields fld ON fc.db_field_id = fld.id
                 inner join users.frm.control_types ct ON fc.control_type_id = ct.id
-                inner join #valueTable v ON fld.id = v.db_field_id;
+                inner join #valueTable v ON fld.id = v.db_field_id
+                ORDER BY fc.list_order;
        ";
 //print($sql); die;
         $time_start = microtime(true);
