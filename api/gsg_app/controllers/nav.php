@@ -16,14 +16,15 @@ class Nav extends MY_Api_Controller {
 	function __construct(){
 		parent::__construct();
 
-		$this->load->model('herd_model');
-		$this->herd_access = new HerdAccess($this->herd_model);
+        if(!$this->session->userdata('user_id')) {
+            $this->sendResponse(401);
+        }
 
-		if(!isset($this->as_ion_auth) || !$this->as_ion_auth->logged_in()){
-			$this->sendResponse(401);
-		}
+        if(!$this->session->userdata('herd_code')){
+            $this->sendResponse(400,  new ResponseMessage('A herd code is required to generate navigation.', 'error'));
+        }
 
-		//$this->page_header_data['num_herds'] = $this->herd_access->getNumAccessibleHerds($this->session->userdata('user_id'), $this->permissions->permissionsList(), $this->session->userdata('arr_regions'));
+        //$this->page_header_data['num_herds'] = $this->herd_access->getNumAccessibleHerds($this->session->userdata('user_id'), $this->permissions->permissionsList(), $this->session->userdata('arr_regions'));
 
 		/* Load the profile.php config file if it exists
 		if (ENVIRONMENT == 'development' || ENVIRONMENT == 'localhost') {
@@ -38,14 +39,12 @@ class Nav extends MY_Api_Controller {
 		$this->load->model('web_content/navigation_model');
         $this->load->model('dhi/herd_model');
 
-		if(!$this->session->userdata('herd_code')){
-            $this->sendResponse(400,  new ResponseMessage('A herd code is required to generate navigation.', 'error'));
-        }
-
         $herd = new Herd($this->herd_model, $this->session->userdata('herd_code'));
-		$Navigation = new Navigation($this->navigation_model, $herd, $this->permissions->permissionsList());
+		$navigation = new Navigation($this->navigation_model, $herd, $this->permissions->permissionsList());
 
-		echo $Navigation->jsonOutput('DHI');
-		exit;
+		//echo $navigation->jsonOutput('DHI');
+        $this->sendResponse(200, null, ['nav'=> $navigation->toArray('DHI')]);
+
+        exit;
     }
 }

@@ -105,6 +105,7 @@ class dform extends dpage {
 		$this->load->library('herds');
 		$this->load->library('form_validation');
         $this->load->model('Forms/data_entry_model');
+//var_dump($params);
         $form_factory = new FormFactory($this->data_entry_model, $supplemental_factory, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
 
         $form = $form_factory->getForm($form_id, $this->session->userdata('herd_code'));

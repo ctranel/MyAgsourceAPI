@@ -62,7 +62,7 @@ class listings extends dpage {
 		$option_listing_factory = new ListingFactory($this->herd_options_model);
 
         //create block content
-        $listings = $option_listing_factory->getByPage($page_id, $this->session->userdata('herd_code'), $serial_num);
+        $listings = $option_listing_factory->getByPage($page_id, ['herd_code'=>$this->session->userdata('herd_code'), 'serial_num'=>$serial_num]);
 
         //create blocks for content
         $blocks = $web_block_factory->getBlocksFromContent($page_id, $listings);
@@ -88,4 +88,51 @@ class listings extends dpage {
 
         $this->sendResponse(200, $this->message, $this->page->toArray());
 	}
+
+    function ev_seq($page_id, $protocol_id){
+        //filters
+        $params = [];
+        if(isset($json_filter_data)) {
+            $params = (array)json_decode(urldecode($json_filter_data));
+        }
+
+        $this->load->model('Listings/herd_options_model', null, false, ['herd_code'=>$this->session->userdata('herd_code'), 'protocol_id'=>$protocol_id]);
+        $option_listing_factory = new ListingFactory($this->herd_options_model);
+
+        //create block content
+        $listings = $option_listing_factory->getByPage($page_id, ['herd_code'=>$this->session->userdata('herd_code'), 'protocol_id' => $protocol_id]);
+
+        //Set up site content objects
+        $this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
+        $this->load->model('web_content/block_model');
+        $web_block_factory = new WebBlockFactory($this->block_model);
+
+        //page content
+        $this->load->model('ReportContent/report_block_model');
+
+        //create blocks for content
+        $blocks = $web_block_factory->getBlocksFromContent($page_id, $listings);
+
+        //supplemental factory
+        $this->load->model('supplemental_model');
+        $supplemental_factory = new SupplementalFactory($this->supplemental_model, site_url());
+
+        $this->load->model('web_content/page_model');
+        $page_data = $this->page_model->getPage($page_id);
+        $this->page = new Page($page_data, $blocks, $supplemental_factory, $this->filters, null);
+
+        //does user have access to current page for selected herd?
+        $this->herd_page_access = new HerdPageAccess($this->page_model, $this->herd, $this->page);
+        $this->page_access = new PageAccess($this->page, ($this->permissions->hasPermission("View All Content") || $this->permissions->hasPermission("View All Content-Billed")));
+        if(!$this->page_access->hasAccess($this->herd_page_access->hasAccess())) {
+            $this->sendResponse(403, new ResponseMessage('You do not have permission to view the requested report for herd ' . $this->herd->herdCode() . '.  Please select a report from the navigation', 'error'));
+        }
+        //the user can access this page for this herd, but do they have to pay?
+        if($this->permissions->hasPermission("View All Content-Billed")){
+            $this->message[] = new ResponseMessage('Herd ' . $this->herd->herdCode() . ' is not paying for this product.  You will be billed a monthly fee for any month in which you view content for which the herd is not paying.', 'message');
+        }
+
+        $this->sendResponse(200, $this->message, $this->page->toArray());
+
+    }
 }

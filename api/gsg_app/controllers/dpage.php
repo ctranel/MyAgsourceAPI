@@ -93,23 +93,23 @@ class dpage extends MY_Api_Controller {
             $this->sendResponse(401);
         }
 
-        if(!isset($this->herd)){
+        if(!$this->session->userdata('herd_code')){
             $this->sendResponse(400,  new ResponseMessage('Please select a herd and try again.', 'error'));
         }
 
         //is someone logged in?
-		if($this->herd->herdCode() != $this->config->item('default_herd')){
+		/*if($this->herd->herdCode() != $this->config->item('default_herd')){
 			//is a herd selected?
 			if(!$this->herd->herdCode() || $this->herd->herdCode() == ''){
                 $this->sendResponse(400,  new ResponseMessage('Please select a herd and try again.', 'error'));
 			}
-			
+			*/
 			//does logged in user have access to selected herd?
 			$has_herd_access = $this->herd_access->hasAccess($this->session->userdata('user_id'), $this->herd->herdCode(), $this->session->userdata('arr_regions'), $this->permissions->permissionsList());
 			if(!$has_herd_access){
                 $this->sendResponse(403,  new ResponseMessage('You do not have permission to access this herd.  Please select another herd and try again.', 'error'));
 			}
-		}
+		//}
 
 		/* Load the profile.php config file if it exists*/
 		if (ENVIRONMENT == 'development' || ENVIRONMENT == 'localhost') {

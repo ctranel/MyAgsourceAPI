@@ -58,7 +58,7 @@ class Navigation{
 		$tmp_array = [];
 
 		if(in_array('View All Content', $this->permissions_list)){
-			$tmp_array = $this->datasource_navigation->getAllContent();
+			$tmp_array = $this->datasource_navigation->getAllContent($this->herd->herdCode());
 		}
 		else{
 			/* 
@@ -75,7 +75,7 @@ class Navigation{
 				$scope[] = 'admin';
 			}
 			if(!empty($scope)){
-				$tmp_array = array_merge($tmp_array, $this->datasource_navigation->getContentByScope($scope));
+				$tmp_array = array_merge($tmp_array, $this->datasource_navigation->getContentByScope($scope, $this->herd->herdCode()));
 			}
 
 			$tmp_array = array_map("unserialize", array_unique(array_map("serialize", $tmp_array)));
