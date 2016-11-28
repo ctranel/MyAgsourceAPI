@@ -93,7 +93,6 @@ class Events_model extends CI_Model {
         $herd_code = MssqlUtility::escape($herd_code);
         if(isset($conditions) && is_array($conditions)){
             array_walk($conditions, function(&$v, $k){
-                //var_dump();
                 $v = 'e.' . MssqlUtility::escape($v[0]) . ' ' . MssqlUtility::escape($v[1]) . ' ' . MssqlUtility::escape($v[2]);
             });
         }
@@ -134,7 +133,7 @@ class Events_model extends CI_Model {
 		}
 
 		$sql = $this->eligibilitySql($herd_code, $serial_num, $event_date);
-
+//echo $sql;
         $ret = $this->db->query($sql)->result_array();
 
         if(isset($ret[0]) && is_array($ret[0])){
@@ -343,7 +342,7 @@ class Events_model extends CI_Model {
 					INNER JOIN td.herd.events b 
 						ON a.event_cd = b.event_cd 
 						AND a.herd_code = b.herd_code
-						AND a.event_dt <= DATEADD(second,-1,'" . $event_date . "')
+						AND a.event_dt <= DATEADD(day,-1,'" . $event_date . "')
 			) as d
 			WHERE d.rowid = 1";
         return $sql;

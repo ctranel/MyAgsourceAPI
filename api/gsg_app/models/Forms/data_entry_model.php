@@ -169,9 +169,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
         $form_id = (int)$form_id;
         if(isset($ancestor_form_ids) && is_array($ancestor_form_ids)){
             //have not yet tested with multiple level nesting
-            //var_dump($ancestor_form_ids);
             array_walk_recursive($ancestor_form_ids, function(&$v, $k){return (int)$v;});
-            //var_dump($ancestor_form_ids);
         }
         $result = $this->db->select('fc.id, ct.name AS control_type, fld.db_field_name AS name, fc.label, fld.is_editable, fld.is_generated, fld.is_fk_field AS is_key, fc.biz_validation_url, fc.default_value')
             ->select("(CAST(
@@ -252,7 +250,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
         $keys = array_keys($params);
         $common = array_intersect(['herd_code', 'serial_num'], $keys);
 
-        if(count($common) === count($keys)){ //no key fields besides herd_code and serial num
+        if(count($common) === count($keys) || true){ //no key fields besides herd_code and serial num--testing this method with all listings
             $results = $this->getFormControlMeta($form_id, $ancestor_form_ids);
             //add passed param values back in to data
             foreach($results as &$r){
@@ -262,7 +260,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
             }
             return $results;
         }
-
+/*
         $key_meta = $this->getFormKeyMeta($form_id, $ancestor_form_ids);
 
         $key_field_list_text = '';
@@ -359,13 +357,14 @@ class Data_entry_model extends CI_Model implements iForm_Model {
 
         $results = $this->db->query($sql)->result_array();
 
-        $time_end = microtime(true);
+        $time_end = microtime(true);*/
 /*        echo "
         
         
         TIME: " . ($time_end - $time_start);
         echo $sql;
-*/        return $results;
+*/
+//return $results;
     }
 
 
@@ -456,17 +455,8 @@ class Data_entry_model extends CI_Model implements iForm_Model {
 				SELECT @sql = N' SELECT ' + @value_col + ', ' + @desc_col + ' FROM ' + @tbl + ' WHERE herd_code = ''" . $herd_code . "'' AND (serial_num = " . $serial_num . " OR serial_num IS NULL) AND isactive = 1 ORDER BY list_order'
 				EXEC sp_executesql @sql";
 //echo $sql;
-        $time_start = microtime(true);
-
         $results = $this->db->query($sql)->result_array();
 
-        $time_end = microtime(true);
-/*        echo "
-
-
-        TIME: " . ($time_end - $time_start);
-        echo $sql;
-*///var_dump($results);
         return $results;
     }
 

@@ -38,13 +38,13 @@ class ListingFactory implements iListingFactory {
 	 * @author ctranel
 	 * @returns \myagsource\Listing
 	 */
-	public function getListing($listing_id, $herd_code, $serial_num = null){
+	public function getListing($listing_id, $criteria){
 		$results = $this->datasource->getListingById($listing_id);
 		if(empty($results)){
 			return false;
 		}
 
-		return $this->createListing($results[0], $herd_code, $serial_num);
+		return $this->createListing($results[0], $criteria);
 	}
 
 	/*
@@ -55,7 +55,7 @@ class ListingFactory implements iListingFactory {
     * @author ctranel
     * @returns Array of Listings
     */
-    protected function createListing($listing_data, $herd_code, $serial_num){
+    protected function createListing($listing_data, $criteria){
         $column_data = $this->datasource->getListingColumnMeta($listing_data['listing_id']);
         $dataset = $this->datasource->getListingData($listing_data['listing_id'], $listing_data['order_by'], $listing_data['sort_order']);//, implode(', ', array_column($column_data, 'name')));
 
@@ -66,12 +66,7 @@ class ListingFactory implements iListingFactory {
             }
         }
 
-        $add_presets['herd_code'] = $herd_code;
-        if(isset($serial_num)){
-            $add_presets['serial_num'] = $serial_num;
-        }
-
-        return new Listing($listing_data['listing_id'], $listing_data['form_id'], $lc, $dataset, $listing_data['active'], $add_presets);
+        return new Listing($listing_data['listing_id'], $listing_data['form_id'], $lc, $dataset, $listing_data['active'], $criteria);
     }
 
     /*
@@ -82,15 +77,16 @@ class ListingFactory implements iListingFactory {
      * @author ctranel
      * @returns array of Listing objects
      */
-    public function getByPage($page_id, $herd_code = null, $serial_num = null){
+    public function getByPage($page_id, $criteria){//$herd_code = null, $serial_num = null){
         $listings = [];
+        //unset herd code and ser num?
         $results = $this->datasource->getListingsByPage($page_id);
         if(empty($results)){
             return [];
         }
 
         foreach($results as $r){
-            $listings[$r['list_order']] = $this->createListing($r, $herd_code, $serial_num);
+            $listings[$r['list_order']] = $this->createListing($r, $criteria);
         }
         return $listings;
     }

@@ -12,6 +12,6 @@ namespace myagsource\Listings;
 
 interface iListingFactory
 {
-    public function getListing($form_id, $herd_code);
-    public function getByPage($page_id, $herd_code = null);
+    public function getListing($form_id, $criteria);
+    public function getByPage($page_id, $criteria);
 }

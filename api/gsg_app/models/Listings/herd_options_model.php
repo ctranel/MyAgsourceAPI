@@ -28,6 +28,12 @@ class Herd_options_model extends CI_Model implements iListing_model  {
      **/
     protected $table_name;
 
+    /**
+     * criteria
+     * @var array
+     **/
+    protected $criteria;
+
 
     public function __construct($args){
 		parent::__construct();
@@ -206,6 +212,9 @@ class Herd_options_model extends CI_Model implements iListing_model  {
 
         if(isset($order_by) && !empty($order_by) && isset($sort_order) && !empty($sort_order)) {
             $sql .= " ORDER BY " . $order_by . " " . $sort_order;
+        }
+        else {
+            $sql .= "ORDER BY list_order ASC";
         }
 
         $sql .= "')
