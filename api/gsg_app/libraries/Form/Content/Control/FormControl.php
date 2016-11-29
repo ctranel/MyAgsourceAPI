@@ -156,13 +156,21 @@ class FormControl implements iFormControl
         }
 
         if($this->control_type === 'boolean' || $this->control_type === 'integer'){
-            $this->value = (int)$this->value;
-            $this->default_value = (int)$this->default_value;
+            if(isset($this->value)){
+                $this->value = (int)$this->value;
+            }
+            if(isset($this->default_value)) {
+                $this->default_value = (int)$this->default_value;
+            }
         }
 
         if($this->control_type === 'currency' || $this->control_type === 'decimal'){
-            $this->value = (float)$this->value;
-            $this->default_value = (float)$this->default_value;
+            if(isset($this->value)){
+                $this->value = (float)$this->value;
+            }
+            if(isset($this->default_value)) {
+                $this->default_value = (float)$this->default_value;
+            }
         }
     }
 
