@@ -58,13 +58,14 @@ class Herd_options_model extends CI_Model implements iListing_model  {
             ->join('users.dbo.blocks b', "pb.block_id = b.id AND b.display_type_id = 8 AND pb.page_id = " . $page_id . ' AND b.active = 1', 'inner')
             ->join('users.options.listings l', "b.id = l.block_id AND l.isactive = 1", 'inner')
             ->join("(
-                    SELECT lci.id, f.db_field_name 
+                    SELECT lci.id, f.db_field_name, lci.list_order 
                     FROM users.options.listings_columns lci 
                         INNER JOIN users.dbo.db_fields f ON lci.db_field_id = f.id
                 ) srt", 'l.order_by = srt.id', 'left'
             )
             ->join('users.dbo.lookup_display_types dt', 'b.display_type_id = dt.id', 'inner')
             ->join('users.dbo.lookup_scopes s', 'b.scope_id = s.id', 'inner')
+            ->order_by('srt.list_order', 'asc')
             ->get('users.dbo.pages_blocks pb')
             ->result_array();
         return $results;
@@ -84,13 +85,14 @@ class Herd_options_model extends CI_Model implements iListing_model  {
             ->select('b.id, l.id AS listing_id, b.name, b.description, dt.name AS display_type, s.name AS scope, srt.db_field_name AS order_by, l.sort_order, l.form_id, b.active, b.path')
             ->join('users.options.listings l', "b.id = l.block_id AND l.id = " . $listing_id, 'inner')
             ->join("(
-                    SELECT lci.id, f.db_field_name 
+                    SELECT lci.id, f.db_field_name, lci.list_order 
                     FROM users.options.listings_columns lci 
                         INNER JOIN users.dbo.db_fields f ON lci.db_field_id = f.id
                 ) srt", 'l.order_by = srt.id', 'left'
             )
             ->join('users.dbo.lookup_display_types dt', 'b.display_type_id = dt.id', 'inner')
             ->join('users.dbo.lookup_scopes s', 'b.scope_id = s.id', 'inner')
+            ->order_by('srt.list_order', 'asc')
             ->get('users.dbo.blocks b')
             ->result_array();
         return $results;
@@ -109,6 +111,7 @@ class Herd_options_model extends CI_Model implements iListing_model  {
         $results = $this->db
             ->select('fld.db_field_name AS name, fld.data_type, fld.max_length')
             ->join('users.dbo.db_fields fld', 'lc.db_field_id = fld.id AND fld.is_fk_field = 1 AND lc.listing_id = ' . $listing_id)
+            ->order_by('lc.list_order', 'asc')
             ->get('users.options.listings_columns lc')
             ->result_array();
         if(is_array($results)){
@@ -161,7 +164,8 @@ class Herd_options_model extends CI_Model implements iListing_model  {
         $sql = " select lc.id, ct.name AS control_type, lc.label, lc.is_displayed, fld.is_fk_field AS is_key, lc.db_field_id , fld.db_field_name AS name, '' AS default_value
                 from users.options.listings_columns lc
                 inner join users.dbo.db_fields fld ON lc.db_field_id = fld.id AND lc.listing_id = " . $listing_id . "
-                inner join users.frm.control_types ct ON lc.control_type_id = ct.id";
+                inner join users.frm.control_types ct ON lc.control_type_id = ct.id
+                order by lc.list_order";
 
         $results = $this->db->query($sql)->result_array();
 
