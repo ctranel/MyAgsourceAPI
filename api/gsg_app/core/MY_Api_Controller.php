@@ -61,10 +61,7 @@ class MY_Api_Controller extends CI_Controller
         // Execute CI_Controller Constructor
         parent::__construct();
         $this->load->library('session');
-//        $this->load->helper('cookie');
 
-        //$request_headers = apache_request_headers();
-        //header('Set-Cookie: ' . $cookie_name . '=' . $this->input->cookie($cookie_name, TRUE));
         header("Content-type: application/json"); //being sent as json
         header("Cache-Control: no-cache, must-revalidate, max-age=0");
         header("Cache-Control: post-check=0, pre-check=0", false);
@@ -78,15 +75,11 @@ class MY_Api_Controller extends CI_Controller
         $this->session->sess_write();
 
 
-        $cookie_name = $this->config->item('sess_cookie_name');
-//print(json_encode([$cookie_name=>get_cookie($cookie_name)])); die;
-//die;
         //if OPTIONS request, header is all we need (pre-flight)
         if($_SERVER['REQUEST_METHOD'] === 'OPTIONS'){
             die();
         }
 
-        $this->load->library('session');
         $this->load->library('carabiner');
         $this->load->model('Settings/settings_model', null, false, ['user-id' => $this->session->userdata('user_id'), 'herd_code' => $this->session->userdata('herd_code')]);
         $this->load->model('web_content/section_model');
@@ -115,9 +108,7 @@ class MY_Api_Controller extends CI_Controller
         else{
             $this->permissions = null;
         }
-        $this->as_ion_auth = new as_ion_auth($this->permissions);
-        
-        //$tmp_uri= $this->uri->uri_string();
+        $this->as_ion_auth = new as_ion_auth($this->permissions, $this->session);
     }
 
     

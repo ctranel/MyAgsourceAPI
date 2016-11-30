@@ -29,12 +29,12 @@ class As_ion_auth extends \Ion_auth {
 	 **/
 	protected $permissions;
 
-	public function __construct($permission){
+	public function __construct($permission, $session){
 		//@todo: get most of this into a controller
 		//if (!$this->logged_in() && get_cookie('identity') && get_cookie('remember_code')){
 			//$this->arr_task_permissions = $this->ion_auth_model->getTaskPermissions('3');
 		//}
-		parent::__construct();
+		parent::__construct($session);
 
 		$this->permissions = $permission;
         $this->is_admin = $this->is_admin();

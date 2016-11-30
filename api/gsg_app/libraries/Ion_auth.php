@@ -50,18 +50,21 @@ class Ion_auth
 	 **/
 	public $_extra_set = array();
 
+    public $session;
+
 	/**
 	 * __construct
 	 *
 	 * @return void
 	 * @author Ben
 	 **/
-	public function __construct()
+	public function __construct($session)
 	{
 		$this->load->config('ion_auth', TRUE);
 		$this->load->library('email');
-		$this->load->library('session');
-		$this->lang->load('ion_auth');
+		//$this->load->library('session');
+		$this->session = $session;
+        $this->lang->load('ion_auth');
 		$this->load->helper('cookie');
 
 		// Load IonAuth MongoDB model if it's set to use MongoDB,

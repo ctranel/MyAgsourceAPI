@@ -25,13 +25,8 @@ require_once APPPATH . 'libraries/AccessLog.php';
 class Auth extends MY_Api_Controller {
 	function __construct()
 	{
-		$this->ionauth = new Ionauth();
 		parent::__construct();
-        //$this->load->library('as_ion_auth');
-        //$this->load->library('session');
-        //$this->load->helper('error');
         $this->load->library('form_validation');
-        //$this->load->model('dhi/herd_model');
 
 		/* Load the profile.php config file if it exists
 		if (ENVIRONMENT == 'development' || ENVIRONMENT == 'localhost') {
