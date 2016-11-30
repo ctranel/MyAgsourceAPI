@@ -279,7 +279,7 @@ class Setting_form_model extends CI_Model implements iForm_Model {
         $sql = "USE users;
 				DECLARE @tbl nvarchar(100), @value_col nvarchar(32), @desc_col nvarchar(32), @sql nvarchar(255)
 				SELECT @tbl = table_name, @value_col = value_column, @desc_col = desc_column FROM users.setng.data_lookup WHERE setting_id = " . $setting_id . "
-				SELECT @sql = N' SELECT ' + @value_col + ', ' + @desc_col + ' FROM ' + @tbl + ' WHERE herd_code = ''" . $herd_code . "'' AND (serial_num = " . $serial_num . " OR serial_num IS NULL) ORDER BY list_order'
+				SELECT @sql = N' SELECT ' + @value_col + ', ' + @desc_col + ' FROM ' + @tbl + ' WHERE herd_code = '" . $herd_code . "' AND (serial_num = " . $serial_num . " OR serial_num IS NULL) ORDER BY list_order'
 				EXEC sp_executesql @sql";
 //echo $sql;
 
@@ -303,13 +303,15 @@ class Setting_form_model extends CI_Model implements iForm_Model {
     * -----------------------------------------------------------------
     */
     public static function composeSettingSelect($user_id, $herd_code, $setting_id, $setting_value){
-        $user_id = (int)$user_id;
+//die($user_id);
+        if($user_id != "NULL"){
+            $user_id = (int)$user_id;
+        }
         $herd_code = MssqlUtility::escape($herd_code);
         $setting_id = (int)$setting_id;
         $setting_value = MssqlUtility::escape($setting_value);
 
-
-        $ret = "SELECT " . $user_id . " AS user_id, " . $herd_code . " AS herd_code, " . $setting_id . " AS setting_id, '" . $setting_value . "' AS value";
+        $ret = "SELECT " . $user_id . " AS user_id, '" . $herd_code . "' AS herd_code, " . $setting_id . " AS setting_id, '" . $setting_value . "' AS value";
         return $ret;
     }
 
@@ -324,18 +326,20 @@ class Setting_form_model extends CI_Model implements iForm_Model {
 	*  @throws: 
 	* -----------------------------------------------------------------
 	*/
-	public function upsert($form_id, $arr_using_stmnts){
+	public function upsert($form_id, $using_stmnt){
         $form_id = (int)$form_id;
         //data in $arr_using_stmnts was cleaned when statements were composed
 
-		if(!isset($arr_using_stmnts) || empty($arr_using_stmnts)){
-			return false;
+		if(!isset($using_stmnt) || empty($using_stmnt)){
+			throw new Exception("No data provided");
 		}
-		$using_stmnt = implode(' UNION ALL ', $arr_using_stmnts);
+		//$using_stmnt = implode(' UNION ALL ', $arr_using_stmnts);
 		
 		$sql = "MERGE INTO users.setng.user_herd_settings uhs
 				USING ($using_stmnt) nd 
-					ON uhs.user_id = nd.user_id AND uhs.herd_code = nd.herd_code AND uhs.setting_id = nd.setting_id
+					ON (uhs.user_id = nd.user_id OR (uhs.user_id IS NULL AND nd.user_id IS NULL)) 
+					    AND (uhs.herd_code = nd.herd_code  OR (uhs.herd_code IS NULL AND nd.herd_code IS NULL))
+					    AND uhs.setting_id = nd.setting_id
 				WHEN MATCHED THEN
 					UPDATE
 					SET uhs.setting_id = nd.setting_id, uhs.value = nd.value

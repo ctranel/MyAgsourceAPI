@@ -55,9 +55,9 @@ class SettingForm extends Form implements iForm {
 
         $form_data = $this->parseFormData($form_data);
 
-        $data = [];
+        //$data = [];
         $user_id = isset($this->user_id) ? $this->user_id : 'NULL';
-        $herd_code = "'$this->herd_code'";
+        $herd_code = $this->herd_code;
 
         foreach($this->controls as $c){
             if(isset($form_data[$c->name()])) {
@@ -67,11 +67,10 @@ class SettingForm extends Form implements iForm {
                 if(!$c->forHerd()){
                     $herd_code = 'NULL';
                 }
-                $data[] = $this->datasource->composeSettingSelect($user_id, $herd_code, $c->id(), $form_data[$c->name()]);
+                $data = $this->datasource->composeSettingSelect($user_id, $herd_code, $c->id(), $form_data[$c->name()]);
+                $this->datasource->upsert($this->id, $data);
             }
         }
-
-        $this->datasource->upsert($this->id, $data);
     }
 
     /* -----------------------------------------------------------------
