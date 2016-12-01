@@ -110,15 +110,63 @@ class Form implements iForm
 *  @throws:
 * -----------------------------------------------------------------
 */
-    public function delete($form_data){
-        if(!isset($form_data) || !is_array($form_data)){
+    public function delete($key_data){
+        if(!isset($key_data) || !is_array($key_data)){
             throw new \UnexpectedValueException('No form data received');
         }
 
-        $form_data = $this->parseFormData($form_data);
+        $key_data = $this->parseKeyData($key_data);
 
         //SEND KEY FIELDS AND VALUES
-        $this->datasource->delete($this->id, $form_data);
+        $this->datasource->delete($this->id, $key_data);
+    }
+
+    /* -----------------------------------------------------------------
+*  deactivate
+
+*  deactivate record from database
+
+*  @author: ctranel
+*  @date: 2016-11-30
+*  @param: array of key=>value pairs that have been processed by the parseFormData static function
+*  @return void
+*  @throws:
+* -----------------------------------------------------------------
+*/
+    public function deactivate($key_data){
+        if(!isset($key_data) || !is_array($key_data)){
+            throw new \UnexpectedValueException('No form data received');
+        }
+
+        $key_data['isactive'] = 0;
+
+        $this->write($key_data);
+    }
+
+    /* -----------------------------------------------------------------
+     *  parses form data according to data type conventions.
+
+    *  Parses form data according to data type conventions.
+
+    *  @since: version 1
+    *  @author: ctranel
+    *  @date: July 1, 2014
+    *  @param array of key-value pairs from form submission
+    *  @return array of formatted key-value pairs from form submission
+    *  @throws:
+    * -----------------------------------------------------------------
+    */
+    protected function parseKeyData($key_data){
+        $ret_val = [];
+        if(!isset($key_data) || !is_array($key_data)){
+            throw new \Exception('No form data found');
+        }
+        foreach($this->controls as $c){
+            if($c->isKey() && isset($key_data[$c->name()])){
+                $ret_val[$c->name()] = $c->parseFormData($key_data[$c->name()]);
+            }
+        }
+        return $ret_val;
     }
 
     /* -----------------------------------------------------------------
@@ -140,7 +188,7 @@ class Form implements iForm
             throw new \Exception('No form data found');
         }
         foreach($this->controls as $c){
-            if(!$c->isGenerated()){
+            if(!$c->isGenerated() && isset($form_data[$c->name()])){
                 $ret_val[$c->name()] = $c->parseFormData($form_data[$c->name()]);
                 //@todo: not the right place to write subforms, but it will do for now
                 $c->writeSubforms($form_data);

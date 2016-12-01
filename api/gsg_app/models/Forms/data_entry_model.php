@@ -553,12 +553,12 @@ class Data_entry_model extends CI_Model implements iForm_Model {
             }
             //string vs numeric, or can we use quotes for both?
             if(in_array($k, $key_field_names)){
-                $delete_cond .= " " . $k . "=" . $v . ",";
+                $delete_cond .= $k . "='" . $v . "' AND ";
             }
         }
 
-        $sql = "DELETE FROM " . $table_name . " WHERE " . substr($delete_cond, 0, -1);
-die($sql);
+        $sql = "DELETE FROM " . $table_name . " WHERE " . substr($delete_cond, 0, -5);
+//die($sql);
         return $this->db->query($sql);
     }
 }

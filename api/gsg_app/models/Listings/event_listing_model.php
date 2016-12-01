@@ -48,7 +48,7 @@ class Event_listing_model extends CI_Model implements iListing_model  {
         $page_id = (int)$page_id;
 
         $results = $this->db
-            ->select('pb.page_id, b.id, l.id AS listing_id, b.name, b.description, dt.name AS display_type, s.name AS scope, srt.db_field_name AS order_by, l.sort_order, l.form_id, b.active, b.path, pb.list_order')
+            ->select('pb.page_id, b.id, l.id AS listing_id, b.name, b.description, dt.name AS display_type, s.name AS scope, srt.db_field_name AS order_by, l.sort_order, l.form_id, l.delete_path, b.active, b.path, pb.list_order')
             ->join('users.dbo.blocks b', "pb.block_id = b.id AND b.display_type_id = 8 AND pb.page_id = " . $page_id . ' AND b.active = 1', 'inner')
             ->join('users.options.listings l', "b.id = l.block_id AND l.isactive = 1", 'inner')
             ->join("(
@@ -76,7 +76,7 @@ class Event_listing_model extends CI_Model implements iListing_model  {
         $listing_id = (int)$listing_id;
 
         $results = $this->db
-            ->select('b.id, l.id AS listing_id, b.name, b.description, dt.name AS display_type, s.name AS scope, srt.db_field_name AS order_by, l.sort_order, l.form_id, b.active, b.path')
+            ->select('b.id, l.id AS listing_id, b.name, b.description, dt.name AS display_type, s.name AS scope, srt.db_field_name AS order_by, l.sort_order, l.form_id, l.delete_path, b.active, b.path')
             ->join('users.options.listings l', "b.id = l.block_id AND l.id = " . $listing_id, 'inner')
             ->join("(
                     SELECT lci.id, f.db_field_name 
