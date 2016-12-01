@@ -186,16 +186,20 @@ class AnimalEvent
         $event_dt = new \DateTime($event_dt);
         if($data['is_active'] == false || $data['TopSoldDiedDate'] !== null){
             $this->eligible_messages[] = "Cannot enter events for inactive, sold or dead animals.";
+            return false;
         }
         if($event_cd == 22 || $event_cd == 23 || $event_cd == 24 || $event_cd == 29){
             $this->eligible_messages[] = "Event entered is an internal event and cannot be keyed.";
+            return false;
         }
         if($event_dt > $now){
             $this->eligible_messages[] = "Cannot enter events with date or time in the future.";
+            return false;
         }
         if($data['sex_cd'] === 2 && ($event_cd < 21 && $event_cd > 28)){
             //@todo: custom events need to be allowed
             $this->eligible_messages[] = "Can only enter sold or died events for males.";
+            return false;
         }
 
         //Fresh events
