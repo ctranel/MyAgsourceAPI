@@ -66,7 +66,7 @@ class ListingFactory implements iListingFactory {
             }
         }
 
-        return new Listing($listing_data['listing_id'], $listing_data['form_id'], $lc, $dataset, $listing_data['active'], $criteria);
+        return new Listing($listing_data['listing_id'], $listing_data['form_id'], $listing_data['delete_path'], $lc, $dataset, $listing_data['active'], $criteria);
     }
 
     /*

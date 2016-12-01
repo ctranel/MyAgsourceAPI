@@ -55,9 +55,16 @@ class Listing implements iListing
      **/
     protected $form_id;
 
-    public function __construct($id, $form_id, $columns, $dataset, $isactive, $add_presets){
+    /**
+     * delete_path
+     * @var int
+     **/
+    protected $delete_path;
+
+    public function __construct($id, $form_id, $delete_path, $columns, $dataset, $isactive, $add_presets){
         $this->id = $id;
         $this->form_id = $form_id;
+        $this->delete_path = $delete_path;
         $this->isactive = $isactive;
         $this->add_presets = $add_presets;
         $this->dataset = $dataset;
@@ -69,6 +76,7 @@ class Listing implements iListing
 //@todo: pull path from form data
         $ret['form_id'] = $this->form_id; //'api/dform/put_entry/' .
         $ret['add_presets'] = $this->add_presets;
+        $ret['delete_path'] = $this->delete_path;
 
         if(isset($this->columns) && is_array($this->columns) && !empty($this->columns)){
             $columns = [];

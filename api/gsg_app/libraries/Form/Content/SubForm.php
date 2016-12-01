@@ -49,6 +49,10 @@ class SubForm implements iSubForm
         $this->form->write($form_data);
     }
 
+    public function delete($form_data)    {
+        $this->form->delete($form_data);
+    }
+
     public function action(){
         return $this->form->action();
     }

@@ -93,9 +93,32 @@ class Form implements iForm
 
         $generated_cols = $this->getGeneratedCols($form_data);
         $form_data = $this->parseFormData($form_data);
-        //$form_data['logID'] =
+
         //SEND KEY FIELDS AND VALUES
         $this->datasource->upsert($this->id, $form_data, $generated_cols);
+    }
+
+    /* -----------------------------------------------------------------
+*  delete
+
+*  delete record from database
+
+*  @author: ctranel
+*  @date: 2016-11-30
+*  @param: array of key=>value pairs that have been processed by the parseFormData static function
+*  @return void
+*  @throws:
+* -----------------------------------------------------------------
+*/
+    public function delete($form_data){
+        if(!isset($form_data) || !is_array($form_data)){
+            throw new \UnexpectedValueException('No form data received');
+        }
+
+        $form_data = $this->parseFormData($form_data);
+
+        //SEND KEY FIELDS AND VALUES
+        $this->datasource->delete($this->id, $form_data);
     }
 
     /* -----------------------------------------------------------------

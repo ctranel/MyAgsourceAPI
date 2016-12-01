@@ -105,7 +105,7 @@ class dform extends dpage {
 		$this->load->library('herds');
 		$this->load->library('form_validation');
         $this->load->model('Forms/data_entry_model');
-//var_dump($params);
+
         $form_factory = new FormFactory($this->data_entry_model, $supplemental_factory, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
 
         $form = $form_factory->getForm($form_id, $this->session->userdata('herd_code'));
@@ -117,7 +117,7 @@ class dform extends dpage {
      * @method get_entry() - setting submission.
      *
      * @param int form id
-     * @param string json data (key data for retrieving form)
+     * @param string json data (form data)
      * @access	public
      * @return	void
      */
@@ -127,12 +127,12 @@ class dform extends dpage {
             $params = (array)json_decode(urldecode($json_data));
         }
             //validate form input
-        $this->load->model('supplemental_model');
-        $supplemental_factory = new SupplementalFactory($this->supplemental_model, site_url());
+        //$this->load->model('supplemental_model');
+        //$supplemental_factory = new SupplementalFactory($this->supplemental_model, site_url());
         $this->load->library('herds');
         $this->load->library('form_validation');
         $this->load->model('Forms/data_entry_model');//, null, false, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
-        $form_factory = new FormFactory($this->data_entry_model, $supplemental_factory, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
+        $form_factory = new FormFactory($this->data_entry_model, null, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
 
         $form = $form_factory->getForm($form_id, $this->session->userdata('herd_code'));
         $input = $this->input->userInputArray();
@@ -157,6 +157,53 @@ class dform extends dpage {
                 $input['logdttm'] = $date->format("Y-m-d H:i:s");
 
                 $form->write($input);
+
+                $resp_msg = [];
+                //$msg = $this->_loadSessionHerd($tmp_arr[0]['herd_code']);
+                //if(!empty($msg)){
+                $resp_msg = new ResponseMessage('Form submission successful', 'message');
+                //}
+                //$this->_record_access(2); //2 is the page code for herd change
+                /*                $this->load->model('web_content/navigation_model');
+                                $navigation = new Navigation($this->navigation_model, $this->herd, $this->permissions->permissionsList());
+                                $payload = ['nav' => $navigation->toArray('DHI')]; */
+                $this->sendResponse(200, $resp_msg);
+            }
+            catch(Exception $e){
+                $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
+            }
+        }
+        $this->sendResponse(400, new ResponseMessage(validation_errors(), 'error'));
+    }
+
+    /**
+     * @method delete_entry() - setting submission.
+     *
+     * @param int form id
+     * @param string json data (key data)
+     * @access	public
+     * @return	void
+     */
+    function delete_entry($form_id, $json_data = null){
+        $params = [];
+        if(isset($json_data)) {
+            $params = (array)json_decode(urldecode($json_data));
+        }
+        //validate form input
+        $this->load->library('herds');
+        $this->load->library('form_validation');
+        $this->load->model('Forms/data_entry_model');//, null, false, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
+        $form_factory = new FormFactory($this->data_entry_model, null, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
+
+        $form = $form_factory->getForm($form_id, $this->session->userdata('herd_code'));
+        $input = $this->input->userInputArray();
+
+        if(!$input || empty($input)){
+            $this->sendResponse(200, $this->message, $form->toArray());
+        }
+        elseif($this->form_validation->run_input() === true){
+            try{
+                $form->delete($input);
 
                 $resp_msg = [];
                 //$msg = $this->_loadSessionHerd($tmp_arr[0]['herd_code']);

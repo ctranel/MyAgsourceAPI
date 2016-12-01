@@ -15,4 +15,5 @@ interface iSubForm extends iForm
     //public function __construct($operator, $operand2, iForm $form);
     public function toArray();
     public function write($form_data);
+    public function delete($form_data);
 }

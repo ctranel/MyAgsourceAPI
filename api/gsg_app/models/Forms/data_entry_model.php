@@ -461,9 +461,9 @@ class Data_entry_model extends CI_Model implements iForm_Model {
     }
 
     /* -----------------------------------------------------------------
-    *  upsert Description
+    *  upsert
 
-    *  upsert Description
+    *  upsert form submitted data
 
     *  @author: ctranel
     *  @param: array of strings
@@ -524,4 +524,41 @@ class Data_entry_model extends CI_Model implements iForm_Model {
 //die($sql);
 		return $this->db->query($sql);
 	}
+
+    /* -----------------------------------------------------------------
+*  upsert
+
+*  upsert form submitted data
+
+*  @author: ctranel
+*  @param: array of strings
+*  @return void
+*  @throws:
+* -----------------------------------------------------------------
+*/
+    public function delete($form_id, $form_data){
+        $form_id = (int)$form_id;
+        $form_data = MssqlUtility::escape($form_data);
+
+        //get table name
+        $table_name = $this->getSourceTable($form_id);
+        //id key fields
+        $key_meta = $this->getFormKeyMeta($form_id);
+        $key_field_names = array_keys($key_meta);
+
+        $delete_cond = '';
+        foreach($form_data as $k=>$v){
+            if(is_array($v)){
+                $v = implode('|', $v);
+            }
+            //string vs numeric, or can we use quotes for both?
+            if(in_array($k, $key_field_names)){
+                $delete_cond .= " " . $k . "=" . $v . ",";
+            }
+        }
+
+        $sql = "DELETE FROM " . $table_name . " WHERE " . substr($delete_cond, 0, -1);
+die($sql);
+        return $this->db->query($sql);
+    }
 }
