@@ -133,14 +133,14 @@ class Form implements iForm
 *  @throws:
 * -----------------------------------------------------------------
 */
-    public function deactivate($key_data){
-        if(!isset($key_data) || !is_array($key_data)){
+    public function deactivate($entity_data){
+        if(!isset($entity_data) || !is_array($entity_data)){
             throw new \UnexpectedValueException('No form data received');
         }
 
-        $key_data['isactive'] = 0;
+        $entity_data['isactive'] = 0;
 
-        $this->write($key_data);
+        $this->write($entity_data);
     }
 
     /* -----------------------------------------------------------------

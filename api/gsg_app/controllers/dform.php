@@ -196,7 +196,7 @@ class dform extends dpage {
         $form = $form_factory->getForm($form_id, $this->session->userdata('herd_code'));
 
             try{
-                $form->deactivate($input);
+                $form->delete($input);
 
                 $resp_msg = new ResponseMessage('The record was removed', 'message');
 
@@ -205,6 +205,37 @@ class dform extends dpage {
             catch(Exception $e){
                 $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
             }
+    }
+
+    /**
+     * @method delete_entry() - setting submission.
+     *
+     * @param int form id
+     * @param string json data (key data)
+     * @access	public
+     * @return	void
+     */
+    function deactivate($form_id, $json_data = null){
+        if(!isset($json_data)){
+            $this->sendResponse(400, new ResponseMessage('No criteria sent for deletion.', 'error'));
+        }
+        $input = (array)json_decode(urldecode($json_data));
+
+        $this->load->model('Forms/data_entry_model');//, null, false, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
+        $form_factory = new FormFactory($this->data_entry_model, null, ['herd_code'=>$this->session->userdata('herd_code')]);
+
+        $form = $form_factory->getForm($form_id, $this->session->userdata('herd_code'));
+
+        try{
+            $form->deactivate($input);
+
+            $resp_msg = new ResponseMessage('The record was removed', 'message');
+
+            $this->sendResponse(200, $resp_msg);
+        }
+        catch(Exception $e){
+            $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
+        }
     }
 
     public function animal_options($herd_code, $serial_num, $control_id){
