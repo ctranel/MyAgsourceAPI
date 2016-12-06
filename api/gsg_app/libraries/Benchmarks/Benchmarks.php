@@ -79,7 +79,7 @@ class Benchmarks extends Settings
 		/**
 		 * @todo : need a more elegent/flexible/reliable (using DB?) way to set a multidimensional setting
 		 */
-		$this->arr_criteria_table = array(
+		$this->arr_criteria_table = [
 			'PROD' => [
 				'field' => 'rha_milk_lbs',
 				'sort_order' => 'desc',
@@ -96,7 +96,7 @@ class Benchmarks extends Settings
 				'field' => 'wtd_avg_scc',
 				'sort_order' => 'asc',
 			],
-		);
+		];
 		
 		$this->setHerdDefaults($herd_info['breed_code'], $herd_info['herd_size']);
 	}
@@ -224,9 +224,7 @@ class Benchmarks extends Settings
 			$arr_group_by
 		);
 		$arr_benchmarks = $this->benchmark_model->getBenchmarkData($bench_sql);
-
-		$tmp_metric = $this->arr_settings['metric']->getLookupOptions();
-		$bench_head_text = ucwords(strtolower($tmp_metric[$this->arr_settings['metric']->getCurrValue($sess_metric)]));
+		$bench_head_text = $this->arr_settings['metric']->getCurrValue($sess_metric);
 		if($arr_benchmarks[0]['cnt_herds'] < 3){
 			$bench_head_text .= '<br>(benchmarks not available)';
 		}

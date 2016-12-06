@@ -73,29 +73,33 @@ class SettingForm extends Form implements iForm {
         }
     }
 
-    /* -----------------------------------------------------------------
-    *  Returns array with data needed to populate forms
-
-    *  Returns array with data needed to populate forms
-
-    *  @since: version 1
-    *  @author: ctranel
-    *  @date: Jun 27, 2014
-    *  @return array with options and selected data for each setting
-    *  @throws:
-    * -----------------------------------------------------------------
-   public function getFormData($session_data = null){
-        $ret_val = array();
-        if(!isset($this->arr_settings)){
-            return false;//$this->loadSettings();
-        }
-        foreach($this->arr_settings as $k=>$set){
-            $session_value = isset($session_data[$k]) ? $session_data[$k] : null;
-            $ret_val[$k] = $set->getFormData($session_value);
-        }
-        return $ret_val;
+    public function delete($form_data){
+        throw new Exception('Cannot delete settings data.');
     }
-*/
+
+        /* -----------------------------------------------------------------
+        *  Returns array with data needed to populate forms
+
+        *  Returns array with data needed to populate forms
+
+        *  @since: version 1
+        *  @author: ctranel
+        *  @date: Jun 27, 2014
+        *  @return array with options and selected data for each setting
+        *  @throws:
+        * -----------------------------------------------------------------
+       public function getFormData($session_data = null){
+            $ret_val = array();
+            if(!isset($this->arr_settings)){
+                return false;//$this->loadSettings();
+            }
+            foreach($this->arr_settings as $k=>$set){
+                $session_value = isset($session_data[$k]) ? $session_data[$k] : null;
+                $ret_val[$k] = $set->getFormData($session_value);
+            }
+            return $ret_val;
+        }
+    */
 
     /* -----------------------------------------------------------------
      *  parses form data according to data type conventions.

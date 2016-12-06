@@ -87,6 +87,35 @@ class Setting {
         $this->value = $control_data['value'];
 	}
 
+	public function toArray(){
+        $ret = [
+            'id' => $this->id,
+            'name' => $this->name,
+            'label' => $this->label,
+            'value' => $this->value,
+            'default_value' => $this->default_value,
+            'control_type' => $this->control_type,
+        ];
+
+        return $ret;
+    }
+
+    /* -----------------------------------------------------------------
+    *  Returns label
+
+    *  Returns setting label
+
+    *  @since: version 1
+    *  @author: ctranel
+    *  @date: Jun 25, 2014
+    *  @return mixed value
+    *  @throws:
+    * -----------------------------------------------------------------
+    */
+    public function label(){
+        return $this->label;
+    }
+
     /* -----------------------------------------------------------------
     *  Returns setting value if set, else default value
 
