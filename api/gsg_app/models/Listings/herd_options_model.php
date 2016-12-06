@@ -212,13 +212,13 @@ class Herd_options_model extends CI_Model implements iListing_model  {
                 inner join users.dbo.db_databases db ON tbl.database_id = db.id
 
             SET @dsql = CONCAT(N'SELECT *
-			    FROM ', @db_table_name, N' WHERE " . $key_condition_text . "isactive = 1";
+			    FROM ', @db_table_name, N' WHERE " . $key_condition_text . " isactive = 1";
 
         if(isset($order_by) && !empty($order_by) && isset($sort_order) && !empty($sort_order)) {
             $sql .= " ORDER BY " . $order_by . " " . $sort_order;
         }
         else {
-            $sql .= "ORDER BY list_order ASC";
+            $sql .= " ORDER BY list_order ASC";
         }
 
         $sql .= "')
