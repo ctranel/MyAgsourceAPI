@@ -1,10 +1,9 @@
 <?php
 namespace myagsource\Page\Content\Table;
 
-require_once APPPATH . 'libraries/Page/Content/Table/TableData.php';
+require_once APPPATH . 'libraries/Report/Content/Table/TableData.php';
 
-use \myagsource\Datasource\DbObjects\DbTable;
-use \myagsource\Benchmarks\Benchmarks;
+use \myagsource\Report\Content\Table\TableData;
 
 class Cowpopulations extends TableData {
 	
