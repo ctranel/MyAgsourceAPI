@@ -83,7 +83,7 @@ class Form implements iForm
 *  @author: ctranel
 *  @date: Jul 1, 2014
 *  @param: array of key=>value pairs that have been processed by the parseFormData static function
-*  @return void
+*  @return key->value array of keys for the record
 *  @throws: * -----------------------------------------------------------------
 */
     public function write($form_data){
@@ -91,11 +91,17 @@ class Form implements iForm
             throw new \UnexpectedValueException('No form data received');
         }
 
+        $is_update = (bool)$form_data['is_edited'];
         $generated_cols = $this->getGeneratedCols($form_data);
         $form_data = $this->parseFormData($form_data);
 
-        //SEND KEY FIELDS AND VALUES
-        $this->datasource->upsert($this->id, $form_data, $generated_cols);
+        if($is_update){
+            $key_vals = $this->datasource->update($this->id, $form_data, $generated_cols);
+        }
+        else {
+            $key_vals = $this->datasource->insert($this->id, $form_data, $generated_cols);
+        }
+        return $key_vals;
     }
 
     /* -----------------------------------------------------------------
@@ -129,7 +135,7 @@ class Form implements iForm
 *  @author: ctranel
 *  @date: 2016-11-30
 *  @param: array of key=>value pairs that have been processed by the parseFormData static function
-*  @return void
+*  @return key->value array of keys for the record
 *  @throws:
 * -----------------------------------------------------------------
 */
@@ -139,8 +145,9 @@ class Form implements iForm
         }
 
         $entity_data['isactive'] = 0;
+        $entity_data['is_edited'] = 1;
 
-        $this->write($entity_data);
+        return $this->write($entity_data);
     }
 
     /* -----------------------------------------------------------------
@@ -188,8 +195,8 @@ class Form implements iForm
             throw new \Exception('No form data found');
         }
         foreach($this->controls as $c){
-            if(!$c->isGenerated() && isset($form_data[$c->name()])){
-                $ret_val[$c->name()] = $c->parseFormData($form_data[$c->name()]);
+            if(isset($form_data[$c->name()])){//!$c->isGenerated() &&
+            $ret_val[$c->name()] = $c->parseFormData($form_data[$c->name()]);
                 //@todo: not the right place to write subforms, but it will do for now
                 $c->writeSubforms($form_data);
             }

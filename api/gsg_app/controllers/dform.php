@@ -156,7 +156,7 @@ class dform extends dpage {
                 $date = new DateTime("now");
                 $input['logdttm'] = $date->format("Y-m-d H:i:s");
 
-                $form->write($input);
+                $entity_keys = $form->write($input);
 
                 $resp_msg = [];
                 //$msg = $this->_loadSessionHerd($tmp_arr[0]['herd_code']);
@@ -167,7 +167,7 @@ class dform extends dpage {
                 /*                $this->load->model('web_content/navigation_model');
                                 $navigation = new Navigation($this->navigation_model, $this->herd, $this->permissions->permissionsList());
                                 $payload = ['nav' => $navigation->toArray('DHI')]; */
-                $this->sendResponse(200, $resp_msg);
+                $this->sendResponse(200, $resp_msg, ['identity_keys' => $entity_keys]);
             }
             catch(Exception $e){
                 $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));

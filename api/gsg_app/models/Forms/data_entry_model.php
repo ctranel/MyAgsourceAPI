@@ -467,31 +467,34 @@ class Data_entry_model extends CI_Model implements iForm_Model {
 
     *  @author: ctranel
     *  @param: array of strings
-    *  @return void
+    *  @return key->value array of keys for the record
     *  @throws:
     * -----------------------------------------------------------------
     */
-	public function upsert($form_id, $form_data, $generated_cols = null){
+    public function upsert($form_id, $form_data, $generated_cols = null){
         $form_id = (int)$form_id;
         $form_data = MssqlUtility::escape($form_data);
+        $is_update = true;
 
-        //get table name
         $table_name = $this->getSourceTable($form_id);
         //id key fields
         $key_meta = $this->getFormKeyMeta($form_id);
-        $key_field_names = array_keys($key_meta);
-        $form_field_names = array_keys($form_data);
 
-        $join_cond = '';
+        $key_field_names = array_keys($key_meta);
+        //$form_field_names = array_keys($form_data);
+
+        $upd_where = '';
         if(isset($key_field_names) && is_array($key_field_names)){
             foreach($key_field_names as $k){
-                $join_cond .= " t." . $k . "=nd." . $k . " AND";
+                $key_values[$k] = $form_data[$k];
+//IN CASES LIKE PEN NUM, KEY FIELDS WILL BE SET, AND IT'S STILL AN UPDATE
+                if(!isset($form_data[$k]) || empty($form_data[$k])){
+                    $is_update = false;
+                }
+                else {
+                    $upd_where .= " " . $k . "='" . $form_data[$k] . "' AND";
+                }
             }
-        }
-
-        $value_as_key = '';
-        foreach($generated_cols as $k => $v){
-            $value_as_key .= "'" .  $v  . "' AS " . $k . ",";
         }
 
         $update_set = '';
@@ -500,35 +503,123 @@ class Data_entry_model extends CI_Model implements iForm_Model {
                 $v = implode('|', $v);
             }
             //string vs numeric, or can we use quotes for both?
-            //only update non-key fields
-            if(in_array($k, $key_field_names) === false){
-                $update_set .= " t." . $k . "=nd." . $k . ",";
-            }
-            if($v === null) {
-                $value_as_key .= "NULL AS " . $k . ",";
-            }
-            else{
-                $value_as_key .= "'" .  $v  . "' AS " . $k . ",";
+            //only update non-generated columns
+            if(in_array($k, $generated_cols) === false){
+                $update_set .= " t." . $k . "=" . $k . ",";
+                $insert_vals[$k] = $form_data[$k];
             }
         }
 
-		$sql = "MERGE INTO " . $table_name . " t
-				USING (SELECT " . substr($value_as_key, 0, -1) . ") nd 
-					ON" . substr($join_cond, 0, -4) . "
-				WHEN MATCHED THEN
-					UPDATE
-					SET " . substr($update_set, 0, -1) . "
-				WHEN NOT MATCHED BY TARGET THEN
-					INSERT (" . implode(', ', $form_field_names) . ")
-					VALUES (nd." . implode(', nd.', $form_field_names) . ");";
-//die($sql);
-		return $this->db->query($sql);
-	}
+        if($is_update){
+            $sql = "UPDATE " . $table_name .
+					" SET " . substr($update_set, 0, -1) .
+                    " WHERE " . $upd_where;
+            $res = $this->db->query($sql);
+            return $key_values;
+        }
+        else{
+            //need the commented select statement to trigger a return value
+            $sql = "--SELECT;
+                    INSERT " . $table_name . " (" . implode(', ', array_keys($insert_vals)) . ")
+					VALUES ('" . implode("', '", $insert_vals) . "');";
+            $res = $this->db->query($sql)->result_array();
+        }
+
+        return $res;
+    }
 
     /* -----------------------------------------------------------------
-*  upsert
+    *  insert
 
-*  upsert form submitted data
+    *  insert form submitted data
+
+    *  @author: ctranel
+    *  @param: array of strings
+    *  @return key->value array of keys for the record
+    *  @throws:
+    * -----------------------------------------------------------------
+    */
+    public function insert($form_id, $form_data, $generated_cols = null){
+        $form_id = (int)$form_id;
+        $form_data = MssqlUtility::escape($form_data);
+
+        $table_name = $this->getSourceTable($form_id);
+
+        foreach($form_data as $k=>$v){
+            if(is_array($v)){
+                $v = implode('|', $v);
+            }
+            //string vs numeric, or can we use quotes for both?
+            //only update non-generated columns
+            if(in_array($k, $generated_cols) === false){
+                $insert_vals[$k] = $v;
+            }
+        }
+
+        //need the commented select statement to trigger a return value
+        $sql = "--SELECT;
+                INSERT " . $table_name . " (" . implode(', ', array_keys($insert_vals)) . ")
+                VALUES ('" . implode("', '", $insert_vals) . "');";
+        $res = $this->db->query($sql)->result_array();
+
+        return $res;
+    }
+
+    /* -----------------------------------------------------------------
+    *  update
+
+    *  update form submitted data
+
+    *  @author: ctranel
+    *  @param: array of strings
+    *  @return key->value array of keys for the record
+    *  @throws:
+    * -----------------------------------------------------------------
+    */
+    public function update($form_id, $form_data, $generated_cols = null){
+        $form_id = (int)$form_id;
+        $form_data = MssqlUtility::escape($form_data);
+
+        $table_name = $this->getSourceTable($form_id);
+        //id key fields
+        $key_meta = $this->getFormKeyMeta($form_id);
+        $key_field_names = array_keys($key_meta);
+
+        $upd_where = [];
+        if(isset($key_field_names) && is_array($key_field_names)){
+            foreach($key_field_names as $k){
+                $key_values[$k] = $form_data[$k];
+                if(isset($form_data[$k]) && !empty($form_data[$k])){
+                    $upd_where[] = $k . "='" . $form_data[$k] . "'";
+                }
+            }
+        }
+
+        $update_set = [];
+        foreach($form_data as $k=>$v){
+            if(is_array($v)){
+                $v = implode('|', $v);
+            }
+            //string vs numeric, or can we use quotes for both?
+            //only update non-generated columns
+            if(in_array($k, $generated_cols) === false){
+                $update_set[] = $k . "='" . $v . "'";
+            }
+        }
+
+        $sql = "UPDATE " . $table_name .
+            " SET " . implode(',' , $update_set) .
+            " WHERE " . implode(" AND ", $upd_where);
+
+        $res = $this->db->query($sql);
+
+        return $key_values;
+    }
+
+    /* -----------------------------------------------------------------
+*  delete
+
+*  delete submitted data
 
 *  @author: ctranel
 *  @param: array of strings

@@ -350,5 +350,10 @@ class Setting_form_model extends CI_Model implements iForm_Model {
 		$this->db->query($sql);
 	}
     
-    
+    public function insert($form_id, $using_stmnt){
+        $this->upsert($form_id, $using_stmnt);
+    }
+    public function update($form_id, $using_stmnt){
+        $this->upsert($form_id, $using_stmnt);
+    }
 }
