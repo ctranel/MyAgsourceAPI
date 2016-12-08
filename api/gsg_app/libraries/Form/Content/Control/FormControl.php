@@ -429,7 +429,7 @@ class FormControl implements iFormControl
             foreach($this->subforms as $s){
                 //only subforms that do not have an action of their own are written with their parent form
                 if($s->action() === null && $s->conditionsMet($form_data[$this->name])){
-                    $s->write($form_data);
+                    return $s->write($form_data);
                 }
             }
         }
