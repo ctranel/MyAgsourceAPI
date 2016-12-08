@@ -61,7 +61,9 @@ class Validator
 		$this->_lang['is_natural_no_zero']	= "The %s field must contain a number greater than zero.";
 		$this->_lang['decimal']			= "The %s field must contain a decimal number.";
 		$this->_lang['maxValue']			= "The %s field must contain a number less than or equal to %s.";
-		$this->_lang['minValue']		= "The %s field must contain a number greater than or equal to %s.";	}
+		$this->_lang['minValue']		= "The %s field must contain a number greater than or equal to %s.";
+        $this->_lang['notEqual']		= "The %s field must contain a number greater than or equal to %s.";
+	}
 
 	// --------------------------------------------------------------------
 
@@ -1099,7 +1101,19 @@ class Validator
 		return $str <= $max;
 	}
 
-	// --------------------------------------------------------------------
+    /**
+     * Not equal
+     *
+     * @access	public
+     * @param	string
+     * @return	bool
+     */
+    public function notEqual($str, $val)
+    {
+        return $str != $val;
+    }
+
+// --------------------------------------------------------------------
 
 	/**
 	 * Is a Natural number  (0,1,2,3, etc.)
