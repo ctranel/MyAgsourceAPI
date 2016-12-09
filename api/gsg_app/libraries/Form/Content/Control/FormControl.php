@@ -281,6 +281,20 @@ class FormControl implements iFormControl
     }
 
     /* -----------------------------------------------------------------
+    *  Returns true if control is editable in datasource, else false
+
+    *  Returns true if control is editable in datasource, else false
+
+    *  @author: ctranel
+    *  @return boolean
+    *  @throws:
+    * -----------------------------------------------------------------
+    */
+    public function isEditable(){
+        return $this->is_editable;
+    }
+
+    /* -----------------------------------------------------------------
     *  Returns true if control is editable, else false
 
     *  Returns true if control is editable, else false

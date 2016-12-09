@@ -92,13 +92,14 @@ class Form implements iForm
         }
 
         $is_update = (bool)$form_data['is_edited'];
-        $generated_cols = $this->getGeneratedCols($form_data);
         $form_data = $this->parseFormData($form_data);
 
         if($is_update){
-            $key_vals = $this->datasource->update($this->id, $form_data, $generated_cols);
+            $uneditable_cols = $this->getUneditableCols($form_data);
+            $key_vals = $this->datasource->update($this->id, $form_data, $uneditable_cols);
         }
         else {
+            $generated_cols = $this->getGeneratedCols($form_data);
             $key_vals = $this->datasource->insert($this->id, $form_data, $generated_cols);
         }
         return $key_vals;
@@ -196,7 +197,7 @@ class Form implements iForm
         }
         foreach($this->controls as $c){
             if(isset($form_data[$c->name()])){//!$c->isGenerated() &&
-            $ret_val[$c->name()] = $c->parseFormData($form_data[$c->name()]);
+                $ret_val[$c->name()] = $c->parseFormData($form_data[$c->name()]);
                 //@todo: not the right place to write subforms, but it will do for now
                 $c->writeSubforms($form_data);
             }
@@ -224,6 +225,32 @@ class Form implements iForm
         }
         foreach($this->controls as $c){
             if($c->isGenerated()){
+                $ret_val[$c->name()] = $c->parseFormData($form_data[$c->name()]);
+            }
+        }
+        return $ret_val;
+    }
+
+    /* -----------------------------------------------------------------
+    *  extracts uneditable column data
+
+    *  extracts uneditable column data from submitted form data, as it is not included in the form data sent to datasource,
+    * but is needed for
+
+    *  @author: ctranel
+    *  @date: 2016-10-13
+    *  @param array of key-value pairs from form submission
+    *  @return key-value pairs
+    *  @throws:
+    * -----------------------------------------------------------------
+    */
+    protected function getUneditableCols($form_data){
+        $ret_val = [];
+        if(!isset($form_data) || !is_array($form_data)){
+            throw new \Exception('No form data found');
+        }
+        foreach($this->controls as $c){
+            if(!$c->isEditable()){
                 $ret_val[$c->name()] = $c->parseFormData($form_data[$c->name()]);
             }
         }
