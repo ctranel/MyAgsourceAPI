@@ -213,7 +213,7 @@ class Event_listing_model extends CI_Model implements iListing_model  {
 
             EXEC (@dsql)
        ";
-        //print($sql);
+        //die($sql);
         $results = $this->db->query($sql)->result_array();
         return $results;
     }

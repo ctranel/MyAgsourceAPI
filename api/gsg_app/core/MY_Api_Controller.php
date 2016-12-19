@@ -45,7 +45,7 @@ class MY_Api_Controller extends CI_Controller
     /**
      * settings
      *
-     * Herd object
+     * Settings object
      * @var Herd
      **/
     protected $settings;
