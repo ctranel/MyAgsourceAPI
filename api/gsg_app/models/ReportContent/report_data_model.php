@@ -46,16 +46,31 @@ class Report_data_model extends CI_Model {
 	
 	/**
 	 * @method search()
-	 * @param string herd code
+	 * @param iReport
+	 * @param array select fields
 	 * @param array filter criteria
-	 * @param array sort by
-	 * @param array sort order
 	 * @return array results of search
 	 * @author ctranel
 	 **/
-	function search(iReport $report, $select_fields, $arr_filter_criteria){//, $arr_sort_by = array(''), $arr_sort_order = array(''), $limit = NULL) {
-//		$this->load->helper('multid_array_helper');
-		//load data used to build query
+	function search(iReport $report, $select_fields, $arr_filter_criteria) {//, $arr_sort_by = array(''), $arr_sort_order = array(''), $limit = NULL) {
+        $this->composeSearch($report, $select_fields, $arr_filter_criteria);
+
+        $ret = $this->db->get()->result_array();
+        //$this->num_results = count($ret);
+        //$ret['arr_unsortable_columns'] = $this->arr_unsortable_columns;
+        return $ret;
+    }
+
+    /**
+     * @method composeSearch()
+     * @param iReport
+     * @param array select fields
+     * @param array filter criteria
+     * @return void
+     * @author ctranel
+     **/
+    protected function composeSearch(iReport $report, $select_fields, $arr_filter_criteria) {
+        //load data used to build query
 		$where_array = $report->getWhereGroupArray();
 		$group_by_array = $report->getGroupBy();
 		
@@ -92,10 +107,7 @@ class Report_data_model extends CI_Model {
         //uncomment to dump search query to screen
             //$this->db->select('d');
 
-		$ret = $this->db->get()->result_array();
-		$this->num_results = count($ret);
-		//$ret['arr_unsortable_columns'] = $this->arr_unsortable_columns;
-		return $ret;
+//echo $this->db->get_compiled_select();
 	}
 	
 	/** function prepWhereCriteria
@@ -155,24 +167,25 @@ class Report_data_model extends CI_Model {
 	protected function setFilters($where_criteria){
 		if(isset($where_criteria) && is_array($where_criteria)){
 			foreach($where_criteria as $k => $v){
-				if(empty($v) === FALSE || $v === '0'){
-					if(is_array($v)){
+                $val = $v['value'];
+				if(empty($val) === FALSE || $val === '0'){
+					if(is_array($val)){
 						//if filter is a range
-						if(key($v) === 'dbfrom' || key($v) === 'dbto'){
-							if(isset($where_criteria[$k]['dbfrom']) && !empty($where_criteria[$k]['dbfrom']) && isset($where_criteria[$k]['dbto']) && !empty($where_criteria[$k]['dbto'])){
-								$from = is_date_format($where_criteria[$k]['dbfrom']) ? date_to_mysqldatetime($where_criteria[$k]['dbfrom']) : $where_criteria[$k]['dbfrom'];
-								$to = is_date_format($where_criteria[$k]['dbto']) ? date_to_mysqldatetime($where_criteria[$k]['dbto']) : $where_criteria[$k]['dbto'];
+						if(key($val) === 'dbfrom' || key($val) === 'dbto'){
+							if(isset($where_criteria[$k]['dbfrom']['value']) && !empty($where_criteria[$k]['dbfrom']['value']) && isset($where_criteria[$k]['dbto']['value']) && !empty($where_criteria[$k]['dbto']['value'])){
+								$from = is_date_format($where_criteria[$k]['dbfrom']['value']) ? date_to_mysqldatetime($where_criteria[$k]['dbfrom']['value']) : $where_criteria[$k]['dbfrom']['value'];
+								$to = is_date_format($where_criteria[$k]['dbto']['value']) ? date_to_mysqldatetime($where_criteria[$k]['dbto']['value']) : $where_criteria[$k]['dbto']['value'];
 								$this->db->where($k . " BETWEEN '" . $from . "' AND '" . $to . "'");
 							}
 						}
 						else {
-							$v = array_filter($v, create_function('$a', 'return (!empty($a) || $a === "0" || $a === 0);'));
+							$v = array_filter($val, create_function('$a', 'return (!empty($a) || $a === "0" || $a === 0);'));
 							if(empty($v)) continue;
 							$this->db->where_in($k, $v);
 						}
 					}
 					else { //is not an array
-						$this->db->where($k, $v);
+						$this->db->where($k . $v['operator'], $val);
 					} 
 				}
 			}

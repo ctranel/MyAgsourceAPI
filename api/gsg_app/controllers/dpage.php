@@ -33,6 +33,7 @@ use \myagsource\Datasource\DbObjects\DbTableFactory;
 use \myagsource\Api\Response\ResponseMessage;
 use \myagsource\Settings\Form\SettingsFormFactory;
 use \myagsource\Form\Content\FormFactory;
+
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /* -----------------------------------------------------------------
@@ -135,6 +136,7 @@ class dpage extends MY_Api_Controller {
         if(isset($json_filter_data)) {
             $params = (array)json_decode(urldecode($json_filter_data));
         }
+
         $this->load->model('filter_model');
         $this->filters = new ReportFilters($this->filter_model, $page_id, ['herd_code' => $this->session->userdata('herd_code')] + $params);
         $this->load->model('Forms/setting_form_model');//, null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
@@ -195,6 +197,96 @@ class dpage extends MY_Api_Controller {
 
         $this->sendResponse(200, $this->message, $this->page->toArray());
 	}
+
+    function todo($page_id, $json_filter_data = null){
+        $report_date = date('Y-m-d');
+
+        //supplemental factory
+        $this->load->model('supplemental_model');
+        $supplemental_factory = new SupplementalFactory($this->supplemental_model, site_url());
+
+        //Set up site content objects
+        $this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
+        $this->load->model('web_content/block_model');
+        $web_block_factory = new WebBlockFactory($this->block_model);
+
+        //filters
+        $params = [];
+        if(isset($json_filter_data)) {
+            $params = (array)json_decode(urldecode($json_filter_data));
+        }
+
+        //convert look-ahead days to date ranges
+        //make sure we have a value
+        if(!isset($params['look_ahead_days']) || (empty($params['look_ahead_days']) && $params['look_ahead_days'] !== 0)){
+            $params['look_ahead_days'] = $this->settings->getValue('look_ahead_days');
+        }
+        $params['expires_date'] = date('Y-m-d');
+        $tmp = strtotime("+" . $params['look_ahead_days'] . " day");
+        $params['target_date'] = date('Y-m-d', $tmp);
+        unset($params['look_ahead_days'], $params['look_ahead_days']);
+
+        $this->load->model('filter_model');
+        $this->filters = new ReportFilters($this->filter_model, $page_id, ['herd_code' => $this->session->userdata('herd_code')] + $params);
+        $this->load->model('Forms/setting_form_model');//, null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
+        $this->filters->removeCriteria('look_ahead_days');
+        //end filters
+
+        //benchmarks
+        if($this->permissions->hasPermission("Set Benchmarks")){
+            $this->load->model('Settings/benchmark_model');//, null, false, ['user_id' => $this->session->userdata('user_id'), 'herd_code' => $this->session->userdata('herd_code')]);
+            $benchmarks = new Benchmarks($this->benchmark_model, $this->session->userdata('user_id'), $this->herd->herdCode(), $this->herd_model->header_info($this->herd->herdCode()), $this->session->userdata('benchmarks'));
+        }
+
+        //page content
+        $this->load->model('ReportContent/report_block_model');
+        $this->load->model('Datasource/db_field_model');
+        $this->load->model('dhi/todo_list_model', null, false, $this->settings);
+        $this->load->model('Datasource/db_table_model');
+        $data_handler = new DataHandler($this->todo_list_model, $benchmarks);
+        $db_table_factory = new DbTableFactory($this->db_table_model);
+
+//this will actually be passed from client
+//$params = ['pen_num' => 1];
+        //$params = ['ID' => 2911100]; //for events, 'serial_num' => '366'
+
+        //load factories for block content
+        $report_factory = new ReportFactory($this->report_block_model, $this->db_field_model, $this->filters, $supplemental_factory, $data_handler, $db_table_factory);
+        $setting_form_factory = new SettingsFormFactory($this->setting_form_model, $supplemental_factory, $params + ['herd_code'=>$this->session->userdata('herd_code'), 'user_id'=>$this->session->userdata('user_id')]);
+
+        $this->load->model('Forms/Data_entry_model');//, null, false, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
+        $entry_form_factory = new FormFactory($this->Data_entry_model, $supplemental_factory, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
+
+        //create block content
+        $reports = $report_factory->getByPage($page_id);
+        $setting_forms = $setting_form_factory->getByPage($page_id);
+        $entry_forms = $entry_form_factory->getByPage($page_id, $this->session->userdata('herd_code'));
+
+        //combine and sort
+        $block_content = $reports + $setting_forms + $entry_forms;
+        ksort($block_content);
+        unset($report_factory, $setting_form_factory, $entry_form_factory, $reports, $setting_forms, $entry_forms);
+
+        //create blocks for content
+        $blocks = $web_block_factory->getBlocksFromContent($page_id, $block_content);
+
+        $this->load->model('web_content/page_model');
+        $page_data = $this->page_model->getPage($page_id);
+        $this->page = new Page($page_data, $blocks, $supplemental_factory, $this->filters, $benchmarks);
+
+        //does user have access to current page for selected herd?
+        $this->herd_page_access = new HerdPageAccess($this->page_model, $this->herd, $this->page);
+        $this->page_access = new PageAccess($this->page, ($this->permissions->hasPermission("View All Content") || $this->permissions->hasPermission("View All Content-Billed")));
+        if(!$this->page_access->hasAccess($this->herd_page_access->hasAccess())) {
+            $this->sendResponse(403, new ResponseMessage('You do not have permission to view the requested report for herd ' . $this->herd->herdCode() . '.  Please select a report from the navigation', 'error'));
+        }
+        //the user can access this page for this herd, but do they have to pay?
+        if($this->permissions->hasPermission("View All Content-Billed")){
+            $this->message[] = new ResponseMessage('Herd ' . $this->herd->herdCode() . ' is not paying for this product.  You will be billed a monthly fee for any month in which you view content for which the herd is not paying.', 'message');
+        }
+
+        $this->sendResponse(200, $this->message, $this->page->toArray());
+    }
 
     protected function _record_access($event_id, $format, $product_code = null){
 		if($this->session->userdata('user_id') === FALSE){
