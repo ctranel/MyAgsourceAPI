@@ -105,7 +105,7 @@ class SupplementalFactory
 	*  @param: string site url
 	*  @return: Supplemental object
 	*  @throws:
-	* -----------------------------------------------------------------*/
+	* -----------------------------------------------------------------
 	public function getReportSupplemental($block_id) {
 		$links = $this->datasource->getLinks(1, $block_id);
 		$supplemental_links = SupplementalLink::datasetToObjects($this->site_url, $links, $this->datasource);
@@ -116,7 +116,7 @@ class SupplementalFactory
 		$supp = new Supplemental($supplemental_links, $supplemental_comments);
 		return $supp;
 	}
-
+*/
 	/* -----------------------------------------------------------------
 	 *  getHeaderGrpSupplemental
 	

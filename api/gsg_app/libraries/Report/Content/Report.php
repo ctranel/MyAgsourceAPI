@@ -133,7 +133,7 @@ abstract class Report implements iReport {
 	 * supp_param_fieldnames
 	 * @var array
 	 **/
-	protected $supp_param_fieldnames;
+	//protected $supp_param_fieldnames;
 	
 	/**
 	 * field_groups
@@ -157,7 +157,7 @@ abstract class Report implements iReport {
      * supplemental
      * @var Supplemental
      **/
-    protected $supplemental;
+    //protected $supplemental;
 
 	/**
 	 * $dataset_supplemental
@@ -219,8 +219,8 @@ abstract class Report implements iReport {
         /* end special case */
 
         $this->supplemental_factory = $supp_factory;
-        $this->supplemental = $supp_factory->getReportSupplemental($this->id);
-		$this->supp_param_fieldnames = [];
+        //$this->supplemental = $supp_factory->getReportSupplemental($this->id);
+		$this->supp_param_fieldnames = []; //used in child classes
 		
 		//load data for remaining fields
 		$this->setWhereGroups();
@@ -417,11 +417,12 @@ abstract class Report implements iReport {
             $ret['dataset'] = $this->dataset;
         }
 
-        $tmp = array_filter($this->supplemental->toArray());
-        if(is_array($tmp) && !empty($tmp)){
-            $ret['supplemental'] = $tmp;
-        }
-        unset($tmp);
+        //MOVING SUPPLEMENTAL TO BLOCK LEVEL
+        //$tmp = array_filter($this->supplemental->toArray());
+        //if(is_array($tmp) && !empty($tmp)){
+        //    $ret['supplemental'] = $tmp;
+        //}
+        //unset($tmp);
 
         if(is_array($this->default_sorts) && !empty($this->default_sorts)){
             $dsorts = [];
@@ -430,7 +431,7 @@ abstract class Report implements iReport {
             }
             $ret['default_sorts'] = $dsorts;
         }
-
+/*
 		if(is_array($this->dataset_supplemental) && !empty($this->dataset_supplemental)){
 			$supp = [];
 			foreach($this->dataset_supplemental as $k=>$f){
@@ -438,7 +439,7 @@ abstract class Report implements iReport {
 			}
 			$ret['dataset_supplemental'] = $supp;
 		}
-
+*/
 		if(is_array($this->report_fields) && !empty($this->report_fields)){
 			$data = [];
 			foreach($this->report_fields as $k=>$f){
@@ -714,12 +715,12 @@ abstract class Report implements iReport {
 			}
 		}
 		//supplemental params
-		if(isset($this->supp_param_fieldnames) && count($this->supp_param_fieldnames) > 0){
+/*		if(isset($this->supp_param_fieldnames) && count($this->supp_param_fieldnames) > 0){
 			foreach($this->supp_param_fieldnames as $f){
 				$ret[] = $f;
 			}
 		}
-
+*/
 		return $ret;
 	}
 	

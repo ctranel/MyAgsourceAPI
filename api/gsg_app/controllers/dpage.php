@@ -129,7 +129,7 @@ class dpage extends MY_Api_Controller {
         //Set up site content objects
         $this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
         $this->load->model('web_content/block_model');
-        $web_block_factory = new WebBlockFactory($this->block_model);
+        $web_block_factory = new WebBlockFactory($this->block_model, $supplemental_factory);
 
         //filters
         $params = [];
@@ -208,7 +208,7 @@ class dpage extends MY_Api_Controller {
         //Set up site content objects
         $this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
         $this->load->model('web_content/block_model');
-        $web_block_factory = new WebBlockFactory($this->block_model);
+        $web_block_factory = new WebBlockFactory($this->block_model, $supplemental_factory);
 
         //filters
         $params = [];

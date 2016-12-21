@@ -6,6 +6,8 @@ require_once(APPPATH . 'libraries/Site/WebContent/Block.php');
 require_once(APPPATH . 'libraries/Site/iWebContent.php');
 require_once(APPPATH . 'libraries/dhi/Herd.php');
 
+use myagsource\Supplemental\Content\SupplementalFactory;
+
 /**
  * A repository? for page objects
  * 
@@ -22,9 +24,16 @@ class WebBlockFactory {
 	 **/
 	protected $datasource_blocks;
 
-	function __construct(\Block_model $datasource_blocks) {
+    /**
+     * supplemental_factory
+     * @var SupplementalFactory
+     **/
+    protected $supplemental_factory;
+
+    function __construct(\Block_model $datasource_blocks, SupplementalFactory $supplemental_factory) {
 		$this->datasource_blocks = $datasource_blocks;
-	}
+        $this->supplemental_factory = $supplemental_factory;
+    }
 	
 	/*
 	 * getByPath
@@ -79,7 +88,7 @@ class WebBlockFactory {
             return false;
         }
         foreach($results as $r){
-            $blocks[] = new Block($block_content[$r['list_order']], $r['id'], $r['name'], $r['description'], $r['display_type'], $r['scope'], $r['active'], $r['path']);//,
+            $blocks[] = new Block($this->supplemental_factory, $block_content[$r['list_order']], $r['id'], $r['name'], $r['description'], $r['display_type'], $r['scope'], $r['active'], $r['path']);//,
         }
         return $blocks;
     }

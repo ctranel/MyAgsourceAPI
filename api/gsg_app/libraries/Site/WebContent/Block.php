@@ -6,7 +6,8 @@ require_once APPPATH . 'libraries/Site/iBlockContent.php';
 
 use myagsource\Site\iBlock;
 use myagsource\Site\iBlockContent;
-use myagsource\dhi\Herd;
+use \myagsource\Supplemental\Content\SupplementalFactory;
+
 /**
 * Name:  Block
 *
@@ -72,14 +73,20 @@ class Block implements iBlock {
 	 * @var boolean
 	protected $has_benchmark;
 **/
-	
-	/**
+
+    /**
 	 * active
 	 * @var boolean
 	 **/
 	protected $active;
 
-	/**
+    /**
+     * supplemental_factory
+     * @var SupplementalFactory
+     **/
+    protected $supplemental_factory;
+
+    /**
 	 * block_content
 	 * @var iBlockContent
 	 **/
@@ -92,7 +99,7 @@ class Block implements iBlock {
 	 * @return void
 	 * @author ctranel
 	 **/
-	public function __construct($block_content, $id, $name, $description, $display_type, $scope, $active, $path) { //
+	public function __construct(SupplementalFactory $supplemental_factory, $block_content, $id, $name, $description, $display_type, $scope, $active, $path) { //
 		$this->id = $id;
 		//$this->page_id = $page_id;
 		$this->name = $name;
@@ -102,6 +109,10 @@ class Block implements iBlock {
 		$this->active = $active;
 		$this->path = $path;
 		$this->block_content = $block_content; //report or form
+
+        $this->supplemental_factory = $supplemental_factory;
+        $this->supplemental = $this->supplemental_factory->getBlockSupplemental($this->id);
+
 	}
 	
 	public function id(){
@@ -142,8 +153,14 @@ class Block implements iBlock {
         $ret['description'] = $this->description;
         $ret['display_type'] = $this->display_type;
         $ret['path'] = $this->path;
-//            'has_benchmark' => $this->has_benchmark
-;
+//            'has_benchmark' => $this->has_benchmark;
+
+        $tmp = array_filter($this->supplemental->toArray());
+        if(is_array($tmp) && !empty($tmp)){
+            $ret['supplemental'] = $tmp;
+        }
+        unset($tmp);
+
         return $ret;
 	}
 

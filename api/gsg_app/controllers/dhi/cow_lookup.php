@@ -65,8 +65,12 @@ class Cow_lookup extends dpage {
         //create block content
         $listings = $option_listing_factory->getByPage($page_id, ['herd_code' => $this->session->userdata('herd_code'), 'serial_num' => $serial_num]);
 
+        //supplemental factory
+        $this->load->model('supplemental_model');
+        $supplemental_factory = new SupplementalFactory($this->supplemental_model, site_url());
+
         //create blocks for content
-        $blocks = $web_block_factory->getBlocksFromContent($page_id, $listings);
+        $blocks = $web_block_factory->getBlocksFromContent($page_id, $listings, $supplemental_factory);
         if(is_array($blocks)){
             foreach($blocks as $b){
                 $data['blocks'][] = $b->toArray();

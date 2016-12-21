@@ -41,7 +41,7 @@ class Table extends Report {
 	
 	function __construct($table_datasource, $id, $path, $max_rows, $cnt_row, $sum_row, $avg_row, $bench_row,
 			$is_summary, $display_type, ReportFilters $filters, SupplementalFactory $supp_factory = null, DataHandler $data_handler, DbTableFactory $db_table_factory, $field_groups) {
-		parent::__construct($table_datasource, $id, $path, $max_rows, $cnt_row, 
+		parent::__construct($table_datasource, $id, $path, $max_rows, $cnt_row,
 			$sum_row, $avg_row, $bench_row, $is_summary, $display_type, $filters, $supp_factory, $data_handler, $db_table_factory, $field_groups);
 		
 		$this->setReportFields();
@@ -57,7 +57,7 @@ class Table extends Report {
 	 * @access public
 	 *
 	 **/
-	public function setTableHeader(){//&$report_data, SupplementalFactory $supplemental_factory = null, $header_groups){
+	public function setTableHeader(){
         //new for API refactoring
         $header_groups = $this->datasource->getHeaderGroups($this->id());
 
@@ -86,8 +86,8 @@ class Table extends Report {
 	 * @access public
 	 *
 	 **/
-	public function setFlatTableHeader(&$report_data, SupplementalFactory $supplemental_factory = null, $header_groups){
-		$this->table_header = new TableHeader($this, $header_groups, $supplemental_factory);
+	public function setFlatTableHeader(&$report_data, $header_groups){
+		$this->table_header = new TableHeader($this, $header_groups, $this->supplemental_factory);
 
 		$top_row = null;
 		if($this->hasPivot() && is_array($report_data) && !empty($report_data)){
