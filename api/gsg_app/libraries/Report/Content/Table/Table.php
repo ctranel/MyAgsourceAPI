@@ -200,7 +200,7 @@ class Table extends Report {
 				$arr_table_ref_cnt[$s['table_name']] = isset($arr_table_ref_cnt[$s['table_name']]) ? ($arr_table_ref_cnt[$s['table_name']] + 1) : 1;
 				$datafield = new DbField($s['db_field_id'], $s['table_name'], $s['db_field_name'], $s['name'], $s['description'], $s['pdf_width'], $s['default_sort_order'],
 						 $s['datatype'], $s['max_length'], $s['decimal_scale'], $s['unit_of_measure'], $s['is_timespan'], $s['is_foreign_key'], $s['is_nullable'], $s['is_natural_sort']);
-				$this->report_fields[] = new TableField($s['id'], $s['name'], $datafield, $s['category_id'], $s['is_displayed'], $s['display_format'], $s['aggregate'], $s['is_sortable'], $header_supp, isset($this->dataset_supplemental[$s['db_field_name']]) ? $this->dataset_supplemental[$s['db_field_name']] : null, $s['block_header_group_id'], $s['field_group'], $s['field_group_ref_key']);
+				$this->report_fields[] = new TableField($s['id'], $s['name'], $datafield, $s['category_id'], $s['is_displayed'], $s['display_format'], $s['aggregate'], $s['is_sortable'], $header_supp, isset($this->dataset_supplemental[$s['db_field_name']]) ? $this->dataset_supplemental[$s['db_field_name']] : null, $s['table_header_group_id'], $s['field_group'], $s['field_group_ref_key']);
 			}
 			$this->primary_table_name = array_search(max($arr_table_ref_cnt), $arr_table_ref_cnt);
 			//set up arr_fields hierarchy

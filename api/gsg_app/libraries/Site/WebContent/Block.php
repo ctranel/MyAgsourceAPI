@@ -147,7 +147,7 @@ class Block implements iBlock {
         if($this->block_content instanceof iBlockContent){
             $ret = $this->block_content->toArray();
         }
-        $ret['id'] = $this->id;
+        $ret['block_id'] = $this->id;
             //'page_id' => $this->page_id,
         $ret['name'] = $this->name;
         $ret['description'] = $this->description;

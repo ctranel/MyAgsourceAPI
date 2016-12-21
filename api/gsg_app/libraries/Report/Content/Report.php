@@ -189,6 +189,7 @@ abstract class Report implements iReport {
 	public function __construct($report_datasource, $id, $path, $max_rows, $cnt_row, $sum_row, $avg_row, $bench_row,
             $is_summary, $display_type, ReportFilters $filters, SupplementalFactory $supp_factory, DataHandler $data_handler, DbTableFactory $db_table_factory, $field_groups = null) {//$id, $page_id, $name, $description, $scope, $active, $path, 
 		$this->datasource = $report_datasource;
+
 		$this->id = $id;
 		$this->max_rows = $max_rows;
 		$this->cnt_row = $cnt_row;
@@ -402,6 +403,7 @@ abstract class Report implements iReport {
      *
      **/
     public function toArray(){
+        $ret['report_id'] = $this->id;
         $ret['pivot_field'] = $this->pivot_field;
         $ret['is_summary'] = $this->is_summary;
         $ret['display_type'] = $this->display_type;

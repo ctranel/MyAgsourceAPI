@@ -12,7 +12,7 @@ class report_block_model extends CI_Model {
 	 **/
 	public function getBlocks() {
 		$this->db
-			->select('b.id, pb.page_id, b.name,b.[description],b.path,b.active,dt.name AS display_type,s.name AS scope,ct.name as chart_type,rb.max_rows,rb.cnt_row,rb.sum_row,rb.avg_row,rb.pivot_db_field,rb.bench_row,rb.is_summary,rb.keep_nulls, pb.list_order')
+			->select('rb.id, pb.page_id, b.name,b.[description],b.path,b.active,dt.name AS display_type,s.name AS scope,ct.name as chart_type,rb.max_rows,rb.cnt_row,rb.sum_row,rb.avg_row,rb.pivot_db_field,rb.bench_row,rb.is_summary,rb.keep_nulls, pb.list_order')
 			->where('b.active', 1)
 			->join('users.dbo.reports rb', 'b.id = rb.block_id', 'inner')
 			->join('users.dbo.lookup_display_types dt', 'b.display_type_id = dt.id', 'inner')
@@ -50,14 +50,14 @@ class report_block_model extends CI_Model {
 	 * @author ctranel
 	 * @todo: implement nested where group iteration (i.e., parent_id field of where groups)
 	 **/
-	public function getWhereData($block_id){
+	public function getWhereData($report_id){
 		return $this->db
 			->select("f.id AS db_field_id, f.db_table_id, f.db_field_name
 				, f.name, f.description, f.pdf_width, f.default_sort_order, f.data_type, f.is_timespan_field as is_timespan
 				, f.is_natural_sort, is_fk_field AS is_foreign_key, f.is_nullable, f.decimal_points AS decimal_scale, f.unit_of_measure, f.data_type as datatype, f.max_length, wg.operator, wc.where_group_id, wc.condition")
 			->from('users.dbo.reports_where_groups wg')
 			//->join('users.dbo.reports_where_groups wg2', 'wg.id = wg2.parent_id', 'inner')
-			->join('users.dbo.reports_where_conditions wc', 'wg.block_id = ' . $block_id . ' AND wg.id = wc.where_group_id', 'inner')
+			->join('users.dbo.reports_where_conditions wc', 'wg.report_id = ' . $report_id . ' AND wg.id = wc.where_group_id', 'inner')
 			->join('users.dbo.db_fields f', 'wc.field_id = f.id' , 'inner')
 			->get()
 			->result_array();
@@ -69,13 +69,13 @@ class report_block_model extends CI_Model {
 	 * @return returns multi-dimensional array, arr_sort_by field data and arr_sort_order
 	 * @author ctranel
 	 **/
-	public function getSortData($block_id){
+	public function getSortData($report_id){
 		return $this->db
 			->select("f.id AS db_field_id, f.db_table_id, f.db_field_name
 				, f.name, f.description, f.pdf_width, f.default_sort_order, f.data_type, f.is_timespan_field as is_timespan
 				, f.is_natural_sort, is_fk_field AS is_foreign_key, f.is_nullable, f.decimal_points AS decimal_scale, f.unit_of_measure, f.data_type as datatype, f.max_length, s.sort_order")
 			->from('users.dbo.reports_sort_by s')
-			->join('users.dbo.db_fields f', 's.field_id = f.id AND s.block_id = ' . $block_id , 'inner')
+			->join('users.dbo.db_fields f', 's.field_id = f.id AND s.report_id = ' . $report_id , 'inner')
 //			->join('users.dbo.db_tables t', 'f.db_table_id = t.id', 'inner')
 //			->join('users.dbo.db_databases d', 't.database_id = d.id' , 'inner')
 			->order_by('s.list_order', 'asc')
@@ -89,13 +89,13 @@ class report_block_model extends CI_Model {
 	 * @return returns multi-dimensional array, one row for each field
 	 * @author ctranel
 	 **/
-	public function getFieldData($block_id){
+	public function getFieldData($report_id){
 		return $this->db
 			->select("rsf_id AS id, db_field_id, table_name, db_field_name, name, description, pdf_width, default_sort_order, data_type as datatype, max_length, category_id,
 					decimal_points AS decimal_scale, unit_of_measure, is_timespan_field as is_timespan, is_fk_field AS is_foreign_key, is_nullable, is_sortable, is_natural_sort,
 					is_displayed, supp_id, a_href, a_rel, a_title, a_class, head_a_href, head_a_rel, head_a_title, head_a_class, head_supp_id, head_comment, aggregate,
-					display_format, block_header_group_id, chart_type, axis_index, trend_type, field_group, field_group_ref_key")
-			->where('block_id', $block_id)
+					display_format, table_header_group_id, chart_type, axis_index, trend_type, field_group, field_group_ref_key")
+			->where('report_id', $report_id)
 //			->order_by('field_group')
 			->order_by('list_order')
 			->get('users.dbo.v_report_field_data')
@@ -108,10 +108,10 @@ class report_block_model extends CI_Model {
 	 * @return returns result set array
 	 * @author ctranel
 	 **/
-	public function getFieldGroupData($block_id){
+	public function getFieldGroupData($report_id){
 		return $this->db
 			->select("[field_group_num],[name],[trend_type]")
-			->where('block_id', $block_id)
+			->where('report_id', $report_id)
 			->order_by('field_group_num')
 			->get('users.dbo.field_groups')
 			->result_array();
@@ -124,13 +124,13 @@ class report_block_model extends CI_Model {
 	 * @return returns array
 	 * @author ctranel
 	 **/
-	public function getFieldByName($block_id, $field_name){
+	public function getFieldByName($report_id, $field_name){
 		$ret = $this->db
 			->select("rsf_id AS id, db_field_id, table_name, db_field_name, name, description, pdf_width, default_sort_order, data_type as datatype, max_length, category_id, 
 					decimal_points AS decimal_scale, unit_of_measure, is_timespan_field as is_timespan, is_fk_field AS is_foreign_key, is_nullable, is_sortable, is_natural_sort,
 					is_displayed, supp_id, a_href, a_rel, a_title, a_class, head_a_href, head_a_rel, head_a_title, head_a_class, head_supp_id, head_comment, aggregate,
-					display_format, block_header_group_id, chart_type, axis_index, trend_type, field_group, field_group_ref_key")
-			->where('block_id', $block_id)
+					display_format, table_header_group_id, chart_type, axis_index, trend_type, field_group, field_group_ref_key")
+			->where('report_id', $report_id)
 			->where('db_field_name', $field_name)
 			->get('users.dbo.v_report_field_data')
 			->result_array();
@@ -151,17 +151,17 @@ class report_block_model extends CI_Model {
 	 * 
 	 * @todo: add supplemental data
 	 **/
-	public function getHeaderGroups($block_in){
+	public function getHeaderGroups($report_id){
 		$grouping_sql = "WITH cteAnchor AS (
-					 SELECT rs.block_id, th.id, th.[text], th.parent_id, th.list_order
+					 SELECT rs.report_id, th.id, th.[text], th.parent_id, th.list_order
 					 FROM users.dbo.table_header_groups th
-					 	LEFT JOIN users.dbo.reports_select_fields rs ON th.id = rs.block_header_group_id
-					 WHERE block_id = ".$block_in."
+					 	LEFT JOIN users.dbo.reports_select_fields rs ON th.id = rs.table_header_group_id
+					 WHERE report_id = ".$report_id."
 				), cteRecursive AS (
-					SELECT block_id, id, [text], parent_id, list_order
+					SELECT report_id, id, [text], parent_id, list_order
 					  FROM cteAnchor
 					 UNION all 
-					 SELECT r.block_id, t.id, t.[text], t.parent_id, t.list_order
+					 SELECT r.report_id, t.id, t.[text], t.parent_id, t.list_order
 					 FROM users.dbo.table_header_groups t
 					 join cteRecursive r ON r.parent_id = t.id
 				)
@@ -193,7 +193,7 @@ class report_block_model extends CI_Model {
 	 * @access public
 	 *
 	 **/
-	public function getChartAxes($block_id){
+	public function getChartAxes($report_id){
 		$this->db
 		->select("a.id, a.x_or_y, a.min, a.max, a.opposite, a.data_type, a.db_field_id, t.name AS table_name, f.db_field_name, f.name, f.description, f.pdf_width, f.default_sort_order, f.data_type as datatype, f.max_length,
 					f.decimal_points AS decimal_scale, f.unit_of_measure, f.is_timespan_field as is_timespan, f.is_fk_field AS is_foreign_key, f.is_nullable, f.is_natural_sort, text, c.name AS category")
@@ -201,7 +201,7 @@ class report_block_model extends CI_Model {
 		->join('users.dbo.chart_categories AS c', 'a.id = c.block_axis_id', 'left')
 		->join('users.dbo.db_fields AS f', 'a.db_field_id = f.id', 'left')
 		->join('users.dbo.db_tables AS t', 'f.db_table_id = t.id', 'left')
-		->where('a.block_id', $block_id)
+		->where('a.report_id', $report_id)
 		->order_by('a.list_order', 'asc')
 		->order_by('c.list_order', 'asc');
 		$result = $this->db->get()->result_array();
