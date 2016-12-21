@@ -225,7 +225,7 @@ class Form implements iForm
         }
         foreach($this->controls as $c){
             if($c->isGenerated()){
-                $ret_val[$c->name()] = $c->parseFormData($form_data[$c->name()]);
+                $ret_val[] = $c->name();
             }
         }
         return $ret_val;
@@ -251,7 +251,7 @@ class Form implements iForm
         }
         foreach($this->controls as $c){
             if(!$c->isEditable()){
-                $ret_val[$c->name()] = $c->parseFormData($form_data[$c->name()]);
+                $ret_val[] = $c->name();
             }
         }
         return $ret_val;
