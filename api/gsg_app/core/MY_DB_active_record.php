@@ -186,4 +186,8 @@ class MY_DB_active_record extends CI_DB_active_record {
 
 		return $this;
 	}
+
+	public function get_compiled_select(){
+        return parent::_compile_select();
+    }
 }
