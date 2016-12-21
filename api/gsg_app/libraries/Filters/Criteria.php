@@ -23,9 +23,10 @@ class Criteria{
 	private $options;
 	private $options_source;
 	//private $list_order;
-	private $default_value;
+	private $operator;
+    private $default_value;
 	private $log_filter_text;
-	private $arr_selected_values = array();
+	private $selected_values;
 	private $arr_options; //array of criteria objects
 	
 	public function __construct($criteria_data, $options){
@@ -35,11 +36,12 @@ class Criteria{
 		$this->field_name = $criteria_data['db_field_name'];
 		$this->label = $criteria_data['name'];
 		$this->default_value = $criteria_data['default_value'];
+        $this->operator = $criteria_data['operator'];
 		$this->options_source = $criteria_data['options_source'];
 //		$this->options_filter_form_field_name = $criteria_data['options_filter_form_field_name'];
 		$this->user_editable = (bool)$criteria_data['user_editable'];
-		if(isset($criteria_data['arr_selected_values'])){
-			$this->setFilterCriteria($criteria_data['arr_selected_values']);
+		if(isset($criteria_data['selected_values'])){
+			$this->setFilterCriteria($criteria_data['selected_values']);
 		}
 		
 		
@@ -62,23 +64,39 @@ class Criteria{
 	* -----------------------------------------------------------------
 	*/
 	public function getSelectedValue(){
-		return $this->arr_selected_values;
+		return $this->selected_values;
 	}
 
-	/* -----------------------------------------------------------------
-	*  Returns options
+    /* -----------------------------------------------------------------
+    *  Returns operator value
 
-	*  Returns array of options
+    *  Returns operator value
 
-	*  @author: ctranel
-	*  @date: Oct 15, 2014
-	*  @return: array 
-	*  @throws: 
-	* -----------------------------------------------------------------
-	public function getOptions(){
-		return $this->options;
-	}
-	*/
+    *  @since: version 1
+    *  @author: ctranel
+    *  @date: 2016-10-20
+    *  @return: string
+    *  @throws:
+    * -----------------------------------------------------------------
+    */
+    public function operator(){
+        return $this->operator;
+    }
+
+    /* -----------------------------------------------------------------
+    *  Returns options
+
+    *  Returns array of options
+
+    *  @author: ctranel
+    *  @date: Oct 15, 2014
+    *  @return: array
+    *  @throws:
+    * -----------------------------------------------------------------
+    public function getOptions(){
+        return $this->options;
+    }
+    */
 
 	/* -----------------------------------------------------------------
 	*  isDisplayed
@@ -130,7 +148,8 @@ class Criteria{
 			'type' => $this->type,
 			'field_name' => $this->field_name,
 			'label' => $this->label,
-			'arr_selected_values' => $this->arr_selected_values,
+            'operator' => $this->operator,
+			'selected_values' => $this->selected_values,
 			'options' => $this->options,
 		);
 		return $arr_return;
@@ -154,10 +173,10 @@ class Criteria{
 		if(!isset($value)){
 			return false;
 		}
-		if(!is_array($value)){
-			$value = array($value);
+		if(!is_array($value) && $this->operator === 'IN'){
+			$value = [$value];
 		}
-		$this->arr_selected_values = $value;
+		$this->selected_values = $value;
 	}
 
 	/* -----------------------------------------------------------------
@@ -176,52 +195,37 @@ class Criteria{
 	*/
 	public function setFilterCriteria($page_filter_value){
 		if(!isset($page_filter_value)){
-			return false;
+			//nothing to do here
+            return;
 		}
 		//? if($field_name == 'page') $this->arr_criteria['page'] = $this->arr_pages[$this->$arr_params['page']]['name'];
-		if($this->type === 'range' || $this->type === 'date range'){
+		if($this->operator === 'BETWEEN'){ //data should be a 2 element assoc array
 			if(!isset($page_filter_value[0]) || !isset($page_filter_value[1])){
-				return;
+				//can't set a range unless both ends are set
+                return;
 			}
-			$this->arr_selected_values['dbfrom'] = $page_filter_value[0];
-			$this->arr_selected_values['dbto'] = $page_filter_value[1];
+			$this->selected_values['dbfrom'] = $page_filter_value[0];
+			$this->selected_values['dbto'] = $page_filter_value[1];
 		}
-		elseif(is_array($page_filter_value)){
-			foreach($page_filter_value as $k1=>$v1){
-				$page_filter_value[$k1] = explode('|', $v1);
-			}
-			$page_filter_value = array_flatten($page_filter_value);
-			$this->arr_selected_values = $page_filter_value;
-		}
-		elseif(strpos($page_filter_value, '|')){
-			$this->arr_selected_values = explode('|', $page_filter_value);
-		}
-		else {
-			$this->arr_selected_values = [$page_filter_value];
-		}
+		elseif($this->operator === 'IN'){ //data should be an array
+			if(is_array($page_filter_value)){
+                foreach($page_filter_value as $k1=>$v1){
+                    $page_filter_value[$k1] = explode('|', $v1);
+                }
+                $page_filter_value = array_flatten($page_filter_value);
+                $this->selected_values = $page_filter_value;
+            }
+            elseif(strpos($page_filter_value, '|')){
+                $this->selected_values = explode('|', $page_filter_value);
+            }
+            else {
+                $this->selected_values = [$page_filter_value];
+            }
+        }
+		else{ //take data as-is
+            $this->selected_values = $page_filter_value;
+        }
 	}
-
-	/* -----------------------------------------------------------------
-	*  setOptions() sets looks up options
-
-	*  sets possible filter options pulled from the database
-
-	*  @since: version 1
-	*  @author: ctranel
-	*  @date: Jun 17, 2014
-	*  @param: string current herd code
-	*  @param: array page-level filters
-	*  @return void
-	*  @throws: 
-	*  @todo: remove--options should be passed to constructor rather than filter_model
-	* -----------------------------------------------------------------
-	protected function setOptions($options_conditions){
-		$this->options_source;
-		if(isset($this->options_source) && !empty($this->options_source)){
-			$this->options = $this->filter_model->getCriteriaOptions($this->options_source, $options_conditions);
-		}
-	}
-	*/
 
 	/* -----------------------------------------------------------------
 	*  setDefaults() sets looks up options and sets default criteria
@@ -237,11 +241,11 @@ class Criteria{
 	* -----------------------------------------------------------------
 	*/
 	protected function setDefaults(){
-		if(isset($this->arr_selected_values) && !empty($this->arr_selected_values)){
+		if(isset($this->selected_values) && !empty($this->selected_values)){
 			return; //default not needed
 		}
 		
-		//if default property of the filter is set, we don't need to look for the option flag
+		//if default property of the filter is not set, and the filter has options, look for the default flag on options
 		if(!isset($this->default_value) || empty($this->default_value)){
 			if(!isset($this->options)){//no defaults to be found
 				return;
@@ -255,20 +259,29 @@ class Criteria{
 			}
 		}
 		if(isset($this->default_value)){
-			if(is_array($this->default_value)){
-				if($this->type === 'range' || $this->type === 'date range'){
-					if(!isset($this->default_value)){
-						$this->default_value = '|';
-					}
-					if(strpos($this->default_value, '|') !== FALSE){
-						list($this->arr_selected_values['dbfrom'], $this->arr_selected_values['dbto']) = explode('|', $this->default_value);
-					}
-				}
-				else{
-					$this->arr_selected_values = $this->default_value;
-				}
-			}
-			else $this->arr_selected_values = array($this->default_value);
+            if($this->operator === 'BETWEEN'){
+                if(strpos($this->default_value, '|') !== FALSE){
+                    list($this->selected_values['dbfrom'], $this->selected_values['dbto']) = explode('|', $this->default_value);
+                }
+                else {
+                    $this->default_value = '|';
+                }
+                return;
+            }
+            elseif($this->operator === 'IN'){
+                if(isset($this->default_value) && is_array($this->default_value)) {
+                    $this->selected_values = $this->default_value;
+                }
+                if(isset($this->default_value) && !is_array($this->default_value)){
+                    $this->selected_values = [$this->default_value];
+                }
+                if(isset($this->default_value)){
+                    $this->selected_values = [];
+                }
+            }
+            else {
+                $this->selected_values = $this->default_value;
+            }
 		}
 	}
 
@@ -283,7 +296,7 @@ class Criteria{
 	 **/
 	public function set_filter_text(){
 		$this->log_filter_text = '';
-		$val = array_filter($this->arr_selected_values);
+		$val = array_filter($this->selected_values);
 		if(is_array($val) && !empty($val)){
 			if(($tmp_key = array_search('NULL', $val)) !== FALSE){
 				unset($val[$tmp_key]);

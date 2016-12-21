@@ -67,8 +67,14 @@ class TableData extends ReportData {
         if($this->report->maxRows() > 0){
             $sort_field = $this->report->getSortDateFieldName();
              if($sort_field){
-                $criteria_key_value[$sort_field]['dbfrom'] = $this->report_datasource->getStartDate($this->report->primaryTableName(), $sort_field, $this->report->maxRows(), 'MM-dd-yyyy');
-                $criteria_key_value[$sort_field]['dbto'] = $this->report_datasource->getRecentDates($this->report->primaryTableName(), $sort_field, 1, 'MM-dd-yyyy')[0];
+                $criteria_key_value[$sort_field] = [
+                    'column' => $sort_field,
+                    'operator' => '=',
+                    'value' => [
+                        'dbfrom' => $this->report_datasource->getStartDate($this->report->primaryTableName(), $sort_field, $this->report->maxRows(), 'MM-dd-yyyy'),
+                        'dbto' => $this->report_datasource->getRecentDates($this->report->primaryTableName(), $sort_field, 1, 'MM-dd-yyyy')[0]
+                    ]
+                ];
             }
             unset($sort_field);
         }

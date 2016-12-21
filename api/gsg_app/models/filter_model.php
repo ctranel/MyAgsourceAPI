@@ -23,7 +23,7 @@ class Filter_model extends CI_Model {
 	public function getPageFilters($page_id) {
 		$ret_array = array();
 		$results = $this->db
-		->select('pf.name, pf.type, pf.options_source, pf.options_filter_form_field_name, pf.default_value, df.db_field_name, pf.user_editable')
+		->select('pf.name, pf.type, pf.options_source, pf.options_filter_form_field_name, pf.default_value, pf.operator, df.db_field_name, pf.user_editable')
 		//->where('p.section_id', $section_id)
 		->where('p.id', $page_id)
 		->join('users.dbo.pages p', "pf.page_id = p.id", "inner")

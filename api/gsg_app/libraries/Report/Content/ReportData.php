@@ -80,16 +80,8 @@ die('ReportData->prepSelectFields');
 					$tbl = $this->report->getFieldTable($k); //get table for this report
 					$tbl = isset($tbl) && !empty($tbl) ? $tbl : $this->report->primaryTableName();
 					$db_field = $tbl . '.' . $k;
-	
-					//@todo: pull this out into function (array wrapper class (dependency)? pass function as param?)	
-					$keys = array_keys($arr_where_criteria);
-					$index = array_search($k, $keys, true);
-					
-					if ($index !== false) {
-						$keys[$index] = $db_field;
-						$arr_where_criteria = array_combine($keys, $arr_where_criteria);
-					}
-					//end function
+
+					$arr_where_criteria[$k]['column'] = $db_field;
 				}
 			}
 		}

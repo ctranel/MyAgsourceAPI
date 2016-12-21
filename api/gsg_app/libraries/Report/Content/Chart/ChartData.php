@@ -77,8 +77,14 @@ class ChartData extends ReportData{
 	public function getData(){
         $criteria_key_value = $this->report->filterKeysValues();
 		if(isset($this->x_axis_dbfield_name) && isset($this->x_axis_dbfield_name)){
-			$criteria_key_value[$this->x_axis_dbfield_name]['dbfrom'] = $this->report_datasource->getStartDate($this->report->primaryTableName(), $this->x_axis_dbfield_name, $this->report->maxRows(), 'MM-dd-yyyy');
-			$criteria_key_value[$this->x_axis_dbfield_name]['dbto'] = $this->report_datasource->getRecentDates($this->report->primaryTableName(), $this->x_axis_dbfield_name, 1, 'MM-dd-yyyy')[0];
+			$criteria_key_value[$this->x_axis_dbfield_name] = [
+			    'column' => $this->x_axis_dbfield_name,
+				'operator' => '=',
+				'value' => [
+                    'dbfrom' => $this->report_datasource->getStartDate($this->report->primaryTableName(), $this->x_axis_dbfield_name, $this->report->maxRows(), 'MM-dd-yyyy'),
+                    'dbto' => $this->report_datasource->getRecentDates($this->report->primaryTableName(), $this->x_axis_dbfield_name, 1, 'MM-dd-yyyy')[0]
+                ]
+			];
 		}
 		
 		$criteria_key_value = $this->whereCriteria($criteria_key_value);

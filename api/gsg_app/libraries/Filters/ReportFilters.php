@@ -178,9 +178,10 @@ class ReportFilters{
 					'type' => 'value',
 					'options_source' => null,
 //					'options_filter_form_field_name' => null,
+                    'operator' => 'IN',
 					'default_value' => $f,
 					'db_field_name' => $k,
-					'arr_selected_values' => $arr_form_data[$k],
+					'selected_values' => $arr_form_data[$k],
 					'user_editable' => false,
 				];
 				$this->arr_criteria[$k] = CriteriaFactory::createCriteria($this->filter_model, $arr_tmp, null);
@@ -189,7 +190,7 @@ class ReportFilters{
 		foreach($arr_page_filter_data as $k=>$f){
 			//if there is a form value set for this filter, use that
 			if(isset($arr_form_data[$k]) && !empty($arr_form_data[$k])){
-				$f['arr_selected_values'] = $arr_form_data[$k];
+				$f['selected_values'] = $arr_form_data[$k];
 			}
 			$options_filter = null;
 			if(isset($arr_form_data[$f['options_filter_form_field_name']])){
@@ -218,10 +219,14 @@ class ReportFilters{
 	public function criteriaKeyValue(){
         $ret = [];
         if(!isset($this->arr_criteria)){
-            return false;
+            return null;
         }
         foreach($this->arr_criteria as $k=>$c){
-            $ret[$k] = $c->getSelectedValue();
+            $ret[$k] = [
+                'column' => $k,
+                'operator' => $c->operator(),
+                'value' => $c->getSelectedValue()
+            ];
         }
         return $ret;
 	}
