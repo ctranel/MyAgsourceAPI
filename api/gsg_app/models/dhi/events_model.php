@@ -116,6 +116,7 @@ class Events_model extends CI_Model {
 
     /**
 	 * @method eventEligibilityData()
+     *
 	 * @param string herd code
      * @param int serial_num
      * @param string event date
@@ -143,6 +144,9 @@ class Events_model extends CI_Model {
 
     /**
      * @method eligibilitySql()
+
+     * This is the same as TD.[animal].[animal_event_eligibility], but is broken out so that subqueries can use herd code and serial num to limit dataset size
+     *
      * @param string herd code
      * @param int serial_num
      * @param string event date
@@ -255,7 +259,7 @@ class Events_model extends CI_Model {
                     SELECT herd_code, serial_num 
                         ,(SELECT Max(v) FROM (VALUES (tp.cat21_event_dt), (tp.cat27_event_dt), (tp.cat28_event_dt)) AS value(v)) as [TopStatusDate]
                         ,tp.cat28_event_dt as [TopDryDate]
-                        ,tp.cat32_event_dt as [TopBredDate]
+			            ,(SELECT Max(v) FROM (VALUES (tp.cat32_event_dt), (tp.cat36_event_dt)) AS value(v)) as [TopBredDate]
                         ,tp.cat27_event_dt as [TopFreshDate]
                         ,tp.cat21_event_dt as [TopSoldDiedDate]
                     FROM (" . $this->topEventsByAnimalSql($herd_code, $serial_num, $event_date) . ") tp
@@ -269,6 +273,9 @@ class Events_model extends CI_Model {
 
     /**
      * @method topEventsByAnimalSql()
+     *
+     * text of [TD].[animal].[vma_top_events_by_animal] view
+     *
      * @param string herd code
      * @param int serial_num
      * @param string event date
@@ -276,7 +283,7 @@ class Events_model extends CI_Model {
      * @access public
      *
      **/
-    protected function topEventsByAnimalSql($herd_code, $serial_num, $event_date){
+    protected function topEventsByAnimalSql($herd_code, $serial_num = null, $event_date = null){
         $sql = "SELECT a.herd_code, a.serial_num, 
 			MAX(CASE WHEN b.event_cat = '1' AND a.event_dt = c.event_dt and a.event_cd = c.event_cd  THEN a.event_cd ELSE NULL END) as cat1_event_cd , MAX(CASE WHEN b.event_cat = '1' AND a.event_dt = c.event_dt and a.event_cd = c.event_cd  THEN a.event_dt ELSE NULL END) as cat1_event_dt 
 			,MAX(CASE WHEN b.event_cat = '2' AND a.event_dt = c.event_dt and a.event_cd = c.event_cd  THEN a.event_cd ELSE NULL END) as cat2_event_cd , MAX(CASE WHEN b.event_cat = '2' AND a.event_dt = c.event_dt and a.event_cd = c.event_cd  THEN a.event_dt ELSE NULL END) as cat2_event_dt 
@@ -332,7 +339,7 @@ class Events_model extends CI_Model {
      * @access public
      *
      **/
-    protected function topEventsByCatSql($herd_code, $serial_num, $event_date){
+    protected function topEventsByCatSql($herd_code, $serial_num = null, $event_date = null){
         $sql = "SELECT herd_code,serial_num, event_cat, event_cd, event_dt 
             FROM (
 				SELECT  row_number() OVER (PARTITION BY a.herd_code, a.serial_num, b.event_cat 
@@ -342,8 +349,14 @@ class Events_model extends CI_Model {
 					INNER JOIN td.herd.events b 
 						ON a.event_cd = b.event_cd 
 						AND a.herd_code = b.herd_code
-						AND a.event_dt <= DATEADD(day,-1,'" . $event_date . "')
-			) as d
+						AND a.herd_code = '" . $herd_code . "'";
+                        if(isset($event_date) && !empty($event_date)) {
+                            $sql .= " AND a.event_dt <= DATEADD(day,-1,'" . $event_date . "')";
+                        }
+                        if(isset($serial_num) && !empty($serial_num)) {
+                            $sql .= " AND a.serial_num = " . $serial_num;
+                        }
+        $sql .= ") as d
 			WHERE d.rowid = 1";
         return $sql;
     }
