@@ -75,6 +75,60 @@ class Form implements iForm
         return $ret;
     }
 
+
+
+    /* -----------------------------------------------------------------
+*  controlsMetaArray
+
+*  returns field-name-keyed array with meta data for controls
+
+*  @author: ctranel
+*  @date: Jul 1, 2014
+*  @param: array of key=>value pairs that have been processed by the parseFormData static function
+*  @return key->value array of control meta data
+*  @throws: * -----------------------------------------------------------------
+*/
+    public function controlsMetaArray(){
+        $controls = [];
+        if(isset($this->controls) && is_array($this->controls) && !empty($this->controls)){
+            foreach($this->controls as $c){
+                $controls[$c->name()] = $c->toArray();
+                $subform_controls = $c->subformControlsMetaArray();
+                if(isset($subform_controls)){
+                    $controls = $controls + $subform_controls;
+                }
+            }
+        }
+        return $controls;
+    }
+
+    /* -----------------------------------------------------------------
+*  keyMetaArray
+
+*  returns field-name-keyed array with meta data for keys
+
+*  @author: ctranel
+*  @date: Jul 1, 2014
+*  @param: array of key=>value pairs that have been processed by the parseFormData static function
+*  @return key->value array of keys meta data
+*  @throws: * -----------------------------------------------------------------
+*/
+    protected function keyMetaArray(){
+        $keys = [];
+        if(isset($this->controls) && is_array($this->controls) && !empty($this->controls)){
+            foreach($this->controls as $c){
+                if($c->isKey()){
+                    $keys[$c->name()] = $c->toArray();
+                }
+                $subform_keys = $c->subformKeyMetaArray();
+                if(isset($subform_keys)){
+                    $keys = $keys + $subform_keys;
+                }
+            }
+        }
+        return $keys;
+    }
+
     /* -----------------------------------------------------------------
 *  write
 
@@ -95,14 +149,66 @@ class Form implements iForm
         $form_data = $this->parseFormData($form_data);
 
         if($is_update){
-            $uneditable_cols = $this->getUneditableCols($form_data);
-            $key_vals = $this->datasource->update($this->id, $form_data, $uneditable_cols);
+            $key_vals = $this->datasource->update($this->id, $form_data, $this->controlsMetaArray(), $this->keyMetaArray());
         }
         else {
-            $generated_cols = $this->getGeneratedCols($form_data);
-            $key_vals = $this->datasource->insert($this->id, $form_data, $generated_cols);
+            $key_vals = $this->datasource->insert($this->id, $form_data, $this->controlsMetaArray());
         }
         return $key_vals;
+    }
+
+    /* -----------------------------------------------------------------
+*  writeBatch
+
+*  write batch form to datasource
+
+*  @author: ctranel
+*  @date: 2016-12-22
+*  @param: array of key=>value pairs that have been processed by the parseFormData static function
+*  @return key->value array of keys for the record
+*  @throws: UnexpectedValueException
+     * * -----------------------------------------------------------------
+*/
+    public function writeBatch($form_data){
+        if(!isset($form_data) || !is_array($form_data)){
+            throw new \UnexpectedValueException('No form data received');
+        }
+
+        $variable_field = $this->batchVariableControl();
+        if(!isset($variable_field)){
+            throw new \UnexpectedValueException('Variable field not set on batch form submission.');
+        }
+
+        $form_data = $this->parseFormData($form_data);
+
+        $key_vals = $this->datasource->batchInsert($this->id, $variable_field->name(), $form_data, $this->controlsMetaArray());
+        return $key_vals;
+    }
+
+    /* -----------------------------------------------------------------
+*  batchVariableControl
+
+*  returns the field
+
+*  @author: ctranel
+*  @date: 2016-12-22
+*  @param: array of key=>value pairs that have been processed by the parseFormData static function
+*  @return FormControl object
+*  @throws: * -----------------------------------------------------------------
+*/
+    public function batchVariableControl() {
+        foreach($this->controls as $c){
+            if($c->batchVariableType() !== null){
+                //each form can only have one
+                return $c;
+            }
+
+            $sbvc = $c->subformBatchVariableControl();
+            if(isset($sbvc)){
+                return $sbvc;
+            }
+        }
+        return null;
     }
 
     /* -----------------------------------------------------------------
@@ -125,7 +231,7 @@ class Form implements iForm
         $key_data = $this->parseKeyData($key_data);
 
         //SEND KEY FIELDS AND VALUES
-        $this->datasource->delete($this->id, $key_data);
+        $this->datasource->delete($this->id, $key_data, $this->keyMetaArray());
     }
 
     /* -----------------------------------------------------------------
@@ -173,6 +279,7 @@ class Form implements iForm
             if($c->isKey() && isset($key_data[$c->name()])){
                 $ret_val[$c->name()] = $c->parseFormData($key_data[$c->name()]);
             }
+            $ret_val += $c->parseSubformKeyData($key_data);
         }
         return $ret_val;
     }
@@ -190,7 +297,7 @@ class Form implements iForm
     *  @throws:
     * -----------------------------------------------------------------
     */
-    protected function parseFormData($form_data){
+    public function parseFormData($form_data){
         $ret_val = [];
         if(!isset($form_data) || !is_array($form_data)){
             throw new \Exception('No form data found');
@@ -198,7 +305,11 @@ class Form implements iForm
         foreach($this->controls as $c){
             if(isset($form_data[$c->name()])){//!$c->isGenerated() &&
                 $ret_val[$c->name()] = $c->parseFormData($form_data[$c->name()]);
-                //@todo: not the right place to write subforms, but it will do for now
+                $parsed_subforms = $c->parseSubformData($form_data);
+                if(isset($parsed_subforms)){
+                    $ret_val = $ret_val + $parsed_subforms;
+                }
+                    //@todo: not the right place to write subforms, but it will do for now
                 $c->writeSubforms($form_data);
             }
         }
@@ -217,7 +328,6 @@ class Form implements iForm
     *  @return key-value pairs
     *  @throws:
     * -----------------------------------------------------------------
-    */
     protected function getGeneratedCols($form_data){
         $ret_val = [];
         if(!isset($form_data) || !is_array($form_data)){
@@ -230,6 +340,7 @@ class Form implements iForm
         }
         return $ret_val;
     }
+*/
 
     /* -----------------------------------------------------------------
     *  extracts uneditable column data
@@ -243,7 +354,6 @@ class Form implements iForm
     *  @return key-value pairs
     *  @throws:
     * -----------------------------------------------------------------
-    */
     protected function getUneditableCols($form_data){
         $ret_val = [];
         if(!isset($form_data) || !is_array($form_data)){
@@ -256,6 +366,7 @@ class Form implements iForm
         }
         return $ret_val;
     }
+*/
 
     /* -----------------------------------------------------------------
     *  animalOptions

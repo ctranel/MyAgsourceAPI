@@ -2,8 +2,10 @@
 require_once(APPPATH . 'controllers/dpage.php');
 require_once APPPATH . 'libraries/Site/WebContent/WebBlockFactory.php';
 require_once APPPATH . 'libraries/Listings/Content/ListingFactory.php';
+require_once(APPPATH . 'libraries/Supplemental/Content/SupplementalFactory.php');
 
 use \myagsource\AccessLog;
+use \myagsource\Supplemental\Content\SupplementalFactory;
 use \myagsource\Site\WebContent\WebBlockFactory;
 use \myagsource\Listings\Content\ListingFactory;
 
@@ -51,10 +53,14 @@ class Cow_lookup extends dpage {
     	$data['animal_data']['chosen_id'] = $data['animal_data'][$this->cow_id_field];
         $data['animal_data']['serial_num'] = $serial_num;
 
+        //supplemental factory
+        $this->load->model('supplemental_model');
+        $supplemental_factory = new SupplementalFactory($this->supplemental_model, site_url());
+
         //Set up site content objects
         $this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
         $this->load->model('web_content/block_model');
-        $web_block_factory = new WebBlockFactory($this->block_model);
+        $web_block_factory = new WebBlockFactory($this->block_model, $supplemental_factory);
 
         //page content
         $this->load->model('ReportContent/report_block_model');
@@ -64,10 +70,6 @@ class Cow_lookup extends dpage {
 
         //create block content
         $listings = $option_listing_factory->getByPage($page_id, ['herd_code' => $this->session->userdata('herd_code'), 'serial_num' => $serial_num]);
-
-        //supplemental factory
-        $this->load->model('supplemental_model');
-        $supplemental_factory = new SupplementalFactory($this->supplemental_model, site_url());
 
         //create blocks for content
         $blocks = $web_block_factory->getBlocksFromContent($page_id, $listings, $supplemental_factory);

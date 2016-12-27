@@ -61,9 +61,15 @@ class FormControl implements iFormControl
 
     /**
      * control_type
-     * @var string (can handle date, datetime, string, int, decimal)
+     * @var string
      **/
     protected $control_type;
+
+    /**
+     * data_type
+     * @var string
+     **/
+    protected $data_type;
 
     /**
      * is_editable
@@ -82,6 +88,12 @@ class FormControl implements iFormControl
      * @var boolean
      **/
     protected $is_key;
+
+    /**
+     * batch_variable_type
+     * @var int
+     **/
+    protected $batch_variable_type;
 
     /**
      * biz_validation_url
@@ -109,9 +121,11 @@ class FormControl implements iFormControl
         $this->value = isset($control_data['value']) ? $control_data['value'] : $control_data['default_value'];
         $this->default_value = $control_data['default_value'];
         $this->control_type = $control_data['control_type'];
+        $this->data_type = $control_data['data_type'];
         $this->is_editable = (bool)(isset($control_data['is_editable']) ? $control_data['is_editable'] : true);
         $this->is_generated = (bool)(isset($control_data['is_generated']) ? $control_data['is_generated'] : false);
         $this->is_key = (bool)(isset($control_data['is_key']) ? $control_data['is_key'] : false);
+        $this->batch_variable_type = $control_data['batch_variable_type'];
         $this->biz_validation_url = (isset($control_data['biz_validation_url']) ? $control_data['biz_validation_url'] : null);
         $this->validators = $validators;
         $this->options = $options;
@@ -253,15 +267,29 @@ class FormControl implements iFormControl
     }
 
     /* -----------------------------------------------------------------
-    *  options
+   *  batchVariableType
 
-    *  Returns options
+   *  Returns batch variable type
 
-    *  @author: ctranel
-    *  @return string
-    *  @throws:
-    * -----------------------------------------------------------------
-    */
+   *  @author: ctranel
+   *  @return int
+   *  @throws:
+   * -----------------------------------------------------------------
+   */
+    public function batchVariableType(){
+        return $this->batch_variable_type;
+    }
+
+    /* -----------------------------------------------------------------
+     *  options
+
+     *  Returns options
+
+     *  @author: ctranel
+     *  @return string
+     *  @throws:
+     * -----------------------------------------------------------------
+     */
     public function options(){
         return $this->options;
     }
@@ -315,8 +343,10 @@ class FormControl implements iFormControl
             'label' => $this->label,
             'value' => $this->value,
             'control_type' => $this->control_type,
+            'data_type' => $this->data_type,
             'is_key' => $this->is_key,
             'is_editable' => $this->is_editable,
+            'is_generated' => $this->is_generated,
             'default_value' => $this->default_value,
             'biz_validation_url' => $this->biz_validation_url,
         ];
@@ -419,7 +449,7 @@ class FormControl implements iFormControl
 */
 
     public function parseFormData($value){
- //@todo: check validators (also in getCurrValue?)
+ //@todo: check validators (also in getCurrValue?), or is this done in controller?
         $ret_val = null;
 
         if(is_array($value)){
@@ -442,8 +472,73 @@ class FormControl implements iFormControl
         if(isset($this->subforms) && is_array($this->subforms)){
             foreach($this->subforms as $s){
                 //only subforms that do not have an action of their own are written with their parent form
+                if($s->action() !== null && $s->conditionsMet($form_data[$this->name])){
+                    $s->write($form_data);
+                }
+            }
+        }
+        return;
+    }
+
+    public function parseSubformData($form_data){
+        if(isset($this->subforms) && is_array($this->subforms)){
+            $return_val = [];
+            foreach($this->subforms as $s){
+                //only subforms that do not have an action of their own are written with their parent form
                 if($s->action() === null && $s->conditionsMet($form_data[$this->name])){
-                    return $s->write($form_data);
+                     $tmp = $s->parseFormData($form_data);
+                    if(isset($tmp)){
+                        $return_val = $return_val + $tmp;
+                    }
+                }
+            }
+            return $return_val;
+        }
+        return null;
+    }
+
+    public function subformControlsMetaArray(){
+        if(isset($this->subforms) && is_array($this->subforms)){
+            $return_val = [];
+            foreach($this->subforms as $s){
+                //only subforms that do not have an action of their own are written with their parent form
+                if($s->action() === null){
+                    $tmp = $s->controlsMetaArray();
+                    if(isset($tmp)){
+                        $return_val = $return_val + $tmp;
+                    }
+                }
+            }
+            return $return_val;
+        }
+        return null;
+    }
+
+    public function subformKeyMetaArray(){
+        if(isset($this->subforms) && is_array($this->subforms)){
+            $return_val = [];
+            foreach($this->subforms as $s){
+                //only subforms that do not have an action of their own are written with their parent form
+                if($s->action() === null){
+                    $tmp = $s->keyMetaArray();
+                    if(isset($tmp)){
+                        $return_val = $return_val + $tmp;
+                    }
+                }
+            }
+            return $return_val;
+        }
+        return null;
+    }
+
+    public function subformBatchVariableControl(){
+//var_dump($this->subforms);
+        if(isset($this->subforms) && is_array($this->subforms)){
+            foreach($this->subforms as $s){
+                $bvc = $s->batchVariableControl();
+//die($bvc);
+                if(isset($bvc)){
+                    return $bvc;
                 }
             }
         }

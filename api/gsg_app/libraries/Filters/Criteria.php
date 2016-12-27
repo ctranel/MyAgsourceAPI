@@ -1,6 +1,8 @@
 <?php
 namespace myagsource\Filters;
 
+require_once(APPPATH . 'helpers/multid_array_helper.php');
+
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /**
 * Name:  Filters Library File
@@ -110,7 +112,7 @@ class Criteria{
 	* -----------------------------------------------------------------
 	*/
 	public function isDisplayed(){
-		return (count($this->options) > 1 || !isset($this->options_source)) && $this->user_editable;
+		return ((count($this->options) > 1 || !isset($this->options_source)) && $this->user_editable);
 	}
 
 	/* -----------------------------------------------------------------
@@ -151,6 +153,7 @@ class Criteria{
             'operator' => $this->operator,
 			'selected_values' => $this->selected_values,
 			'options' => $this->options,
+            'editable' => $this->user_editable,
 		);
 		return $arr_return;
 	}
@@ -212,7 +215,9 @@ class Criteria{
                 foreach($page_filter_value as $k1=>$v1){
                     $page_filter_value[$k1] = explode('|', $v1);
                 }
-                $page_filter_value = array_flatten($page_filter_value);
+//var_dump($page_filter_value);
+                $page_filter_value = \array_flatten($page_filter_value);
+//var_dump($page_filter_value);
                 $this->selected_values = $page_filter_value;
             }
             elseif(strpos($page_filter_value, '|')){

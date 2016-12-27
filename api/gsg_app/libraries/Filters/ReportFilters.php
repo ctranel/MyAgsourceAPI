@@ -3,6 +3,7 @@ namespace myagsource\Filters;
 require_once APPPATH . 'libraries/Filters/CriteriaFactory.php';
 
 use myagsource\Filters\CriteriaFactory;
+use myagsource\Settings\Settings;
 
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
@@ -36,6 +37,12 @@ class ReportFilters{
 	private $arr_criteria;
 
     /**
+     * Object containing herd and user settings
+     * @var Settings
+     **/
+    private $settings;
+
+    /**
      * text describing filters
      * @var string
      **/
@@ -53,10 +60,11 @@ class ReportFilters{
      **/
     protected $form_data;
 	
-	public function __construct(\Filter_model $filter_model, $page_id, $form_data = null){
+	public function __construct(\Filter_model $filter_model, $page_id, $form_data = null, Settings $settings){
 		$this->filter_model = $filter_model;
 		$this->page_id = $page_id;
         $this->form_data = $form_data;
+        $this->settings = $settings;
 
         $this->setCriteria();
 	}
@@ -91,7 +99,6 @@ class ReportFilters{
 	*  @return boolean
 	*  @throws: 
 	* -----------------------------------------------------------------
-	*/
 	public function displayFilters(){
 		if(count($this->arr_criteria) == 0){
 			return false;
@@ -103,7 +110,8 @@ class ReportFilters{
 		}
 		return false;
 	}
-	
+*/
+
 	/* -----------------------------------------------------------------
 	*  setCriteria() sets default filter criteria based on the field-specific values (herd code, test date)
 	*   and page filters pulled from the database
@@ -137,12 +145,12 @@ class ReportFilters{
 	* -----------------------------------------------------------------
 	*/
 	public function removeCriteria($criteria_field_name){
-			foreach($this->arr_criteria as $k => $c){
-			if($k === $criteria_field_name) {
-				unset($this->arr_criteria[$k]);
+			//foreach($this->arr_criteria as $k => $c){
+			//if($k === $criteria_field_name) {
+				unset($this->arr_criteria[$criteria_field_name]);
 				return;
-			}
-		}
+			//}
+		//}
 	}
 
 	/* -----------------------------------------------------------------
@@ -165,7 +173,7 @@ class ReportFilters{
 		if(!isset($arr_page_filter_data)){
 			return false;
 		}
-		
+
 		//if there is a value in form data that is not in FilterCriteria (e.g., a value that is set programmatically (herd_code)), need to set that up
 		$arr_to_create = array_diff_key($arr_form_data, $arr_page_filter_data);
 		if(is_array($arr_to_create) && !empty($arr_to_create)){
@@ -188,12 +196,20 @@ class ReportFilters{
 			}
 		}
 		foreach($arr_page_filter_data as $k=>$f){
-			//if there is a form value set for this filter, use that
+            //$f['selected_values'] = $f['default_value'];
+
+            if(is_array($f['default_value']) && key($f['default_value']) === 'SET'){
+                $f['selected_values'] = [$this->settings->getValue($f['default_value']['SET'])];
+            }
+
+            //if there is a form value set for this filter, use that
 			if(isset($arr_form_data[$k]) && !empty($arr_form_data[$k])){
 				$f['selected_values'] = $arr_form_data[$k];
 			}
+
 			$options_filter = null;
-			if(isset($arr_form_data[$f['options_filter_form_field_name']])){
+
+            if(isset($arr_form_data[$f['options_filter_form_field_name']])){
 				$options_filter = [[
 					'db_field_name' => $f['options_filter_form_field_name'],
 					'operator' => '=',
@@ -300,12 +316,15 @@ class ReportFilters{
 	* -----------------------------------------------------------------
 	*/
 	public function toArray(){
-		if(!isset($this->arr_criteria)){
+		if(!isset($this->arr_criteria) || count($this->arr_criteria) == 0){
 			return [];
 		}
+
 		$arr_return = [];
 		foreach($this->arr_criteria as $k=>$c){
-			$arr_return[$k] = $c->toArray();
+            if($c->isDisplayed()) {
+                $arr_return[$k] = $c->toArray();
+            }
 		}
 		return $arr_return;
 	}

@@ -56,19 +56,38 @@ class SubForm implements iSubForm
     public function action(){
         return $this->form->action();
     }
-/*
-    public function conditionsMet($control_value){
-        switch($this->operator){
-            case "=":
-                return $control_value === $this->operand;
-            case "!=":
-                return $control_value !== $this->operand;
-            case ">":
-                return $control_value > $this->operand;
-            case "<":
-                return $control_value < $this->operand;
-        }
-        return false;
+
+    public function batchVariableControl(){
+        return $this->form->batchVariableControl();
     }
-*/
+
+    public function parseFormData($form_data){
+        return $this->form->parseFormData($form_data);
+    }
+
+    public function controlsMetaArray(){
+        return $this->form->controlsMetaArray();
+    }
+
+    public function keyMetaArray(){
+        return $this->form->keyMetaArray();
+    }
+
+    /**
+     * conditionsMet
+     *
+     * are all subform conditions met?
+     *
+     * @param $control_value
+     * @return bool
+     */
+    public function conditionsMet($control_value){
+        foreach($this->condition_groups as $cg){
+            if(!$cg->conditionsMet($control_value)){
+                return false;
+            }
+        }
+
+        return true;
+    }
 }

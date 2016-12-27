@@ -177,6 +177,59 @@ class dform extends dpage {
     }
 
     /**
+     * @method batch_entry()
+     *
+     * @param int form id
+     * @param string json data (key data)
+     * @access	public
+     * @return	void
+     */
+    function batch_entry($form_id, $json_data = null) {
+        $params = [];
+        if(isset($json_data)) {
+            $params = (array)json_decode(urldecode($json_data));
+        }
+
+        //validate form input
+        $this->load->library('herds');
+        $this->load->library('form_validation');
+        $this->load->model('Forms/data_entry_model');
+        $form_factory = new FormFactory($this->data_entry_model, null, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
+
+        $form = $form_factory->getForm($form_id, $this->session->userdata('herd_code'));
+        $input = $this->input->userInputArray();
+
+
+        if($this->form_validation->run_input() === true){
+            try{
+                //get form object
+
+                //add field values for logging
+                $input['logID'] = $this->session->userdata('user_id');
+                $date = new DateTime("now");
+                $input['logdttm'] = $date->format("Y-m-d H:i:s");
+
+                $entity_keys = $form->writeBatch($input);
+
+                $resp_msg = [];
+                //$msg = $this->_loadSessionHerd($tmp_arr[0]['herd_code']);
+                //if(!empty($msg)){
+                $resp_msg = new ResponseMessage('Form submission successful', 'message');
+                //}
+                //$this->_record_access(2); //2 is the page code for herd change
+                /*                $this->load->model('web_content/navigation_model');
+                                $navigation = new Navigation($this->navigation_model, $this->herd, $this->permissions->permissionsList());
+                                $payload = ['nav' => $navigation->toArray('DHI')]; */
+                $this->sendResponse(200, $resp_msg, ['identity_keys' => $entity_keys]);
+            }
+            catch(Exception $e){
+                $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
+            }
+        }
+        $this->sendResponse(400, new ResponseMessage(validation_errors(), 'error'));
+    }
+
+    /**
      * @method delete_entry() - setting submission.
      *
      * @param int form id

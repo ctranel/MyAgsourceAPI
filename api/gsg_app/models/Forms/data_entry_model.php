@@ -102,7 +102,6 @@ class Data_entry_model extends CI_Model implements iForm_Model {
      * @param array of ints $ancestor_form_ids
      * @return string category
      * @author ctranel
-     **/
     protected function getFormKeyMeta($form_id, $ancestor_form_ids = null) {
         $ret = [];
 
@@ -126,6 +125,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
         }
         return $ret;
     }
+**/
 
     /**
      * getSourceTable
@@ -171,7 +171,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
             //have not yet tested with multiple level nesting
             array_walk_recursive($ancestor_form_ids, function(&$v, $k){return (int)$v;});
         }
-        $result = $this->db->select('fc.id, ct.name AS control_type, fld.db_field_name AS name, fc.label, fld.is_editable, fld.is_generated, fld.is_fk_field AS is_key, fc.biz_validation_url, fc.default_value')
+        $result = $this->db->select('fc.id, ct.name AS control_type, fld.db_field_name AS name, fc.label, fld.is_editable, fld.is_generated, fld.is_fk_field AS is_key, fld.data_type, fc.biz_validation_url, fc.default_value, fc.batch_variable_type')
             ->select("(CAST(
                   (SELECT STUFF((
                       SELECT '|', CONCAT(v.name, ':', v.value) AS [data()] 
@@ -202,7 +202,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
     public function getControlMetaById($control_id) {
         $control_id = (int)$control_id;
 
-        $result = $this->db->select('fc.id, ct.name AS control_type, fld.db_field_name AS name, fc.label, fld.is_editable, fld.is_generated, fld.is_fk_field AS is_key, fc.biz_validation_url, fc.default_value')
+        $result = $this->db->select('fc.id, ct.name AS control_type, fld.db_field_name AS name, fc.label, fld.is_editable, fld.is_generated, fld.is_fk_field AS is_key, fc.biz_validation_url, fc.default_value, fc.batch_variable_type')
             ->select("(CAST(
                   (SELECT STUFF((
                       SELECT '|', CONCAT(v.name, ':', v.value) AS [data()] 
@@ -217,6 +217,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
                  AS VARCHAR(100))) AS validators
             ")
             ->from('users.frm.form_controls fc')
+//            ->join('TD.ref.lookup_codes l', "l.codetype = 'BATCH_VAR_TYPE' AND fc.batch_variable_type = l.code", 'inner')
             ->join('users.dbo.db_fields fld', "fc.db_field_id = fld.id AND fc.id = '" . $control_id . "'", 'inner')
             ->join('users.frm.control_types ct', 'fc.control_type_id = ct.id', 'inner')
             ->order_by('fc.list_order')
@@ -471,14 +472,14 @@ class Data_entry_model extends CI_Model implements iForm_Model {
     *  @throws:
     * -----------------------------------------------------------------
     */
-    public function upsert($form_id, $form_data, $generated_cols = null){
+    public function upsert($form_id, $form_data, $control_meta = null, $key_meta = null){
         $form_id = (int)$form_id;
         $form_data = MssqlUtility::escape($form_data);
         $is_update = true;
 
         $table_name = $this->getSourceTable($form_id);
         //id key fields
-        $key_meta = $this->getFormKeyMeta($form_id);
+        //$key_meta = $this->getFormKeyMeta($form_id);
 
         $key_field_names = array_keys($key_meta);
         //$form_field_names = array_keys($form_data);
@@ -504,9 +505,11 @@ class Data_entry_model extends CI_Model implements iForm_Model {
             }
             //string vs numeric, or can we use quotes for both?
             //only update non-generated columns
-            if(in_array($k, $generated_cols) === false){
-                $update_set .= " t." . $k . "=" . $k . ",";
+            if($control_meta['is_generated'] === true){
                 $insert_vals[$k] = $form_data[$k];
+            }
+            if($control_meta['is_editable'] === true){
+                $update_set .= " t." . $k . "=" . $k . ",";
             }
         }
 
@@ -539,27 +542,90 @@ class Data_entry_model extends CI_Model implements iForm_Model {
     *  @throws:
     * -----------------------------------------------------------------
     */
-    public function insert($form_id, $form_data, $generated_cols = null){
+    public function insert($form_id, $form_data, $control_meta = null){
         $form_id = (int)$form_id;
         $form_data = MssqlUtility::escape($form_data);
 
         $table_name = $this->getSourceTable($form_id);
 
+        //string vs numeric, or can we use quotes for both?
+        $no_quotes = ['decimal', 'numeric', 'tinyint', 'int', 'smallint', 'bit'];
+
         foreach($form_data as $k=>$v){
             if(is_array($v)){
                 $v = implode('|', $v);
             }
-            //string vs numeric, or can we use quotes for both?
             //only update non-generated columns
-            if(in_array($k, $generated_cols) === false){
-                $insert_vals[$k] = $v;
+            if($control_meta[$k]['is_generated'] === false){
+                if(in_array($control_meta[$k]['data_type'], $no_quotes) === true){
+                    $v = (isset($v) && !empty($v)) ? $v : 'null';
+                    $insert_vals[$k] = $v;
+                }
+                else {
+                    $insert_vals[$k] = "'" . $v . "'";
+                }
             }
         }
 
         //need the commented select statement to trigger a return value
         $sql = "--SELECT;
                 INSERT " . $table_name . " (" . implode(', ', array_keys($insert_vals)) . ")
-                VALUES ('" . implode("', '", $insert_vals) . "');";
+                VALUES (" . implode(", ", $insert_vals) . ");";
+        $res = $this->db->query($sql)->result_array();
+
+        return $res;
+    }
+
+    /* -----------------------------------------------------------------
+    *  batchInsert
+
+    *  batchInsert form submitted data
+
+    *  @author: ctranel
+     * @param: int form id
+     * @param: string variable field name
+    *  @param: array of form data
+     * @param: array of generated columns
+    *  @return key->value array of keys for the record
+    *  @throws:
+    * -----------------------------------------------------------------
+    */
+    public function batchInsert($form_id, $variable_field, $form_data, $control_meta = null){
+        $form_id = (int)$form_id;
+        $form_data = MssqlUtility::escape($form_data);
+
+        $table_name = $this->getSourceTable($form_id);
+
+        //string vs numeric, or can we use quotes for both?
+        $no_quotes = ['decimal', 'numeric', 'tinyint', 'int', 'smallint', 'bit'];
+
+        foreach($form_data as $k=>$v){
+            if(is_array($v)){
+                $v = implode('|', $v);
+            }
+            //only update non-generated columns
+            if($control_meta[$k]['is_generated'] === false && $k != $variable_field){
+                if(in_array($control_meta[$k]['data_type'], $no_quotes) === true){
+                    $v = (isset($v) && !empty($v)) ? $v : 'null';
+                    $insert_vals[$k] = $v;
+                }
+                else {
+                    $insert_vals[$k] = "'" . $v . "'";
+                }
+            }
+        }
+
+        //need the commented select statement to trigger a return value
+        $sql = "INSERT " . $table_name . " (" . $variable_field . ", " . implode(', ', array_keys($insert_vals)) . ")
+                VALUES ";
+
+        if(isset($form_data[$variable_field]) && !empty($form_data[$variable_field])){
+            $batch_values = explode('|', $form_data[$variable_field]);
+            foreach($batch_values as $v){
+                $sql .= "(" . $v . ", " . implode(", ", $insert_vals) . "),";
+            }
+        }
+die($sql);
         $res = $this->db->query($sql)->result_array();
 
         return $res;
@@ -576,13 +642,13 @@ class Data_entry_model extends CI_Model implements iForm_Model {
     *  @throws:
     * -----------------------------------------------------------------
     */
-    public function update($form_id, $form_data, $generated_cols = null){
+    public function update($form_id, $form_data, $control_meta = null, $key_meta = null){
         $form_id = (int)$form_id;
         $form_data = MssqlUtility::escape($form_data);
 
         $table_name = $this->getSourceTable($form_id);
         //id key fields
-        $key_meta = $this->getFormKeyMeta($form_id);
+        //$key_meta = $this->getFormKeyMeta($form_id);
         $key_field_names = array_keys($key_meta);
 
         $upd_where = [];
@@ -596,14 +662,21 @@ class Data_entry_model extends CI_Model implements iForm_Model {
         }
 
         $update_set = [];
+        //string vs numeric, or can we use quotes for both?
+        $no_quotes = ['decimal', 'numeric', 'tinyint', 'int', 'smallint', 'bit'];
         foreach($form_data as $k=>$v){
             if(is_array($v)){
                 $v = implode('|', $v);
             }
-            //string vs numeric, or can we use quotes for both?
             //only update non-generated columns
-            if(in_array($k, $generated_cols) === false){
-                $update_set[] = $k . "='" . $v . "'";
+            if($control_meta[$k]['is_editable'] === true){
+                if(in_array($control_meta[$k]['data_type'], $no_quotes) === true){
+                    $v = (isset($v) && !empty($v)) ? $v : 'null';
+                    $update_set[] = $k . "=" . $v;
+                }
+                else {
+                    $update_set[] = $k . "='" . $v . "'";
+                }
             }
         }
 
@@ -627,14 +700,14 @@ class Data_entry_model extends CI_Model implements iForm_Model {
 *  @throws:
 * -----------------------------------------------------------------
 */
-    public function delete($form_id, $form_data){
+    public function delete($form_id, $form_data, $key_meta){
         $form_id = (int)$form_id;
         $form_data = MssqlUtility::escape($form_data);
 
         //get table name
         $table_name = $this->getSourceTable($form_id);
         //id key fields
-        $key_meta = $this->getFormKeyMeta($form_id);
+        //$key_meta = $this->getFormKeyMeta($form_id);
         $key_field_names = array_keys($key_meta);
 
         $delete_cond = '';

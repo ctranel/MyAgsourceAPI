@@ -55,4 +55,22 @@ class SubFormConditionGroup //implements iSubFormConditionGroup
 
         return $ret;
     }
+
+    /**
+     * conditionsMet
+     *
+     * are all subform conditions met?
+     *
+     * @param $control_value
+     * @return bool
+     */
+    public function conditionsMet($control_value){
+        foreach($this->conditions as $c){
+            if(!$c->conditionsMet($control_value)){
+                return false;
+            }
+        }
+
+        return true;
+    }
 }

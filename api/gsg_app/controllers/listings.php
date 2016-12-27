@@ -42,10 +42,14 @@ class listings extends dpage {
 	}
 	
 	function index($page_id, $json_filter_data = null){
+        //supplemental factory
+        $this->load->model('supplemental_model');
+        $supplemental_factory = new SupplementalFactory($this->supplemental_model, site_url());
+
         //Set up site content objects
         $this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
         $this->load->model('web_content/block_model');
-        $web_block_factory = new WebBlockFactory($this->block_model);
+        $web_block_factory = new WebBlockFactory($this->block_model, $supplemental_factory);
 
         //filters
         $params = [];
@@ -63,10 +67,6 @@ class listings extends dpage {
 
         //create block content
         $listings = $option_listing_factory->getByPage($page_id, ['herd_code'=>$this->session->userdata('herd_code'), 'serial_num'=>$serial_num]);
-
-        //supplemental factory
-        $this->load->model('supplemental_model');
-        $supplemental_factory = new SupplementalFactory($this->supplemental_model, site_url());
 
 
         //create blocks for content
@@ -102,17 +102,17 @@ class listings extends dpage {
         //create block content
         $listings = $option_listing_factory->getByPage($page_id, ['herd_code'=>$this->session->userdata('herd_code'), 'protocol_id' => $protocol_id]);
 
-        //Set up site content objects
-        $this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
-        $this->load->model('web_content/block_model');
-        $web_block_factory = new WebBlockFactory($this->block_model);
-
-        //page content
-        $this->load->model('ReportContent/report_block_model');
-
         //supplemental factory
         $this->load->model('supplemental_model');
         $supplemental_factory = new SupplementalFactory($this->supplemental_model, site_url());
+
+        //Set up site content objects
+        $this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
+        $this->load->model('web_content/block_model');
+        $web_block_factory = new WebBlockFactory($this->block_model, $supplemental_factory);
+
+        //page content
+        $this->load->model('ReportContent/report_block_model');
 
         //create blocks for content
         $blocks = $web_block_factory->getBlocksFromContent($page_id, $listings, $supplemental_factory);

@@ -38,4 +38,26 @@ class SubFormCondition //implements iSubFormCondition
 
         return $ret;
     }
+
+    /**
+     * conditionsMet
+     *
+     * are all subform conditions met?
+     *
+     * @param $control_value
+     * @return bool
+     */
+    public function conditionsMet($control_value){
+        switch($this->operator){
+            case "=":
+                return $control_value === $this->operand;
+            case "!=":
+                return $control_value !== $this->operand;
+            case ">":
+                return $control_value > $this->operand;
+            case "<":
+                return $control_value < $this->operand;
+        }
+        return false;
+    }
 }
