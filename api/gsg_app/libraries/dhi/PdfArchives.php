@@ -1,5 +1,10 @@
 <?php
 namespace myagsource\dhi;
+
+require_once(APPPATH . 'libraries/Site/iBlockContent.php');
+
+use myagsource\Site\iBlockContent;
+
 /**
  * Name:  HerdAccess
  *
@@ -14,7 +19,7 @@ namespace myagsource\dhi;
 
 
 
-class PdfArchives
+class PdfArchives implements iBlockContent
 {
     /**
      * datasource
@@ -43,6 +48,9 @@ class PdfArchives
         $this->datasource = $datasource;
     }
 
+    public function toArray() {
+        return $this->dataset;
+    }
 
     /**
      * getAllHerdArchives
@@ -50,9 +58,9 @@ class PdfArchives
      * @return array reflecting structure of pdf archives (test_date-->report)
      * @author ctranel
      **/
-    public function getAllHerdArchives(){
+    public function setAllHerdArchives(){
         $archives = $this->datasource->getHerdArchiveData($this->herd_code);
-        return $this->getHerdArchives($archives);
+        $this->setHerdArchives($archives);
     }
 
     /**
@@ -61,9 +69,9 @@ class PdfArchives
      * @return array reflecting structure of pdf archives (test_date-->report)
      * @author ctranel
      **/
-    public function getSubscribedHerdArchives(){
+    public function setSubscribedHerdArchives(){
         $archives = $this->datasource->getSubscribedHerdArchiveData($this->herd_code);
-        return $this->getHerdArchives($archives);
+        $this->setHerdArchives($archives);
     }
 
     /**
@@ -73,7 +81,7 @@ class PdfArchives
      * @return array reflecting structure of pdf archives (test_date-->report)
      * @author ctranel
      **/
-    protected function getHerdArchives($data){
+    protected function setHerdArchives($data){
         $tests = [];
         $prev_test_date = '';
         $reports = [];
@@ -103,6 +111,6 @@ class PdfArchives
             ];
         }
 
-        return $tests;
+        $this->dataset = $tests;
     }
 }

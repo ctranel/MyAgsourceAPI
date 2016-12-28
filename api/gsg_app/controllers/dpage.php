@@ -120,35 +120,25 @@ class dpage extends MY_Api_Controller {
 			}
 		}
 	}
-	
-	function index($page_id, $json_filter_data = null){
+
+	protected function _supplementalFactory(){
         //supplemental factory
         $this->load->model('supplemental_model');
-        $supplemental_factory = new SupplementalFactory($this->supplemental_model, site_url());
-
-        //Set up site content objects
-        $this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
-        $this->load->model('web_content/block_model');
-        $web_block_factory = new WebBlockFactory($this->block_model, $supplemental_factory);
-
-        //filters
-        $params = [];
-        if(isset($json_filter_data)) {
-            $params = (array)json_decode(urldecode($json_filter_data));
-        }
-
+        return new SupplementalFactory($this->supplemental_model, site_url());
+    }
+    protected function _filters($page_id, $params){
         $this->load->model('filter_model');
-        $this->filters = new ReportFilters($this->filter_model, $page_id, ['herd_code' => $this->session->userdata('herd_code')] + $params, $this->settings);
-        $this->load->model('Forms/setting_form_model');//, null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
-        //end filters
-
-        //benchmarks
+        return new ReportFilters($this->filter_model, $page_id, ['herd_code' => $this->session->userdata('herd_code')] + $params, $this->settings);
+    }
+    protected function _benchmarks(){
         if($this->permissions->hasPermission("Set Benchmarks")){
             $this->load->model('Settings/benchmark_model');//, null, false, ['user_id' => $this->session->userdata('user_id'), 'herd_code' => $this->session->userdata('herd_code')]);
-            $benchmarks = new Benchmarks($this->benchmark_model, $this->session->userdata('user_id'), $this->herd->herdCode(), $this->herd_model->header_info($this->herd->herdCode()), $this->session->userdata('benchmarks'));
+            return new Benchmarks($this->benchmark_model, $this->session->userdata('user_id'), $this->herd->herdCode(), $this->herd_model->header_info($this->herd->herdCode()), $this->session->userdata('benchmarks'));
         }
 
-        //page content
+        return null;
+    }
+    protected function _blockContent($page_id, $supplemental_factory, $params, $benchmarks){
         $this->load->model('ReportContent/report_block_model');
         $this->load->model('Datasource/db_field_model');
         $this->load->model('ReportContent/report_data_model');
@@ -156,16 +146,13 @@ class dpage extends MY_Api_Controller {
         $data_handler = new DataHandler($this->report_data_model, $benchmarks);
         $db_table_factory = new DbTableFactory($this->db_table_model);
 
-//this will actually be passed from client
-//$params = ['pen_num' => 1];
-        //$params = ['ID' => 2911100]; //for events, 'serial_num' => '366'
-
         //load factories for block content
-		$report_factory = new ReportFactory($this->report_block_model, $this->db_field_model, $this->filters, $supplemental_factory, $data_handler, $db_table_factory);
-		$setting_form_factory = new SettingsFormFactory($this->setting_form_model, $supplemental_factory, $params + ['herd_code'=>$this->session->userdata('herd_code'), 'user_id'=>$this->session->userdata('user_id')]);
+        $report_factory = new ReportFactory($this->report_block_model, $this->db_field_model, $this->filters, $supplemental_factory, $data_handler, $db_table_factory);
+        $this->load->model('Forms/setting_form_model');//, null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
+        $setting_form_factory = new SettingsFormFactory($this->setting_form_model, $supplemental_factory, $params + ['herd_code'=>$this->session->userdata('herd_code'), 'user_id'=>$this->session->userdata('user_id')]);
 
         $this->load->model('Forms/Data_entry_model');//, null, false, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
-		$entry_form_factory = new FormFactory($this->Data_entry_model, $supplemental_factory, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
+        $entry_form_factory = new FormFactory($this->Data_entry_model, $supplemental_factory, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
 
         //create block content
         $reports = $report_factory->getByPage($page_id);
@@ -175,7 +162,24 @@ class dpage extends MY_Api_Controller {
         //combine and sort
         $block_content = $reports + $setting_forms + $entry_forms;
         ksort($block_content);
-        unset($report_factory, $setting_form_factory, $entry_form_factory, $reports, $setting_forms, $entry_forms);
+        return $block_content;
+    }
+	
+	function index($page_id, $json_filter_data = null){
+        $params = [];
+        if(isset($json_filter_data)) {
+            $params = (array)json_decode(urldecode($json_filter_data));
+        }
+
+        $supplemental_factory = $this->_supplementalFactory();
+        $this->filters = $this->_filters($page_id, $params);
+        $benchmarks = $this->_benchmarks();
+        $block_content = $this->_blockContent($page_id, $supplemental_factory, $params, $benchmarks);
+
+        //Set up site content objects
+        $this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
+        $this->load->model('web_content/block_model');
+        $web_block_factory = new WebBlockFactory($this->block_model, $supplemental_factory);
 
         //create blocks for content
         $blocks = $web_block_factory->getBlocksFromContent($page_id, $block_content);
@@ -229,7 +233,6 @@ class dpage extends MY_Api_Controller {
         $this->load->model('filter_model');
         $this->filters = new ReportFilters($this->filter_model, $page_id, ['herd_code' => $this->session->userdata('herd_code')] + $params, $this->settings);
         $this->load->model('Forms/setting_form_model');//, null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
-        //$this->filters->removeCriteria('look_ahead_days');
         //end filters
 
         //benchmarks
@@ -245,10 +248,6 @@ class dpage extends MY_Api_Controller {
         $this->load->model('Datasource/db_table_model');
         $data_handler = new DataHandler($this->todo_list_model, $benchmarks);
         $db_table_factory = new DbTableFactory($this->db_table_model);
-
-//this will actually be passed from client
-//$params = ['pen_num' => 1];
-        //$params = ['ID' => 2911100]; //for events, 'serial_num' => '366'
 
         //load factories for block content
         $report_factory = new ReportFactory($this->report_block_model, $this->db_field_model, $this->filters, $supplemental_factory, $data_handler, $db_table_factory);

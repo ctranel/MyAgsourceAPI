@@ -38,9 +38,10 @@
 |
 */
 
-$route['default_controller'] = "index";
+$route['default_controller'] = "dashboard/index";
 $route['404_override'] = 'http_error';
 
+$route['dashboard'] = 'dashboard/index';
 $route['dpage/(:num)'] = 'dpage/index/$1';
 $route['listings/(:num)'] = 'listings/index/$1';
 
