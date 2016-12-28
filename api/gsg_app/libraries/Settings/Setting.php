@@ -77,7 +77,7 @@ class Setting {
         }
         //if type is array and value is not an array, wrap it in an array
         if(strpos($this->control_type, 'array') !== false && isset($control_data['value']) && !is_array($control_data['value'])){
-            if(strpos($control_data['value'], '|')){
+            if(strpos($control_data['value'], '|') !== false){
                 $control_data['value'] = explode('|', $control_data['value']);
             }
             else{
@@ -180,6 +180,9 @@ class Setting {
             if(isset($session_value) && is_array($session_value) && !empty($session_value)){
                 return $session_value;
             }
+            if(strpos($this->control_type, 'range') && strpos($session_value, '|') !== false){
+                return array_combine(['dbfrom', 'dbto'], explode('|', $session_value));
+            }
         }
         elseif(isset($session_value)){
             return $session_value;
@@ -187,6 +190,9 @@ class Setting {
         if(strpos($this->control_type, 'range') !== false || strpos($this->control_type, 'array') !== false){
             if(isset($this->value) && is_array($this->value) && !empty($this->value)){
                 return $this->value;
+            }
+            if(strpos($this->control_type, 'range') && strpos($this->value, '|') !== false){
+                return array_combine(['dbfrom', 'dbto'], explode('|', $this->value));
             }
         }
         elseif(isset($this->value)){

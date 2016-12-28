@@ -52,7 +52,7 @@ class Benchmark_model extends Settings_model {
 	}
 	
 	public function getBenchmarkData($bench_sql){
-        $bench_sql = MssqlUtility::escape($bench_sql);
+        //$bench_sql = MssqlUtility::escape($bench_sql);
 
 		$arr_benchmarks = $this->db->query($bench_sql)->result_array();
 		return $arr_benchmarks;

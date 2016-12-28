@@ -28,7 +28,9 @@ class Todo_list_model extends Report_data_model {
      **/
 
     public function search(iReport $report, $select_fields, $arr_filter_criteria){
-//die(var_dump($arr_filter_criteria));
+        //look ahead days was used to derive other filter values.  We don't want to use it in query
+        unset($arr_filter_criteria['look_ahead_days']);
+
         $this->composeSearch($report, $select_fields, $arr_filter_criteria);
 
         $report_date = date('Y-m-d');
