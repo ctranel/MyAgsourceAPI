@@ -96,6 +96,24 @@ class Data_entry_model extends CI_Model implements iForm_Model {
     }
 
     /**
+     * getSubformById
+     * @param int form id
+     * @return form data
+     * @author ctranel
+     **/
+    public function getSubformById($form_id) {
+        $form_id = (int)$form_id;
+
+        $results = $this->db
+            ->select('f.id AS form_id, f.name, f.description, s.name AS scope, f.active, f.dom_id, f.action')
+            //->join('users.frm.forms f', "b.id = f.block_id AND f.id = " . $form_id, 'inner')
+            ->join('users.dbo.lookup_scopes s', "f.scope_id = s.id AND f.id = " . $form_id, 'inner')
+            ->get('users.frm.forms f')
+            ->result_array();
+        return $results;
+    }
+
+    /**
      * getFormKeyMeta
      *
      * @param int form id

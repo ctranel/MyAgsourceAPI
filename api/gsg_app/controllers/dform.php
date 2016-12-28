@@ -108,10 +108,42 @@ class dform extends dpage {
 
         $form_factory = new FormFactory($this->data_entry_model, $supplemental_factory, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
 
-        $form = $form_factory->getForm($form_id, $this->session->userdata('herd_code'));
+        $form = $form_factory->getFormDisplay($form_id, $this->session->userdata('herd_code'));
 
         $this->sendResponse(200, $this->message, $form->toArray());
 	}
+
+    /**
+     * @method get_subform_entry()
+     *
+     * @param int form id
+     * @param string json data (key data for retrieving form)
+     * @access	public
+     * @return	void
+     */
+    function get_subform_entry($form_id, $json_data = null){
+        $params = [];
+        if(isset($json_data)) {
+            $params = (array)json_decode(urldecode($json_data));
+        }
+
+        if(empty(array_filter($params))){
+            $this->sendResponse(400, new ResponseMessage("No identifying information received", 'error'));
+        }
+
+        //validate form input
+        $this->load->model('supplemental_model');
+        $supplemental_factory = new SupplementalFactory($this->supplemental_model, site_url());
+        $this->load->library('herds');
+        $this->load->library('form_validation');
+        $this->load->model('Forms/data_entry_model');
+
+        $form_factory = new FormFactory($this->data_entry_model, $supplemental_factory, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
+
+        $form = $form_factory->getSubformDisplay($form_id, $this->session->userdata('herd_code'));
+
+        $this->sendResponse(200, $this->message, $form->toArray());
+    }
 
     /**
      * @method get_entry() - setting submission.
