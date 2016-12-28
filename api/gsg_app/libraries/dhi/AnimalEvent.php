@@ -184,7 +184,7 @@ class AnimalEvent
         $data = $this->datasource->eventEligibilityData($this->herd_code, $this->serial_num, $event_dt);
         $now = new \DateTime();
         $event_dt = new \DateTime($event_dt);
-        if($data['is_active'] == false || $data['TopSoldDiedDate'] !== null){
+        if($data['isactive'] == false || $data['TopSoldDiedDate'] !== null){
             $this->eligible_messages[] = "Cannot enter events for inactive, sold or dead animals.";
             return false;
         }

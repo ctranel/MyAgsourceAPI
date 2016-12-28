@@ -100,7 +100,7 @@ class BatchEvent
 
         //BELOW CONDITIONS ARE USED TO BUILD QUERY
         $conditions = [
-            ['is_active', '=', '1'],
+            ['isactive', '=', '1'],
             ['topSoldDiedDate', 'IS', 'NULL']
         ];
 

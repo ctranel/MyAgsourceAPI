@@ -158,7 +158,7 @@ class Events_model extends CI_Model {
         $sql = "SELECT
                 herd_code
                 ,serial_num
-                ,is_active
+                ,isactive
                 ,species_cd
                 ,sex_cd
                 ,birth_dt
@@ -189,12 +189,12 @@ class Events_model extends CI_Model {
                  SELECT
                   id.herd_code
                   ,id.serial_num
-                  ,id.is_active
+                  ,id.isactive
                   ,id.species_cd
                   ,id.sex_cd
                   ,id.birth_dt
                   ,CASE
-                    WHEN id.is_active = 0 OR te.[TopSoldDiedDate] IS NOT NULL THEN NULL
+                    WHEN id.isactive = 0 OR te.[TopSoldDiedDate] IS NOT NULL THEN NULL
                     WHEN te.[TopFreshDate] IS NOT NULL THEN --cow
                         CASE WHEN id.species_cd = 'C' AND te.[TopDryDate] = te.[TopStatusDate] THEN DATEADD(day, 251, te.[TopFreshDate])
                             WHEN id.species_cd = 'G' AND te.[TopDryDate] = te.[TopStatusDate] THEN DATEADD(day, 136, te.[TopFreshDate])
@@ -206,32 +206,32 @@ class Events_model extends CI_Model {
                     END AS earliest_fresh_date
             
                   ,CASE 
-                    WHEN id.is_active = 0 OR te.[TopSoldDiedDate] IS NOT NULL THEN NULL
+                    WHEN id.isactive = 0 OR te.[TopSoldDiedDate] IS NOT NULL THEN NULL
                     WHEN te.[TopBredDate] IS NOT NULL AND te.[TopBredDate] > te.[TopFreshDate] THEN DATEADD(day, 153, te.[TopBredDate]) --if bred
                     END AS earliest_abort_date
                   
                   ,CASE
-                    WHEN id.is_active = 0 OR te.[TopSoldDiedDate] IS NOT NULL THEN NULL
+                    WHEN id.isactive = 0 OR te.[TopSoldDiedDate] IS NOT NULL THEN NULL
                     WHEN te.[TopFreshDate] IS NOT NULL THEN DATEADD(day, 1, te.[TopFreshDate])
                     END AS earliest_dry_date
                   
                   ,CASE
-                    WHEN id.is_active = 0 OR te.[TopSoldDiedDate] IS NOT NULL THEN NULL
+                    WHEN id.isactive = 0 OR te.[TopSoldDiedDate] IS NOT NULL THEN NULL
                     WHEN te.[TopDryDate] IS NOT NULL AND te.[TopDryDate] = te.[TopStatusDate] THEN DATEADD(day, 1, te.[TopFreshDate])
                     END AS earliest_dry_donor_date
                   
                   ,CASE 
-                    WHEN id.is_active = 0 OR te.[TopSoldDiedDate] IS NOT NULL THEN NULL
+                    WHEN id.isactive = 0 OR te.[TopSoldDiedDate] IS NOT NULL THEN NULL
                     WHEN te.[TopSoldDiedDate] IS NULL THEN DATEADD(day, 1, te.[TopStatusDate])
                     END AS earliest_solddied_date
             
                   ,CASE
-                    WHEN id.is_active = 0 OR te.[TopSoldDiedDate] IS NOT NULL THEN NULL
+                    WHEN id.isactive = 0 OR te.[TopSoldDiedDate] IS NOT NULL THEN NULL
                     WHEN te.[TopBredDate] > te.[TopFreshDate] THEN DATEADD(day, 27, te.[TopBredDate])
                     END AS earliest_preg_date
             
                   ,CASE
-                    WHEN id.is_active = 0 OR te.[TopSoldDiedDate] IS NOT NULL THEN NULL
+                    WHEN id.isactive = 0 OR te.[TopSoldDiedDate] IS NOT NULL THEN NULL
                     WHEN te.[TopFreshDate] IS NOT NULL THEN DATEADD(day, 1, te.[TopFreshDate])--cow
                     WHEN te.[TopFreshDate] IS NULL THEN --heifer (no fresh date)
                         CASE WHEN id.species_cd = 'C' THEN DATEADD(day, 301, id.birth_dt)
