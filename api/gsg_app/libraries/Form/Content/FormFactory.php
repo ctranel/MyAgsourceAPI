@@ -6,6 +6,7 @@ require_once(APPPATH . 'libraries/Settings/SettingFormControl.php');
 require_once(APPPATH . 'libraries/Form/Content/Form.php');
 require_once(APPPATH . 'libraries/Form/Content/Control/FormControl.php');
 require_once(APPPATH . 'libraries/Form/Content/SubForm.php');
+require_once(APPPATH . 'libraries/Form/Content/SubFormShell.php');
 require_once(APPPATH . 'libraries/Form/Content/SubFormCondition.php');
 require_once(APPPATH . 'libraries/Form/Content/SubFormConditionGroup.php');
 require_once(APPPATH . 'libraries/Form/iFormFactory.php');
@@ -78,12 +79,42 @@ class FormFactory implements iFormFactory{
 	public function getForm($form_id, $herd_code){
 		$results = $this->datasource->getFormById($form_id);
 		if(empty($results)){
-			throw new Exception('No data found for requested form.');
+			throw new \Exception('No data found for requested form.');
 		}
 		return $this->createForm($results[0], $herd_code);
 	}
 
-	/*
+    /*
+     * getFormDisplay
+     *
+     * @param int form id
+     * @author ctranel
+     * @returns \myagsource\Form\Form
+     */
+    public function getFormDisplay($form_id, $herd_code){
+        $results = $this->datasource->getFormById($form_id);
+        if(empty($results)){
+            throw new \Exception('No data found for requested form.');
+        }
+        return $this->createDisplayForm($results[0], $herd_code);
+    }
+
+    /*
+     * getSubformDisplay
+     *
+     * @param int form id
+     * @author ctranel
+     * @returns \myagsource\Form\Form
+     */
+    public function getSubformDisplay($form_id, $herd_code){
+        $results = $this->datasource->getSubformById($form_id);
+        if(empty($results)){
+            throw new \Exception('No data found for requested form.');
+        }
+        return $this->createDisplayForm($results[0], $herd_code);
+    }
+
+    /*
     * createForm
     *
     * @param array of form data
@@ -94,6 +125,45 @@ class FormFactory implements iFormFactory{
     */
     protected function createForm($form_data, $herd_code, $ancestor_form_ids = null){
         $subforms = $this->getSubForms($form_data['form_id'], $herd_code, $ancestor_form_ids);
+
+        //this function depends on an existing record
+        $control_data = $this->datasource->getFormControlData($form_data['form_id'], $this->key_params, $ancestor_form_ids);
+
+        $fc = [];
+        if(is_array($control_data) && !empty($control_data) && is_array($control_data[0])){
+            foreach($control_data as $d){
+                $validators = null;
+                if(isset($d['validators'])){
+                    $validators = [];
+                    $valids = explode('|', $d['validators']);
+                    foreach($valids as $v){
+                        list($name, $comparison_value) = explode(':', $v);
+                        $validators[] = new Validator($name, $comparison_value);
+                    }
+                }
+
+                $s = isset($subforms[$d['name']]) ? $subforms[$d['name']] : null;
+                $options = null;
+                if(strpos($d['control_type'], 'lookup') !== false){
+                    $options = $this->getLookupOptions($d['id'], $d['control_type']);
+                }
+                $fc[] = new FormControl($d, $validators, $options, $s);
+            }
+        }
+        return new Form($form_data['form_id'], $this->datasource, $fc, $form_data['dom_id'], $form_data['action'], $herd_code);
+    }
+
+    /*
+    * createDisplayForm
+    *
+    * @param array of form data
+    * @param string herd code
+    * @param array of ints ancestor_form_ids
+    * @author ctranel
+    * @returns Array of Forms
+    */
+    protected function createDisplayForm($form_data, $herd_code, $ancestor_form_ids = null){
+        $subforms = $this->getSubFormShells($form_data['form_id'], $herd_code, $ancestor_form_ids);
 
         //this function depends on an existing record
         $control_data = $this->datasource->getFormControlData($form_data['form_id'], $this->key_params, $ancestor_form_ids);
@@ -154,6 +224,44 @@ class FormFactory implements iFormFactory{
                 $form = $this->createForm($r, $herd_code, $ancestor_form_ids);
                 $subform_groups = $this->extractConditionGroups($subform_data[$r['form_control_name']][$r['form_id']]);
                 $subforms[$r['form_control_name']][$r['form_id']] = new SubForm($subform_groups, $form);
+            }
+        }
+
+        return $subforms;
+    }
+
+    /*
+    * getSubForms
+    *
+    * @param int parent form id
+    * @param string herd code
+    * @param array of ints ancestor_form_ids
+    * @author ctranel
+    * @returns Array of Forms
+    */
+    protected function getSubFormShells($parent_form_id, $herd_code, $ancestor_form_ids = null){
+        $results = $this->datasource->getSubFormsByParentId($parent_form_id); //would return control-name-indexed array
+        if(empty($results)){
+            return false;
+        }
+
+        if(is_array($ancestor_form_ids)){
+            $ancestor_form_ids = $ancestor_form_ids + [$parent_form_id];
+        }
+        else{
+            $ancestor_form_ids = [$parent_form_id];
+        }
+
+        $subforms = [];
+        //get and organize all condition data for form
+        $subform_data = $this->structureSubFormCondData($results);
+
+        //parse each subform separately
+        foreach($results as $k => $r){
+            if(!isset($subforms[$r['form_control_name']][$r['form_id']])){
+                //$form = $this->createForm($r, $herd_code, $ancestor_form_ids);
+                $subform_groups = $this->extractConditionGroups($subform_data[$r['form_control_name']][$r['form_id']]);
+                $subforms[$r['form_control_name']][$r['form_id']] = new SubFormShell($subform_groups, $r['form_id']);
             }
         }
 
