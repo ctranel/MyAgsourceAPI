@@ -98,7 +98,7 @@ class Benchmarks extends Settings
 			],
 		];
 		
-		$this->setHerdDefaults($herd_info['breed_code'], $herd_info['herd_size']);
+		//$this->setHerdDefaults($herd_info['breed_code'], $herd_info['herd_size']);
 	}
 
 	/**

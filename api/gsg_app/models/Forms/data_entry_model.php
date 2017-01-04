@@ -279,111 +279,6 @@ class Data_entry_model extends CI_Model implements iForm_Model {
             }
             return $results;
         }
-/*
-        $key_meta = $this->getFormKeyMeta($form_id, $ancestor_form_ids);
-
-        $key_field_list_text = '';
-        $key_field_def_text = '';
-        $key_condition_text = '';
-        $key_val_field_list_text = '';
-        $declare_key_var_text = '';
-        $set_key_var_text = '';
-
-        foreach($keys as $k){
-            $key_field_def_text .= $k . " " . $key_meta[$k]['data_type'];
-            $declare_key_var_text .= ", @" . $k . " " . $key_meta[$k]['data_type'];
-            if(strpos($key_meta[$k]['data_type'], 'char') !== false){
-                $key_field_def_text .= '(' .  $key_meta[$k]['max_length'] . ')';
-                $declare_key_var_text .= '(' .  $key_meta[$k]['max_length'] . ')';
-                $key_condition_text .= "N'" . $k . " = ''', @" . $k . ", N''' AND ',";
-            }
-            else {
-                $key_condition_text .= "N'" . $k . " = ', @" . $k . ", N' AND ', ";
-            }
-            $key_field_def_text .= ', ';
-
-            $key_field_list_text .= $k . ', ';
-
-            $key_val_field_list_text .= 'v.' . $k . ', ';
-
-
-            $set_key_var_text .= "SET @" . $k . " = '" . $params[$k] . "';";
-        }
-
-       $sql = "
-            DECLARE 
-                @dsql NVARCHAR(MAX)
-                ,@psql NVARCHAR(500)
-                ,@db_field_id INT
-                ,@db_table_name VARCHAR(100)
-                ,@db_field_name VARCHAR(50)
-                " . $declare_key_var_text . "
-            
-            " . $set_key_var_text . "
-            
-            IF OBJECT_ID('tempdb..#valueTable', 'U') IS NOT NULL
-              DROP TABLE #valueTable;
-            
-            CREATE TABLE #valueTable (
-                db_field_id INT,
-                " . $key_field_def_text . "
-                value VARCHAR(MAX) NULL,
-            )
-
-            DECLARE Table_Cursor CURSOR FOR
-                select fld.id, CONCAT(db.name, '.',  tbl.db_schema, '.', tbl.name) AS db_table_name,fld.db_field_name
-                from users.frm.form_control_groups cg
-                inner join users.frm.form_controls fc ON cg.id = fc.form_control_group_id AND cg.form_id = " . $form_id . "
-                inner join users.dbo.db_fields fld ON fc.db_field_id = fld.id
-                inner join users.dbo.db_tables tbl ON fld.db_table_id = tbl.id AND allow_update = 1
-                inner join users.dbo.db_databases db ON tbl.database_id = db.id
-
-            
-            OPEN Table_Cursor;
-            
-            FETCH NEXT FROM Table_Cursor INTO @db_field_id, @db_table_name, @db_field_name;
-            
-            WHILE @@FETCH_STATUS = 0
-            BEGIN
-               SET @dsql = CONCAT(N'INSERT INTO #valueTable (db_field_id, " . $key_field_list_text . " value) SELECT DISTINCT @p_id AS db_field_id, " . $key_field_list_text . " ' , @db_field_name, N' FROM ', @db_table_name, N' WHERE ', " . substr($key_condition_text, 0, -7) . "')
-               SET @psql = N'@p_id INT'
-               EXEC sp_executesql @dsql, @psql, @p_id = @db_field_id
-               FETCH NEXT FROM Table_Cursor INTO @db_field_id, @db_table_name, @db_field_name;
-            END;
-            
-            CLOSE Table_Cursor;
-            
-            DEALLOCATE Table_Cursor;
-
-                select fc.id, ct.name AS control_type, fld.db_field_name AS name, fc.label, fld.is_editable, fld.is_generated, fld.is_fk_field AS is_key, fc.biz_validation_url, fc.default_value, " . $key_val_field_list_text . " v.value AS value,
-                    (CAST(
-                        (SELECT STUFF((
-                          SELECT '|', CONCAT(v.name, ':', v.value) AS [data()] 
-                          FROM (SELECT cv.form_control_id, val.name, cv.value FROM users.frm.controls_validators cv INNER JOIN users.frm.validators val ON cv.validator_id = val.id) AS v
-                          WHERE v.form_control_id = fc.id 
-                          FOR xml path('')
-                        ), 1, 1, ''))
-                     AS VARCHAR(100))) AS validators
-                from users.frm.form_control_groups cg
-                inner join users.frm.form_controls fc ON cg.id = fc.form_control_group_id AND cg.form_id = " . $form_id . "
-                inner join users.dbo.db_fields fld ON fc.db_field_id = fld.id
-                inner join users.frm.control_types ct ON fc.control_type_id = ct.id
-                inner join #valueTable v ON fld.id = v.db_field_id
-                ORDER BY fc.list_order;
-       ";
-//print($sql); die;
-        $time_start = microtime(true);
-
-        $results = $this->db->query($sql)->result_array();
-
-        $time_end = microtime(true);*/
-/*        echo "
-        
-        
-        TIME: " . ($time_end - $time_start);
-        echo $sql;
-*/
-//return $results;
     }
 
 
@@ -643,7 +538,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
                 $sql .= "(" . $v . ", " . implode(", ", $insert_vals) . "),";
             }
         }
-die($sql);
+//die($sql);
         $res = $this->db->query($sql)->result_array();
 
         return $res;
@@ -701,7 +596,6 @@ die($sql);
         $sql = "UPDATE " . $table_name .
             " SET " . implode(',' , $update_set) .
             " WHERE " . implode(" AND ", $upd_where);
-
         $res = $this->db->query($sql);
 
         return $key_values;

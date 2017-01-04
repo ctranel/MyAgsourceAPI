@@ -53,7 +53,7 @@ class Todo_list_model extends Report_data_model {
                     WHERE s.id = 81 /*Open months - heifer*/ AND (uhs.herd_code IS NULL OR uhs.herd_code = '" . $herd_code . "')"
                 . $sql . " UNION " . $this->openHeiferSql($herd_code, $report_date);
         }
-
+//var_dump($this->settings->getValue('cycle_check'));
         if(in_array("1", $this->settings->getValue('cycle_check'))){
             $sql = "SELECT @cycle_days_min = COALESCE(uhs.value, s.default_value, 0)
                     FROM users.setng.settings s
@@ -171,7 +171,7 @@ class Todo_list_model extends Report_data_model {
                 , NULL AS expires_date
                 , CASE 
                     WHEN TopReproStatusCd = 31 THEN CONCAT('Last Heat ', DATEDIFF(MONTH, y.TopHeatDate, '" . $report_date . "'), ' days')
-                    ELSE CONCAT('Last Breeding ', DATEDIFF(MONTH, y.TopBredDate, '" . $report_date . "'), ' days')
+                    ELSE CONCAT('Last Breeding ', DATEDIFF(DAY, y.TopBredDate, '" . $report_date . "'), ' days')
                     END AS comment
             FROM TD.[animal].[vma_vet_check_DAL_data] y
             WHERE
@@ -191,6 +191,7 @@ class Todo_list_model extends Report_data_model {
                     AND DATEDIFF(DAY, TopReproStatusDate, '" . $report_date . "') < @cycle_days_max
                 )
             )";
+//die($sql);
         return $sql;
     }
 

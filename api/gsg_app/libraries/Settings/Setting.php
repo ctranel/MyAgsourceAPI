@@ -65,26 +65,37 @@ class Setting {
         $this->default_value = $control_data['default_value'];
         $this->control_type = $control_data['control_type'];
 
-        if($this->control_type === 'range'){
+        if(strpos($this->control_type, 'range') !== false){
             if(strpos($control_data['value'], '|') !== false){
-                $tmp = [];
-                list($tmp['dbfrom'], $tmp['dbto']) = explode('|', $control_data['value']);
-                $control_data['value'] = $tmp;
+                $this->value = array_combine(['dbfrom', 'dbto'], explode('|', $control_data['value']));
             }
             else{
-                $control_data['value'] = null;
+                $this->value = null;
+            }
+            if(strpos($control_data['default_value'], '|') !== false){
+                $this->default_value = array_combine(['dbfrom', 'dbto'], explode('|', $control_data['default_value']));
+            }
+            else{
+                $this->default_value = null;
             }
         }
         //if type is array and value is not an array, wrap it in an array
-        if(strpos($this->control_type, 'array') !== false && isset($control_data['value']) && !is_array($control_data['value'])){
-            if(strpos($control_data['value'], '|') !== false){
-                $control_data['value'] = explode('|', $control_data['value']);
+        if(strpos($this->control_type, 'array') !== false){
+            if(isset($control_data['value']) && !is_array($control_data['value'])) {
+                if (strpos($control_data['value'], '|') !== false) {
+                    $this->value = explode('|', $control_data['value']);
+                } else {
+                    $this->value = [$control_data['value']];
+                }
             }
-            else{
-                $control_data['value'] = [$control_data['value']];
+            if(isset($control_data['default_value']) && !is_array($control_data['default_value'])) {
+                if (strpos($control_data['default_value'], '|') !== false) {
+                    $this->default_value = explode('|', $control_data['default_value']);
+                } else {
+                    $this->default_value = [$control_data['default_value']];
+                }
             }
         }
-        $this->value = $control_data['value'];
 	}
 
 	public function toArray(){
@@ -156,6 +167,28 @@ class Setting {
 
     public function setDefaultValue($new_value){
         $this->default_value = $new_value;
+
+        if($this->control_type === 'range'){
+            if(strpos($new_value, '|') !== false){
+                $tmp = [];
+                list($tmp['dbfrom'], $tmp['dbto']) = explode('|', $new_value);
+                $new_value = $tmp;
+            }
+            else{
+                $new_value = null;
+            }
+        }
+        //if type is array and value is not an array, wrap it in an array
+        if(strpos($this->control_type, 'array') !== false && isset($new_value) && !is_array($new_value)){
+            if(strpos($new_value, '|') !== false){
+                $new_value = explode('|', $new_value);
+            }
+            else{
+                $new_value = [$new_value];
+            }
+        }
+        $this->default_value = $new_value;
+
     }
 
 
@@ -173,19 +206,30 @@ class Setting {
     */
     public function getCurrValue($session_value = null){
         //if a string is sent for array type, insert string into array
-        if(strpos($this->control_type, 'array') !== false && !is_array($session_value)){
-            $session_value = [$session_value];
-        }
-        if(strpos($this->control_type, 'range') !== false || strpos($this->control_type, 'array') !== false){
-            if(isset($session_value) && is_array($session_value) && !empty($session_value)){
+ //var_dump($this->name, $session_value, $this->value, $this->default_value);
+        if(isset($session_value)){
+            if(strpos($this->control_type, 'array') !== false){
+                if(!is_array($session_value)){
+                    $session_value = [$session_value];
+                }
                 return $session_value;
             }
-            if(strpos($this->control_type, 'range') && strpos($session_value, '|') !== false){
-                return array_combine(['dbfrom', 'dbto'], explode('|', $session_value));
+            if(strpos($this->control_type, 'range') !== false || strpos($this->control_type, 'array') !== false){
+//                if(isset($session_value) && is_array($session_value) && !empty($session_value)){
+//                    return $session_value;
+//                }
+                if(strpos($this->control_type, 'range') && strpos($session_value, '|') !== false){
+                    return array_combine(['dbfrom', 'dbto'], explode('|', $session_value));
+                }
             }
-        }
-        elseif(isset($session_value)){
             return $session_value;
+        }
+        //if session_value is null
+        if(strpos($this->control_type, 'array') !== false){
+            if(!is_array($this->value)){
+                $this->value = [$this->value];
+            }
+            return $this->value;
         }
         if(strpos($this->control_type, 'range') !== false || strpos($this->control_type, 'array') !== false){
             if(isset($this->value) && is_array($this->value) && !empty($this->value)){
