@@ -3,10 +3,19 @@
   <component name="WebServers">
     <option name="servers">
       <webServer id="e745e44c-ea57-47c7-b285-8aed9971852b" name="Chris' VM" url="http://192.168.3.68">
-        <fileTransfer host="192.168.3.68" port="22" rootFolder="/var/www" accessType="SFTP" password="dfc3dfd8df9adfc4df9bdf99dfe7df9edfe4" username="agsource">
+        <fileTransfer host="192.168.3.68" port="22" rootFolder="/var/www" accessType="SFTP">
           <advancedOptions>
             <advancedOptions dataProtectionLevel="Private" />
           </advancedOptions>
+          <option name="port" value="22" />
+        </fileTransfer>
+      </webServer>
+      <webServer id="b785d9b4-a564-470f-a89f-19d7a42429f2" name="Afshin's VM" url="http://192.168.3.70">
+        <fileTransfer host="192.168.3.70" port="22" rootFolder="/var/www" accessType="SFTP">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" />
+          </advancedOptions>
+          <option name="port" value="22" />
         </fileTransfer>
       </webServer>
     </option>

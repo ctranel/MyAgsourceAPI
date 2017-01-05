@@ -33,17 +33,23 @@ class Demo extends MY_Controller {
 		$this->session->unset_userdata('arr_tstring');
 		$this->session->unset_userdata('tstring');
 		
-		$this->session->keep_all_flashdata();
-		
 		if($this->as_ion_auth->login('support@myagsource.com', 'AQECTGBUZI', false)){ //if the login is successful
-			//$this->_record_access(1); //1 is the page code for login for the user management section
-			$this->session->set_flashdata('message', [$this->as_ion_auth->messages()]);
-			redirect(site_url('dhi/change_herd/select'));
-		}
-		else{ //if the login was un-successful
-			$this->session->set_flashdata('message', ['Sorry, we could not log in the guest user.  Please contact customer service for assistance: 1-800-236-4995']);
-			redirect(site_url('auth/login')); //use redirects instead of loading views for compatibility with MY_Controller libraries
-		}
+            $this->_record_access(1); //1 is the page code for login for the user management section
+            //get permissions (also in constuctor, put in function/class somewhere)
+            $this->load->model('permissions_model');
+            $this->load->model('product_model');
+            //$herd = new Herd($this->herd_model, $this->session->userdata('herd_code'));
+            $group_permissions = ProgramPermissions::getGroupPermissionsList($this->permissions_model, $this->session->userdata('active_group_id'));
+            $products = new Products($this->product_model, $this->herd, $group_permissions);
+            $this->permissions = new ProgramPermissions($this->permissions_model, $group_permissions, $products->allHerdProductCodes());
+
+            $msgs = [];
+            $msgs[] = new ResponseMessage("This is sample herd data, please login or register to see your herd's data.", 'message');
+            //send response
+            $this->sendResponse(200, $msgs);
+        }
+
+        $this->sendResponse(401, new ResponseMessage($this->as_ion_auth->errors(), 'error'));
 	}
 /*
 	protected function set_herd_session_data(){
