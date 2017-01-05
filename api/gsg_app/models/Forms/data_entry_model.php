@@ -538,8 +538,8 @@ class Data_entry_model extends CI_Model implements iForm_Model {
                 $sql .= "(" . $v . ", " . implode(", ", $insert_vals) . "),";
             }
         }
-//die($sql);
-        $res = $this->db->query($sql)->result_array();
+//die(substr($sql, 0, -1));
+        $res = $this->db->query(substr($sql, 0, -1));
 
         return $res;
     }

@@ -165,7 +165,7 @@ class Form implements iForm
 *  @author: ctranel
 *  @date: 2016-12-22
 *  @param: array of key=>value pairs that have been processed by the parseFormData static function
-*  @return key->value array of keys for the record
+*  @return void
 *  @throws: UnexpectedValueException
      * * -----------------------------------------------------------------
 */
@@ -181,8 +181,9 @@ class Form implements iForm
 
         $form_data = $this->parseFormData($form_data);
 
-        $key_vals = $this->datasource->batchInsert($this->id, $variable_field->name(), $form_data, $this->controlsMetaArray());
-        return $key_vals;
+        if(!$this->datasource->batchInsert($this->id, $variable_field->name(), $form_data, $this->controlsMetaArray())){
+            throw new \Exception('Batch insert failed.');
+        }
     }
 
     /* -----------------------------------------------------------------
