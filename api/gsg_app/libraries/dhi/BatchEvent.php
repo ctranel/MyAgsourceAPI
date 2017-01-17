@@ -111,10 +111,10 @@ class BatchEvent
 
         //Fresh events
         if($event_cd == 1 || $event_cd == 2){
-            if($event_cd == 1){
+            if($event_cd == 2){
                 $conditions[] = ['is_youngstock', '=', '0'];
             }
-            if($event_cd == 1){
+            else{
                 $conditions[] = ['is_youngstock', '=', '1'];
             }
 

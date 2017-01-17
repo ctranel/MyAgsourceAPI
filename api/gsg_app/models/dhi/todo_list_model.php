@@ -37,41 +37,26 @@ class Todo_list_model extends Report_data_model {
         $herd_code = $arr_filter_criteria['herd_code']['value'][0];
 
         $sql = $this->db->get_compiled_select();
-
-        if(in_array("1", $this->settings->getValue('open_cows'))){
-            $sql = "SELECT @cow_open_days = COALESCE(uhs.value, s.default_value, 0)
-                    FROM users.setng.settings s
-                        LEFT JOIN users.setng.user_herd_settings uhs ON uhs.setting_id = s.id
-                    WHERE s.id = 79 /*Open days - cows*/ AND (uhs.herd_code IS NULL OR uhs.herd_code = '" . $herd_code . "');"
-                . $sql . " UNION " . $this->openCowSql($herd_code, $report_date);
+//die($sql);
+        if(in_array("2", $this->settings->getValue('open_cows'))){
+            $sql .= " UNION " . $this->openCowSql($herd_code, $report_date, $this->settings->getValue('open_cows_days'));
         }
 
-        if(in_array("1", $this->settings->getValue('open_heifers'))){
-            $sql = "SELECT @heifer_open_months = COALESCE(uhs.value, s.default_value, 0)
-                    FROM users.setng.settings s
-                        LEFT JOIN users.setng.user_herd_settings uhs ON uhs.setting_id = s.id
-                    WHERE s.id = 81 /*Open months - heifer*/ AND (uhs.herd_code IS NULL OR uhs.herd_code = '" . $herd_code . "')"
-                . $sql . " UNION " . $this->openHeiferSql($herd_code, $report_date);
-        }
-//var_dump($this->settings->getValue('cycle_check'));
-        if(in_array("1", $this->settings->getValue('cycle_check'))){
-            $sql = "SELECT @cycle_days_min = COALESCE(uhs.value, s.default_value, 0)
-                    FROM users.setng.settings s
-                        LEFT JOIN users.setng.user_herd_settings uhs ON uhs.setting_id = s.id
-                    WHERE s.id = 56 /*cycle days min*/ AND (uhs.herd_code IS NULL OR uhs.herd_code = '" . $herd_code . "')
-
-            SELECT @cycle_days_max = COALESCE(uhs.value, s.default_value, 0)
-                    FROM users.setng.settings s
-                        LEFT JOIN users.setng.user_herd_settings uhs ON uhs.setting_id = s.id
-                    WHERE s.id = 57 /*cycle days max*/ AND (uhs.herd_code IS NULL OR uhs.herd_code = '" . $herd_code . "')"
-                . $sql . " UNION " . $this->bredCycleSql($herd_code, $report_date);
+        if(in_array("2", $this->settings->getValue('open_heifers'))){
+            $sql .= " UNION " . $this->openHeiferSql($herd_code, $report_date, $this->settings->getValue('open_heifers_age'));
         }
 
-        $sql = "            DECLARE @cow_open_days SMALLINT,
-				@heifer_open_months SMALLINT,
-				@cycle_days_min SMALLINT,
-				@cycle_days_max SMALLINT;" . $sql;
-//echo $sql; die;
+        if(in_array("2", $this->settings->getValue('cycle_check'))){
+            $sql .= " UNION " . $this->bredCycleSql($herd_code, $report_date, $this->settings->getValue('cycle_days_min'), $this->settings->getValue('cycle_days_max'));
+        }
+
+        if(in_array("2", $this->settings->getValue('repeat_breedings'))){
+            $sql .= " UNION " . $this->maxTimesBred($herd_code, $report_date, $this->settings->getValue('breeding_number'));
+        }
+
+        if(in_array("2", $this->settings->getValue('non_cycling'))){
+            $sql .= " UNION " . $this->nonCyclingCows($herd_code, $report_date, $this->settings->getValue('non_cycle_days'));
+        }
 
         $ret = $this->db->query($sql)->result_array();
         return $ret;
@@ -82,11 +67,12 @@ class Todo_list_model extends Report_data_model {
      *
      * @param string herd code
      * @param string report date
+     * @param int cow open days target
      * @return string sql text
      * @access public
      *
      **/
-    public function openCowSql($herd_code, $report_date) {
+    public function openCowSql($herd_code, $report_date, $open_cows_days) {
         $sql = "
             SELECT
                 serial_num
@@ -96,7 +82,7 @@ class Todo_list_model extends Report_data_model {
                 , pen_num
                 , DATEDIFF(DAY, y.TopFreshDate, '" . $report_date . "') AS dim_age
                 , curr_lact_num
-                ,'' AS attention
+                ,'Cow is Open' AS attention
                 , NULL AS target_date
                 , NULL AS expires_date
                 , CONCAT(DATEDIFF(DAY, y.TopFreshDate, '" . $report_date . "'), ' Days in Milk') AS comment
@@ -106,7 +92,8 @@ class Todo_list_model extends Report_data_model {
                 AND curr_lact_num > 0
                 AND TopPregStatusCd != 33
                 AND TopStatusDate = TopFreshDate
-                AND DATEDIFF(DAY, TopFreshDate, '" . $report_date . "') > @cow_open_days";
+                AND TopPregStatusDate > TopBredDate
+                AND DATEDIFF(DAY, TopFreshDate, '" . $report_date . "') > " . $open_cows_days;
 
         return $sql;
     }
@@ -116,12 +103,12 @@ class Todo_list_model extends Report_data_model {
      *
      * @param string herd code
      * @param string report date
+     * @param int heifer age target
      * @return string sql text
      * @access public
      *
      **/
-    public function openHeiferSql($herd_code, $report_date)
-    {
+    public function openHeiferSql($herd_code, $report_date, $heifer_open_months) {
         $sql = "
             SELECT 
                 serial_num
@@ -131,7 +118,7 @@ class Todo_list_model extends Report_data_model {
                 , pen_num
                 , DATEDIFF(MONTH, y.birth_dt, '" . $report_date . "') AS dim_age
                 , curr_lact_num
-                ,'No Reproduction Events' AS attention
+                ,'Heifer is Open' AS attention
                 , NULL AS target_date
                 , NULL AS expires_date
                 , CONCAT('OPEN ', DATEDIFF(MONTH, y.birth_dt, '" . $report_date . "'), ' Months') AS comment
@@ -141,7 +128,8 @@ class Todo_list_model extends Report_data_model {
             AND curr_lact_num = 0
             AND sex_cd = 1
             AND TopPregStatusCd != 33
-            AND DATEDIFF(MONTH, birth_dt, '" . $report_date . "') > @heifer_open_months";
+            AND TopPregStatusDate > TopBredDate
+            AND DATEDIFF(MONTH, birth_dt, '" . $report_date . "') > " . $heifer_open_months;
 
         return $sql;
     }
@@ -151,12 +139,13 @@ class Todo_list_model extends Report_data_model {
      *
      * @param string herd code
      * @param string report date
+     * @param int cycle days min
+     * @param int cycle days max
      * @return string sql text
      * @access public
      *
      **/
-    public function bredCycleSql($herd_code, $report_date)
-    {
+    public function bredCycleSql($herd_code, $report_date, $cycle_days_min, $cycle_days_max) {
         $sql = "
             SELECT 
                 serial_num
@@ -166,7 +155,7 @@ class Todo_list_model extends Report_data_model {
                 , pen_num
                 , DATEDIFF(DAY, y.TopFreshDate, '" . $report_date . "') AS dim_age
                 , curr_lact_num
-                ,'' AS attention
+                ,'Watch Cow for Heat' AS attention
                 , NULL AS target_date
                 , NULL AS expires_date
                 , CASE 
@@ -181,17 +170,84 @@ class Todo_list_model extends Report_data_model {
             AND (
                 (
                     TopBredCd IS NOT NULL
-                    AND DATEDIFF(DAY, TopBredDate, '" . $report_date . "') > @cycle_days_min
-                    AND DATEDIFF(DAY, TopBredDate, '" . $report_date . "') < @cycle_days_max
+                    AND DATEDIFF(DAY, TopBredDate, '" . $report_date . "') > " . $cycle_days_min . "
+                    AND DATEDIFF(DAY, TopBredDate, '" . $report_date . "') < " . $cycle_days_max . "
                 )
                 OR
                 (
                     TopReproStatusCd = 31
-                    AND DATEDIFF(DAY, TopReproStatusDate, '" . $report_date . "') > @cycle_days_min
-                    AND DATEDIFF(DAY, TopReproStatusDate, '" . $report_date . "') < @cycle_days_max
+                    AND DATEDIFF(DAY, TopReproStatusDate, '" . $report_date . "') > " . $cycle_days_min . "
+                    AND DATEDIFF(DAY, TopReproStatusDate, '" . $report_date . "') < " . $cycle_days_max . "
                 )
             )";
 //die($sql);
+        return $sql;
+    }
+
+    /**
+     * @method maxTimesBred()
+     *
+     * @param string herd code
+     * @param string report date
+     * @param int max number of breedings
+     * @return string sql text
+     * @access public
+     *
+     **/
+    public function maxTimesBred($herd_code, $report_date, $breeding_number) {
+        $sql = "
+            SELECT 
+                serial_num
+                , NULL AS seq_satisfying_event_cd
+                , chosen_id
+                , visible_id
+                , pen_num
+                , DATEDIFF(MONTH, y.birth_dt, '" . $report_date . "') AS dim_age
+                , curr_lact_num
+                ,'Reproductive Problem' AS attention
+                , NULL AS target_date
+                , NULL AS expires_date
+                , CONCAT('Bred ', curr_lact_bred_cnt, ' times and not preganant') AS comment
+            FROM TD.[animal].[vma_vet_check_DAL_data] y
+            WHERE
+            herd_code = '" . $herd_code . "'
+            AND TopPregStatusCd != 33
+            AND TopPregStatusDate > TopBredDate
+            AND curr_lact_bred_cnt >= " . $breeding_number;
+
+        return $sql;
+    }
+
+    /**
+     * @method nonCyclingCows()
+     *
+     * @param string herd code
+     * @param string report date
+     * @return string sql text
+     * @access public
+     *
+     **/
+    public function nonCyclingCows($herd_code, $report_date, $target_dim) {
+        $sql = "
+            SELECT
+                serial_num
+                , NULL AS seq_satisfying_event_cd
+                , chosen_id
+                , visible_id
+                , pen_num
+                , DATEDIFF(DAY, y.TopFreshDate, '" . $report_date . "') AS dim_age
+                , curr_lact_num
+                ,'No Breedings or Heats' AS attention
+                , NULL AS target_date
+                , NULL AS expires_date
+                , CONCAT('DIM ', DATEDIFF(DAY, TopFreshDate, '" . $report_date . "'), ' days') AS comment
+            FROM TD.[animal].[vma_vet_check_DAL_data] y
+            WHERE
+                herd_code = '" . $herd_code . "'
+                AND curr_lact_num > 0
+                AND (TopReproStatusDate < TopFreshDate OR TopReproStatusDate IS NULL)
+                AND DATEDIFF(DAY, TopFreshDate, '" . $report_date . "') >= " . $target_dim;
+
         return $sql;
     }
 

@@ -30,6 +30,43 @@ class Events_model extends CI_Model {
     }
 
     /**
+     * @method getHerdDefaultValues()
+     * @param string herd code
+     * @param int event code
+     * @return array of key -> value data
+     * @access public
+     *
+     **/
+    public function getHerdDefaultValues($herd_code, $event_code){
+        $event_code = (int)$event_code;
+        $herd_code = MssqlUtility::escape($herd_code);
+
+        $res = $this->db
+            ->select("
+               [cost_df] AS cost
+              ,[meat_df] AS withhold_meat_dt
+              ,[milk_df] AS withhold_milk_dt
+              ,[pen_df] AS pen_num
+              ,[comment_df] AS comment
+            ")
+            ->where('herd_code', $herd_code)
+            ->where('event_cd', $event_code)
+            ->where('isactive', 1)
+            ->get("[TD].[herd].[events]")
+            ->result_array();
+
+        if(!$res){
+            throw new \Exception($this->db->_error_message());
+        }
+
+        if(isset($res[0]) && is_array($res[0])){
+            return $res[0];
+        }
+
+        return [];
+    }
+
+    /**
      * @method getEventsBetweenDates()
      * @param string early date
      * @param string late date
@@ -207,7 +244,7 @@ class Events_model extends CI_Model {
             
                   ,CASE 
                     WHEN id.isactive = 0 OR te.[TopSoldDiedDate] IS NOT NULL THEN NULL
-                    WHEN te.[TopBredDate] IS NOT NULL AND te.[TopBredDate] > te.[TopFreshDate] THEN DATEADD(day, 153, te.[TopBredDate]) --if bred
+                    WHEN id.curr_lact_bred_cnt > 0 THEN DATEADD(day, 153, te.[TopBredDate]) --if bred
                     END AS earliest_abort_date
                   
                   ,CASE
@@ -227,7 +264,7 @@ class Events_model extends CI_Model {
             
                   ,CASE
                     WHEN id.isactive = 0 OR te.[TopSoldDiedDate] IS NOT NULL THEN NULL
-                    WHEN te.[TopBredDate] > te.[TopFreshDate] THEN DATEADD(day, 27, te.[TopBredDate])
+                    WHEN id.curr_lact_bred_cnt > 0 THEN DATEADD(day, 27, te.[TopBredDate])
                     END AS earliest_preg_date
             
                   ,CASE
@@ -250,7 +287,7 @@ class Events_model extends CI_Model {
                     WHEN te.[TopFreshDate] = te.[TopStatusDate] THEN 'In Milk'
                     END AS current_status
             
-                  ,CASE WHEN te.[TopBredDate] > te.[TopFreshDate] THEN 1
+                  ,CASE WHEN id.curr_lact_bred_cnt > 0 THEN 1
                     ELSE 0
                     END AS is_bred
             
