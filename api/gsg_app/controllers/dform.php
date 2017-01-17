@@ -279,7 +279,6 @@ class dform extends dpage {
         $form_factory = new FormFactory($this->data_entry_model, null, ['herd_code'=>$this->session->userdata('herd_code')]);
 
         $form = $form_factory->getForm($form_id, $this->session->userdata('herd_code'));
-
             try{
                 $form->delete($input);
 

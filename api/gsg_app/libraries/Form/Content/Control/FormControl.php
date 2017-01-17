@@ -102,6 +102,12 @@ class FormControl implements iFormControl
     protected $biz_validation_url;
 
     /**
+     * form_defaults_url
+     * @var string
+     **/
+    protected $form_defaults_url;
+
+    /**
      * validators
      * @var Validator[]
      **/
@@ -127,6 +133,7 @@ class FormControl implements iFormControl
         $this->is_key = (bool)(isset($control_data['is_key']) ? $control_data['is_key'] : false);
         $this->batch_variable_type = $control_data['batch_variable_type'];
         $this->biz_validation_url = (isset($control_data['biz_validation_url']) ? $control_data['biz_validation_url'] : null);
+        $this->form_defaults_url = (isset($control_data['form_defaults_url']) ? $control_data['form_defaults_url'] : null);
         $this->validators = $validators;
         $this->options = $options;
         $this->subforms = $subforms;
@@ -349,6 +356,7 @@ class FormControl implements iFormControl
             'is_generated' => $this->is_generated,
             'default_value' => $this->default_value,
             'biz_validation_url' => $this->biz_validation_url,
+            'form_defaults_url' => $this->form_defaults_url,
         ];
 
         if(isset($this->options)){

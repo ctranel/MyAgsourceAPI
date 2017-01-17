@@ -100,13 +100,11 @@ class Change_herd extends MY_Api_Controller {
                     $resp_msg = [];
                     $msg = $this->_loadSessionHerd($tmp_arr[0]['herd_code']);
                     if(!empty($msg)){
-                        $resp_msg = new ResponseMessage($msg, 'message');
+                        $resp_msg[] = new ResponseMessage($msg, 'message');
                     }
                     $this->_record_access(2); //2 is the page code for herd change
-                    $this->load->model('web_content/navigation_model');
-                    $navigation = new Navigation($this->navigation_model, $this->herd, $this->permissions->permissionsList());
-                    $payload = ['nav' => $navigation->toArray('DHI')];
-                    $this->sendResponse(200, $resp_msg, $payload);
+                 //SHOULD WE LOAD DASHBOARD CONTENT HERE???
+                    $this->sendResponse(200, $resp_msg);
                 }
                 catch(Exception $e){
                     $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
@@ -121,10 +119,7 @@ class Change_herd extends MY_Api_Controller {
                     $resp_msg = new ResponseMessage($msg, 'message');
                 }
                 $this->_record_access(2); //2 is the page code for herd change
-/*                $this->load->model('web_content/navigation_model');
-                $navigation = new Navigation($this->navigation_model, $this->herd, $this->permissions->permissionsList());
-                $payload = ['nav' => $navigation->toArray('DHI')];
-*/                $this->sendResponse(200, $resp_msg); //, $payload
+                $this->sendResponse(200, $resp_msg);
             }
             catch(Exception $e){
                 $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));

@@ -113,7 +113,7 @@ class Form implements iForm
 *  @return key->value array of keys meta data
 *  @throws: * -----------------------------------------------------------------
 */
-    protected function keyMetaArray(){
+    public function keyMetaArray(){
         $keys = [];
         if(isset($this->controls) && is_array($this->controls) && !empty($this->controls)){
             foreach($this->controls as $c){
@@ -229,8 +229,7 @@ class Form implements iForm
             throw new \UnexpectedValueException('No form data received');
         }
 
-        $key_data = $this->parseKeyData($key_data);
-
+        $key_data = $this->parseFormData($key_data);
         //SEND KEY FIELDS AND VALUES
         $this->datasource->delete($this->id, $key_data, $this->keyMetaArray());
     }
@@ -256,33 +255,6 @@ class Form implements iForm
         $entity_data['is_edited'] = 1;
 
         return $this->write($entity_data);
-    }
-
-    /* -----------------------------------------------------------------
-     *  parses form data according to data type conventions.
-
-    *  Parses form data according to data type conventions.
-
-    *  @since: version 1
-    *  @author: ctranel
-    *  @date: July 1, 2014
-    *  @param array of key-value pairs from form submission
-    *  @return array of formatted key-value pairs from form submission
-    *  @throws:
-    * -----------------------------------------------------------------
-    */
-    protected function parseKeyData($key_data){
-        $ret_val = [];
-        if(!isset($key_data) || !is_array($key_data)){
-            throw new \Exception('No form data found');
-        }
-        foreach($this->controls as $c){
-            if($c->isKey() && isset($key_data[$c->name()])){
-                $ret_val[$c->name()] = $c->parseFormData($key_data[$c->name()]);
-            }
-            $ret_val += $c->parseSubformKeyData($key_data);
-        }
-        return $ret_val;
     }
 
     /* -----------------------------------------------------------------

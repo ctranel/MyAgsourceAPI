@@ -189,7 +189,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
             //have not yet tested with multiple level nesting
             array_walk_recursive($ancestor_form_ids, function(&$v, $k){return (int)$v;});
         }
-        $result = $this->db->select('fc.id, ct.name AS control_type, fld.db_field_name AS name, fc.label, fld.is_editable, fld.is_generated, fld.is_fk_field AS is_key, fld.data_type, fc.biz_validation_url, fc.default_value, fc.batch_variable_type')
+        $result = $this->db->select('fc.id, ct.name AS control_type, fld.db_field_name AS name, fc.label, fld.is_editable, fld.is_generated, fld.is_fk_field AS is_key, fld.data_type, fc.biz_validation_url, fc.form_defaults_url, fc.default_value, fc.batch_variable_type')
             ->select("(CAST(
                   (SELECT STUFF((
                       SELECT '|', CONCAT(v.name, ':', v.value) AS [data()] 
@@ -220,7 +220,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
     public function getControlMetaById($control_id) {
         $control_id = (int)$control_id;
 
-        $result = $this->db->select('fc.id, ct.name AS control_type, fld.db_field_name AS name, fc.label, fld.is_editable, fld.is_generated, fld.is_fk_field AS is_key, fc.biz_validation_url, fc.default_value, fc.batch_variable_type')
+        $result = $this->db->select('fc.id, ct.name AS control_type, fld.db_field_name AS name, fc.label, fld.is_editable, fld.is_generated, fld.is_fk_field AS is_key, fc.biz_validation_url, fc.form_defaults_url, fc.default_value, fc.batch_variable_type')
             ->select("(CAST(
                   (SELECT STUFF((
                       SELECT '|', CONCAT(v.name, ':', v.value) AS [data()] 
@@ -485,7 +485,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
                 INSERT " . $table_name . " (" . implode(', ', array_keys($insert_vals)) . ")
                 VALUES (" . implode(", ", $insert_vals) . ");";
         $res = $this->db->query($sql)->result_array();
-
+//die(var_dump($res));
         return $res;
     }
 
@@ -596,6 +596,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
         $sql = "UPDATE " . $table_name .
             " SET " . implode(',' , $update_set) .
             " WHERE " . implode(" AND ", $upd_where);
+//die($sql);
         $res = $this->db->query($sql);
 
         return $key_values;
@@ -612,18 +613,18 @@ class Data_entry_model extends CI_Model implements iForm_Model {
 *  @throws:
 * -----------------------------------------------------------------
 */
-    public function delete($form_id, $form_data, $key_meta){
+    public function delete($form_id, $key_data){
         $form_id = (int)$form_id;
-        $form_data = MssqlUtility::escape($form_data);
+        $key_data = MssqlUtility::escape($key_data);
 
         //get table name
         $table_name = $this->getSourceTable($form_id);
         //id key fields
         //$key_meta = $this->getFormKeyMeta($form_id);
-        $key_field_names = array_keys($key_meta);
+        $key_field_names = array_keys($key_data);
 
         $delete_cond = '';
-        foreach($form_data as $k=>$v){
+        foreach($key_data as $k=>$v){
             if(is_array($v)){
                 $v = implode('|', $v);
             }

@@ -22,6 +22,7 @@ use \myagsource\AccessLog;
 //use \myagsource\Site\WebContent\SectionFactory;
 use \myagsource\Settings\Settings;
 use \myagsource\Api\Response\Response;
+use \myagsource\Api\Response\ResponseMessage;
 //use \myagsource\Site\WebContent\PageFactory;
 //use \myagsource\Site\WebContent\WebBlockFactory;
 use \myagsource\dhi\Herd;
@@ -112,11 +113,14 @@ class MY_Api_Controller extends CI_Controller
     }
 
     
-    protected function sendResponse($http_code, $messages = null, $payload = null){
+    protected function sendResponse($http_code, $messages = [], $payload = null){
         $response = new Response();
         http_response_code($http_code);
         if(isset($messages) && !is_array($messages)){
             $messages = [$messages];
+        }
+        if($this->session->userdata('herd_code') === $this->config->item('default_herd')){
+            $messages[] = new ResponseMessage("This is sample herd data, please login or register to see your herd's data.", 'warning');
         }
 
         switch($http_code){

@@ -1,11 +1,13 @@
 <?php
 //namespace myagsource;
+require_once(APPPATH . 'core/MY_Api_Controller.php');
 
-require_once(APPPATH . 'libraries/Benchmarks/Benchmarks.php');
-require_once(APPPATH . 'libraries/dhi/Herd.php');
+//require_once(APPPATH . 'libraries/Benchmarks/Benchmarks.php');
+//require_once(APPPATH . 'libraries/dhi/Herd.php');
 
-use \myagsource\Benchmarks\Benchmarks;
+//use \myagsource\Benchmarks\Benchmarks;
 use \myagsource\dhi\Herd;
+use \myagsource\Api\Response\ResponseMessage;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
@@ -19,11 +21,12 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 * -----------------------------------------------------------------
 */
 
-class Demo extends MY_Controller {
-	
-	/* 
-	 * @var Herd object
-	 */
+class Demo extends MY_Api_Controller {
+
+    function __construct()
+    {
+        parent::__construct();
+    }
 	
 	function index(){
 		//Clear out session
@@ -34,19 +37,20 @@ class Demo extends MY_Controller {
 		$this->session->unset_userdata('tstring');
 		
 		if($this->as_ion_auth->login('support@myagsource.com', 'AQECTGBUZI', false)){ //if the login is successful
-            $this->_record_access(1); //1 is the page code for login for the user management section
+            //$this->_record_access(1); //1 is the page code for login for the user management section
+/*
             //get permissions (also in constuctor, put in function/class somewhere)
             $this->load->model('permissions_model');
             $this->load->model('product_model');
-            //$herd = new Herd($this->herd_model, $this->session->userdata('herd_code'));
+            $herd = new Herd($this->herd_model, $this->session->userdata('herd_code'));
             $group_permissions = ProgramPermissions::getGroupPermissionsList($this->permissions_model, $this->session->userdata('active_group_id'));
             $products = new Products($this->product_model, $this->herd, $group_permissions);
             $this->permissions = new ProgramPermissions($this->permissions_model, $group_permissions, $products->allHerdProductCodes());
-
             $msgs = [];
             $msgs[] = new ResponseMessage("This is sample herd data, please login or register to see your herd's data.", 'message');
+*/
             //send response
-            $this->sendResponse(200, $msgs);
+            $this->sendResponse(200, null);
         }
 
         $this->sendResponse(401, new ResponseMessage($this->as_ion_auth->errors(), 'error'));

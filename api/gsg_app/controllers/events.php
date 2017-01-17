@@ -81,6 +81,27 @@ class events extends dpage {
         $this->sendResponse(200, $errors);
     }
 
+    function herd_defaults(){
+        $input = $this->input->userInputArray();
+        if(empty($input) || count($input) == 0){
+            $this->sendResponse(400, new ResponseMessage('No data sent with request.', 'error'));
+        }
+
+        if(!isset($input['event_cd']) || empty($input['event_cd'])){
+            $this->sendResponse(204);
+        }
+
+        $this->load->model('dhi/events_model');
+        try{
+            $defaults = $this->events_model->getHerdDefaultValues($input['herd_code'], $input['event_cd']);
+        }
+        catch(exception $e){
+            $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
+        }
+
+        $this->sendResponse(200, null, ['herd_defaults' => $defaults]);
+    }
+
     function eligible_animals(){
         $input = $this->input->userInputArray();
         if(empty($input) || count($input) == 0){
