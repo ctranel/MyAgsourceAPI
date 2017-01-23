@@ -15,7 +15,8 @@ require_once(BASEPATH . 'core/Model.php');
 
 interface iListing_model {
     public function getListingsByPage($page_id);
+    public function getListingByBlock($block_id);
     public function getListingById($listing_id);
     public function getListingColumnMeta($listing_id);
-    public function getListingData($listing_id, $order_by, $sort_order);
+    public function getListingData($listing_id, $criteria, $order_by, $sort_order);
 }

@@ -16,17 +16,6 @@ use \myagsource\MssqlUtility;
  */
 
 class Event_listing_model extends CI_Model implements iListing_model  {
-    /**
-     * herd_code
-     * @var string
-     **/
-    protected $herd_code;
-
-    /**
-     * serial_num
-     * @var int
-     **/
-    protected $serial_num;
 
     public function __construct($args){
 		parent::__construct();
@@ -41,7 +30,7 @@ class Event_listing_model extends CI_Model implements iListing_model  {
     /**
      * getListingsByPage
      * @param page_id
-     * @return string category
+     * @return array listing data
      * @author ctranel
      **/
     public function getListingsByPage($page_id) {
@@ -60,6 +49,32 @@ class Event_listing_model extends CI_Model implements iListing_model  {
             ->join('users.dbo.lookup_display_types dt', 'b.display_type_id = dt.id', 'inner')
             ->join('users.dbo.lookup_scopes s', 'b.scope_id = s.id', 'inner')
             ->get('users.dbo.pages_blocks pb')
+//            ->where('')
+            ->result_array();
+        return $results;
+    }
+
+    /**
+     * getListingByBlock
+     * @param block_id
+     * @return array listing data
+     * @author ctranel
+     **/
+    public function getListingByBlock($block_id) {
+        $block_id = (int)$block_id;
+
+        $results = $this->db
+            ->select('b.id, l.id AS listing_id, b.name, b.description, dt.name AS display_type, s.name AS scope, srt.db_field_name AS order_by, l.sort_order, l.form_id, l.delete_path, b.active, b.path, 1 AS list_order')//pb.page_id, pb.list_order
+            ->join('users.options.listings l', "b.id = l.block_id AND l.isactive = 1 AND b.active = 1 AND b.display_type_id = 8 AND b.id = " . $block_id, 'inner')
+            ->join("(
+                    SELECT lci.id, f.db_field_name 
+                    FROM users.options.listings_columns lci 
+                        INNER JOIN users.dbo.db_fields f ON lci.db_field_id = f.id
+                ) srt", 'l.order_by = srt.id', 'left'
+            )
+            ->join('users.dbo.lookup_display_types dt', 'b.display_type_id = dt.id', 'inner')
+            ->join('users.dbo.lookup_scopes s', 'b.scope_id = s.id', 'inner')
+            ->get('users.dbo.blocks b')
 //            ->where('')
             ->result_array();
         return $results;
@@ -174,21 +189,21 @@ class Event_listing_model extends CI_Model implements iListing_model  {
      * @return array column data
      * @author ctranel
      **/
-    public function getListingData($listing_id, $order_by, $sort_order) {
+    public function getListingData($listing_id, $criteria, $order_by, $sort_order) {
         $listing_id = (int)$listing_id;
         $order_by = MssqlUtility::escape($order_by);
         $sort_order = MssqlUtility::escape($sort_order);
 
-        $keys = array_keys($this->criteria);
+        $keys = array_keys($criteria);
         $key_meta = $this->getListingKeyMeta($listing_id);
         $key_condition_text = '';
 
         foreach($keys as $k){
             if(strpos($key_meta[$k]['data_type'], 'char') !== false){
-                $key_condition_text .= $k . " = ''" . $this->criteria[$k] . "'' AND ";
+                $key_condition_text .= $k . " = ''" . $criteria[$k] . "'' AND ";
             }
             else {
-                $key_condition_text .= $k . " = " . $this->criteria[$k] . " AND ";
+                $key_condition_text .= $k . " = " . $criteria[$k] . " AND ";
             }
         }
 

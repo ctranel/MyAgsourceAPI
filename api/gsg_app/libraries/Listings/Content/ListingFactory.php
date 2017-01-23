@@ -57,7 +57,7 @@ class ListingFactory implements iListingFactory {
     */
     protected function createListing($listing_data, $criteria){
         $column_data = $this->datasource->getListingColumnMeta($listing_data['listing_id']);
-        $dataset = $this->datasource->getListingData($listing_data['listing_id'], $listing_data['order_by'], $listing_data['sort_order']);//, implode(', ', array_column($column_data, 'name')));
+        $dataset = $this->datasource->getListingData($listing_data['listing_id'], $criteria, $listing_data['order_by'], $listing_data['sort_order']);//, implode(', ', array_column($column_data, 'name')));
 
         $lc = [];
         if(is_array($column_data) && !empty($column_data) && is_array($column_data[0])){
@@ -81,6 +81,28 @@ class ListingFactory implements iListingFactory {
         $listings = [];
         //unset herd code and ser num?
         $results = $this->datasource->getListingsByPage($page_id);
+        if(empty($results)){
+            return [];
+        }
+
+        foreach($results as $r){
+            $listings[$r['list_order']] = $this->createListing($r, $criteria);
+        }
+        return $listings;
+    }
+
+    /*
+     * getByPage
+     *
+     * @param int page_id
+         * @param string herd_code
+     * @author ctranel
+     * @returns array of Listing objects
+     */
+    public function getByBlock($block_id, $criteria){//$herd_code = null, $serial_num = null){
+        $listings = [];
+        //unset herd code and ser num?
+        $results = $this->datasource->getListingByBlock($block_id);
         if(empty($results)){
             return [];
         }

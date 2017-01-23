@@ -94,7 +94,6 @@ class dform extends dpage {
         if(isset($json_data)) {
             $params = (array)json_decode(urldecode($json_data));
         }
-
         if(empty(array_filter($params))){
             $this->sendResponse(400, new ResponseMessage("No identifying information received", 'error'));
         }
@@ -177,12 +176,6 @@ class dform extends dpage {
         }
         elseif($this->form_validation->run_input() === true){
             try{
-                //get form object
-                //@todo: split form core from form display (core would be included in display), no need for web content or supplemental here
-                //supplemental factory
-                //$this->load->model('supplemental_model');
-                //$supplemental_factory = new SupplementalFactory($this->supplemental_model, site_url());
-
                 //add field values for logging
                 $input['logID'] = $this->session->userdata('user_id');
                 $date = new DateTime("now");

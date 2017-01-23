@@ -9,7 +9,9 @@
 interface iForm_Model
 {
     public function getFormsByPage($page_id);
+    public function getFormByBlock($block_id);
     public function getSubFormsByParentId($parent_form_id);
+    public function getSubBlocksByParentId($parent_form_id);
     public function getFormById($form_id);
     public function getFormControlData($form_id, $key_params);
     public function getLookupOptions($control_id);

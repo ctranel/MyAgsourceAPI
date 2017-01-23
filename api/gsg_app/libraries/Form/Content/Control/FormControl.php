@@ -4,6 +4,7 @@ namespace myagsource\Form\Content\Control;
 require_once APPPATH . 'libraries/Form/iFormControl.php';
 
 use \myagsource\Form\iFormControl;
+use \myagsource\Site\iBlock;
 
 /**
  * FormControl
@@ -119,8 +120,14 @@ class FormControl implements iFormControl
      **/
     protected $subforms;
 
+    /**
+     * subblocks
+     * @var iBlock[]
+     **/
+    protected $subblocks;
+
     //@todo: implement validators
-    public function __construct($control_data, $validators = null, $options = null, $subforms = null){
+    public function __construct($control_data, $validators = null, $options = null, $subforms = null, $subblocks = null){
         $this->id = $control_data['id'];
         $this->name = $control_data['name'];
         $this->label = $control_data['label'];
@@ -137,6 +144,7 @@ class FormControl implements iFormControl
         $this->validators = $validators;
         $this->options = $options;
         $this->subforms = $subforms;
+        $this->subblocks = $subblocks;
         //handle ranges
         if($this->control_type === 'range'){
             if(strpos($this->value, '|') !== false){
@@ -367,6 +375,12 @@ class FormControl implements iFormControl
             $ret['subforms'] = [];
             foreach($this->subforms as $s){
                 $ret['subforms'][] = $s->toArray();
+            }
+        }
+        if(isset($this->subblocks) && is_array($this->subblocks) && !empty($this->subblocks)){
+            $ret['subblocks'] = [];
+            foreach($this->subblocks as $s){
+                $ret['subblocks'][] = $s->toArray();
             }
         }
         // validator

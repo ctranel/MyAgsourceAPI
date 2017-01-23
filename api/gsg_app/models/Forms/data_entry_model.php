@@ -46,6 +46,27 @@ class Data_entry_model extends CI_Model implements iForm_Model {
         return $results;
     }
 
+    /**
+     * getFormByBlock
+     * @param block_id
+     * @return string category
+     * @author ctranel
+     **/
+    public function getFormByBlock($block_id) {
+        $block_id = (int)$block_id;
+        $results = $this->db
+            ->select('b.id, f.id AS form_id, b.name, b.description, dt.name AS display_type, s.name AS scope, b.active, b.path, f.dom_id, f.action, 1 AS list_order') //, pb.list_order, pb.page_id,
+            ->join('users.frm.forms f', "b.id = f.block_id AND f.active = 1 AND b.active = 1 AND b.display_type_id = 7 AND b.id = " . $block_id, 'inner')
+            //the following gets only data-entry form data
+            //->join('users.frm.form_control_groups cg', "f.id = cg.form_id", 'inner')
+            ->join('users.dbo.lookup_display_types dt', 'b.display_type_id = dt.id', 'inner')
+            ->join('users.dbo.lookup_scopes s', 'b.scope_id = s.id', 'inner')
+            ->get('users.dbo.blocks b')
+//            ->where('')
+            ->result_array();
+        return $results;
+    }
+
 
     /**
      * getSubFormsByParentId
@@ -57,19 +78,33 @@ class Data_entry_model extends CI_Model implements iForm_Model {
         $parent_form_id = (int)$parent_form_id;
 
         $results = $this->db
-            ->select('f.id AS form_id, s.name AS scope, f.active, f.dom_id, f.action, sl.list_order, scg.id AS group_id, scg.parent_id AS group_parent_id, scg.operator AS group_operator, sc.id AS condition_id, sc.operator, sc.operand, fld.db_field_name AS form_control_name') //, sc.form_control_name
-            ->join('users.frm.subform_condition_groups scg', "sl.id = scg.subform_link_id AND sl.parent_form_id = " . $parent_form_id, 'inner')
-            ->join('users.frm.subform_condition sc', "scg.id = sc.condition_group_id", 'inner')
+            ->select('sub.form_id, sub.action, sub.dom_id, sub.condition_group_id, sub.condition_group_parent_id, sub.condition_group_operator, sub.condition_id, sub.form_control_name, sub.form_control_name, sub.operator, sub.operand, sub.active, s.name AS scope, sub.list_order') //, sub.form_control_name
+            ->join('users.dbo.lookup_scopes s', 'sub.scope_id = s.id', 'inner')
+            ->where('sub.active', 1)
+            ->where('sub.parent_form_id', $parent_form_id)
+            ->order_by('sub.form_control_name, sub.list_order')
+            ->get('users.frm.v_subforms sub')
+            ->result_array();
 
-            ->join('users.frm.form_controls fc', 'sl.parent_control_id = fc.id', 'inner')
-            ->join('users.dbo.db_fields fld', 'fc.db_field_id = fld.id', 'inner')
-            ->join('users.frm.form_control_groups fcg', 'fc.form_control_group_id = fcg.id', 'inner')
+        return $results;
+    }
 
-            ->join('users.frm.forms f', "sl.form_id = f.id AND f.active = 1", 'inner')
+    /**
+     * getSubBlocksByParentId
+     * @param $parent_form_id
+     * @return string category
+     * @author ctranel
+     **/
+    public function getSubBlocksByParentId($parent_form_id) {
+        $parent_form_id = (int)$parent_form_id;
 
-            ->join('users.dbo.lookup_scopes s', 'f.scope_id = s.id', 'inner')
-            ->order_by('sc.form_control_name, sl.list_order')
-            ->get('users.frm.subform_link sl')
+        $results = $this->db
+            ->select('sub.block_id, sub.condition_group_id, sub.condition_group_parent_id, sub.condition_group_operator, sub.condition_id, sub.form_control_name, sub.operator, sub.operand, sub.active, s.name AS scope, sub.list_order') //
+            ->join('users.dbo.lookup_scopes s', 'sub.scope_id = s.id', 'inner')
+            ->where('sub.active', 1)
+            ->where('sub.parent_form_id', $parent_form_id)
+            ->order_by('sub.form_control_name, sub.list_order')
+            ->get('users.frm.v_subblocks sub')
             ->result_array();
 
         return $results;
@@ -162,7 +197,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
                 inner join users.dbo.db_fields fld ON fc.db_field_id = fld.id
                 inner join users.dbo.db_tables tbl ON fld.db_table_id = tbl.id AND allow_update = 1
                 inner join users.dbo.db_databases db ON tbl.database_id = db.id";
-
+//print($sql);
         $results = $this->db->query($sql)->result_array();
 
         if(!$results){
@@ -464,6 +499,8 @@ class Data_entry_model extends CI_Model implements iForm_Model {
         //string vs numeric, or can we use quotes for both?
         $no_quotes = ['decimal', 'numeric', 'tinyint', 'int', 'smallint', 'bit'];
 
+        $tmp_table_schema = [];
+
         foreach($form_data as $k=>$v){
             if(is_array($v)){
                 $v = implode('|', $v);
@@ -478,12 +515,20 @@ class Data_entry_model extends CI_Model implements iForm_Model {
                     $insert_vals[$k] = "'" . $v . "'";
                 }
             }
+            //use identity columns to build temp table schema
+            else {
+                $tmp_table_schema[] = $k . ' ' . $control_meta[$k]['data_type'];
+            }
         }
 
-        //need the commented select statement to trigger a return value
+        //need the commented select statement to trigger a return value.  temp table is used in updatable views to return key data
         $sql = "--SELECT;
+                CREATE TABLE #output(" . implode(", ", $tmp_table_schema) . ");
                 INSERT " . $table_name . " (" . implode(', ', array_keys($insert_vals)) . ")
-                VALUES (" . implode(", ", $insert_vals) . ");";
+                VALUES (" . implode(", ", $insert_vals) . ");
+                SELECT * FROM #output;
+                DROP TABLE #output";
+//die($sql);
         $res = $this->db->query($sql)->result_array();
 //die(var_dump($res));
         return $res;

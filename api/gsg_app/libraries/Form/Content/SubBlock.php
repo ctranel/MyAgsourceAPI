@@ -8,29 +8,31 @@
 
 namespace myagsource\Form\Content;
 
+//require_once APPPATH . 'libraries/Form/iSubBlock.php';
 
-use myagsource\Form\iForm;
+//use \myagsource\Site\iBlock;
+//use \myagsource\Form\iSubBlock;
 
-class SubFormShell
+class SubBlock //implements iSubBlock
 {
     /**
-     * @var array of SubContentConditionGroup objects
+     * @var array of SubBlockConditionGroup objects
      */
     protected $condition_groups;
 
     /**
      * @var int
      */
-    protected $form_id;
+    protected $block_id;
 
-    public function __construct($condition_groups, $form_id)
+    public function __construct($condition_groups, $block_id)
     {
         $this->condition_groups = $condition_groups;
-        $this->form_id = $form_id;
+        $this->block_id = $block_id;
     }
     
     public function toArray(){
-        $ret['form_id'] = $this->form_id;
+        $ret['block_id'] = $this->block_id;
 
         if(isset($this->condition_groups) && is_array($this->condition_groups) && !empty($this->condition_groups)){
             $ret['condition_groups'] = [];
@@ -41,11 +43,11 @@ class SubFormShell
 
         return $ret;
     }
-    
+
     /**
      * conditionsMet
      *
-     * are all subform conditions met?
+     * are all subblock conditions met?
      *
      * @param $control_value
      * @return bool

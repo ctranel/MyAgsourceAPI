@@ -8,11 +8,11 @@
 
 namespace myagsource\Form\Content;
 
-//require_once APPPATH . 'libraries/Form/iSubFormCondition.php';
+//require_once APPPATH . 'libraries/Form/iSubContentCondition.php';
 
 //use myagsource\Form\iSubFormCondtion;
 
-class SubFormCondition //implements iSubFormCondition
+class SubContentCondition //implements iSubContentCondition
 {
     /**
      * @var string

@@ -8,11 +8,11 @@
 
 namespace myagsource\Form\Content;
 
-//require_once APPPATH . 'libraries/Form/iSubFormCondition.php';
+//require_once APPPATH . 'libraries/Form/iSubContentCondition.php';
 
 //use myagsource\Form\iSubFormCondtion;
 
-class SubFormConditionGroup //implements iSubFormConditionGroup
+class SubContentConditionGroup //implements iSubContentConditionGroup
 {
     /**
      * @var string
@@ -20,12 +20,12 @@ class SubFormConditionGroup //implements iSubFormConditionGroup
     protected $operator;
 
     /**
-     * @var array of SubFormConditionGroup objects
+     * @var array of SubContentConditionGroup objects
      */
     protected $child_groups;
 
     /**
-     * @var array of SubFormCondition objects
+     * @var array of SubContentCondition objects
      */
     protected $conditions;
 

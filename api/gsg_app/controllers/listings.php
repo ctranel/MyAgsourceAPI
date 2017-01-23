@@ -42,20 +42,18 @@ class listings extends dpage {
 	}
 	
 	function index($page_id, $json_filter_data = null){
-        //supplemental factory
-        $this->load->model('supplemental_model');
-        $supplemental_factory = new SupplementalFactory($this->supplemental_model, site_url());
-
-        //Set up site content objects
-        $this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
-        $this->load->model('web_content/block_model');
-        $web_block_factory = new WebBlockFactory($this->block_model, $supplemental_factory);
-
         //filters
         $params = [];
         if(isset($json_filter_data)) {
             $params = (array)json_decode(urldecode($json_filter_data));
         }
+
+        $supplemental_factory = $this->_supplementalFactory();
+
+        //Set up site content objects
+        $this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
+        $this->load->model('web_content/block_model');
+        $web_block_factory = new WebBlockFactory($this->block_model, $supplemental_factory);
 
         $serial_num = isset($params['serial_num']) ? $params['serial_num'] : null;
 

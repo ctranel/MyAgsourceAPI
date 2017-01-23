@@ -13,6 +13,7 @@ require_once(APPPATH . 'libraries/Site/WebContent/Page.php');
 require_once(APPPATH . 'libraries/Datasource/DbObjects/DbTableFactory.php');
 require_once(APPPATH . 'libraries/DataHandler.php');
 
+require_once APPPATH . 'libraries/Listings/Content/ListingFactory.php';
 require_once(APPPATH . 'libraries/Report/Content/ReportFactory.php');
 require_once(APPPATH . 'libraries/Form/Content/FormFactory.php');
 require_once(APPPATH . 'libraries/Settings/Form/SettingsFormFactory.php');
@@ -27,11 +28,12 @@ use \myagsource\dhi\HerdPageAccess;
 use \myagsource\Site\WebContent\Page;
 use \myagsource\Site\WebContent\WebBlockFactory;
 use \myagsource\Site\WebContent\PageAccess;
-use \myagsource\Report\Content\ReportFactory;
 use \myagsource\DataHandler;
 use \myagsource\Datasource\DbObjects\DbTableFactory;
 use \myagsource\Api\Response\ResponseMessage;
 use \myagsource\Settings\Form\SettingsFormFactory;
+use \myagsource\Listings\Content\ListingFactory;
+use \myagsource\Report\Content\ReportFactory;
 use \myagsource\Form\Content\FormFactory;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
@@ -154,13 +156,18 @@ class dpage extends MY_Api_Controller {
         $this->load->model('Forms/Data_entry_model');//, null, false, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
         $entry_form_factory = new FormFactory($this->Data_entry_model, $supplemental_factory, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
 
+        $this->load->model('Listings/herd_options_model');
+        $option_listing_factory = new ListingFactory($this->herd_options_model, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
+
         //create block content
         $reports = $report_factory->getByPage($page_id);
         $setting_forms = $setting_form_factory->getByPage($page_id);
         $entry_forms = $entry_form_factory->getByPage($page_id, $this->session->userdata('herd_code'));
+        //$serial_num = isset($params['serial_num']) ? $params['serial_num'] : null;
+        $listings = $option_listing_factory->getByPage($page_id, $params + ['herd_code'=>$this->session->userdata('herd_code')]);//, 'serial_num'=>$serial_num
 
         //combine and sort
-        $block_content = $reports + $setting_forms + $entry_forms;
+        $block_content = $reports + $setting_forms + $entry_forms + $listings;
         ksort($block_content);
         return $block_content;
     }
@@ -168,7 +175,7 @@ class dpage extends MY_Api_Controller {
 	function index($page_id, $json_filter_data = null){
         $params = [];
         if(isset($json_filter_data)) {
-            $params = (array)json_decode(urldecode($json_filter_data));
+            $params = array_filter((array)json_decode(urldecode($json_filter_data)));
         }
 
         $supplemental_factory = $this->_supplementalFactory();

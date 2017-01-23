@@ -68,6 +68,28 @@ class SettingsFormFactory implements iFormFactory {
     }
 
     /*
+     * getByPage
+     *
+     * @param int page_id
+         * @param string herd_code
+         * @param int user_id
+     * @author ctranel
+     * @returns \myagsource\Page\Content\FormBlock\FormBlock[]
+     */
+    public function getByBlock($block_id, $herd_code = null, $user_id = null){
+        $forms = [];
+        $results = $this->datasource->getFormByBlock($block_id);
+        if(empty($results)){
+            return [];
+        }
+
+        foreach($results as $r){
+            $forms[$r['list_order']] = $this->createForm($r, $user_id, $herd_code);
+        }
+        return $forms;
+    }
+
+    /*
      * getForm
      *
      * @param int form id
@@ -174,8 +196,8 @@ class SettingsFormFactory implements iFormFactory {
 
             if(isset($grp['conditions']) && is_array($grp['conditions']) && !empty($grp['conditions'])) {
                 foreach($grp['conditions'] as $cond_id => $cond) {
-                    //$ret[$cond['form_control_name']][$cond['form_id']][$cond['group_id']][$cond['condition_id']] = new SubFormCondition($cond['operator'], $cond['operand']);
-                    $conditions[] = new SubFormCondition($cond['operator'], $cond['operand']);
+                    //$ret[$cond['form_control_name']][$cond['form_id']][$cond['group_id']][$cond['condition_id']] = new SubContentCondition($cond['operator'], $cond['operand']);
+                    $conditions[] = new SubContentCondition($cond['operator'], $cond['operand']);
                 }
             }
             if (isset($grp['groups']) && is_array($grp['groups']) && !empty($grp['groups'])) {
@@ -183,7 +205,7 @@ class SettingsFormFactory implements iFormFactory {
 
 
             }
-            $ret[$grp_id] = new SubFormConditionGroup($grp['group_operator'], $subgroups, $conditions);
+            $ret[$grp_id] = new SubContentConditionGroup($grp['group_operator'], $subgroups, $conditions);
         }
 
         return $ret;

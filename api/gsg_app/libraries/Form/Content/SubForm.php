@@ -16,7 +16,7 @@ use myagsource\Form\iForm;
 class SubForm implements iSubForm
 {
     /**
-     * @var array of SubFormConditionGroup objects
+     * @var array of SubContentConditionGroup objects
      */
     protected $condition_groups;
 
@@ -27,7 +27,6 @@ class SubForm implements iSubForm
 
     public function __construct($condition_groups, iForm $form)
     {
-//var_dump($this->condition_groups);
         $this->condition_groups = $condition_groups;
         $this->form = $form;
     }

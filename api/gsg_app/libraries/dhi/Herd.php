@@ -67,7 +67,7 @@ class Herd
 	 * __construct
 	 *
 	 * @return void
-	 * @author Chris
+	 * @author ctranel
 	 **/
 	public function __construct(\herd_model $herd_model, $herd_code) {
 		if(empty($herd_code) || strlen($herd_code) != 8){
@@ -77,21 +77,6 @@ class Herd
 		$this->herd_model = $herd_model;
 	}
 
-	/**
-	 * __call
-	 *
-	 * Acts as a simple way to call model methods without loads of stupid alias'
-	 *
-	public function __call($method, $arguments) {
-		if (!method_exists( $this->ci->herd_model, $method) )
-		{
-			throw new Exception('Undefined method Herd::' . $method . '() called');
-		}
-
-		return call_user_func_array( array($this->ci->herd_model, $method), $arguments);
-	}
-	 **/
-	
 	/**
 	 * @method herdCode()
 	 * @return string herd_code
@@ -114,82 +99,6 @@ class Herd
 		}
 		return $this->recent_test_date;
 	}
-
-	/**
-	 * Returns enrollment status id of the herd for the given report code
-	 * 
-	 * 	Possible options are:
-	 *  (1) no output record = none
-	 *  (2) billing account of AS035099 = unpaid
-	 *  (3) billing account of 00000001 = paid
-	 * 
-	 * @method getHerdEnrollStatus()
-	 * @return string recent test date
-	 * @access public
-	 *
-	public function getHerdEnrollStatus($report_code){
-		$ret = 1;
-
-        if(!isset($report_code)){
-			throw new \Exception('No report code given.');
-		}
-        if(!is_array($report_code)){
-            $report_code = [$report_code];
-        }
-
-        $herd_output = $this->herd_model->getHerdEnrollmentData($this->herd_code, $report_code);
-        if(!$herd_output || count($herd_output) == 0){
-            return 1;
-        }
-		foreach($herd_output as $ho){
-			if($ho['herd_is_paying'] === 1){
-				if($ret < 3){
-                    $ret = 3;
-                }
-			}
-			if($ho['herd_is_active_trial'] === 1){
-                if($ret < 2){
-                    $ret = 2;
-                }
-			}
-		}
-        return $ret;
-	}
-**/
-	
-	/* -----------------------------------------------------------------
-	*  Returns number of days since the initial access for herds that
-	*  are not paying for the specified product.
-
-	*  Returns number of days since the initial access for herds that
-	*  are not paying for the specified product.
-
-	*  @since: version 1
-	*  @author: ctranel
-	*  @date: Jul 7, 2014
-	*  @param: access log object
-	*  @param: int user id
-	*  @param: string herd code
-	*  @param: string report code
-	*  @return int 
-	*  @throws: 
-	* -----------------------------------------------------------------
-	public function getTrialDays($access_log, $herd_code, $report_code){
-		if(isset($report_code)){
-			if(!is_array($report_code)){
-				$report_code = [$report_code];
-			}
-		}
-		$initial_access = $access_log->getInitialAccessDate($herd_code, $report_code);
-		if(empty($initial_access)){
-			return 0;
-		}
-		$d_start = new DateTime($initial_access);
-		$d_end  = new DateTime();
-		$d_diff = $d_start->diff($d_end)->days;
-		return $d_diff;
-	}
-	*/
 
 	/* -----------------------------------------------------------------
 	 *  Returns number of days since the initial access for herds that

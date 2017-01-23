@@ -79,12 +79,32 @@ class ReportFactory {
         $this->db_table_factory = $db_table_factory;
 	}
 
-	/*
-	 * getByPage
-	 * 
-	 * @param int page_id
-	 * @author ctranel
-	 * @returns array of Reports
+
+    /*
+     * getByBlock
+     *
+     * @param int block_id
+     * @author ctranel
+     * @returns Report
+*/
+    public function getByBlock($block_id){
+        $criteria = ['b.id' => $block_id];
+        $results = $this->datasource_reports->getByCriteria($criteria);
+        if(empty($results)){
+            return [];
+        }
+        $r = $results[0];
+        $report = $this->dataToObject($r);
+
+        return $report;
+    }
+
+    /*
+     * getByPage
+     *
+     * @param int page_id
+     * @author ctranel
+     * @returns array of Reports
 */
 	public function getByPage($page_id){
 		$reports = [];
