@@ -523,12 +523,9 @@ class FormControl implements iFormControl
         if(isset($this->subforms) && is_array($this->subforms)){
             $return_val = [];
             foreach($this->subforms as $s){
-                //only subforms that do not have an action of their own are written with their parent form
-                if($s->action() === null){
-                    $tmp = $s->controlsMetaArray();
-                    if(isset($tmp)){
-                        $return_val = $return_val + $tmp;
-                    }
+                $tmp = $s->controlsMetaArray();
+                if(isset($tmp)){
+                    $return_val = $return_val + $tmp;
                 }
             }
             return $return_val;
@@ -540,12 +537,9 @@ class FormControl implements iFormControl
         if(isset($this->subforms) && is_array($this->subforms)){
             $return_val = [];
             foreach($this->subforms as $s){
-                //only subforms that do not have an action of their own are written with their parent form
-                if($s->action() === null){
-                    $tmp = $s->keyMetaArray();
-                    if(isset($tmp)){
-                        $return_val = $return_val + $tmp;
-                    }
+                $tmp = $s->keyMetaArray();
+                if(isset($tmp)){
+                    $return_val = $return_val + $tmp;
                 }
             }
             return $return_val;
