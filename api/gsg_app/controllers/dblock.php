@@ -111,7 +111,7 @@ $page_id = 105;
             return array_values($entry_forms)[0];
         }
         $serial_num = isset($params['serial_num']) ? $params['serial_num'] : null;
-        $listings = $option_listing_factory->getByBlock($block_id, ['herd_code'=>$this->session->userdata('herd_code'), 'serial_num'=>$serial_num]);
+        $listings = $option_listing_factory->getByBlock($block_id, $params);
         if(!empty($listings)){
             return array_values($listings)[0];
         }
