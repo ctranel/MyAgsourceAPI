@@ -4,9 +4,11 @@ namespace myagsource\Settings\Form;
 
 require_once(APPPATH . 'libraries/Settings/SettingForm.php');
 require_once(APPPATH . 'libraries/Settings/SettingFormControl.php');
-//require_once(APPPATH . 'libraries/Form/Content/Form.php');
-//require_once(APPPATH . 'libraries/Form/Content/Control/FormControl.php');
-//require_once(APPPATH . 'libraries/Form/Content/SubForm.php');
+require_once(APPPATH . 'libraries/Form/Content/SubForm.php');
+require_once(APPPATH . 'libraries/Form/Content/SubBlock.php');
+require_once(APPPATH . 'libraries/Form/Content/SubFormShell.php');
+require_once(APPPATH . 'libraries/Form/Content/SubContentCondition.php');
+require_once(APPPATH . 'libraries/Form/Content/SubContentConditionGroup.php');
 require_once(APPPATH . 'libraries/Form/iFormFactory.php');
 require_once(APPPATH . 'libraries/Validation/Input/Validator.php');
 require_once(APPPATH . 'models/Forms/iForm_Model.php');
@@ -16,7 +18,9 @@ use \myagsource\Form\Content\SubForm;
 use \myagsource\Supplemental\Content\SupplementalFactory;
 use \myagsource\Settings\SettingForm;
 use \myagsource\Settings\SettingFormControl;
-use myagsource\Validation\Input\Validator;
+use \myagsource\Validation\Input\Validator;
+use \myagsource\Form\Content\SubContentCondition;
+use \myagsource\Form\Content\SubContentConditionGroup;
 
 /**
  * A factory for form objects
@@ -77,16 +81,15 @@ class SettingsFormFactory implements iFormFactory {
      * @returns \myagsource\Page\Content\FormBlock\FormBlock[]
      */
     public function getByBlock($block_id, $herd_code = null, $user_id = null){
-        $forms = [];
         $results = $this->datasource->getFormByBlock($block_id);
         if(empty($results)){
             return [];
         }
 
-        foreach($results as $r){
-            $forms[$r['list_order']] = $this->createForm($r, $user_id, $herd_code);
-        }
-        return $forms;
+        $r = $results[0];
+        $form = $this->createForm($r, $user_id, $herd_code);
+
+        return $form;
     }
 
     /*
@@ -101,9 +104,8 @@ class SettingsFormFactory implements iFormFactory {
 	public function getForm($form_id, $herd_code, $user_id = null){
 		$results = $this->datasource->getFormById($form_id);
 		if(empty($results)){
-			return false;
+			throw new \Exception('No data found for requested form.');
 		}
-
 		return $this->createForm($results[0], $user_id, $herd_code);
 	}
 	
@@ -118,6 +120,8 @@ class SettingsFormFactory implements iFormFactory {
      */
     protected function createForm($form_data, $user_id, $herd_code, $ancestor_form_ids = null){
         $subforms = $this->getSubForms($form_data['form_id'], $user_id, $herd_code, $ancestor_form_ids);
+        $subblocks = $this->getSubBlockShells($form_data['form_id'], $user_id, $herd_code, $ancestor_form_ids);
+
         $control_data = $this->datasource->getFormControlData($form_data['form_id'], $this->key_params, $ancestor_form_ids);
 
         $fc = [];
@@ -134,14 +138,54 @@ class SettingsFormFactory implements iFormFactory {
                 }
 
                 $sf = isset($subforms[$d['name']]) ? $subforms[$d['name']] : null;
+                $b = isset($subblocks[$d['name']]) ? $subblocks[$d['name']] : null;
                 $options = null;
                 if(strpos($d['control_type'], 'lookup') !== false){
                     $options = $this->getLookupOptions($d['id'], $d['control_type']);
                 }
-                $fc[] = new SettingFormControl($d, $validators, $options, $sf);
+                $fc[] = new SettingFormControl($d, $validators, $options, $sf, $b);
             }
         }
         return new SettingForm($form_data['form_id'], $this->datasource, $fc, $form_data['dom_id'], $form_data['action'],$user_id, $herd_code);
+    }
+
+    /*
+    * getSubBlockShells
+    *
+    * @param int parent form id
+    * @param string herd code
+    * @param array of ints ancestor_form_ids
+    * @author ctranel
+    * @returns Array of Forms
+    */
+    protected function getSubBlockShells($parent_form_id, $user_id, $herd_code, $ancestor_form_ids = null){
+        $results = $this->datasource->getSubBlocksByParentId($parent_form_id); //would return control-name-indexed array
+        if(empty($results)){
+            return false;
+        }
+
+        if(is_array($ancestor_form_ids)){
+            $ancestor_form_ids = $ancestor_form_ids + [$parent_form_id];
+        }
+        else{
+            $ancestor_form_ids = [$parent_form_id];
+        }
+
+        $subblocks = [];
+        //get and organize all condition data for form
+        $subblock_data = $this->structureSubFormCondData($results, 'block_id');
+
+        //parse each subform separately
+        foreach($results as $k => $r){
+            if(!isset($subforms[$r['form_control_name']][$r['block_id']])){
+                //$form = $this->createForm($r, $herd_code, $ancestor_form_ids);
+                $block = $r['block_id'];
+                $subform_groups = $this->extractConditionGroups($subblock_data[$r['form_control_name']][$r['block_id']]);
+                $subblocks[$r['form_control_name']][$r['block_id']] = new SubBlock($subform_groups, $block);
+            }
+        }
+
+        return $subblocks;
     }
 
     protected function getSubForms($parent_form_id, $user_id, $herd_code, $ancestor_form_ids = null){
@@ -161,7 +205,7 @@ class SettingsFormFactory implements iFormFactory {
         $subforms = [];
 
         //get and organize all condition data for form
-        $subform_data = $this->structureSubFormCondData($results);
+        $subform_data = $this->structureSubFormCondData($results, 'form_id');
 
         //parse each subform separately
         foreach($results as $k => $r){
@@ -169,6 +213,44 @@ class SettingsFormFactory implements iFormFactory {
                 $form = $this->createForm($r, $herd_code, $ancestor_form_ids);
                 $subform_groups = $this->extractConditionGroups($subform_data[$r['form_control_name']][$r['form_id']]);
                 $subforms[$r['form_control_name']][$r['form_id']] = new SubForm($subform_groups, $form);
+            }
+        }
+
+        return $subforms;
+    }
+
+    /*
+    * getSubForms
+    *
+    * @param int parent form id
+    * @param string herd code
+    * @param array of ints ancestor_form_ids
+    * @author ctranel
+    * @returns Array of Forms
+    */
+    protected function getSubFormShells($parent_form_id, $user_id, $herd_code, $ancestor_form_ids = null){
+        $results = $this->datasource->getSubFormsByParentId($parent_form_id); //would return control-name-indexed array
+        if(empty($results)){
+            return false;
+        }
+
+        if(is_array($ancestor_form_ids)){
+            $ancestor_form_ids = $ancestor_form_ids + [$parent_form_id];
+        }
+        else{
+            $ancestor_form_ids = [$parent_form_id];
+        }
+
+        $subforms = [];
+        //get and organize all condition data for form
+        $subform_data = $this->structureSubFormCondData($results, 'form_id');
+
+        //parse each subform separately
+        foreach($results as $k => $r){
+            if(!isset($subforms[$r['form_control_name']][$r['form_id']])){
+                //$form = $this->createForm($r, $herd_code, $ancestor_form_ids);
+                $subform_groups = $this->extractConditionGroups($subform_data[$r['form_control_name']][$r['form_id']]);
+                $subforms[$r['form_control_name']][$r['form_id']] = new SubFormShell($subform_groups, $r['form_id']);
             }
         }
 
@@ -190,7 +272,7 @@ class SettingsFormFactory implements iFormFactory {
 
         $ret = [];
 
-        foreach($condition_data['groups'] as $grp_id => $grp){
+        foreach($condition_data['condition_groups'] as $grp_id => $grp){
             $subgroups = null;
             $conditions = null;
 
@@ -200,12 +282,12 @@ class SettingsFormFactory implements iFormFactory {
                     $conditions[] = new SubContentCondition($cond['operator'], $cond['operand']);
                 }
             }
-            if (isset($grp['groups']) && is_array($grp['groups']) && !empty($grp['groups'])) {
+            if (isset($grp['condition_groups']) && is_array($grp['condition_groups']) && !empty($grp['condition_groups'])) {
                 $subgroups = $this->extractConditionGroups($grp);
 
 
             }
-            $ret[$grp_id] = new SubContentConditionGroup($grp['group_operator'], $subgroups, $conditions);
+            $ret[$grp_id] = new SubContentConditionGroup($grp['condition_group_operator'], $subgroups, $conditions);
         }
 
         return $ret;
@@ -220,7 +302,7 @@ class SettingsFormFactory implements iFormFactory {
     * @author ctranel
     * @returns array of hierarchical subform condition data
     */
-    protected function structureSubFormCondData($condition_data){
+    protected function structureSubFormCondData($condition_data, $cond_key_field){
         if(!isset($condition_data) || !is_array($condition_data)){
             return;
         }
@@ -228,20 +310,20 @@ class SettingsFormFactory implements iFormFactory {
         $conditions_data = [];
 
         foreach($condition_data as $k=>$v){
-            if(isset($v['group_parent_id']) && !empty($v['group_parent_id'])){
-                $parent_id = $v['group_parent_id'];
-                $v['group_parent_id'] = null;
-                $conditions_data[$v['form_control_name']][$v['form_id']]['groups'][$parent_id]['groups'][$v['group_id']]['conditions'][$v['condition_id']]
-                    = $this->structureSubFormCondData([$v], $v['group_operator'])[$v['form_control_name']][$v['form_id']]['groups'][$v['group_id']]['conditions'][$v['condition_id']];
-                $conditions_data[$v['form_control_name']][$v['form_id']]['groups'][$parent_id]['groups'][$v['group_id']]['group_operator'] = $v['group_operator'];
+            if(isset($v['condition_group_parent_id']) && !empty($v['condition_group_parent_id'])){
+                $parent_id = $v['condition_group_parent_id'];
+                $v['condition_group_parent_id'] = null;
+                $conditions_data[$v['form_control_name']][$v[$cond_key_field]]['condition_groups'][$parent_id]['condition_groups'][$v['condition_group_id']]['conditions'][$v['condition_id']]
+                    = $this->structureSubFormCondData([$v], $v['condition_group_operator'])[$v['form_control_name']][$v[$cond_key_field]]['condition_groups'][$v['condition_group_id']]['conditions'][$v['condition_id']];
+                $conditions_data[$v['form_control_name']][$v[$cond_key_field]]['condition_groups'][$parent_id]['condition_groups'][$v['condition_group_id']]['condition_group_operator'] = $v['condition_group_operator'];
 
                 //need to get the group operator from the parent group
                 $parent_key = array_search($parent_id, array_column($condition_data, 'group_id'));
-                $conditions_data[$v['form_control_name']][$v['form_id']]['groups'][$parent_id]['group_operator'] = $condition_data[$parent_key]['group_operator'];
+                $conditions_data[$v['form_control_name']][$v[$cond_key_field]]['condition_groups'][$parent_id]['condition_group_operator'] = $condition_data[$parent_key]['condition_group_operator'];
             }
             else{
-                $conditions_data[$v['form_control_name']][$v['form_id']]['groups'][$v['group_id']]['conditions'][$v['condition_id']] = $v;
-                $conditions_data[$v['form_control_name']][$v['form_id']]['groups'][$v['group_id']]['group_operator'] = $v['group_operator'];
+                $conditions_data[$v['form_control_name']][$v[$cond_key_field]]['condition_groups'][$v['condition_group_id']]['conditions'][$v['condition_id']] = $v;
+                $conditions_data[$v['form_control_name']][$v[$cond_key_field]]['condition_groups'][$v['condition_group_id']]['condition_group_operator'] = $v['condition_group_operator'];
             }
         }
 

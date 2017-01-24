@@ -23,64 +23,6 @@ class Setting_form_model extends CI_Model implements iForm_Model {
 		parent::__construct();
 	}
 
-
-    /**
-     * getSettingsByPage
-     * @param mixed int/string page_id or form name
-     * @return string category
-     * @author ctranel
-    public function getSettingsByPage($page_id, $user_id, $herd_code) {
-        if(isset($user_id) && $user_id !== FALSE){
-            $uhs_join_cond = "s.id = uhs.setting_id AND uhs.user_id = " . $user_id . " AND uhs.herd_code = '" . $herd_code . "'";
-            $uhs_where = "(uhs.user_id = " . $user_id . " OR uhs.user_id IS NULL)";
-        }
-        else{
-            $uhs_join_cond = "s.id = uhs.setting_id AND uhs.user_id IS NULL AND uhs.herd_code = '" . $herd_code . "'";
-            $uhs_where = "uhs.user_id IS NULL";
-        }
-
-        $sql =
-            "WITH parentForms AS (
-                SELECT f.id AS form_id, f.block_id, sl.parent_control_id, sl.list_order AS list_order
-                FROM users.frm.forms f
-                   
-                   --INNER JOIN users.setng.forms_settings fs ON f.id = fs.form_id
-                   --INNER JOIN users.setng.settings s ON fs.form_id = f.id AND f.active = 1
-
- 
-                    LEFT JOIN users.frm.subform_link sl ON f.id = sl.form_id
-                WHERE sl.parent_control_id IS NULL
-            ), cteForms AS (
-                SELECT form_id, block_id, parent_control_id, list_order
-                FROM parentForms
-                UNION all 
-                SELECT sl.form_id, f.block_id AS block_id, sl.parent_control_id, sl.list_order
-                FROM users.frm.subform_link sl
-                   
-                   INNER JOIN users.setng.settings s ON sl.parent_control_id = s.id
-                   INNER JOIN users.setng.forms_settings fs ON s.id = fs.setting_id
-
-                    join cteForms f ON f.form_id = fs.form_id
-            )
-    
-            SELECT s.id, t.name AS control_type, b.name AS category, s.name, s.label, s.default_value, uhs.value
-            FROM users.dbo.pages_blocks pb
-                INNER JOIN users.dbo.blocks b ON pb.block_id = b.id AND b.display_type_id = 6 AND (pb.page_id = " . $page_id . ")
-                INNER JOIN cteForms cte ON b.id = cte.block_id-- OR s.id = cte.parent_control_id)
-                INNER JOIN users.frm.forms f ON cte.block_id = f.block_id
-                INNER JOIN users.setng.forms_settings fs ON cte.form_id = fs.form_id
-                INNER JOIN users.setng.settings s ON fs.setting_id = s.id
-                LEFT JOIN users.setng.user_herd_settings uhs ON s.id = uhs.setting_id AND uhs.user_id = 1 AND uhs.herd_code = '35371684'
-                INNER JOIN users.frm.control_types t ON s.type_id = t.id 
-            WHERE " . $uhs_where . "
-            AND (uhs.herd_code = '" . $herd_code . "' OR uhs.herd_code IS NULL)
-            ORDER BY pb.list_order, fs.list_order";
-//die($sql);
-        $results = $this->db->query($sql)->result_array();
-        return $results;
-    }
-**/
-
     /**
      * getFormsByPage
      * @param page_id
@@ -133,12 +75,12 @@ class Setting_form_model extends CI_Model implements iForm_Model {
         $parent_form_id = (int)$parent_form_id;
 
         $results = $this->db
-            ->select('sub.form_id, sub.condition_group_id, sub.condition_group_parent_id, sub.condition_group_operator, sub.condition_id, sub.form_control_name, sub.operator, sub.operand, sub.active, s.name AS scope, sub.list_order') //, sub.form_control_name
-             ->join('users.dbo.lookup_scopes s', 'sub.scope_id = s.id', 'inner')
+            ->select('sub.form_id, sub.action, sub.dom_id, sub.condition_group_id, sub.condition_group_parent_id, sub.condition_group_operator, sub.condition_id, sub.form_control_name, sub.form_control_name, sub.operator, sub.operand, sub.active, s.name AS scope, sub.list_order') //, sub.form_control_name
+            ->join('users.dbo.lookup_scopes s', 'sub.scope_id = s.id', 'inner')
             ->where('sub.active', 1)
             ->where('sub.parent_form_id', $parent_form_id)
             ->order_by('sub.form_control_name, sub.list_order')
-            ->get('users.frm.v_subforms sub')
+            ->get('users.frm.vma_setting_subforms sub')
             ->result_array();
 
         return $results;
@@ -154,7 +96,7 @@ class Setting_form_model extends CI_Model implements iForm_Model {
         $parent_form_id = (int)$parent_form_id;
 
         $results = $this->db
-            ->select('sub.block_id, sub.condition_group_id, sub.condition_group_parent_id, sub.condition_group_operator, sub.condition_id, sub.operator, sub.operand, sub.active, s.name AS scope, sub.list_order') //, sub.form_control_name
+            ->select('sub.block_id, sub.condition_group_id, sub.condition_group_parent_id, sub.condition_group_operator, sub.condition_id, sub.form_control_name, sub.operator, sub.operand, sub.active, s.name AS scope, sub.list_order') //
             ->join('users.dbo.lookup_scopes s', 'sub.scope_id = s.id', 'inner')
             ->where('sub.active', 1)
             ->where('sub.parent_form_id', $parent_form_id)

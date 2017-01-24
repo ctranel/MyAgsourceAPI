@@ -83,7 +83,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
             ->where('sub.active', 1)
             ->where('sub.parent_form_id', $parent_form_id)
             ->order_by('sub.form_control_name, sub.list_order')
-            ->get('users.frm.v_subforms sub')
+            ->get('users.frm.vma_entry_subforms sub')
             ->result_array();
 
         return $results;
@@ -531,7 +531,11 @@ class Data_entry_model extends CI_Model implements iForm_Model {
 //die($sql);
         $res = $this->db->query($sql)->result_array();
 //die(var_dump($res));
-        return $res;
+        if($res && count($res) > 0){
+            return $res[0];
+        }
+
+        return [];
     }
 
     /* -----------------------------------------------------------------

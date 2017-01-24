@@ -1,8 +1,6 @@
 <?php
 namespace myagsource\Form\Content;
 
-require_once(APPPATH . 'libraries/Settings/SettingForm.php');
-require_once(APPPATH . 'libraries/Settings/SettingFormControl.php');
 require_once(APPPATH . 'libraries/Form/Content/Form.php');
 require_once(APPPATH . 'libraries/Form/Content/Control/FormControl.php');
 require_once(APPPATH . 'libraries/Form/Content/SubForm.php');
@@ -265,6 +263,7 @@ class FormFactory implements iFormFactory{
     */
     protected function getSubForms($parent_form_id, $herd_code, $ancestor_form_ids = null){
         $results = $this->datasource->getSubFormsByParentId($parent_form_id); //would return control-name-indexed array
+
         if(empty($results)){
             return false;
         }
@@ -277,6 +276,7 @@ class FormFactory implements iFormFactory{
         }
 
         $subforms = [];
+
         //get and organize all condition data for form
         $subform_data = $this->structureSubFormCondData($results, 'form_id');
 
