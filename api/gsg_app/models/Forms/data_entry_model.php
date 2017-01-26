@@ -425,58 +425,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
         $form_data = MssqlUtility::escape($form_data);
         $is_update = true;
 
-        $table_name = $this->getSourceTable($form_id);
-        //id key fields
-        //$key_meta = $this->getFormKeyMeta($form_id);
-
-        $key_field_names = array_keys($key_meta);
-        //$form_field_names = array_keys($form_data);
-
-        $upd_where = '';
-        if(isset($key_field_names) && is_array($key_field_names)){
-            foreach($key_field_names as $k){
-                $key_values[$k] = $form_data[$k];
-//IN CASES LIKE PEN NUM, KEY FIELDS WILL BE SET, AND IT'S STILL AN UPDATE
-                if(!isset($form_data[$k]) || empty($form_data[$k])){
-                    $is_update = false;
-                }
-                else {
-                    $upd_where .= " " . $k . "='" . $form_data[$k] . "' AND";
-                }
-            }
-        }
-
-        $update_set = '';
-        foreach($form_data as $k=>$v){
-            if(is_array($v)){
-                $v = implode('|', $v);
-            }
-            //string vs numeric, or can we use quotes for both?
-            //only update non-generated columns
-            if($control_meta['is_generated'] === true){
-                $insert_vals[$k] = $form_data[$k];
-            }
-            if($control_meta['is_editable'] === true){
-                $update_set .= " t." . $k . "=" . $k . ",";
-            }
-        }
-
-        if($is_update){
-            $sql = "UPDATE " . $table_name .
-					" SET " . substr($update_set, 0, -1) .
-                    " WHERE " . $upd_where;
-            $res = $this->db->query($sql);
-            return $key_values;
-        }
-        else{
-            //need the commented select statement to trigger a return value
-            $sql = "--SELECT;
-                    INSERT " . $table_name . " (" . implode(', ', array_keys($insert_vals)) . ")
-					VALUES ('" . implode("', '", $insert_vals) . "');";
-            $res = $this->db->query($sql)->result_array();
-        }
-
-        return $res;
+            throw new \Exception('Upsert function not defined.');
     }
 
     /* -----------------------------------------------------------------
@@ -508,7 +457,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
             //only update non-generated columns
             if($control_meta[$k]['is_generated'] === false){
                 if(in_array($control_meta[$k]['data_type'], $no_quotes) === true){
-                    $v = (isset($v) && !empty($v)) ? $v : 'null';
+                    $v = (isset($v) && (!empty($v) || $v === 0)) ? $v : 'null';
                     $insert_vals[$k] = $v;
                 }
                 else {
@@ -522,17 +471,30 @@ class Data_entry_model extends CI_Model implements iForm_Model {
         }
 
         //need the commented select statement to trigger a return value.  temp table is used in updatable views to return key data
-        $sql = "--SELECT;
+        if(!empty($tmp_table_schema)){
+            $sql = "--SELECT;
                 CREATE TABLE #output(" . implode(", ", $tmp_table_schema) . ");
                 INSERT " . $table_name . " (" . implode(', ', array_keys($insert_vals)) . ")
                 VALUES (" . implode(", ", $insert_vals) . ");
                 SELECT * FROM #output;
                 DROP TABLE #output";
+        }
+        else {
+            $sql = "--SELECT;
+                INSERT " . $table_name . " (" . implode(', ', array_keys($insert_vals)) . ")
+                VALUES (" . implode(", ", $insert_vals) . ");";
+        }
 //die($sql);
-        $res = $this->db->query($sql)->result_array();
+        $res = $this->db->query($sql);
 //die(var_dump($res));
-        if($res && count($res) > 0){
-            return $res[0];
+
+        if(!$res){
+            throw new \Exception('Submission Failed.');
+        }
+
+        $dataset = $res->result_array();
+        if(count($dataset) > 0){
+            return $dataset[0];
         }
 
         return [];
@@ -568,7 +530,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
             //only update non-generated columns
             if($control_meta[$k]['is_generated'] === false && $k != $variable_field){
                 if(in_array($control_meta[$k]['data_type'], $no_quotes) === true){
-                    $v = (isset($v) && !empty($v)) ? $v : 'null';
+                    $v = (isset($v) && (!empty($v) || $v === 0)) ? $v : 'null';
                     $insert_vals[$k] = $v;
                 }
                 else {
@@ -589,6 +551,10 @@ class Data_entry_model extends CI_Model implements iForm_Model {
         }
 //die(substr($sql, 0, -1));
         $res = $this->db->query(substr($sql, 0, -1));
+
+        if(!$res){
+            throw new \Exception('Batch Submission.');
+        }
 
         return $res;
     }
@@ -633,7 +599,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
             //only update non-generated columns
             if($control_meta[$k]['is_editable'] === true){
                 if(in_array($control_meta[$k]['data_type'], $no_quotes) === true){
-                    $v = (isset($v) && !empty($v)) ? $v : 'null';
+                    $v = (isset($v) && (!empty($v) || $v === 0)) ? $v : 'null';
                     $update_set[] = $k . "=" . $v;
                 }
                 else {
@@ -647,6 +613,9 @@ class Data_entry_model extends CI_Model implements iForm_Model {
             " WHERE " . implode(" AND ", $upd_where);
 //die($sql);
         $res = $this->db->query($sql);
+        if(!$res){
+            throw new \Exception('Update failed.');
+        }
 
         return $key_values;
     }
@@ -685,6 +654,12 @@ class Data_entry_model extends CI_Model implements iForm_Model {
 
         $sql = "DELETE FROM " . $table_name . " WHERE " . substr($delete_cond, 0, -5);
 //die($sql);
-        return $this->db->query($sql);
+        $res = $this->db->query($sql);
+
+        if(!$res){
+            throw new \Exception('Submission Failed.');
+        }
+
+        return $res;
     }
 }

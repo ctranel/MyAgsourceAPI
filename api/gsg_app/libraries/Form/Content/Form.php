@@ -252,9 +252,9 @@ class Form implements iForm
         }
 
         $entity_data['isactive'] = 0;
-        $entity_data['is_edited'] = 1;
 
-        return $this->write($entity_data);
+        $key_vals = $this->datasource->update($this->id, $entity_data, $this->controlsMetaArray(), $this->keyMetaArray());
+        return $key_vals;
     }
 
     /* -----------------------------------------------------------------
@@ -282,8 +282,6 @@ class Form implements iForm
                 if(isset($parsed_subforms)){
                     $ret_val = $ret_val + $parsed_subforms;
                 }
-                    //@todo: not the right place to write subforms, but it will do for now
-                $c->writeSubforms($form_data);
             }
         }
         return $ret_val;

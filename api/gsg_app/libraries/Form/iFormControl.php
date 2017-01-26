@@ -20,5 +20,4 @@ interface iFormControl
     //public function setDefaultValue($new_value);
     public function getLookupOptions();
     public function parseFormData($form_data);
-    public function writeSubforms($form_data);
 }

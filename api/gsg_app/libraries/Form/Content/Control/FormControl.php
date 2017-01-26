@@ -490,18 +490,6 @@ class FormControl implements iFormControl
         return $ret_val;
     }
 
-    public function writeSubforms($form_data){
-        if(isset($this->subforms) && is_array($this->subforms)){
-            foreach($this->subforms as $s){
-                //only subforms that do not have an action of their own are written with their parent form
-                if($s->action() !== null && $s->conditionsMet($form_data[$this->name])){
-                    $s->write($form_data);
-                }
-            }
-        }
-        return;
-    }
-
     public function parseSubformData($form_data){
         if(isset($this->subforms) && is_array($this->subforms)){
             $return_val = [];
