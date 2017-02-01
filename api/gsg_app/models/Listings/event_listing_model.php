@@ -17,14 +17,8 @@ use \myagsource\MssqlUtility;
 
 class Event_listing_model extends CI_Model implements iListing_model  {
 
-    public function __construct($args){
+    public function __construct(){
 		parent::__construct();
-        if(isset($args) && is_array($args)){
-            array_walk($args, function(&$v, $k){return MssqlUtility::escape($v);});
-        }
-        $this->criteria = $args;
-        $this->herd_code = $args['herd_code'];
-        $this->serial_num = $args['serial_num'];
 	}
 
     /**
@@ -41,13 +35,14 @@ class Event_listing_model extends CI_Model implements iListing_model  {
             ->join('users.dbo.blocks b', "pb.block_id = b.id AND b.display_type_id = 8 AND pb.page_id = " . $page_id . ' AND b.active = 1', 'inner')
             ->join('users.options.listings l', "b.id = l.block_id AND l.isactive = 1", 'inner')
             ->join("(
-                    SELECT lci.id, f.db_field_name 
+                    SELECT lci.id, f.db_field_name, lci.list_order 
                     FROM users.options.listings_columns lci 
                         INNER JOIN users.dbo.db_fields f ON lci.db_field_id = f.id
                 ) srt", 'l.order_by = srt.id', 'left'
             )
             ->join('users.dbo.lookup_display_types dt', 'b.display_type_id = dt.id', 'inner')
             ->join('users.dbo.lookup_scopes s', 'b.scope_id = s.id', 'inner')
+            ->order_by('srt.list_order', 'asc')
             ->get('users.dbo.pages_blocks pb')
 //            ->where('')
             ->result_array();
@@ -113,8 +108,7 @@ class Event_listing_model extends CI_Model implements iListing_model  {
      * @return string category
      * @author ctranel
      **/
-    protected function getListingKeyMeta($listing_id)
-    {
+    protected function getListingKeyMeta($listing_id) {
         $ret = [];
 
         $results = $this->db
@@ -193,6 +187,7 @@ class Event_listing_model extends CI_Model implements iListing_model  {
         $listing_id = (int)$listing_id;
         $order_by = MssqlUtility::escape($order_by);
         $sort_order = MssqlUtility::escape($sort_order);
+        $criteria = MssqlUtility::escape(array_filter($criteria));
 
         $keys = array_keys($criteria);
         $key_meta = $this->getListingKeyMeta($listing_id);
