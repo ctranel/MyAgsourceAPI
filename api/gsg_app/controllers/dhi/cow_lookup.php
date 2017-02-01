@@ -47,44 +47,55 @@ class Cow_lookup extends dpage {
 	function events($serial_num, $show_all_events = 0){
         $page_id = 79;
 
-		$this->_loadObjVars($serial_num);
-		$this->load->model('dhi/cow_lookup/events_model');
-    	$data['animal_data'] = $this->events_model->getCowArray($this->session->userdata('herd_code'), $serial_num);
-    	$data['animal_data']['chosen_id'] = $data['animal_data'][$this->cow_id_field];
-        $data['animal_data']['serial_num'] = $serial_num;
+		try{
+            $this->_loadObjVars($serial_num);
+            $this->load->model('dhi/cow_lookup/events_model');
+            $data['animal_data'] = $this->events_model->getCowArray($this->session->userdata('herd_code'), $serial_num);
+            $data['animal_data']['chosen_id'] = $data['animal_data'][$this->cow_id_field];
+            $data['animal_data']['serial_num'] = $serial_num;
 
-        //supplemental factory
-        $this->load->model('supplemental_model');
-        $supplemental_factory = new SupplementalFactory($this->supplemental_model, site_url());
+            //supplemental factory
+            $this->load->model('supplemental_model');
+            $supplemental_factory = new SupplementalFactory($this->supplemental_model, site_url());
 
-        //Set up site content objects
-        $this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
-        $this->load->model('web_content/block_model');
-        $web_block_factory = new WebBlockFactory($this->block_model, $supplemental_factory);
+            //Set up site content objects
+            $this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
+            $this->load->model('web_content/block_model');
+            $web_block_factory = new WebBlockFactory($this->block_model, $supplemental_factory);
 
-        //page content
-        $this->load->model('ReportContent/report_block_model');
+            //page content
+            $this->load->model('ReportContent/report_block_model');
 
-        $this->load->model('Listings/event_listing_model', null, false, ['herd_code'=>$this->session->userdata('herd_code'), 'serial_num'=>$serial_num]);
-        $option_listing_factory = new ListingFactory($this->event_listing_model);
+            $this->load->model('Listings/event_listing_model');
+            $option_listing_factory = new ListingFactory($this->event_listing_model);
 
-        //create block content
-        $listings = $option_listing_factory->getByPage($page_id, ['herd_code' => $this->session->userdata('herd_code'), 'serial_num' => $serial_num]);
+            //create block content
+            $listings = $option_listing_factory->getByPage($page_id, ['herd_code' => $this->session->userdata('herd_code'), 'serial_num' => $serial_num]);
 
-        //create blocks for content
-        $blocks = $web_block_factory->getBlocksFromContent($page_id, $listings, $supplemental_factory);
-        if(is_array($blocks)){
-            foreach($blocks as $b){
-                $data['blocks'][] = $b->toArray();
+            //create blocks for content
+            $blocks = $web_block_factory->getBlocksFromContent($page_id, $listings, $supplemental_factory);
+            if(is_array($blocks)){
+                foreach($blocks as $b){
+                    $data['blocks'][] = $b->toArray();
+                }
             }
         }
+        catch(Exception $e){
+            $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
+        }
+
         $this->sendResponse(200, null, $data);
 	}
 	
 	function id($serial_num){
-		$this->load->model('dhi/cow_lookup/id_model');
-    	$data = $this->id_model->getCowArray($this->session->userdata('herd_code'), $serial_num);
-        $data['chosen_id'] = $data[$this->cow_id_field];
+		try{
+            $this->load->model('dhi/cow_lookup/id_model');
+            $data = $this->id_model->getCowArray($this->session->userdata('herd_code'), $serial_num);
+            $data['chosen_id'] = $data[$this->cow_id_field];
+        }
+        catch(Exception $e){
+            $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
+        }
 
         $this->sendResponse(200, null, ['animal_data' => $data]);
 	}
@@ -92,32 +103,43 @@ class Cow_lookup extends dpage {
 	function dam($serial_num){
 		$this->load->model('dhi/cow_lookup/dam_model');
 
-    	$data['dam'] = $this->dam_model->getCowArray($this->session->userdata('herd_code'), $serial_num);
-		//build lactation tables
-		$this->load->model('dhi/cow_lookup/lactations_model');
-		$tab = array();
-		if(isset($data['dam']['dam_serial_num']) && !empty($data['dam']['dam_serial_num'])){
-			$subdata['arr_lacts'] = $this->lactations_model->getLactationsArray($this->session->userdata('herd_code'), $data['dam']['dam_serial_num']);
-			$tab['lact_table'] = $subdata;
-			$subdata['arr_offspring'] = $this->lactations_model->getOffspringArray($this->session->userdata('herd_code'), $data['dam']['dam_serial_num']);
-			$tab['offspring_table'] = $subdata;
-			unset($subdata);
-		}
-		$data['lact_tables'] = $tab;
-		unset($tab);
+    	try{
+            $data['dam'] = $this->dam_model->getCowArray($this->session->userdata('herd_code'), $serial_num);
+            //build lactation tables
+            $this->load->model('dhi/cow_lookup/lactations_model');
+            $tab = array();
+            if(isset($data['dam']['dam_serial_num']) && !empty($data['dam']['dam_serial_num'])){
+                $subdata['arr_lacts'] = $this->lactations_model->getLactationsArray($this->session->userdata('herd_code'), $data['dam']['dam_serial_num']);
+                $tab['lact_table'] = $subdata;
+                $subdata['arr_offspring'] = $this->lactations_model->getOffspringArray($this->session->userdata('herd_code'), $data['dam']['dam_serial_num']);
+                $tab['offspring_table'] = $subdata;
+                unset($subdata);
+            }
+            $data['lact_tables'] = $tab;
+            unset($tab);
 
-        $data['chosen_id'] = $data['dam'][$this->cow_id_field];
+            $data['chosen_id'] = $data['dam'][$this->cow_id_field];
+        }
+        catch(Exception $e){
+            $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
+        }
 
         $this->sendResponse(200, null, ['animal_data' => $data]);
 	}
 	
 	function sire($serial_num){
-		$this->load->model('dhi/cow_lookup/sire_model');
-    	$data = $this->sire_model->getCowArray($this->session->userdata('herd_code'), $serial_num);
-        $data['chosen_id'] = $data[$this->cow_id_field];
+		try{
+            $this->load->model('dhi/cow_lookup/sire_model');
+            $data = $this->sire_model->getCowArray($this->session->userdata('herd_code'), $serial_num);
+            $data['chosen_id'] = $data[$this->cow_id_field];
 
-        $test_empty = array_filter($data);
-    	if(!empty($test_empty)){
+            $test_empty = array_filter($data);
+        }
+        catch(Exception $e){
+            $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
+        }
+
+        if(!empty($test_empty)){
             $this->sendResponse(200, null, ['animal_data' => $data]);
     	}
     	else{
@@ -128,70 +150,96 @@ class Cow_lookup extends dpage {
 	
 	function tests($serial_num, $lact_num=NULL){
 		if(!isset($this->curr_lact_num) || !isset($this->cow_id)) {
-			$this->_loadObjVars($serial_num);
-		}
+			try{
+                $this->_loadObjVars($serial_num);
+            }
+            catch(Exception $e){
+                $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
+            }
+        }
 		if(!isset($lact_num)){
 			$lact_num = $this->curr_lact_num;
 		}
-        $this->load->model('dhi/cow_model');
-        $cow_data = $this->cow_model->cowIdData($this->session->userdata('herd_code'), $serial_num);
+        try{
+            $this->load->model('dhi/cow_model');
+            $cow_data = $this->cow_model->cowIdData($this->session->userdata('herd_code'), $serial_num);
 
-		$this->load->model('dhi/cow_lookup/tests_model');
-		$data = [
-			'arr_tests' => $this->tests_model->getTests($this->session->userdata('herd_code'), $serial_num, $lact_num)
-			,'cow_id' => $this->cow_id
-			,'serial_num' => $serial_num
-			,'lact_num' => $lact_num
-			,'curr_lact_num' => $this->curr_lact_num
-		];
+            $this->load->model('dhi/cow_lookup/tests_model');
+            $data = [
+                'arr_tests' => $this->tests_model->getTests($this->session->userdata('herd_code'), $serial_num, $lact_num)
+                ,'cow_id' => $this->cow_id
+                ,'serial_num' => $serial_num
+                ,'lact_num' => $lact_num
+                ,'curr_lact_num' => $this->curr_lact_num
+            ];
 
-        $data['chosen_id'] = $cow_data[$this->cow_id_field];
+            $data['chosen_id'] = $cow_data[$this->cow_id_field];
+        }
+        catch(Exception $e){
+            $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
+        }
 
         $this->sendResponse(200, null, ['animal_data' => $data]);
 	}
 	
 	function lactations($serial_num){
-        $this->load->model('dhi/cow_model');
-        $cow_data = $this->cow_model->cowIdData($this->session->userdata('herd_code'), $serial_num);
+        try{
+            $this->load->model('dhi/cow_model');
+            $cow_data = $this->cow_model->cowIdData($this->session->userdata('herd_code'), $serial_num);
 
-		$this->load->model('dhi/cow_lookup/lactations_model');
-    	$data['lactations'] = $this->lactations_model->getLactationsArray($this->session->userdata('herd_code'), $serial_num);
-    	$data['offspring'] = $this->lactations_model->getOffspringArray($this->session->userdata('herd_code'), $serial_num);
+            $this->load->model('dhi/cow_lookup/lactations_model');
+            $data['lactations'] = $this->lactations_model->getLactationsArray($this->session->userdata('herd_code'), $serial_num);
+            $data['offspring'] = $this->lactations_model->getOffspringArray($this->session->userdata('herd_code'), $serial_num);
 
-        $data['chosen_id'] = $cow_data[$this->cow_id_field];
+            $data['chosen_id'] = $cow_data[$this->cow_id_field];
+        }
+        catch(Exception $e){
+            $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
+        }
 
         $this->sendResponse(200, null, ['animal_data' => $data]);
 	}
 	
 	function graphs($serial_num, $lact_num=NULL){
 		if(!isset($this->curr_lact_num) || !isset($this->cow_id)) {
-			$this->_loadObjVars($serial_num);
-		}
+			try{
+                $this->_loadObjVars($serial_num);
+            }
+            catch(Exception $e){
+                $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
+            }
+
+        }
 		if(!isset($lact_num)){
 			$lact_num = $this->curr_lact_num;
 		}
 
-        $this->load->model('dhi/cow_model');
-        $cow_data = $this->cow_model->cowIdData($this->session->userdata('herd_code'), $serial_num);
+        try{
+            $this->load->model('dhi/cow_model');
+            $cow_data = $this->cow_model->cowIdData($this->session->userdata('herd_code'), $serial_num);
 
-		$this->load->model('dhi/cow_lookup/graphs_model');
-		$this->load->library('chart');
-		$data = array(
-			'arr_tests' => $this->chart->formatDataSet($this->graphs_model->getGraphData($this->session->userdata('herd_code'), $serial_num, $lact_num), 'lact_dim')
-			,'cow_id' => $this->cow_id
-			,'serial_num' => $serial_num
-			,'lact_num' => $lact_num
-			,'curr_lact_num' => $this->curr_lact_num
-		);
+            $this->load->model('dhi/cow_lookup/graphs_model');
+            $this->load->library('chart');
+            $data = array(
+                'arr_tests' => $this->chart->formatDataSet($this->graphs_model->getGraphData($this->session->userdata('herd_code'), $serial_num, $lact_num), 'lact_dim')
+                ,'cow_id' => $this->cow_id
+                ,'serial_num' => $serial_num
+                ,'lact_num' => $lact_num
+                ,'curr_lact_num' => $this->curr_lact_num
+            );
 
 
-		$ret = $this->load->view('dhi/cow_lookup/graphs', $data, true);
-        $ret['chosen_id'] = $cow_data[$this->cow_id_field];
+            $ret = $this->load->view('dhi/cow_lookup/graphs', $data, true);
+            $ret['chosen_id'] = $cow_data[$this->cow_id_field];
+        }
+        catch(Exception $e){
+            $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
+        }
 
         $this->sendResponse(200, null, $ret);
 	}
 
-	protected function _loadObjVars($serial_num){
+    protected function _loadObjVars($serial_num){
 		$this->load->model('dhi/cow_lookup/events_model');
 		$events_data = $this->events_model->getCowArray($this->session->userdata('herd_code'), $serial_num);
    		$this->cow_id = $events_data[$this->cow_id_field];

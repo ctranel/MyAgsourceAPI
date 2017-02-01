@@ -42,22 +42,28 @@ class dform extends dpage {
 		//validate form input
         $this->load->library('herds');
 		$this->load->library('form_validation');
+        try{
         //supplemental factory
-        $this->load->model('supplemental_model');
-        $supplemental_factory = new SupplementalFactory($this->supplemental_model, site_url());
+            $this->load->model('supplemental_model');
+            $supplemental_factory = new SupplementalFactory($this->supplemental_model, site_url());
 
-        //$this->form_validation->set_rules('herd_code', 'Herd', 'required|max_length[8]');
-		//$this->form_validation->set_rules('herd_code_fill', 'Type Herd Code');
-        $this->load->model('Forms/setting_form_model');//, null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
-        $setting_form_factory = new SettingsFormFactory($this->setting_form_model, $supplemental_factory, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
+            //$this->form_validation->set_rules('herd_code', 'Herd', 'required|max_length[8]');
+            //$this->form_validation->set_rules('herd_code_fill', 'Type Herd Code');
+            $this->load->model('Forms/setting_form_model');//, null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
+            $setting_form_factory = new SettingsFormFactory($this->setting_form_model, $supplemental_factory, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
 
-        $form = $setting_form_factory->getForm($form_id, $this->session->userdata('herd_code'), $this->session->userdata('user_id'));
-        $input = $this->input->userInputArray();
+            $form = $setting_form_factory->getForm($form_id, $this->session->userdata('herd_code'), $this->session->userdata('user_id'));
+            $input = $this->input->userInputArray();
+        }
+        catch(Exception $e){
+            $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
+        }
 
 		if($this->form_validation->run_input() === true){
             try{
                 //get form object
                 //@todo: split form core from form display (core would be included in display), no need for web content or supplemental here
+
                 $form->write($input);
 
                 $resp_msg = [];
@@ -98,16 +104,21 @@ class dform extends dpage {
             $this->sendResponse(400, new ResponseMessage("No identifying information received", 'error'));
         }
 
-		//validate form input
-        $this->load->model('supplemental_model');
-        $supplemental_factory = new SupplementalFactory($this->supplemental_model, site_url());
-		$this->load->library('herds');
-		$this->load->library('form_validation');
-        $this->load->model('Forms/data_entry_model');
+		try{
+            //validate form input
+            $this->load->model('supplemental_model');
+            $supplemental_factory = new SupplementalFactory($this->supplemental_model, site_url());
+            $this->load->library('herds');
+            $this->load->library('form_validation');
+            $this->load->model('Forms/data_entry_model');
 
-        $form_factory = new FormFactory($this->data_entry_model, $supplemental_factory, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
+            $form_factory = new FormFactory($this->data_entry_model, $supplemental_factory, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
 
-        $form = $form_factory->getFormDisplay($form_id, $this->session->userdata('herd_code'));
+            $form = $form_factory->getFormDisplay($form_id, $this->session->userdata('herd_code'));
+        }
+        catch(Exception $e){
+            $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
+        }
 
         $this->sendResponse(200, $this->message, $form->toArray());
 	}
@@ -130,16 +141,21 @@ class dform extends dpage {
             $this->sendResponse(400, new ResponseMessage("No identifying information received", 'error'));
         }
 
-        //validate form input
-        $this->load->model('supplemental_model');
-        $supplemental_factory = new SupplementalFactory($this->supplemental_model, site_url());
-        $this->load->library('herds');
-        $this->load->library('form_validation');
-        $this->load->model('Forms/data_entry_model');
+        try{
+            //validate form input
+            $this->load->model('supplemental_model');
+            $supplemental_factory = new SupplementalFactory($this->supplemental_model, site_url());
+            $this->load->library('herds');
+            $this->load->library('form_validation');
+            $this->load->model('Forms/data_entry_model');
 
-        $form_factory = new FormFactory($this->data_entry_model, $supplemental_factory, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
+            $form_factory = new FormFactory($this->data_entry_model, $supplemental_factory, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
 
-        $form = $form_factory->getSubformDisplay($form_id, $this->session->userdata('herd_code'));
+            $form = $form_factory->getSubformDisplay($form_id, $this->session->userdata('herd_code'));
+        }
+        catch(\Exception $e){
+            $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
+        }
 
         $this->sendResponse(200, $this->message, $form->toArray());
     }
@@ -163,10 +179,14 @@ class dform extends dpage {
         $this->load->library('herds');
         $this->load->library('form_validation');
         $this->load->model('Forms/data_entry_model');//, null, false, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
-        $form_factory = new FormFactory($this->data_entry_model, null, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
-
-        $form = $form_factory->getForm($form_id, $this->session->userdata('herd_code'));
-        $input = $this->input->userInputArray();
+        try{
+            $form_factory = new FormFactory($this->data_entry_model, null, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
+            $form = $form_factory->getForm($form_id, $this->session->userdata('herd_code'));
+            $input = $this->input->userInputArray();
+        }
+        catch(Exception $e){
+            $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
+        }
         //$this->form_validation->set_rules('herd_code', 'Herd', 'required|max_length[8]');
         //$this->form_validation->set_rules('herd_code_fill', 'Type Herd Code');
 
@@ -177,9 +197,10 @@ class dform extends dpage {
         elseif($this->form_validation->run_input() === true){
             try{
                 //add field values for logging
-                $input['logID'] = $this->session->userdata('user_id');
+                $input['logid'] = $this->session->userdata('user_id');
+                //DB functions use server time, will do the same to be consistent
                 $date = new DateTime("now");
-                $input['logdttm'] = $date->format("Y-m-d H:i:s");
+                $input['logdttm'] = $date->format("Y-m-d\TH:i:s");
 
                 $entity_keys = $form->write($input);
 
@@ -194,7 +215,7 @@ class dform extends dpage {
                                 $payload = ['nav' => $navigation->toArray('DHI')]; */
                 $this->sendResponse(200, $resp_msg, ['identity_keys' => $entity_keys]);
             }
-            catch(Exception $e){
+            catch(\Exception $e){
                 $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
             }
         }
@@ -230,7 +251,7 @@ class dform extends dpage {
                 //get form object
 
                 //add field values for logging
-                $input['logID'] = $this->session->userdata('user_id');
+                $input['logid'] = $this->session->userdata('user_id');
                 $date = new DateTime("now");
                 $input['logdttm'] = $date->format("Y-m-d H:i:s");
 
@@ -304,6 +325,12 @@ class dform extends dpage {
         $form = $form_factory->getForm($form_id, $this->session->userdata('herd_code'));
 
         try{
+            //add field values for logging
+            $input['logid'] = $this->session->userdata('user_id');
+            //DB functions use server time, will do the same to be consistent
+            $date = new DateTime("now");
+            $input['logdttm'] = $date->format("Y-m-d\TH:i:s");
+
             $form->deactivate($input);
 
             $resp_msg = new ResponseMessage('The record was removed', 'message');
