@@ -31,6 +31,12 @@ class Form implements iForm
     protected $datasource;
 
     /**
+     * name
+     * @var string
+     **/
+    protected $name;
+
+    /**
      * form dom_id
      * @var string
      **/
@@ -48,10 +54,11 @@ class Form implements iForm
      **/
     protected $controls;
 
-    public function __construct($id, $datasource, $controls, $dom_id, $action){
+    public function __construct($id, $datasource, $controls, $name, $dom_id, $action){
         $this->id = $id;
         $this->datasource = $datasource;
         $this->controls = $controls;
+        $this->name = $name;
         $this->dom_id = $dom_id;
         $this->action = $action;
     }
@@ -61,8 +68,9 @@ class Form implements iForm
     }
 
     public function toArray(){
-       $ret['dom_id'] = $this->dom_id;
+        $ret['dom_id'] = $this->dom_id;
         $ret['action'] = $this->action;
+        $ret['name'] = $this->name;
 
         if(isset($this->controls) && is_array($this->controls) && !empty($this->controls)){
             $controls = [];

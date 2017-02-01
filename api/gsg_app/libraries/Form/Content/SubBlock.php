@@ -25,14 +25,21 @@ class SubBlock //implements iSubBlock
      */
     protected $block_id;
 
-    public function __construct($condition_groups, $block_id)
+    /**
+     * @var string
+     */
+    protected $block_name;
+
+    public function __construct($condition_groups, $block_id, $block_name)
     {
         $this->condition_groups = $condition_groups;
         $this->block_id = $block_id;
+        $this->block_name = $block_name;
     }
     
     public function toArray(){
         $ret['block_id'] = $this->block_id;
+        $ret['block_name'] = $this->block_name;
 
         if(isset($this->condition_groups) && is_array($this->condition_groups) && !empty($this->condition_groups)){
             $ret['condition_groups'] = [];

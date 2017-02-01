@@ -33,7 +33,7 @@ class Setting_form_model extends CI_Model implements iForm_Model {
         $page_id = (int)$page_id;
 
         $results = $this->db
-            ->select('pb.page_id, b.id, f.id AS form_id, b.name, b.description, dt.name AS display_type, s.name AS scope, b.active, b.path, f.dom_id, f.action, pb.list_order')
+            ->select('pb.page_id, b.id, b.name, f.id AS form_id, f.name AS form_name, b.name AS block_name, b.description, dt.name AS display_type, s.name AS scope, b.active, b.path, f.dom_id, f.action, pb.list_order')
             ->join('users.dbo.blocks b', "pb.block_id = b.id AND b.display_type_id = 6 AND pb.page_id = " . $page_id, 'inner')
             ->join('users.frm.forms f', "b.id = f.block_id", 'inner')
             ->join('users.dbo.lookup_display_types dt', 'b.display_type_id = dt.id', 'inner')
@@ -54,7 +54,7 @@ class Setting_form_model extends CI_Model implements iForm_Model {
         $block_id = (int)$block_id;
 
         $results = $this->db
-            ->select('b.id, f.id AS form_id, b.name, b.description, dt.name AS display_type, s.name AS scope, b.active, b.path, f.dom_id, f.action, 1 AS list_order') //pb.page_id, pb.list_order
+            ->select('b.id, b.name, f.id AS form_id, f.name AS form_name, b.name AS block_name, b.description, dt.name AS display_type, s.name AS scope, b.active, b.path, f.dom_id, f.action, 1 AS list_order') //pb.page_id, pb.list_order
             ->join('users.frm.forms f', "b.id = f.block_id AND b.display_type_id = 6 AND b.id = " . $block_id, 'inner')
             ->join('users.dbo.lookup_display_types dt', 'b.display_type_id = dt.id', 'inner')
             ->join('users.dbo.lookup_scopes s', 'b.scope_id = s.id', 'inner')
@@ -75,7 +75,7 @@ class Setting_form_model extends CI_Model implements iForm_Model {
         $parent_form_id = (int)$parent_form_id;
 
         $results = $this->db
-            ->select('sub.form_id, sub.action, sub.dom_id, sub.condition_group_id, sub.condition_group_parent_id, sub.condition_group_operator, sub.condition_id, sub.form_control_name, sub.form_control_name, sub.operator, sub.operand, sub.active, s.name AS scope, sub.list_order') //, sub.form_control_name
+            ->select('sub.form_id, sub.form_name, sub.action, sub.dom_id, sub.condition_group_id, sub.condition_group_parent_id, sub.condition_group_operator, sub.condition_id, sub.form_control_name, sub.form_control_name, sub.operator, sub.operand, sub.active, s.name AS scope, sub.list_order') //, sub.form_control_name
             ->join('users.dbo.lookup_scopes s', 'sub.scope_id = s.id', 'inner')
             ->where('sub.active', 1)
             ->where('sub.parent_form_id', $parent_form_id)
@@ -96,7 +96,7 @@ class Setting_form_model extends CI_Model implements iForm_Model {
         $parent_form_id = (int)$parent_form_id;
 
         $results = $this->db
-            ->select('sub.block_id, sub.condition_group_id, sub.condition_group_parent_id, sub.condition_group_operator, sub.condition_id, sub.form_control_name, sub.operator, sub.operand, sub.active, s.name AS scope, sub.list_order') //
+            ->select('sub.block_id, sub.block_name, sub.condition_group_id, sub.condition_group_parent_id, sub.condition_group_operator, sub.condition_id, sub.form_control_name, sub.operator, sub.operand, sub.active, s.name AS scope, sub.list_order') //
             ->join('users.dbo.lookup_scopes s', 'sub.scope_id = s.id', 'inner')
             ->where('sub.active', 1)
             ->where('sub.parent_form_id', $parent_form_id)
@@ -117,7 +117,7 @@ class Setting_form_model extends CI_Model implements iForm_Model {
         $form_id = (int)$form_id;
 
         $results = $this->db
-            ->select('b.id, f.id AS form_id, b.name, b.description, dt.name AS display_type, s.name AS scope, b.active, b.path, f.dom_id, f.action')
+            ->select('b.id, b.name, f.id AS form_id, f.name AS form_name, b.name AS block_name, b.description, dt.name AS display_type, s.name AS scope, b.active, b.path, f.dom_id, f.action')
             ->join('users.frm.forms f', "b.id = f.block_id AND f.id = " . $form_id, 'inner')
             ->join('users.dbo.lookup_display_types dt', 'b.display_type_id = dt.id', 'inner')
             ->join('users.dbo.lookup_scopes s', 'b.scope_id = s.id', 'inner')
@@ -274,11 +274,13 @@ class Setting_form_model extends CI_Model implements iForm_Model {
      * @param: string herd code
      * @param: int setting id
      * @param: string setting value
+     * @param: datetime log datetime
+     * @param: int log id
     *  @return void
     *  @throws:
     * -----------------------------------------------------------------
     */
-    public static function composeSettingSelect($user_id, $herd_code, $setting_id, $setting_value){
+    public static function composeSettingSelect($user_id, $herd_code, $setting_id, $setting_value, $log_dttm, $log_id){
 //die($user_id);
         if($user_id != "NULL"){
             $user_id = (int)$user_id;
@@ -287,7 +289,7 @@ class Setting_form_model extends CI_Model implements iForm_Model {
         $setting_id = (int)$setting_id;
         $setting_value = MssqlUtility::escape($setting_value);
 
-        $ret = "SELECT " . $user_id . " AS user_id, '" . $herd_code . "' AS herd_code, " . $setting_id . " AS setting_id, '" . $setting_value . "' AS value";
+        $ret = "SELECT " . $user_id . " AS user_id, '" . $herd_code . "' AS herd_code, " . $setting_id . " AS setting_id, '" . $setting_value . "' AS value, '" . $log_dttm . "' AS logdttm, '" . $log_id . "' AS logid";
         return $ret;
     }
 
@@ -318,10 +320,10 @@ class Setting_form_model extends CI_Model implements iForm_Model {
 					    AND uhs.setting_id = nd.setting_id
 				WHEN MATCHED THEN
 					UPDATE
-					SET uhs.setting_id = nd.setting_id, uhs.value = nd.value
+					SET uhs.setting_id = nd.setting_id, uhs.value = nd.value, uhs.logdttm = nd.logdttm, uhs.logid = nd.logid
 				WHEN NOT MATCHED BY TARGET THEN
-					INSERT (user_id, herd_code, setting_id, value)
-					VALUES (nd.user_id, nd.herd_code, nd.setting_id, nd.value);";
+					INSERT (user_id, herd_code, setting_id, value, logdttm, logid)
+					VALUES (nd.user_id, nd.herd_code, nd.setting_id, nd.value, nd.logdttm, nd.logid);";
 //print($sql);
 		$this->db->query($sql);
 	}

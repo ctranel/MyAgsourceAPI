@@ -146,7 +146,7 @@ class SettingsFormFactory implements iFormFactory {
                 $fc[] = new SettingFormControl($d, $validators, $options, $sf, $b);
             }
         }
-        return new SettingForm($form_data['form_id'], $this->datasource, $fc, $form_data['dom_id'], $form_data['action'],$user_id, $herd_code);
+        return new SettingForm($form_data['form_id'], $this->datasource, $fc, $form_data['form_name'], $form_data['dom_id'], $form_data['action'],$user_id, $herd_code);
     }
 
     /*

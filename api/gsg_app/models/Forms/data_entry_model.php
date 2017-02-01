@@ -33,7 +33,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
     public function getFormsByPage($page_id) {
         $page_id = (int)$page_id;
         $results = $this->db
-            ->select('pb.page_id, b.id, f.id AS form_id, b.name, b.description, dt.name AS display_type, s.name AS scope, b.active, b.path, f.dom_id, f.action, pb.list_order')
+            ->select('pb.page_id, b.id, b.name, f.id AS form_id, f.name AS form_name, b.description, dt.name AS display_type, s.name AS scope, b.active, b.path, f.dom_id, f.action, pb.list_order')
             ->join('users.dbo.blocks b', "pb.block_id = b.id AND b.display_type_id = 7 AND pb.page_id = " . $page_id . ' AND b.active = 1', 'inner')
             ->join('users.frm.forms f', "b.id = f.block_id AND f.active = 1", 'inner')
             //the following gets only data-entry form data
@@ -55,7 +55,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
     public function getFormByBlock($block_id) {
         $block_id = (int)$block_id;
         $results = $this->db
-            ->select('b.id, f.id AS form_id, b.name, b.description, dt.name AS display_type, s.name AS scope, b.active, b.path, f.dom_id, f.action, 1 AS list_order') //, pb.list_order, pb.page_id,
+            ->select('b.id, b.name, f.id AS form_id, f.name AS form_name, b.description, dt.name AS display_type, s.name AS scope, b.active, b.path, f.dom_id, f.action, 1 AS list_order') //, pb.list_order, pb.page_id,
             ->join('users.frm.forms f', "b.id = f.block_id AND f.active = 1 AND b.active = 1 AND b.display_type_id = 7 AND b.id = " . $block_id, 'inner')
             //the following gets only data-entry form data
             //->join('users.frm.form_control_groups cg', "f.id = cg.form_id", 'inner')
@@ -78,7 +78,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
         $parent_form_id = (int)$parent_form_id;
 
         $results = $this->db
-            ->select('sub.form_id, sub.action, sub.dom_id, sub.condition_group_id, sub.condition_group_parent_id, sub.condition_group_operator, sub.condition_id, sub.form_control_name, sub.form_control_name, sub.operator, sub.operand, sub.active, s.name AS scope, sub.list_order') //, sub.form_control_name
+            ->select('sub.form_id, sub.form_name, sub.action, sub.dom_id, sub.condition_group_id, sub.condition_group_parent_id, sub.condition_group_operator, sub.condition_id, sub.form_control_name, sub.form_control_name, sub.operator, sub.operand, sub.active, s.name AS scope, sub.list_order') //, sub.form_control_name
             ->join('users.dbo.lookup_scopes s', 'sub.scope_id = s.id', 'inner')
             ->where('sub.active', 1)
             ->where('sub.parent_form_id', $parent_form_id)
@@ -99,7 +99,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
         $parent_form_id = (int)$parent_form_id;
 
         $results = $this->db
-            ->select('sub.block_id, sub.condition_group_id, sub.condition_group_parent_id, sub.condition_group_operator, sub.condition_id, sub.form_control_name, sub.operator, sub.operand, sub.active, s.name AS scope, sub.list_order') //
+            ->select('sub.block_id, sub.block_name, sub.condition_group_id, sub.condition_group_parent_id, sub.condition_group_operator, sub.condition_id, sub.form_control_name, sub.operator, sub.operand, sub.active, s.name AS scope, sub.list_order') //
             ->join('users.dbo.lookup_scopes s', 'sub.scope_id = s.id', 'inner')
             ->where('sub.active', 1)
             ->where('sub.parent_form_id', $parent_form_id)
@@ -121,7 +121,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
         $form_id = (int)$form_id;
 
         $results = $this->db
-            ->select('b.id, f.id AS form_id, b.name, b.description, dt.name AS display_type, s.name AS scope, b.active, b.path, f.dom_id, f.action')
+            ->select('b.id, b.name, f.id AS form_id, f.name AS form_name, b.description, dt.name AS display_type, s.name AS scope, b.active, b.path, f.dom_id, f.action')
             ->join('users.frm.forms f', "b.id = f.block_id AND f.id = " . $form_id, 'inner')
             ->join('users.dbo.lookup_display_types dt', 'b.display_type_id = dt.id', 'inner')
             ->join('users.dbo.lookup_scopes s', 'b.scope_id = s.id', 'inner')
@@ -140,7 +140,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
         $form_id = (int)$form_id;
 
         $results = $this->db
-            ->select('f.id AS form_id, f.name, f.description, s.name AS scope, f.active, f.dom_id, f.action')
+            ->select('f.id AS form_id, f.name AS form_name, f.description, s.name AS scope, f.active, f.dom_id, f.action')
             //->join('users.frm.forms f', "b.id = f.block_id AND f.id = " . $form_id, 'inner')
             ->join('users.dbo.lookup_scopes s', "f.scope_id = s.id AND f.id = " . $form_id, 'inner')
             ->get('users.frm.forms f')
@@ -224,7 +224,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
             //have not yet tested with multiple level nesting
             array_walk_recursive($ancestor_form_ids, function(&$v, $k){return (int)$v;});
         }
-        $result = $this->db->select('fc.id, ct.name AS control_type, fld.db_field_name AS name, fc.label, fld.is_editable, fld.is_generated, fld.is_fk_field AS is_key, fld.data_type, fc.biz_validation_url, fc.form_defaults_url, fc.default_value, fc.batch_variable_type')
+        $result = $this->db->select('fc.id, ct.name AS control_type, fld.db_field_name AS name, fc.label, fld.is_editable, fld.is_generated, fld.is_fk_field AS is_key, fld.data_type, fc.biz_validation_url, fc.form_defaults_url, fc.add_option_form_id, fc.default_value, fc.batch_variable_type')
             ->select("(CAST(
                   (SELECT STUFF((
                       SELECT '|', CONCAT(v.name, ':', v.value) AS [data()] 
@@ -255,7 +255,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
     public function getControlMetaById($control_id) {
         $control_id = (int)$control_id;
 
-        $result = $this->db->select('fc.id, ct.name AS control_type, fld.db_field_name AS name, fc.label, fld.is_editable, fld.is_generated, fld.is_fk_field AS is_key, fc.biz_validation_url, fc.form_defaults_url, fc.default_value, fc.batch_variable_type')
+        $result = $this->db->select('fc.id, ct.name AS control_type, fld.db_field_name AS name, fc.label, fld.is_editable, fld.is_generated, fld.is_fk_field AS is_key, fc.biz_validation_url, fc.form_defaults_url, fc.add_option_form_id, fc.default_value, fc.batch_variable_type')
             ->select("(CAST(
                   (SELECT STUFF((
                       SELECT '|', CONCAT(v.name, ':', v.value) AS [data()] 
@@ -583,9 +583,10 @@ class Data_entry_model extends CI_Model implements iForm_Model {
         if(isset($key_field_names) && is_array($key_field_names)){
             foreach($key_field_names as $k){
                 $key_values[$k] = $form_data[$k];
-                if(isset($form_data[$k]) && !empty($form_data[$k])){
-                    $upd_where[] = $k . "='" . $form_data[$k] . "'";
+                if(!isset($form_data[$k]) || empty($form_data[$k])){
+                    throw new \Exception('Missing key data, submission failed.');
                 }
+                $upd_where[] = $k . "='" . $form_data[$k] . "'";
             }
         }
 

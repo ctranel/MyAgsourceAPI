@@ -108,7 +108,7 @@ class Custom_report extends CI_Controller {
 			//REPORT FIELDS
 			$this->form_validation->set_rules('column[]', 'Field');
 			$this->form_validation->set_rules('aggregate[]', 'Field Calculation');
-			$this->form_validation->set_rules('table_header_group_id[]', 'Table Header Group');
+			$this->form_validation->set_rules('block_header_group_id[]', 'Table Header Group');
 			$this->form_validation->set_rules('table_header_text[]', 'Table Header Text', 'trim|max_length[30]'); //for the field itself, not the header group
 			$this->form_validation->set_rules('series_chart_type_id[]', 'Series Type');
 			//GROUP BY

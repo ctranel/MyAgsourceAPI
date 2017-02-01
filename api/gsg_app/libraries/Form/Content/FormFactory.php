@@ -169,7 +169,7 @@ class FormFactory implements iFormFactory{
                 $fc[] = new FormControl($d, $validators, $options, $s, $b);
             }
         }
-        return new Form($form_data['form_id'], $this->datasource, $fc, $form_data['dom_id'], $form_data['action'], $herd_code);
+        return new Form($form_data['form_id'], $this->datasource, $fc, $form_data['form_name'], $form_data['dom_id'], $form_data['action'], $herd_code);
     }
 
     /*
@@ -210,7 +210,7 @@ class FormFactory implements iFormFactory{
                 $fc[] = new FormControl($d, $validators, $options, $s, $b);
             }
         }
-        return new Form($form_data['form_id'], $this->datasource, $fc, $form_data['dom_id'], $form_data['action'], $herd_code);
+        return new Form($form_data['form_id'], $this->datasource, $fc, $form_data['form_name'], $form_data['dom_id'], $form_data['action'], $herd_code);
     }
 
     /*
@@ -243,9 +243,8 @@ class FormFactory implements iFormFactory{
         foreach($results as $k => $r){
             if(!isset($subforms[$r['form_control_name']][$r['block_id']])){
                 //$form = $this->createForm($r, $herd_code, $ancestor_form_ids);
-                $block = $r['block_id'];
                 $subform_groups = $this->extractConditionGroups($subblock_data[$r['form_control_name']][$r['block_id']]);
-                $subblocks[$r['form_control_name']][$r['block_id']] = new SubBlock($subform_groups, $block);
+                $subblocks[$r['form_control_name']][$r['block_id']] = new SubBlock($subform_groups, $r['block_id'], $r['block_name']);
             }
         }
 
