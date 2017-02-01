@@ -31,8 +31,8 @@ class SettingForm extends Form implements iForm {
 	protected $herd_code;
 		
 	
-	function __construct($id, $datasource, $controls, $dom_id, $action, $user_id, $herd_code) {
-		parent::__construct($id, $datasource, $controls, $dom_id, $action);
+	function __construct($id, $datasource, $controls, $name, $dom_id, $action, $user_id, $herd_code) {
+		parent::__construct($id, $datasource, $controls, $name, $dom_id, $action);
         $this->user_id = $user_id;
 		$this->herd_code = $herd_code;
 	}
@@ -55,9 +55,13 @@ class SettingForm extends Form implements iForm {
 
         $form_data = $this->parseFormData($form_data);
 
-        //$data = [];
         $user_id = isset($this->user_id) ? $this->user_id : 'NULL';
         $herd_code = $this->herd_code;
+
+        //DB functions use server time, will do the same to be consistent
+        $date = new \DateTime("now");
+        $logdttm = $date->format("Y-m-d\TH:i:s");
+
 
         foreach($this->controls as $c){
             if(isset($form_data[$c->name()])) {
@@ -67,7 +71,7 @@ class SettingForm extends Form implements iForm {
                 if(!$c->forHerd()){
                     $herd_code = 'NULL';
                 }
-                $data = $this->datasource->composeSettingSelect($user_id, $herd_code, $c->id(), $form_data[$c->name()]);
+                $data = $this->datasource->composeSettingSelect($user_id, $herd_code, $c->id(), $form_data[$c->name()], $logdttm, $this->user_id);
                 $this->datasource->upsert($this->id, $data);
             }
         }

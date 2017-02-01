@@ -159,7 +159,6 @@ function date_to_mysqldatetime($date = "", $full_day = FALSE)
 * @author Clemens Kofler <clemens.kofler@chello.at>
 * @access    public
 * @return    integer
-*/
 function mysqldatetime_to_timestamp($datetime = "")
 {
   // function is only applicable for valid MySQL DATETIME (19 characters) and DATE (10 characters)
@@ -184,6 +183,7 @@ function mysqldatetime_to_timestamp($datetime = "")
 
     return mktime($hours, $minutes, $seconds, $month, $day, $year);
 }
+*/
 
 /**
 * Convert MySQL's DATE (YYYY-MM-DD) or DATETIME (YYYY-MM-DD hh:mm:ss) to date using given format string
@@ -193,10 +193,10 @@ function mysqldatetime_to_timestamp($datetime = "")
 * @author Clemens Kofler <clemens.kofler@chello.at>
 * @access    public
 * @return    integer
-*/
 function mysqldatetime_to_date($datetime = "", $format = "m-d-Y, H:i")
 {
     return date($format, mysqldatetime_to_timestamp($datetime));
 }
+*/
 
 

@@ -16,24 +16,6 @@ use \myagsource\MssqlUtility;
  */
 
 class Herd_options_model extends CI_Model implements iListing_model  {
-    /**
-     * herd_code
-     * @var string
-     **/
-    protected $herd_code;
-
-    /**
-     * table_name
-     * @var string
-     **/
-    protected $table_name;
-
-    /**
-     * criteria
-     * @var array
-     **/
-    protected $criteria;
-
 
     public function __construct(){
 		parent::__construct();
@@ -42,7 +24,7 @@ class Herd_options_model extends CI_Model implements iListing_model  {
     /**
      * getListingsByPage
      * @param page_id
-     * @return string category
+     * @return array listing data
      * @author ctranel
      **/
     public function getListingsByPage($page_id) {

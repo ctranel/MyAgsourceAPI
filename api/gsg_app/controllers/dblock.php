@@ -60,10 +60,13 @@ class dblock extends dpage {
 
         $supplemental_factory = $this->_supplementalFactory();
 $page_id = 105;
+        $this->load->model('Listings/herd_options_model');
+        $listing_factory = new ListingFactory($this->herd_options_model, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
+
         $this->filters = $this->_filters($page_id, $params);
         $benchmarks = $this->_benchmarks();
         try {
-            $block_content = $this->_blockContent($block_id, $supplemental_factory, $params, $benchmarks);
+            $block_content = $this->_blockContent($block_id, $supplemental_factory, $params, $benchmarks, $listing_factory);
 
             $this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
             $this->load->model('web_content/block_model');
@@ -78,7 +81,54 @@ $page_id = 105;
         $this->sendResponse(200, $this->message, $block->toArray());
     }
 
-    protected function _blockContent($block_id, $supplemental_factory, $params, $benchmarks){
+    /**
+     * @method get()
+     *
+     * @param int block id
+     * @param string json data (key data for retrieving form)
+     * @access	public
+     * @return	void
+     */
+    function event_subblock($block_id, $json_data = null){
+        $page_id = 79;
+
+        $params = [];
+        if(isset($json_data)) {
+            $params = array_filter((array)json_decode(urldecode($json_data)));
+        }
+
+        $params = ['ID' => $params['ID']];
+        //$params = ['eventid' => $params['eventid']];
+        /*
+                if(empty(array_filter($params))){
+                    $this->sendResponse(400, new ResponseMessage("No identifying information received", 'error'));
+                }
+        */
+
+        $this->load->model('Listings/event_listing_model');
+        $listing_factory = new ListingFactory($this->event_listing_model);
+
+        $supplemental_factory = $this->_supplementalFactory();
+
+        $this->filters = $this->_filters($page_id, $params);
+        $benchmarks = $this->_benchmarks();
+        try {
+            $block_content = $this->_blockContent($block_id, $supplemental_factory, $params, $benchmarks, $listing_factory);
+
+            $this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
+            $this->load->model('web_content/block_model');
+            $web_block_factory = new WebBlockFactory($this->block_model, $supplemental_factory);
+
+            //create blocks for content
+            $block = $web_block_factory->getBlock($block_id, $block_content);
+        }
+        catch(\Exception $e){
+            $this->sendResponse(404, new ResponseMessage($e->getMessage(), 'error'));
+        }
+        $this->sendResponse(200, $this->message, $block->toArray());
+    }
+
+    protected function _blockContent($block_id, $supplemental_factory, $params, $benchmarks, $listing_factory){
         $this->load->model('ReportContent/report_block_model');
         $this->load->model('Datasource/db_field_model');
         $this->load->model('ReportContent/report_data_model');
@@ -94,8 +144,8 @@ $page_id = 105;
         $this->load->model('Forms/Data_entry_model');//, null, false, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
         $entry_form_factory = new FormFactory($this->Data_entry_model, $supplemental_factory, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
 
-        $this->load->model('Listings/herd_options_model');
-        $option_listing_factory = new ListingFactory($this->herd_options_model, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
+        //$this->load->model('Listings/herd_options_model');
+        //$option_listing_factory = new ListingFactory($this->herd_options_model, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
 
         //create block content
         $reports = $report_factory->getByBlock($block_id);
@@ -111,7 +161,7 @@ $page_id = 105;
             return array_values($entry_forms)[0];
         }
         $serial_num = isset($params['serial_num']) ? $params['serial_num'] : null;
-        $listings = $option_listing_factory->getByBlock($block_id, $params);
+        $listings = $listing_factory->getByBlock($block_id, $params);
         if(!empty($listings)){
             return array_values($listings)[0];
         }
