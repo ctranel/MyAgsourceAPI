@@ -97,8 +97,7 @@ $page_id = 105;
             $params = array_filter((array)json_decode(urldecode($json_data)));
         }
 
-        $params = ['ID' => $params['ID']];
-        //$params = ['eventid' => $params['eventid']];
+        $params = ['animal_event_id' => $params['animal_event_id']];
         /*
                 if(empty(array_filter($params))){
                     $this->sendResponse(400, new ResponseMessage("No identifying information received", 'error'));

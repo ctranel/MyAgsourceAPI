@@ -61,7 +61,19 @@ class Listing implements iListing
      **/
     protected $delete_path;
 
-    public function __construct($id, $form_id, $delete_path, $columns, $dataset, $isactive, $add_presets){
+    /**
+     * sort_column
+     * @var string
+     **/
+    protected $sort_column;
+
+    /**
+     * sort_order
+     * @var string
+     **/
+    protected $sort_order;
+
+    public function __construct($id, $form_id, $delete_path, $columns, $dataset, $isactive, $add_presets, $sort_column, $sort_order){
         $this->id = $id;
         $this->form_id = $form_id;
         $this->delete_path = $delete_path;
@@ -69,13 +81,19 @@ class Listing implements iListing
         $this->add_presets = $add_presets;
         $this->dataset = $dataset;
         $this->columns = $columns;
+        $this->sort_column = $sort_column;
+        $this->sort_order = $sort_order;
     }
 
     public function toArray(){
-        $ret['isactive'] = $this->isactive;
-        $ret['form_id'] = $this->form_id;
-        $ret['add_presets'] = $this->add_presets;
-        $ret['delete_path'] = $this->delete_path;
+        $ret = [
+            'isactive' => $this->isactive,
+            'form_id' => $this->form_id,
+            'add_presets' => $this->add_presets,
+            'delete_path' => $this->delete_path,
+            'sort_column' => $this->sort_column,
+            'sort_order' => $this->sort_order,
+        ];
 
         if(isset($this->columns) && is_array($this->columns) && !empty($this->columns)){
             $columns = [];
