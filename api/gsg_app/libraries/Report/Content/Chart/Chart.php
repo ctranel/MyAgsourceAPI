@@ -122,7 +122,7 @@ class Chart extends Report {
 		$this->has_aggregate = false;
 		$this->report_fields = [];
 			
-		$arr_ret = array();
+		$arr_ret = [];
 		$arr_res = $this->datasource->getFieldData($this->id);
 		if(is_array($arr_res)){
 			foreach($arr_res as $s){

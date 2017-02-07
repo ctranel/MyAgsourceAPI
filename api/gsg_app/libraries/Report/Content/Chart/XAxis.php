@@ -124,6 +124,7 @@ class XAxis {
             'opposite' => $this->opposite,
             'data_type' => $this->data_type,
             'label_text' => $this->label_text,
+            'text' => $this->label_text,
             //'' => $this->um,
             'category' => $this->category,
         ];

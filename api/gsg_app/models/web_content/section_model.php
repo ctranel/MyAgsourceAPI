@@ -145,4 +145,53 @@ class Section_model extends CI_Model {
 
 		return $tmp_arr_sections;
 	}
+
+    /**
+     * return array of sections to which herd is subscribed (child sections if a parent section is specified)
+     *
+     * subscription is different in that it fetches content by herd data (i.e. herd output) for users that
+     * have permission only for subscribed content.  All other scopes are strictly users-based
+     * @method getPublicSections
+     * @param int $parent_section_id
+     * @param string $herd_code
+     * @return array of section data for given user
+     * @author ctranel
+     **/
+    public function getSectionsByUser($parent_section_id, $user_id) {
+        $parent_section_id = (int)$parent_section_id;
+
+        $sql = "
+			WITH section_tree AS
+				(
+					SELECT id, parent_id, name, description, scope_id, path, active, default_page_path, list_order
+					FROM users.dbo.sections
+	                WHERE active = 1 AND (user_id IS NULL OR user_id = " . $user_id . ")
+			
+					UNION ALL
+			
+					SELECT s.id, s.parent_id, s.name, s.description, s.scope_id, s.path, s.active, s.default_page_path, s.list_order
+					FROM users.dbo.sections s
+						JOIN section_tree st ON st.parent_id = s.id AND s.active = 1 AND (s.user_id IS NULL OR s.user_id = " . $user_id . ")
+				)
+			
+			SELECT a.id, a.name AS scope FROM (
+				SELECT id, parent_id, name, description, scope_id, path, active, default_page_path, list_order
+				FROM section_tree
+			
+				UNION
+			
+				SELECT id, parent_id, name, description, scope_id, path, active, default_page_path, list_order
+				FROM users.dbo.sections
+				WHERE parent_id = " . $parent_section_id . " AND active = 1 AND (user_id IS NULL OR user_id = " . $user_id . ")
+			) a
+			
+			INNER JOIN users.dbo.lookup_scopes ls ON a.scope_id = ls.id
+			ORDER BY a.path";
+//die($sql);
+        $tmp_arr_sections = $this->db
+            ->query($sql)
+            ->result_array();
+
+        return $tmp_arr_sections;
+    }
 }

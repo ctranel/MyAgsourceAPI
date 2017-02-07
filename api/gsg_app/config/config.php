@@ -13,19 +13,19 @@
 */
 	switch (ENVIRONMENT){
 		case 'development':
-			$config['base_url']	= "https://" . $_SERVER['HTTP_HOST'] . "/";
-			$config['base_url_assets']	= "https://" . $_SERVER['HTTP_HOST'] . "/";
-			$config['pdf_path']	= "/var/www//asset_cache/all_pdf_reports/";
+			$config['base_url']	= "https://" . $_SERVER['HTTP_HOST'] . "/api/";
+			$config['base_url_assets']	= "https://" . $_SERVER['HTTP_HOST'] . "/api/";
+			$config['pdf_path']	= "/var/www//api/asset_cache/all_pdf_reports/";
 		break;
 		case 'localhost':
-			$config['base_url']	= "http://localhost/MyAgSource/";
-			$config['base_url_assets']	= "http://localhost/MyAgSource/";
-			$config['pdf_path']	= "C:\\Users\\ctranel\\PhpstormProjects\\MyAgsource\\asset_cache\\all_pdf_reports\\";
+			$config['base_url']	= "http://localhost/MyAgSource/api/";
+			$config['base_url_assets']	= "http://localhost/MyAgSource/api/";
+			$config['pdf_path']	= "C:\\Users\\ctranel\\PhpstormProjects\\MyAgsource\\api\\asset_cache\\all_pdf_reports\\";
 		break;
 		case 'qa':
-			$config['base_url']	= "http://feweb.verona.crinet/";
-			$config['base_url_assets']	= "http://feweb.verona.crinet/";
-			$config['pdf_path']	= "/var/www/asset_cache/all_pdf_reports/";
+			$config['base_url']	= "http://feweb.verona.crinet/api/";
+			$config['base_url_assets']	= "http://feweb.verona.crinet/api/";
+			$config['pdf_path']	= "/var/www/api/asset_cache/all_pdf_reports/";
 		break;
 		case 'production':
 			$config['base_url']	= "https://myagsource.com/";

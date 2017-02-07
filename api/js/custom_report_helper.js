@@ -301,26 +301,12 @@ function add_where_grouping(ev){
 
 
 //DOM MANIPULATION FUNCTIONS
-//fills the section page select list based on the value of the report super section form field
-function fill_section_select(ev){
-	var options_html = '';
-	var super_section_id = $(ev.target).val();
-	var cache_bust = Math.floor(Math.random()*1000);
-	var ajax_url = base_url + '/custom_report/select_section_data/' + super_section_id + '/' + cache_bust;
-	$.getJSON(ajax_url, function(result){
-		$.each(result, function(id, field){
-			options_html += '<option value="' + id + '">' + field + '</option>';
-		});
-		$("#section_id").html(options_html);
-	});
-}
-
 //fills the report page select list based on the value of the report section form field
 function fill_page_select(ev){
 	var options_html = '';
 	var section_id = $(ev.target).val();
 	var cache_bust = Math.floor(Math.random()*1000);
-	var ajax_url = base_url + '/custom_report/select_page_data/' + section_id + '/' + cache_bust;
+	var ajax_url = base_url + '/select_page_data/' + section_id + '/' + cache_bust;
 	$.getJSON(ajax_url, function(result){
 		$.each(result, function(id, field){
 			options_html += '<option value="' + id + '">' + field + '</option>';
@@ -334,7 +320,7 @@ function fill_insert_after(ev){
 	var options_html = '<option value="1" selected="selected">First position</option>';
 	var page_id = $(ev.target).val();
 	var cache_bust = Math.floor(Math.random()*1000);
-	var ajax_url = base_url + '/custom_report/insert_after_data/' + page_id + '/' + cache_bust;
+	var ajax_url = base_url + '/insert_after_data/' + page_id + '/' + cache_bust;
 	$.getJSON(ajax_url, function(result){
 		$.each(result, function(list_order, name){
 			options_html += '<option value="' + list_order + '">' + name + '</option>';
@@ -348,7 +334,7 @@ function fill_table_select(ev){
 	var options_html = '<option value="">Select one</option>';
 	var cow_or_summary = getRadioValue(ev.target);
 	var cache_bust = Math.floor(Math.random()*1000);
-	var ajax_url = base_url + '/custom_report/select_table_data/' + cow_or_summary + '/' + cache_bust;
+	var ajax_url = base_url + '/select_table_data/' + cow_or_summary + '/' + cache_bust;
 	$.getJSON(ajax_url, function(result){
 
 		$.each(result, function(id, field){
@@ -366,7 +352,7 @@ function fill_fields(ev){
 	var table_id = $(ev.target).val();
 	if(table_id == null) return false;
 	var cache_bust = Math.floor(Math.random()*1000);
-	var ajax_url = base_url + '/custom_report/select_field_data/' + table_id + '/' + cache_bust;
+	var ajax_url = base_url + '/select_field_data/' + table_id + '/' + cache_bust;
 	
 	$.getJSON(ajax_url, function(result){
 		$.each(result, function(id, fields){
@@ -432,7 +418,6 @@ function submit_form(ev){
 //EVENT HANDLERS
 //block-specific
 $("#rep-build").on("submit", submit_form);
-$("#super_section_id").on("change", fill_section_select);
 $("#section_id").on("change", fill_page_select);
 $("#page_id").on("change", fill_insert_after);
 $(".display-options").on("change", toggle_table_chart);
@@ -577,48 +562,3 @@ $.fn.get_non_colspan_index = function() {
 
     return nonColSpanIndex;
 };
-
-/*
-$.fn.serializeObject = function(){
-    var o = {};
-    var name_index;
-    var root_name;
-	var a = this.serializeArray();
-    $.each(a, function() {
- 		if(this.name.indexOf('[') > 0){
- 			name_index = this.name.match(/\[(.*)\]/i)[1];
-        	root_name = this.name.split('[');
-        	root_name = root_name[0];
- 		}
- 		else{
- 			name_index = null;
- 			root_name = this.name;
- 		}
- 		if (name_index == null) {
-	       if(o[root_name] !== undefined){
-	    	   if (!o[root_name].push) {
-	               o[root_name] = [o[root_name]];
-	           }
-	           o[this.name].push(this.value || '');
-	       }
-	       else{
-	            o[root_name] = this.value || '';
-	       }
-	   }
-       else if (name_index > 0) {
-			if (o[root_name] === undefined) {
-				o[root_name] = {};
-			}
-			if (o[root_name][name_index] !== undefined) {
-				if (!o[root_name][name_index].push) {
-					o[root_name][name_index] = [ o[root_name][name_index] ];
-				}
-				o[root_name][name_index].push(this.value || '');
-			}
-			else {
-				o[root_name][name_index] = this.value || '';
-			}
-		}
-    });
-    return o;
-}; */

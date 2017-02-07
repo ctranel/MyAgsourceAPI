@@ -19,6 +19,10 @@ class Custom_report_model extends CI_Model {
 	function complete_transaction(){
 		$this->db->trans_complete();
 	}
+
+    function trans_status(){
+        $this->db->trans_status();
+    }
 	/**
 	 * @method create_block($data)
 	 * @param array data to insert
@@ -27,9 +31,9 @@ class Custom_report_model extends CI_Model {
 	 **/
 	function create_block($data){
 		$this->db->insert('users.dbo.blocks', $data);
+
 		if($this->db->affected_rows() <= 0){
-			$this->error = "Could not create report";
-			return FALSE;
+			throw new \Exception("Could not create block");
 		}
 		else {
 			$arr_ret = $this->db
@@ -39,7 +43,26 @@ class Custom_report_model extends CI_Model {
 		}
 	}
 
-	/**
+    /**
+     * @method create_report($data)
+     * @param array data to insert
+     * @access public
+     *
+     **/
+    function create_report($data){
+        $this->db->insert('users.dbo.reports', $data);
+        if($this->db->affected_rows() <= 0){
+            throw new \Exception("Could not create report");
+        }
+        else {
+            $arr_ret = $this->db
+                ->query("SELECT SCOPE_IDENTITY()")
+                ->result_array();
+            return $arr_ret[0]['computed'];
+        }
+    }
+
+    /**
 	 * @method add_block_to_page
 	 * @param array with block and page ids
 	 * @access public
@@ -48,8 +71,7 @@ class Custom_report_model extends CI_Model {
 	function add_block_to_page($data){
 		$this->db->insert('users.dbo.pages_blocks', $data);
 		if($this->db->affected_rows() <= 0){
-			$this->error = "Could not add block to page";
-			return FALSE;
+            throw new \Exception("Could not add block to page");
 		}
 		return TRUE;
 	}
@@ -63,8 +85,7 @@ class Custom_report_model extends CI_Model {
 	function add_header_group($data){
 		$this->db->insert('users.dbo.table_header_groups', $data);
 		if($this->db->affected_rows() <= 0){
-			$this->error = "Could not create report";
-			return FALSE;
+            throw new \Exception("Could not create header group");
 		}
 		else {
 			$arr_ret = $this->db
@@ -81,10 +102,13 @@ class Custom_report_model extends CI_Model {
 	 *
 	 **/
 	function add_yaxes($data){
-		$this->db->insert_batch('users.dbo.chart_axes', $data);
+        $prepped = $this->prepBatchData($data);
+        $sql = "INSERT INTO users.dbo.chart_axes (" . implode(",", $prepped['keys']) . ")
+            VALUES (" . implode("),(", $prepped['values']) . ")";
+        $this->db->query($sql);
+
 		if($this->db->affected_rows() <= 0){
-			$this->error = "Could not add yaxes to block";
-			return FALSE;
+            throw new \Exception("Could not add Y axis to chart");
 		}
 		return TRUE;
 	}
@@ -96,10 +120,13 @@ class Custom_report_model extends CI_Model {
 	 *
 	 **/
 	function add_xaxis($data){
-		$this->db->insert_batch('users.dbo.chart_axes', $data);
+        $prepped = $this->prepBatchData($data);
+        $sql = "INSERT INTO users.dbo.chart_axes (" . implode(",", $prepped['keys']) . ")
+            VALUES (" . implode("),(", $prepped['values']) . ")";
+        $this->db->query($sql);
+
 		if($this->db->affected_rows() <= 0){
-			$this->error = "Could not add xaxes to block";
-			return FALSE;
+            throw new \Exception("Could not add X axis to chart");
 		}
 		return TRUE;
 	}
@@ -111,13 +138,36 @@ class Custom_report_model extends CI_Model {
 	 *
 	 **/
 	function add_columns($data){
-		$this->db->insert_batch('users.dbo.reports_select_fields', $data);
+        $prepped = $this->prepBatchData($data);
+
+        $sql = "INSERT INTO users.dbo.reports_select_fields (" . implode(",", $prepped['keys']) . ")
+            VALUES (" . implode("),(", $prepped['values']) . ")";
+		$this->db->query($sql);
+
 		if($this->db->affected_rows() <= 0){
-			$this->error = "Could not add columns";
-			return FALSE;
+            throw new \Exception("Could not add columns to report");
 		}
 		return TRUE;
 	}
+
+	function prepBatchData($data){
+        $values = [];
+        foreach($data as $r){
+            if(!isset($keys)){
+                $keys = array_keys($r);
+            }
+            foreach($r AS &$v){
+                if(!isset($v)){
+                    $v = "NULL";
+                }
+                elseif(!is_numeric($v)){
+                    $v = "'$v'";
+                }
+            }
+            $values[] = implode(",", $r);
+        }
+        return ['keys'=>$keys, 'values'=>$values];
+    }
 
 	/**
 	 * @method add_sort_by
@@ -126,10 +176,13 @@ class Custom_report_model extends CI_Model {
 	 *
 	 **/
 	function add_sort_by($data){
-		$this->db->insert_batch('users.dbo.reports_sort_by', $data);
+        $prepped = $this->prepBatchData($data);
+        $sql = "INSERT INTO users.dbo.reports_sort_by (" . implode(",", $prepped['keys']) . ")
+            VALUES (" . implode("),(", $prepped['values']) . ")";
+        $this->db->query($sql);
+
 		if($this->db->affected_rows() <= 0){
-			$this->error = "Could not add sort by to block";
-			return FALSE;
+            throw new \Exception("Could not add sort to report");
 		}
 		return TRUE;
 	}
@@ -144,8 +197,7 @@ class Custom_report_model extends CI_Model {
 //need to account for where groups
 		$this->db->insert('users.dbo.reports_sort_by', $data);
 		if($this->db->affected_rows() <= 0){
-			$this->error = "Could not add sort by to block";
-			return FALSE;
+            throw new \Exception("Could not add conditions to report");
 		}
 		return TRUE;
 	}
@@ -222,4 +274,53 @@ class Custom_report_model extends CI_Model {
 		}
 		return $arr_return;
 	}
+
+    /**
+     * getChartDisplayTypes
+     * @return array of chart display types
+     * @author ctranel
+     **/
+    public function getChartDisplayTypes() {
+        return $this->db
+            //->where($this->tables['lookup_chart_types'] . '.active', 1)
+            ->get('users.dbo.lookup_chart_types');
+    }
+
+    /**
+     * @method get_pages_select_data()
+     * @return int id of section
+     * @access public
+     *
+     **/
+    function getPagesSelectDataByUser($user_id, $section_id){
+        $user_id = (int)$user_id;
+        $section_id = (int)$section_id;
+
+        $arr_return = array();
+        $this->db
+            ->select('id, name')
+            ->where('users.dbo.pages.section_id', $section_id)
+            ->where('(users.dbo.pages.user_id IS NULL OR users.dbo.pages.user_id = ' . $user_id . ')');
+        $tmp = $this->get_pages()->result_array();
+        if(is_array($tmp)){
+            foreach($tmp as $t){
+                $arr_return[$t['id']] = $t['name'];
+            }
+        }
+        return $arr_return;
+    }
+
+    /**
+     * get_pages
+     * @return array of page data
+     * @author ctranel
+     **/
+    private function get_pages() {
+        return $this->db
+            ->where('users.dbo.pages.active', 1)
+            ->order_by('users.dbo.pages.list_order')
+            ->get('users.dbo.pages');
+    }
+
 }
+

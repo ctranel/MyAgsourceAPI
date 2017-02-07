@@ -59,7 +59,7 @@ class MY_Controller extends CI_Controller
         else{
             $this->permissions = new ProgramPermissions($this->permissions_model, [], []);
         }
-        $this->as_ion_auth = new as_ion_auth($this->permissions);
+        $this->as_ion_auth = new as_ion_auth($this->permissions, $this->session);
         
         //$tmp_uri= $this->uri->uri_string();
     }

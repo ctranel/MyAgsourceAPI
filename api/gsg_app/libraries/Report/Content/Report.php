@@ -433,7 +433,7 @@ abstract class Report implements iReport {
             }
             $ret['default_sorts'] = $dsorts;
         }
-/*
+
 		if(is_array($this->dataset_supplemental) && !empty($this->dataset_supplemental)){
 			$supp = [];
 			foreach($this->dataset_supplemental as $k=>$f){
@@ -441,7 +441,7 @@ abstract class Report implements iReport {
 			}
 			$ret['dataset_supplemental'] = $supp;
 		}
-*/
+
 		if(is_array($this->report_fields) && !empty($this->report_fields)){
 			$data = [];
 			foreach($this->report_fields as $k=>$f){

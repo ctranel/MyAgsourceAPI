@@ -2,7 +2,7 @@
 <div class='mainInfo'>
 	<?php if(isset($page_heading) !== FALSE) echo heading($page_heading); ?>
 	<?php echo form_input($block_id); //form_input?>
-	<?php echo form_open("custom_report/custom_report/create", $form_attr);?>
+	<?php echo form_open("custom_report/create", $form_attr);?>
 	<div id="gen-info-top">
 	    <h2>General Information</h2>
 	    <p id="p-report-name"><?php echo form_label('Report Name', 'report_name', NULL, $report_name); ?>
@@ -12,11 +12,6 @@
 	      	<?php echo form_input($report_description);?>
 	    </p>
 	    <h2>Placement of Report on Site</h2>  
-	    <p id="p-report-super-section"><?php echo form_label('Report Parent Section', 'report_super_section');
-			if(!empty($report_super_section_options)):
-	      		echo form_dropdown('super_section_id', $report_super_section_options, $report_section_selected, $report_super_section);
-			endif; ?>
-	    </p>
 	    <p id="p-report-section"><?php echo form_label('Report Section', 'report_section');
 			if(empty($report_section_options)) $report_section_options = array();
 	      	echo form_dropdown('section_id', $report_section_options, $report_page_selected, $report_section); ?>

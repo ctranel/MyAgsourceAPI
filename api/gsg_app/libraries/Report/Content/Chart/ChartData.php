@@ -151,10 +151,14 @@ class ChartData extends ReportData{
 			elseif($this->x_axis_dbfield_name == 'age_months'){
 				$x_val = $this->dataset[$x][$this->x_axis_dbfield_name];
 			}
-			else{//if(isset($this->dataset[$x][$this->x_axis_dbfield_name]) && !empty($this->dataset[$x][$this->x_axis_dbfield_name])){
+			elseif(isset($this->dataset[$x][$this->x_axis_dbfield_name]) && !empty($this->dataset[$x][$this->x_axis_dbfield_name])){
 				$arr_d = explode('-', $this->dataset[$x][$this->x_axis_dbfield_name]);
 				$x_val = (mktime(0, 0, 0, $arr_d[1], $arr_d[2],$arr_d[0]) * 1000);
 			}
+			else{ //can't plot without an x axes value, remove row and move on
+                unset($this->dataset[$x]);
+                continue;
+            }
 			foreach($arr_fields as $k=>$f){
 			    $tmp_data = is_numeric($this->dataset[$x][$f]) ? (float)$this->dataset[$x][$f] : $this->dataset[$x][$f];
 				if($keep_nulls === true || isset($tmp_data)) {

@@ -33,7 +33,6 @@
 	$config['tables']['users_service_groups']   = 'users.dbo.users_service_groups';
 	$config['tables']['service_groups']    		= 'address.dbo.service_group';
 
-	$config['tables']['super_sections']    		= 'users.dbo.super_sections';
 	$config['tables']['sections']    			= 'users.dbo.sections';
 	$config['tables']['pages']  				= 'users.dbo.pages';
 	$config['tables']['pages_blocks']  			= 'users.dbo.pages_blocks';
