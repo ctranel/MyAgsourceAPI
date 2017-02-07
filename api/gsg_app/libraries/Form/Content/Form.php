@@ -189,9 +189,8 @@ class Form implements iForm
 
         $form_data = $this->parseFormData($form_data);
 
-        if(!$this->datasource->batchInsert($this->id, $variable_field->name(), $form_data, $this->controlsMetaArray())){
-            throw new \Exception('Batch insert failed.');
-        }
+        $key_vals = $this->datasource->batchInsert($this->id, $variable_field->name(), $form_data, $this->controlsMetaArray());
+        return $key_vals;
     }
 
     /* -----------------------------------------------------------------

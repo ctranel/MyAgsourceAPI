@@ -491,6 +491,10 @@ class Data_entry_model extends CI_Model implements iForm_Model {
         if(!$res){
             throw new \Exception('Submission Failed.');
         }
+        $err = $this->db->_error_message();
+        if(!empty($err)){
+            throw new \Exception($err);
+        }
 
         $dataset = $res->result_array();
         if(count($dataset) > 0){
@@ -523,6 +527,8 @@ class Data_entry_model extends CI_Model implements iForm_Model {
         //string vs numeric, or can we use quotes for both?
         $no_quotes = ['decimal', 'numeric', 'tinyint', 'int', 'smallint', 'bit'];
 
+        $tmp_table_schema = [];
+//var_dump($control_meta); die;
         foreach($form_data as $k=>$v){
             if(is_array($v)){
                 $v = implode('|', $v);
@@ -537,10 +543,18 @@ class Data_entry_model extends CI_Model implements iForm_Model {
                     $insert_vals[$k] = "'" . $v . "'";
                 }
             }
+            //use identity columns to build temp table schema
+            elseif($control_meta[$k]['is_generated'] === true) {
+                $tmp_table_schema[] = $k . ' ' . $control_meta[$k]['data_type'];
+            }
         }
 
-        //need the commented select statement to trigger a return value
-        $sql = "INSERT " . $table_name . " (" . $variable_field . ", " . implode(', ', array_keys($insert_vals)) . ")
+        $sql = "--SELECT;\n";
+        if(!empty($tmp_table_schema)){
+            //need the commented select statement to trigger a return value
+            $sql .= "CREATE TABLE #output(" . implode(", ", $tmp_table_schema) . ");\n";
+        }
+        $sql .= "INSERT " . $table_name . " (" . $variable_field . ", " . implode(', ', array_keys($insert_vals)) . ")
                 VALUES ";
 
         if(isset($form_data[$variable_field]) && !empty($form_data[$variable_field])){
@@ -549,14 +563,30 @@ class Data_entry_model extends CI_Model implements iForm_Model {
                 $sql .= "(" . $v . ", " . implode(", ", $insert_vals) . "),";
             }
         }
+
+        $sql = substr($sql, 0, -1);
+
+        if(!empty($tmp_table_schema)){
+            $sql .= "\nSELECT * FROM #output;
+                DROP TABLE #output";
+        }
 //die(substr($sql, 0, -1));
-        $res = $this->db->query(substr($sql, 0, -1));
+        $res = $this->db->query($sql);
 
         if(!$res){
-            throw new \Exception('Batch Submission.');
+            throw new \Exception('Batch Submission Failed.');
+        }
+        $err = $this->db->_error_message();
+        if(!empty($err)){
+            throw new \Exception($err);
         }
 
-        return $res;
+        $dataset = $res->result_array();
+        if(count($dataset) > 0){
+            return $dataset[0];
+        }
+
+        return [];
     }
 
     /* -----------------------------------------------------------------
