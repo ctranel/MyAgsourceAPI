@@ -43,16 +43,18 @@ class Events_model extends CI_Model {
 
         $res = $this->db
             ->select("
-               [cost_df] AS cost
-              ,[meat_df] AS withhold_meat_dt
-              ,[milk_df] AS withhold_milk_dt
-              ,[pen_df] AS pen_num
-              ,[comment_df] AS comment
+               e.[cost_df] AS cost
+              ,e.[meat_df] AS withhold_meat_dt
+              ,e.[milk_df] AS withhold_milk_dt
+              ,e.[pen_df] AS pen_num
+              ,p.[siteID] AS siteID
+              ,e.[comment_df] AS comment
             ")
-            ->where('herd_code', $herd_code)
-            ->where('event_cd', $event_code)
-            ->where('isactive', 1)
-            ->get("[TD].[herd].[events]")
+            ->join('TD.herd.pens p', 'e.pen_df = p.pen_num', 'left')
+            ->where('e.herd_code', $herd_code)
+            ->where('e.event_cd', $event_code)
+            ->where('e.isactive', 1)
+            ->get("[TD].[herd].[events] e")
             ->result_array();
 
         if(!$res){
