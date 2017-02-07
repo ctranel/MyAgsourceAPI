@@ -62,6 +62,22 @@ class Events_model extends CI_Model {
         }
 
         if(isset($res[0]) && is_array($res[0])){
+            //Get default treatments for the event
+            $tx = $this->db
+                ->where('herd_code', $herd_code)
+                ->where('event_cd', $event_code)
+                ->where('isactive', 1)
+                ->order_by('list_order')
+                ->get('[TD].[herd].[event_rxtx]')
+                ->result_array();
+            if(!$tx){
+                throw new \Exception($this->db->_error_message());
+            }
+            if(isset($tx[0]) && is_array($tx[0])){
+                $res[0]['treatments'] = $tx;
+            }
+
+
             return $res[0];
         }
 
