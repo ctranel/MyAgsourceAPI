@@ -583,7 +583,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
 
         $dataset = $res->result_array();
         if(count($dataset) > 0){
-            return $dataset[0];
+            return $dataset;
         }
 
         return [];

@@ -57,8 +57,8 @@ class Events_model extends CI_Model {
             ->get("[TD].[herd].[events] e")
             ->result_array();
 
-        if(!$res){
-            throw new \Exception($this->db->_error_message());
+        if($res === false){
+            throw new \Exception('Event defaults: ' . $this->db->_error_message());
         }
 
         if(isset($res[0]) && is_array($res[0])){
@@ -70,8 +70,9 @@ class Events_model extends CI_Model {
                 ->order_by('list_order')
                 ->get('[TD].[herd].[event_rxtx]')
                 ->result_array();
-            if(!$tx){
-                throw new \Exception($this->db->_error_message());
+
+            if($tx === false){
+                throw new \Exception('Treatment defaults failed: ' . $this->db->_error_message());
             }
             if(isset($tx[0]) && is_array($tx[0])){
                 $res[0]['treatments'] = $tx;
