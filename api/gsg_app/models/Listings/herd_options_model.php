@@ -216,7 +216,7 @@ class Herd_options_model extends CI_Model implements iListing_model  {
                 inner join users.dbo.db_databases db ON tbl.database_id = db.id
 
             SET @dsql = CONCAT(N'SELECT *
-			    FROM ', @db_table_name, N' WHERE " . $key_condition_text . " isactive = 1";
+			    FROM ', @db_table_name, N' WHERE " . $key_condition_text . "1=1";// isactive = 1";
 
         if(isset($order_by) && !empty($order_by) && isset($sort_order) && !empty($sort_order)) {
             $sql .= " ORDER BY " . $order_by . " " . $sort_order;
@@ -229,10 +229,16 @@ class Herd_options_model extends CI_Model implements iListing_model  {
             EXEC (@dsql)
        ";
 
+        $res = $this->db->query($sql)->result_array();
         //print($sql);
-        $results = $this->db->query($sql)->result_array();
-        return $results;
+        if($res === false){
+            throw new \Exception('Listing data: ' . $this->db->_error_message());
+        }
+
+        if(isset($res[0]) && is_array($res[0])) {
+            return $res;
+        }
+
+        return [];
     }
-
-
 }
