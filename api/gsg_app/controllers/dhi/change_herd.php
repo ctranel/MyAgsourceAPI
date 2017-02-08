@@ -102,9 +102,10 @@ class Change_herd extends MY_Api_Controller {
                     if(!empty($msg)){
                         $resp_msg[] = new ResponseMessage($msg, 'message');
                     }
+                    $herd_info = $this->_setSessionHerdData();
                     $this->_record_access(2); //2 is the page code for herd change
                  //SHOULD WE LOAD DASHBOARD CONTENT HERE???
-                    $this->sendResponse(200, $resp_msg);
+                    $this->sendResponse(200, $resp_msg, ['herd_info' => $herd_info]);
                 }
                 catch(Exception $e){
                     $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
@@ -118,8 +119,9 @@ class Change_herd extends MY_Api_Controller {
                 if(!empty($msg)){
                     $resp_msg = new ResponseMessage($msg, 'message');
                 }
+                $herd_info = $this->_setSessionHerdData();
                 $this->_record_access(2); //2 is the page code for herd change
-                $this->sendResponse(200, $resp_msg);
+                $this->sendResponse(200, $resp_msg, ['herd_info' => $herd_info]);
             }
             catch(Exception $e){
                 $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
@@ -161,8 +163,9 @@ class Change_herd extends MY_Api_Controller {
 		}
 
         $this->_loadSessionHerd($this->input->userInput('herd_code'));
+        $herd_info = $this->_setSessionHerdData();
         $this->_record_access(2); //2 is the page code for herd change
-        $this->sendResponse(200);
+        $this->sendResponse(200, null, ['herd_info' => $herd_info]);
 	}
 
     public function herd_enrolled($herd_code){
@@ -212,19 +215,20 @@ class Change_herd extends MY_Api_Controller {
                 }
             }
         }
-        $this->_setSessionHerdData();
         return $msg;
     }
 
 	protected function _setSessionHerdData(){
+        $herd_info = $this->herd->header_info($this->herd->herdCode());
 		$this->session->set_userdata('herd_code', $this->herd->herdCode());
-		$this->session->set_userdata('recent_test_date', $this->herd->getRecentTest());
+		$this->session->set_userdata('recent_test_date', $herd_info['test_date']);
 		//load new benchmarks
 		//$this->load->model('Forms/setting_form_model', null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->herd->herdCode()]);
 		$this->load->model('Settings/benchmark_model', null, false, ['user_id' => $this->session->userdata('user_id'), 'herd_code' => $this->session->userdata('herd_code')]);
-		$benchmarks = new Benchmarks($this->benchmark_model, $this->session->userdata('user_id'), $this->herd->herdCode(), $this->herd->header_info($this->herd->herdCode()), []);
+        $benchmarks = new Benchmarks($this->benchmark_model, $this->session->userdata('user_id'), $this->herd->herdCode(), $herd_info, []);
 		$this->session->set_userdata('benchmarks', $benchmarks->getSettingKeyValues());
 
+        return $herd_info;
 		//$general_dhi = new Settings($this->session->userdata('user_id'), $this->herd->herdCode(), $this->setting_form_model, 'general_dhi', []);
 		//$this->session->set_userdata('general_dhi', $general_dhi->getSettingKeyValues());
 	}
