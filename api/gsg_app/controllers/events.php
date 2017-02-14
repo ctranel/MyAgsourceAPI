@@ -99,7 +99,7 @@ class events extends dpage {
             $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
         }
 
-        $this->sendResponse(200, null, ['herd_defaults' => $defaults]);
+        $this->sendResponse(200, null, ['defaults' => $defaults]);
     }
 
     function eligible_animals(){
