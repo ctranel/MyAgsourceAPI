@@ -148,49 +148,4 @@ class Navigation_model extends CI_Model {
 
 		return $tmp_arr_sections;
 	}
-
-	/**
-	 * getPublicContent
-	 * 
-	 * @return array of section and page data
-	 * @author ctranel
-	public function getPublicContent($herd_code) {
-		$sql = "
-			WITH section_tree AS (
-				SELECT id, parent_id, name, description, scope_id, path, active, default_page_path, list_order
-				FROM users.dbo.sections
-				WHERE id IN(
-					SELECT DISTINCT p.section_id
-					FROM users.dbo.v_pages p
-					WHERE p.active = 1 AND p.scope_id = 1
-				)
-		
-				UNION ALL
-		
-				SELECT s.id, s.parent_id, s.name, s.description, s.scope_id, s.path, s.active, s.default_page_path, s.list_order
-				FROM users.dbo.sections s
-					JOIN section_tree st ON st.parent_id = s.id   
-			)
-			
-			SELECT DISTINCT a.*, ls.name AS scope FROM (
-				SELECT id, parent_id, name, description, scope_id, path, active, default_page_path, list_order
-				FROM section_tree
-			
-				UNION
-			
-				SELECT id, section_id AS parent_id, name, description, scope_id, path, active, path, list_order
-					FROM users.dbo.v_pages
-					WHERE active = 1 AND scope_id = 1 AND (herd_code IS NULL OR herd_code = $herd_code)
-			) a
-			
-			INNER JOIN users.dbo.lookup_scopes ls ON a.scope_id = ls.id
-			ORDER BY list_order";
-		
-		$tmp_arr_sections = $this->db
-		->query($sql)
-		->result_array();
-
-		return $tmp_arr_sections;
-	}
-	 **/
 }
