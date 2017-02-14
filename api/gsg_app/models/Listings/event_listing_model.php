@@ -146,6 +146,10 @@ class Event_listing_model extends CI_Model implements iListing_model  {
         if(!$results){
             throw new Exception('No data found.');
         }
+        $err = $this->db->_error_message();
+        if(!empty($err)){
+            throw new \Exception($err);
+        }
 
         if(count($results) > 1){
             throw new Exception('There must be only one source for listing data.');
@@ -173,6 +177,11 @@ class Event_listing_model extends CI_Model implements iListing_model  {
         if(!$results){
             throw new Exception('No meta data found.');
         }
+        $err = $this->db->_error_message();
+        if(!empty($err)){
+            throw new \Exception($err);
+        }
+
         return $results;
     }
 

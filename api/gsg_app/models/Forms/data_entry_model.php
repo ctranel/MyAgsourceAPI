@@ -203,6 +203,10 @@ class Data_entry_model extends CI_Model implements iForm_Model {
         if(!$results){
             throw new Exception('No data found.');
         }
+        $err = $this->db->_error_message();
+        if(!empty($err)){
+            throw new \Exception($err);
+        }
 
         if(count($results) > 1){
             throw new Exception('There must be only one source for form data.');
@@ -488,7 +492,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
         $res = $this->db->query($sql);
 //die(var_dump($res));
 
-        if(!$res){
+        if($res === false){
             throw new \Exception('Submission Failed.');
         }
         $err = $this->db->_error_message();
@@ -573,7 +577,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
 //die(substr($sql, 0, -1));
         $res = $this->db->query($sql);
 
-        if(!$res){
+        if($res === false){
             throw new \Exception('Batch Submission Failed.');
         }
         $err = $this->db->_error_message();
@@ -644,8 +648,12 @@ class Data_entry_model extends CI_Model implements iForm_Model {
             " WHERE " . implode(" AND ", $upd_where);
 //die($sql);
         $res = $this->db->query($sql);
-        if(!$res){
+        if($res === false){
             throw new \Exception('Update failed.');
+        }
+        $err = $this->db->_error_message();
+        if(!empty($err)){
+            throw new \Exception($err);
         }
 
         return $key_values;
@@ -687,8 +695,12 @@ class Data_entry_model extends CI_Model implements iForm_Model {
 //die($sql);
         $res = $this->db->query($sql);
 
-        if(!$res){
+        if($res === false){
             throw new \Exception('Submission Failed.');
+        }
+        $err = $this->db->_error_message();
+        if(!empty($err)){
+            throw new \Exception($err);
         }
 
         return $res;
