@@ -34,7 +34,7 @@ class form_defaults extends dpage {
 		}
 	}
 	
-	function et_sire(){
+	function herd_sire(){
         $input = $this->input->userInputArray();
         if(empty($input) || count($input) == 0){
             $this->sendResponse(400, new ResponseMessage('No data sent with request.', 'error'));
@@ -55,7 +55,7 @@ class form_defaults extends dpage {
         }
     }
 
-    function et_donor(){
+    function herd_donor(){
         $input = $this->input->userInputArray();
         if(empty($input) || count($input) == 0){
             $this->sendResponse(400, new ResponseMessage('No data sent with request.', 'error'));
@@ -74,5 +74,71 @@ class form_defaults extends dpage {
         catch(exception $e){
             $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
         }
+    }
+
+    function et_sire(){
+        $input = $this->input->userInputArray();
+        if(empty($input) || count($input) == 0){
+            $this->sendResponse(400, new ResponseMessage('No data sent with request.', 'error'));
+        }
+
+        if(isset($input['sire_naab']) && !empty($input['sire_naab'])){
+            $this->load->model('Forms/form_defaults_model');
+            try{
+                $defaults = new Defaults($this->form_defaults_model);
+                $bull_defaults = $defaults->etSireNAABData($input['sire_naab']);
+                $this->sendResponse(200, null, ['defaults' => $bull_defaults]);
+            }
+            catch(exception $e){
+                $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
+            }
+        }
+
+        if(isset($input['sire_bull_id']) && !empty($input['sire_bull_id'])){
+            $this->load->model('Forms/form_defaults_model');
+            try{
+                $defaults = new Defaults($this->form_defaults_model);
+                $bull_defaults = $defaults->etSireIDData($input['sire_bull_id']);
+                $this->sendResponse(200, null, ['defaults' => $bull_defaults]);
+            }
+            catch(exception $e){
+                $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
+            }
+        }
+
+        $this->sendResponse(204);
+    }
+
+    function sire(){
+        $input = $this->input->userInputArray();
+        if(empty($input) || count($input) == 0){
+            $this->sendResponse(400, new ResponseMessage('No data sent with request.', 'error'));
+        }
+
+        if(isset($input['naab']) && !empty($input['naab'])){
+            $this->load->model('Forms/form_defaults_model');
+            try{
+                $defaults = new Defaults($this->form_defaults_model);
+                $bull_defaults = $defaults->sireNAABData($input['naab']);
+                $this->sendResponse(200, null, ['defaults' => $bull_defaults]);
+            }
+            catch(exception $e){
+                $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
+            }
+        }
+
+        if(isset($input['bull_id']) && !empty($input['bull_id'])){
+            $this->load->model('Forms/form_defaults_model');
+            try{
+                $defaults = new Defaults($this->form_defaults_model);
+                $bull_defaults = $defaults->sireIDData($input['bull_id']);
+                $this->sendResponse(200, null, ['defaults' => $bull_defaults]);
+            }
+            catch(exception $e){
+                $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
+            }
+        }
+
+        $this->sendResponse(204);
     }
 }

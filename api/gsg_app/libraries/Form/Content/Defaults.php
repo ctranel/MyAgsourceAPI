@@ -34,4 +34,24 @@ class Defaults
         return $ret;
     }
 
+    public function etSireIDData($bull_id){
+        $ret = $this->datasource->getETSireIDDefaultValues($bull_id);
+        return $ret;
+    }
+
+    public function etSireNAABData($naab){
+        $ret = $this->datasource->getETSireNAABDefaultValues($naab);
+        return $ret;
+    }
+
+    public function sireIDData($bull_id){
+        $ret = $this->datasource->getSireIDDefaultValues($bull_id);
+        return $ret;
+    }
+
+    public function sireNAABData($naab){
+        $ret = $this->datasource->getSireNAABDefaultValues($naab);
+        return $ret;
+    }
+
 }
