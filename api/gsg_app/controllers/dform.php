@@ -194,25 +194,34 @@ class dform extends dpage {
         if(!$input || empty($input)){
             $this->sendResponse(200, $this->message, $form->toArray());
         }
-        elseif($this->form_validation->run_input() === true){
+        if($this->form_validation->run_input() === true){
             try{
                 //add field values for logging
                 $input['logid'] = $this->session->userdata('user_id');
                 //DB functions use server time, will do the same to be consistent
                 $date = new DateTime("now");
                 $input['logdttm'] = $date->format("Y-m-d\TH:i:s");
+                $parent_control_id = null;
+
+                //control_id indicates that the form is from a herd option "add" button
+                //return data to add entry to triggering option list
+                if(isset($input['parent_control_id'])){
+                    $parent_control_id = $input['parent_control_id'];
+                    unset($input['parent_control_id']);
+                }
 
                 $entity_keys = $form->write($input);
 
-                $resp_msg = [];
-                //$msg = $this->_loadSessionHerd($tmp_arr[0]['herd_code']);
-                //if(!empty($msg)){
                 $resp_msg = new ResponseMessage('Form submission successful', 'message');
-                //}
                 //$this->_record_access(2); //2 is the page code for herd change
-                /*                $this->load->model('web_content/navigation_model');
-                                $navigation = new Navigation($this->navigation_model, $this->herd, $this->permissions->permissionsList());
-                                $payload = ['nav' => $navigation->toArray('DHI')]; */
+
+                if($parent_control_id){
+                    //use the inserted value
+                    $lookup_keys = $form_factory->getLookupKeys($parent_control_id);
+                    $value = isset($entity_keys[$lookup_keys['value_column']]) ? $entity_keys[$lookup_keys['value_column']] : $input[$lookup_keys['value_column']];
+                    $this->sendResponse(200, $resp_msg, ['option' => [$value => $input[$lookup_keys['desc_column']]]]);
+                }
+
                 $this->sendResponse(200, $resp_msg, ['identity_keys' => $entity_keys]);
             }
             catch(\Exception $e){

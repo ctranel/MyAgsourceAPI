@@ -203,6 +203,41 @@ class Setting_form_model extends CI_Model implements iForm_Model {
 	}
 
     /* -----------------------------------------------------------------
+    *  returns key-value pairs of options for a given lookup field
+
+    *  returns key-value pairs of options for a given lookup field
+
+    *  @since: version 1
+    *  @author: ctranel
+    *  @date: Jun 26, 2014
+    *  @param: int setting id
+    *  @return array key-value pairs
+    *  @throws:
+    * -----------------------------------------------------------------
+    */
+    public function getLookupKeys($control_id){
+        $control_id = (int)$control_id;
+
+        $sql = "SELECT value_column, desc_column FROM users.frm.data_lookup WHERE control_id = " . $control_id;
+
+        $results = $this->db->query($sql)->result_array();
+
+        if(!$results){
+            throw new Exception('No lookup key data found.');
+        }
+        $err = $this->db->_error_message();
+        if(!empty($err)){
+            throw new \Exception($err);
+        }
+//print($sql);
+        if(isset($results[0]) && is_array($results[0])) {
+            return $results[0];
+        }
+
+        return [];
+    }
+
+    /* -----------------------------------------------------------------
      *  returns key-value pairs of options for a given lookup field
 
      *  returns key-value pairs of options for a given lookup field

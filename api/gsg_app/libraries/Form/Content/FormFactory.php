@@ -164,7 +164,7 @@ class FormFactory implements iFormFactory{
                 $b = isset($subblocks[$d['name']]) ? $subblocks[$d['name']] : null;
                 $options = null;
                 if(strpos($d['control_type'], 'lookup') !== false){
-                    $options = $this->getLookupOptions($d['id'], $d['control_type']);
+                    $options = $this->getLookupOptions($d['id'], $d['control_type'], $d['data_type']);
                 }
                 $fc[] = new FormControl($d, $validators, $options, $s, $b);
             }
@@ -205,7 +205,7 @@ class FormFactory implements iFormFactory{
                 $b = isset($subblocks[$d['name']]) ? $subblocks[$d['name']] : null;
                 $options = null;
                 if(strpos($d['control_type'], 'lookup') !== false){
-                    $options = $this->getLookupOptions($d['id'], $d['control_type']);
+                    $options = $this->getLookupOptions($d['id'], $d['control_type'], $d['data_type']);
                 }
                 $fc[] = new FormControl($d, $validators, $options, $s, $b);
             }
@@ -418,24 +418,26 @@ class FormFactory implements iFormFactory{
     public function getControlOptionsById($control_id){
         $control_meta = $this->datasource->getControlMetaById($control_id);
 
-        return $this->getLookupOptions($control_meta['id'], $control_meta['control_type']);
+        return $this->getLookupOptions($control_meta['id'], $control_meta['control_type'], $control_meta['data_type']);
     }
 
 
     /* -----------------------------------------------------------------
-*  getLookupOptions
+    *  getLookupOptions
 
-*  Returns all options
+    *  Returns all options
 
-*  @since: version 1
-*  @author: ctranel
-*  @date: Jun 26, 2014
-*  @param: string setting name
-*  @return array of key=>value pairs
-*  @throws:
-* -----------------------------------------------------------------
-*/
-    protected function getLookupOptions($control_id, $control_type){
+    *  @since: version 1
+    *  @author: ctranel
+    *  @date: Jun 26, 2014
+    *  @param: int control_id
+    *  @param: string control_type
+    *  @param: string data_type
+    *  @return array of key=>value pairs
+    *  @throws:
+    * -----------------------------------------------------------------
+    */
+    protected function getLookupOptions($control_id, $control_type, $data_type){
         if(strpos($control_type, 'lookup') === false){
             return false;
         }
@@ -456,14 +458,35 @@ class FormFactory implements iFormFactory{
         if(isset($options) && is_array($options) && !empty($options)){
             $keys = array_keys($options[0]);
             foreach($options as $o){
-                //if(isset($o['value'])){
+                if($data_type === 'int'){
+                    $o[$keys[0]] = (int)$o[$keys[0]];
+                }
                 $ret[] = ['value' => $o[$keys[0]], 'label' => $o[$keys[1]]];
-                //}
-                //else{
-                //    $this->options[] = ['value' => $o['key_value'], 'label' => $o['description']];
-                //}
             }
         }
+
+        return $ret;
+    }
+
+    /* -----------------------------------------------------------------
+    *  getLookupKeys
+
+    *  Returns all options
+
+    *  @since: version 1
+    *  @author: ctranel
+    *  @date: Jun 26, 2014
+    *  @param: int control_id
+    *  @return array of key=>value pairs
+    *  @throws:
+    * -----------------------------------------------------------------
+    */
+    public function getLookupKeys($control_id){
+        if(isset($control_id) === false){
+            throw new \Exception("Unable to look up option keys.");
+        }
+
+        $ret = $this->datasource->getLookupKeys($control_id);
 
         return $ret;
     }
