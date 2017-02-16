@@ -64,9 +64,9 @@ class SubContentConditionGroup //implements iSubContentConditionGroup
      * @param $control_value
      * @return bool
      */
-    public function conditionsMet($control_value){
+    public function conditionsMet($form_values){
         foreach($this->conditions as $c){
-            if(!$c->conditionsMet($control_value)){
+            if(!$c->conditionsMet($form_values)){
                 return false;
             }
         }

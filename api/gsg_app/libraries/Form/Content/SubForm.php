@@ -80,9 +80,9 @@ class SubForm implements iSubForm
      * @param $control_value
      * @return bool
      */
-    public function conditionsMet($control_value){
+    public function conditionsMet($form_values){
         foreach($this->condition_groups as $cg){
-            if(!$cg->conditionsMet($control_value)){
+            if(!$cg->conditionsMet($form_values)){
                 return false;
             }
         }

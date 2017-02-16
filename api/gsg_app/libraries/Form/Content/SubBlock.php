@@ -59,7 +59,7 @@ class SubBlock //implements iSubBlock
      * @param $control_value
      * @return bool
      */
-    public function conditionsMet($control_value){
+    public function DELconditionsMet($control_value){ //need to pass all form data, not jsut control value
         foreach($this->condition_groups as $cg){
             if(!$cg->conditionsMet($control_value)){
                 return false;

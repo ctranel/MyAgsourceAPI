@@ -503,7 +503,7 @@ class FormControl implements iFormControl
             $return_val = [];
             foreach($this->subforms as $s){
                 //only subforms that do not have an action of their own are written with their parent form
-                if($s->action() === null && $s->conditionsMet($form_data[$this->name])){
+                if($s->action() === null && $s->conditionsMet($form_data)){
                      $tmp = $s->parseFormData($form_data);
                     if(isset($tmp)){
                         $return_val = $return_val + $tmp;

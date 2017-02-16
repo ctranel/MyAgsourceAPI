@@ -177,11 +177,11 @@ class SettingsFormFactory implements iFormFactory {
 
         //parse each subform separately
         foreach($results as $k => $r){
-            if(!isset($subforms[$r['form_control_name']][$r['block_id']])){
+            if(!isset($subforms[$r['parent_control_name']][$r['block_id']])){
                 //$form = $this->createForm($r, $herd_code, $ancestor_form_ids);
                 $block = $r['block_id'];
-                $subform_groups = $this->extractConditionGroups($subblock_data[$r['form_control_name']][$r['block_id']]);
-                $subblocks[$r['form_control_name']][$r['block_id']] = new SubBlock($subform_groups, $block);
+                $subform_groups = $this->extractConditionGroups($subblock_data[$r['parent_control_name']][$r['block_id']]);
+                $subblocks[$r['parent_control_name']][$r['block_id']] = new SubBlock($subform_groups, $block);
             }
         }
 
@@ -209,10 +209,10 @@ class SettingsFormFactory implements iFormFactory {
 
         //parse each subform separately
         foreach($results as $k => $r){
-            if(!isset($subforms[$r['form_control_name']][$r['form_id']])){
+            if(!isset($subforms[$r['parent_control_name']][$r['form_id']])){
                 $form = $this->createForm($r, $herd_code, $ancestor_form_ids);
-                $subform_groups = $this->extractConditionGroups($subform_data[$r['form_control_name']][$r['form_id']]);
-                $subforms[$r['form_control_name']][$r['form_id']] = new SubForm($subform_groups, $form);
+                $subform_groups = $this->extractConditionGroups($subform_data[$r['parent_control_name']][$r['form_id']]);
+                $subforms[$r['parent_control_name']][$r['form_id']] = new SubForm($subform_groups, $form);
             }
         }
 
@@ -247,10 +247,10 @@ class SettingsFormFactory implements iFormFactory {
 
         //parse each subform separately
         foreach($results as $k => $r){
-            if(!isset($subforms[$r['form_control_name']][$r['form_id']])){
+            if(!isset($subforms[$r['parent_control_name']][$r['form_id']])){
                 //$form = $this->createForm($r, $herd_code, $ancestor_form_ids);
-                $subform_groups = $this->extractConditionGroups($subform_data[$r['form_control_name']][$r['form_id']]);
-                $subforms[$r['form_control_name']][$r['form_id']] = new SubFormShell($subform_groups, $r['form_id']);
+                $subform_groups = $this->extractConditionGroups($subform_data[$r['parent_control_name']][$r['form_id']]);
+                $subforms[$r['parent_control_name']][$r['form_id']] = new SubFormShell($subform_groups, $r['form_id']);
             }
         }
 
@@ -279,7 +279,7 @@ class SettingsFormFactory implements iFormFactory {
             if(isset($grp['conditions']) && is_array($grp['conditions']) && !empty($grp['conditions'])) {
                 foreach($grp['conditions'] as $cond_id => $cond) {
                     //$ret[$cond['form_control_name']][$cond['form_id']][$cond['group_id']][$cond['condition_id']] = new SubContentCondition($cond['operator'], $cond['operand']);
-                    $conditions[] = new SubContentCondition($cond['operator'], $cond['operand']);
+                    $conditions[] = new SubContentCondition($cond['form_control_name'], $cond['operator'], $cond['operand']);
                 }
             }
             if (isset($grp['condition_groups']) && is_array($grp['condition_groups']) && !empty($grp['condition_groups'])) {
@@ -313,17 +313,17 @@ class SettingsFormFactory implements iFormFactory {
             if(isset($v['condition_group_parent_id']) && !empty($v['condition_group_parent_id'])){
                 $parent_id = $v['condition_group_parent_id'];
                 $v['condition_group_parent_id'] = null;
-                $conditions_data[$v['form_control_name']][$v[$cond_key_field]]['condition_groups'][$parent_id]['condition_groups'][$v['condition_group_id']]['conditions'][$v['condition_id']]
-                    = $this->structureSubFormCondData([$v], $v['condition_group_operator'])[$v['form_control_name']][$v[$cond_key_field]]['condition_groups'][$v['condition_group_id']]['conditions'][$v['condition_id']];
-                $conditions_data[$v['form_control_name']][$v[$cond_key_field]]['condition_groups'][$parent_id]['condition_groups'][$v['condition_group_id']]['condition_group_operator'] = $v['condition_group_operator'];
+                $conditions_data[$v['parent_control_name']][$v[$cond_key_field]]['condition_groups'][$parent_id]['condition_groups'][$v['condition_group_id']]['conditions'][$v['condition_id']]
+                    = $this->structureSubFormCondData([$v], $v['condition_group_operator'])[$v['parent_control_name']][$v[$cond_key_field]]['condition_groups'][$v['condition_group_id']]['conditions'][$v['condition_id']];
+                $conditions_data[$v['parent_control_name']][$v[$cond_key_field]]['condition_groups'][$parent_id]['condition_groups'][$v['condition_group_id']]['condition_group_operator'] = $v['condition_group_operator'];
 
                 //need to get the group operator from the parent group
                 $parent_key = array_search($parent_id, array_column($condition_data, 'group_id'));
-                $conditions_data[$v['form_control_name']][$v[$cond_key_field]]['condition_groups'][$parent_id]['condition_group_operator'] = $condition_data[$parent_key]['condition_group_operator'];
+                $conditions_data[$v['parent_control_name']][$v[$cond_key_field]]['condition_groups'][$parent_id]['condition_group_operator'] = $condition_data[$parent_key]['condition_group_operator'];
             }
             else{
-                $conditions_data[$v['form_control_name']][$v[$cond_key_field]]['condition_groups'][$v['condition_group_id']]['conditions'][$v['condition_id']] = $v;
-                $conditions_data[$v['form_control_name']][$v[$cond_key_field]]['condition_groups'][$v['condition_group_id']]['condition_group_operator'] = $v['condition_group_operator'];
+                $conditions_data[$v['parent_control_name']][$v[$cond_key_field]]['condition_groups'][$v['condition_group_id']]['conditions'][$v['condition_id']] = $v;
+                $conditions_data[$v['parent_control_name']][$v[$cond_key_field]]['condition_groups'][$v['condition_group_id']]['condition_group_operator'] = $v['condition_group_operator'];
             }
         }
 

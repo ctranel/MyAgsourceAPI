@@ -78,7 +78,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
         $parent_form_id = (int)$parent_form_id;
 
         $results = $this->db
-            ->select('sub.form_id, sub.form_name, sub.action, sub.dom_id, sub.condition_group_id, sub.condition_group_parent_id, sub.condition_group_operator, sub.condition_id, sub.form_control_name, sub.form_control_name, sub.operator, sub.operand, sub.active, s.name AS scope, sub.list_order') //, sub.form_control_name
+            ->select('sub.parent_control_name, sub.form_id, sub.form_name, sub.action, sub.dom_id, sub.condition_group_id, sub.condition_group_parent_id, sub.condition_group_operator, sub.condition_id, sub.form_control_name, sub.form_control_name, sub.operator, sub.operand, sub.active, s.name AS scope, sub.list_order') //, sub.form_control_name
             ->join('users.dbo.lookup_scopes s', 'sub.scope_id = s.id', 'inner')
             ->where('sub.active', 1)
             ->where('sub.parent_form_id', $parent_form_id)
@@ -99,12 +99,12 @@ class Data_entry_model extends CI_Model implements iForm_Model {
         $parent_form_id = (int)$parent_form_id;
 
         $results = $this->db
-            ->select('sub.block_id, sub.block_name, sub.condition_group_id, sub.condition_group_parent_id, sub.condition_group_operator, sub.condition_id, sub.form_control_name, sub.operator, sub.operand, sub.active, s.name AS scope, sub.list_order') //
+            ->select('sub.parent_control_name, sub.block_id, sub.block_name, sub.condition_group_id, sub.condition_group_parent_id, sub.condition_group_operator, sub.condition_id, sub.form_control_name, sub.operator, sub.operand, sub.active, s.name AS scope, sub.list_order') //
             ->join('users.dbo.lookup_scopes s', 'sub.scope_id = s.id', 'inner')
             ->where('sub.active', 1)
             ->where('sub.parent_form_id', $parent_form_id)
             ->order_by('sub.form_control_name, sub.list_order')
-            ->get('users.frm.v_subblocks sub')
+            ->get('users.frm.vma_subblocks sub')
             ->result_array();
 
         return $results;
@@ -621,8 +621,16 @@ class Data_entry_model extends CI_Model implements iForm_Model {
         }
 
         $dataset = $res->result_array();
+
         if(count($dataset) > 0){
-            return $dataset;
+            $ret = [];
+            $keys = array_keys($dataset[0]);
+            if(isset($keys) && is_array($keys)){
+                foreach($keys as $k){
+                    $ret[$k] = array_column($dataset, $k);
+                }
+            }
+            return $ret;
         }
 
         return [];
