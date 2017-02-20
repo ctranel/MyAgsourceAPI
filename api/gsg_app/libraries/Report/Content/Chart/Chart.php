@@ -76,8 +76,6 @@ class Chart extends Report {
 		parent::__construct($report_datasource, $id, $path, $max_rows, $cnt_row,
 			$sum_row, $avg_row, $bench_row, $is_summary, $display_type, $filters, $supp_factory, $data_handler, $db_table_factory, $field_groups);
 		
-		$this->setReportFields();
-		
 		$this->keep_nulls = $keep_nulls;
 		$this->chart_type = $chart_type;
 		$this->x_axes = [];
@@ -118,40 +116,20 @@ class Chart extends Report {
 	 * @access protected
 	 **/
 	protected function setReportFields(){
-		$arr_table_ref_cnt = [];
-		$this->has_aggregate = false;
-		$this->report_fields = [];
-			
-		$arr_ret = [];
 		$arr_res = $this->datasource->getFieldData($this->id);
 		if(is_array($arr_res)){
 			foreach($arr_res as $s){
-				$header_supp = null;
-				$data_supp = null;
-				if(isset($s['aggregate']) && !empty($s['aggregate'])){
+				//aggregate
+                if(isset($s['aggregate']) && !empty($s['aggregate'])){
 					$this->has_aggregate = true;
 				}
-				if(isset($this->supplemental_factory)){
-					if(isset($s['head_supp_id'])){
-						$header_supp = $this->supplemental_factory->getColHeaderSupplemental($s['head_supp_id'], $s['head_a_href'], $s['head_a_rel'], $s['head_a_title'], $s['head_a_class'], $s['head_comment']);
-					}
-					if(isset($s['supp_id'])){
-						$data_supp = $this->supplemental_factory->getColDataSupplemental($s['supp_id'], $s['a_href'], $s['a_rel'], $s['a_title'], $s['a_class']);
-					}
-				}
-				$arr_table_ref_cnt[$s['table_name']] = isset($arr_table_ref_cnt[$s['table_name']]) ? ($arr_table_ref_cnt[$s['table_name']] + 1) : 1;
-				$datafield = new DbField($s['db_field_id'], $s['table_name'], $s['db_field_name'], $s['name'], $s['description'], $s['pdf_width'], $s['default_sort_order'],
+
+                $this->setSupplemental($s);
+
+                //set report field
+                $datafield = new DbField($s['db_field_id'], $s['table_name'], $s['db_field_name'], $s['name'], $s['description'], $s['pdf_width'], $s['default_sort_order'],
 						 $s['datatype'], $s['max_length'], $s['decimal_scale'], $s['unit_of_measure'], $s['is_timespan'], $s['is_foreign_key'], $s['is_nullable'], $s['is_natural_sort']);
-				$this->report_fields[] = new ChartField($s['id'], $s['name'], $datafield, $s['category_id'], $s['is_displayed'], $s['display_format'], $s['aggregate'], $s['is_sortable'], $s['chart_type'], $s['axis_index'], $s['trend_type'], $s['field_group'], $header_supp, $data_supp, $s['field_group'], $s['field_group_ref_key']);
-			}
-			$this->primary_table_name = array_search(max($arr_table_ref_cnt), $arr_table_ref_cnt);
-			//set up arr_fields hierarchy
-			if(is_array($arr_table_ref_cnt) && count($arr_table_ref_cnt) >  1){
-				foreach($arr_table_ref_cnt as $t => $cnt){
-					if($t != $this->primary_table_name){
-						$this->joins[] = array('table'=>$t, 'join_text'=>$this->get_join_text($this->primary_table_name, $t));
-					}
-				}
+				$this->report_fields[] = new ChartField($s['id'], $s['name'], $datafield, $s['category_id'], $s['is_displayed'], $s['display_format'], $s['aggregate'], $s['is_sortable'], $s['chart_type'], $s['axis_index'], $s['trend_type'], $s['field_group'], $this->header_supplemental[$s['db_field_name']], $this->dataset_supplemental[$s['db_field_name']], $s['field_group'], $s['field_group_ref_key']);
 			}
 		}
 	}

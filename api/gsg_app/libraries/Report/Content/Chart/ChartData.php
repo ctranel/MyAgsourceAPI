@@ -148,7 +148,7 @@ class ChartData extends ReportData{
 				$x_val++;
 			}
 			//@todo: use field meta data rather than hard-coding "age_months"?
-			elseif($this->x_axis_dbfield_name == 'age_months'){
+			elseif($this->x_axis_dbfield_name == 'age_months' || strpos($this->x_axis_dbfield_name, 'dim') !== false){
 				$x_val = $this->dataset[$x][$this->x_axis_dbfield_name];
 			}
 			elseif(isset($this->dataset[$x][$this->x_axis_dbfield_name]) && !empty($this->dataset[$x][$this->x_axis_dbfield_name])){

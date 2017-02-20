@@ -122,8 +122,14 @@ abstract class Report implements iReport {
 	 * @var string
 	 **/
 	protected $primary_table_name;
-	
-	/**
+
+    /**
+     * db_tables
+     * @var string
+     **/
+    protected $db_tables;
+
+    /**
 	 * joins
 	 * @var Joins
 	 **/
@@ -165,7 +171,13 @@ abstract class Report implements iReport {
 	 **/
 	protected $dataset_supplemental;
 
-	/**
+    /**
+     * $header_supplemental
+     * @var Supplemental
+     **/
+    protected $header_supplemental;
+
+    /**
      * supplemental_factory
      * @var SupplementalFactory
      **/
@@ -204,6 +216,8 @@ abstract class Report implements iReport {
         $this->filters = $filters;
         $this->data_handler = $data_handler;
         $this->db_table_factory = $db_table_factory;
+        $this->has_aggregate = false;
+        $this->report_fields = [];
 
         /*
          * myagsource special case: if PAGE filters or params contain only a pstring of 0, and the report is not a summary
@@ -221,12 +235,15 @@ abstract class Report implements iReport {
 
         $this->supplemental_factory = $supp_factory;
         //$this->supplemental = $supp_factory->getReportSupplemental($this->id);
-		$this->supp_param_fieldnames = []; //used in child classes
+		//$this->supp_param_fieldnames = []; //used in child classes
 		
-		//load data for remaining fields
-		$this->setWhereGroups();
+		//load data for remaining properties
+        $this->setReportFields();
+		$this->setDBTables();
+        $this->setWhereGroups();
 		$this->setDefaultSort();
-		//@todo: joins
+		$this->setJoins();
+        $this->verifyFilters();
 
         $this->appended_rows_count = 0;
 		if ($cnt_row) {
@@ -267,6 +284,9 @@ abstract class Report implements iReport {
 	}
 
 	public function primaryTableName(){
+        if(!isset($this->primary_table_name)){
+            $this->setDBTables();
+        }
 		return $this->primary_table_name;
 	}
 
@@ -437,7 +457,9 @@ abstract class Report implements iReport {
 		if(is_array($this->dataset_supplemental) && !empty($this->dataset_supplemental)){
 			$supp = [];
 			foreach($this->dataset_supplemental as $k=>$f){
-				$supp[$k] = $f->toArray();
+				if(isset($f)){
+                    $supp[$k] = $f->toArray();
+                }
 			}
 			$ret['dataset_supplemental'] = $supp;
 		}
@@ -452,7 +474,72 @@ abstract class Report implements iReport {
 
         return $ret;
     }
-	/**
+
+
+    abstract protected function setReportFields();
+
+
+    /**
+     * @method setDBTables()
+     * @return void
+     * @author ctranel
+     **/
+    protected function setDBTables(){
+        $max_cnt = 0;
+        $max_table = null;
+
+        if(is_array($this->report_fields) && count($this->report_fields) >  1){
+            foreach($this->report_fields as $f){
+                $tbl = $f->dbTableName();
+
+                if(isset($this->db_tables[$tbl])){
+                    $this->db_tables[$tbl]['cnt']++;
+                    $max_cnt = $this->db_tables[$tbl]['cnt'];
+                    $max_table = $this->db_tables[$tbl]['DBTable'];
+                    continue;
+                }
+
+                $this->db_tables[$tbl] = [
+                    'DBTable' => $this->db_table_factory->getTable($tbl),
+                    'cnt' => 1,
+                ];
+                if($this->db_tables[$tbl]['cnt'] > $max_cnt){
+                    $max_cnt = 1;
+                    $max_table = $this->db_tables[$tbl]['DBTable'];
+                }
+            }
+
+            $this->primary_table_name = $max_table->full_table_name();
+        }
+    }
+
+    /**
+     * @method setSupplemental()
+     *
+     * sets header and dataset supplemental for given field name
+     *
+     * @param array of field data
+     *
+     * @return void
+     * @author ctranel
+     **/
+    protected function setSupplemental($data){
+        $this->header_supplemental[$data['db_field_name']] = null;
+        $this->dataset_supplemental[$data['db_field_name']] = null;
+
+        if(isset($this->supplemental_factory)){
+            if(isset($data['head_supp_id'])){
+                $this->header_supplemental[$data['db_field_name']] = $this->supplemental_factory->getColHeaderSupplemental($data['head_supp_id'], $data['head_a_href'], $data['head_a_rel'], $data['head_a_title'], $data['head_a_class'], $data['head_comment']);
+            }
+            if(isset($data['supp_id'])){
+                //@todo: this is currently being stored with report objects and the underlying field object
+                $this->dataset_supplemental[$data['db_field_name']] = $this->supplemental_factory->getColDataSupplemental($data['supp_id'], $data['a_href'], $data['a_rel'], $data['a_title'], $data['a_class']);
+                //$this->supp_param_fieldnames = array_unique(array_merge($this->supp_param_fieldnames, $this->dataset_supplemental[$s['db_field_name']]->getLinkParamFields()));
+            }
+       }
+    }
+
+    /**
 	 * setWhereGroups()
 	 * 
 	 * @return void
@@ -567,29 +654,29 @@ abstract class Report implements iReport {
 	 * @method resetSort()
 	 * @return void
 	 * @access public
-	* */
 	public function resetSort(){
 		if(isset($this->sorts) && count($this->sorts) > 0){
 			$this->sorts->removeAll($this->sorts);
 		}
 	}
-	
+* */
+
 	/**
 	 * @method addSort()
 	 * @param array of Sort objects
 	 * @return void
 	 * @access public
-	* */
 	public function addSort(Sort $sort){
 		$this->sorts[] = $sort;
 	}
-	
+* */
+
 	/**
 	 * @method setDefaultSort()
 	 * @return void
 	 * @author ctranel
 	 **/
-	public function setDefaultSort(){
+	protected function setDefaultSort(){
 		$this->default_sorts = [];
 		$arr_ret = [];
 		$arr_res = $this->datasource->getSortData($this->id);
@@ -602,8 +689,50 @@ abstract class Report implements iReport {
 		}
 		$this->sorts = $this->default_sorts;
 	}
-	
-	/**
+
+    /**
+     * @method setJoins()
+     * @return void
+     * @author ctranel
+     **/
+    protected function setJoins(){
+        if(is_array($this->db_tables) && count($this->db_tables) >  1){
+            foreach($this->db_tables as $t => $cnt){
+                if($t != $this->primaryTableName()){
+                    $this->joins[] = array('table'=>$t, 'join_text'=>$this->get_join_text($this->primaryTableName(), $t));
+                }
+            }
+        }
+    }
+
+    /**
+     * @verifyFilters
+     *
+     * verifies that the filter columns exist in the tables behind the report.  Removes any that do not.
+     *
+     * @return void
+     * @author ctranel
+     **/
+    protected function verifyFilters(){
+        if(is_array($this->db_tables) && !empty($this->db_tables)){
+            $criteria = $this->filterKeysValues();
+            $criteria = array_keys($criteria);
+            $cols = [];
+
+            foreach($this->db_tables as $tname => $tobj){
+                $cols = array_merge($cols, $tobj['DBTable']->columns());
+            }
+            $cols = array_column($cols, 'COLUMN_NAME');
+            $remove = array_diff($criteria, $cols);
+            if(isset($remove) && !empty($remove)){
+                foreach($remove as $r){
+                    $this->filters->removeCriteria($r);
+                }
+            }
+        }
+    }
+
+    /**
 	 * @method sortFieldNames()
 	 * @return ordered array of field names
 	 * @access public
@@ -772,7 +901,7 @@ abstract class Report implements iReport {
      * @access public
      * */
     protected function setDataset($path){
-        $db_table = $this->db_table_factory->getTable($this->primary_table_name);
+        $db_table = $this->db_table_factory->getTable($this->primaryTableName());
         $tmp_path = 'libraries/DataHandlers/' . $path . '.php';
         $report_data_handler = $this->data_handler->load($this, $tmp_path, $db_table);
         $this->dataset = $report_data_handler->getData();

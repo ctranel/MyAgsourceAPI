@@ -205,7 +205,6 @@ class dpage extends MY_Api_Controller {
         if($this->permissions->hasPermission("View All Content-Billed")){
             $this->message[] = new ResponseMessage('Herd ' . $this->herd->herdCode() . ' is not paying for this product.  You will be billed a monthly fee for any month in which you view content for which the herd is not paying.', 'message');
         }
-
         $this->sendResponse(200, $this->message, $this->page->toArray());
 	}
 
@@ -237,8 +236,7 @@ class dpage extends MY_Api_Controller {
         $params['target_date'] = date('Y-m-d', $tmp);
         unset($params['look_ahead_days']);
 
-        $this->load->model('filter_model');
-        $this->filters = new ReportFilters($this->filter_model, $page_id, ['herd_code' => $this->session->userdata('herd_code')] + $params, $this->settings);
+        $this->filters = $this->_filters($page_id, $params);
         $this->load->model('Forms/setting_form_model');//, null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
         //end filters
 
@@ -325,8 +323,7 @@ class dpage extends MY_Api_Controller {
         $params['target_date'] = date('Y-m-d', $tmp);
         unset($params['look_ahead_days']);
 
-        $this->load->model('filter_model');
-        $this->filters = new ReportFilters($this->filter_model, $page_id, ['herd_code' => $this->session->userdata('herd_code')] + $params, $this->settings);
+        $this->filters = $this->_filters($page_id, $params);
         $this->load->model('Forms/setting_form_model');//, null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
         //end filters
 

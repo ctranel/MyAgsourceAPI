@@ -73,22 +73,40 @@ use \myagsource\Datasource\iDataTable;
 		}
 		return (bool)array_search_recursive($col_name, $this->arr_fields);
 	}
-	
-	/* -----------------------------------------------------------------
-	*  Gets or sets table name
-	
-	*  If a value is passed, the object variable is set to that value.
-	*  If no value is passed, the current table name is passed.
-	*  Returns false on failure
-	
-	*  @since: 1.0
-	*  @author: ctranel
-	*  @date: May 19, 2014
-	*  @return: bool / string
-	*  @throws:
-	* -----------------------------------------------------------------*/
-	function full_table_name($value = null) {
-		if(isset($value)){
+
+     /**
+      * returns all columns from given table
+      *
+      * returns all columns from given table
+
+      *  @author: ctranel
+      *  @date: 2017-02-20
+      * @return array of column names
+      *  @throws:
+      **/
+     public function columns(){
+         //require_once APPPATH . 'helpers/multid_array_helper.php';
+         if(!isset($this->arr_fields)){
+             $this->arr_fields = $this->db_table_model->get_columns($this->database_name, $this->table_name);
+         }
+         return $this->arr_fields;
+     }
+
+     /* -----------------------------------------------------------------
+     *  Gets or sets table name
+
+     *  If a value is passed, the object variable is set to that value.
+     *  If no value is passed, the current table name is passed.
+     *  Returns false on failure
+
+     *  @since: 1.0
+     *  @author: ctranel
+     *  @date: May 19, 2014
+     *  @return: bool / string
+     *  @throws:
+     * -----------------------------------------------------------------*/
+	function full_table_name($full_table_name = null) {
+		if(isset($full_table_name)){
 			list($this->database_name, $this->schema_name, $this->table_name) = explode('.', $full_table_name);
 			return true;
 		}

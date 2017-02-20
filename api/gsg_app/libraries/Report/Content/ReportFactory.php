@@ -88,8 +88,8 @@ class ReportFactory {
      * @returns Report
 */
     public function getByBlock($block_id){
-        $criteria = ['b.id' => $block_id];
-        $results = $this->datasource_reports->getByCriteria($criteria);
+        //$criteria = ['b.id' => $block_id];
+        $results = $this->datasource_reports->getBlock($block_id);
         if(empty($results)){
             return [];
         }
