@@ -5,7 +5,26 @@ class report_block_model extends CI_Model {
 		$this->tables = $this->config->item('tables', 'ion_auth');
 	}
 
-	/**
+    /**
+     * @method getBlock
+     * @param int block_id
+     * @return array of block data
+     * @author ctranel
+     **/
+    public function getBlock($block_id) {
+        $this->db
+            ->select('rb.id, b.name,b.[description],b.path,b.active,dt.name AS display_type,s.name AS scope,ct.name as chart_type,rb.max_rows,rb.cnt_row,rb.sum_row,rb.avg_row,rb.pivot_db_field,rb.bench_row,rb.is_summary,rb.keep_nulls')//, pb.page_id, pb.list_order
+            ->where('b.active', 1)
+            ->where('b.id', $block_id)
+            ->join('users.dbo.reports rb', 'b.id = rb.block_id', 'inner')
+            ->join('users.dbo.lookup_display_types dt', 'b.display_type_id = dt.id', 'inner')
+            ->join('users.dbo.lookup_scopes s', 'b.scope_id = s.id', 'inner')
+            ->join('users.dbo.lookup_chart_types ct', 'rb.chart_type_id = ct.id', 'left')
+            ->from('users.dbo.blocks' . ' b');
+        return $this->db->get()->result_array();
+    }
+
+    /**
 	 * @method getBlocks
 	 * @return array of block data
 	 * @author ctranel
@@ -23,8 +42,8 @@ class report_block_model extends CI_Model {
 			->from('users.dbo.blocks' . ' b');
 		return $this->db->get()->result_array();
 	}
-	
-	/**
+
+    /**
 	 * getPagesByCriteria
 	 * @param associative array of criteria
 	 * @param 2d array of joins ('table', 'condition')

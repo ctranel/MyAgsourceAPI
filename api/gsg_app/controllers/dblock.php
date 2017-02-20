@@ -51,7 +51,6 @@ class dblock extends dpage {
         if(isset($json_data)) {
             $params = array_filter((array)json_decode(urldecode($json_data)));
         }
-//        var_dump($params);
 /*
         if(empty(array_filter($params))){
             $this->sendResponse(400, new ResponseMessage("No identifying information received", 'error'));
@@ -59,15 +58,14 @@ class dblock extends dpage {
 */
 
         $supplemental_factory = $this->_supplementalFactory();
-$page_id = 105;
+$page_id = 105; //@todo: this will work until we have content that uses filters (reports)
         $this->load->model('Listings/herd_options_model');
-        $listing_factory = new ListingFactory($this->herd_options_model, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
+        $listing_factory = new ListingFactory($this->herd_options_model);//, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
 
         $this->filters = $this->_filters($page_id, $params);
         $benchmarks = $this->_benchmarks();
         try {
             $block_content = $this->_blockContent($block_id, $supplemental_factory, $params, $benchmarks, $listing_factory);
-
             $this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
             $this->load->model('web_content/block_model');
             $web_block_factory = new WebBlockFactory($this->block_model, $supplemental_factory);
@@ -147,9 +145,9 @@ $page_id = 105;
         //$option_listing_factory = new ListingFactory($this->herd_options_model, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
 
         //create block content
-        $reports = $report_factory->getByBlock($block_id);
-        if(!empty($reports)){
-            return array_values($reports)[0];
+        $report = $report_factory->getByBlock($block_id);
+        if(!empty($report)){
+            return $report;
         }
         $setting_forms = $setting_form_factory->getByBlock($block_id);
         if(!empty($setting_forms)){
@@ -159,7 +157,7 @@ $page_id = 105;
         if(!empty($entry_forms)){
             return array_values($entry_forms)[0];
         }
-        $serial_num = isset($params['serial_num']) ? $params['serial_num'] : null;
+        //$serial_num = isset($params['serial_num']) ? $params['serial_num'] : null;
         $listings = $listing_factory->getByBlock($block_id, $params);
         if(!empty($listings)){
             return array_values($listings)[0];

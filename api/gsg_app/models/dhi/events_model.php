@@ -49,6 +49,7 @@ class Events_model extends CI_Model {
               ,e.[pen_df] AS pen_num
               ,p.[siteID] AS siteID
               ,e.[comment_df] AS comment
+              ,e.[body_df] AS body_df
             ")
             ->join('TD.herd.pens p', 'e.pen_df = p.pen_num', 'left')
             ->where('e.herd_code', $herd_code)
