@@ -36,15 +36,6 @@ abstract class ReportData implements iReportData{
 	protected $report_datasource;
 	
 	/**
-	 * dataset
-	 *
-	 * dataset
-	 * @var array
-	 **/
-	protected $dataset;
-	
-	
-	/**
 	 * @todo: add filter data
 	 */
 	function __construct(iReport $report, \Report_data_model $report_datasource) {//, Benchmarks $benchmarks, DbTable $db_table

@@ -165,16 +165,16 @@ class Report_data_model extends CI_Model {
 	 */
 	
 	protected function setFilters($where_criteria){
-		if(isset($where_criteria) && is_array($where_criteria)){
+        if(isset($where_criteria) && is_array($where_criteria)){
 			foreach($where_criteria as $k => $v){
                 $val = $v['value'];
 				if(empty($val) === FALSE || $val === '0'){
 					if(is_array($val)){
 						//if filter is a range
 						if(key($val) === 'dbfrom' || key($val) === 'dbto'){
-							if(isset($where_criteria[$k]['dbfrom']['value']) && !empty($where_criteria[$k]['dbfrom']['value']) && isset($where_criteria[$k]['dbto']['value']) && !empty($where_criteria[$k]['dbto']['value'])){
-								$from = is_date_format($where_criteria[$k]['dbfrom']['value']) ? date_to_mysqldatetime($where_criteria[$k]['dbfrom']['value']) : $where_criteria[$k]['dbfrom']['value'];
-								$to = is_date_format($where_criteria[$k]['dbto']['value']) ? date_to_mysqldatetime($where_criteria[$k]['dbto']['value']) : $where_criteria[$k]['dbto']['value'];
+							if(isset($where_criteria[$k]['value']['dbfrom']) && !empty($where_criteria[$k]['value']['dbfrom']) && isset($where_criteria[$k]['value']['dbto']) && !empty($where_criteria[$k]['value']['dbto'])){
+								$from = is_date_format($where_criteria[$k]['value']['dbfrom']) ? date_to_mysqldatetime($where_criteria[$k]['value']['dbfrom']) : $where_criteria[$k]['value']['dbfrom'];
+								$to = is_date_format($where_criteria[$k]['value']['dbto']) ? date_to_mysqldatetime($where_criteria[$k]['value']['dbto']) : $where_criteria[$k]['value']['dbto'];
 								$this->db->where($k . " BETWEEN '" . $from . "' AND '" . $to . "'");
 							}
 						}
