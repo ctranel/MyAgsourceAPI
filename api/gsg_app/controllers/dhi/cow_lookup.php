@@ -6,8 +6,12 @@ require_once(APPPATH . 'libraries/Supplemental/Content/SupplementalFactory.php')
 
 use \myagsource\AccessLog;
 use \myagsource\Supplemental\Content\SupplementalFactory;
+use \myagsource\DataHandler;
+use \myagsource\Datasource\DbObjects\DbTableFactory;
 use \myagsource\Site\WebContent\WebBlockFactory;
+use \myagsource\Report\Content\ReportFactory;
 use \myagsource\Listings\Content\ListingFactory;
+use \myagsource\Api\Response\ResponseMessage;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 class Cow_lookup extends dpage {
@@ -45,8 +49,6 @@ class Cow_lookup extends dpage {
 	 *   we would have to create a page within the database for each tab
 	*/
 	function events($serial_num, $show_all_events = 0){
-        $page_id = 79;
-
 		try{
             $this->_loadObjVars($serial_num);
             $this->load->model('dhi/cow_lookup/events_model');
@@ -61,7 +63,6 @@ class Cow_lookup extends dpage {
             //Set up site content objects
             $this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
             $this->load->model('web_content/block_model');
-            $web_block_factory = new WebBlockFactory($this->block_model, $supplemental_factory);
 
             //page content
             $this->load->model('ReportContent/report_block_model');
@@ -70,10 +71,13 @@ class Cow_lookup extends dpage {
             $option_listing_factory = new ListingFactory($this->event_listing_model);
 
             //create block content
-            $listings = $option_listing_factory->getByPage($page_id, ['herd_code' => $this->session->userdata('herd_code'), 'serial_num' => $serial_num]);
+            $listing = $option_listing_factory->getListing(3, ['herd_code' => $this->session->userdata('herd_code'), 'serial_num' => $serial_num]);
 
             //create blocks for content
-            $blocks = $web_block_factory->getBlocksFromContent($page_id, $listings, $supplemental_factory);
+            $web_block_factory = new WebBlockFactory($this->block_model, $supplemental_factory);
+            $listing_block = $web_block_factory->getBlock(323, $listing);
+
+            $blocks = [$listing_block];
             if(is_array($blocks)){
                 foreach($blocks as $b){
                     $data['blocks'][] = $b->toArray();
@@ -213,30 +217,48 @@ class Cow_lookup extends dpage {
 		if(!isset($lact_num)){
 			$lact_num = $this->curr_lact_num;
 		}
+		$params = [
+		    'herd_code' => $this->session->userdata('herd_code'),
+            'serial_ num' => $serial_num,
+            'lact_num' => $lact_num,
+        ];
 
         try{
-            $this->load->model('dhi/cow_model');
-            $cow_data = $this->cow_model->cowIdData($this->session->userdata('herd_code'), $serial_num);
+            $supplemental_factory = $this->_supplementalFactory();
+            $this->filters = $this->_filters(79, $params);
+            $benchmarks = $this->_benchmarks();
 
-            $this->load->model('dhi/cow_lookup/graphs_model');
-            $this->load->library('chart');
-            $data = array(
-                'arr_tests' => $this->chart->formatDataSet($this->graphs_model->getGraphData($this->session->userdata('herd_code'), $serial_num, $lact_num), 'lact_dim')
-                ,'cow_id' => $this->cow_id
-                ,'serial_num' => $serial_num
-                ,'lact_num' => $lact_num
-                ,'curr_lact_num' => $this->curr_lact_num
-            );
+            //load models for block content
+            $this->load->model('ReportContent/report_block_model');
+            $this->load->model('Datasource/db_field_model');
+            $this->load->model('ReportContent/report_data_model');
+            $this->load->model('Datasource/db_table_model');
+            $benchmarks = $this->_benchmarks();
 
+            //load factories for block content
+            $data_handler = new DataHandler($this->report_data_model, $benchmarks);
+            $db_table_factory = new DbTableFactory($this->db_table_model);
+            $report_factory = new ReportFactory($this->report_block_model, $this->db_field_model, $this->filters, $supplemental_factory, $data_handler, $db_table_factory);
 
-            $ret = $this->load->view('dhi/cow_lookup/graphs', $data, true);
-            $ret['chosen_id'] = $cow_data[$this->cow_id_field];
+            $report = $report_factory->getByBlock(410);
+
+            //create blocks for content
+            $web_block_factory = new WebBlockFactory($this->block_model, $supplemental_factory);
+            $report_block = $web_block_factory->getBlock(410, $report);
+
+            $blocks = [$report_block];
+            if(is_array($blocks)){
+                foreach($blocks as $b){
+                    $data['blocks'][] = $b->toArray();
+                }
+            }
+            $data['lact_num'] = $lact_num;
         }
         catch(Exception $e){
             $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
         }
 
-        $this->sendResponse(200, null, $ret);
+        $this->sendResponse(200, null, $data);
 	}
 
     protected function _loadObjVars($serial_num){
