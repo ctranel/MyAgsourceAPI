@@ -219,7 +219,7 @@ class Cow_lookup extends dpage {
 		}
 		$params = [
 		    'herd_code' => $this->session->userdata('herd_code'),
-            'serial_ num' => $serial_num,
+            'serial_num' => $serial_num,
             'lact_num' => $lact_num,
         ];
 
