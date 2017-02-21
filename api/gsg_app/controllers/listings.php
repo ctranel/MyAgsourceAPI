@@ -68,7 +68,7 @@ class listings extends dpage {
 
 
         //create blocks for content
-        $blocks = $web_block_factory->getBlocksFromContent($page_id, $listings, $supplemental_factory);
+        $blocks = $web_block_factory->getBlocksFromContent($page_id, $listings);
         $this->load->model('web_content/page_model');
         $page_data = $this->page_model->getPage($page_id);
         $this->page = new Page($page_data, $blocks, $supplemental_factory, $this->filters, null);
@@ -113,7 +113,7 @@ class listings extends dpage {
         $this->load->model('ReportContent/report_block_model');
 
         //create blocks for content
-        $blocks = $web_block_factory->getBlocksFromContent($page_id, $listings, $supplemental_factory);
+        $blocks = $web_block_factory->getBlocksFromContent($page_id, $listings);
 
         $this->load->model('web_content/page_model');
         $page_data = $this->page_model->getPage($page_id);

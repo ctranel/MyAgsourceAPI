@@ -129,7 +129,24 @@ class Chart extends Report {
                 //set report field
                 $datafield = new DbField($s['db_field_id'], $s['table_name'], $s['db_field_name'], $s['name'], $s['description'], $s['pdf_width'], $s['default_sort_order'],
 						 $s['datatype'], $s['max_length'], $s['decimal_scale'], $s['unit_of_measure'], $s['is_timespan'], $s['is_foreign_key'], $s['is_nullable'], $s['is_natural_sort']);
-				$this->report_fields[] = new ChartField($s['id'], $s['name'], $datafield, $s['category_id'], $s['is_displayed'], $s['display_format'], $s['aggregate'], $s['is_sortable'], $s['chart_type'], $s['axis_index'], $s['trend_type'], $s['field_group'], $this->header_supplemental[$s['db_field_name']], $this->dataset_supplemental[$s['db_field_name']], $s['field_group'], $s['field_group_ref_key']);
+				$this->report_fields[] = new ChartField(
+				    $s['id'],
+                    $s['name'],
+                    $datafield,
+                    $s['category_id'],
+                    $s['is_displayed'],
+                    $s['display_format'],
+                    $s['aggregate'],
+                    $s['is_sortable'],
+                    $s['chart_type'],
+                    $s['axis_index'],
+                    $s['trend_type'],
+                    $s['field_group'],
+                    isset($this->header_supplemental[$s['db_field_name']]) ? $this->header_supplemental[$s['db_field_name']] : null,
+                    isset($this->dataset_supplemental[$s['db_field_name']]) ? $this->dataset_supplemental[$s['db_field_name']] : null,
+                    $s['field_group'],
+                    $s['field_group_ref_key']
+                );
 			}
 		}
 	}
