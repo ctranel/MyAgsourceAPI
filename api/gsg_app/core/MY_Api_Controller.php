@@ -142,11 +142,11 @@ class MY_Api_Controller extends CI_Controller
             case 200:
                 $message = $response->message($messages);
 
-                if(is_array($message) && is_array($payload)){
+                if(is_array($message) && !empty($message) && is_array($payload) && !empty($payload)){
                     echo json_encode(array_merge(['messages'=>$message], $payload));
                     break;
                 }
-                if(is_array($message)){
+                if(is_array($message) && !empty($message)){
                     echo json_encode(['messages'=>$message]);
                     break;
                 }
