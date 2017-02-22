@@ -3,11 +3,12 @@
 require_once(APPPATH . 'controllers/dpage.php');
 require_once(APPPATH . 'libraries/Form/Content/Defaults.php');
 require_once(APPPATH . 'libraries/dhi/BatchEvent.php');
+require_once(APPPATH . 'libraries/dhi/Animal.php');
 
 
 use \myagsource\Api\Response\ResponseMessage;
 use \myagsource\Form\Content\Defaults;
-use \myagsource\dhi\BatchEvent;
+use \myagsource\dhi\Animal;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
@@ -83,6 +84,14 @@ class form_defaults extends dpage {
         }
 
         if(isset($input['sire_naab']) && !empty($input['sire_naab'])){
+            try{
+                $this->load->model('dhi/animal_model');
+                $input['sire_naab'] = Animal::formatNAAB($this->animal_model, $input['sire_naab'], $this->settings->getValue('species'));
+            }
+            catch(\Exception $e){
+                $this->sendResponse(400, new ResponseMessage($e->getMessage(), 'error'));
+            }
+
             $this->load->model('Forms/form_defaults_model');
             try{
                 $defaults = new Defaults($this->form_defaults_model);
@@ -95,6 +104,14 @@ class form_defaults extends dpage {
         }
 
         if(isset($input['sire_bull_id']) && !empty($input['sire_bull_id'])){
+            try{
+                $this->load->model('dhi/animal_model');
+                $input['sire_bull_id'] = Animal::formatOfficialId($this->animal_model, $input['sire_bull_id']);
+            }
+            catch(\Exception $e){
+                $this->sendResponse(400, new ResponseMessage($e->getMessage(), 'error'));
+            }
+
             $this->load->model('Forms/form_defaults_model');
             try{
                 $defaults = new Defaults($this->form_defaults_model);
@@ -116,6 +133,14 @@ class form_defaults extends dpage {
         }
 
         if(isset($input['naab']) && !empty($input['naab'])){
+            try{
+                $this->load->model('dhi/animal_model');
+                $input['naab'] = Animal::formatNAAB($this->animal_model, $input['naab'], $this->settings->getValue('species'));
+            }
+            catch(\Exception $e){
+                $this->sendResponse(400, new ResponseMessage($e->getMessage(), 'error'));
+            }
+
             $this->load->model('Forms/form_defaults_model');
             try{
                 $defaults = new Defaults($this->form_defaults_model);
@@ -128,6 +153,14 @@ class form_defaults extends dpage {
         }
 
         if(isset($input['bull_id']) && !empty($input['bull_id'])){
+            try{
+                $this->load->model('dhi/animal_model');
+                $input['bull_id'] = Animal::formatOfficialId($this->animal_model, $input['bull_id']);
+            }
+            catch(\Exception $e){
+                $this->sendResponse(400, new ResponseMessage($e->getMessage(), 'error'));
+            }
+
             $this->load->model('Forms/form_defaults_model');
             try{
                 $defaults = new Defaults($this->form_defaults_model);
@@ -141,4 +174,5 @@ class form_defaults extends dpage {
 
         $this->sendResponse(204);
     }
+
 }

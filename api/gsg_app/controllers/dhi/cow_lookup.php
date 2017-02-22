@@ -165,8 +165,8 @@ class Cow_lookup extends dpage {
 			$lact_num = $this->curr_lact_num;
 		}
         try{
-            $this->load->model('dhi/cow_model');
-            $cow_data = $this->cow_model->cowIdData($this->session->userdata('herd_code'), $serial_num);
+            $this->load->model('dhi/animal_model');
+            $cow_data = $this->animal_model->cowIdData($this->session->userdata('herd_code'), $serial_num);
 
             $this->load->model('dhi/cow_lookup/tests_model');
             $data = [
@@ -188,8 +188,8 @@ class Cow_lookup extends dpage {
 	
 	function lactations($serial_num){
         try{
-            $this->load->model('dhi/cow_model');
-            $cow_data = $this->cow_model->cowIdData($this->session->userdata('herd_code'), $serial_num);
+            $this->load->model('dhi/animal_model');
+            $cow_data = $this->animal_model->cowIdData($this->session->userdata('herd_code'), $serial_num);
 
             $this->load->model('dhi/cow_lookup/lactations_model');
             $data['lactations'] = $this->lactations_model->getLactationsArray($this->session->userdata('herd_code'), $serial_num);

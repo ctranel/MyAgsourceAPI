@@ -3,7 +3,7 @@ require_once APPPATH . 'libraries/MssqlUtility.php';
 
 use \myagsource\MssqlUtility;
 
-class Cow_model extends CI_Model {
+class Animal_model extends CI_Model {
 
     protected $mssql_utility;
 
@@ -36,6 +36,35 @@ class Cow_model extends CI_Model {
             ->result_array();
         if(is_array($result) && isset($result[0]) && is_array($result[0])){
             return $result[0];
+        }
+    }
+
+    /**
+     * @method cowIdData()
+     * @param string herd code
+     * @param int serial num
+     * @return array of cow id data.
+     * @access public
+     *
+     **/
+
+    public function getNaabBreedCode($breed, $species_code){
+        $breed = MssqlUtility::escape($breed);
+        $species_code = MssqlUtility::escape($species_code);
+
+        if(empty($breed) || empty($species_code)){
+            throw new Exception('Cannot look up NAAB.');
+        }
+
+        $result = $this->db
+            ->select('naab')
+            ->where('descr', $breed)
+            ->where('species_cd', $species_code)
+            ->get('[TD].[ref].[breeds]')
+            ->result_array();
+        //only return a result if there is exactly 1 match, otherwise request is ambiguous
+        if(is_array($result) && count($result)==1 && isset($result[0]) && is_array($result[0])){
+            return $result[0]['naab'];
         }
     }
 }

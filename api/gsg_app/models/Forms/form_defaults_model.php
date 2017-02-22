@@ -101,7 +101,13 @@ class Form_defaults_model extends CI_Model {
         $bull_id = MssqlUtility::escape($bull_id);
 
         $res = $this->db
-            ->select("[breed_code] AS sire_breed_cd,[country_code] AS sire_country_cd,[short_ai_name] AS sire_name,[primary_naab] AS sire_naab")
+            ->select("
+                [bull_id] AS sire_bull_id,
+                [breed_code] AS sire_breed_cd,
+                [country_code] AS sire_country_cd,
+                [short_ai_name] AS sire_name,
+                [primary_naab] AS sire_naab"
+            )
             ->where('bull_id', $bull_id)
             ->get("[sire].[dbo].[view_sire_id2]")
             ->result_array();
@@ -132,7 +138,13 @@ class Form_defaults_model extends CI_Model {
         $naab = MssqlUtility::escape($naab);
 
         $res = $this->db
-            ->select("[breed_code] AS sire_breed_cd,[country_code] AS sire_country_cd,[bull_id] AS sire_bull_id,[short_ai_name] AS sire_name")
+            ->select("
+                [bull_naab] AS sire_naab,
+                [breed_code] AS sire_breed_cd,
+                [country_code] AS sire_country_cd,
+                [bull_id] AS sire_bull_id,
+                [short_ai_name] AS sire_name"
+            )
             ->where('bull_naab', $naab)
             ->get("[sire].[dbo].[view_sire_naab2]")
             ->result_array();
@@ -163,7 +175,13 @@ class Form_defaults_model extends CI_Model {
         $bull_id = MssqlUtility::escape($bull_id);
 
         $res = $this->db
-            ->select("[breed_code] AS breed_cd,[country_code] AS country_cd,[short_ai_name] AS name,[primary_naab] AS naab")
+            ->select("
+                [bull_id] AS bull_id,
+                [breed_code] AS breed_cd,
+                [country_code] AS country_cd,
+                [short_ai_name] AS name,
+                [primary_naab] AS naab"
+            )
             ->where('bull_id', $bull_id)
             ->get("[sire].[dbo].[view_sire_id2]")
             ->result_array();
@@ -194,7 +212,13 @@ class Form_defaults_model extends CI_Model {
         $naab = MssqlUtility::escape($naab);
 
         $res = $this->db
-            ->select("[breed_code] AS breed_cd,[country_code] AS country_cd,[bull_id],[short_ai_name] AS name")
+            ->select("
+                [bull_naab] AS naab,
+                [breed_code] AS breed_cd,
+                [country_code] AS country_cd,
+                [bull_id],
+                [short_ai_name] AS name"
+            )
             ->where('bull_naab', $naab)
             ->get("[sire].[dbo].[view_sire_naab2]")
             ->result_array();
