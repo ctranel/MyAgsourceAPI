@@ -524,6 +524,9 @@ abstract class Report implements iReport {
      * @author ctranel
      **/
     protected function setSupplemental($data){
+        //$this->header_supplemental[$data['db_field_name']] = null;
+        //$this->dataset_supplemental[$data['db_field_name']] = null;
+
         if(isset($this->supplemental_factory)){
             if(isset($data['head_supp_id'])){
                 $this->header_supplemental[$data['db_field_name']] = $this->supplemental_factory->getColHeaderSupplemental($data['head_supp_id'], $data['head_a_href'], $data['head_a_rel'], $data['head_a_title'], $data['head_a_class'], $data['head_comment']);

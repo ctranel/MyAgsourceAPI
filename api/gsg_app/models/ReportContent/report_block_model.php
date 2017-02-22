@@ -214,12 +214,13 @@ class report_block_model extends CI_Model {
 	 **/
 	public function getChartAxes($report_id){
 		$this->db
-		->select("a.id, a.x_or_y, a.min, a.max, a.opposite, a.data_type, a.db_field_id, t.name AS table_name, f.db_field_name, f.name, f.description, f.pdf_width, f.default_sort_order, f.data_type as datatype, f.max_length,
+		->select("a.id, a.x_or_y, a.min, a.max, a.opposite, a.data_type, a.db_field_id, CONCAT(db.name, '.', t.db_schema, '.', t.name) AS table_name, f.db_field_name, f.name, f.description, f.pdf_width, f.default_sort_order, f.data_type as datatype, f.max_length,
 					f.decimal_points AS decimal_scale, f.unit_of_measure, f.is_timespan_field as is_timespan, f.is_fk_field AS is_foreign_key, f.is_nullable, f.is_natural_sort, text, c.name AS category")
 		->from('users.dbo.chart_axes AS a')
 		->join('users.dbo.chart_categories AS c', 'a.id = c.block_axis_id', 'left')
 		->join('users.dbo.db_fields AS f', 'a.db_field_id = f.id', 'left')
 		->join('users.dbo.db_tables AS t', 'f.db_table_id = t.id', 'left')
+        ->join('users.dbo.db_databases AS db', 't.database_id = db.id', 'left')
 		->where('a.report_id', $report_id)
 		->order_by('a.list_order', 'asc')
 		->order_by('c.list_order', 'asc');
