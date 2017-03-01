@@ -116,6 +116,9 @@ class form_defaults extends dpage {
             try{
                 $defaults = new Defaults($this->form_defaults_model);
                 $bull_defaults = $defaults->etSireIDData($input['sire_bull_id']);
+                if(strlen($input['sire_bull_id']) > strlen($defaults['sire_bull_id'])){
+                    $defaults['sire_bull_id'] = $input['sire_bull_id'];
+                }
                 $this->sendResponse(200, null, ['defaults' => $bull_defaults]);
             }
             catch(exception $e){
@@ -165,6 +168,9 @@ class form_defaults extends dpage {
             try{
                 $defaults = new Defaults($this->form_defaults_model);
                 $bull_defaults = $defaults->sireIDData($input['bull_id']);
+                if(strlen($input['bull_id']) > strlen($defaults['bull_id'])){
+                    $defaults['bull_id'] = $input['bull_id'];
+                }
                 $this->sendResponse(200, null, ['defaults' => $bull_defaults]);
             }
             catch(exception $e){

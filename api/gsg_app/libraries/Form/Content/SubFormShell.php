@@ -41,22 +41,4 @@ class SubFormShell
 
         return $ret;
     }
-    
-    /**
-     * conditionsMet
-     *
-     * are all subform conditions met?
-     *
-     * @param $control_value
-     * @return bool
-     */
-    public function DELconditionsMet($control_value){//need to pass all form data, not jsut control value
-        foreach($this->condition_groups as $cg){
-            if(!$cg->conditionsMet($control_value)){
-                return false;
-            }
-        }
-
-        return true;
-    }
 }

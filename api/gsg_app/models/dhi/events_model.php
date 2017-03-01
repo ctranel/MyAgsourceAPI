@@ -44,8 +44,8 @@ class Events_model extends CI_Model {
         $res = $this->db
             ->select("
                e.[cost_df] AS cost
-              ,e.[meat_df] AS withhold_meat_dt
-              ,e.[milk_df] AS withhold_milk_dt
+              ,e.[meat_df] AS withhold_meat_days
+              ,e.[milk_df] AS withhold_milk_days
               ,e.[pen_df] AS pen_num
               ,p.[siteID] AS siteID
               ,e.[comment_df] AS comment

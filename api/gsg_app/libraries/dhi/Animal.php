@@ -66,7 +66,7 @@ class Animal
      *  @throws: Exception
      * -----------------------------------------------------------------*/
     public static function formatNAAB(\Animal_model $datasource, $naab, $species_code){
-        $orig_breed = preg_replace("/[^A-Z]+/", "", $naab);
+        $orig_breed = preg_replace("/[^a-zA-Z]+/", "", $naab);
         $breed = $orig_breed;
 
         if(strlen($orig_breed) == 1){
@@ -91,7 +91,7 @@ class Animal
 
      *  @author: ctranel
      *  @date: 2016-10-20
-     *  @return: valid SireId
+     *  @return: valid 12 digit SireId
      *  @throws: Exception
      * -----------------------------------------------------------------*/
     public static function formatOfficialId(\Animal_model $datasource, $sire_id){

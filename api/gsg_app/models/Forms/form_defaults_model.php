@@ -17,7 +17,7 @@ class Form_defaults_model extends CI_Model {
      *
      **/
     public function getETSireDefaultValues($herd_code, $sire_id){
-        $event_code = (int)$sire_id;
+        $sire_id = (int)$sire_id;
         $herd_code = MssqlUtility::escape($herd_code);
 
         $res = $this->db
