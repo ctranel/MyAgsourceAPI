@@ -66,7 +66,7 @@ class ReportFactory {
     function __construct(
 		\report_block_model $datasource_reports,
         \db_field_model $datasource_dbfield, 
-        ReportFilters $filters, 
+        ReportFilters $filters,
         SupplementalFactory $supplemental_factory = null, 
         DataHandler $data_handler,
         DbTableFactory $db_table_factory
@@ -84,12 +84,16 @@ class ReportFactory {
      * getByBlock
      *
      * @param int block_id
+     * @param array key=>value new filter data
      * @author ctranel
      * @returns Report
 */
-    public function getByBlock($block_id){
+    public function getByBlock($block_id, $filter_data = null){
         //$criteria = ['b.id' => $block_id];
-        $results = $this->datasource_reports->getBlock($block_id);
+        if(isset($filter_data) && !empty($filter_data)){
+			$this->filters->resetFilters($filter_data);
+		}
+		$results = $this->datasource_reports->getBlock($block_id);
         if(empty($results)){
             return [];
         }
@@ -109,8 +113,7 @@ class ReportFactory {
 	public function getByPage($page_id){
 		$reports = [];
 		
-		$criteria = ['page_id' => $page_id];
-		$results = $this->datasource_reports->getByCriteria($criteria);
+		$results = $this->datasource_reports->getByPage($page_id);
 		if(empty($results)){
 			return [];
 		}

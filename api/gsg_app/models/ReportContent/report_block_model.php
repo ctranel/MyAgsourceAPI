@@ -13,8 +13,8 @@ class report_block_model extends CI_Model {
      **/
     public function getBlock($block_id) {
         $this->db
-            ->select('rb.id, b.name,b.[description],b.path,b.active,dt.name AS display_type,s.name AS scope,ct.name as chart_type,rb.max_rows,rb.cnt_row,rb.sum_row,rb.avg_row,rb.pivot_db_field,rb.bench_row,rb.is_summary,rb.keep_nulls')//, pb.page_id, pb.list_order
-            ->where('b.active', 1)
+            ->select('rb.id, b.name,b.[description],b.path,b.isactive,dt.name AS display_type,s.name AS scope,ct.name as chart_type,rb.max_rows,rb.cnt_row,rb.sum_row,rb.avg_row,rb.pivot_db_field,rb.bench_row,rb.is_summary,rb.keep_nulls')//, pb.page_id, pb.list_order
+            ->where('b.isactive', 1)
             ->where('b.id', $block_id)
             ->join('users.dbo.reports rb', 'b.id = rb.block_id', 'inner')
             ->join('users.dbo.lookup_display_types dt', 'b.display_type_id = dt.id', 'inner')
@@ -31,14 +31,12 @@ class report_block_model extends CI_Model {
 	 **/
 	public function getBlocks() {
 		$this->db
-			->select('rb.id, pb.page_id, b.name,b.[description],b.path,b.active,dt.name AS display_type,s.name AS scope,ct.name as chart_type,rb.max_rows,rb.cnt_row,rb.sum_row,rb.avg_row,rb.pivot_db_field,rb.bench_row,rb.is_summary,rb.keep_nulls, pb.list_order')
-			->where('b.active', 1)
+			->select('rb.id, b.id AS block_id, b.name,b.[description],b.path,b.isactive,dt.name AS display_type,s.name AS scope,ct.name as chart_type,rb.max_rows,rb.cnt_row,rb.sum_row,rb.avg_row,rb.pivot_db_field,rb.bench_row,rb.is_summary,rb.keep_nulls')
+			->where('b.isactive', 1)
 			->join('users.dbo.reports rb', 'b.id = rb.block_id', 'inner')
 			->join('users.dbo.lookup_display_types dt', 'b.display_type_id = dt.id', 'inner')
 			->join('users.dbo.lookup_scopes s', 'b.scope_id = s.id', 'inner')
-			->join('users.dbo.pages_blocks pb', 'b.id = pb.block_id', 'inner')
 			->join('users.dbo.lookup_chart_types ct', 'rb.chart_type_id = ct.id', 'left')
-			->order_by('list_order', 'asc')
 			->from('users.dbo.blocks' . ' b');
 		return $this->db->get()->result_array();
 	}
@@ -61,8 +59,25 @@ class report_block_model extends CI_Model {
 		}
 		return $this->getBlocks();
 	}
-	
-	/**
+
+    /**
+     * getByPage
+     * @param associative array of criteria
+     * @param 2d array of joins ('table', 'condition')
+     * @return array of section data
+     * @author ctranel
+     **/
+    public function getByPage($page_id) {
+        $page_id = (int)$page_id;
+        $this->db
+            ->select('pb.page_id, pb.list_order')
+            ->join('users.dbo.pages_blocks pb', 'b.id = pb.block_id', 'inner')
+            ->where('pb.page_id', $page_id)
+            ->order_by('pb.list_order', 'asc');
+        return $this->getBlocks();
+    }
+
+    /**
 	 * @method getWhereData()
 	 * @param int block id
 	 * @return returns multi-dimensional array, arr_sort_by field data and arr_sort_order

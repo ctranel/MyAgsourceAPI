@@ -68,13 +68,29 @@ class ReportFilters{
 
         $this->setCriteria();
 	}
+    /* -----------------------------------------------------------------
+    *  Resets filters based on additional criteria
+
+    *  Resets filters based on additional criteria
+
+    *  @author: ctranel
+    *  @date: 2017-03-01
+    *  @return: void
+    *  @throws:
+    * -----------------------------------------------------------------
+    */
+    public function resetFilters($filter_data){
+        $this->arr_criteria = [];
+        $this->form_data = $filter_data;
+
+        $this->setCriteria();
+    }
 
     /* -----------------------------------------------------------------
     *  Returns filter text
 
     *  Returns filter text
 
-    *  @since: version 1
     *  @author: ctranel
     *  @date: Jun 17, 2014
     *  @return: string filter text
@@ -93,7 +109,6 @@ class ReportFilters{
 
 	*  Returns boolean of whether filters should be displayed
 
-	*  @since: version 1
 	*  @author: ctranel
 	*  @date: Jun 17, 2014
 	*  @return boolean
@@ -127,7 +142,10 @@ class ReportFilters{
 	*/
 	protected function setCriteria(){//$page_id, $arr_form_data = null
 		//get filters from DB for the current page, set other vars
-		$page_filter_data = $this->filter_model->getPageFilters($this->page_id);
+        $page_filter_data = [];
+        if(isset($this->page_id)){
+            $page_filter_data = $this->filter_model->getPageFilters($this->page_id);
+        }
 		//set default criteria as base
 		$this->setFilterCriteria($page_filter_data, $this->form_data);
 	}

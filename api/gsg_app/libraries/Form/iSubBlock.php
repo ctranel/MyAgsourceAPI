@@ -10,6 +10,6 @@ namespace myagsource\Form;
 
 use \myagsource\Site\iBlock;
 
-interface iSubBlock extends iBlock
+interface iSubBlock// extends iBlock
 {
 }

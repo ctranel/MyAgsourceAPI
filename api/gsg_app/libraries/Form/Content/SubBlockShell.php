@@ -10,11 +10,10 @@ namespace myagsource\Form\Content;
 
 require_once APPPATH . 'libraries/Form/iSubBlock.php';
 
-use \myagsource\Site\iBlock;
-use \myagsource\Form\iForm;
+//use \myagsource\Site\iBlock;
 use \myagsource\Form\iSubBlock;
 
-class SubBlock implements iSubBlock
+class SubBlockShell
 {
     /**
      * @var array of SubBlockConditionGroup objects
@@ -22,23 +21,29 @@ class SubBlock implements iSubBlock
     protected $condition_groups;
 
     /**
-     * @var iBlock
+     * @var int
      */
-    protected $block;
+    protected $block_id;
 
     /**
-     * @var iForm
+     * @var string
      */
-    protected $datalink_form;
+    protected $block_name;
 
-    public function __construct($condition_groups, iBlock $block, iForm $datalink_form = null){
+    public function __construct($condition_groups, $block_id, $block_name, $content_type, $content_id)
+    {
         $this->condition_groups = $condition_groups;
-        $this->block = $block;
-        $this->datalink_form = $datalink_form;
+        $this->block_id = $block_id;
+        $this->block_name = $block_name;
+        $this->content_type = $content_type;
+        $this->content_id = $content_id;
     }
     
     public function toArray(){
-        $ret['block'] = $this->block->toArray();
+        $ret['block_id'] = $this->block_id;
+        $ret['block_name'] = $this->block_name;
+        $ret['content_type'] = $this->content_type;
+        $ret['content_id'] = $this->content_id;
 
         if(isset($this->condition_groups) && is_array($this->condition_groups) && !empty($this->condition_groups)){
             $ret['condition_groups'] = [];
@@ -66,27 +71,5 @@ class SubBlock implements iSubBlock
         }
 
         return true;
-    }
-
-    /**
-     * insertDefaultListingRecords
-     *
-     * are all subblock conditions met?
-     *
-     * @param $control_value
-     * @return bool
-     */
-    public function insertDefaultListingRecords($parent_key_vals, $form_data){
-        if(isset($this->datalink_form) && $this->conditionsMet($form_data)){
-            $input = $this->block->dataset();
-            if(!is_array($input) || empty(array_filter($input))){
-                return;
-                //throw new \Exception("Default data not found.");
-            }
-
-            foreach($input as $i){
-                $this->datalink_form->writeBatch($i + $parent_key_vals);
-            }
-        }
     }
 }

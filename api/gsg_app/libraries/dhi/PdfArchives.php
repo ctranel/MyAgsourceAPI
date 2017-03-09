@@ -74,6 +74,21 @@ class PdfArchives implements iBlockContent
         $this->setHerdArchives($archives);
     }
 
+    /* -----------------------------------------------------------------
+*  keyMetaArray
+
+*  returns field-name-keyed array with meta data for keys
+
+*  @author: ctranel
+*  @date: Jul 1, 2014
+*  @param: array of key=>value pairs that have been processed by the parseFormData static function
+*  @return key->value array of keys meta data
+*  @throws: * -----------------------------------------------------------------
+*/
+    public function keyMetaArray(){
+        return ['herd_code' => $this->herd_code];
+    }
+
     /**
      * getHerdArchives
      *

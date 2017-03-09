@@ -66,11 +66,13 @@ class SubContentConditionGroup //implements iSubContentConditionGroup
      */
     public function conditionsMet($form_values){
         foreach($this->conditions as $c){
-            if(!$c->conditionsMet($form_values)){
+            if(!$c->conditionsMet($form_values) && $this->operator === "AND"){
                 return false;
             }
+            if($c->conditionsMet($form_values) && $this->operator === "OR"){
+                return true;
+            }
         }
-
         return true;
     }
 }

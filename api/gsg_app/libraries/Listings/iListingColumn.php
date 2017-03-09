@@ -15,5 +15,6 @@ interface iListingColumn
 {
     public function id();
     public function toArray();
+    public function isKey();
     public function getDisplayText($value);
 }

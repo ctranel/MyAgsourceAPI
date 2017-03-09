@@ -13,8 +13,8 @@ class Block_model extends CI_Model {
 		$id = (int)$id;
 
         $this->db
-			->select('b.id, b.name,b.[description],b.path,dt.name AS display_type,s.name AS scope,b.active, 1 AS list_order')//,b.chart_type_id,b.max_rows,b.cnt_row,b.sum_row,b.avg_row,b.pivot_db_field,b.bench_row,b.is_summary
-			->where('b.active', 1)
+			->select('b.id, b.name,b.[description],b.path,dt.name AS display_type,s.name AS scope,b.isactive, 1 AS list_order')//,b.chart_type_id,b.max_rows,b.cnt_row,b.sum_row,b.avg_row,b.pivot_db_field,b.bench_row,b.is_summary
+			->where('b.isactive', 1)
             ->where('b.id', $id)
 			->join('users.dbo.lookup_display_types dt', 'b.display_type_id = dt.id', 'inner')
 			->join('users.dbo.lookup_scopes s', 'b.scope_id = s.id', 'inner')
@@ -34,8 +34,8 @@ class Block_model extends CI_Model {
      **/
     public function getBlocks() {
         $this->db
-            ->select('b.id, pb.page_id, b.name,b.[description],b.path,dt.name AS display_type,s.name AS scope,b.active, pb.list_order')//,b.chart_type_id,b.max_rows,b.cnt_row,b.sum_row,b.avg_row,b.pivot_db_field,b.bench_row,b.is_summary
-            ->where('b.active', 1)
+            ->select('b.id, pb.page_id, b.name,b.[description],b.path,dt.name AS display_type,s.name AS scope,b.isactive, pb.list_order')//,b.chart_type_id,b.max_rows,b.cnt_row,b.sum_row,b.avg_row,b.pivot_db_field,b.bench_row,b.is_summary
+            ->where('b.isactive', 1)
             ->join('users.dbo.lookup_display_types dt', 'b.display_type_id = dt.id', 'inner')
             ->join('users.dbo.lookup_scopes s', 'b.scope_id = s.id', 'inner')
             ->join('users.dbo.pages_blocks pb', 'b.id = pb.block_id', 'inner')
@@ -69,4 +69,43 @@ class Block_model extends CI_Model {
 		}
 		return $this->getBlocks();
 	}
+
+    /**
+     * getKeysByBlock
+     * @param int block_ic
+     * @return array of db field names
+     * @author ctranel
+     **/
+    public function getKeysByBlock($block_id) {
+        $res = $this->db
+            ->select('db_field_name')
+            ->distinct()
+            ->from('users.dbo.vma_db_fields_by_block')
+            ->where('is_fk_field', 1)
+            ->where('block_id', $block_id)
+            ->get()
+            ->result_array();
+
+        return array_column($res, 'db_field_name');
+    }
+
+    /**
+     * getKeysByContentId
+     * @param int content id
+     * @return array of db field names
+     * @author ctranel
+     **/
+    public function getKeysByContentId($content_type_id, $content_id) {
+        $res = $this->db
+            ->select('db_field_name')
+            ->from('users.dbo.vma_db_fields_by_block')
+            ->where('is_fk_field', 1)
+            ->where('content_id', $content_id)
+            ->where('display_type_id', $content_type_id)
+            ->get()
+            ->result_array();
+
+        return array_column($res, 'db_field_name');
+    }
+
 }

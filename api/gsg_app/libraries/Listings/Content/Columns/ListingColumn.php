@@ -104,6 +104,10 @@ class ListingColumn implements iListingColumn
         return $this->id;
     }
 
+    public function isKey(){
+        return $this->is_key;
+    }
+
     public function toArray(){
         $ret = [
             'label' => $this->label,
@@ -142,6 +146,7 @@ class ListingColumn implements iListingColumn
                 $value = null;
             }
         }
+        //prep arrays for display
         elseif(strpos($this->control_type, 'array') !== false){
             return str_replace('|', ', ', $value);
         }

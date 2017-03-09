@@ -4,8 +4,8 @@ namespace myagsource\Site\WebContent;
 require_once APPPATH . 'libraries/Site/iBlock.php';
 require_once APPPATH . 'libraries/Site/iBlockContent.php';
 
-use myagsource\Site\iBlock;
-use myagsource\Site\iBlockContent;
+use \myagsource\Site\iBlock;
+use \myagsource\Site\iBlockContent;
 use \myagsource\Supplemental\Content\SupplementalFactory;
 
 /**
@@ -142,8 +142,12 @@ class Block implements iBlock {
 	public function hasBenchmark(){
 		return $this->block_content->hasBenchmark();
 	}
+//@todo: add conditional to ensure this is a report
+    public function dataset(){
+        return $this->block_content->dataset();
+    }
 
-	public function toArray(){
+    public function toArray(){
         if($this->block_content instanceof iBlockContent){
             $ret = $this->block_content->toArray();
         }

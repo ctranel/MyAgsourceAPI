@@ -153,7 +153,7 @@ class Form implements iForm
             throw new \UnexpectedValueException('No form data received');
         }
 
-        $is_update = (bool)$form_data['is_edited'];
+        $is_update = (bool)isset($form_data['is_edited']) ? $form_data['is_edited'] : false;
         $form_data = $this->parseFormData($form_data);
 
         if($is_update){
@@ -161,6 +161,7 @@ class Form implements iForm
         }
         else {
             $key_vals = $this->datasource->insert($this->id, $form_data, $this->controlsMetaArray());
+            $this->insertDefaultListingRecords($key_vals, $form_data);
         }
         return $key_vals;
     }
@@ -187,10 +188,34 @@ class Form implements iForm
             throw new \UnexpectedValueException('Variable field not set on batch form submission.');
         }
 
+        $is_update = (bool)isset($form_data['is_edited']) ? $form_data['is_edited'] : false;
         $form_data = $this->parseFormData($form_data);
 
-        $key_vals = $this->datasource->batchInsert($this->id, $variable_field->name(), $form_data, $this->controlsMetaArray());
+        if($is_update){
+            $key_vals = $this->datasource->batchUpdate($this->id, $variable_field->name(), $form_data, $this->controlsMetaArray());
+        }
+        else {
+            $key_vals = $this->datasource->batchInsert($this->id, $variable_field->name(), $form_data, $this->controlsMetaArray());
+            $this->insertDefaultListingRecords($key_vals, $form_data);
+        }
         return $key_vals;
+    }
+
+    /* -----------------------------------------------------------------
+*  insertDefaultListingRecords
+
+*  returns the field
+
+*  @author: ctranel
+*  @date: 2017-02-23
+*  @param: array of key=>value pairs (values can be array of values) of identity columns from inserted
+*  @return: void
+*  @throws: * -----------------------------------------------------------------
+*/
+    protected function insertDefaultListingRecords($parent_key_vals, $form_data){
+        foreach($this->controls as $c){
+            $c->insertDefaultListingRecords($parent_key_vals, $form_data);
+        }
     }
 
     /* -----------------------------------------------------------------
@@ -239,6 +264,34 @@ class Form implements iForm
         $key_data = $this->parseFormData($key_data);
         //SEND KEY FIELDS AND VALUES
         $this->datasource->delete($this->id, $key_data, $this->keyMetaArray());
+    }
+
+    /* -----------------------------------------------------------------
+*  deleteBatch
+
+*  deleteBatch form from datasource
+
+*  @author: ctranel
+*  @date: 2017-02-16
+*  @param: array of key=>value pairs that have been processed by the parseFormData static function
+*  @return void
+*  @throws: UnexpectedValueException
+     * * -----------------------------------------------------------------
+*/
+    public function deleteBatch($key_data){
+        if(!isset($key_data) || !is_array($key_data)){
+            throw new \UnexpectedValueException('No form data received');
+        }
+
+        $variable_field = $this->batchVariableControl();
+        if(!isset($variable_field)){
+            throw new \UnexpectedValueException('Variable field not set on batch form submission.');
+        }
+
+        $key_data = $this->parseFormData($key_data);
+
+        $key_vals = $this->datasource->batchDelete($this->id, $variable_field->name(), $key_data);
+        return $key_vals;
     }
 
     /* -----------------------------------------------------------------

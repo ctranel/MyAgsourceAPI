@@ -60,7 +60,8 @@ class Dashboard extends dpage {
         $supplemental_factory = $this->_supplementalFactory();
         $this->filters = $this->_filters($page_id, $params);
         $benchmarks = $this->_benchmarks();
-        $block_content = $this->_blockContent($page_id, $supplemental_factory, $params, $benchmarks);
+        $this->load->model('ReportContent/report_data_model');
+        $block_content = $this->_blockContent($page_id, $supplemental_factory, $params, $benchmarks, $this->report_data_model);
         $tmp = $this->_archivePDFs();
         if(isset($tmp)){
             $block_content[] = $tmp;

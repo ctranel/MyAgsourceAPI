@@ -4,6 +4,7 @@ namespace myagsource\Settings;
 require_once APPPATH . 'libraries/Form/Content/Control/FormControl.php';
 
 use \myagsource\Form\Content\Control\FormControl;
+use myagsource\Form\iSubBlock;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /**
@@ -30,8 +31,8 @@ class SettingFormControl extends FormControl {
     protected $for_herd;
 
 
-    function __construct($control_data, $validators, $options = null, $subforms = null) {
-        parent::__construct($control_data, $validators, $options, $subforms);
+    function __construct($control_data, $validators, $options = null, $subforms = null, iSubBlock $subblocks = null) {//, $listing_datasource = null
+        parent::__construct($control_data, $validators, $options, $subforms, $subblocks);//, $listing_datasource
         $this->for_user = (boolean)$control_data['for_user'];
         $this->for_herd = (boolean)$control_data['for_herd'];
     }

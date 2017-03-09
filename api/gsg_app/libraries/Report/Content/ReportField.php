@@ -131,7 +131,11 @@ abstract class ReportField {
 		return $this->is_sortable;
 	}
 
-	public function isDisplayed() {
+    public function isKey() {
+        return $this->data_field->isKey();
+    }
+
+    public function isDisplayed() {
 		return $this->is_displayed;
 	}
 

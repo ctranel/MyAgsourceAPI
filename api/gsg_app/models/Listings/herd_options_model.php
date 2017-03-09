@@ -31,9 +31,9 @@ class Herd_options_model extends CI_Model implements iListing_model  {
         $page_id = (int)$page_id;
 
         $results = $this->db
-            ->select('pb.page_id, b.id, l.id AS listing_id, b.name, b.description, dt.name AS display_type, s.name AS scope, srt.db_field_name AS order_by, l.sort_order, l.form_id, l.delete_path, b.active, b.path, pb.list_order')
-            ->join('users.dbo.blocks b', "pb.block_id = b.id AND b.display_type_id = 8 AND pb.page_id = " . $page_id . ' AND b.active = 1', 'inner')
-            ->join('users.options.listings l', "b.id = l.block_id AND l.isactive = 1", 'inner')
+            ->select('pb.page_id, b.id, l.id AS listing_id, b.name, b.description, dt.name AS display_type, s.name AS scope, srt.db_field_name AS order_by, l.sort_order, l.form_id, l.delete_path, b.isactive, b.path, pb.list_order')
+            ->join('users.dbo.blocks b', "pb.block_id = b.id AND b.display_type_id = 8 AND pb.page_id = " . $page_id . ' AND b.isactive = 1', 'inner')
+            ->join('users.options.listings l', "b.id = l.block_id", 'inner')
             ->join("(
                     SELECT lci.id, f.db_field_name, lci.list_order 
                     FROM users.options.listings_columns lci 
@@ -58,8 +58,8 @@ class Herd_options_model extends CI_Model implements iListing_model  {
         $block_id = (int)$block_id;
 
         $results = $this->db
-            ->select('b.id, l.id AS listing_id, b.name, b.description, dt.name AS display_type, s.name AS scope, srt.db_field_name AS order_by, l.sort_order, l.form_id, l.delete_path, b.active, b.path, 1 AS list_order') //pb.page_id, pb.list_order
-            ->join('users.options.listings l', "b.id = l.block_id AND l.isactive = 1 AND b.active = 1 AND b.display_type_id = 8 AND b.id = " . $block_id, 'inner')
+            ->select('b.id, l.id AS listing_id, b.name, b.description, dt.name AS display_type, s.name AS scope, srt.db_field_name AS order_by, l.sort_order, l.form_id, l.delete_path, b.isactive, b.path, 1 AS list_order') //pb.page_id, pb.list_order
+            ->join('users.options.listings l', "b.id = l.block_id AND b.isactive = 1 AND b.display_type_id = 8 AND b.id = " . $block_id, 'inner')
             ->join("(
                     SELECT lci.id, f.db_field_name 
                     FROM users.options.listings_columns lci 
@@ -74,7 +74,6 @@ class Herd_options_model extends CI_Model implements iListing_model  {
         return $results;
     }
 
-
     /**
      * getListingById
      * @param int listing id
@@ -85,7 +84,7 @@ class Herd_options_model extends CI_Model implements iListing_model  {
         $listing_id = (int)$listing_id;
 
         $results = $this->db
-            ->select('b.id, l.id AS listing_id, b.name, b.description, dt.name AS display_type, s.name AS scope, srt.db_field_name AS order_by, l.sort_order, l.form_id, l.delete_path, b.active, b.path')
+            ->select('b.id, l.id AS listing_id, b.name, b.description, dt.name AS display_type, s.name AS scope, srt.db_field_name AS order_by, l.sort_order, l.form_id, l.delete_path, b.isactive, b.path')
             ->join('users.options.listings l', "b.id = l.block_id AND l.id = " . $listing_id, 'inner')
             ->join("(
                     SELECT lci.id, f.db_field_name, lci.list_order 
@@ -145,7 +144,7 @@ class Herd_options_model extends CI_Model implements iListing_model  {
         $results = $this->db->query($sql)->result_array();
 
         if(!$results){
-            throw new Exception('No data found.');
+            throw new Exception('Could not find source table.');
         }
         $err = $this->db->_error_message();
         if(!empty($err)){
@@ -193,7 +192,7 @@ class Herd_options_model extends CI_Model implements iListing_model  {
      * @return array column data
      * @author ctranel
      **/
-    public function getListingData($listing_id, $criteria, $order_by, $sort_order) {
+    public function getListingData($listing_id, $criteria, $order_by, $sort_order, $display_cols) {
         $listing_id = (int)$listing_id;
         $order_by = MssqlUtility::escape($order_by);
         $sort_order = MssqlUtility::escape($sort_order);
@@ -203,15 +202,25 @@ class Herd_options_model extends CI_Model implements iListing_model  {
         $key_meta = $this->getListingKeyMeta($listing_id);
         $key_condition_text = '';
 
-        foreach($keys as $k){
-            if(strpos($key_meta[$k]['data_type'], 'char') !== false){
-                $key_condition_text .= $k . " = ''" . $criteria[$k] . "'' AND ";
+        foreach($keys as $k) {
+            if(!isset($key_meta[$k])){
+                continue;
             }
-            else {
-                $key_condition_text .= $k . " = " . $criteria[$k] . " AND ";
+            $criteria_val = $criteria[$k];
+            if (strpos($key_meta[$k]['data_type'], 'char') !== false) {
+                if(is_array($criteria_val)){
+                    $criteria_val = implode("'',''", $criteria_val);
+                }
+                $key_condition_text .= $k . " IN(''" . $criteria_val . "'') AND ";
+            } else {
+                if(is_array($criteria_val)){
+                    $criteria_val = implode(",", $criteria_val);
+                }
+                $key_condition_text .= $k . " IN(" . $criteria_val . ") AND ";
             }
         }
 
+        //@todo: if this is within a batch form, I would not include the primary key
         $sql = "
             DECLARE
                 @dsql NVARCHAR(MAX)
@@ -223,8 +232,8 @@ class Herd_options_model extends CI_Model implements iListing_model  {
                 inner join users.dbo.db_tables tbl ON fld.db_table_id = tbl.id AND allow_update = 1
                 inner join users.dbo.db_databases db ON tbl.database_id = db.id
 
-            SET @dsql = CONCAT(N'SELECT *
-			    FROM ', @db_table_name, N' WHERE " . $key_condition_text . "1=1";// isactive = 1";
+            SET @dsql = CONCAT(N'SELECT DISTINCT " . implode(',', $display_cols) . "
+			    FROM ', @db_table_name, N' WHERE " . substr($key_condition_text, 0, -5);
 
         if(isset($order_by) && !empty($order_by) && isset($sort_order) && !empty($sort_order)) {
             $sql .= " ORDER BY " . $order_by . " " . $sort_order;
@@ -236,14 +245,22 @@ class Herd_options_model extends CI_Model implements iListing_model  {
         $sql .= "')
             EXEC (@dsql)
        ";
+//print($sql); die;
 
         $res = $this->db->query($sql)->result_array();
-        //print($sql);
         if($res === false){
-            throw new \Exception('Listing data: ' . $this->db->_error_message());
+            throw new \Exception('Listing data not found.');
+        }
+        $err = $this->db->_error_message();
+
+        if(!empty($err)){
+            throw new \Exception($err);
         }
 
         if(isset($res[0]) && is_array($res[0])) {
+            foreach($res as &$r){
+                $r = $r + $criteria;
+            }
             return $res;
         }
 

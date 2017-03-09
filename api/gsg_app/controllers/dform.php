@@ -4,12 +4,18 @@
 require_once(APPPATH . 'controllers/dpage.php');
 require_once(APPPATH . 'libraries/Settings/Settings.php');
 require_once(APPPATH . 'libraries/Settings/Form/SettingsFormFactory.php');
-require_once(APPPATH . 'libraries/Form/Content/FormFactory.php');
+require_once(APPPATH . 'libraries/Form/Content/FormSubmissionFactory.php');
 
+use \myagsource\Datasource\DbObjects\DbTableFactory;
 use \myagsource\Settings\Form\SettingsFormFactory;
-use \myagsource\Form\Content\FormFactory;
+use \myagsource\Form\Content\FormSubmissionFactory;
+use \myagsource\Form\Content\FormDisplayFactory;
+use \myagsource\Listings\Content\ListingFactory;
+use \myagsource\Report\Content\ReportFactory;
 use \myagsource\Api\Response\ResponseMessage;
 use \myagsource\Supplemental\Content\SupplementalFactory;
+use \myagsource\DataHandler;
+use \myagsource\Benchmarks\Benchmarks;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 class dform extends dpage {
@@ -112,7 +118,7 @@ class dform extends dpage {
             $this->load->library('form_validation');
             $this->load->model('Forms/data_entry_model');
 
-            $form_factory = new FormFactory($this->data_entry_model, $supplemental_factory, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
+            $form_factory = new FormDisplayFactory($this->data_entry_model, $supplemental_factory, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
 
             $form = $form_factory->getFormDisplay($form_id, $this->session->userdata('herd_code'));
         }
@@ -149,7 +155,7 @@ class dform extends dpage {
             $this->load->library('form_validation');
             $this->load->model('Forms/data_entry_model');
 
-            $form_factory = new FormFactory($this->data_entry_model, $supplemental_factory, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
+            $form_factory = new FormDisplayFactory($this->data_entry_model, $supplemental_factory, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
 
             $form = $form_factory->getSubformDisplay($form_id, $this->session->userdata('herd_code'));
         }
@@ -173,16 +179,18 @@ class dform extends dpage {
         if(isset($json_data)) {
             $params = (array)json_decode(urldecode($json_data));
         }
+
+        $input = $this->input->userInputArray();
+
             //validate form input
         //$this->load->model('supplemental_model');
         //$supplemental_factory = new SupplementalFactory($this->supplemental_model, site_url());
         $this->load->library('herds');
         $this->load->library('form_validation');
-        $this->load->model('Forms/data_entry_model');//, null, false, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
+
         try{
-            $form_factory = new FormFactory($this->data_entry_model, null, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
-            $form = $form_factory->getForm($form_id, $this->session->userdata('herd_code'));
-            $input = $this->input->userInputArray();
+            $form_factory = $this->_formFactory($params + ['herd_code'=>$this->session->userdata('herd_code')], $input);
+            $form = $form_factory->getForm($form_id);
         }
         catch(Exception $e){
             $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
@@ -212,6 +220,9 @@ class dform extends dpage {
 
                 $entity_keys = $form->write($input);
 
+                //if subcontent = listing,
+                //$form->writeSubContent()
+
                 $resp_msg = new ResponseMessage('Form submission successful', 'message');
                 //$this->_record_access(2); //2 is the page code for herd change
 
@@ -232,27 +243,27 @@ class dform extends dpage {
     }
 
     /**
-     * @method batch_entry()
+     * @method put_batch()
      *
      * @param int form id
      * @param string json data (key data)
      * @access	public
      * @return	void
      */
-    function batch_entry($form_id, $json_data = null) {
+    function put_batch($form_id, $json_data = null) {
         $params = [];
         if(isset($json_data)) {
             $params = (array)json_decode(urldecode($json_data));
         }
 
+        $input = $this->input->userInputArray();
+
         //validate form input
         $this->load->library('herds');
         $this->load->library('form_validation');
-        $this->load->model('Forms/data_entry_model');
-        $form_factory = new FormFactory($this->data_entry_model, null, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
+        $form_factory = $this->_formFactory($params + ['herd_code'=>$this->session->userdata('herd_code')], $input);
 
-        $form = $form_factory->getForm($form_id, $this->session->userdata('herd_code'));
-        $input = $this->input->userInputArray();
+        $form = $form_factory->getForm($form_id);
 
 
         if($this->form_validation->run_input() === true){
@@ -298,10 +309,9 @@ class dform extends dpage {
         }
         $input = (array)json_decode(urldecode($json_data));
 
-        $this->load->model('Forms/data_entry_model');//, null, false, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
-        $form_factory = new FormFactory($this->data_entry_model, null, ['herd_code'=>$this->session->userdata('herd_code')]);
+        $form_factory = $this->_formFactory($input + ['herd_code'=>$this->session->userdata('herd_code')], $input);
 
-        $form = $form_factory->getForm($form_id, $this->session->userdata('herd_code'));
+        $form = $form_factory->getForm($form_id);
             try{
                 $form->delete($input);
 
@@ -315,7 +325,36 @@ class dform extends dpage {
     }
 
     /**
-     * @method delete_entry() - setting submission.
+     * @method delete_batch() - setting submission.
+     *
+     * @param int form id
+     * @param string json data (key data)
+     * @access	public
+     * @return	void
+     */
+    function delete_batch($form_id, $json_data = null){
+        if(!isset($json_data)){
+            $this->sendResponse(400, new ResponseMessage('No criteria sent for deletion.', 'error'));
+        }
+        $input = (array)json_decode(urldecode($json_data));
+
+        $form_factory = $this->_formFactory($input + ['herd_code'=>$this->session->userdata('herd_code')]);
+
+        $form = $form_factory->getForm($form_id);
+        try{
+            $form->deleteBatch($input);
+
+            $resp_msg = new ResponseMessage('The record was removed', 'message');
+
+            $this->sendResponse(200, $resp_msg);
+        }
+        catch(Exception $e){
+            $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
+        }
+    }
+
+    /**
+     * @method deactivate() - setting submission.
      *
      * @param int form id
      * @param string json data (key data)
@@ -328,10 +367,9 @@ class dform extends dpage {
         }
         $input = (array)json_decode(urldecode($json_data));
 
-        $this->load->model('Forms/data_entry_model');//, null, false, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
-        $form_factory = new FormFactory($this->data_entry_model, null, ['herd_code'=>$this->session->userdata('herd_code')]);
+        $form_factory = $this->_formFactory($input + ['herd_code'=>$this->session->userdata('herd_code')], $input);
 
-        $form = $form_factory->getForm($form_id, $this->session->userdata('herd_code'));
+        $form = $form_factory->getForm($form_id);
 
         try{
             //add field values for logging
@@ -354,7 +392,7 @@ class dform extends dpage {
     public function animal_options($herd_code, $serial_num, $control_id){
         $this->load->model('Forms/data_entry_model');
         try {
-            $form_factory = new FormFactory($this->data_entry_model, null, ['herd_code'=>$herd_code, 'serial_num'=>$serial_num]);
+            $form_factory = new FormDisplayFactory($this->data_entry_model, null, ['herd_code'=>$herd_code, 'serial_num'=>$serial_num]);
 
             $options = $form_factory->getControlOptionsById($control_id);
 
@@ -363,5 +401,43 @@ class dform extends dpage {
         catch(Exception $e){
             $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
         }
+    }
+
+    protected function _formFactory($key_data, $form_data = null){
+$page_id = 105;
+
+
+//$this->load->model('web_content/block_model');
+//$key_fields = $this->block_model->getKeysByContentId($form_id);
+
+
+
+        $this->filters = $this->_filters($page_id, $key_data);
+        $benchmarks = $this->_benchmarks();
+        $supplemental_factory = $this->_supplementalFactory();
+
+        //load factories for block content
+
+        $this->load->model('Datasource/db_table_model');
+        $db_table_factory = new DbTableFactory($this->db_table_model);
+
+        $this->load->model('ReportContent/report_data_model');
+        $data_handler = new DataHandler($this->report_data_model, $benchmarks);
+
+        $this->load->model('Datasource/db_field_model');
+        $this->load->model('ReportContent/report_block_model');
+        $report_factory = new ReportFactory($this->report_block_model, $this->db_field_model, $this->filters, $supplemental_factory, $data_handler, $db_table_factory);
+
+        $this->load->model('Listings/herd_options_model');
+        $option_listing_factory = new ListingFactory($this->herd_options_model, $key_data + ['herd_code'=>$this->session->userdata('herd_code')]);
+
+        $this->load->model('Forms/setting_form_model');//, null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
+        $setting_form_factory = new SettingsFormFactory($this->setting_form_model, $supplemental_factory, $key_data + ['herd_code'=>$this->session->userdata('herd_code'), 'user_id'=>$this->session->userdata('user_id')]);
+
+        $this->load->model('web_content/block_model');
+        $this->load->model('Forms/Data_entry_model');//, null, false, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
+        $entry_form_factory = new FormSubmissionFactory($this->Data_entry_model, $key_data + ['herd_code'=>$this->session->userdata('herd_code')], $form_data, $supplemental_factory, $report_factory, $option_listing_factory, $setting_form_factory, $this->block_model);
+
+        return $entry_form_factory;
     }
 }

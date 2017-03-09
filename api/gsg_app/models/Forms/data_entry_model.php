@@ -33,9 +33,9 @@ class Data_entry_model extends CI_Model implements iForm_Model {
     public function getFormsByPage($page_id) {
         $page_id = (int)$page_id;
         $results = $this->db
-            ->select('pb.page_id, b.id, b.name, f.id AS form_id, f.name AS form_name, b.description, dt.name AS display_type, s.name AS scope, b.active, b.path, f.dom_id, f.action, pb.list_order')
-            ->join('users.dbo.blocks b', "pb.block_id = b.id AND b.display_type_id = 7 AND pb.page_id = " . $page_id . ' AND b.active = 1', 'inner')
-            ->join('users.frm.forms f', "b.id = f.block_id AND f.active = 1", 'inner')
+            ->select('pb.page_id, b.id, b.name, f.id AS form_id, f.name AS form_name, b.description, dt.name AS display_type, s.name AS scope, b.isactive, b.path, f.dom_id, f.action, pb.list_order')
+            ->join('users.dbo.blocks b', "pb.block_id = b.id AND b.display_type_id = 7 AND pb.page_id = " . $page_id . ' AND b.isactive = 1', 'inner')
+            ->join('users.frm.forms f', "b.id = f.block_id", 'inner')
             //the following gets only data-entry form data
             //->join('users.frm.form_control_groups cg', "f.id = cg.form_id", 'inner')
             ->join('users.dbo.lookup_display_types dt', 'b.display_type_id = dt.id', 'inner')
@@ -55,8 +55,8 @@ class Data_entry_model extends CI_Model implements iForm_Model {
     public function getFormByBlock($block_id) {
         $block_id = (int)$block_id;
         $results = $this->db
-            ->select('b.id, b.name, f.id AS form_id, f.name AS form_name, b.description, dt.name AS display_type, s.name AS scope, b.active, b.path, f.dom_id, f.action, 1 AS list_order') //, pb.list_order, pb.page_id,
-            ->join('users.frm.forms f', "b.id = f.block_id AND f.active = 1 AND b.active = 1 AND b.display_type_id = 7 AND b.id = " . $block_id, 'inner')
+            ->select('b.id, b.name, f.id AS form_id, f.name AS form_name, b.description, dt.name AS display_type, s.name AS scope, b.isactive, b.path, f.dom_id, f.action, 1 AS list_order') //, pb.list_order, pb.page_id,
+            ->join('users.frm.forms f', "b.id = f.block_id AND b.isactive = 1 AND b.display_type_id = 7 AND b.id = " . $block_id, 'inner')
             //the following gets only data-entry form data
             //->join('users.frm.form_control_groups cg', "f.id = cg.form_id", 'inner')
             ->join('users.dbo.lookup_display_types dt', 'b.display_type_id = dt.id', 'inner')
@@ -78,9 +78,9 @@ class Data_entry_model extends CI_Model implements iForm_Model {
         $parent_form_id = (int)$parent_form_id;
 
         $results = $this->db
-            ->select('sub.parent_control_name, sub.form_id, sub.form_name, sub.action, sub.dom_id, sub.condition_group_id, sub.condition_group_parent_id, sub.condition_group_operator, sub.condition_id, sub.form_control_name, sub.form_control_name, sub.operator, sub.operand, sub.active, s.name AS scope, sub.list_order') //, sub.form_control_name
+            ->select('sub.parent_control_name, sub.parent_control_id, sub.form_id, sub.form_name, sub.action, sub.dom_id, sub.condition_group_id, sub.condition_group_parent_id, sub.condition_group_operator, sub.condition_id, sub.form_control_name, sub.form_control_name, sub.operator, sub.operand, sub.isactive, s.name AS scope, sub.list_order') //, sub.form_control_name
             ->join('users.dbo.lookup_scopes s', 'sub.scope_id = s.id', 'inner')
-            ->where('sub.active', 1)
+            ->where('sub.isactive', 1)
             ->where('sub.parent_form_id', $parent_form_id)
             ->order_by('sub.form_control_name, sub.list_order')
             ->get('users.frm.vma_entry_subforms sub')
@@ -99,9 +99,9 @@ class Data_entry_model extends CI_Model implements iForm_Model {
         $parent_form_id = (int)$parent_form_id;
 
         $results = $this->db
-            ->select('sub.parent_control_name, sub.block_id, sub.block_name, sub.condition_group_id, sub.condition_group_parent_id, sub.condition_group_operator, sub.condition_id, sub.form_control_name, sub.operator, sub.operand, sub.active, s.name AS scope, sub.list_order') //
+            ->select('sub.parent_control_name, sub.parent_control_id, sub.block_id, sub.name, sub.display_type, sub.subblock_content_id, sub.datalink_form_id, sub.condition_group_id, sub.condition_group_parent_id, sub.condition_group_operator, sub.condition_id, sub.form_control_name, sub.operator, sub.operand, sub.isactive, s.name AS scope, sub.list_order')
             ->join('users.dbo.lookup_scopes s', 'sub.scope_id = s.id', 'inner')
-            ->where('sub.active', 1)
+            ->where('sub.isactive', 1)
             ->where('sub.parent_form_id', $parent_form_id)
             ->order_by('sub.form_control_name, sub.list_order')
             ->get('users.frm.vma_subblocks sub')
@@ -121,7 +121,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
         $form_id = (int)$form_id;
 
         $results = $this->db
-            ->select('b.id, b.name, f.id AS form_id, f.name AS form_name, b.description, dt.name AS display_type, s.name AS scope, b.active, b.path, f.dom_id, f.action')
+            ->select('b.id, b.name, f.id AS form_id, f.name AS form_name, b.description, dt.name AS display_type, s.name AS scope, b.isactive, b.path, f.dom_id, f.action')
             ->join('users.frm.forms f', "b.id = f.block_id AND f.id = " . $form_id, 'inner')
             ->join('users.dbo.lookup_display_types dt', 'b.display_type_id = dt.id', 'inner')
             ->join('users.dbo.lookup_scopes s', 'b.scope_id = s.id', 'inner')
@@ -140,7 +140,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
         $form_id = (int)$form_id;
 
         $results = $this->db
-            ->select('f.id AS form_id, f.name AS form_name, f.description, s.name AS scope, f.active, f.dom_id, f.action')
+            ->select('f.id AS form_id, f.name AS form_name, f.description, s.name AS scope, f.dom_id, f.action')
             //->join('users.frm.forms f', "b.id = f.block_id AND f.id = " . $form_id, 'inner')
             ->join('users.dbo.lookup_scopes s', "f.scope_id = s.id AND f.id = " . $form_id, 'inner')
             ->get('users.frm.forms f')
@@ -197,11 +197,11 @@ class Data_entry_model extends CI_Model implements iForm_Model {
                 inner join users.dbo.db_fields fld ON fc.db_field_id = fld.id
                 inner join users.dbo.db_tables tbl ON fld.db_table_id = tbl.id AND allow_update = 1
                 inner join users.dbo.db_databases db ON tbl.database_id = db.id";
-//print($sql);
+
         $results = $this->db->query($sql)->result_array();
 
         if(!$results){
-            throw new Exception('No data found.');
+            throw new Exception('Could not find source table.');
         }
         $err = $this->db->_error_message();
         if(!empty($err)){
@@ -228,7 +228,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
             //have not yet tested with multiple level nesting
             array_walk_recursive($ancestor_form_ids, function(&$v, $k){return (int)$v;});
         }
-        $result = $this->db->select('fc.id, ct.name AS control_type, fld.db_field_name AS name, fc.label, fld.is_editable, fld.is_generated, fld.is_fk_field AS is_key, fld.data_type, fc.biz_validation_url, fc.form_defaults_url, fc.add_option_form_id, fc.default_value, fc.batch_variable_type')
+        $result = $this->db->select('fc.id, ct.name AS control_type, fld.db_field_name AS name, fc.label, fld.is_editable, fld.is_generated, fld.is_fk_field AS is_key, fld.data_type, fc.biz_validation_url, fc.form_defaults_url, fc.add_option_form_id, fc.default_value, fc.batch_variable_type, ld.lookup_url AS dependency_lookup_url, dfld.db_field_name AS dependent_form_control_name')
             ->select("(CAST(
                   (SELECT STUFF((
                       SELECT '|', CONCAT(v.name, ':', v.value) AS [data()] 
@@ -242,6 +242,11 @@ class Data_entry_model extends CI_Model implements iForm_Model {
             ->join('users.frm.form_controls fc', "cg.id = fc.form_control_group_id AND cg.form_id = " . $form_id, 'inner')
             ->join('users.dbo.db_fields fld', 'fc.db_field_id = fld.id', 'inner')
             ->join('users.frm.control_types ct', 'fc.control_type_id = ct.id', 'inner')
+            ->join('users.frm.lookup_dependencies ld', 'fc.id = ld.form_control_id', 'left')
+
+            ->join('users.frm.form_controls dc', 'ld.dependent_form_control_id = dc.id', 'left')
+            ->join('users.dbo.db_fields dfld', 'dc.db_field_id = dfld.id', 'left')
+
             ->order_by('fc.list_order')
 
             ->get()
@@ -348,7 +353,6 @@ class Data_entry_model extends CI_Model implements iForm_Model {
 
         $results = $this->db->query($sql)->result_array();
 
-//print($sql);
 		return $results;
 	}
 
@@ -379,7 +383,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
         if(!empty($err)){
             throw new \Exception($err);
         }
-//print($sql);
+
         if(isset($results[0]) && is_array($results[0])) {
             return $results[0];
         }
@@ -410,7 +414,6 @@ class Data_entry_model extends CI_Model implements iForm_Model {
 				SELECT @sql = N' SELECT ' + @value_col + ', ' + @desc_col + ' FROM ' + @tbl + ' WHERE herd_code = ''" . $herd_code . "'' AND isactive = 1 ORDER BY list_order'
 				EXEC sp_executesql @sql";
 
-//echo $sql;
         $results = $this->db->query($sql)->result_array();
 
         return $results;
@@ -442,7 +445,37 @@ class Data_entry_model extends CI_Model implements iForm_Model {
 				SELECT @tbl = table_name, @value_col = value_column, @desc_col = desc_column FROM users.frm.data_lookup WHERE control_id = " . $control_id . "
 				SELECT @sql = N' SELECT ' + @value_col + ', ' + @desc_col + ' FROM ' + @tbl + ' WHERE herd_code = ''" . $herd_code . "'' AND (serial_num = " . $serial_num . " OR serial_num IS NULL) AND isactive = 1 ORDER BY list_order'
 				EXEC sp_executesql @sql";
-//echo $sql;
+
+        $results = $this->db->query($sql)->result_array();
+
+        return $results;
+    }
+
+    /* -----------------------------------------------------------------
+     *  returns key-value pairs of options for a given lookup field
+
+     *  returns key-value pairs of options for a given lookup field
+
+     *  @author: ctranel
+     *  @date: 2017-03-02
+     *  @param: int control id
+     *  @return array key-value pairs
+     *  @throws:
+     * -----------------------------------------------------------------
+     */
+    public function getUserLookupOptions($control_id, $user_id){
+        $control_id = (int)$control_id;
+        $user_id = (int)$user_id;
+
+        if(!isset($user_id) || empty($user_id)){
+            throw new Exception('User not specified when getting options.');
+        }
+        $sql = "USE users;
+				DECLARE @tbl nvarchar(100), @value_col nvarchar(32), @desc_col nvarchar(32), @sql nvarchar(255)
+				SELECT @tbl = table_name, @value_col = value_column, @desc_col = desc_column FROM users.frm.data_lookup WHERE control_id = " . $control_id . "
+				SELECT @sql = N' SELECT ' + @value_col + ', ' + @desc_col + ' FROM ' + @tbl + ' WHERE (user_id = " . $user_id . " OR user_id IS NULL) AND isactive = 1 ORDER BY list_order'
+				EXEC sp_executesql @sql";
+
         $results = $this->db->query($sql)->result_array();
 
         return $results;
@@ -523,9 +556,8 @@ class Data_entry_model extends CI_Model implements iForm_Model {
                 INSERT " . $table_name . " (" . implode(', ', array_keys($insert_vals)) . ")
                 VALUES (" . implode(", ", $insert_vals) . ");";
         }
-//die($sql);
+//print($sql);//die($sql);
         $res = $this->db->query($sql);
-//die(var_dump($res));
 
         if($res === false){
             throw new \Exception('Submission Failed.');
@@ -560,6 +592,17 @@ class Data_entry_model extends CI_Model implements iForm_Model {
     public function batchInsert($form_id, $variable_field, $form_data, $control_meta = null){
         $form_id = (int)$form_id;
         $form_data = MssqlUtility::escape($form_data);
+        $variable_field = MssqlUtility::escape($variable_field);
+        //below was converting booleans to string, needs attention before uncommenting
+        //$control_meta = MssqlUtility::escape($control_meta);
+
+        //make sure the value for the batch field can be iterated
+        if(!isset($form_data[$variable_field]) || empty($form_data[$variable_field])){
+            throw new \Exception("Batch key field (" . $variable_field . ") is empty, there is nothing to insert.");
+        }
+        //if(!is_array($form_data[$variable_field])){
+        //    $form_data[$variable_field] = [$form_data[$variable_field]];
+        //}
 
         $table_name = $this->getSourceTable($form_id);
 
@@ -567,11 +610,12 @@ class Data_entry_model extends CI_Model implements iForm_Model {
         $no_quotes = ['decimal', 'numeric', 'tinyint', 'int', 'smallint', 'bit'];
 
         $tmp_table_schema = [];
-//var_dump($control_meta); die;
+
         foreach($form_data as $k=>$v){
             if(is_array($v)){
                 $v = implode('|', $v);
             }
+
             //only update non-generated columns
             if($control_meta[$k]['is_generated'] === false && $k != $variable_field){
                 if(in_array($control_meta[$k]['data_type'], $no_quotes) === true){
@@ -597,7 +641,10 @@ class Data_entry_model extends CI_Model implements iForm_Model {
                 VALUES ";
 
         if(isset($form_data[$variable_field]) && !empty($form_data[$variable_field])){
-            $batch_values = explode('|', $form_data[$variable_field]);
+            $batch_values = $form_data[$variable_field];
+            if(!is_array($batch_values)){
+                $batch_values = explode('|', $batch_values);
+            }
             foreach($batch_values as $v){
                 $sql .= "(" . $v . ", " . implode(", ", $insert_vals) . "),";
             }
@@ -609,11 +656,11 @@ class Data_entry_model extends CI_Model implements iForm_Model {
             $sql .= "\nSELECT * FROM #output;
                 DROP TABLE #output";
         }
-//die(substr($sql, 0, -1));
+//print($sql);
         $res = $this->db->query($sql);
 
         if($res === false){
-            throw new \Exception('Batch Submission Failed.');
+            throw new \Exception('Batch Insertion Failed.');
         }
         $err = $this->db->_error_message();
         if(!empty($err)){
@@ -627,7 +674,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
             $keys = array_keys($dataset[0]);
             if(isset($keys) && is_array($keys)){
                 foreach($keys as $k){
-                    $ret[$k] = array_column($dataset, $k);
+                    $ret[$k] = array_unique(array_column($dataset, $k));
                 }
             }
             return $ret;
@@ -650,6 +697,8 @@ class Data_entry_model extends CI_Model implements iForm_Model {
     public function update($form_id, $form_data, $control_meta = null, $key_meta = null){
         $form_id = (int)$form_id;
         $form_data = MssqlUtility::escape($form_data);
+        $control_meta = MssqlUtility::escape($control_meta);
+        $key_meta = MssqlUtility::escape($key_meta);
 
         $table_name = $this->getSourceTable($form_id);
         //id key fields
@@ -703,6 +752,110 @@ class Data_entry_model extends CI_Model implements iForm_Model {
     }
 
     /* -----------------------------------------------------------------
+    *  batchInsert
+
+    *  batchInsert form submitted data
+
+    *  @author: ctranel
+     * @param: int form id
+     * @param: string variable field name
+    *  @param: array of form data
+     * @param: array of generated columns
+    *  @return key->value array of keys for the record
+    *  @throws:
+    * -----------------------------------------------------------------
+    */
+    public function batchUpdate($form_id, $variable_field, $form_data, $control_meta = null){
+        $form_id = (int)$form_id;
+        $variable_field = MssqlUtility::escape($variable_field);
+        $form_data = MssqlUtility::escape($form_data);
+        //$control_meta = MssqlUtility::escape($control_meta);
+
+        $key_field_names = array_filter($control_meta, function($v){return $v['is_key'] === true;});
+        $key_field_names = array_column($key_field_names, 'name');
+
+        $table_name = $this->getSourceTable($form_id);
+
+        //make sure the value for the batch field can be iterated
+        //if(!isset($form_data[$variable_field]) || empty($form_data[$variable_field])){
+        //    throw new \Exception("Batch key field (" . $variable_field . ") is empty, there is nothing to update.");
+        //}
+
+        //build query components
+        $join_cond = [];
+
+        if(isset($key_field_names) && is_array($key_field_names)){
+            foreach($key_field_names as $k){
+                //if($k === $variable_field){
+                //    continue;
+                //}
+                $key_values[$k] = $form_data[$k];
+                if(!isset($form_data[$k]) || empty($form_data[$k])){
+                    throw new \Exception('Missing key data, submission failed.');
+                }
+                if(is_array($form_data[$k])) {
+                    $join_cond[] = $k . " IN(" . implode(',', $form_data[$k]) . ")";
+                }
+                else {
+                    $join_cond[] = "t." . $k . "=s." . $k;
+                }
+            }
+        }
+
+        $update_set = [];
+        $update_dataset = [];
+        $no_quotes = ['decimal', 'numeric', 'tinyint', 'int', 'smallint', 'bit'];
+
+        foreach($form_data as $k=>$v){
+            if(is_array($v)){
+                $v = implode('|', $v);
+            }
+            //only update non-generated, editable columns
+            elseif($k != $variable_field && $control_meta[$k]['is_generated'] !== true){
+                if($control_meta[$k]['is_editable'] === true){
+                    $update_set[] = "t." . $k . "=s." . $k;
+                }
+                if(in_array($control_meta[$k]['data_type'], $no_quotes) === true){
+                    $v = (isset($v) && (!empty($v) || $v === 0)) ? $v : 'null';
+                    $update_dataset[] = $v . " AS " . $k;
+                }
+                else {
+                    $update_dataset[] = "'" . $v . "' AS " . $k;
+                }
+            }
+        }
+/*
+        $batch_values = $form_data[$variable_field];
+         if(!is_array($batch_values)){
+            $batch_values = explode('|', $batch_values);
+        }
+*/
+        //Because we are using updatable views, we need to use a merge statement rather than update.
+        $sql = "MERGE INTO " . $table_name . " t" .
+            " USING (SELECT " . implode(', ', $update_dataset) . ") s ON " . implode(" AND ", $join_cond) . //' AND ' . $variable_field . " IN(" . implode(',', $batch_values) . ")" .
+            " WHEN MATCHED THEN UPDATE" .
+            " SET " . implode(',' , $update_set) . ';';
+
+/*        $sql = "UPDATE t SET " . implode(',' , $update_set) .
+                " FROM " . $table_name . " t" .
+                    " INNER JOIN (SELECT " . implode(', ', $update_dataset) . ") s ON " . implode(" AND ", $join_cond) .
+                " WHERE t." . $variable_field . " IN(" . implode(", ", $batch_values) . ")";
+*/
+//die($sql);
+        $res = $this->db->query($sql);
+
+        if($res === false){
+            throw new \Exception('Batch Update Failed.');
+        }
+        $err = $this->db->_error_message();
+        if(!empty($err)){
+            throw new \Exception($err);
+        }
+
+        return $key_values;
+    }
+
+    /* -----------------------------------------------------------------
 *  delete
 
 *  delete submitted data
@@ -736,6 +889,58 @@ class Data_entry_model extends CI_Model implements iForm_Model {
 
         $sql = "DELETE FROM " . $table_name . " WHERE " . substr($delete_cond, 0, -5);
 //die($sql);
+        $res = $this->db->query($sql);
+
+        if($res === false){
+            throw new \Exception('Submission Failed.');
+        }
+        $err = $this->db->_error_message();
+        if(!empty($err)){
+            throw new \Exception($err);
+        }
+
+        return $res;
+    }
+
+    /* -----------------------------------------------------------------
+*  delete
+
+*  delete submitted data
+
+*  @author: ctranel
+*  @param: array of strings
+*  @return void
+*  @throws:
+* -----------------------------------------------------------------
+*/
+    public function batchDelete($form_id, $variable_field, $key_data){
+        $form_id = (int)$form_id;
+        $key_data = MssqlUtility::escape($key_data);
+
+        //get table name
+        $table_name = $this->getSourceTable($form_id);
+        //id key fields
+        //$key_meta = $this->getFormKeyMeta($form_id);
+        $key_field_names = array_keys($key_data);
+
+        $delete_cond = [];
+        if(isset($key_field_names) && is_array($key_field_names)){
+            foreach($key_field_names as $k){
+                $key_values[$k] = $key_data[$k];
+                if(!isset($key_data[$k]) || empty($key_data[$k])){
+                    throw new \Exception('Missing key data, submission failed.');
+                }
+                if(is_array($key_data[$k])) {
+                    $delete_cond[] = $k . " IN(" . implode(',', $key_data[$k]) . ")";
+                }
+                else {
+                    $delete_cond[] = $k . "='" . $key_data[$k] . "'";
+                }
+            }
+        }
+
+        $sql = "DELETE FROM " . $table_name . " WHERE " . implode(" AND ", $delete_cond);
+
         $res = $this->db->query($sql);
 
         if($res === false){

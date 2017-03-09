@@ -14,5 +14,5 @@ use myagsource\Site\iBlockContent;
 
 interface iListing extends iBlockContent
 {
-    public function toArray();
+
 }

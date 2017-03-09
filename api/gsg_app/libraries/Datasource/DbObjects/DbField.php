@@ -128,6 +128,10 @@ class DbField implements iDataField {
 		$this->is_natural_sort = $is_natural_sort;
 	}
 
+	public function isKey(){
+        return $this->is_foreign_key;
+    }
+
 	public function toArray(){
         $ret = [
 //            'id' => $this->id,

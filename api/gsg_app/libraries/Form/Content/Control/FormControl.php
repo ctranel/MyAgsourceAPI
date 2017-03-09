@@ -4,7 +4,7 @@ namespace myagsource\Form\Content\Control;
 require_once APPPATH . 'libraries/Form/iFormControl.php';
 
 use \myagsource\Form\iFormControl;
-use \myagsource\Site\iBlock;
+use \myagsource\Site\iSubBlock;
 
 /**
  * FormControl
@@ -121,6 +121,18 @@ class FormControl implements iFormControl
     protected $validators;
 
     /**
+     * dependency_lookup_url
+     * @var string
+     **/
+    protected $dependency_lookup_url;
+
+    /**
+     * dependent_form_control_name
+     * @var string
+     **/
+    protected $dependent_form_control_name;
+
+    /**
      * subforms
      * @var iForm[]
      **/
@@ -128,12 +140,18 @@ class FormControl implements iFormControl
 
     /**
      * subblocks
-     * @var iBlock[]
+     * @var iSubBlock[]
      **/
     protected $subblocks;
 
+    /**
+     * listing_datasource
+     * @var \iListing_model
+     **/
+    //protected $listing_datasource;
+
     //@todo: implement validators
-    public function __construct($control_data, $validators = null, $options = null, $subforms = null, $subblocks = null){
+    public function __construct($control_data, $validators = null, $options = null, $subforms = null, $subblocks = null){//, $listing_datasource = null
         $this->id = $control_data['id'];
         $this->name = $control_data['name'];
         $this->label = $control_data['label'];
@@ -149,9 +167,12 @@ class FormControl implements iFormControl
         $this->form_defaults_url = (isset($control_data['form_defaults_url']) ? $control_data['form_defaults_url'] : null);
         $this->add_option_form_id = (isset($control_data['add_option_form_id']) ? $control_data['add_option_form_id'] : null);
         $this->validators = $validators;
+        $this->dependency_lookup_url = $control_data['dependency_lookup_url'];
+        $this->dependent_form_control_name = $control_data['dependent_form_control_name'];
         $this->options = $options;
         $this->subforms = $subforms;
         $this->subblocks = $subblocks;
+        //$this->listing_datasource = $listing_datasource;
         //handle ranges
         if($this->control_type === 'range'){
             if(strpos($this->value, '|') !== false){
@@ -379,6 +400,13 @@ class FormControl implements iFormControl
             $ret['options'] = $this->options;
         }
 
+        if(isset($this->dependency_lookup_url) && isset($this->dependent_form_control_name) && !empty($this->dependency_lookup_url) && !empty($this->dependent_form_control_name)){
+            $ret['dependency_lookup'] = [
+                'dependency_lookup_url' => $this->dependency_lookup_url,
+                'dependent_form_control_name' => $this->dependent_form_control_name
+            ];
+        }
+
         if(isset($this->subforms) && is_array($this->subforms) && !empty($this->subforms)){
             $ret['subforms'] = [];
             foreach($this->subforms as $s){
@@ -481,16 +509,30 @@ class FormControl implements iFormControl
     public function parseFormData($value){
  //@todo: check validators (also in getCurrValue?), or is this done in controller?
         $ret_val = null;
-
-        if(is_array($value)){
+        //batch variables should be returned as arrays
+        if($this->batch_variable_type > 0){
+            if(is_array($value)){
+                return $value;
+            }
+            if(strpos($value, '|')){
+                return explode('|', $value);
+            }
+            if(strpos($value, ',')){
+                return explode(',', $value);
+            }
+        }
+        elseif(is_array($value) && !empty($value)){
             //if($this->control_type === 'range'){
             $ret_val = implode('|', $value);
             //handle range notation
             //    $ret_val = $value['dbfrom'] . '|' . $value['dbto'];
             //}
         }
-        else{
+        elseif(in_array($this->data_type, ['char', 'varchar', 'time', 'date', 'datetime', 'smalldatetime'])){
             $ret_val = $value;
+        }
+        elseif($value !== '' && in_array($this->data_type, ['int', 'smallint', 'tinyint', 'bit', 'decimal', 'numeric'])){
+            $ret_val = (int)$value;
         }
         if(strpos($this->control_type, 'lookup') !== false && empty($ret_val)){
             $ret_val = null;
@@ -544,15 +586,35 @@ class FormControl implements iFormControl
     }
 
     public function subformBatchVariableControl(){
-//var_dump($this->subforms);
         if(isset($this->subforms) && is_array($this->subforms)){
             foreach($this->subforms as $s){
                 $bvc = $s->batchVariableControl();
-//die($bvc);
                 if(isset($bvc)){
                     return $bvc;
                 }
             }
         }
     }
+
+    /* -----------------------------------------------------------------
+    *  insertDefaultListingRecords
+
+    *  returns the field
+
+    *  @author: ctranel
+    *  @date: 2017-02-23
+    *  @param: array of key=>value pairs (values can be array of values) of identity columns from inserted
+    *  @return: void
+    *  @throws: * -----------------------------------------------------------------
+    */
+    public function insertDefaultListingRecords($parent_key_vals, $form_data){
+        if(!isset($this->subblocks) || empty($this->subblocks)){
+            return true;
+        }
+       foreach($this->subblocks as $k=>$sb){
+            $sb->insertDefaultListingRecords($parent_key_vals, $form_data);
+        }
+    }
+
+
 }

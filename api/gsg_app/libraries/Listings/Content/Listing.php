@@ -120,4 +120,26 @@ class Listing implements iListing
         }
         return $ret;
     }
+
+    /* -----------------------------------------------------------------
+*  keyMetaArray
+
+*  returns field-name-keyed array with meta data for keys
+
+*  @author: ctranel
+*  @date: Jul 1, 2014
+*  @return key->value array of keys meta data
+*  @throws: * -----------------------------------------------------------------
+*/
+    public function keyMetaArray(){
+        $keys = [];
+        if(isset($this->columns) && is_array($this->columns) && !empty($this->columns)){
+            foreach($this->columns as $c){
+                if($c->isKey()){
+                    $keys[$c->name()] = $c->toArray();
+                }
+            }
+        }
+        return $keys;
+    }
 }

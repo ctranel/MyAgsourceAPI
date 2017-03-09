@@ -4,7 +4,7 @@
 require_once(APPPATH . 'controllers/dpage.php');
 //require_once(APPPATH . 'libraries/Settings/Settings.php');
 //require_once(APPPATH . 'libraries/Settings/Form/SettingsFormFactory.php');
-//require_once(APPPATH . 'libraries/Form/Content/FormFactory.php');
+require_once(APPPATH . 'libraries/Form/Content/FormDisplayFactory.php');
 
 use \myagsource\DataHandler;
 use \myagsource\Datasource\DbObjects\DbTableFactory;
@@ -15,7 +15,7 @@ use \myagsource\Site\WebContent\WebBlockFactory;
 use \myagsource\Settings\Form\SettingsFormFactory;
 use \myagsource\Listings\Content\ListingFactory;
 use \myagsource\Report\Content\ReportFactory;
-use \myagsource\Form\Content\FormFactory;
+use \myagsource\Form\Content\FormDisplayFactory;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 class dblock extends dpage {
@@ -65,9 +65,9 @@ $page_id = 105; //@todo: this will work until we have content that uses filters 
         $this->filters = $this->_filters($page_id, $params);
         $benchmarks = $this->_benchmarks();
         try {
-            $block_content = $this->_blockContent($block_id, $supplemental_factory, $params, $benchmarks, $listing_factory);
             $this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
             $this->load->model('web_content/block_model');
+            $block_content = $this->_blockContent($block_id, $supplemental_factory, $params, $benchmarks, $listing_factory);
             $web_block_factory = new WebBlockFactory($this->block_model, $supplemental_factory);
 
             //create blocks for content
@@ -95,7 +95,11 @@ $page_id = 105; //@todo: this will work until we have content that uses filters 
             $params = array_filter((array)json_decode(urldecode($json_data)));
         }
 
-        $params = ['animal_event_id' => $params['animal_event_id'], 'herd_code' => $params['herd_code']];
+        if(isset($params['batchid']) && is_array($params['batchid']) && count($params['batchid']) === 1){
+            $params['batchid'] = $params['batchid'][0];
+        }
+
+        //$params = ['animal_event_id' => $params['animal_event_id'], 'herd_code' => $params['herd_code']];
         /*
                 if(empty(array_filter($params))){
                     $this->sendResponse(400, new ResponseMessage("No identifying information received", 'error'));
@@ -110,10 +114,10 @@ $page_id = 105; //@todo: this will work until we have content that uses filters 
         $this->filters = $this->_filters($page_id, $params);
         $benchmarks = $this->_benchmarks();
         try {
-            $block_content = $this->_blockContent($block_id, $supplemental_factory, $params, $benchmarks, $listing_factory);
-
             $this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
             $this->load->model('web_content/block_model');
+            $block_content = $this->_blockContent($block_id, $supplemental_factory, $params, $benchmarks, $listing_factory);
+
             $web_block_factory = new WebBlockFactory($this->block_model, $supplemental_factory);
 
             //create blocks for content
@@ -125,7 +129,7 @@ $page_id = 105; //@todo: this will work until we have content that uses filters 
         $this->sendResponse(200, $this->message, $block->toArray());
     }
 
-    protected function _blockContent($block_id, $supplemental_factory, $params, $benchmarks, $listing_factory){
+    protected function _blockContent($block_id, $supplemental_factory, $params, $benchmarks, $option_listing_factory){
         $this->load->model('ReportContent/report_block_model');
         $this->load->model('Datasource/db_field_model');
         $this->load->model('ReportContent/report_data_model');
@@ -133,13 +137,18 @@ $page_id = 105; //@todo: this will work until we have content that uses filters 
         $data_handler = new DataHandler($this->report_data_model, $benchmarks);
         $db_table_factory = new DbTableFactory($this->db_table_model);
 
+        //we want params for the child block, not the parent
+        $key_fields = $this->block_model->getKeysByBlock($block_id);
+//var_dump($key_fields, $params); die;
+        //$params = array_intersect_key($params, array_flip( $key_fields));
+
         //load factories for block content
         $report_factory = new ReportFactory($this->report_block_model, $this->db_field_model, $this->filters, $supplemental_factory, $data_handler, $db_table_factory);
         $this->load->model('Forms/setting_form_model');//, null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
         $setting_form_factory = new SettingsFormFactory($this->setting_form_model, $supplemental_factory, $params + ['herd_code'=>$this->session->userdata('herd_code'), 'user_id'=>$this->session->userdata('user_id')]);
 
         $this->load->model('Forms/Data_entry_model');//, null, false, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
-        $entry_form_factory = new FormFactory($this->Data_entry_model, $supplemental_factory, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
+        $entry_form_factory = new FormDisplayFactory($this->Data_entry_model, $supplemental_factory,$report_factory, $option_listing_factory, $setting_form_factory, $this->block_model, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
 
         //$this->load->model('Listings/herd_options_model');
         //$option_listing_factory = new ListingFactory($this->herd_options_model, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
@@ -158,7 +167,7 @@ $page_id = 105; //@todo: this will work until we have content that uses filters 
             return array_values($entry_forms)[0];
         }
         //$serial_num = isset($params['serial_num']) ? $params['serial_num'] : null;
-        $listings = $listing_factory->getByBlock($block_id, $params);
+        $listings = $option_listing_factory->getByBlock($block_id, $params);
         if(!empty($listings)){
             return array_values($listings)[0];
         }

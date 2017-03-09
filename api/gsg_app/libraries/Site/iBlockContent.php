@@ -11,7 +11,7 @@ interface iBlockContent{// extends iWebContent {
 //	public function id();
 //	public function name();
 //	public function description();
-//	public function displayType();
+	public function keyMetaArray();
 	public function toArray();
 }
 

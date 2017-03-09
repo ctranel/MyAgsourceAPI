@@ -15,7 +15,7 @@ require_once(APPPATH . 'libraries/DataHandler.php');
 
 require_once APPPATH . 'libraries/Listings/Content/ListingFactory.php';
 require_once(APPPATH . 'libraries/Report/Content/ReportFactory.php');
-require_once(APPPATH . 'libraries/Form/Content/FormFactory.php');
+require_once(APPPATH . 'libraries/Form/Content/FormDisplayFactory.php');
 require_once(APPPATH . 'libraries/Settings/Form/SettingsFormFactory.php');
 
 
@@ -34,7 +34,7 @@ use \myagsource\Api\Response\ResponseMessage;
 use \myagsource\Settings\Form\SettingsFormFactory;
 use \myagsource\Listings\Content\ListingFactory;
 use \myagsource\Report\Content\ReportFactory;
-use \myagsource\Form\Content\FormFactory;
+use \myagsource\Form\Content\FormDisplayFactory;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
@@ -140,24 +140,24 @@ class dpage extends MY_Api_Controller {
 
         return null;
     }
-    protected function _blockContent($page_id, $supplemental_factory, $params, $benchmarks){
+    protected function _blockContent($page_id, $supplemental_factory, $params, $benchmarks, $data_handler_model){
         $this->load->model('ReportContent/report_block_model');
         $this->load->model('Datasource/db_field_model');
-        $this->load->model('ReportContent/report_data_model');
         $this->load->model('Datasource/db_table_model');
-        $data_handler = new DataHandler($this->report_data_model, $benchmarks);
+        $data_handler = new DataHandler($data_handler_model, $benchmarks);//$this->report_data_model
         $db_table_factory = new DbTableFactory($this->db_table_model);
 
         //load factories for block content
         $report_factory = new ReportFactory($this->report_block_model, $this->db_field_model, $this->filters, $supplemental_factory, $data_handler, $db_table_factory);
+
+        $this->load->model('Listings/herd_options_model');
+        $option_listing_factory = new ListingFactory($this->herd_options_model, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
+
         $this->load->model('Forms/setting_form_model');//, null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
         $setting_form_factory = new SettingsFormFactory($this->setting_form_model, $supplemental_factory, $params + ['herd_code'=>$this->session->userdata('herd_code'), 'user_id'=>$this->session->userdata('user_id')]);
 
         $this->load->model('Forms/Data_entry_model');//, null, false, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
-        $entry_form_factory = new FormFactory($this->Data_entry_model, $supplemental_factory, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
-
-        $this->load->model('Listings/herd_options_model');
-        $option_listing_factory = new ListingFactory($this->herd_options_model, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
+        $entry_form_factory = new FormDisplayFactory($this->Data_entry_model, $supplemental_factory, $params + ['herd_code'=>$this->session->userdata('herd_code'), 'user_id'=>$this->session->userdata('user_id')]);
 
         //create block content
         $reports = $report_factory->getByPage($page_id);
@@ -181,7 +181,8 @@ class dpage extends MY_Api_Controller {
         $supplemental_factory = $this->_supplementalFactory();
         $this->filters = $this->_filters($page_id, $params);
         $benchmarks = $this->_benchmarks();
-        $block_content = $this->_blockContent($page_id, $supplemental_factory, $params, $benchmarks);
+        $this->load->model('ReportContent/report_data_model');
+        $block_content = $this->_blockContent($page_id, $supplemental_factory, $params, $benchmarks, $this->report_data_model);
 
         //Set up site content objects
         $this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
@@ -246,32 +247,9 @@ class dpage extends MY_Api_Controller {
             $benchmarks = new Benchmarks($this->benchmark_model, $this->session->userdata('user_id'), $this->herd->herdCode(), $this->herd_model->header_info($this->herd->herdCode()), $this->session->userdata('benchmarks'));
         }
 
-        //page content
-        $this->load->model('ReportContent/report_block_model');
-        $this->load->model('Datasource/db_field_model');
-        $this->load->model('dhi/todo_list_model', null, false, $this->settings);
-        $this->load->model('Datasource/db_table_model');
-        $data_handler = new DataHandler($this->todo_list_model, $benchmarks);
-        $db_table_factory = new DbTableFactory($this->db_table_model);
-
-        //load factories for block content
-        $report_factory = new ReportFactory($this->report_block_model, $this->db_field_model, $this->filters, $supplemental_factory, $data_handler, $db_table_factory);
-        $setting_form_factory = new SettingsFormFactory($this->setting_form_model, $supplemental_factory, $params + ['herd_code'=>$this->session->userdata('herd_code'), 'user_id'=>$this->session->userdata('user_id')]);
-
-        $this->load->model('Forms/Data_entry_model');//, null, false, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
-        $entry_form_factory = new FormFactory($this->Data_entry_model, $supplemental_factory, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
-
-        //create block content
-        $reports = $report_factory->getByPage($page_id);
-        $setting_forms = $setting_form_factory->getByPage($page_id);
-        $entry_forms = $entry_form_factory->getByPage($page_id, $this->session->userdata('herd_code'));
-
-        //combine and sort
-        $block_content = $reports + $setting_forms + $entry_forms;
-        ksort($block_content);
-        unset($report_factory, $setting_form_factory, $entry_form_factory, $reports, $setting_forms, $entry_forms);
-
         //create blocks for content
+        $this->load->model('dhi/todo_list_model', null, false, $this->settings);
+        $block_content = $this->_blockContent($page_id, $supplemental_factory, $params, $benchmarks, $this->todo_list_model);
         $blocks = $web_block_factory->getBlocksFromContent($page_id, $block_content);
 
         $this->load->model('web_content/page_model');
@@ -332,33 +310,9 @@ class dpage extends MY_Api_Controller {
             $this->load->model('Settings/benchmark_model');//, null, false, ['user_id' => $this->session->userdata('user_id'), 'herd_code' => $this->session->userdata('herd_code')]);
             $benchmarks = new Benchmarks($this->benchmark_model, $this->session->userdata('user_id'), $this->herd->herdCode(), $this->herd_model->header_info($this->herd->herdCode()), $this->session->userdata('benchmarks'));
         }
-
-        //page content
-        $this->load->model('ReportContent/report_block_model');
-        $this->load->model('Datasource/db_field_model');
-        $this->load->model('dhi/todo_list_model', null, false, $this->settings);
-        $this->load->model('Datasource/db_table_model');
-        $data_handler = new DataHandler($this->todo_list_model, $benchmarks);
-        $db_table_factory = new DbTableFactory($this->db_table_model);
-
-        //load factories for block content
-        $report_factory = new ReportFactory($this->report_block_model, $this->db_field_model, $this->filters, $supplemental_factory, $data_handler, $db_table_factory);
-        $setting_form_factory = new SettingsFormFactory($this->setting_form_model, $supplemental_factory, $params + ['herd_code'=>$this->session->userdata('herd_code'), 'user_id'=>$this->session->userdata('user_id')]);
-
-        $this->load->model('Forms/Data_entry_model');//, null, false, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
-        $entry_form_factory = new FormFactory($this->Data_entry_model, $supplemental_factory, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
-
-        //create block content
-        $reports = $report_factory->getByPage($page_id);
-        $setting_forms = $setting_form_factory->getByPage($page_id);
-        $entry_forms = $entry_form_factory->getByPage($page_id, $this->session->userdata('herd_code'));
-
-        //combine and sort
-        $block_content = $reports + $setting_forms + $entry_forms;
-        ksort($block_content);
-        unset($report_factory, $setting_form_factory, $entry_form_factory, $reports, $setting_forms, $entry_forms);
-
         //create blocks for content
+        $this->load->model('dhi/todo_list_model', null, false, $this->settings);
+        $block_content = $this->_blockContent($page_id, $supplemental_factory, $params, $benchmarks, $this->todo_list_model);
         $blocks = $web_block_factory->getBlocksFromContent($page_id, $block_content);
 
         $this->load->model('web_content/page_model');

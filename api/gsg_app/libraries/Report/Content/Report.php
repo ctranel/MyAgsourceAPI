@@ -328,11 +328,15 @@ abstract class Report implements iReport {
 		return $this->field_groups;
 	}
 
-	public function hasCntRow(){
-		return $this->cnt_row;
+	public function dataset(){
+		return $this->dataset;
 	}
 
-	public function hasAvgRow(){
+    public function hasCntRow(){
+        return $this->cnt_row;
+    }
+
+    public function hasAvgRow(){
 		return $this->avg_row;
 	}
 
@@ -379,6 +383,19 @@ abstract class Report implements iReport {
 		}
 		return $ret;
 	}
+
+    public function keyMetaArray(){
+        if(!isset($this->report_fields) || count($this->report_fields) === 0){
+            return false;
+        }
+        $ret = [];
+        foreach($this->report_fields as $f){
+            if($f->isKey()){
+                $ret[] = $f->toArray();
+            }
+        }
+        return $ret;
+    }
 
 	public function getAppendedRowsCount(){
 	    return $this->appended_rows_count;
