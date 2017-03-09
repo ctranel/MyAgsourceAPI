@@ -238,12 +238,12 @@ class Custom_report extends MY_Controller {
 	}
 	
 	/***********  AJAX FUNCTIONS  **********************/
-	function select_page_data($section_id){
+	function select_page($section_id){
 		header('Content-type: application/json');
 		$data = $this->custom_report_model->getPagesSelectDataByUser($this->session->userdata('user_id'), $section_id);
 		$this->load->view('echo.php', ['text' => json_encode($data)]);
 	}
-	function select_table_data($cow_or_summary){
+	function select_table($cow_or_summary){
 		header('Content-type: application/json');
 		switch ($cow_or_summary){
 			case 'summary':
@@ -268,7 +268,7 @@ class Custom_report extends MY_Controller {
 		$data = $this->custom_report_model->get_fields_select_data($table_id);
 		$this->load->view('echo.php', ['text' => json_encode($data)]);
 	}
-	function insert_after_data($page_id){
+	function select_list_order($page_id){
 		header('Content-type: application/json');
 		$data = $this->custom_report_model->get_insert_after_data($page_id);
 		$this->load->view('echo.php', ['text' => json_encode($data)]);
