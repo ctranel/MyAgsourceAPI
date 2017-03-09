@@ -32,7 +32,6 @@ class Criteria{
 	private $arr_options; //array of criteria objects
 	
 	public function __construct($criteria_data, $options){
-//var_dump($criteria_data);
 		$this->type = $criteria_data['type'];
 		$this->options = $options;
 		$this->field_name = $criteria_data['db_field_name'];
@@ -215,9 +214,7 @@ class Criteria{
                 foreach($page_filter_value as $k1=>$v1){
                     $page_filter_value[$k1] = explode('|', $v1);
                 }
-//var_dump($page_filter_value);
                 $page_filter_value = \array_flatten($page_filter_value);
-//var_dump($page_filter_value);
                 $this->selected_values = $page_filter_value;
             }
             elseif(strpos($page_filter_value, '|')){

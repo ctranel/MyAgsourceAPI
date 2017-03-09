@@ -36,7 +36,6 @@ class events extends dpage {
 	}
 	
 	function code_map(){
-	    //var_dump($this->settings);
         $events = $this->herd->getEventMap();
         if(empty(array_filter($events))) {
             $this->sendResponse(404, new ResponseMessage('No events found for herd ' . $this->herd->herdCode() . '.', 'error'));

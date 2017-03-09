@@ -48,7 +48,6 @@ class MY_Form_validation extends CI_Form_validation {
 		// If not, we look to see if they were assigned via a config file
 		if (count($this->_field_data) == 0) {
 			// No validation rules?  We're done...
-//die(var_dump($this->_field_data));
 			if (count($this->_config_rules) == 0) {
 				//no rules to fail
 				return true;

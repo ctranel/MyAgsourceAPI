@@ -124,7 +124,7 @@ class Page implements iPage {//iWebContent,
 		$this->name = $page_data['name'];
 		$this->description = $page_data['description'];
 		$this->scope = $page_data['scope'];
-		$this->active = $page_data['active'];
+		$this->active = $page_data['isactive'];
 		$this->path = $page_data['path'];
         $this->route = $page_data['route'];
         $this->supplemental = $supplemental_factory->getPageSupplemental($this->id);

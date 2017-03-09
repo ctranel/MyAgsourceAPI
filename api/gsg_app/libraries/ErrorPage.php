@@ -66,7 +66,6 @@ class ErrorPage {
 	 */
 	function show_404($page = '')
 	{
-//var_dump($template_vars);
 		$this->template_vars['page'] = $page;
 		
 		// By default we log this, but allow a dev to skip it

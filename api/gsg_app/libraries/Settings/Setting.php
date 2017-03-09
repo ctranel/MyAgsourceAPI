@@ -206,7 +206,6 @@ class Setting {
     */
     public function getCurrValue($session_value = null){
         //if a string is sent for array type, insert string into array
- //var_dump($this->name, $session_value, $this->value, $this->default_value);
         if(isset($session_value)){
             if(strpos($this->control_type, 'array') !== false){
                 if(!is_array($session_value)){

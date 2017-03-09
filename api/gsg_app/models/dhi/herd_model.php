@@ -584,16 +584,16 @@ class Herd_model extends CI_Model {
 	
 		$sql = "
 			SELECT a.*, ls.name AS scope FROM (
-				SELECT p.id, section_id, name, description, scope_id, path, active, list_order, pr.report_code
+				SELECT p.id, section_id, name, description, scope_id, path, isactive, list_order, pr.report_code
 				FROM users.dbo.pages p
-					INNER JOIN users.dbo.pages_dhi_products pr ON (p.id = pr.page_id AND p.active = 1 AND p.scope_id = 2)
+					INNER JOIN users.dbo.pages_dhi_products pr ON (p.id = pr.page_id AND p.isactive = 1 AND p.scope_id = 2)
 					INNER JOIN users.dbo.v_user_status_info si ON pr.report_code = si.report_code AND si.herd_code = '" . $herd_code . "' AND (si.herd_is_paying = 1 OR si.herd_is_active_trial = 1)
 	
 				UNION ALL
 	
-				SELECT id, section_id, name, description, scope_id, path, active, list_order, NULL AS report_code
+				SELECT id, section_id, name, description, scope_id, path, isactive, list_order, NULL AS report_code
 				FROM users.dbo.pages p
-				WHERE scope_id = 1 AND active = 1
+				WHERE scope_id = 1 AND isactive = 1
 			) a
 		
 			INNER JOIN users.dbo.lookup_scopes ls ON a.scope_id = ls.id

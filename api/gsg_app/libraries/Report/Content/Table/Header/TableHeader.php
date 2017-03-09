@@ -102,7 +102,6 @@ class TableHeader {
      **/
 	public function toArray(){
         $ret = [];
- //var_dump($this->header_structure);
         foreach($this->header_structure as $k => $h){
             if(is_array($h)){
                 $ret[$k] = $this->arrayConversion($h);

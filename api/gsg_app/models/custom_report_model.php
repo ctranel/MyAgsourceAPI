@@ -317,7 +317,7 @@ class Custom_report_model extends CI_Model {
      **/
     private function get_pages() {
         return $this->db
-            ->where('users.dbo.pages.active', 1)
+            ->where('users.dbo.pages.isactive', 1)
             ->order_by('users.dbo.pages.list_order')
             ->get('users.dbo.pages');
     }

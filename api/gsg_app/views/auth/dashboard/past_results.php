@@ -1,4 +1,3 @@
-    <?php //var_dump($tests); ?>
     Expand test date to see reports.
     <div class="css-treeview">
 		<ul><?php foreach($tests as $k=>$t){ ?>

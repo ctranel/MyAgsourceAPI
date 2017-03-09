@@ -157,7 +157,6 @@ class Herd
 		foreach($cows as $c){
 			$return[] = (Object)[$c['serial_num'] => $c[$value_field]];
 		}
-//		var_dump($return);
 		return $return;
 	}
 

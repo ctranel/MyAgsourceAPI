@@ -16,7 +16,7 @@ class Page_model extends CI_Model {
 	public function getPages() {
 		return $this->db
 			->select('p.*, s.name AS scope')
-			->where('p.active', 1)
+			->where('p.isactive', 1)
 			->where("(p.user_id IS NULL OR p.user_id = " . $this->user_id . ")")
 			->join('users.dbo.lookup_scopes s', 'p.scope_id = s.id', 'inner')
 			->order_by('p.list_order')
