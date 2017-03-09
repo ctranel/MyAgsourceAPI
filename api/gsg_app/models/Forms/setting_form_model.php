@@ -141,7 +141,7 @@ class Setting_form_model extends CI_Model implements iForm_Model {
         $user_id = $key_params['user_id'];
 
         $this->db
-            ->select("s.id, t.name AS control_type, s.name, s.label, s.default_value, 'string' AS data_type, NULL AS batch_variable_type, s.for_user, s.for_herd, uhs.value") //, f.name AS category, s.dom_id
+            ->select("s.id, t.name AS control_type, s.name, s.label, s.default_value, 'varchar' AS data_type, NULL AS batch_variable_type, s.for_user, s.for_herd, uhs.value") //, f.name AS category, s.dom_id
             ->select("(CAST(
                   (SELECT STUFF((
                       SELECT '|', CONCAT(v.name, ':', v.value) AS [data()] 
@@ -345,7 +345,6 @@ class Setting_form_model extends CI_Model implements iForm_Model {
     * -----------------------------------------------------------------
     */
     public static function composeSettingSelect($user_id, $herd_code, $setting_id, $setting_value, $log_dttm, $log_id){
-//die($user_id);
         if($user_id != "NULL"){
             $user_id = (int)$user_id;
         }

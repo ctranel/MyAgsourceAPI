@@ -167,8 +167,8 @@ class FormControl implements iFormControl
         $this->form_defaults_url = (isset($control_data['form_defaults_url']) ? $control_data['form_defaults_url'] : null);
         $this->add_option_form_id = (isset($control_data['add_option_form_id']) ? $control_data['add_option_form_id'] : null);
         $this->validators = $validators;
-        $this->dependency_lookup_url = $control_data['dependency_lookup_url'];
-        $this->dependent_form_control_name = $control_data['dependent_form_control_name'];
+        $this->dependency_lookup_url = (isset($control_data['dependency_lookup_url']) ? $control_data['dependency_lookup_url'] : null);
+        $this->dependent_form_control_name = (isset($control_data['dependent_form_control_name']) ? $control_data['dependent_form_control_name'] : null);
         $this->options = $options;
         $this->subforms = $subforms;
         $this->subblocks = $subblocks;

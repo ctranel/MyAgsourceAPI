@@ -724,7 +724,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
                 $v = implode('|', $v);
             }
             //only update non-generated columns
-            if($control_meta[$k]['is_editable'] === true){
+            if($control_meta[$k]['is_editable'] == true){
                 if(in_array($control_meta[$k]['data_type'], $no_quotes) === true){
                     $v = (isset($v) && (!empty($v) || $v === 0)) ? $v : 'null';
                     $update_set[] = $k . "=" . $v;
