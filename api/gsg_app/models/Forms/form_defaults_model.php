@@ -237,4 +237,79 @@ class Form_defaults_model extends CI_Model {
 
         return [];
     }
+
+    /**
+     * @method getAnimalSireIDDefaultValues()
+     * @param char bull_id
+     * @return array of animal id data
+     * @access public
+     *
+     **/
+    public function getAnimalSireIDDefaultValues($bull_id){
+        $bull_id = MssqlUtility::escape($bull_id);
+
+        $res = $this->db
+            ->select("
+                [bull_id] AS sire_id_num,
+                [breed_code] AS sire_breed_cd,
+                [country_code] AS sire_country_cd,
+                [short_ai_name] AS sire_name,
+                [primary_naab] AS sire_naab"
+            )
+            ->where('bull_id', $bull_id)
+            ->get("[sire].[dbo].[view_sire_id2]")
+            ->result_array();
+
+        if($res === false ){
+            throw new \Exception('Sire ID defaults: ' . $this->db->_error_message());
+        }
+        $err = $this->db->_error_message();
+        if(!empty($err)){
+            throw new \Exception($err);
+        }
+
+        if(isset($res[0]) && is_array($res[0])){
+            return $res[0];
+        }
+
+        return [];
+    }
+
+    /**
+     * @method getAnimalSireNAABDefaultValues()
+     * @param varchar NAAB
+     * @return array of animal id data
+     * @access public
+     *
+     **/
+    public function getAnimalSireNAABDefaultValues($naab){
+        $naab = MssqlUtility::escape($naab);
+
+        $res = $this->db
+            ->select("
+                [bull_naab] AS sire_naab,
+                [breed_code] AS sire_breed_cd,
+                [country_code] AS sire_country_cd,
+                [bull_id] AS sire_id_num,
+                [short_ai_name] AS sire_name"
+            )
+            ->where('bull_naab', $naab)
+            ->get("[sire].[dbo].[view_sire_naab2]")
+            ->result_array();
+
+        if($res === false ){
+            throw new \Exception('Sire NAAB defaults: ' . $this->db->_error_message());
+        }
+        $err = $this->db->_error_message();
+        if(!empty($err)){
+            throw new \Exception($err);
+        }
+
+        if(isset($res[0]) && is_array($res[0])){
+            return $res[0];
+        }
+
+        return [];
+    }
+
 }

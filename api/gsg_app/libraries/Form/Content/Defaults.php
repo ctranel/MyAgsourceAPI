@@ -54,4 +54,13 @@ class Defaults
         return $ret;
     }
 
+    public function animalSireIDData($bull_id){
+        $ret = $this->datasource->getAnimalSireIDDefaultValues($bull_id);
+        return $ret;
+    }
+
+    public function animalSireNAABData($naab){
+        $ret = $this->datasource->getAnimalSireNAABDefaultValues($naab);
+        return $ret;
+    }
 }

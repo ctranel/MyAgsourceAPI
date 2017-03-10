@@ -129,6 +129,58 @@ class form_defaults extends dpage {
         $this->sendResponse(204);
     }
 
+    function animal_sire(){
+        $input = $this->input->userInputArray();
+        if(empty($input) || count($input) == 0){
+            $this->sendResponse(400, new ResponseMessage('No data sent with request.', 'error'));
+        }
+
+        if(isset($input['sire_naab']) && !empty($input['sire_naab'])){
+            try{
+                $this->load->model('dhi/animal_model');
+                $input['sire_naab'] = Animal::formatNAAB($this->animal_model, $input['sire_naab'], $this->settings->getValue('species'));
+            }
+            catch(\Exception $e){
+                $this->sendResponse(400, new ResponseMessage($e->getMessage(), 'error'));
+            }
+
+            $this->load->model('Forms/form_defaults_model');
+            try{
+                $defaults = new Defaults($this->form_defaults_model);
+                $bull_defaults = $defaults->animalSireNAABData($input['sire_naab']);
+                $this->sendResponse(200, null, ['defaults' => $bull_defaults]);
+            }
+            catch(exception $e){
+                $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
+            }
+        }
+
+        if(isset($input['sire_bull_id']) && !empty($input['sire_bull_id'])){
+            try{
+                $this->load->model('dhi/animal_model');
+                $input['sire_bull_id'] = Animal::formatOfficialId($this->animal_model, $input['sire_bull_id']);
+            }
+            catch(\Exception $e){
+                $this->sendResponse(400, new ResponseMessage($e->getMessage(), 'error'));
+            }
+
+            $this->load->model('Forms/form_defaults_model');
+            try{
+                $defaults = new Defaults($this->form_defaults_model);
+                $bull_defaults = $defaults->animalSireIDData($input['sire_bull_id']);
+                if(strlen($input['sire_bull_id']) > strlen($defaults['sire_bull_id'])){
+                    $defaults['sire_bull_id'] = $input['sire_bull_id'];
+                }
+                $this->sendResponse(200, null, ['defaults' => $bull_defaults]);
+            }
+            catch(exception $e){
+                $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
+            }
+        }
+
+        $this->sendResponse(204);
+    }
+
     function sire(){
         $input = $this->input->userInputArray();
         if(empty($input) || count($input) == 0){

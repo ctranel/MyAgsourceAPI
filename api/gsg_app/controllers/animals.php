@@ -48,4 +48,18 @@ class animals extends dpage {
         }
         $this->sendResponse(200, null, ['animals' => $cow_options]);
 	}
+
+    function select_breed($species_id){
+        try{
+            $this->load->model('dhi/animal_model');
+            $data = $this->animal_model->getBreeds($species_id);
+            $this->sendResponse(200, null, ['options' => json_encode($data)]);
+        }
+        catch(\Exception $e){
+            $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
+        }
+        $this->sendResponse(400, new ResponseMessage(validation_errors(), 'error'));
+    }
+
+
 }
