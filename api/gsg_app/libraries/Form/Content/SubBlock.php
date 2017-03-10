@@ -76,16 +76,20 @@ class SubBlock implements iSubBlock
      * @param $control_value
      * @return bool
      */
-    public function insertDefaultListingRecords($parent_key_vals, $form_data){
+    public function insertDefaultListingRecords($parent_key_vals, $form_data, $batch_variable){
         if(isset($this->datalink_form) && $this->conditionsMet($form_data)){
             $input = $this->block->dataset();
             if(!is_array($input) || empty(array_filter($input))){
                 return;
                 //throw new \Exception("Default data not found.");
             }
-
             foreach($input as $i){
-                $this->datalink_form->writeBatch($i + $parent_key_vals);
+                if(isset($batch_variable)){
+                    $this->datalink_form->writeBatch($i + $parent_key_vals);
+                }
+                else{
+                    $this->datalink_form->write($i + $parent_key_vals);
+                }
             }
         }
     }

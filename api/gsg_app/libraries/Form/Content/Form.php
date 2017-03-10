@@ -214,7 +214,7 @@ class Form implements iForm
 */
     protected function insertDefaultListingRecords($parent_key_vals, $form_data){
         foreach($this->controls as $c){
-            $c->insertDefaultListingRecords($parent_key_vals, $form_data);
+            $c->insertDefaultListingRecords($parent_key_vals, $form_data, $this->batchVariableControl());
         }
     }
 

@@ -607,12 +607,12 @@ class FormControl implements iFormControl
     *  @return: void
     *  @throws: * -----------------------------------------------------------------
     */
-    public function insertDefaultListingRecords($parent_key_vals, $form_data){
+    public function insertDefaultListingRecords($parent_key_vals, $form_data, $batch_variable){
         if(!isset($this->subblocks) || empty($this->subblocks)){
-            return true;
+            return;
         }
        foreach($this->subblocks as $k=>$sb){
-            $sb->insertDefaultListingRecords($parent_key_vals, $form_data);
+            $sb->insertDefaultListingRecords($parent_key_vals, $form_data, $batch_variable);
         }
     }
 
