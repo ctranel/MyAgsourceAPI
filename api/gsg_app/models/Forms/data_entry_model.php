@@ -631,6 +631,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
                 $tmp_table_schema[] = $k . ' ' . $control_meta[$k]['data_type'];
             }
         }
+        $insert_vals['is_batch'] = 1;
 
         $sql = "--SELECT;\n";
         if(!empty($tmp_table_schema)){
@@ -656,7 +657,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
             $sql .= "\nSELECT * FROM #output;
                 DROP TABLE #output";
         }
-//print($sql);
+//print($sql); die;
         $res = $this->db->query($sql);
 
         if($res === false){

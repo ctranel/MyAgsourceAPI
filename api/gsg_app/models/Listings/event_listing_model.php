@@ -246,9 +246,7 @@ class Event_listing_model extends CI_Model implements iListing_model  {
 //die($sql);
 
         $results = $this->db->query($sql)->result_array();
-        if(!$results){
-            throw new Exception('No event listing data found.');
-        }
+
         $err = $this->db->_error_message();
 
         if(!empty($err)){
