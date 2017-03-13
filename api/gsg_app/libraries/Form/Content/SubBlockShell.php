@@ -30,20 +30,42 @@ class SubBlockShell
      */
     protected $block_name;
 
-    public function __construct($condition_groups, $block_id, $block_name, $content_type, $content_id)
+    /**
+     * @var string
+     */
+    protected $content_type;
+
+    /**
+     * @var int
+     */
+    protected $content_id;
+
+    /**
+     * @var int
+     */
+    protected $datalink_form_id;
+
+    public function __construct($condition_groups, $block_id, $block_name, $content_type, $content_id, $datalink_form_id)
     {
         $this->condition_groups = $condition_groups;
         $this->block_id = $block_id;
         $this->block_name = $block_name;
         $this->content_type = $content_type;
         $this->content_id = $content_id;
+        $this->datalink_form_id = $datalink_form_id;
     }
     
     public function toArray(){
-        $ret['block_id'] = $this->block_id;
-        $ret['block_name'] = $this->block_name;
-        $ret['content_type'] = $this->content_type;
-        $ret['content_id'] = $this->content_id;
+        $ret = [
+            'block_id' => $this->block_id,
+            'block_name' => $this->block_name,
+            'content_type' => $this->content_type,
+            'content_id' => $this->content_id,
+        ];
+
+        if(isset($this->datalink_form_id)){
+            $ret['datalink_form_id'] = $this->datalink_form_id;
+        }
 
         if(isset($this->condition_groups) && is_array($this->condition_groups) && !empty($this->condition_groups)){
             $ret['condition_groups'] = [];

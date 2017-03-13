@@ -215,7 +215,7 @@ class FormDisplayFactory {// implements iFormFactory{
         foreach($results as $k => $r){
             if(!isset($subforms[$r['parent_control_name']][$r['block_id']])){
                 $subblock_groups = $this->extractConditionGroups($subblock_data[$r['parent_control_name']][$r['block_id']]);
-                $subblocks[$r['parent_control_name']][$r['block_id']] = new SubBlockShell($subblock_groups, $r['block_id'], $r['name'], $r['display_type'], $r['subblock_content_id']);
+                $subblocks[$r['parent_control_name']][$r['block_id']] = new SubBlockShell($subblock_groups, $r['block_id'], $r['name'], $r['display_type'], $r['subblock_content_id'], $r['datalink_form_id']);
             }
         }
 
