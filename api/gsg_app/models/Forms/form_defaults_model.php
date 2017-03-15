@@ -9,6 +9,37 @@ class Form_defaults_model extends CI_Model {
 	}
 
     /**
+     * @method getHerdEventTreatmentValues()
+     * @param int herd event rxtx id
+     * @return array of event data
+     * @access public
+     *
+     **/
+    public function getHerdTreatmentValues($herd_rxtx_id){
+        $id = (int)$herd_rxtx_id;
+
+        $res = $this->db
+            ->select("meat_df , milk_df, cost_df, quant_df")
+            ->where('id', $id)
+            ->get('TD.herd.rxtx')
+            ->result_array();
+
+        if($res === false ){
+            throw new \Exception('Herd treatment defaults could not be found: ' . $this->db->_error_message());
+        }
+        $err = $this->db->_error_message();
+        if(!empty($err)){
+            throw new \Exception($err);
+        }
+
+        if(isset($res[0]) && is_array($res[0])){
+            return $res[0];
+        }
+
+        return [];
+    }
+
+    /**
      * @method getBreedingSireDefaultValues()
      * @param string herd code
      * @param int sire code

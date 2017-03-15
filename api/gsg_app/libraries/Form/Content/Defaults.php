@@ -24,6 +24,11 @@ class Defaults
         $this->datasource = $datasource;
     }
 
+    public function herdTreatment($herd_rxtx_id){
+        $ret = $this->datasource->getHerdTreatmentValues($herd_rxtx_id);
+        return $ret;
+    }
+
     public function etSire($herd_code, $sire_id){
         $ret = $this->datasource->getETSireDefaultValues($herd_code, $sire_id);
         return $ret;

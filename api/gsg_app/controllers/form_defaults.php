@@ -35,6 +35,27 @@ class form_defaults extends dpage {
 		}
 	}
 	
+    function herd_treatment(){
+        $input = $this->input->userInputArray();
+        if(empty($input) || count($input) == 0){
+            $this->sendResponse(400, new ResponseMessage('No data sent with request.', 'error'));
+        }
+
+        if(!isset($input['rxtxid']) || empty($input['rxtxid'])){
+            $this->sendResponse(204);
+        }
+
+        $this->load->model('Forms/form_defaults_model');
+        try{
+            $defaults = new Defaults($this->form_defaults_model);
+            $defaults = $defaults->herdTreatment((int)$input['rxtxid']);
+            $this->sendResponse(200, null, ['defaults' => $defaults]);
+        }
+        catch(exception $e){
+            $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
+        }
+    }
+
 	function herd_sire(){
         $input = $this->input->userInputArray();
         if(empty($input) || count($input) == 0){
