@@ -91,7 +91,7 @@ class BatchEvent
         $now = new \DateTime();
         $event_dt = isset($event_dt) ? new \DateTime($event_dt) : null;
 
-        if($event_cd == 22 || $event_cd == 23 || $event_cd == 24 || $event_cd == 29){
+        if(in_array($event_cd, [7,11,12,13,9,3,4])){
             $this->eligible_messages[] = "Event entered is an internal event and cannot be keyed.";
         }
         if(isset($event_dt) && $event_dt > $now){
@@ -106,19 +106,18 @@ class BatchEvent
 
         if($event_cd < 21 || $event_cd > 28){
             //@todo: custom events need to be allowed
-            $conditions[] = ['sex_cd', '!=', '2'];
+            $conditions[] = ['sex_cd', '!=', 2];
         }
 
         //Fresh events
         if($event_cd == 1 || $event_cd == 2){
             if($event_cd == 2){
-                $conditions[] = ['is_youngstock', '=', '0'];
+                $conditions[] = ['is_youngstock', '=', 1];
             }
             else{
-                $conditions[] = ['is_youngstock', '=', '1'];
+                $conditions[] = ['is_youngstock', '=', 0];
             }
-
-            if($event_dt instanceof DateTime){
+            if($event_dt instanceof \DateTime){
                 $conditions[] = ['earliest_fresh_eligible_date', '<=',  $event_dt->format('Y-m-d')];
             }
             else{
@@ -128,7 +127,7 @@ class BatchEvent
 
         //Abort events
         if($event_cd == 5){
-            if($event_dt instanceof DateTime){
+            if($event_dt instanceof \DateTime){
                 $conditions[] = ['earliest_abort_eligible_date', '<=',  $event_dt->format('Y-m-d')];
             }
             else{
@@ -138,7 +137,7 @@ class BatchEvent
 
         //Dry events
         if($event_cd == 6 || $event_cd == 10){
-            if($event_dt instanceof DateTime){
+            if($event_dt instanceof \DateTime){
                 $conditions[] = ['earliest_dry_eligible_date', '<=',  $event_dt->format('Y-m-d')];
             }
             else{
@@ -149,7 +148,7 @@ class BatchEvent
         //Repro Eligible
         $repro_eligible_codes = [30,31,34,35,38,39,40,32,36];
         if(in_array($event_cd, $repro_eligible_codes)){
-            if($event_dt instanceof DateTime){
+            if($event_dt instanceof \DateTime){
                 $conditions[] = ['earliest_repro_eligible_date', '<=',  $event_dt->format('Y-m-d')];
             }
             else{
@@ -159,7 +158,7 @@ class BatchEvent
 
         //Preg events
         if($event_cd == 33){
-            if($event_dt instanceof DateTime){
+            if($event_dt instanceof \DateTime){
                 $conditions[] = ['earliest_preg_eligible_date', '<=',  $event_dt->format('Y-m-d')];
             }
             else{

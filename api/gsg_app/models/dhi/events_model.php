@@ -150,19 +150,20 @@ class Events_model extends CI_Model {
         $herd_code = MssqlUtility::escape($herd_code);
         if(isset($conditions) && is_array($conditions)){
             array_walk($conditions, function(&$v, $k){
-                $v = 'e.' . MssqlUtility::escape($v[0]) . ' ' . MssqlUtility::escape($v[1]) . ' ' . MssqlUtility::escape($v[2]);
-            });
+                if(MssqlUtility::escape($v[2]) === 'NULL'){
+                    $this->db->where('e.' . MssqlUtility::escape($v[0]) . ' ' . MssqlUtility::escape($v[1]) . ' ' . MssqlUtility::escape($v[2]));
+                }
+                else{
+                    $this->db->where('e.' . MssqlUtility::escape($v[0]) . ' ' . MssqlUtility::escape($v[1]), MssqlUtility::escape($v[2]));
+                }
+            }, $this->db);
         }
-
-        $conditions = implode(' AND ', $conditions);
-
 
         $res = $this->db
             ->select('id.serial_num, id.chosen_id')
             ->from('TD.animal.vma_animal_options id')
             ->join('TD.animal.animal_event_eligibility e', 'id.herd_code = e.herd_code AND id.serial_num = e.serial_num', 'inner')
             ->where('id.herd_code', $herd_code)
-            ->where($conditions)
             ->get()
             ->result_array();
 

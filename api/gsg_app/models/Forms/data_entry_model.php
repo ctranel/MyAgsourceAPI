@@ -342,8 +342,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
 	public function getLookupOptions($control_id){
         $control_id = (int)$control_id;
 
-	    $sql = "USE users;
-				DECLARE @tbl nvarchar(100), @value_col nvarchar(32), @desc_col nvarchar(32), @code_type nvarchar(15), @sql nvarchar(255)
+	    $sql = "DECLARE @tbl nvarchar(100), @value_col nvarchar(32), @desc_col nvarchar(32), @code_type nvarchar(15), @sql nvarchar(255)
 				SELECT @tbl = table_name, @value_col = value_column, @desc_col = desc_column, @code_type = codetype FROM users.frm.data_lookup WHERE control_id = " . $control_id . "
                 IF @code_type IS NOT NULL
 				    SELECT @sql = N' SELECT ' + @value_col + ', ' + @desc_col + ' FROM ' + @tbl + ' WHERE codetype = ''' + @code_type + ''' AND isactive = 1 ORDER BY list_order'
@@ -812,8 +811,8 @@ class Data_entry_model extends CI_Model implements iForm_Model {
                 $v = implode('|', $v);
             }
             //only update non-generated, editable columns
-            elseif($k != $variable_field && $control_meta[$k]['is_generated'] !== true){
-                if($control_meta[$k]['is_editable'] === true){
+            elseif($k != $variable_field){
+                if($control_meta[$k]['is_editable'] === true && $control_meta[$k]['is_generated'] !== true){
                     $update_set[] = "t." . $k . "=s." . $k;
                 }
                 if(in_array($control_meta[$k]['data_type'], $no_quotes) === true){

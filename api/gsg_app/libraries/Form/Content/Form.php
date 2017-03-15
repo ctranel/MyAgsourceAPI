@@ -71,6 +71,7 @@ class Form implements iForm
         $ret['dom_id'] = $this->dom_id;
         $ret['action'] = $this->action;
         $ret['name'] = $this->name;
+        $ret['form_id'] = $this->id;
 
         if(isset($this->controls) && is_array($this->controls) && !empty($this->controls)){
             $controls = [];
