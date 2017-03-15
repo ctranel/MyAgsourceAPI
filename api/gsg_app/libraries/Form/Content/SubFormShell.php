@@ -23,14 +23,21 @@ class SubFormShell
      */
     protected $form_id;
 
-    public function __construct($condition_groups, $form_id)
+    /**
+     * @var int
+     */
+    protected $list_order;
+
+    public function __construct($condition_groups, $form_id, $list_order)
     {
         $this->condition_groups = $condition_groups;
         $this->form_id = $form_id;
+        $this->list_order = $list_order;
     }
     
     public function toArray(){
         $ret['form_id'] = $this->form_id;
+        $ret['list_order'] = $this->list_order;
 
         if(isset($this->condition_groups) && is_array($this->condition_groups) && !empty($this->condition_groups)){
             $ret['condition_groups'] = [];

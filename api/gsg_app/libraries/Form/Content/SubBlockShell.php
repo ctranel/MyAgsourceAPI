@@ -43,15 +43,21 @@ class SubBlockShell
     /**
      * @var int
      */
+    protected $list_order;
+
+    /**
+     * @var int
+     */
     protected $datalink_form_id;
 
-    public function __construct($condition_groups, $block_id, $block_name, $content_type, $content_id, $datalink_form_id)
+    public function __construct($condition_groups, $block_id, $block_name, $content_type, $content_id, $list_order, $datalink_form_id)
     {
         $this->condition_groups = $condition_groups;
         $this->block_id = $block_id;
         $this->block_name = $block_name;
         $this->content_type = $content_type;
         $this->content_id = $content_id;
+        $this->list_order = $list_order;
         $this->datalink_form_id = $datalink_form_id;
     }
     
@@ -61,6 +67,7 @@ class SubBlockShell
             'block_name' => $this->block_name,
             'content_type' => $this->content_type,
             'content_id' => $this->content_id,
+            'list_order' => $this->list_order,
         ];
 
         if(isset($this->datalink_form_id)){

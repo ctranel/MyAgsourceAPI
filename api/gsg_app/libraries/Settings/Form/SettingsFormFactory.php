@@ -179,7 +179,7 @@ class SettingsFormFactory implements iFormSubmissionFactory {
         foreach($results as $k => $r){
             if(!isset($subforms[$r['parent_control_name']][$r['block_id']])){
                 $subform_groups = $this->extractConditionGroups($subblock_data[$r['parent_control_name']][$r['block_id']]);
-                $subblocks[$r['parent_control_name']][$r['block_id']] = new SubBlockShell($subform_groups, $r['block_id'], $r['block_name'], $r['display_type'], $r['subblock_content_id']);
+                $subblocks[$r['parent_control_name']][$r['block_id']] = new SubBlockShell($subform_groups, $r['block_id'], $r['block_name'], $r['display_type'], $r['subblock_content_id'], $r['list_order']);
             }
         }
 
@@ -248,7 +248,7 @@ class SettingsFormFactory implements iFormSubmissionFactory {
             if(!isset($subforms[$r['parent_control_name']][$r['form_id']])){
                 //$form = $this->createForm($r, $herd_code, $ancestor_form_ids);
                 $subform_groups = $this->extractConditionGroups($subform_data[$r['parent_control_name']][$r['form_id']]);
-                $subforms[$r['parent_control_name']][$r['form_id']] = new SubFormShell($subform_groups, $r['form_id']);
+                $subforms[$r['parent_control_name']][$r['form_id']] = new SubFormShell($subform_groups, $r['form_id'], $r['list_order']);
             }
         }
 
