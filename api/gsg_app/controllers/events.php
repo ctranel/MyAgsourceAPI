@@ -122,7 +122,7 @@ class events extends dpage {
 
         //processed successfully, no errors
         if($eligible_animals){
-            $this->sendResponse(200, null, ['eligible_animals' => $eligible_animals]);
+            $this->sendResponse(200, null, ['options' => $eligible_animals]);
         }
 
         //if there are errors
