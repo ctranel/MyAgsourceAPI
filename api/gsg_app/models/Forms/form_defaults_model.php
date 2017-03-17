@@ -9,7 +9,7 @@ class Form_defaults_model extends CI_Model {
 	}
 
     /**
-     * @method getHerdEventTreatmentValues()
+     * @method getHerdTreatmentValues()
      * @param int herd event rxtx id
      * @return array of event data
      * @access public
@@ -22,6 +22,38 @@ class Form_defaults_model extends CI_Model {
             ->select("meat_df , milk_df, cost_df, quant_df")
             ->where('id', $id)
             ->get('TD.herd.rxtx')
+            ->result_array();
+
+        if($res === false ){
+            throw new \Exception('Herd treatment defaults could not be found: ' . $this->db->_error_message());
+        }
+        $err = $this->db->_error_message();
+        if(!empty($err)){
+            throw new \Exception($err);
+        }
+
+        if(isset($res[0]) && is_array($res[0])){
+            return $res[0];
+        }
+
+        return [];
+    }
+
+    /**
+     * @method getHerdEventTreatmentValues()
+     * @param int herd event rxtx id
+     * @return array of event data
+     * @access public
+     *
+     **/
+    public function getHerdEventTreatmentValues($animal_event_id, $herd_rxtx_id){
+        $id = (int)$herd_rxtx_id;
+
+        $res = $this->db
+            ->select("cost_df, quant_df AS med_qty")
+            //->where('id', $id)
+            ->join('TD.animal.events ae','ae.id = ' . $animal_event_id . ' AND t.rxtxid = ' . $herd_rxtx_id . ' AND t.event_cd = ae.event_cd','inner')
+            ->get('TD.herd.event_rxtx t')
             ->result_array();
 
         if($res === false ){

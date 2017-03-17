@@ -29,6 +29,11 @@ class Defaults
         return $ret;
     }
 
+    public function herdEventTreatment($event_cd, $herd_rxtx_id){
+        $ret = $this->datasource->getHerdEventTreatmentValues($event_cd, $herd_rxtx_id);
+        return $ret;
+    }
+
     public function etSire($herd_code, $sire_id){
         $ret = $this->datasource->getETSireDefaultValues($herd_code, $sire_id);
         return $ret;

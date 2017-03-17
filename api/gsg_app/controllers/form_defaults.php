@@ -34,7 +34,10 @@ class form_defaults extends dpage {
 			}
 		}
 	}
-	
+
+	/*
+	 * returns records from TD.herd.rxtx when adding treatments to custom events
+	 */
     function herd_treatment(){
         $input = $this->input->userInputArray();
         if(empty($input) || count($input) == 0){
@@ -56,7 +59,31 @@ class form_defaults extends dpage {
         }
     }
 
-	function herd_sire(){
+    /*
+     * returns records from TD.herd.event_rxtx when adding treatments to animal events
+     */
+    function herd_event_treatment(){
+        $input = $this->input->userInputArray();
+        if(empty($input) || count($input) == 0){
+            $this->sendResponse(400, new ResponseMessage('No data sent with request.', 'error'));
+        }
+
+        if(!isset($input['rxtxid']) || empty($input['rxtxid']) || !isset($input['event_cd']) || empty($input['event_cd'])){
+            $this->sendResponse(204);
+        }
+
+        $this->load->model('Forms/form_defaults_model');
+        try{
+            $defaults = new Defaults($this->form_defaults_model);
+            $defaults = $defaults->herdEventTreatment($input['animal_event_id'], (int)$input['rxtxid']);
+            $this->sendResponse(200, null, ['defaults' => $defaults]);
+        }
+        catch(exception $e){
+            $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
+        }
+    }
+
+    function herd_sire(){
         $input = $this->input->userInputArray();
         if(empty($input) || count($input) == 0){
             $this->sendResponse(400, new ResponseMessage('No data sent with request.', 'error'));
