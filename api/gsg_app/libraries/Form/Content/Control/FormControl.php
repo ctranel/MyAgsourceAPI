@@ -509,7 +509,7 @@ class FormControl implements iFormControl
     public function parseFormData($value){
  //@todo: check validators (also in getCurrValue?), or is this done in controller?
         $ret_val = null;
-        //batch variables should be returned as arrays
+        //batch variables should be returned as arrays, so convert any delimited batch values to arrays
         if($this->batch_variable_type > 0){
             if(is_array($value)){
                 return $value;
@@ -528,7 +528,7 @@ class FormControl implements iFormControl
             //    $ret_val = $value['dbfrom'] . '|' . $value['dbto'];
             //}
         }
-        elseif(in_array($this->data_type, ['char', 'varchar', 'time', 'date', 'datetime', 'smalldatetime'])){
+        elseif($value !== '' && in_array($this->data_type, ['char', 'varchar', 'time', 'date', 'datetime', 'smalldatetime'])){
             $ret_val = $value;
         }
         elseif($value !== '' && in_array($this->data_type, ['int', 'smallint', 'tinyint', 'bit', 'decimal', 'numeric'])){
@@ -537,6 +537,7 @@ class FormControl implements iFormControl
         if(strpos($this->control_type, 'lookup') !== false && empty($ret_val)){
             $ret_val = null;
         }
+
         return $ret_val;
     }
 

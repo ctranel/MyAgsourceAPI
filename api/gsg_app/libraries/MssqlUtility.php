@@ -20,7 +20,7 @@ class MssqlUtility
     public static function escape($data)
     {
         if ((!isset($data) or empty($data)) && $data !== 0 && $data !== '0'){
-            return '';
+            return null;
         }
         if (is_numeric($data)){
             return $data;
