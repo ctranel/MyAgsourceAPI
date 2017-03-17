@@ -160,6 +160,9 @@ class FormDisplayFactory {// implements iFormFactory{
         $control_data = $this->getFormControlData($form_data['form_id'], $ancestor_form_ids);
 
         $fc = [];
+
+        $existing_values = $this->datasource->getFormData($form_data['form_id'], $this->key_params);
+
         if(is_array($control_data) && !empty($control_data) && is_array($control_data[0])){
             foreach($control_data as $d){
                 $validators = null;
@@ -175,6 +178,11 @@ class FormDisplayFactory {// implements iFormFactory{
                 $s = isset($subforms[$d['name']]) ? $subforms[$d['name']] : null;
                 $b = isset($subblocks[$d['name']]) ? $subblocks[$d['name']] : null;
                 $options = null;
+
+                if(isset($existing_values[$d['name']])){
+                    $d['value'] = $existing_values[$d['name']];
+                }
+
                 if(strpos($d['control_type'], 'lookup') !== false){
                     $options = $this->getLookupOptions($d['id'], $d['control_type'], $d['data_type']);
                 }

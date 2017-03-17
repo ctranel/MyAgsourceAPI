@@ -11,6 +11,7 @@ use \myagsource\Datasource\DbObjects\DbTableFactory;
 use \myagsource\Site\WebContent\WebBlockFactory;
 use \myagsource\Report\Content\ReportFactory;
 use \myagsource\Listings\Content\ListingFactory;
+use \myagsource\Form\Content\FormDisplayFactory;
 use \myagsource\Api\Response\ResponseMessage;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
@@ -93,15 +94,47 @@ class Cow_lookup extends dpage {
 	
 	function id($serial_num){
 		try{
+            $params = ['serial_num' => $serial_num];
+
             $this->load->model('dhi/cow_lookup/id_model');
-            $data = $this->id_model->getCowArray($this->session->userdata('herd_code'), $serial_num);
-            $data['chosen_id'] = $data[$this->cow_id_field];
+            $data['animal_data'] = $this->id_model->getCowArray($this->session->userdata('herd_code'), $serial_num);
+            $data['animal_data']['chosen_id'] = $data['animal_data'][$this->cow_id_field];
+
+
+            //supplemental factory
+            $this->load->model('supplemental_model');
+            $supplemental_factory = new SupplementalFactory($this->supplemental_model, site_url());
+
+            //Set up site content objects
+            $this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
+            $this->load->model('web_content/block_model');
+
+            //page content
+            $this->load->model('ReportContent/report_block_model');
+
+            $this->load->model('Forms/Data_entry_model');//, null, false, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
+            $entry_form_factory = new FormDisplayFactory($this->Data_entry_model, $supplemental_factory, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
+
+            //create block content
+            //$listing = $option_listing_factory->getListing(3, ['herd_code' => $this->session->userdata('herd_code'), 'serial_num' => $serial_num]);
+            $entry_form = $entry_form_factory->getByBlock(415, $this->session->userdata('herd_code'));
+
+            //create blocks for content
+            $web_block_factory = new WebBlockFactory($this->block_model, $supplemental_factory);
+            $listing_block = $web_block_factory->getBlock(415, $entry_form);
+
+            $blocks = [$listing_block];
+            if(is_array($blocks)){
+                foreach($blocks as $b){
+                    $data['blocks'][] = $b->toArray();
+                }
+            }
         }
         catch(Exception $e){
             $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
         }
 
-        $this->sendResponse(200, null, ['animal_data' => $data]);
+        $this->sendResponse(200, null, $data);
 	}
 
 	function dam($serial_num){

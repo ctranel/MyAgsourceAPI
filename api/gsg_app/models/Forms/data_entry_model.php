@@ -155,6 +155,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
      * @param array of ints $ancestor_form_ids
      * @return string category
      * @author ctranel
+     **/
     protected function getFormKeyMeta($form_id, $ancestor_form_ids = null) {
         $ret = [];
 
@@ -178,7 +179,6 @@ class Data_entry_model extends CI_Model implements iForm_Model {
         }
         return $ret;
     }
-**/
 
     /**
      * getSourceTable
@@ -325,6 +325,77 @@ class Data_entry_model extends CI_Model implements iForm_Model {
         }
     }
 
+    /**
+     * getFormData
+     *
+     *
+     *
+     * @param int form id
+     * @param array key=>value pairs
+     * @return array key (field_name) => value array of data for given object
+     * @author ctranel
+     **/
+    public function getFormData($form_id, $criteria) {
+        $form_id = (int)$form_id;
+        $criteria = MssqlUtility::escape(array_filter($criteria));
+
+        $keys = array_keys($criteria);
+        $key_meta = $this->getFormKeyMeta($form_id);
+        $key_condition_text = '';
+
+        foreach($keys as $k) {
+            if(!isset($key_meta[$k])){
+                return [];
+            }
+            $criteria_val = $criteria[$k];
+
+            if (strpos($key_meta[$k]['data_type'], 'char') !== false) {
+                if(is_array($criteria_val)){
+                    $criteria_val = implode("'',''", $criteria_val);
+                }
+                $key_condition_text .= $k . " IN(''" . $criteria_val . "'') AND ";
+            } else {
+                if(is_array($criteria_val)){
+                    $criteria_val = implode(",", $criteria_val);
+                }
+                $key_condition_text .= $k . " IN(" . $criteria_val . ") AND ";
+            }
+        }
+
+        //@todo: if this is within a batch form, I would not include the primary key
+        $sql = "
+            DECLARE
+                @dsql NVARCHAR(MAX)
+                ,@db_table_name VARCHAR(100)
+
+            SELECT TOP 1 @db_table_name = CONCAT(db.name, '.',  tbl.db_schema, '.', tbl.name)
+                from users.frm.form_controls fc
+                inner join users.frm.form_control_groups cg ON fc.form_control_group_id = cg.id AND cg.form_id = " . $form_id . "
+                inner join users.dbo.db_fields fld ON fc.db_field_id = fld.id
+                inner join users.dbo.db_tables tbl ON fld.db_table_id = tbl.id AND allow_update = 1
+                inner join users.dbo.db_databases db ON tbl.database_id = db.id
+
+            SET @dsql = CONCAT(N'SELECT DISTINCT * " . //implode(',', $display_cols) . "
+			    "FROM ', @db_table_name, N' WHERE " . substr($key_condition_text, 0, -5) . "')
+            EXEC (@dsql)
+       ";
+//print($sql); die;
+        $res = $this->db->query($sql)->result_array();
+        if($res === false){
+            throw new \Exception('Listing data not found.');
+        }
+        $err = $this->db->_error_message();
+
+        if(!empty($err)){
+            throw new \Exception($err);
+        }
+
+        if(isset($res[0]) && is_array($res[0])) {
+            return $res[0];
+        }
+
+        return [];
+    }
 
     /* -----------------------------------------------------------------
     *  returns key-value pairs of options for a given lookup field
