@@ -39,7 +39,12 @@ class Nav extends MY_Api_Controller {
 		$this->load->model('web_content/navigation_model');
         $this->load->model('dhi/herd_model');
 
-		$navigation = new Navigation($this->navigation_model, $this->herd, $this->permissions->permissionsList());
+		$navigation = new Navigation($this->navigation_model,
+            $this->herd,
+            $this->permissions->permissionsList(),
+            $this->as_ion_auth->get_group_dropdown_data($this->session->userdata('active_group_id')),
+            $this->session->userdata('active_group_id')
+        );
 
 		//echo $navigation->jsonOutput('DHI');
         $this->sendResponse(200, null, ['nav'=> $navigation->toArray('DHI')]);
