@@ -236,6 +236,7 @@ class dpage extends MY_Api_Controller {
         $tmp = strtotime("+" . $params['look_ahead_days'] . " day");
         $params['target_date'] = date('Y-m-d', $tmp);
         unset($params['look_ahead_days']);
+        $params['report_options'] = $page_id == 103 ? 2 : $page_id == 106 ? 1 : null;
 
         $this->filters = $this->_filters($page_id, $params);
         $this->load->model('Forms/setting_form_model');//, null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);

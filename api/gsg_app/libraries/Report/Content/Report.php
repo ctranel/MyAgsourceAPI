@@ -865,7 +865,7 @@ abstract class Report implements iReport {
 		//supplemental params
 		if(isset($this->dataset_supplemental) && count($this->dataset_supplemental) > 0){
 			foreach($this->dataset_supplemental as $f){
-				$ret = array_merge($ret, $f->getLinkParamFields());
+                $ret = array_unique(array_merge($ret, $f->getLinkParamFields()));
 			}
 		}
 		return $ret;

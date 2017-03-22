@@ -228,10 +228,12 @@ class ReportFilters{
 			$options_filter = null;
 
             if(isset($arr_form_data[$f['options_filter_form_field_name']])){
-				$options_filter = [[
+				$filter_value = $arr_form_data[$f['options_filter_form_field_name']];
+                $options_filter = [[
 					'db_field_name' => $f['options_filter_form_field_name'],
-					'operator' => '=',
-					'value' => $arr_form_data[$f['options_filter_form_field_name']],
+//@todo:  terrible, terrible hack to accommodate 1 situation.  need to update filter lookup data structure to be similar to form data loookups
+					'operator' => $f['options_filter_form_field_name'] == 'report_options' ? ' LIKE ' : '=',
+					'value' => $f['options_filter_form_field_name'] == 'report_options' ? '%' . $filter_value . '%' : $filter_value,
 				]];
 			}
 			$this->arr_criteria[$k] = CriteriaFactory::createCriteria($this->filter_model, $f, $options_filter);

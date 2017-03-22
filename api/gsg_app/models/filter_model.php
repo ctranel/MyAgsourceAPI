@@ -58,15 +58,16 @@ class Filter_model extends CI_Model {
 */		
 		if(isset($options_conditions) && is_array($options_conditions)){
 			foreach($options_conditions as $c){
-				$this->db->where($c['db_field_name'] . ' ' . $c['operator'], $c['value']);
+                $this->db->where($c['db_field_name'] . ' ' . $c['operator'], $c['value']);
 			}
 		}
 		// run query
-		$results = $this->db
-		->select('value, label, is_default')
-		->order_by('list_order')
-		->get($source_table)
-		->result_array();
-		return $results;
+        $results = $this->db
+            ->select('value, label, is_default')
+            ->order_by('list_order')
+            ->get($source_table)
+            ->result_array();
+
+        return $results;
 	}
 }
