@@ -247,6 +247,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
             ->join('users.frm.form_controls dc', 'ld.dependent_form_control_id = dc.id', 'left')
             ->join('users.dbo.db_fields dfld', 'dc.db_field_id = dfld.id', 'left')
 
+            ->order_by('cg.list_order')
             ->order_by('fc.list_order')
 
             ->get()
