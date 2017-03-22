@@ -29,8 +29,8 @@ class Defaults
         return $ret;
     }
 
-    public function herdEventTreatment($event_cd, $herd_rxtx_id){
-        $ret = $this->datasource->getHerdEventTreatmentValues($event_cd, $herd_rxtx_id);
+    public function herdEventTreatment($herd_rxtx_id){
+        $ret = $this->datasource->getHerdEventTreatmentValues($herd_rxtx_id);
         return $ret;
     }
 

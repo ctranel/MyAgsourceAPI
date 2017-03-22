@@ -60,7 +60,7 @@ class form_defaults extends dpage {
     }
 
     /*
-     * returns records from TD.herd.event_rxtx when adding treatments to animal events
+     * returns records from TD.herd.rxtx with control names matching treatments to animal events
      */
     function herd_event_treatment(){
         $input = $this->input->userInputArray();
@@ -68,14 +68,14 @@ class form_defaults extends dpage {
             $this->sendResponse(400, new ResponseMessage('No data sent with request.', 'error'));
         }
 
-        if(!isset($input['rxtxid']) || empty($input['rxtxid']) || !isset($input['event_cd']) || empty($input['event_cd'])){
+        if(!isset($input['rxtxid']) || empty($input['rxtxid'])){
             $this->sendResponse(204);
         }
 
         $this->load->model('Forms/form_defaults_model');
         try{
             $defaults = new Defaults($this->form_defaults_model);
-            $defaults = $defaults->herdEventTreatment($input['animal_event_id'], (int)$input['rxtxid']);
+            $defaults = $defaults->herdEventTreatment((int)$input['rxtxid']);
             $this->sendResponse(200, null, ['defaults' => $defaults]);
         }
         catch(exception $e){

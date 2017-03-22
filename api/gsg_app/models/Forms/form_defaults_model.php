@@ -46,14 +46,13 @@ class Form_defaults_model extends CI_Model {
      * @access public
      *
      **/
-    public function getHerdEventTreatmentValues($animal_event_id, $herd_rxtx_id){
+    public function getHerdEventTreatmentValues($herd_rxtx_id){
         $id = (int)$herd_rxtx_id;
 
         $res = $this->db
-            ->select("cost_df, quant_df AS med_qty")
-            //->where('id', $id)
-            ->join('TD.animal.events ae','ae.id = ' . $animal_event_id . ' AND t.rxtxid = ' . $herd_rxtx_id . ' AND t.event_cd = ae.event_cd','inner')
-            ->get('TD.herd.event_rxtx t')
+            ->select("meat_df , milk_df, cost_df AS cost, quant_df AS med_qty")
+            ->where('id', $id)
+            ->get('TD.herd.rxtx')
             ->result_array();
 
         if($res === false ){

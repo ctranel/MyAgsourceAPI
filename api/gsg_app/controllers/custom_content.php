@@ -5,34 +5,14 @@ require_once APPPATH . 'libraries/CustomReport.php';
 
 use \myagsource\CustomReport;
 
-class Custom_report extends MY_Api_Controller {
+class Custom_content extends MY_Api_Controller {
 	protected $page_header_data;
 
 	function __construct()
 	{
         parent::__construct();
 
-        if(!$this->session->userdata('user_id')) {
-            $this->sendResponse(401);
-        }
-
-        if(!$this->session->userdata('herd_code')){
-            $this->sendResponse(400,  new ResponseMessage('Please select a herd and try again.', 'error'));
-        }
-
-        //is someone logged in?
-        /*if($this->herd->herdCode() != $this->config->item('default_herd')){
-            //is a herd selected?
-            if(!$this->herd->herdCode() || $this->herd->herdCode() == ''){
-                $this->sendResponse(400,  new ResponseMessage('Please select a herd and try again.', 'error'));
-            }
-            */
-        //does logged in user have access to selected herd?
-        $has_herd_access = $this->herd_access->hasAccess($this->session->userdata('user_id'), $this->herd->herdCode(), $this->session->userdata('arr_regions'), $this->permissions->permissionsList());
-        if(!$has_herd_access){
-            $this->sendResponse(403,  new ResponseMessage('You do not have permission to access this herd.  Please select another herd and try again.', 'error'));
-        }
-        //}
+        $this->load->model('custom_report_model');
 
 		/* Load the profile.php config file if it exists
 		$this->config->load('profiler', false, true);
