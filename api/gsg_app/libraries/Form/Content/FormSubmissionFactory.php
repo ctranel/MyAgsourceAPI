@@ -223,11 +223,14 @@ class FormSubmissionFactory implements iFormSubmissionFactory{
         //parse each subblock separately
         foreach($subblock_data as $control_name => $sblocks){
             foreach($sblocks as $block_id => $sb){
-                $block = $this->_loadBlock($block_id);
-                $datalink = null;
-                if(isset($sb['datalink_form_id'])){
-                    $datalink = $this->getForm($sb['datalink_form_id']);
+                //for form submissions, subblocks load only when there is a datalink
+                if(!isset($sb['datalink_form_id'])){
+                    continue;
                 }
+                $block = $this->_loadBlock($block_id);
+
+                $datalink = $this->getForm($sb['datalink_form_id']);
+
                 $subblock_groups = $this->extractConditionGroups($subblock_data[$control_name][$block_id]);
                 $subblocks[$control_name][$block_id] = new SubBlock($subblock_groups, $block, $datalink);
             }
