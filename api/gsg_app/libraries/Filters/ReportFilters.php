@@ -223,7 +223,7 @@ class ReportFilters{
 				$f['selected_values'] = $arr_form_data[$k];
 			}
 
-			$options_filter = null;
+			$options_filter = [];
 
             if(isset($arr_form_data[$f['options_filter_form_field_name']])){
 				$filter_value = $arr_form_data[$f['options_filter_form_field_name']];
@@ -233,14 +233,16 @@ class ReportFilters{
 					'options_operator' => $f['options_filter_form_field_name'] == 'report_options' ? ' LIKE ' : '=',
 					'value' => $f['options_filter_form_field_name'] == 'report_options' ? '%' . $filter_value . '%' : $filter_value,
 				]];
-                if(strpos($f['type'], 'herd') !== false){
-                    $options_filter[] = [
-                        'db_field_name' => 'herd_code',
-                        'options_operator' => '=',
-                        'value' => $this->form_data['herd_code'],
-                    ];
-                }
 			}
+//            echo $f['type'];
+            if(strpos($f['type'], 'herd') !== false){
+                $options_filter[] = [
+                    'db_field_name' => 'herd_code',
+                    'options_operator' => '=',
+                    'value' => $this->form_data['herd_code'],
+                ];
+            }
+//var_dump($options_filter);
 			$this->arr_criteria[$k] = CriteriaFactory::createCriteria($this->filter_model, $f, $options_filter);
 		}
 	}
