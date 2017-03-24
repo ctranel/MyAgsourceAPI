@@ -23,14 +23,15 @@ class Filter_model extends CI_Model {
 	public function getPageFilters($page_id) {
 		$ret_array = array();
 		$results = $this->db
-		->select('pf.name, pf.type, pf.options_source, pf.options_filter_form_field_name, pf.default_value, pf.operator, df.db_field_name, pf.user_editable')
-		//->where('p.section_id', $section_id)
-		->where('p.id', $page_id)
-		->join('users.dbo.pages p', "pf.page_id = p.id", "inner")
-		->join('users.dbo.db_fields df', "pf.field_id = df.id", 'left')
-		->order_by('pf.list_order')
-		->get('users.dbo.page_filters pf')
-		->result_array();
+            ->select('pf.name, fct.name AS type, pf.options_source, pf.options_filter_form_field_name, pf.default_value, df.db_field_name, pf.user_editable')
+            //->where('p.section_id', $section_id)
+            ->where('p.id', $page_id)
+            ->join('users.dbo.pages p', "pf.page_id = p.id", "inner")
+            ->join('users.frm.control_types fct', "pf.control_type_id = fct.id", "inner")
+            ->join('users.dbo.db_fields df', "pf.field_id = df.id", 'left')
+            ->order_by('pf.list_order')
+            ->get('users.dbo.page_filters pf')
+            ->result_array();
 		if(isset($results) && is_array($results)){
 			foreach($results as $r){
 				foreach($r as $k => $v){
@@ -58,7 +59,7 @@ class Filter_model extends CI_Model {
 */		
 		if(isset($options_conditions) && is_array($options_conditions)){
 			foreach($options_conditions as $c){
-                $this->db->where($c['db_field_name'] . ' ' . $c['operator'], $c['value']);
+                $this->db->where($c['db_field_name'] . ' ' . $c['options_operator'], $c['value']);
 			}
 		}
 		// run query

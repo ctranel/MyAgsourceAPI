@@ -203,8 +203,6 @@ class ReportFilters{
 					'name' => ucwords(str_replace('_', ' ', $k)),
 					'type' => 'value',
 					'options_source' => null,
-//					'options_filter_form_field_name' => null,
-                    'operator' => 'IN',
 					'default_value' => $f,
 					'db_field_name' => $k,
 					'selected_values' => $arr_form_data[$k],
@@ -232,9 +230,16 @@ class ReportFilters{
                 $options_filter = [[
 					'db_field_name' => $f['options_filter_form_field_name'],
 //@todo:  terrible, terrible hack to accommodate 1 situation.  need to update filter lookup data structure to be similar to form data loookups
-					'operator' => $f['options_filter_form_field_name'] == 'report_options' ? ' LIKE ' : '=',
+					'options_operator' => $f['options_filter_form_field_name'] == 'report_options' ? ' LIKE ' : '=',
 					'value' => $f['options_filter_form_field_name'] == 'report_options' ? '%' . $filter_value . '%' : $filter_value,
 				]];
+                if(strpos($f['type'], 'herd') !== false){
+                    $options_filter[] = [
+                        'db_field_name' => 'herd_code',
+                        'options_operator' => '=',
+                        'value' => $this->form_data['herd_code'],
+                    ];
+                }
 			}
 			$this->arr_criteria[$k] = CriteriaFactory::createCriteria($this->filter_model, $f, $options_filter);
 		}
@@ -251,7 +256,7 @@ class ReportFilters{
 	*  @return array field_name=>selected_value
 	*  @throws: 
 	* -----------------------------------------------------------------
-	*/
+*/
 	public function criteriaKeyValue(){
         $ret = [];
         if(!isset($this->arr_criteria)){
@@ -268,7 +273,7 @@ class ReportFilters{
 	}
 
 	/* -----------------------------------------------------------------
-	*  criteriaKeyValue() Returns an key=>value array of field_name=>selected_value
+	*  getCriteriaValueByKey() Returns an key=>value array of field_name=>selected_value
 
 	*  Returns an key=>value array of field_name=>selected_value.  These values are populated with the set filter function
 

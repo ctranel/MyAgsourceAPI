@@ -25,7 +25,6 @@ class Criteria{
 	private $options;
 	private $options_source;
 	//private $list_order;
-	private $operator;
     private $default_value;
 	private $log_filter_text;
 	private $selected_values;
@@ -37,7 +36,6 @@ class Criteria{
 		$this->field_name = $criteria_data['db_field_name'];
 		$this->label = $criteria_data['name'];
 		$this->default_value = $criteria_data['default_value'];
-        $this->operator = $criteria_data['operator'];
 		$this->options_source = $criteria_data['options_source'];
 //		$this->options_filter_form_field_name = $criteria_data['options_filter_form_field_name'];
 		$this->user_editable = (bool)$criteria_data['user_editable'];
@@ -68,37 +66,6 @@ class Criteria{
 		return $this->selected_values;
 	}
 
-    /* -----------------------------------------------------------------
-    *  Returns operator value
-
-    *  Returns operator value
-
-    *  @since: version 1
-    *  @author: ctranel
-    *  @date: 2016-10-20
-    *  @return: string
-    *  @throws:
-    * -----------------------------------------------------------------
-    */
-    public function operator(){
-        return $this->operator;
-    }
-
-    /* -----------------------------------------------------------------
-    *  Returns options
-
-    *  Returns array of options
-
-    *  @author: ctranel
-    *  @date: Oct 15, 2014
-    *  @return: array
-    *  @throws:
-    * -----------------------------------------------------------------
-    public function getOptions(){
-        return $this->options;
-    }
-    */
-
 	/* -----------------------------------------------------------------
 	*  isDisplayed
 
@@ -114,17 +81,41 @@ class Criteria{
 		return ((count($this->options) > 1 || !isset($this->options_source)) && $this->user_editable);
 	}
 
-	/* -----------------------------------------------------------------
-	*  Returns filter text
+    /* -----------------------------------------------------------------
+    *  Returns operator based on type
 
-	*  Returns filter text
+    *  Returns selected value
 
-	*  @author: ctranel
-	*  @date: Jun 17, 2014
-	*  @return: string filter text
-	*  @throws: 
-	* -----------------------------------------------------------------
-	*/
+    *  @since: version 1
+    *  @author: ctranel
+    *  @date: Jun 17, 2014
+    *  @return: array
+    *  @throws:
+    * -----------------------------------------------------------------
+    */
+    public function operator(){
+        $operator = '=';
+        if(strpos($this->type, 'array') !== false){
+            $operator = 'IN';
+        }
+        if(strpos($this->type, 'range') !== false){
+            $operator = 'BETWEEN';
+        }
+
+        return $operator;
+    }
+
+    /* -----------------------------------------------------------------
+    *  Returns filter text
+
+    *  Returns filter text
+
+    *  @author: ctranel
+    *  @date: Jun 17, 2014
+    *  @return: string filter text
+    *  @throws:
+    * -----------------------------------------------------------------
+    */
 	public function get_filter_text(){
 		if(empty($this->log_filter_text)){
 			$this->set_filter_text();
@@ -149,7 +140,6 @@ class Criteria{
 			'type' => $this->type,
 			'field_name' => $this->field_name,
 			'label' => $this->label,
-            'operator' => $this->operator,
 			'selected_values' => $this->selected_values,
 			'options' => $this->options,
             'editable' => $this->user_editable,
@@ -175,7 +165,7 @@ class Criteria{
 		if(!isset($value)){
 			return false;
 		}
-		if(!is_array($value) && $this->operator === 'IN'){
+		if(!is_array($value) && strpos($this->type, 'array') !== false){
 			$value = [$value];
 		}
 		$this->selected_values = $value;
@@ -201,7 +191,7 @@ class Criteria{
             return;
 		}
 		//? if($field_name == 'page') $this->arr_criteria['page'] = $this->arr_pages[$this->$arr_params['page']]['name'];
-		if($this->operator === 'BETWEEN'){ //data should be a 2 element assoc array
+		if(strpos($this->type, 'range') !== false){ //data should be a 2 element assoc array
 			if(!isset($page_filter_value[0]) || !isset($page_filter_value[1])){
 				//can't set a range unless both ends are set
                 return;
@@ -209,7 +199,7 @@ class Criteria{
 			$this->selected_values['dbfrom'] = $page_filter_value[0];
 			$this->selected_values['dbto'] = $page_filter_value[1];
 		}
-		elseif($this->operator === 'IN'){ //data should be an array
+		elseif(strpos($this->type, 'array') !== false){ //data should be an array
 			if(is_array($page_filter_value)){
                 foreach($page_filter_value as $k1=>$v1){
                     $page_filter_value[$k1] = explode('|', $v1);
@@ -261,7 +251,7 @@ class Criteria{
 			}
 		}
 		if(isset($this->default_value)){
-            if($this->operator === 'BETWEEN'){
+            if(strpos($this->type, 'range') !== false){
                 if(strpos($this->default_value, '|') !== FALSE){
                     list($this->selected_values['dbfrom'], $this->selected_values['dbto']) = explode('|', $this->default_value);
                 }
@@ -270,7 +260,7 @@ class Criteria{
                 }
                 return;
             }
-            elseif($this->operator === 'IN'){
+            elseif(strpos($this->type, 'array') !== false){
                 if(isset($this->default_value) && is_array($this->default_value)) {
                     $this->selected_values = $this->default_value;
                 }
