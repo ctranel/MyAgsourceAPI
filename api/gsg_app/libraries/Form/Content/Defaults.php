@@ -24,6 +24,11 @@ class Defaults
         $this->datasource = $datasource;
     }
 
+    public function siteByPen($herd_code, $pen_num){
+        $ret = $this->datasource->getSiteByPen($herd_code, $pen_num);
+        return $ret;
+    }
+
     public function herdTreatment($herd_rxtx_id){
         $ret = $this->datasource->getHerdTreatmentValues($herd_rxtx_id);
         return $ret;

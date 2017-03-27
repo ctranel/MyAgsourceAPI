@@ -35,6 +35,27 @@ class form_defaults extends dpage {
 		}
 	}
 
+	function site_from_pen(){
+        $input = $this->input->userInputArray();
+        if(empty($input) || count($input) == 0){
+            $this->sendResponse(400, new ResponseMessage('No data sent with request.', 'error'));
+        }
+
+        if(!isset($input['pen_num']) || empty($input['pen_num'])){
+            $this->sendResponse(204);
+        }
+
+        $this->load->model('Forms/form_defaults_model');
+        try{
+            $defaults = new Defaults($this->form_defaults_model);
+            $defaults = $defaults->siteByPen($input['herd_code'], (int)$input['pen_num']);
+            $this->sendResponse(200, null, ['defaults' => $defaults]);
+        }
+        catch(exception $e){
+            $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
+        }
+    }
+
 	/*
 	 * returns records from TD.herd.rxtx when adding treatments to custom events
 	 */

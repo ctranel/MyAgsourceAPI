@@ -15,6 +15,39 @@ class Form_defaults_model extends CI_Model {
      * @access public
      *
      **/
+    public function getSiteByPen($herd_code, $pen_num){
+        $pen_num = (int)$pen_num;
+        $herd_code = MssqlUtility::escape($herd_code);
+
+        $res = $this->db
+            ->select("siteID")
+            ->where('pen_num', $pen_num)
+            ->where('herd_code', $herd_code)
+            ->get('TD.herd.pens')
+            ->result_array();
+
+        if($res === false ){
+            throw new \Exception('Pen defaults could not be found: ' . $this->db->_error_message());
+        }
+        $err = $this->db->_error_message();
+        if(!empty($err)){
+            throw new \Exception($err);
+        }
+
+        if(isset($res[0]) && is_array($res[0])){
+            return $res[0];
+        }
+
+        return [];
+    }
+
+    /**
+     * @method getHerdTreatmentValues()
+     * @param int herd event rxtx id
+     * @return array of event data
+     * @access public
+     *
+     **/
     public function getHerdTreatmentValues($herd_rxtx_id){
         $id = (int)$herd_rxtx_id;
 
