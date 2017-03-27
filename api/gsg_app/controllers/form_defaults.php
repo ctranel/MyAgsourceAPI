@@ -144,6 +144,9 @@ class form_defaults extends dpage {
             try{
                 $defaults = new Defaults($this->form_defaults_model);
                 $bull_defaults = $defaults->etSireNAABData($input['sire_naab']);
+                if(empty($bull_defaults)){
+                    $bull_defaults['sire_naab'] = $input['sire_naab'];
+                }
                 $this->sendResponse(200, null, ['defaults' => $bull_defaults]);
             }
             catch(exception $e){
@@ -196,6 +199,9 @@ class form_defaults extends dpage {
             try{
                 $defaults = new Defaults($this->form_defaults_model);
                 $bull_defaults = $defaults->animalSireNAABData($input['sire_naab']);
+                if(empty($bull_defaults)){
+                    $bull_defaults['sire_naab'] = $input['sire_naab'];
+                }
                 $this->sendResponse(200, null, ['defaults' => $bull_defaults]);
             }
             catch(exception $e){
@@ -248,6 +254,9 @@ class form_defaults extends dpage {
             try{
                 $defaults = new Defaults($this->form_defaults_model);
                 $bull_defaults = $defaults->sireNAABData($input['naab']);
+                if(empty($bull_defaults)){
+                    $bull_defaults['naab'] = $input['naab'];
+                }
                 $this->sendResponse(200, null, ['defaults' => $bull_defaults]);
             }
             catch(exception $e){
