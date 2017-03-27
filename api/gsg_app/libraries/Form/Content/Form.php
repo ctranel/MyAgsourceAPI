@@ -49,15 +49,15 @@ class Form implements iForm
     protected $action;
 
     /**
-     * array of control objects
-     * @var FormControl[]
+     * array of control groups
+     * @var FormControlGroup[]
      **/
-    protected $controls;
+    protected $control_groups;
 
-    public function __construct($id, $datasource, $controls, $name, $dom_id, $action){
+    public function __construct($id, $datasource, $control_groups, $name, $dom_id, $action){
         $this->id = $id;
         $this->datasource = $datasource;
-        $this->controls = $controls;
+        $this->control_groups = $control_groups;
         $this->name = $name;
         $this->dom_id = $dom_id;
         $this->action = $action;
@@ -67,19 +67,31 @@ class Form implements iForm
         return $this->action;
     }
 
+    protected function controls(){
+        if(!isset($this->control_groups) || !is_array($this->control_groups)){
+            return [];
+        }
+
+        $ret_controls = [];
+        foreach($this->control_groups as $cg){
+            $ret_controls = array_merge($ret_controls, $cg->controls());
+        }
+        return $ret_controls;
+    }
+
     public function toArray(){
         $ret['dom_id'] = $this->dom_id;
         $ret['action'] = $this->action;
         $ret['name'] = $this->name;
         $ret['form_id'] = $this->id;
 
-        if(isset($this->controls) && is_array($this->controls) && !empty($this->controls)){
-            $controls = [];
-            foreach($this->controls as $c){
-                $controls[] = $c->toArray();
+        if(isset($this->control_groups) && is_array($this->control_groups)){
+            $ret_cg = [];
+            foreach($this->control_groups as $cg){
+                $ret_cg[] = $cg->toArray();
             }
-            $ret['controls'] = $controls;
-            unset($controls);
+            $ret['control_groups'] = $ret_cg;
+            unset($ret_cg);
         }
         return $ret;
     }
@@ -98,17 +110,20 @@ class Form implements iForm
 *  @throws: * -----------------------------------------------------------------
 */
     public function controlsMetaArray(){
-        $controls = [];
-        if(isset($this->controls) && is_array($this->controls) && !empty($this->controls)){
-            foreach($this->controls as $c){
-                $controls[$c->name()] = $c->toArray();
+        $ret_controls = [];
+
+        $controls = $this->controls();
+
+        if(isset($controls) && is_array($controls) && !empty($controls)){
+            foreach($controls as $c){
+                $ret_controls[$c->name()] = $c->toArray();
                 $subform_controls = $c->subformControlsMetaArray();
                 if(isset($subform_controls)){
-                    $controls = $controls + $subform_controls;
+                    $ret_controls = $ret_controls + $subform_controls;
                 }
             }
         }
-        return $controls;
+        return $ret_controls;
     }
 
     /* -----------------------------------------------------------------
@@ -124,8 +139,11 @@ class Form implements iForm
 */
     public function keyMetaArray(){
         $keys = [];
-        if(isset($this->controls) && is_array($this->controls) && !empty($this->controls)){
-            foreach($this->controls as $c){
+
+        $controls = $this->controls();
+
+        if(isset($controls) && is_array($controls) && !empty($controls)){
+            foreach($controls as $c){
                 if($c->isKey()){
                     $keys[$c->name()] = $c->toArray();
                 }
@@ -214,7 +232,9 @@ class Form implements iForm
 *  @throws: * -----------------------------------------------------------------
 */
     protected function insertDefaultListingRecords($parent_key_vals, $form_data){
-        foreach($this->controls as $c){
+        $controls = $this->controls();
+
+        foreach($controls as $c){
             $c->insertDefaultListingRecords($parent_key_vals, $form_data, $this->batchVariableControl());
         }
     }
@@ -231,7 +251,9 @@ class Form implements iForm
 *  @throws: * -----------------------------------------------------------------
 */
     public function batchVariableControl() {
-        foreach($this->controls as $c){
+        $controls = $this->controls();
+
+        foreach($controls as $c){
             if($c->batchVariableType() !== null){
                 //each form can only have one
                 return $c;
@@ -336,7 +358,10 @@ class Form implements iForm
         if(!isset($form_data) || !is_array($form_data)){
             throw new \Exception('No form data found');
         }
-        foreach($this->controls as $c){
+
+        $controls = $this->controls();
+
+        foreach($controls as $c){
             if(isset($form_data[$c->name()])){//!$c->isGenerated() &&
                 $ret_val[$c->name()] = $c->parseFormData($form_data[$c->name()]);
                 $parsed_subforms = $c->parseSubformData($form_data);
@@ -414,7 +439,9 @@ class Form implements iForm
     public function animalOptions(){
         $ret_val = [];
 
-        foreach($this->controls as $c){
+        $controls = $this->controls();
+
+        foreach($controls as $c){
             if($c->controlType() === "animal_lookup"){
                 $ret_val[$c->name()] = $c->options();
             }

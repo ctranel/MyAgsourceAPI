@@ -228,7 +228,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
             //have not yet tested with multiple level nesting
             array_walk_recursive($ancestor_form_ids, function(&$v, $k){return (int)$v;});
         }
-        $result = $this->db->select('fc.id, ct.name AS control_type, fld.db_field_name AS name, fc.label, fld.is_editable, fld.is_generated, fld.is_fk_field AS is_key, fld.data_type, fc.biz_validation_url, fc.form_defaults_url, fc.add_option_form_id, fc.default_value, fc.batch_variable_type, ld.lookup_url AS dependency_lookup_url, dfld.db_field_name AS dependent_form_control_name')
+        $result = $this->db->select('cg.label AS control_group, cg.list_order AS cg_list_order, fc.id, ct.name AS control_type, fld.db_field_name AS name, fc.label, fld.is_editable, fld.is_generated, fld.is_fk_field AS is_key, fld.data_type, fc.biz_validation_url, fc.form_defaults_url, fc.add_option_form_id, fc.default_value, fc.batch_variable_type, ld.lookup_url AS dependency_lookup_url, dfld.db_field_name AS dependent_form_control_name')
             ->select("(CAST(
                   (SELECT STUFF((
                       SELECT '|', CONCAT(v.name, ':', v.value) AS [data()] 
