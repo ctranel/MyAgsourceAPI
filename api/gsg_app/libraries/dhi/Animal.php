@@ -91,22 +91,30 @@ class Animal
 
      *  @author: ctranel
      *  @date: 2016-10-20
-     *  @return: valid 12 digit SireId
+     *  @return: array with country code (3 char) and id (12 char) elements
      *  @throws: Exception
      * -----------------------------------------------------------------*/
-    public static function formatOfficialId(\Animal_model $datasource, $sire_id){
-        $sire_id = substr($sire_id, -12);
-        /*
+    public static function formatOfficialId($sire_id){
         $letters = preg_replace("/[0-9]+/", "", $sire_id);
+        $id = str_pad(substr($sire_id, -12), 12, "0", STR_PAD_LEFT);
 
-        if(!empty($letters)){
-            throw new \Exception('Non-numeric characters are not allowed in official IDs.');
-        }
-*/
-        if(strlen($sire_id) < 12){
-            $sire_id = str_pad($sire_id, 12, "0", STR_PAD_LEFT);
+        if(empty($letters) && strlen($sire_id) === 15){
+            $country_cd = substr($sire_id, 0, 3);
+            return [
+                'country_cd' => $country_cd,
+                'id' => $id,
+            ];
         }
 
-        return $sire_id;
+        if(strlen($sire_id) > 12){
+            throw new \Exception('ID cannot be more than 12 characters.');
+        }
+
+        $ret = [
+            'country_cd' => 'USA',
+            'id' => $id,
+        ];
+
+        return $ret;
     }
 }

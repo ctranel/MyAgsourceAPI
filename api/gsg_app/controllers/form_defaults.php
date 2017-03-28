@@ -177,8 +177,7 @@ class form_defaults extends dpage {
 
         if(isset($input['sire_bull_id']) && !empty($input['sire_bull_id'])){
             try{
-                $this->load->model('dhi/animal_model');
-                $input['sire_bull_id'] = Animal::formatOfficialId($this->animal_model, $input['sire_bull_id']);
+                $sire_id_pieces = Animal::formatOfficialId($input['sire_bull_id']);
             }
             catch(\Exception $e){
                 $this->sendResponse(400, new ResponseMessage($e->getMessage(), 'error'));
@@ -187,9 +186,12 @@ class form_defaults extends dpage {
             $this->load->model('Forms/form_defaults_model');
             try{
                 $defaults = new Defaults($this->form_defaults_model);
-                $bull_defaults = $defaults->etSireIDData($input['sire_bull_id']);
-                if(strlen($input['sire_bull_id']) > strlen($bull_defaults['sire_bull_id'])){
-                    $bull_defaults['sire_bull_id'] = $input['sire_bull_id'];
+                $bull_defaults = $defaults->etSireIDData($sire_id_pieces['id']);
+                if(empty($bull_defaults)){
+                    $bull_defaults = [
+                        'sire_bull_id' => $sire_id_pieces['id'],
+                        'country_cd' => $sire_id_pieces['country_cd'],
+                    ];
                 }
                 $this->sendResponse(200, null, ['defaults' => $bull_defaults]);
             }
@@ -232,8 +234,7 @@ class form_defaults extends dpage {
 
         if(isset($input['sire_bull_id']) && !empty($input['sire_bull_id'])){
             try{
-                $this->load->model('dhi/animal_model');
-                $input['sire_bull_id'] = Animal::formatOfficialId($this->animal_model, $input['sire_bull_id']);
+                $sire_id_pieces = Animal::formatOfficialId($input['sire_bull_id']);
             }
             catch(\Exception $e){
                 $this->sendResponse(400, new ResponseMessage($e->getMessage(), 'error'));
@@ -242,9 +243,12 @@ class form_defaults extends dpage {
             $this->load->model('Forms/form_defaults_model');
             try{
                 $defaults = new Defaults($this->form_defaults_model);
-                $bull_defaults = $defaults->animalSireIDData($input['sire_bull_id']);
-                if(strlen($input['sire_bull_id']) > strlen($defaults['sire_bull_id'])){
-                    $defaults['sire_bull_id'] = $input['sire_bull_id'];
+                $bull_defaults = $defaults->animalSireIDData($sire_id_pieces['id']);
+                if(empty($bull_defaults)){
+                    $bull_defaults = [
+                        'sire_bull_id' => $sire_id_pieces['id'],
+                        'country_cd' => $sire_id_pieces['country_cd'],
+                    ];
                 }
                 $this->sendResponse(200, null, ['defaults' => $bull_defaults]);
             }
@@ -287,8 +291,7 @@ class form_defaults extends dpage {
 
         if(isset($input['bull_id']) && !empty($input['bull_id'])){
             try{
-                $this->load->model('dhi/animal_model');
-                $input['bull_id'] = Animal::formatOfficialId($this->animal_model, $input['bull_id']);
+                $sire_id_pieces = Animal::formatOfficialId($input['bull_id']);
             }
             catch(\Exception $e){
                 $this->sendResponse(400, new ResponseMessage($e->getMessage(), 'error'));
@@ -297,9 +300,13 @@ class form_defaults extends dpage {
             $this->load->model('Forms/form_defaults_model');
             try{
                 $defaults = new Defaults($this->form_defaults_model);
-                $bull_defaults = $defaults->sireIDData($input['bull_id']);
-                if(strlen($input['bull_id']) > strlen($defaults['bull_id'])){
-                    $defaults['bull_id'] = $input['bull_id'];
+                $bull_defaults = $defaults->sireIDData($sire_id_pieces['id']);
+
+                if(empty($bull_defaults)){
+                    $bull_defaults = [
+                        'bull_id' => $sire_id_pieces['id'],
+                        'country_cd' => $sire_id_pieces['country_cd'],
+                    ];
                 }
                 $this->sendResponse(200, null, ['defaults' => $bull_defaults]);
             }
