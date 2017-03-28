@@ -161,8 +161,13 @@ class FormDisplayFactory {// implements iFormFactory{
         //this function depends on an existing record
         $control_data = $this->getFormControlData($form_data['form_id'], $ancestor_form_ids);
 
-        $existing_values = $this->datasource->getFormData($form_data['form_id'], $this->key_params);
-//var_dump($this->key_params, $existing_values);
+        $existing_values = [];
+
+        //if all keys have a value, pull data based on those keys
+        $key_control_names = $this->extractKeysNamesFromControlData($control_data);
+        if(count(array_intersect($key_control_names, array_keys($this->key_params))) === count($key_control_names)){
+            $existing_values = $this->datasource->getFormData($form_data['form_id'], $this->key_params);
+        }
 
         $control_group_data = $this->extractControlGroup($control_data);
         unset($control_data);
@@ -208,6 +213,27 @@ class FormDisplayFactory {// implements iFormFactory{
         return new Form($form_data['form_id'], $this->datasource, $control_groups, $form_data['form_name'], $form_data['dom_id'], $form_data['action'], $herd_code);
     }
 
+    /*
+    * extractKeysNamesFromControlData
+    *
+    * @param array of control data
+    * @author ctranel
+    * @returns Array list of control names that are keys
+    */
+    protected function extractKeysNamesFromControlData($control_data){
+        if(!isset($control_data) || !is_array($control_data)){
+            return [];
+        }
+
+        $ret = [];
+        foreach($control_data as $c){
+            if($c['is_key'] === 1){
+                $ret[] = $c['name'];
+            }
+        }
+
+        return $ret;
+    }
     /*
     * extractControlGroup
     *
