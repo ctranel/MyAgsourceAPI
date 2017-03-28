@@ -232,7 +232,7 @@ class Herd_options_model extends CI_Model implements iListing_model  {
                 inner join users.dbo.db_tables tbl ON fld.db_table_id = tbl.id AND allow_update = 1
                 inner join users.dbo.db_databases db ON tbl.database_id = db.id
 
-            SET @dsql = CONCAT(N'SELECT DISTINCT " . implode(',', $display_cols) . "
+            SET @dsql = CONCAT(N'SELECT " . implode(',', $display_cols) . "
 			    FROM ', @db_table_name, N' WHERE " . substr($key_condition_text, 0, -5);
 
         if(isset($order_by) && !empty($order_by) && isset($sort_order) && !empty($sort_order)) {
