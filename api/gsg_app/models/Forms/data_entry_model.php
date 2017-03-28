@@ -784,7 +784,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
             foreach($key_field_names as $k){
                 $key_values[$k] = $form_data[$k];
                 if(!isset($form_data[$k]) || empty($form_data[$k])){
-                    throw new \Exception('Missing key data, submission failed.');
+                    throw new \Exception('Missing key data, update failed.');
                 }
                 $upd_where[] = $k . "='" . $form_data[$k] . "'";
             }
@@ -865,7 +865,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
                 //}
                 $key_values[$k] = $form_data[$k];
                 if(!isset($form_data[$k]) || empty($form_data[$k])){
-                    throw new \Exception('Missing key data, submission failed.');
+                    throw new \Exception('Missing key data, batch update failed (' . $k . ').');
                 }
                 if(is_array($form_data[$k])) {
                     $join_cond[] = $k . " IN(" . implode(',', $form_data[$k]) . ")";
@@ -1002,7 +1002,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
             foreach($key_field_names as $k){
                 $key_values[$k] = $key_data[$k];
                 if(!isset($key_data[$k]) || empty($key_data[$k])){
-                    throw new \Exception('Missing key data, submission failed.');
+                    throw new \Exception('Missing key data, batch delete failed.');
                 }
                 if(is_array($key_data[$k])) {
                     $delete_cond[] = $k . " IN(" . implode(',', $key_data[$k]) . ")";
