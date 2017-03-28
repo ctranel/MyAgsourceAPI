@@ -48,6 +48,35 @@ class Animal_model extends CI_Model {
      *
      **/
 
+    public function getAnimalDataByControlNum($herd_code, $control_num){
+        $herd_code = MssqlUtility::escape($herd_code);
+        $control_num = (int)$control_num;
+
+        if(empty($herd_code) || empty($control_num)){
+            throw new Exception('Animal is not specified');
+        }
+
+        $result = $this->db
+            ->select('serial_num, control_num, list_order AS list_order_num, visible_id, barn_name')
+            ->where('herd_code', $herd_code)
+            ->where('control_num', $control_num)
+            ->where('isactive', 1)
+            ->get('[TD].[animal].[id]')
+            ->result_array();
+        if(is_array($result) && isset($result[0]) && is_array($result[0])){
+            return $result[0];
+        }
+    }
+
+    /**
+     * @method cowIdData()
+     * @param string herd code
+     * @param int serial num
+     * @return array of cow id data.
+     * @access public
+     *
+     **/
+
     public function getNaabBreedCode($breed, $species_code){
         $breed = MssqlUtility::escape($breed);
         $species_code = MssqlUtility::escape($species_code);

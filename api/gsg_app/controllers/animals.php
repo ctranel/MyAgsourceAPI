@@ -1,19 +1,8 @@
 <?php
 //namespace myagsource;
 require_once(APPPATH . 'controllers/dpage.php');
-require_once APPPATH . 'libraries/Site/WebContent/WebBlockFactory.php';
-require_once APPPATH . 'libraries/Listings/Content/ListingFactory.php';
-require_once(APPPATH . 'libraries/Supplemental/Content/SupplementalFactory.php');
-require_once(APPPATH . 'libraries/Site/WebContent/Page.php');
-require_once(APPPATH . 'libraries/dhi/HerdPageAccess.php');
-require_once(APPPATH . 'libraries/Site/WebContent/PageAccess.php');
 
-use \myagsource\Site\WebContent\WebBlockFactory;
-use \myagsource\Listings\Content\ListingFactory;
-use \myagsource\Supplemental\Content\SupplementalFactory;
-use \myagsource\Site\WebContent\Page;
-use \myagsource\dhi\HerdPageAccess;
-use \myagsource\Site\WebContent\PageAccess;
+use \myagsource\Api\Response\ResponseMessage;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
@@ -58,8 +47,21 @@ class animals extends dpage {
         catch(\Exception $e){
             $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
         }
-        $this->sendResponse(400, new ResponseMessage(validation_errors(), 'error'));
     }
 
+    function check_ctrl_num(){
+        $input = $this->input->userInputArray();
+        try{
+            $this->load->model('dhi/animal_model');
+            $data = $this->animal_model->getAnimalDataByControlNum($input['herd_code'], $input['control_num']);
 
+            if(count($data) > 0){
+                $this->sendResponse(400,  new ResponseMessage('Control Number '. $input['control_num'] . ' is already in use.  Please enter a different number.', 'error'));
+            }
+            $this->sendResponse(200, null);
+        }
+        catch(\Exception $e){
+            $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
+        }
+    }
 }
