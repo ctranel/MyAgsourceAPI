@@ -20,6 +20,7 @@ use myagsource\Listings\Content\ListingFactory;
 use myagsource\Report\Content\ReportFactory;
 use myagsource\Settings\Form\SettingsFormFactory;
 use \myagsource\Supplemental\Content\SupplementalFactory;
+use \myagsource\Form\Content\Control\FormControlGroup;
 use \myagsource\Form\Content\Control\FormControl;
 use myagsource\Validation\Input\Validator;
 
@@ -167,9 +168,20 @@ class FormSubmissionFactory implements iFormSubmissionFactory{
         //this function depends on an existing record
         $control_data = $this->datasource->getFormControlData($form_data['form_id'], $this->key_params, $ancestor_form_ids);
 
-        $fc = [];
-        if(is_array($control_data) && !empty($control_data) && is_array($control_data[0])){
-            foreach($control_data as $d){
+        $control_group_data = $this->extractControlGroup($control_data);
+        unset($control_data);
+
+        $control_group_keys = array_keys($control_group_data);
+        $control_groups = [];
+
+        foreach($control_group_keys as $cgk) {
+            $fc = [];
+
+            if (!is_array($control_group_data[$cgk]) || empty($control_group_data[$cgk]) || !is_array($control_group_data[$cgk][0])) {
+                $control_data[$cgk] = [];
+            }
+
+            foreach($control_group_data[$cgk] as $d){
                 $validators = null;
                 if(isset($d['validators'])){
                     $validators = [];
@@ -188,8 +200,31 @@ class FormSubmissionFactory implements iFormSubmissionFactory{
                 //}
                 $fc[] = new FormControl($d, $validators, $options, $s, $b);//, $this->listing_datasource
             }
+
+            $control_groups[] = new FormControlGroup($control_group_data[$cgk][0]['control_group'], $control_group_data[$cgk][0]['cg_list_order'], $fc);
         }
-        return new Form($form_data['form_id'], $this->datasource, $fc, $form_data['form_name'], $form_data['dom_id'], $form_data['action'], $this->key_params['herd_code']);
+        return new Form($form_data['form_id'], $this->datasource, $control_groups, $form_data['form_name'], $form_data['dom_id'], $form_data['action'], $this->key_params['herd_code']);
+    }
+
+    /*
+    * extractControlGroup
+    *
+    * @param array of control data
+    * @author ctranel
+    * @returns Array of Control data group by control group name
+    */
+    protected function extractControlGroup($control_data) {
+        if(!isset($control_data) || !is_array($control_data)){
+            return [];
+        }
+
+        $cg = [];
+
+        foreach($control_data as $c){
+            $cg[$c['control_group']][] = $c;
+        }
+
+        return $cg;
     }
 
     /*
