@@ -232,9 +232,9 @@ class form_defaults extends dpage {
             }
         }
 
-        if(isset($input['sire_bull_id']) && !empty($input['sire_bull_id'])){
+        if(isset($input['sire_id_num']) && !empty($input['sire_id_num'])){
             try{
-                $sire_id_pieces = Animal::formatOfficialId($input['sire_bull_id']);
+                $sire_id_pieces = Animal::formatOfficialId($input['sire_id_num']);
             }
             catch(\Exception $e){
                 $this->sendResponse(400, new ResponseMessage($e->getMessage(), 'error'));
@@ -246,8 +246,8 @@ class form_defaults extends dpage {
                 $bull_defaults = $defaults->animalSireIDData($sire_id_pieces['id']);
                 if(empty($bull_defaults)){
                     $bull_defaults = [
-                        'sire_bull_id' => $sire_id_pieces['id'],
-                        'country_cd' => $sire_id_pieces['country_cd'],
+                        'sire_id_num' => $sire_id_pieces['id'],
+                        'sire_country_cd' => $sire_id_pieces['country_cd'],
                     ];
                 }
                 $this->sendResponse(200, null, ['defaults' => $bull_defaults]);
