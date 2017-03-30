@@ -115,7 +115,7 @@ class Herd_model extends CI_Model {
         }
 		$this->db->join('users.dbo.users_herds uh', 'h.herd_code = uh.herd_code')
 		->where('uh.user_id', $user_id)
-		->where ('uh.status',1);
+		->where ('uh.isactive',1);
 //		->where(' (users.dbo.users_herds.expire_date >'. now() . ' OR  users.dbo.users_herds.expire_date IS NULL) ');
 		return $this->getHerds($limit,null);
 		
@@ -306,7 +306,7 @@ class Herd_model extends CI_Model {
 		}
 		$this->db->join('users.dbo.users_herds' . ' uh', 'h.herd_code = uh.herd_code')
 		->where('uh.user_id', $user_id)
-		->where ('uh.status',1);
+		->where ('uh.isactive',1);
 		return $this->getHerdCodes($limit,null);
 	}
 

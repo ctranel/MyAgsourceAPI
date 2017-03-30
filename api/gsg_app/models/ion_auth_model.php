@@ -302,7 +302,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 * @author ctranel
 	 **/
 	public function get_users_group_array($id=false) {
-		$this->db->where($this->tables['groups'] . '.status', 1);
+		$this->db->where($this->tables['groups'] . '.isactive', 1);
 		$arr_db_groups = parent::get_users_groups($id)->result_array();
 		$arr_return = array();
 		if(is_array($arr_db_groups) && !empty($arr_db_groups)){
@@ -351,7 +351,7 @@ class Ion_auth_model extends Ion_auth_parent_model
 	 **/
 	public function get_active_groups()
 	{
-		$this->_ion_where[] = array($this->tables['groups'] . '.status' => 1);
+		$this->_ion_where[] = array($this->tables['groups'] . '.isactive' => 1);
 		$this->_ion_order_by = $this->tables['groups'] . '.list_order';
 		$this->_ion_order = 'asc';
 		return parent::groups();
@@ -367,21 +367,21 @@ class Ion_auth_model extends Ion_auth_parent_model
 	public function get_editable_groups($group_id_in)
 	{
 		$sql = "WITH cteAnchor AS (
-	SELECT g.id, g.name, gp.parent_group_id as parent_group, g.status, g.list_order
+	SELECT g.id, g.name, gp.parent_group_id as parent_group, g.isactive, g.list_order
 	FROM users.dbo.groups g 
 	INNER JOIN users.dbo.group_parents gp ON g.id = gp.group_id 
 	WHERE gp.parent_group_id = " . $group_id_in . " OR g.id = " . $group_id_in . "
 
 	UNION all 
 	
-	SELECT t.id, t.name, t.parent_group, t.status, t.list_order
+	SELECT t.id, t.name, t.parent_group, t.isactive, t.list_order
 	FROM (
-		SELECT g.id, g.name, gp.parent_group_id as parent_group, g.status, g.list_order
+		SELECT g.id, g.name, gp.parent_group_id as parent_group, g.isactive, g.list_order
 		FROM users.dbo.groups g 
 		INNER JOIN users.dbo.group_parents gp ON g.id = gp.group_id
 	) t
 	INNER JOIN cteAnchor r ON r.id = t.parent_group 
-	WHERE t.status = 1 
+	WHERE t.isactive = 1 
 ) 
 SELECT DISTINCT id, name, list_order FROM cteAnchor ORDER BY list_order;";
 		
