@@ -31,8 +31,8 @@ class SettingForm extends Form implements iForm {
 	protected $herd_code;
 		
 	
-	function __construct($id, $datasource, $controls, $name, $dom_id, $action, $user_id, $herd_code) {
-		parent::__construct($id, $datasource, $controls, $name, $dom_id, $action);
+	function __construct($id, $datasource, $controls_groups, $name, $dom_id, $action, $user_id, $herd_code) {
+		parent::__construct($id, $datasource, $controls_groups, $name, $dom_id, $action);
         $this->user_id = $user_id;
 		$this->herd_code = $herd_code;
 	}
@@ -62,8 +62,8 @@ class SettingForm extends Form implements iForm {
         $date = new \DateTime("now");
         $logdttm = $date->format("Y-m-d\TH:i:s");
 
-
-        foreach($this->controls as $c){
+        $controls = $this->controls();
+        foreach($controls as $c){
             if(isset($form_data[$c->name()])) {
                 if(!$c->forUser()){
                     $user_id = 'NULL';

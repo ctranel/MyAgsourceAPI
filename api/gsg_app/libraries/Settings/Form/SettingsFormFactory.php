@@ -4,6 +4,7 @@ namespace myagsource\Settings\Form;
 
 require_once(APPPATH . 'libraries/Settings/SettingForm.php');
 require_once(APPPATH . 'libraries/Settings/SettingFormControl.php');
+require_once(APPPATH . 'libraries/Form/Content/Control/FormControlGroup.php');
 require_once(APPPATH . 'libraries/Form/Content/SubForm.php');
 require_once(APPPATH . 'libraries/Form/Content/SubBlock.php');
 require_once(APPPATH . 'libraries/Form/Content/SubFormShell.php');
@@ -18,6 +19,7 @@ use \myagsource\Form\Content\SubForm;
 use \myagsource\Supplemental\Content\SupplementalFactory;
 use \myagsource\Settings\SettingForm;
 use \myagsource\Settings\SettingFormControl;
+use \myagsource\Form\Content\Control\FormControlGroup;
 use \myagsource\Validation\Input\Validator;
 use \myagsource\Form\Content\SubContentCondition;
 use \myagsource\Form\Content\SubContentConditionGroup;
@@ -146,7 +148,9 @@ class SettingsFormFactory implements iFormSubmissionFactory {
                 $fc[] = new SettingFormControl($d, $validators, $options, $sf, $b);
             }
         }
-        return new SettingForm($form_data['form_id'], $this->datasource, $fc, $form_data['form_name'], $form_data['dom_id'], $form_data['action'],$user_id, $herd_code);
+        $control_group = [new FormControlGroup(NULL, 1, $fc)];
+
+        return new SettingForm($form_data['form_id'], $this->datasource, $control_group, $form_data['form_name'], $form_data['dom_id'], $form_data['action'],$user_id, $herd_code);
     }
 
     /*
