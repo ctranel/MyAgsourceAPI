@@ -398,12 +398,14 @@ class dform extends dpage {
      * @return	void
      */
     function activate($form_id, $json_data = null){
-        if(!isset($json_data)){
-            $this->sendResponse(400, new ResponseMessage('No criteria sent for deletion.', 'error'));
+        $params = [];
+        if(isset($json_data)) {
+            $params = (array)json_decode(urldecode($json_data));
         }
-        $input = (array)json_decode(urldecode($json_data));
 
-        $form_factory = $this->_formFactory($input + ['herd_code'=>$this->session->userdata('herd_code')], $input);
+        $input = $this->input->userInputArray();
+
+        $form_factory = $this->_formFactory($params, $input);
 
         $form = $form_factory->getForm($form_id);
 
@@ -416,7 +418,7 @@ class dform extends dpage {
 
             $form->activate($input);
 
-            $resp_msg = new ResponseMessage('The record was removed', 'message');
+            $resp_msg = new ResponseMessage('The record was activated', 'message');
 
             $this->sendResponse(200, $resp_msg);
         }
