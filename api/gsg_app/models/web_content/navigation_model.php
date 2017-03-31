@@ -2,7 +2,6 @@
 class Navigation_model extends CI_Model {
 	public function __construct(){
 		parent::__construct();
-		$this->tables = $this->config->item('tables', 'ion_auth');
 	}
 
 	/**
@@ -48,7 +47,7 @@ class Navigation_model extends CI_Model {
 	 * @return array of section and page data for given user
 	 * @author ctranel
 	 **/
-	public function getContentByScope($scopes) {
+	public function getContentByScope($scopes, $herd_code) {
 		if(empty($scopes)){
 			return false;
 		}

@@ -498,6 +498,16 @@ class Auth extends MY_Api_Controller {
         $this->sendResponse(400, new ResponseMessage(validation_errors(), 'error'));
     }
 
+    function manage_user(){
+        $user_id = $this->input->userInput('user_id');
+        if(isset($user_id)){
+            $this->edit_user($user_id);
+        }
+        else{
+            $this->create_user();
+        }
+    }
+
     function create_user(){
 		//validate form input
 		$this->form_validation->set_rules('first_name', 'First Name', 'trim|required');
@@ -689,10 +699,16 @@ class Auth extends MY_Api_Controller {
         $this->sendResponse(400, new ResponseMessage($this->as_ion_auth->errors(), 'error'));
 	}
 		
-	function ajax_techs($assoc_acct_num){
-		$arr_tech_obj = $this->ion_auth_model->get_dhi_supervisor_acct_nums_by_association($assoc_acct_num);
-		$supervisor_acct_num_options = $this->as_ion_auth->get_dhi_supervisor_dropdown_data($arr_tech_obj);
-        $this->sendResponse(200, null, $supervisor_acct_num_options);
+	function assoc_techs($assoc_acct_num){
+        try{
+            $arr_tech_obj = $this->ion_auth_model->get_dhi_supervisor_acct_nums_by_association($assoc_acct_num);
+            $supervisor_acct_num_options = $this->as_ion_auth->get_dhi_supervisor_dropdown_data($arr_tech_obj);
+            $this->sendResponse(200, null, $supervisor_acct_num_options);
+        }
+        catch(\Exception $e){
+            $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
+        }
+        $this->sendResponse(400, new ResponseMessage(validation_errors(), 'error'));
 	}
 	
 	function ajax_terms(){

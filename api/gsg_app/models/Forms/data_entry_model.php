@@ -339,6 +339,9 @@ class Data_entry_model extends CI_Model implements iForm_Model {
     public function getFormData($form_id, $criteria) {
         $form_id = (int)$form_id;
         $criteria = MssqlUtility::escape(array_filter($criteria));
+        if(!isset($criteria) || empty($criteria)){
+            return [];
+        }
 
         $keys = array_keys($criteria);
         $key_meta = $this->getFormKeyMeta($form_id);
@@ -421,7 +424,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
 				ELSE
 				    SELECT @sql = N' SELECT ' + @value_col + ', ' + @desc_col + ' FROM ' + @tbl + ' WHERE isactive = 1 ORDER BY list_order'
 				EXEC sp_executesql @sql";
-
+//die($sql);
         $results = $this->db->query($sql)->result_array();
 
 		return $results;

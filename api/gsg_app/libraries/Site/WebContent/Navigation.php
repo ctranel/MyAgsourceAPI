@@ -90,9 +90,9 @@ class Navigation{
 			if(in_array('View Subscriptions', $this->permissions_list)){
 				$tmp_array = array_merge($tmp_array, $this->datasource_navigation->getSubscribedContent($this->herd->herdCode()));
 			}
-			//if(in_array('View Account', $this->permissions_list)){
-				//$scope[] = 'account';
-			//}
+			if(in_array('View Account', $this->permissions_list)){
+				$scope[] = 'account';
+			}
 			if(in_array('View Admin', $this->permissions_list)){
 				$scope[] = 'admin';
 			}
@@ -167,9 +167,9 @@ class Navigation{
         if(in_array("Update Service Group Access", $this->permissions_list)){//$this->active_group_id == 2){
             $acct_nav[] = [
                 'dom_id' => 'manage_service_grp',
-                'href' => 'auth/manage_service_grp',
+                'href' => 'api/auth/manage_service_grp',
                 'name' => 'Manage Consultant Access',
-                'route' => '/manage_service_grp',
+                'route' => 'api/auth/manage_service_grp',
                 'scope' => 'base'
                 ,
             ];
@@ -177,16 +177,16 @@ class Navigation{
         if(in_array("View Assign w permission", $this->permissions_list)){
             $acct_nav[] = [
                 'dom_id' => 'service_grp_manage_herds',
-                'href' => 'auth/service_grp_manage_herds',
+                'href' => 'api/auth/service_grp_manage_herds',
                 'name' => 'Manage Herd Access',
-                'route' => '/service_grp_manage_herds',
+                'route' => 'api/auth/service_grp_manage_herds',
                 'scope' => 'base',
             ];
             $acct_nav[] = [
                 'dom_id' => 'service_grp_request',
-                'href' => 'auth/service_grp_request',
+                'href' => 'api/auth/service_grp_request',
                 'name' => 'Request Herd Access',
-                'route' => '/service_grp_request',
+                'route' => 'api/auth/service_grp_request',
                 'scope' => 'base',
             ];
         }
@@ -202,9 +202,16 @@ class Navigation{
         if(true){//$this->as_ion_auth->is_editable_user($this->session->userdata('user_id'), $this->session->userdata('user_id'))){
             $acct_nav[] = [
                 'dom_id' => 'edit_user',
-                'href' => 'auth/edit_user',
+                'href' => 'api/auth/edit_user',
                 'name' => 'Edit User Account',
-                'route' => '/edit_user',
+                'route' => 'api/auth/edit_user',
+                'scope' => 'base',
+            ];
+            $acct_nav[] = [
+                'dom_id' => 'edit_user',
+                'href' => 'auth/create_user',
+                'name' => 'Edit My User',
+                'route' => 'dhi/dpage/123/{"user_id":' . '1' . '}',
                 'scope' => 'base',
             ];
         }
@@ -213,16 +220,30 @@ class Navigation{
                 'dom_id' => 'list_accounts',
                 'href' => 'auth/list_accounts',
                 'name' => 'List User Account',
-                'route' => '/list_accounts',
+                'route' => 'api/auth/list_accounts',
                 'scope' => 'base',
             ];
+            $acct_nav[] = [
+                'dom_id' => 'list_accounts',
+                'href' => 'auth/list_accounts',
+                'name' => 'Manage Users',
+                'route' => 'dhi/dpage/122',
+                'scope' => 'account',
+            ];
         }
-        if(in_array("Add All Users", $this->permissions_list) || in_array("Add Users In Region", $this->permissions_list)){
+        if(false && in_array("Add All Users", $this->permissions_list) || in_array("Add Users In Region", $this->permissions_list)){
             $acct_nav[] = [
                 'dom_id' => 'create_user',
                 'href' => 'auth/create_user',
                 'name' => 'Add User Account',
-                'route' => '/create_user',
+                'route' => 'api/auth/create_user',
+                'scope' => 'base',
+            ];
+            $acct_nav[] = [
+                'dom_id' => 'create_user',
+                'href' => 'auth/create_user',
+                'name' => 'Add User',
+                'route' => 'dhi/dpage/123',
                 'scope' => 'base',
             ];
         }
@@ -251,9 +272,9 @@ class Navigation{
         foreach($this->groups as $k=>$v){
             $group_change_nav[] = [
                 'dom_id' => $k . '',
-                'href' => '/auth/set_role/'. $k,
+                'href' => 'api/auth/set_role/'. $k,
                 'name' => $v,
-                'route' => '/auth/set_role/'. $k,
+                'route' => 'api/auth/set_role/'. $k,
                 'scope' => 'base',
             ];
         }

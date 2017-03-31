@@ -165,8 +165,9 @@ class FormDisplayFactory {// implements iFormFactory{
 
         //if all keys have a value, pull data based on those keys
         $key_control_names = $this->extractKeysNamesFromControlData($control_data);
-        if(count(array_intersect($key_control_names, array_keys($this->key_params))) === count($key_control_names)){
-            $existing_values = $this->datasource->getFormData($form_data['form_id'], $this->key_params);
+        $key_data = array_intersect_key($this->key_params, array_fill_keys($key_control_names, null));
+        if(count($key_data) === count($key_control_names)){
+            $existing_values = $this->datasource->getFormData($form_data['form_id'], $key_data);
         }
 
         $control_group_data = $this->extractControlGroup($control_data);

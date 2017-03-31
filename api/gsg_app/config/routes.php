@@ -43,6 +43,7 @@ $route['404_override'] = 'http_error';
 
 $route['dashboard'] = 'dashboard/index';
 $route['dpage/(:num)'] = 'dpage/index/$1';
+$route['dpage/(:num)/(:any)'] = 'dpage/index/$1/$2';
 $route['listings/(:num)'] = 'listings/index/$1';
 
 /* End of file routes.php */
