@@ -107,7 +107,7 @@ class dform extends dpage {
             $params = (array)json_decode(urldecode($json_data));
         }
         if(empty(array_filter($params))){
-            $this->sendResponse(400, new ResponseMessage("No identifying information received", 'error'));
+            //$this->sendResponse(400, new ResponseMessage("No identifying information received", 'error'));
         }
 
 		try{
@@ -144,7 +144,7 @@ class dform extends dpage {
         }
 
         if(empty(array_filter($params))){
-            $this->sendResponse(400, new ResponseMessage("No identifying information received", 'error'));
+            //$this->sendResponse(400, new ResponseMessage("No identifying information received", 'error'));
         }
 
         try{
@@ -379,6 +379,42 @@ class dform extends dpage {
             $input['logdttm'] = $date->format("Y-m-d\TH:i:s");
 
             $form->deactivate($input);
+
+            $resp_msg = new ResponseMessage('The record was removed', 'message');
+
+            $this->sendResponse(200, $resp_msg);
+        }
+        catch(Exception $e){
+            $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
+        }
+    }
+
+    /**
+     * @method activate() - setting submission.
+     *
+     * @param int form id
+     * @param string json data (key data)
+     * @access	public
+     * @return	void
+     */
+    function activate($form_id, $json_data = null){
+        if(!isset($json_data)){
+            $this->sendResponse(400, new ResponseMessage('No criteria sent for deletion.', 'error'));
+        }
+        $input = (array)json_decode(urldecode($json_data));
+
+        $form_factory = $this->_formFactory($input + ['herd_code'=>$this->session->userdata('herd_code')], $input);
+
+        $form = $form_factory->getForm($form_id);
+
+        try{
+            //add field values for logging
+            $input['logid'] = $this->session->userdata('user_id');
+            //DB functions use server time, will do the same to be consistent
+            $date = new DateTime("now");
+            $input['logdttm'] = $date->format("Y-m-d\TH:i:s");
+
+            $form->activate($input);
 
             $resp_msg = new ResponseMessage('The record was removed', 'message');
 

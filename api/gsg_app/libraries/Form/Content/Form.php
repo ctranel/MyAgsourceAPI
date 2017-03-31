@@ -341,6 +341,29 @@ class Form implements iForm
     }
 
     /* -----------------------------------------------------------------
+*  activate
+
+*  activate record from database
+
+*  @author: ctranel
+*  @date: 2017-03-31
+*  @param: array of key=>value pairs that have been processed by the parseFormData static function
+*  @return key->value array of keys for the record
+*  @throws:
+* -----------------------------------------------------------------
+*/
+    public function activate($entity_data){
+        if(!isset($entity_data) || !is_array($entity_data)){
+            throw new \UnexpectedValueException('No form data received');
+        }
+
+        $entity_data['isactive'] = 1;
+
+        $key_vals = $this->datasource->update($this->id, $entity_data, $this->controlsMetaArray(), $this->keyMetaArray());
+        return $key_vals;
+    }
+
+    /* -----------------------------------------------------------------
      *  parses form data according to data type conventions.
 
     *  Parses form data according to data type conventions.

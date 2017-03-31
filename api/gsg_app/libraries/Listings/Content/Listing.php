@@ -57,9 +57,15 @@ class Listing implements iListing
 
     /**
      * delete_path
-     * @var int
+     * @var string
      **/
     protected $delete_path;
+
+    /**
+     * activate_path
+     * @var string
+     **/
+    protected $activate_path;
 
     /**
      * sort_column
@@ -73,10 +79,11 @@ class Listing implements iListing
      **/
     protected $sort_order;
 
-    public function __construct($id, $form_id, $delete_path, $columns, $dataset, $isactive, $add_presets, $sort_column, $sort_order){
+    public function __construct($id, $form_id, $delete_path, $activate_path, $columns, $dataset, $isactive, $add_presets, $sort_column, $sort_order){
         $this->id = $id;
         $this->form_id = $form_id;
         $this->delete_path = $delete_path;
+        $this->activate_path = $activate_path;
         $this->isactive = $isactive;
         $this->add_presets = $add_presets;
         $this->dataset = $dataset;
@@ -91,6 +98,7 @@ class Listing implements iListing
             'form_id' => $this->form_id,
             'add_presets' => $this->add_presets,
             'delete_path' => $this->delete_path,
+            'activate_path' => $this->activate_path,
             'sort_column' => $this->sort_column,
             'sort_order' => $this->sort_order,
         ];

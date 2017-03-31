@@ -31,7 +31,7 @@ class Herd_options_model extends CI_Model implements iListing_model  {
         $page_id = (int)$page_id;
 
         $results = $this->db
-            ->select('pb.page_id, b.id, l.id AS listing_id, b.name, b.description, dt.name AS display_type, s.name AS scope, srt.db_field_name AS order_by, l.sort_order, l.form_id, l.delete_path, b.isactive, b.path, pb.list_order')
+            ->select('pb.page_id, b.id, l.id AS listing_id, b.name, b.description, dt.name AS display_type, s.name AS scope, srt.db_field_name AS order_by, l.sort_order, l.form_id, l.delete_path, l.activate_path, b.isactive, b.path, pb.list_order')
             ->join('users.dbo.blocks b', "pb.block_id = b.id AND b.display_type_id = 8 AND pb.page_id = " . $page_id . ' AND b.isactive = 1', 'inner')
             ->join('users.options.listings l', "b.id = l.block_id", 'inner')
             ->join("(
@@ -58,7 +58,7 @@ class Herd_options_model extends CI_Model implements iListing_model  {
         $block_id = (int)$block_id;
 
         $results = $this->db
-            ->select('b.id, l.id AS listing_id, b.name, b.description, dt.name AS display_type, s.name AS scope, srt.db_field_name AS order_by, l.sort_order, l.form_id, l.delete_path, b.isactive, b.path, 1 AS list_order') //pb.page_id, pb.list_order
+            ->select('b.id, l.id AS listing_id, b.name, b.description, dt.name AS display_type, s.name AS scope, srt.db_field_name AS order_by, l.sort_order, l.form_id, l.delete_path, l.activate_path, b.isactive, b.path, 1 AS list_order') //pb.page_id, pb.list_order
             ->join('users.options.listings l', "b.id = l.block_id AND b.isactive = 1 AND b.display_type_id = 8 AND b.id = " . $block_id, 'inner')
             ->join("(
                     SELECT lci.id, f.db_field_name 
@@ -84,7 +84,7 @@ class Herd_options_model extends CI_Model implements iListing_model  {
         $listing_id = (int)$listing_id;
 
         $results = $this->db
-            ->select('b.id, l.id AS listing_id, b.name, b.description, dt.name AS display_type, s.name AS scope, srt.db_field_name AS order_by, l.sort_order, l.form_id, l.delete_path, b.isactive, b.path')
+            ->select('b.id, l.id AS listing_id, b.name, b.description, dt.name AS display_type, s.name AS scope, srt.db_field_name AS order_by, l.sort_order, l.form_id, l.delete_path, l.activate_path, b.isactive, b.path')
             ->join('users.options.listings l', "b.id = l.block_id AND l.id = " . $listing_id, 'inner')
             ->join("(
                     SELECT lci.id, f.db_field_name, lci.list_order 
@@ -233,7 +233,11 @@ class Herd_options_model extends CI_Model implements iListing_model  {
                 inner join users.dbo.db_databases db ON tbl.database_id = db.id
 
             SET @dsql = CONCAT(N'SELECT " . implode(',', $display_cols) . "
-			    FROM ', @db_table_name, N' WHERE " . substr($key_condition_text, 0, -5);
+			    FROM ', @db_table_name, N' ";
+
+        if(isset($key_condition_text) && !empty($key_condition_text)){
+            $sql .= " WHERE " . substr($key_condition_text, 0, -5);
+        }
 
         if(isset($order_by) && !empty($order_by) && isset($sort_order) && !empty($sort_order)) {
             $sql .= " ORDER BY " . $order_by . " " . $sort_order;
