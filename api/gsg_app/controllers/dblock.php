@@ -2,8 +2,6 @@
 //namespace myagsource;
 
 require_once(APPPATH . 'controllers/dpage.php');
-//require_once(APPPATH . 'libraries/Settings/Settings.php');
-//require_once(APPPATH . 'libraries/Settings/Form/SettingsFormFactory.php');
 require_once(APPPATH . 'libraries/Form/Content/FormDisplayFactory.php');
 
 use \myagsource\DataHandler;
@@ -12,7 +10,7 @@ use \myagsource\Api\Response\ResponseMessage;
 use \myagsource\Supplemental\Content\SupplementalFactory;
 
 use \myagsource\Site\WebContent\WebBlockFactory;
-use \myagsource\Settings\Form\SettingsFormFactory;
+use \myagsource\Settings\Form\SettingsFormDisplayFactory;
 use \myagsource\Listings\Content\ListingFactory;
 use \myagsource\Report\Content\ReportFactory;
 use \myagsource\Form\Content\FormDisplayFactory;
@@ -145,7 +143,7 @@ $page_id = 105; //@todo: this will work until we have content that uses filters 
         //load factories for block content
         $report_factory = new ReportFactory($this->report_block_model, $this->db_field_model, $this->filters, $supplemental_factory, $data_handler, $db_table_factory);
         $this->load->model('Forms/setting_form_model');//, null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
-        $setting_form_factory = new SettingsFormFactory($this->setting_form_model, $supplemental_factory, $params + ['herd_code'=>$this->session->userdata('herd_code'), 'user_id'=>$this->session->userdata('user_id')]);
+        $setting_form_factory = new SettingsFormDisplayFactory($this->setting_form_model, $supplemental_factory, $params + ['herd_code'=>$this->session->userdata('herd_code'), 'user_id'=>$this->session->userdata('user_id')]);
 
         $this->load->model('Forms/Data_entry_model');//, null, false, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
         $entry_form_factory = new FormDisplayFactory($this->Data_entry_model, $supplemental_factory,$report_factory, $option_listing_factory, $setting_form_factory, $this->block_model, $params + ['herd_code'=>$this->session->userdata('herd_code')]);

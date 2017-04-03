@@ -108,4 +108,35 @@ class Block_model extends CI_Model {
         return array_column($res, 'db_field_name');
     }
 
+    /**
+     * getKeysByContentId
+     * @param string content category
+     * @param int content id
+     * @return array of db field names
+     * @author ctranel
+     **/
+    public function getDisplayDataByContent($content_category, $content_id) {
+        $res = $this->db
+            ->select('block_id, block_name, display_type_id')
+            ->from('users.dbo.vma_display_objects_by_block')
+            ->where('content_id', $content_id)
+            ->where('display_category', $content_category)
+            ->get()
+            ->result_array();
+
+        if($res === false){
+            throw new \Exception('Display content not found.');
+        }
+        $err = $this->db->_error_message();
+
+        if(!empty($err)){
+            throw new \Exception($err);
+        }
+
+        if(isset($res[0]) && is_array($res[0])) {
+            return $res[0];
+        }
+
+        return [];
+    }
 }

@@ -16,7 +16,7 @@ require_once(APPPATH . 'libraries/DataHandler.php');
 require_once APPPATH . 'libraries/Listings/Content/ListingFactory.php';
 require_once(APPPATH . 'libraries/Report/Content/ReportFactory.php');
 require_once(APPPATH . 'libraries/Form/Content/FormDisplayFactory.php');
-require_once(APPPATH . 'libraries/Settings/Form/SettingsFormFactory.php');
+require_once(APPPATH . 'libraries/Settings/Form/SettingsFormDisplayFactory.php');
 
 
 use \myagsource\Benchmarks\Benchmarks;
@@ -31,7 +31,7 @@ use \myagsource\Site\WebContent\PageAccess;
 use \myagsource\DataHandler;
 use \myagsource\Datasource\DbObjects\DbTableFactory;
 use \myagsource\Api\Response\ResponseMessage;
-use \myagsource\Settings\Form\SettingsFormFactory;
+use \myagsource\Settings\Form\SettingsFormDisplayFactory;
 use \myagsource\Listings\Content\ListingFactory;
 use \myagsource\Report\Content\ReportFactory;
 use \myagsource\Form\Content\FormDisplayFactory;
@@ -154,7 +154,7 @@ class dpage extends MY_Api_Controller {
         $option_listing_factory = new ListingFactory($this->herd_options_model, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
 
         $this->load->model('Forms/setting_form_model');//, null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
-        $setting_form_factory = new SettingsFormFactory($this->setting_form_model, $supplemental_factory, $params + ['herd_code'=>$this->session->userdata('herd_code'), 'user_id'=>$this->session->userdata('user_id')]);
+        $setting_form_factory = new SettingsFormDisplayFactory($this->setting_form_model, $supplemental_factory, $params + ['herd_code'=>$this->session->userdata('herd_code'), 'user_id'=>$this->session->userdata('user_id')]);
 
         $this->load->model('Forms/Data_entry_model');//, null, false, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
         $entry_form_factory = new FormDisplayFactory($this->Data_entry_model, $supplemental_factory, $params + ['herd_code'=>$this->session->userdata('herd_code'), 'user_id'=>$this->session->userdata('user_id')]);

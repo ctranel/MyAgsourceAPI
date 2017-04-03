@@ -44,4 +44,11 @@ class SettingFormControl extends FormControl {
     public function forHerd(){
         return $this->for_herd;
     }
+
+    public function toArray(){
+        $ret = parent::toArray();
+        $ret['for_user'] = $this->for_user;
+        $ret['for_herd'] = $this->for_herd;
+        return $ret;
+    }
 }

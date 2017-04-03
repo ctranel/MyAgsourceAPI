@@ -62,16 +62,16 @@ class SettingForm extends Form implements iForm {
         $date = new \DateTime("now");
         $logdttm = $date->format("Y-m-d\TH:i:s");
 
-        $controls = $this->controls();
+        $controls = $this->controlsMetaArray();
         foreach($controls as $c){
-            if(isset($form_data[$c->name()])) {
-                if(!$c->forUser()){
+            if(isset($form_data[$c['name']])) {
+                if(!$c['for_user']){
                     $user_id = 'NULL';
                 }
-                if(!$c->forHerd()){
+                if(!$c['for_herd']){
                     $herd_code = 'NULL';
                 }
-                $data = $this->datasource->composeSettingSelect($user_id, $herd_code, $c->id(), $form_data[$c->name()], $logdttm, $this->user_id);
+                $data = $this->datasource->composeSettingSelect($user_id, $herd_code, $c['id'], $form_data[$c['name']], $logdttm, $this->user_id);
                 $this->datasource->upsert($this->id, $data);
             }
         }

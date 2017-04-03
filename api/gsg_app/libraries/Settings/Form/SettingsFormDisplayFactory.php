@@ -16,6 +16,7 @@ require_once(APPPATH . 'models/Forms/iForm_Model.php');
 
 use \myagsource\Form\iFormSubmissionFactory;
 use \myagsource\Form\Content\SubForm;
+use \myagsource\Form\Content\SubFormShell;
 use \myagsource\Supplemental\Content\SupplementalFactory;
 use \myagsource\Settings\SettingForm;
 use \myagsource\Settings\SettingFormControl;
@@ -33,7 +34,7 @@ use \myagsource\Form\Content\SubContentConditionGroup;
  * 
  *        
  */
-class SettingsFormFactory implements iFormSubmissionFactory {
+class SettingsFormDisplayFactory {//} implements iFormSubmissionFactory {
 	/**
 	 * datasource_blocks
 	 * @var form_model
@@ -68,7 +69,7 @@ class SettingsFormFactory implements iFormSubmissionFactory {
         }
 
         foreach($results as $r){
-            $forms[$r['list_order']] = $this->createForm($r, $user_id, $herd_code);
+            $forms[$r['list_order']] = $this->createDisplayForm($r, $user_id, $herd_code);
         }
         return $forms;
     }
@@ -89,7 +90,7 @@ class SettingsFormFactory implements iFormSubmissionFactory {
         }
 
         $r = $results[0];
-        $form = $this->createForm($r, $user_id, $herd_code);
+        $form = $this->createDisplayForm($r, $user_id, $herd_code);
 
         return $form;
     }
@@ -103,14 +104,29 @@ class SettingsFormFactory implements iFormSubmissionFactory {
      * @author ctranel
      * @returns \myagsource\Settings\SettingForm
      */
-	public function getForm($form_id, $herd_code=null, $user_id = null){
+	public function getFormDisplay($form_id, $herd_code=null, $user_id = null){
 		$results = $this->datasource->getFormById($form_id);
 		if(empty($results)){
 			throw new \Exception('No data found for requested form.');
 		}
-		return $this->createForm($results[0], $user_id, $herd_code);
+		return $this->createDisplayForm($results[0], $user_id, $herd_code);
 	}
-	
+
+    /*
+     * getSubformDisplay
+     *
+     * @param int form id
+     * @author ctranel
+     * @returns \myagsource\Form\Form
+     */
+    public function getSubformDisplay($form_id, $herd_code){
+        $results = $this->datasource->getSubformById($form_id);
+        if(empty($results)){
+            throw new \Exception('No data found for requested form.');
+        }
+        return $this->createDisplayForm($results[0], $this->key_params['herd_code'], $this->key_params['user_id']);
+    }
+
     /*
      * createForm
      *
@@ -120,8 +136,8 @@ class SettingsFormFactory implements iFormSubmissionFactory {
      * @author ctranel
      * @returns \myagsource\Settings\SettingForm
      */
-    protected function createForm($form_data, $user_id, $herd_code, $ancestor_form_ids = null){
-        $subforms = $this->getSubForms($form_data['form_id'], $user_id, $herd_code, $ancestor_form_ids);
+    protected function createDisplayForm($form_data, $user_id, $herd_code, $ancestor_form_ids = null){
+        $subforms = $this->getSubFormShells($form_data['form_id'], $user_id, $herd_code, $ancestor_form_ids);
         $subblocks = $this->getSubBlockShells($form_data['form_id'], $user_id, $herd_code, $ancestor_form_ids);
 
         $control_data = $this->datasource->getFormControlData($form_data['form_id'], $this->key_params, $ancestor_form_ids);
@@ -190,39 +206,8 @@ class SettingsFormFactory implements iFormSubmissionFactory {
         return $subblocks;
     }
 
-    protected function getSubForms($parent_form_id, $user_id, $herd_code, $ancestor_form_ids = null){
-        $results = $this->datasource->getSubFormsByParentId($parent_form_id); //would return control-name-indexed array
-
-        if(empty($results)){
-            return false;
-        }
-
-        if(is_array($ancestor_form_ids)){
-            $ancestor_form_ids = $ancestor_form_ids + [$parent_form_id];
-        }
-        else{
-            $ancestor_form_ids = [$parent_form_id];
-        }
-
-        $subforms = [];
-
-        //get and organize all condition data for form
-        $subform_data = $this->structureSubFormCondData($results, 'form_id');
-
-        //parse each subform separately
-        foreach($results as $k => $r){
-            if(!isset($subforms[$r['parent_control_name']][$r['form_id']])){
-                $form = $this->createForm($r, $herd_code, $ancestor_form_ids);
-                $subform_groups = $this->extractConditionGroups($subform_data[$r['parent_control_name']][$r['form_id']]);
-                $subforms[$r['parent_control_name']][$r['form_id']] = new SubForm($subform_groups, $form);
-            }
-        }
-
-        return $subforms;
-    }
-
     /*
-    * getSubForms
+    * getSubFormShells
     *
     * @param int parent form id
     * @param string herd code

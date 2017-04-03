@@ -64,6 +64,10 @@ class SubForm implements iSubForm
         return $this->form->parseFormData($form_data);
     }
 
+    public function controls(){
+        return $this->form->controls();
+    }
+
     public function controlsMetaArray(){
         return $this->form->controlsMetaArray();
     }
