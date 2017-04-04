@@ -155,7 +155,7 @@ class Custom_report extends MY_Controller {
 			else { //display the custom report form
                 $this->load->model('web_content/section_model');
 
-				$this->page_header_data['message'] = compose_error(validation_errors());
+				$this->page_header_data['message'] = '<div>' . validation_errors() . '</div>';
 				$obj_user = $this->ion_auth_model->user($this->session->userdata('user_id'))->row();
 				$this->data['form_attr'] = array('id'=>'rep-build');
 				$this->data['page_heading'] = 'Custom Reports';
