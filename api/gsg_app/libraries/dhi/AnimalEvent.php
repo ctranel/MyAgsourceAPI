@@ -91,7 +91,7 @@ class AnimalEvent
      *  @throws:
      * -----------------------------------------------------------------*/
     protected function isValidDateChange($event_id, $event_dt){
-        $data = $this->datasource->eventData($event_id);
+        $data = $this->datasource->eventDataById($event_id);
 
         if(!isset($data) || !is_array($data)){
             throw new \Exception("Could not find an existing event matching submitted event.");
@@ -179,6 +179,12 @@ class AnimalEvent
                 return false;
             }
 
+        }
+
+        $curr_event = $this->datasource->existingEventData($this->herd_code, $this->serial_num, $event_cd, $event_dt);
+        if(isset($curr_event) && is_array($curr_event) && count($curr_event) > 0){
+            $this->eligible_messages[] = "Event has already been entered on given date.";
+            return false;
         }
 
         $data = $this->datasource->eventEligibilityData($this->herd_code, $this->serial_num, $event_dt);

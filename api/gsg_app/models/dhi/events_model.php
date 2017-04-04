@@ -10,23 +10,80 @@ class Events_model extends CI_Model {
 
     /**
      * @method eventData()
+     * @return array of event data
+     * @access public
+     *
+     **/
+	public function eventData(){
+	    $res = $this->db
+            ->select("[herd_code],[serial_num],[event_cd_text],[edit_cd],[cost_df],[meat_df],[milk_df],[pen_df],[site_df],[comment_df],[body_df],[animal_event_id],[event_cd],[event_cat],[event_dt],[eventtm],[cost],[times_treat],[is_lf_qtr_treated],[is_rf_qtr_treated],[is_lr_qtr_treated],[is_rr_qtr_treated],[comment],[sire_breed_cd],[sire_country_cd],[sire_id],[sire_reg_num],[sire_name],[sire_naab],[preg_stat],[preg_stat_dt],[preg_result_cd],[conception_dt],[days_bred],[breeding_type],[open_reason_cd],[times_bred_seq],[logID],[logdttm],[body_wt],[height],[condition_score],[withhold_meat_dt],[withhold_milk_dt],[pen_num],[siteID]")
+            ->get('TD.animal.vmat_event_data')
+            ->result_array();
+
+        if($res === false){
+            throw new \Exception('Event data not found.');
+        }
+        $err = $this->db->_error_message();
+
+        if(!empty($err)){
+            throw new \Exception($err);
+        }
+
+        if(isset($res[0]) && is_array($res[0])) {
+            return $res[0];
+        }
+
+        return [];
+    }
+
+    /**
+     * @method eventDataById()
      * @param int event id
      * @return array of event data
      * @access public
      *
      **/
-	public function eventData($id){
-	    $id = (int)$id;
+    public function eventDataById($id){
+        $id = (int)$id;
 
-	    $res = $this->db
-            ->select("[herd_code],[serial_num],[event_cd_text],[edit_cd],[cost_df],[meat_df],[milk_df],[pen_df],[site_df],[comment_df],[body_df],[ID],[event_cd],[event_cat],[event_dt],[eventtm],[cost],[times_treat],[is_lf_qtr_treated],[is_rf_qtr_treated],[is_lr_qtr_treated],[is_rr_qtr_treated],[comment],[sire_breed_cd],[sire_country_cd],[sire_id],[sire_reg_num],[sire_name],[sire_naab],[preg_stat],[preg_stat_dt],[tech_id],[preg_result_cd],[conception_dt],[days_bred],[breeding_type],[data_source],[open_reason_cd],[times_bred_seq],[logID],[logdttm],[body_wt],[height],[condition_score],[withhold_meat_dt],[withhold_milk_dt],[pen_num],[siteID]")
-            ->where('ID', $id)
-            ->get('TD.animal.vma_event_data')
-            ->result_array();
+        $this->db->where('ID', $id);
 
-        if(isset($res[0]) && is_array($res[0])){
-            return $res[0];
+        return $this->eventData();
+    }
+
+    /**
+     * @method existingEventData()
+     *
+     * Returns array of event data matching herd, animal, event and event date or null
+     *
+     * @param string herd code
+     * @param int serial_num
+     * @param int event code
+     * @param string event date
+     * @return array of event data
+     * @access public
+     *
+     **/
+    public function existingEventData($herd_code, $serial_num, $event_cd, $event_date){
+        $herd_code = MssqlUtility::escape($herd_code);
+        $serial_num = (int)$serial_num;
+        $event_cd = (int)$event_cd;
+        $event_date = MssqlUtility::escape($event_date);
+
+        if (!isset($herd_code) || !isset($serial_num) || !isset($event_cd) || !isset($event_date)){
+            throw new Exception('Missing required information');
         }
+
+        if(isset($serial_num)){
+            $this->db->where('serial_num', $serial_num);
+        }
+
+        $this->db
+            ->where('herd_code', $herd_code)
+            ->where('event_cd', $event_cd)
+            ->where('event_dt', $event_date);
+
+        return $this->eventData();
     }
 
     /**
@@ -138,7 +195,7 @@ class Events_model extends CI_Model {
             ->select("TopFreshDate")
             ->where('herd_code', $herd_code)
             ->where('serial_num', $serial_num)
-            ->get('[TD].[animal].[animal_event_eligibility]')
+            ->get('[TD].[animal].[vma_animal_event_eligibility]')
             ->result_array();
 
         if(isset($res[0]) && is_array($res[0])){
@@ -146,7 +203,7 @@ class Events_model extends CI_Model {
         }
     }
 
-    public function getEligibleAnimals($herd_code, $conditions){
+    public function getEligibleAnimals($herd_code, $event_cd, $event_dt, $conditions){
         $herd_code = MssqlUtility::escape($herd_code);
         if(isset($conditions) && is_array($conditions)){
             array_walk($conditions, function(&$v, $k){
@@ -162,8 +219,9 @@ class Events_model extends CI_Model {
         $res = $this->db
             ->select('id.serial_num, id.chosen_id')
             ->from('TD.animal.vma_animal_options id')
-            ->join('TD.animal.animal_event_eligibility e', 'id.herd_code = e.herd_code AND id.serial_num = e.serial_num', 'inner')
+            ->join('TD.animal.vma_animal_event_eligibility e', 'id.herd_code = e.herd_code AND id.serial_num = e.serial_num', 'inner')
             ->where('id.herd_code', $herd_code)
+            ->where("NOT EXISTS(SELECT 1 FROM TD.animal.events WHERE herd_code = id.herd_code AND serial_num = id.serial_num AND event_cd = " . $event_cd . " AND event_dt = '" . $event_dt . "')")
             ->get()
             ->result_array();
 
@@ -191,19 +249,36 @@ class Events_model extends CI_Model {
 			throw new Exception('Missing required information');
 		}
 
-		$sql = $this->eligibilitySql($herd_code, $serial_num, $event_date);
-//echo $sql;
-        $ret = $this->db->query($sql)->result_array();
+		//$sql = $this->eligibilitySql($herd_code, $serial_num, $event_date);
+        //$ret = $this->db->query($sql)->result_array();
 
-        if(isset($ret[0]) && is_array($ret[0])){
-            return $ret[0];
+        $res = $this->db
+            ->where('herd_code', $herd_code)
+            ->where('serial_num', $serial_num)
+            ->where('event_dt', $event_date)
+            ->get('[TD].[animal].[vma_animal_event_eligibility]')
+            ->result_array();
+
+        if($res === false){
+            throw new \Exception('Event eligibility data not found.');
         }
+        $err = $this->db->_error_message();
+
+        if(!empty($err)){
+            throw new \Exception($err);
+        }
+
+        if(isset($res[0]) && is_array($res[0])) {
+            return $res[0];
+        }
+
+        return [];
 	}
 
     /**
      * @method eligibilitySql()
 
-     * This is the same as TD.[animal].[animal_event_eligibility], but is broken out so that subqueries can use herd code and serial num to limit dataset size
+     * This is the same as TD.[animal].[vma_animal_event_eligibility], but is broken out so that subqueries can use herd code and serial num to limit dataset size
      *
      * @param string herd code
      * @param int serial_num
@@ -211,8 +286,9 @@ class Events_model extends CI_Model {
      * @return array of data for determining event eligibility
      * @access public
      *
-     **/
-    protected function eligibilitySql($herd_code, $serial_num, $event_date){
+
+     * MAKE SURE SQL MATCHES VIEW BEFORE ENABLING THIS FUNCTION
+     * protected function eligibilitySql($herd_code, $serial_num, $event_date){
         $sql = "SELECT
                 herd_code
                 ,serial_num
@@ -270,7 +346,7 @@ class Events_model extends CI_Model {
                   
                   ,CASE
                     WHEN id.isactive = 0 OR te.[TopSoldDiedDate] IS NOT NULL THEN NULL
-                    WHEN te.[TopFreshDate] IS NOT NULL THEN DATEADD(day, 1, te.[TopFreshDate])
+                    WHEN te.[TopFreshDate] IS NOT NULL AND te.[TopFreshDate] > te.[TopDryDate] THEN DATEADD(day, 1, te.[TopFreshDate])
                     END AS earliest_dry_date
                   
                   ,CASE
@@ -328,6 +404,7 @@ class Events_model extends CI_Model {
 //echo $sql;
         return $sql;
     }
+**/
 
     /**
      * @method topEventsByAnimalSql()
@@ -340,7 +417,6 @@ class Events_model extends CI_Model {
      * @return string of SQL
      * @access public
      *
-     **/
     protected function topEventsByAnimalSql($herd_code, $serial_num = null, $event_date = null){
         $sql = "SELECT a.herd_code, a.serial_num, 
 			MAX(CASE WHEN b.event_cat = '1' AND a.event_dt = c.event_dt and a.event_cd = c.event_cd  THEN a.event_cd ELSE NULL END) as cat1_event_cd , MAX(CASE WHEN b.event_cat = '1' AND a.event_dt = c.event_dt and a.event_cd = c.event_cd  THEN a.event_dt ELSE NULL END) as cat1_event_dt 
@@ -387,6 +463,7 @@ class Events_model extends CI_Model {
 			GROUP BY a.herd_code, a.serial_num";
         return $sql;
     }
+**/
 
     /**
      * @method topEventsSql()
@@ -396,7 +473,6 @@ class Events_model extends CI_Model {
      * @return string of SQL
      * @access public
      *
-     **/
     protected function topEventsByCatSql($herd_code, $serial_num = null, $event_date = null){
         $sql = "SELECT herd_code,serial_num, event_cat, event_cd, event_dt 
             FROM (
@@ -418,4 +494,5 @@ class Events_model extends CI_Model {
 			WHERE d.rowid = 1";
         return $sql;
     }
+**/
 }

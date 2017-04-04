@@ -89,12 +89,12 @@ class BatchEvent
         }
 
         $now = new \DateTime();
-        $event_dt = isset($event_dt) ? new \DateTime($event_dt) : null;
+        $objEvent_dt = isset($event_dt) ? new \DateTime($event_dt) : null;
 
         if(in_array($event_cd, [7,11,12,13,9,3,4])){
             $this->eligible_messages[] = "Event entered is an internal event and cannot be keyed.";
         }
-        if(isset($event_dt) && $event_dt > $now){
+        if(isset($objEvent_dt) && $objEvent_dt > $now){
             $this->eligible_messages[] = "Cannot enter events with date or time in the future.";
         }
 
@@ -117,8 +117,8 @@ class BatchEvent
             else{
                 $conditions[] = ['is_youngstock', '=', 0];
             }
-            if($event_dt instanceof \DateTime){
-                $conditions[] = ['earliest_fresh_eligible_date', '<=',  $event_dt->format('Y-m-d')];
+            if($objEvent_dt instanceof \DateTime){
+                $conditions[] = ['earliest_fresh_eligible_date', '<=',  $objEvent_dt->format('Y-m-d')];
             }
             else{
                 $conditions[] = ['earliest_fresh_eligible_date', 'IS NOT', 'NULL'];
@@ -127,8 +127,8 @@ class BatchEvent
 
         //Abort events
         if($event_cd == 5){
-            if($event_dt instanceof \DateTime){
-                $conditions[] = ['earliest_abort_eligible_date', '<=',  $event_dt->format('Y-m-d')];
+            if($objEvent_dt instanceof \DateTime){
+                $conditions[] = ['earliest_abort_eligible_date', '<=',  $objEvent_dt->format('Y-m-d')];
             }
             else{
                 $conditions[] = ['earliest_abort_eligible_date', 'IS NOT', 'NULL'];
@@ -137,8 +137,8 @@ class BatchEvent
 
         //Dry events
         if($event_cd == 6 || $event_cd == 10){
-            if($event_dt instanceof \DateTime){
-                $conditions[] = ['earliest_dry_eligible_date', '<=',  $event_dt->format('Y-m-d')];
+            if($objEvent_dt instanceof \DateTime){
+                $conditions[] = ['earliest_dry_eligible_date', '<=',  $objEvent_dt->format('Y-m-d')];
             }
             else{
                 $conditions[] = ['earliest_dry_eligible_date', 'IS NOT', 'NULL'];
@@ -148,8 +148,8 @@ class BatchEvent
         //Repro Eligible
         $repro_eligible_codes = [30,31,34,35,38,39,40,32,36];
         if(in_array($event_cd, $repro_eligible_codes)){
-            if($event_dt instanceof \DateTime){
-                $conditions[] = ['earliest_repro_eligible_date', '<=',  $event_dt->format('Y-m-d')];
+            if($objEvent_dt instanceof \DateTime){
+                $conditions[] = ['earliest_repro_eligible_date', '<=',  $objEvent_dt->format('Y-m-d')];
             }
             else{
                 $conditions[] = ['earliest_repro_eligible_date', 'IS NOT', 'NULL'];
@@ -158,8 +158,8 @@ class BatchEvent
 
         //Preg events
         if($event_cd == 33){
-            if($event_dt instanceof \DateTime){
-                $conditions[] = ['earliest_preg_eligible_date', '<=',  $event_dt->format('Y-m-d')];
+            if($objEvent_dt instanceof \DateTime){
+                $conditions[] = ['earliest_preg_eligible_date', '<=',  $objEvent_dt->format('Y-m-d')];
             }
             else{
                 $conditions[] = ['earliest_preg_eligible_date', 'IS NOT', 'NULL'];
@@ -172,7 +172,7 @@ class BatchEvent
             return false;
         };
 
-        $animals = $this->datasource->getEligibleAnimals($this->herd_code, $conditions);
+        $animals = $this->datasource->getEligibleAnimals($this->herd_code, $event_cd, $event_dt, $conditions);
 
         if(!$animals || count($animals) < 1){
             $this->eligible_messages[] = "No animals are eligible for the selected event on the selected date.";
