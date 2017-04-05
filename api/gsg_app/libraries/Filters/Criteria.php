@@ -1,6 +1,8 @@
 <?php
 namespace myagsource\Filters;
 
+use myagsource\Settings\Settings;
+
 require_once(APPPATH . 'helpers/multid_array_helper.php');
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
@@ -28,9 +30,13 @@ class Criteria{
     private $default_value;
 	private $log_filter_text;
 	private $selected_values;
+    /*
+     * var Settings
+     */
+    private $settings;
 	private $arr_options; //array of criteria objects
 	
-	public function __construct($criteria_data, $options){
+	public function __construct($criteria_data, $options, Settings $settings = NULL){
 		$this->type = $criteria_data['type'];
 		$this->options = $options;
 		$this->field_name = $criteria_data['db_field_name'];
@@ -39,9 +45,11 @@ class Criteria{
 		$this->options_source = $criteria_data['options_source'];
 //		$this->options_filter_form_field_name = $criteria_data['options_filter_form_field_name'];
 		$this->user_editable = (bool)$criteria_data['user_editable'];
+        $this->settings = $settings;
 		if(isset($criteria_data['selected_values'])){
 			$this->setFilterCriteria($criteria_data['selected_values']);
 		}
+
 		
 		
 
@@ -251,13 +259,31 @@ class Criteria{
 			}
 		}
 		if(isset($this->default_value)){
-            if(strpos($this->type, 'range') !== false){
-                if(strpos($this->default_value, '|') !== FALSE){
-                    list($this->selected_values['dbfrom'], $this->selected_values['dbto']) = explode('|', $this->default_value);
+            if(strpos($this->type, 'range') !== false) {
+                if(isset($this->default_value['dbfrom']['FUNC'])){
+                    if($this->default_value['dbfrom']['FUNC'] === 'CURRDATE') {
+                        $this->selected_values['dbfrom'] = date('Y-m-d');
+                    }
                 }
-                else {
-                    $this->default_value = '|';
+                elseif(isset($this->default_value['dbfrom']['SET'])){
+                    $this->selected_values['dbfrom'] = $this->settings->getValue($this->default_value['dbfrom']['SET']);
                 }
+                else{
+                    $this->selected_values['dbfrom'] = $this->default_value['dbfrom'];
+                }
+
+                if(isset($this->default_value['dbto']['FUNC'])){
+                    if($this->default_value['dbto']['FUNC'] === 'CURRDATE') {
+                        $this->selected_values['dbto'] = date('Y-m-d');
+                    }
+                }
+                elseif(isset($this->default_value['dbto']['SET'])){
+                    $this->selected_values['dbto'] = $this->settings->getValue($this->default_value['dbto']['SET']);
+                }
+                else{
+                    $this->selected_values['dbto'] = $this->default_value['dbto'];
+                }
+
                 return;
             }
             elseif(strpos($this->type, 'array') !== false){
@@ -272,7 +298,17 @@ class Criteria{
                 }
             }
             else {
-                $this->selected_values = $this->default_value;
+                if(isset($this->default_value['FUNC'])){
+                    if($this->default_value['FUNC'] === 'CURRDATE') {
+                        $this->selected_values = date('Y-m-d');
+                    }
+                }
+                elseif(isset($this->default_value['SET'])){
+                    $this->selected_values = $this->settings->getValue($this->default_value['SET']);
+                }
+                else {
+                    $this->selected_values = $this->default_value;
+                }
             }
 		}
 	}

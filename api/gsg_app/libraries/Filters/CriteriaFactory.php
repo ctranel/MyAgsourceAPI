@@ -1,5 +1,8 @@
 <?php
 namespace myagsource\Filters;
+use myagsource\Settings\Setting;
+use myagsource\Settings\Settings;
+
 require_once 'Criteria.php';
 
 
@@ -25,12 +28,12 @@ class CriteriaFactory {
 	*  @todo: options should be passed to constructor rather than filter_model and options_conditions
 	* -----------------------------------------------------------------
 	*/
-	public static function createCriteria(\Filter_model $filter_model, $criteria_data, $options_conditions){
+	public static function createCriteria(\Filter_model $filter_model, $criteria_data, $options_conditions, Settings $settings = null){
 		$options = null;
 		if(isset($criteria_data['options_source']) && !empty($criteria_data['options_source'])){
 			$options = $filter_model->getCriteriaOptions($criteria_data['options_source'], $options_conditions);
 		}
-		return new Criteria($criteria_data, $options);
+		return new Criteria($criteria_data, $options, $settings);
 	}
 
 }

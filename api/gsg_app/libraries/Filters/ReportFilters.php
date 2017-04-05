@@ -214,17 +214,17 @@ class ReportFilters{
 		foreach($arr_page_filter_data as $k=>$f){
             //$f['selected_values'] = $f['default_value'];
 
-            if(is_array($f['default_value']) && key($f['default_value']) === 'SET'){
-                $f['selected_values'] = [$this->settings->getValue($f['default_value']['SET'])];
-            }
+            //if(is_array($f['default_value']) && key($f['default_value']) === 'SET'){
+            //    $f['selected_values'] = [$this->settings->getValue($f['default_value']['SET'])];
+            //}
 
             //if there is a form value set for this filter, use that
 			if(isset($arr_form_data[$k]) && !empty($arr_form_data[$k])){
 				$f['selected_values'] = $arr_form_data[$k];
 			}
 
+			//handle filter options
 			$options_filter = [];
-
             if(isset($arr_form_data[$f['options_filter_form_field_name']])){
 				$filter_value = $arr_form_data[$f['options_filter_form_field_name']];
                 $options_filter = [[
@@ -243,7 +243,7 @@ class ReportFilters{
                 ];
             }
 //var_dump($options_filter);
-			$this->arr_criteria[$k] = CriteriaFactory::createCriteria($this->filter_model, $f, $options_filter);
+			$this->arr_criteria[$k] = CriteriaFactory::createCriteria($this->filter_model, $f, $options_filter, $this->settings);
 		}
 	}
 
