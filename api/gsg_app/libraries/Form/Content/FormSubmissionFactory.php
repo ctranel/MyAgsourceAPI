@@ -16,7 +16,7 @@ require_once(APPPATH . 'models/Forms/iForm_Model.php');
 use \myagsource\Site\WebContent\WebBlockFactory;
 use \myagsource\Form\iFormSubmissionFactory;
 //use myagsource\Site\WebContent\SubBlock;
-use myagsource\Listings\Content\ListingFactory;
+use myagsource\Listings\iListingFactory;
 use myagsource\Report\Content\ReportFactory;
 use myagsource\Settings\Form\SettingsFormSubmissionFactory;
 use \myagsource\Supplemental\Content\SupplementalFactory;
