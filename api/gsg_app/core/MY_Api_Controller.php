@@ -73,8 +73,6 @@ class MY_Api_Controller extends CI_Controller
         header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
         header('Access-Control-Allow-Headers: Content-Type, Authorization');
         header('Strict-Transport-Security: max-age=31536000; includeSubdomains');
-        $this->session->sess_write();
-
 
         //if OPTIONS request, header is all we need (pre-flight)
         if($_SERVER['REQUEST_METHOD'] === 'OPTIONS'){
@@ -90,7 +88,6 @@ class MY_Api_Controller extends CI_Controller
         $this->load->model('dhi/herd_model');
         $this->load->helper('url');
         $this->load->helper('form');
-        $this->load->helper('error');
         $this->herd_access = new HerdAccess($this->herd_model);
 
         $this->settings = new Settings($this->session->userdata('user_id'), $this->session->userdata('herd_code'), $this->settings_model);
