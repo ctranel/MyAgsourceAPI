@@ -240,12 +240,11 @@ class Events_model extends CI_Model {
 	 * @access public
 	 *
 	 **/
-	public function eventEligibilityData($herd_code, $serial_num, $event_date){
+	public function eventEligibilityData($herd_code, $serial_num){
         $herd_code = MssqlUtility::escape($herd_code);
         $serial_num = (int)$serial_num;
-        $event_date = MssqlUtility::escape($event_date);
 
-		if (!isset($herd_code) || !isset($serial_num) || !isset($event_date)){
+		if (!isset($herd_code) || !isset($serial_num)){
 			throw new Exception('Missing required information');
 		}
 
@@ -255,7 +254,7 @@ class Events_model extends CI_Model {
         $res = $this->db
             ->where('herd_code', $herd_code)
             ->where('serial_num', $serial_num)
-            ->where('event_dt', $event_date)
+//            ->where('event_dt', $event_date)
             ->get('[TD].[animal].[vma_animal_event_eligibility]')
             ->result_array();
 

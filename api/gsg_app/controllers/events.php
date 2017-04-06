@@ -49,7 +49,7 @@ class events extends dpage {
             $this->sendResponse(400, new ResponseMessage('No data sent with request.', 'error'));
         }
 
-        if(!isset($input['event_cd']) || empty($input['event_cd'])){
+        if(!isset($input['event_cd']) || empty($input['event_cd']) || !isset($input['event_dt']) || empty($input['event_dt'])){
             $this->sendResponse(204);
         }
 

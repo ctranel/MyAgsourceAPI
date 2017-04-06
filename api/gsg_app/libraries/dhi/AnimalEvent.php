@@ -187,7 +187,7 @@ class AnimalEvent
             return false;
         }
 
-        $data = $this->datasource->eventEligibilityData($this->herd_code, $this->serial_num, $event_dt);
+        $data = $this->datasource->eventEligibilityData($this->herd_code, $this->serial_num);
         $now = new \DateTime();
         $event_dt = new \DateTime($event_dt);
         if($data['isactive'] == false || $data['TopSoldDiedDate'] !== null){
