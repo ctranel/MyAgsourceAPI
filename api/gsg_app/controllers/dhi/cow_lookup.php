@@ -96,11 +96,6 @@ class Cow_lookup extends dpage {
 		try{
             $params = ['serial_num' => $serial_num];
 
-            $this->load->model('dhi/cow_lookup/id_model');
-            $data['animal_data'] = $this->id_model->getCowArray($this->session->userdata('herd_code'), $serial_num);
-            $data['animal_data']['chosen_id'] = $data['animal_data'][$this->cow_id_field];
-
-
             //supplemental factory
             $this->load->model('supplemental_model');
             $supplemental_factory = new SupplementalFactory($this->supplemental_model, site_url());
