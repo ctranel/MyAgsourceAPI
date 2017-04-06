@@ -40,6 +40,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
             //->join('users.frm.form_control_groups cg', "f.id = cg.form_id", 'inner')
             ->join('users.dbo.lookup_display_types dt', 'b.display_type_id = dt.id', 'inner')
             ->join('users.dbo.lookup_scopes s', 'b.scope_id = s.id', 'inner')
+            ->order_by('pb.list_order', 'asc')
             ->get('users.dbo.pages_blocks pb')
 //            ->where('')
             ->result_array();

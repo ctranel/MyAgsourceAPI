@@ -42,6 +42,7 @@ class Herd_options_model extends CI_Model implements iListing_model  {
             )
             ->join('users.dbo.lookup_display_types dt', 'b.display_type_id = dt.id', 'inner')
             ->join('users.dbo.lookup_scopes s', 'b.scope_id = s.id', 'inner')
+            ->order_by('pb.list_order', 'asc')
             ->order_by('srt.list_order', 'asc')
             ->get('users.dbo.pages_blocks pb')
             ->result_array();

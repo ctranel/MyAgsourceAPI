@@ -39,7 +39,7 @@ class Block_model extends CI_Model {
             ->join('users.dbo.lookup_display_types dt', 'b.display_type_id = dt.id', 'inner')
             ->join('users.dbo.lookup_scopes s', 'b.scope_id = s.id', 'inner')
             ->join('users.dbo.pages_blocks pb', 'b.id = pb.block_id', 'inner')
-            ->order_by('list_order', 'asc')
+            ->order_by('pb.list_order', 'asc')
             ->from('users.dbo.blocks b');
         $results = $this->db->get()->result_array();
         $ret = [];

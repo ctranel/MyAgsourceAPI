@@ -38,6 +38,7 @@ class Setting_form_model extends CI_Model implements iForm_Model {
             ->join('users.frm.forms f', "b.id = f.block_id", 'inner')
             ->join('users.dbo.lookup_display_types dt', 'b.display_type_id = dt.id', 'inner')
             ->join('users.dbo.lookup_scopes s', 'b.scope_id = s.id', 'inner')
+            ->order_by('pb.list_order', 'asc')
             ->get('users.dbo.pages_blocks pb')
 //            ->where('')
             ->result_array();
