@@ -20,7 +20,7 @@ class Form_defaults_model extends CI_Model {
         $herd_code = MssqlUtility::escape($herd_code);
 
         $res = $this->db
-            ->select("siteID")
+            ->select("siteid")
             ->where('pen_num', $pen_num)
             ->where('herd_code', $herd_code)
             ->get('TD.herd.pens')

@@ -18,12 +18,12 @@ class Events_model extends CI_Model {
 	}
 	
 	public function getCowArray($herd_code, $serial_num){
-		$arr_ret = $this->{$this->db_group_name}->select ("i.barn_name, i.visible_id, i.control_num, i.list_order_num, i.net_merit_\$amt AS net_merit_amt, i.tstring, p2.curr_lact_num, p1.curr_milk_lbs, p1.curr_pct_last_milk, p1.curr_scc_cnt, p2.curr_ltd_dim, p2.curr_305_milk_lbs, p2.curr_305_fat_lbs, p2.curr_305_pro_lbs, FORMAT(p2.curr_calving_date, 'd') AS curr_calving_date")
-			->where ('i.herd_code', $herd_code)
-			->where ('i.serial_num', $serial_num)
-			->join ('rpm.dbo.report_cow_prod_1 p1', 'i.herd_code = p1.herd_code AND i.serial_num = p1.serial_num')
-			->join ('rpm.dbo.report_cow_prod_2 p2', 'i.herd_code = p2.herd_code AND i.serial_num = p2.serial_num')
-			->get ('rpm.dbo.report_cow_id_1 i')
+		$arr_ret = $this->{$this->db_group_name}->select ('barn_name, visible_id, control_num, curr_lact_num, curr_lact_start_dt AS curr_calving_date')//, list_order_num', net_merit_$amt AS net_merit_amt, tstring, curr_lact_num, curr_milk_lbs, curr_pct_last_milk, curr_scc_cnt, curr_ltd_dim, curr_305_milk_lbs, curr_305_fat_lbs, curr_305_pro_lbs, FORMAT(curr_calving_date, \'d\') AS curr_calving_date')
+			->where ('herd_code', $herd_code)
+			->where ('serial_num', $serial_num)
+			//->join ('rpm.dbo.report_cow_prod_1 p1', 'i.herd_code = p1.herd_code AND i.serial_num = p1.serial_num')
+			//->join ('rpm.dbo.report_cow_prod_2 p2', 'i.herd_code = p2.herd_code AND i.serial_num = p2.serial_num')
+			->get ('TD.animal.id')
 			->result_array();
 
 		if(is_array($arr_ret) && !empty($arr_ret)){

@@ -559,10 +559,10 @@ class Herd_model extends CI_Model {
 		->select('serial_num')
 		->select($id_field)
 		->where('herd_code', $herd_code)
-		->where('term_date IS NULL')
-		->where('is_active', 1)
+		//->where('term_date IS NULL')
+		->where('isactive', 1)
 		->order_by('users.dbo.naturalize(' . $id_field . ')')
-		->get('[animal].[dbo].[cow_id]')
+		->get('[TD].[animal].[id]')
 		->result_array();
 		if(is_array($result)){
 			return $result;
