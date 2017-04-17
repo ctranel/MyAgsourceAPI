@@ -11,7 +11,7 @@ namespace myagsource\Validation\Input;
 *
 */
 
-class Validator
+class ControlValidator
 {
     /**
      * name
@@ -20,26 +20,26 @@ class Validator
     protected $name;
 
     /**
-     * comparison_value
+     * condition_value
      * @var string
      **/
-    protected $comparison_value;
+    protected $condition_value;
 
 
 
     /**
 	 * Constructor
 	 */
-	public function __construct($name, $comparison_value = null) {
+	public function __construct($name, $condition_value = null) {
 		// Validation rules can be stored in a config file.
         $this->name = $name;
-        $this->comparison_value = $comparison_value;
+        $this->condition_value = $condition_value;
 	}
 
 	public function toArray(){
 	    $ret = [
             'name' => $this->name,
-            'label' => $this->comparison_value,
+            'condition_value' => $this->condition_value,
         ];
         return $ret;
     }

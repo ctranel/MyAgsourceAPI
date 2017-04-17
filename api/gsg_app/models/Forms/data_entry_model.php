@@ -328,6 +328,41 @@ class Data_entry_model extends CI_Model implements iForm_Model {
     }
 
     /**
+     * getFormValidatorData
+     *
+     * @param int form id
+     * @return array dataset
+     * @author ctranel
+     **/
+    public function getFormValidatorData($form_id) {
+        $form_id = (int)$form_id;
+
+        $res = $this->db
+            ->select('form_validator_id,form_id,validator,subject_control_id,subject_control_name,subject_control_label,condition_control_id,condition_control_name,condition_control_label,condition_operator,condition_value')
+            ->where('form_id', $form_id)
+            ->get('users.frm.vma_forms_validators')
+            ->result_array();
+
+        if(empty($res)){
+            return [];
+        }
+        if($res === false){
+            throw new \Exception('Form validators data not found.');
+        }
+        $err = $this->db->_error_message();
+
+        if(!empty($err)){
+            throw new \Exception($err);
+        }
+
+        if(isset($res[0]) && is_array($res[0])) {
+            return $res;
+        }
+
+        return [];
+    }
+
+    /**
      * getFormData
      *
      *
@@ -633,7 +668,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
                 INSERT " . $table_name . " (" . implode(', ', array_keys($insert_vals)) . ")
                 VALUES (" . implode(", ", $insert_vals) . ");";
         }
-//print($sql);//die($sql);
+//print($sql);die($sql);
         $res = $this->db->query($sql);
 
         if($res === false){

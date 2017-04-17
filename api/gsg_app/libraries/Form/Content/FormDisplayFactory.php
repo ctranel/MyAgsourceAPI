@@ -11,14 +11,16 @@ require_once(APPPATH . 'libraries/Form/Content/SubFormShell.php');
 require_once(APPPATH . 'libraries/Form/Content/SubContentCondition.php');
 require_once(APPPATH . 'libraries/Form/Content/SubContentConditionGroup.php');
 //require_once(APPPATH . 'libraries/Form/iFormDisplayFactory.php');
-require_once(APPPATH . 'libraries/Validation/Input/Validator.php');
+require_once(APPPATH . 'libraries/Validation/Input/FormValidator.php');
+require_once(APPPATH . 'libraries/Validation/Input/ControlValidator.php');
 require_once(APPPATH . 'models/Forms/iForm_Model.php');
 
 //use \myagsource\Form\iFormDisplayFactory;
 use \myagsource\Supplemental\Content\SupplementalFactory;
 use \myagsource\Form\Content\Control\FormControl;
 use \myagsource\Form\Content\Control\FormControlGroup;
-use myagsource\Validation\Input\Validator;
+use myagsource\Validation\Input\FormValidator;
+use \myagsource\Validation\Input\ControlValidator;
 
 /**
  * A factory for form objects
@@ -190,7 +192,7 @@ class FormDisplayFactory {// implements iFormFactory{
                     $valids = explode('|', $d['validators']);
                     foreach ($valids as $v) {
                         list($name, $comparison_value) = explode(':', $v);
-                        $validators[] = new Validator($name, $comparison_value);
+                        $validators[] = new ControlValidator($name, $comparison_value);
                     }
                 }
 
@@ -211,7 +213,29 @@ class FormDisplayFactory {// implements iFormFactory{
             $control_groups[] = new FormControlGroup($control_group_data[$cgk][0]['control_group'], $control_group_data[$cgk][0]['cg_list_order'], $fc);
         }
 
-        return new Form($form_data['form_id'], $this->datasource, $control_groups, $form_data['form_name'], $form_data['dom_id'], $form_data['action'], $herd_code);
+        return new Form($form_data['form_id'], $this->datasource, $control_groups, $form_data['form_name'], $form_data['dom_id'], $form_data['action'], $this->formValidators($form_data['form_id']));
+    }
+
+    /*
+    * formValidators
+    *
+    * @param int form id
+    * @author ctranel
+    * @returns Array of FormValidator objects
+    */
+    protected function formValidators($form_id){
+        if(!isset($form_id)){
+            return [];
+        }
+
+        $validator_data = $this->datasource->getFormValidatorData($form_id);
+
+        $ret = [];
+        foreach($validator_data as $c){
+            $ret[] = new FormValidator($c['validator'], $c['subject_control_name'], $c['subject_control_label'], $c['condition_control_name'], $c['condition_control_label'], $c['condition_operator'], $c['condition_value']);
+        }
+
+        return $ret;
     }
 
     /*
@@ -235,6 +259,7 @@ class FormDisplayFactory {// implements iFormFactory{
 
         return $ret;
     }
+
     /*
     * extractControlGroup
     *

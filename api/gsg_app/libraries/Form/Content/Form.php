@@ -49,18 +49,25 @@ class Form implements iForm
     protected $action;
 
     /**
+     * form validators
+     * @var array of FormValidator objects
+     **/
+    protected $form_validators;
+
+    /**
      * array of control groups
      * @var FormControlGroup[]
      **/
     protected $control_groups;
 
-    public function __construct($id, $datasource, $control_groups, $name, $dom_id, $action){
+    public function __construct($id, $datasource, $control_groups, $name, $dom_id, $action, $form_validators){
         $this->id = $id;
         $this->datasource = $datasource;
         $this->control_groups = $control_groups;
         $this->name = $name;
         $this->dom_id = $dom_id;
         $this->action = $action;
+        $this->form_validators = $form_validators;
     }
 
     public function action(){
@@ -93,6 +100,16 @@ class Form implements iForm
             $ret['control_groups'] = $ret_cg;
             unset($ret_cg);
         }
+
+        if(isset($this->form_validators) && is_array($this->form_validators)){
+            $ret_v = [];
+            foreach($this->form_validators as $v){
+                $ret_v[] = $v->toArray();
+            }
+            $ret['form_validators'] = $ret_v;
+            unset($ret_v);
+        }
+
         return $ret;
     }
 
