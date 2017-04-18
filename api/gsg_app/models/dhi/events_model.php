@@ -108,7 +108,7 @@ class Events_model extends CI_Model {
               ,e.[comment_df] AS comment
               ,e.[body_df] AS body_df
             ")
-            ->join('TD.herd.pens p', 'e.pen_df = p.pen_num', 'left')
+            ->join('TD.herd.pens p', 'e.pen_df = p.pen_num AND e.herd_code = p.herd_code', 'inner')
             ->where('e.herd_code', $herd_code)
             ->where('e.event_cd', $event_code)
             ->where('e.isactive', 1)
