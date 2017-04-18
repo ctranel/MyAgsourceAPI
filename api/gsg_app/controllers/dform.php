@@ -4,10 +4,12 @@
 require_once(APPPATH . 'controllers/dpage.php');
 require_once(APPPATH . 'libraries/Settings/Settings.php');
 require_once(APPPATH . 'libraries/Settings/Form/SettingsFormSubmissionFactory.php');
+require_once(APPPATH . 'libraries/Settings/Form/SettingsFormDisplayFactory.php');
 require_once(APPPATH . 'libraries/Form/Content/FormSubmissionFactory.php');
 
 use \myagsource\Datasource\DbObjects\DbTableFactory;
 use \myagsource\Settings\Form\SettingsFormSubmissionFactory;
+use \myagsource\Settings\Form\SettingsFormDisplayFactory;
 use \myagsource\Form\Content\FormSubmissionFactory;
 use \myagsource\Form\Content\FormDisplayFactory;
 use \myagsource\Listings\Content\ListingFactory;

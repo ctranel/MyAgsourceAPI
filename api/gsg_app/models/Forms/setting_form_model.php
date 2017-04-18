@@ -190,6 +190,41 @@ class Setting_form_model extends CI_Model implements iForm_Model {
     }
 
 
+    /**
+     * getFormValidatorData
+     *
+     * @param int form id
+     * @return array dataset
+     * @author ctranel
+     **/
+    public function getFormValidatorData($form_id) {
+        $form_id = (int)$form_id;
+
+        $res = $this->db
+            ->select('form_validator_id,form_id,validator,subject_control_id,subject_control_name,subject_control_label,condition_control_id,condition_control_name,condition_control_label,condition_operator,condition_value')
+            ->where('form_id', $form_id)
+            ->get('users.frm.vma_forms_validators')
+            ->result_array();
+
+        if(empty($res)){
+            return [];
+        }
+        if($res === false){
+            throw new \Exception('Form validators data not found.');
+        }
+        $err = $this->db->_error_message();
+
+        if(!empty($err)){
+            throw new \Exception($err);
+        }
+
+        if(isset($res[0]) && is_array($res[0])) {
+            return $res;
+        }
+
+        return [];
+    }
+
     /* -----------------------------------------------------------------
     *  returns key-value pairs of options for a given lookup field
 
