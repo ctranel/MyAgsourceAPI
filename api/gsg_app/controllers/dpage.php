@@ -227,15 +227,18 @@ class dpage extends MY_Api_Controller {
             $params = (array)json_decode(urldecode($json_filter_data));
         }
 
+        //added look-ahead days to view, but will keep this around to make sure it works
         //convert look-ahead days to date ranges
         //make sure we have a value
-        if(!isset($params['look_ahead_days']) || (empty($params['look_ahead_days']) && $params['look_ahead_days'] !== 0)){
-            $params['look_ahead_days'] = $this->settings->getValue('look_ahead_days');
+        /*if(isset($params['look_ahead_days']) && !empty($params['look_ahead_days'])){
+            //$params['look_ahead_days'] = $this->settings->getValue('look_ahead_days');
+            $params['expires_date']['dbfrom'] = date('Y-m-d');
+            $params['expires_date']['dbto'] = date('Y-m-d');
+            $tmp = strtotime("+" . $params['look_ahead_days'] . " day");
+            $params['target_date']['dbfrom'] = date('Y-m-d', $tmp);
+            $params['target_date']['dbto'] = date('Y-m-d', $tmp);
         }
-        $params['expires_date'] = date('Y-m-d');
-        $tmp = strtotime("+" . $params['look_ahead_days'] . " day");
-        $params['target_date'] = date('Y-m-d', $tmp);
-        unset($params['look_ahead_days']);
+        unset($params['look_ahead_days']); */
         $params['report_options'] = ($page_id == 103) ? 2 : ($page_id == 106 ? 1 : null);
 
         $this->filters = $this->_filters($page_id, $params);
@@ -292,15 +295,18 @@ class dpage extends MY_Api_Controller {
             $params['protocol_id'] = $protocol_id;
         }
 
+        //added look-ahead days to view, but will keep this around to make sure it works
         //convert look-ahead days to date ranges
         //make sure we have a value
-        if(!isset($params['look_ahead_days']) || (empty($params['look_ahead_days']) && $params['look_ahead_days'] !== 0)){
-            $params['look_ahead_days'] = $this->settings->getValue('look_ahead_days');
+        /*if(isset($params['look_ahead_days']) && !empty($params['look_ahead_days'])){
+            //$params['look_ahead_days'] = $this->settings->getValue('look_ahead_days');
+            $params['expires_date']['dbfrom'] = date('Y-m-d');
+            $params['expires_date']['dbto'] = date('Y-m-d');
+            $tmp = strtotime("+" . $params['look_ahead_days'] . " day");
+            $params['target_date']['dbfrom'] = date('Y-m-d', $tmp);
+            $params['target_date']['dbto'] = date('Y-m-d', $tmp);
         }
-        $params['expires_date'] = date('Y-m-d');
-        $tmp = strtotime("+" . $params['look_ahead_days'] . " day");
-        $params['target_date'] = date('Y-m-d', $tmp);
-        unset($params['look_ahead_days']);
+        unset($params['look_ahead_days']); */
 
         $this->filters = $this->_filters($page_id, $params);
         $this->load->model('Forms/setting_form_model');//, null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
