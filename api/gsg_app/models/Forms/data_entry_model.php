@@ -229,7 +229,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
             //have not yet tested with multiple level nesting
             array_walk_recursive($ancestor_form_ids, function(&$v, $k){return (int)$v;});
         }
-        $result = $this->db->select('cg.label AS control_group, cg.list_order AS cg_list_order, fc.id, ct.name AS control_type, fld.db_field_name AS name, fc.label, fld.is_editable, fld.is_generated, fld.is_fk_field AS is_key, fld.data_type, fc.biz_validation_url, fc.form_defaults_url, fc.add_option_form_id, fc.default_value, fc.batch_variable_type, ld.lookup_url AS dependency_lookup_url, dfld.db_field_name AS dependent_form_control_name')
+        $results = $this->db->select('cg.label AS control_group, cg.list_order AS cg_list_order, fc.id, ct.name AS control_type, fld.db_field_name AS name, fc.label, fld.is_editable, fld.is_generated, fld.is_fk_field AS is_key, fld.data_type, fc.biz_validation_url, fc.form_defaults_url, fc.add_option_form_id, fc.default_value, fc.batch_variable_type, ld.lookup_url AS dependency_lookup_url, dfld.db_field_name AS dependent_form_control_name')
             ->select("(CAST(
                   (SELECT STUFF((
                       SELECT '|', CONCAT(v.name, ':', v.value) AS [data()] 
@@ -253,7 +253,16 @@ class Data_entry_model extends CI_Model implements iForm_Model {
 
             ->get()
             ->result_array();
-        return $result;
+
+        if(isset($results) && is_array($results)){
+            foreach($results as &$r){
+                if(isset($r['default_value'])){
+                    $r['default_value'] = unserialize($r['default_value']);
+                }
+            }
+        }
+
+        return $results;
     }
 
     /**
@@ -266,7 +275,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
     public function getControlMetaById($control_id) {
         $control_id = (int)$control_id;
 
-        $result = $this->db->select('fc.id, ct.name AS control_type, fld.db_field_name AS name, fc.label, fld.is_editable, fld.is_generated, fld.is_fk_field AS is_key, fc.biz_validation_url, fc.form_defaults_url, fc.add_option_form_id, fc.default_value, fc.batch_variable_type')
+        $results = $this->db->select('fc.id, ct.name AS control_type, fld.db_field_name AS name, fc.label, fld.is_editable, fld.is_generated, fld.is_fk_field AS is_key, fc.biz_validation_url, fc.form_defaults_url, fc.add_option_form_id, fc.default_value, fc.batch_variable_type')
             ->select("(CAST(
                   (SELECT STUFF((
                       SELECT '|', CONCAT(v.name, ':', v.value) AS [data()] 
@@ -289,8 +298,14 @@ class Data_entry_model extends CI_Model implements iForm_Model {
             ->get()
             ->result_array();
 
-        if(isset($result) && is_array($result) && isset($result[0])){
-            return $result[0];
+        if(isset($results) && is_array($results)){
+            foreach($results as &$r){
+                $r['default_value'] = unserialize($r['default_value']);
+            }
+        }
+
+        if(isset($results) && is_array($results) && isset($results[0])){
+            return $results[0];
         }
     }
 

@@ -155,8 +155,8 @@ class FormControl implements iFormControl
         $this->id = $control_data['id'];
         $this->name = $control_data['name'];
         $this->label = $control_data['label'];
-        $this->value = isset($control_data['value']) ? $control_data['value'] : $control_data['default_value'];
-        $this->default_value = $control_data['default_value'];
+        $this->value = isset($control_data['value']) ? $control_data['value'] : $this->parseDefaultValue($control_data['default_value']);
+        $this->default_value = $this->parseDefaultValue($control_data['default_value']);
         $this->control_type = $control_data['control_type'];
         $this->data_type = $control_data['data_type'];
         $this->is_editable = (bool)(isset($control_data['is_editable']) ? $control_data['is_editable'] : true);
@@ -174,61 +174,8 @@ class FormControl implements iFormControl
         $this->subblocks = $subblocks;
         //$this->listing_datasource = $listing_datasource;
         //handle ranges
-        if(strpos($this->control_type, 'range') !== false){
-            if(strpos($this->value, '|') !== false){
-                $tmp = [];
-                list($tmp['dbfrom'], $tmp['dbto']) = explode('|', $this->value);
-                $this->value = $tmp;
-            }
-            else{
-                $this->value = null;
-            }
-            if(strpos($this->default_value, '|') !== false){
-                $tmp = [];
-                list($tmp['dbfrom'], $tmp['dbto']) = explode('|', $this->default_value);
-                $this->default_value = $tmp;
-            }
-            else{
-                $this->default_value = null;
-            }
-        }
-        //if type is array and value is not an array, wrap it in an array
-        if(strpos($this->control_type, 'array') !== false && isset($this->value) && !is_array($this->value)){
-            if(isset($this->value) && !is_array($this->value)){
-                if(strpos($this->value, '|')){
-                    $this->value = explode('|', $this->value);
-                }
-                else{
-                    $this->value = [$this->value];
-                }
-            }
-            if(isset($this->default_value) && !is_array($this->default_value)){
-                if(strpos($this->default_value, '|')){
-                    $this->default_value = explode('|', $this->default_value);
-                }
-                else{
-                    $this->default_value = [$this->default_value];
-                }
-            }
-        }
 
-        if($this->control_type === 'boolean' || $this->control_type === 'integer'){
-            if(isset($this->value)){
-                $this->value = (int)$this->value;
-            }
-            if(isset($this->default_value)) {
-                $this->default_value = (int)$this->default_value;
-            }
-        }
-
-        if($this->control_type === 'currency' || $this->control_type === 'decimal'){
-            if(isset($this->value)){
-                $this->value = (float)$this->value;
-            }
-            if(isset($this->default_value)) {
-                $this->default_value = (float)$this->default_value;
-            }
-        }
+        $this->castValues();
     }
 
     /* -----------------------------------------------------------------
@@ -617,5 +564,73 @@ class FormControl implements iFormControl
         }
     }
 
+    protected function parseDefaultValue($default_value){
+        $ret = $default_value;
 
+        if(is_array($default_value) && isset($default_value['FUNC'])){
+            if($default_value['FUNC'] === 'CURRDATE') {
+                $ret = date('Y-m-d');
+            }
+        }
+
+        return $ret;
+    }
+
+    protected function castValues(){
+        if(strpos($this->control_type, 'range') !== false){
+            if(strpos($this->value, '|') !== false){
+                $tmp = [];
+                list($tmp['dbfrom'], $tmp['dbto']) = explode('|', $this->value);
+                $this->value = $tmp;
+            }
+            else{
+                $this->value = null;
+            }
+            if(strpos($this->default_value, '|') !== false){
+                $tmp = [];
+                list($tmp['dbfrom'], $tmp['dbto']) = explode('|', $this->default_value);
+                $this->default_value = $tmp;
+            }
+            else{
+                $this->default_value = null;
+            }
+        }
+        //if type is array and value is not an array, wrap it in an array
+        if(strpos($this->control_type, 'array') !== false && isset($this->value) && !is_array($this->value)){
+            if(isset($this->value) && !is_array($this->value)){
+                if(strpos($this->value, '|')){
+                    $this->value = explode('|', $this->value);
+                }
+                else{
+                    $this->value = [$this->value];
+                }
+            }
+            if(isset($this->default_value) && !is_array($this->default_value)){
+                if(strpos($this->default_value, '|')){
+                    $this->default_value = explode('|', $this->default_value);
+                }
+                else{
+                    $this->default_value = [$this->default_value];
+                }
+            }
+        }
+
+        if($this->control_type === 'boolean' || $this->control_type === 'integer'){
+            if(isset($this->value)){
+                $this->value = (int)$this->value;
+            }
+            if(isset($this->default_value)) {
+                $this->default_value = (int)$this->default_value;
+            }
+        }
+
+        if($this->control_type === 'currency' || $this->control_type === 'decimal'){
+            if(isset($this->value)){
+                $this->value = (float)$this->value;
+            }
+            if(isset($this->default_value)) {
+                $this->default_value = (float)$this->default_value;
+            }
+        }
+    }
 }
