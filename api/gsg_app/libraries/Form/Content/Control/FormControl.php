@@ -174,7 +174,7 @@ class FormControl implements iFormControl
         $this->subblocks = $subblocks;
         //$this->listing_datasource = $listing_datasource;
         //handle ranges
-        if($this->control_type === 'range'){
+        if(strpos($this->control_type, 'range') !== false){
             if(strpos($this->value, '|') !== false){
                 $tmp = [];
                 list($tmp['dbfrom'], $tmp['dbto']) = explode('|', $this->value);
@@ -445,7 +445,7 @@ class FormControl implements iFormControl
     * -----------------------------------------------------------------
     */
     public function getDisplayText($session_value){
-        if($this->control_type === 'range'){
+        if(strpos($this->control_type, 'range') !== false){
             $range = $this->getCurrValue($session_value);
             return 'between ' . $range['dbfrom'] . ' and ' . $range['dbto'];
         }

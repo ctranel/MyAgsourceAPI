@@ -204,8 +204,8 @@ class Criteria{
 				//can't set a range unless both ends are set
                 return;
 			}
-			$this->selected_values['dbfrom'] = $page_filter_value[0];
-			$this->selected_values['dbto'] = $page_filter_value[1];
+			$this->selected_values[0] = $page_filter_value[0];
+			$this->selected_values[1] = $page_filter_value[1];
 		}
 		elseif(strpos($this->type, 'array') !== false){ //data should be an array
 			if(is_array($page_filter_value)){
@@ -260,30 +260,30 @@ class Criteria{
 		}
 		if(isset($this->default_value)){
             if(strpos($this->type, 'range') !== false) {
+                //selected values should use numeric index so it is sent to client as an array
                 if(isset($this->default_value['dbfrom']['FUNC'])){
                     if($this->default_value['dbfrom']['FUNC'] === 'CURRDATE') {
-                        $this->selected_values['dbfrom'] = date('Y-m-d');
+                        $this->selected_values[0] = date('Y-m-d');
                     }
                 }
                 elseif(isset($this->default_value['dbfrom']['SET'])){
-                    $this->selected_values['dbfrom'] = $this->settings->getValue($this->default_value['dbfrom']['SET']);
+                    $this->selected_values[0] = $this->settings->getValue($this->default_value['dbfrom']['SET']);
                 }
                 else{
-                    $this->selected_values['dbfrom'] = $this->default_value['dbfrom'];
+                    $this->selected_values[0] = $this->default_value['dbfrom'];
                 }
 
                 if(isset($this->default_value['dbto']['FUNC'])){
                     if($this->default_value['dbto']['FUNC'] === 'CURRDATE') {
-                        $this->selected_values['dbto'] = date('Y-m-d');
+                        $this->selected_values[1] = date('Y-m-d');
                     }
                 }
                 elseif(isset($this->default_value['dbto']['SET'])){
-                    $this->selected_values['dbto'] = $this->settings->getValue($this->default_value['dbto']['SET']);
+                    $this->selected_values[1] = $this->settings->getValue($this->default_value['dbto']['SET']);
                 }
                 else{
-                    $this->selected_values['dbto'] = $this->default_value['dbto'];
+                    $this->selected_values[1] = $this->default_value['dbto'];
                 }
-
                 return;
             }
             elseif(strpos($this->type, 'array') !== false){

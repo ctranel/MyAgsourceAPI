@@ -234,7 +234,7 @@ class ReportFilters{
 					'value' => $f['options_filter_form_field_name'] == 'report_options' ? '%' . $filter_value . '%' : $filter_value,
 				]];
 			}
-//            echo $f['type'];
+
             if(strpos($f['type'], 'herd') !== false){
                 $options_filter[] = [
                     'db_field_name' => 'herd_code',
@@ -242,7 +242,7 @@ class ReportFilters{
                     'value' => $this->form_data['herd_code'],
                 ];
             }
-//var_dump($options_filter);
+
 			$this->arr_criteria[$k] = CriteriaFactory::createCriteria($this->filter_model, $f, $options_filter, $this->settings);
 		}
 	}
