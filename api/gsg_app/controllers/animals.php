@@ -32,7 +32,7 @@ class animals extends dpage {
 	
 	function listing(){
         $cow_options = $this->herd->getCowOptions($this->settings->getValue('cow_id_field'));
-        if(empty(array_filter($cow_options))) {
+        if(!is_array($cow_options) || empty(array_filter($cow_options))) {
             $this->sendResponse(404, new ResponseMessage('No animals found for herd ' . $this->herd->herdCode() . '.  Please select a report from the navigation', 'error'));
         }
         $this->sendResponse(200, null, ['animals' => $cow_options]);

@@ -96,23 +96,26 @@ class Animal
      * -----------------------------------------------------------------*/
     public static function formatOfficialId($sire_id){
         $letters = preg_replace("/[0-9]+/", "", $sire_id);
-        $id = str_pad(substr($sire_id, -12), 12, "0", STR_PAD_LEFT);
+        //$id = str_pad(substr($sire_id, -12), 12, "0", STR_PAD_LEFT);
+        $id = substr($sire_id, -12);
 
         if(empty($letters) && strlen($sire_id) === 15){
             $country_cd = substr($sire_id, 0, 3);
             return [
                 'country_cd' => $country_cd,
-                'id' => $id,
+                'id' => $sire_id,
+                'stored_id' => $id,
             ];
         }
 
         if(strlen($sire_id) > 12){
-            throw new \Exception('ID cannot be more than 12 characters.');
+            throw new \Exception('ID cannot be more than 12 characters unless it is an RFID number.');
         }
 
         $ret = [
             'country_cd' => 'USA',
             'id' => $id,
+            'stored_id' => str_pad($id, 12, '0', STR_PAD_LEFT)
         ];
 
         return $ret;

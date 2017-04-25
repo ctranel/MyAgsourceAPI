@@ -168,6 +168,10 @@ class form_defaults extends dpage {
                 if(empty($bull_defaults)){
                     $bull_defaults['sire_naab'] = $input['sire_naab'];
                 }
+                else{
+                    $bull_defaults['sire_naab'] = ltrim($bull_defaults['sire_naab'], '0');
+                };
+                $bull_defaults['sire_bull_id'] = ltrim($bull_defaults['sire_bull_id'], '0');
                 $this->sendResponse(200, null, ['defaults' => $bull_defaults]);
             }
             catch(exception $e){
@@ -186,13 +190,13 @@ class form_defaults extends dpage {
             $this->load->model('Forms/form_defaults_model');
             try{
                 $defaults = new Defaults($this->form_defaults_model);
-                $bull_defaults = $defaults->etSireIDData($sire_id_pieces['id']);
+                $bull_defaults = $defaults->etSireIDData($sire_id_pieces['stored_id']);
                 if(empty($bull_defaults)){
                     $bull_defaults = [
-                        'sire_bull_id' => $sire_id_pieces['id'],
                         'country_cd' => $sire_id_pieces['country_cd'],
                     ];
                 }
+                $bull_defaults['sire_bull_id'] = $sire_id_pieces['id'];
                 $this->sendResponse(200, null, ['defaults' => $bull_defaults]);
             }
             catch(exception $e){
@@ -225,6 +229,11 @@ class form_defaults extends dpage {
                 if(empty($bull_defaults)){
                     $bull_defaults['sire_naab'] = $input['sire_naab'];
                 }
+                else{
+                    $bull_defaults['sire_naab'] = ltrim($bull_defaults['sire_naab'], '0');
+                };
+                $bull_defaults['sire_id_num'] = ltrim($bull_defaults['sire_id_num'], '0');
+
                 $this->sendResponse(200, null, ['defaults' => $bull_defaults]);
             }
             catch(exception $e){
@@ -243,14 +252,14 @@ class form_defaults extends dpage {
             $this->load->model('Forms/form_defaults_model');
             try{
                 $defaults = new Defaults($this->form_defaults_model);
-                $bull_defaults = $defaults->animalSireIDData($sire_id_pieces['id']);
+                $bull_defaults = $defaults->animalSireIDData($sire_id_pieces['stored_id']);
                 if(empty($bull_defaults)){
                     $bull_defaults = [
-                        'sire_id_num' => $sire_id_pieces['id'],
                         'sire_country_cd' => $sire_id_pieces['country_cd'],
                     ];
                 }
-                $this->sendResponse(200, null, ['defaults' => $bull_defaults]);
+               $bull_defaults['sire_id_num'] = $sire_id_pieces['id'];
+               $this->sendResponse(200, null, ['defaults' => $bull_defaults]);
             }
             catch(exception $e){
                 $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
@@ -282,6 +291,11 @@ class form_defaults extends dpage {
                 if(empty($bull_defaults)){
                     $bull_defaults['naab'] = $input['naab'];
                 }
+                else{
+                    $bull_defaults['sire_naab'] = ltrim($bull_defaults['sire_naab'], '0');
+                };
+                $bull_defaults['bull_id'] = ltrim($bull_defaults['bull_id'], '0');
+
                 $this->sendResponse(200, null, ['defaults' => $bull_defaults]);
             }
             catch(exception $e){
@@ -300,14 +314,14 @@ class form_defaults extends dpage {
             $this->load->model('Forms/form_defaults_model');
             try{
                 $defaults = new Defaults($this->form_defaults_model);
-                $bull_defaults = $defaults->sireIDData($sire_id_pieces['id']);
+                $bull_defaults = $defaults->sireIDData($sire_id_pieces['stored_id']);
 
                 if(empty($bull_defaults)){
                     $bull_defaults = [
-                        'bull_id' => $sire_id_pieces['id'],
                         'country_cd' => $sire_id_pieces['country_cd'],
                     ];
                 }
+                $bull_defaults['bull_id'] = $sire_id_pieces['id'];
                 $this->sendResponse(200, null, ['defaults' => $bull_defaults]);
             }
             catch(exception $e){
