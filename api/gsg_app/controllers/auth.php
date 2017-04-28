@@ -516,7 +516,6 @@ class Auth extends MY_Api_Controller {
 		$this->form_validation->set_rules('supervisor_acct_num', 'Field Technician Account Number', 'maxLength[8]');
 		$this->form_validation->set_rules('sg_acct_num', 'Service Group Account Number', 'maxLength[8]');
 		$this->form_validation->set_rules('assoc_acct_num[]', 'Association Account Number', 'maxLength[8]');
-		$this->form_validation->set_rules('best_time', 'Best Time to Call', 'maxLength[10]|required');
 		$this->form_validation->set_rules('password', 'Password', 'trim|required|minLength[' . $this->config->item('min_password_length', 'ion_auth') . ']|maxLength[' . $this->config->item('max_password_length', 'ion_auth') . ']|matches[password_confirm]');
 		$this->form_validation->set_rules('password_confirm', 'Password Confirmation', 'trim|required');
 		$this->form_validation->set_rules('group_id[]', 'Name of User Group');
@@ -538,6 +537,7 @@ class Auth extends MY_Api_Controller {
         }
 
         //start with nothing
+        $report_code = null;
         $assoc_acct_num = NULL;
         $supervisor_acct_num = NULL;
         $sg_acct_num = NULL;
@@ -562,11 +562,17 @@ class Auth extends MY_Api_Controller {
             }
         }
         if(in_array(2, $arr_posted_group_id) || in_array(13, $arr_posted_group_id)){ //producers
-            $herd_code = $this->input->userInput('herd_code') ? $this->input->userInput('herd_code') : NULL;
-            $herd_release_code = $this->input->userInput('herd_release_code');
+            $herd_code = $this->input->post('herd_code') ? $this->input->post('herd_code') : NULL;
+            $herd_release_code = $this->input->post('herd_release_code');
             $error = $this->herd_model->herd_authorization_error($herd_code, $herd_release_code);
             if($error){
-                $this->sendResponse(403, new ResponseMessage($error, 'error'));
+                $this->as_ion_auth->set_error($error);
+                $is_validated = false;
+            }
+            $herd_data = $this->herd_model->get_herd($herd_code);
+            $dmi_regions = ['092', '093', '094', '095', '099'];
+            if(in_array($herd_data['association_num'], $dmi_regions) === false){
+                $report_code = 'AMYA-500';
             }
         }
         if(in_array(9, $arr_posted_group_id)){ //service groups
@@ -585,15 +591,12 @@ class Auth extends MY_Api_Controller {
             'supervisor_acct_num' => $supervisor_acct_num,
             'sg_acct_num' => $sg_acct_num,
             'assoc_acct_num' => $assoc_acct_num,
-//            'phone' => $this->input->userInput('phone1') . '-' . $this->input->userInput('phone2') . '-' . $this->input->userInput('phone3'),
-            'best_time' => $this->input->userInput('best_time'),
             'group_id' => $arr_posted_group_id,
             'section_id' => $this->input->userInput('section_id')
         );
- //       if($additional_data['phone'] == '--') $additional_data['phone'] = '';
 
         try{
-            $is_registered = $this->as_ion_auth->register($username, $password, $email, $additional_data, $arr_posted_group_id, 'AMYA-500');
+            $is_registered = $this->as_ion_auth->register($username, $password, $email, $additional_data, $arr_posted_group_id, $report_code);
             if ($is_registered === true) { //check to see if we are creating the user
                 //$this->as_ion_auth->activate();
                 $this->sendResponse(200, new ResponseMessage('Your account has been created.  You will be receiving an email shortly that will confirm your registration and allow you to activate your account.', 'message'));
@@ -628,7 +631,6 @@ class Auth extends MY_Api_Controller {
 		$this->form_validation->set_rules('email', 'Email Address', 'trim|required|valid_email');
 		$this->form_validation->set_rules('supervisor_acct_num', 'Field Technician Number', 'exactLength[8]');
 		$this->form_validation->set_rules('assoc_acct_num[]', 'Association/Region Account Number', 'exactLength[8]');
-		$this->form_validation->set_rules('best_time', 'Best Time to Call', 'maxLength[10]|required');
 		$this->form_validation->set_rules('password', 'Password', 'trim|minLength[' . $this->config->item('min_password_length', 'ion_auth') . ']|maxLength[' . $this->config->item('max_password_length', 'ion_auth') . ']|matches[password_confirm]');
 		$this->form_validation->set_rules('password_confirm', 'Password Confirmation', 'trim');
 		$this->form_validation->set_rules('group_id[]', 'Name of Account Group');
@@ -679,8 +681,6 @@ class Auth extends MY_Api_Controller {
             'email' => $email,
             'first_name' => $this->input->userInput('first_name'),
             'last_name' => $this->input->userInput('last_name'),
-//            'phone' => $this->input->userInput('phone1') . '-' . $this->input->userInput('phone2') . '-' . $this->input->userInput('phone3'),
-            'best_time' => $this->input->userInput('best_time'),
             'group_id' => $arr_posted_group_id,
             'supervisor_acct_num' => $supervisor_acct_num,
             'assoc_acct_num' => $assoc_acct_num,

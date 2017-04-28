@@ -43,15 +43,6 @@
 	endif; ?>
 
 
-
-      <p><?php echo form_label('Phone', 'phone1', NULL, $phone1); ?>
-      <?php echo form_input($phone1);?>-<?php echo form_input($phone2);?>-<?php echo form_input($phone3);?>
-      </p>
-
-      <p><?php echo form_label('Best Time to Call', 'best_time', NULL, $best_time) ?>
-      <?php echo form_input($best_time);?>
-      </p>
-      
       <p><?php echo form_label('Email', 'email', NULL, $email); ?>
       <?php echo form_input($email); ?>
       </p>

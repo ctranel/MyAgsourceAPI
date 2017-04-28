@@ -8,7 +8,7 @@
 	<div>Herd: <?php echo $herd_code; ?></div>
 	<div>Email: <?php echo $email; ?></div>
 	<div>Phone: <?php echo $phone; ?></div>
-	<div>Best time to call: <?php echo $best_time; ?></div>
+
 	<?php if((int)$group === 2){ ?>
 		<h2 style="font-size: 1em;">Herd Information</h2>
 		<div>Owner: <?php echo $arr_herd['herd_owner']; ?></div>

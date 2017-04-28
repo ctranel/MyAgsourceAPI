@@ -48,10 +48,6 @@ class As_ion_auth extends \Ion_auth {
 	 * @author ctranel
 	 **/
 	public function register($username, $password, $email, $additional_data = array(), $group_name = array(), $report_code) {
-        if(!isset($report_code) || empty($report_code)){
-            throw new \Exception('No product information included');
-        }
-
 		$id = parent::register($username, $password, $email, $additional_data, $group_name);
 
         if(!$id){
@@ -61,7 +57,7 @@ class As_ion_auth extends \Ion_auth {
 		$herd_code = $additional_data['herd_code'];
 
         //if herd is set, insert entry to herd output
-        if(isset($herd_code) && !empty($herd_code)){
+        if(isset($herd_code) && !empty($herd_code) && isset($report_code) && !empty($report_code)){
             if(!$this->herd_model->addHerdOutput($herd_code, $report_code)){
                 throw new \Exception('No product information included');
             }
@@ -75,8 +71,6 @@ class As_ion_auth extends \Ion_auth {
             'group'=> implode(', ', $group_name),
             'email'     => $email,
             'herd_code'	=> $herd_code,
-//            'phone'		=> $additional_data['phone'],
-            'best_time'	=> $additional_data['best_time'],
             'arr_herd'	=> $this->herd_model->get_herd($herd_code),
             'arr_tech'	=> $this->tech_model->get_tech_by_herd($herd_code),
         );
