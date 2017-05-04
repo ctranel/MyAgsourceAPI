@@ -852,7 +852,7 @@ abstract class Report implements iReport {
 	 * 
 	 * Retrieves fields designated as select, supplemental params (if set), 
 	 * 
-	 * @return string table name
+	 * @return array of text for select statement
 	 * @access public
 	 * */
 	public function getSelectFields(){
@@ -868,6 +868,7 @@ abstract class Report implements iReport {
                 $ret = array_unique(array_merge($ret, $f->getLinkParamFields()));
 			}
 		}
+
 		return $ret;
 	}
 	

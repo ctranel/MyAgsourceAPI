@@ -185,7 +185,15 @@ class Report_data_model extends CI_Model {
 						}
 					}
 					else { //is not an array
-						$this->db->where($k . $v['operator'], $val);
+                        if(strtoupper($v['operator']) === 'IN'){
+                            $this->db->where_in($k, [$val]);
+                        }
+                        elseif(strtoupper($v['operator']) === 'LIKE'){
+                            $this->db->like($k, $val);
+                        }
+						else{
+                            $this->db->where($k . $v['operator'] . ' ', $val);
+                        }
 					} 
 				}
 			}

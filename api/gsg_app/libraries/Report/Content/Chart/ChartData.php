@@ -75,15 +75,17 @@ class ChartData extends ReportData{
 	 **/
 	public function getData(){
         $criteria_key_value = $this->report->filterKeysValues();
-        $x_axis_dbfield_name = $this->x_axis->dbFieldName();
-		if(isset($this->x_axis_dbfield_name) && isset($this->x_axis_dbfield_name)){
+        if(isset($this->x_axis)){
+            $x_axis_dbfield_name = $this->x_axis->dbFieldName();
+        }
+		if(isset($x_axis_dbfield_name) && !empty($x_axis_dbfield_name)){
 			if($this->x_axis->dataType() === 'datetime'){
-                $criteria_key_value[$this->x_axis_dbfield_name] = [
-                    'column' => $this->x_axis_dbfield_name,
+                $criteria_key_value[$x_axis_dbfield_name] = [
+                    'column' => $x_axis_dbfield_name,
                     'operator' => '=',
                     'value' => [
-                        'dbfrom' => $this->report_datasource->getStartDate($this->report->primaryTableName(), $this->x_axis_dbfield_name, $this->report->maxRows(), 'MM-dd-yyyy'),
-                        'dbto' => $this->report_datasource->getRecentDates($this->report->primaryTableName(), $this->x_axis_dbfield_name, 1, 'MM-dd-yyyy')[0]
+                        'dbfrom' => $this->report_datasource->getStartDate($this->report->primaryTableName(), $x_axis_dbfield_name, $this->report->maxRows(), 'MM-dd-yyyy'),
+                        'dbto' => $this->report_datasource->getRecentDates($this->report->primaryTableName(), $x_axis_dbfield_name, 1, 'MM-dd-yyyy')[0]
                     ]
                 ];
 			}
@@ -135,7 +137,9 @@ class ChartData extends ReportData{
 	protected function splitLinearData($keep_nulls = true){
 		$count = count($this->dataset);
 		$x_val = 0;
-        $x_axis_dbfield_name = $this->x_axis->dbFieldName();
+        if(isset($this->x_axis)){
+            $x_axis_dbfield_name = $this->x_axis->dbFieldName();
+        }
 		$tmp_fg = $this->report->fieldGroups();
         $has_field_groups = (isset($tmp_fg) && !empty($tmp_fg));
 		unset($tmp_fg);
@@ -144,7 +148,7 @@ class ChartData extends ReportData{
 			$ser_key = 1;
 			$arr_y_values = $this->dataset[$x];
 			$arr_fields = array_keys($arr_y_values);
-			$date_key = array_search($x_axis_dbfield_name, $arr_fields);
+			$date_key = isset($x_axis_dbfield_name) ? array_search($x_axis_dbfield_name, $arr_fields) : null;
 			if(isset($arr_fields[$date_key]) && !empty($date_key)){
 				unset($arr_fields[$date_key]);
 			}
@@ -251,7 +255,9 @@ class ChartData extends ReportData{
 			return false;
 		}
 
-        $x_axis_dbfield_name = $this->x_axis->dbFieldName();
+        if(isset($this->x_axis)){
+			$x_axis_dbfield_name = $this->x_axis->dbFieldName();
+		}
 		$arr_return = [];
 		foreach($this->dataset as $series=>$rows){
 			foreach($rows as $x_val=>$v){
@@ -283,7 +289,7 @@ class ChartData extends ReportData{
 			}
 		}
 		$this->dataset = $arr_return;
-		$this->stripFieldNames($this->x_axis->dbFieldName());
+		$this->stripFieldNames(isset($x_axis_dbfield_name));
 	}
 	
 	/**
