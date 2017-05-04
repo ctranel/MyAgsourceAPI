@@ -58,7 +58,7 @@ class dform extends dpage {
             //$this->form_validation->set_rules('herd_code', 'Herd', 'required|max_length[8]');
             //$this->form_validation->set_rules('herd_code_fill', 'Type Herd Code');
             $this->load->model('Forms/setting_form_model');//, null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
-            $setting_form_factory = new SettingsFormDisplayFactory($this->setting_form_model, $supplemental_factory, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
+            $setting_form_factory = new SettingsFormSubmissionFactory($this->setting_form_model, $supplemental_factory, ['herd_code'=>$this->session->userdata('herd_code'), 'user_id'=>$this->session->userdata('user_id')]);
 
             $form = $setting_form_factory->getForm($form_id, $this->session->userdata('herd_code'), $this->session->userdata('user_id'));
             $input = $this->input->userInputArray();
