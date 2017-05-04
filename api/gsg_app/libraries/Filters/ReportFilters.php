@@ -203,6 +203,7 @@ class ReportFilters{
 					'name' => ucwords(str_replace('_', ' ', $k)),
 					'type' => 'value',
 					'options_source' => null,
+                    'operator' => '=',
 					'default_value' => $f,
 					'db_field_name' => $k,
 					'selected_values' => $arr_form_data[$k],
@@ -229,9 +230,8 @@ class ReportFilters{
 				$filter_value = $arr_form_data[$f['options_filter_form_field_name']];
                 $options_filter = [[
 					'db_field_name' => $f['options_filter_form_field_name'],
-//@todo:  terrible, terrible hack to accommodate 1 situation.  need to update filter lookup data structure to be similar to form data loookups
-					'options_operator' => $f['options_filter_form_field_name'] == 'report_options' ? ' LIKE ' : '=',
-					'value' => $f['options_filter_form_field_name'] == 'report_options' ? '%' . $filter_value . '%' : $filter_value,
+					'options_operator' => $f['options_filter_operator'],
+					'value' => strtoupper($f['options_filter_operator']) === 'LIKE' ? '%' . $filter_value . '%' : $filter_value,
 				]];
 			}
 

@@ -22,7 +22,8 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 class Criteria{
 	private $type;
 	private $field_name;
-	private $label;
+    private $label;
+	private $operator;
 	private $user_editable;
 	private $options;
 	private $options_source;
@@ -41,6 +42,7 @@ class Criteria{
 		$this->options = $options;
 		$this->field_name = $criteria_data['db_field_name'];
 		$this->label = $criteria_data['name'];
+        $this->operator = $criteria_data['operator'];
 		$this->default_value = $criteria_data['default_value'];
 		$this->options_source = $criteria_data['options_source'];
 //		$this->options_filter_form_field_name = $criteria_data['options_filter_form_field_name'];
@@ -58,18 +60,31 @@ class Criteria{
 		$this->setDefaults();
 	}
 
-	/* -----------------------------------------------------------------
-	*  Returns selected value
+ /*   public function selectFieldText() {
+        //if(isset($this->display_format) && !empty($this->display_format) && false){ //test with no formatting on back end
+        //	return "FORMAT(" . $this->data_field->dbTableName() . "." . $this->data_field->dbFieldName() . ", '" . $this->display_format . "', 'en-US') AS " . $this->data_field->dbFieldName();
+        //}
+        if(strpos($this->type, "datetime")){
+            return "FORMAT(" . $this->data_field->dbTableName() . "." . $this->field_name . ",  'yyyy-MM-dd HH:mm:ss', 'en-US') AS " . $this->field_name;
+        }
+        elseif(strpos($this->type, "date") !== false){
+            return "FORMAT(" . $this->data_field->dbTableName() . "." . $this->field_name . ",  'yyyy-MM-dd', 'en-US') AS " . $this->field_name;
+        }
+        return $this->field_name;
+    } */
 
-	*  Returns selected value
+    /* -----------------------------------------------------------------
+    *  Returns selected value
 
-	*  @since: version 1
-	*  @author: ctranel
-	*  @date: Jun 17, 2014
-	*  @return: array 
-	*  @throws: 
-	* -----------------------------------------------------------------
-	*/
+    *  Returns selected value
+
+    *  @since: version 1
+    *  @author: ctranel
+    *  @date: Jun 17, 2014
+    *  @return: array
+    *  @throws:
+    * -----------------------------------------------------------------
+    */
 	public function getSelectedValue(){
 		return $this->selected_values;
 	}
@@ -102,15 +117,15 @@ class Criteria{
     * -----------------------------------------------------------------
     */
     public function operator(){
-        $operator = '=';
+        /*$operator = '=';
         if(strpos($this->type, 'array') !== false){
             $operator = 'IN';
         }
         if(strpos($this->type, 'range') !== false){
             $operator = 'BETWEEN';
-        }
+        }*/
 
-        return $operator;
+        return $this->operator;
     }
 
     /* -----------------------------------------------------------------
@@ -147,6 +162,7 @@ class Criteria{
 		$arr_return = array(
 			'type' => $this->type,
 			'field_name' => $this->field_name,
+            'operator' => $this->operator,
 			'label' => $this->label,
 			'selected_values' => $this->selected_values,
 			'options' => $this->options,

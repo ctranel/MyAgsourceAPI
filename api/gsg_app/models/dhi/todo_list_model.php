@@ -28,9 +28,6 @@ class Todo_list_model extends Report_data_model {
      **/
 
     public function search(iReport $report, $select_fields, $arr_filter_criteria){
-        //look ahead days was used to derive other filter values.  We don't want to use it in query
-        unset($arr_filter_criteria['look_ahead_days']);
-
         $this->composeSearch($report, $select_fields, $arr_filter_criteria);
 
         $report_date = date('Y-m-d');
@@ -59,6 +56,7 @@ class Todo_list_model extends Report_data_model {
         }
 
         $ret = $this->db->query($sql)->result_array();
+ //die($sql);
         return $ret;
     }
 
@@ -81,6 +79,7 @@ class Todo_list_model extends Report_data_model {
                 , visible_id
                 , pen_num
                 , DATEDIFF(DAY, y.TopFreshDate, '" . $report_date . "') AS dim_age
+                , 0 AS look_ahead_days
                 , curr_lact_num
                 ,'Cow is Open' AS attention
                 , NULL AS target_date
@@ -117,6 +116,7 @@ class Todo_list_model extends Report_data_model {
                 , visible_id
                 , pen_num
                 , DATEDIFF(MONTH, y.birth_dt, '" . $report_date . "') AS dim_age
+                , 0 AS look_ahead_days
                 , curr_lact_num
                 ,'Heifer is Open' AS attention
                 , NULL AS target_date
@@ -154,6 +154,7 @@ class Todo_list_model extends Report_data_model {
                 , visible_id
                 , pen_num
                 , DATEDIFF(DAY, y.TopFreshDate, '" . $report_date . "') AS dim_age
+                , 0 AS look_ahead_days
                 , curr_lact_num
                 ,'Watch Cow for Heat' AS attention
                 , NULL AS target_date
@@ -203,6 +204,7 @@ class Todo_list_model extends Report_data_model {
                 , visible_id
                 , pen_num
                 , DATEDIFF(MONTH, y.birth_dt, '" . $report_date . "') AS dim_age
+                , 0 AS look_ahead_days
                 , curr_lact_num
                 ,'Reproductive Problem' AS attention
                 , NULL AS target_date
@@ -236,6 +238,7 @@ class Todo_list_model extends Report_data_model {
                 , visible_id
                 , pen_num
                 , DATEDIFF(DAY, y.TopFreshDate, '" . $report_date . "') AS dim_age
+                , 0 AS look_ahead_days
                 , curr_lact_num
                 ,'No Breedings or Heats' AS attention
                 , NULL AS target_date
