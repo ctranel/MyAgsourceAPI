@@ -64,14 +64,21 @@ class SettingForm extends Form implements iForm {
 
         $controls = $this->controlsMetaArray();
         foreach($controls as $c){
-            if(isset($form_data[$c['name']])) {
+            if(array_key_exists($c['name'], $form_data)) {
                 if(!$c['for_user']){
                     $user_id = 'NULL';
                 }
                 if(!$c['for_herd']){
                     $herd_code = 'NULL';
                 }
-                $data = $this->datasource->composeSettingSelect($user_id, $herd_code, $c['id'], $form_data[$c['name']], $logdttm, $this->user_id);
+
+                $val = $form_data[$c['name']];
+
+                if($c['control_type'] === 'boolean'){
+                        $val = (int)(bool)$val;
+                }
+
+                $data = $this->datasource->composeSettingSelect($user_id, $herd_code, $c['id'], $val, $logdttm, $this->user_id);
                 $this->datasource->upsert($this->id, $data);
             }
         }

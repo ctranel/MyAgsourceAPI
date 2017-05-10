@@ -256,13 +256,20 @@ class AnimalEvent
         }
 
         //Dry events
-        if($event_cd == 6 || $event_cd == 10){
+        if($event_cd == 6){
             $earliest = new \DateTime($data['earliest_dry_eligible_date']);
             if($data['earliest_dry_eligible_date'] === null){
                 $this->eligible_messages[] = "This animal is not eligible for a dry event.  Current status is " . $data['current_status'] . ".";
             }
             elseif(isset($event_dt) && !empty($event_dt) && $earliest > $event_dt){
                 $this->eligible_messages[] = "This animal is not eligible for a dry event until " . $data['earliest_dry_eligible_date'] . ".  Animal last freshened on " . $data['TopFreshDate'] . ".";
+            }
+        }
+
+        //Dry donor
+        if($event_cd == 10){
+            if($data['current_status'] !== 'Dry'){
+                $this->eligible_messages[] = "Animal must be dry to enter a dry donor event.  Current status is " . $data['current_status'] . ".";
             }
         }
 

@@ -148,8 +148,8 @@ class Herd
 	 *  @return: array
 	 *  @throws: 
 	 * -----------------------------------------------------------------*/
-	public function getCowOptions($value_field) {
-		$cows = $this->herd_model->getCowList($this->herd_code, $value_field);
+	public function getCowOptions($value_field, $show_heifers, $show_bulls, $show_sold) {
+		$cows = $this->herd_model->getCowList($this->herd_code, $value_field, $show_heifers, $show_bulls, $show_sold);
 		if(!$cows || empty($cows)){
 			return false;
 		}

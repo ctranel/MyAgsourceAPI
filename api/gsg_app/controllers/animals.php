@@ -31,7 +31,12 @@ class animals extends dpage {
 	}
 	
 	function listing(){
-        $cow_options = $this->herd->getCowOptions($this->settings->getValue('cow_id_field'));
+        $cow_options = $this->herd->getCowOptions(
+            $this->settings->getValue('cow_id_field'),
+            (bool)$this->settings->getValue('show_heifers'),
+            (bool)$this->settings->getValue('keep_bull_calves'),
+            (bool)$this->settings->getValue('show_sold')
+        );
         if(!is_array($cow_options) || empty(array_filter($cow_options))) {
             $this->sendResponse(404, new ResponseMessage('No animals found for herd ' . $this->herd->herdCode() . '.  Please select a report from the navigation', 'error'));
         }

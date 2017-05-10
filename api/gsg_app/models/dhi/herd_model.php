@@ -547,20 +547,31 @@ class Herd_model extends CI_Model {
 	 * getCowList
 	 * @param string herd code
 	 * @param string or array id fields
+     * @param boolean show_heifers
+     * @param boolean show_bulls
+     * @param boolean show_sold
 	 * @return array
 	 * @author ctranel
 	 **/
-	public function getCowList($herd_code, $id_field){
+	public function getCowList($herd_code, $id_field, $show_heifers, $show_bulls, $show_sold){
 		if(empty($id_field)){
 		    throw new Exception('Cow ID field not specified');
+        }
+
+        if(!$show_heifers){
+            $this->db->where('curr_lact_num > ', 0);
+        }
+        if(!$show_bulls){
+            $this->db->where('sex_cd', 1);
+        }
+        if(!$show_sold){
+            $this->db->where('isactive', 1);
         }
 
 	    $result = $this->db
 		->select('serial_num')
 		->select($id_field)
 		->where('herd_code', $herd_code)
-		//->where('term_date IS NULL')
-		->where('isactive', 1)
 		->order_by('users.dbo.naturalize(' . $id_field . ')')
 		->get('[TD].[animal].[id]')
 		->result_array();
