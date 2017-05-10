@@ -100,7 +100,8 @@ class Events_model extends CI_Model {
 
         $res = $this->db
             ->select("
-               e.[cost_df] AS cost
+              e.event_cat
+              ,e.[cost_df] AS cost
               ,e.[meat_df] AS withhold_meat_days
               ,e.[milk_df] AS withhold_milk_days
               ,e.[pen_df] AS pen_num
@@ -108,7 +109,7 @@ class Events_model extends CI_Model {
               ,e.[comment_df] AS comment
               ,e.[body_df] AS body_df
             ")
-            ->join('TD.herd.pens p', 'e.pen_df = p.pen_num AND e.herd_code = p.herd_code', 'inner')
+            ->join('TD.herd.pens p', 'e.pen_df = p.pen_num AND e.herd_code = p.herd_code', 'left')
             ->where('e.herd_code', $herd_code)
             ->where('e.event_cd', $event_code)
             ->where('e.isactive', 1)

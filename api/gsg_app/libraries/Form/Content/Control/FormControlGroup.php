@@ -44,7 +44,7 @@ class FormControlGroup
 
     public function toArray(){
         $ret['label'] = $this->label;
-        //$ret['list_order'] = $this->list_order;
+        $ret['list_order'] = $this->list_order;
 
         if(isset($this->controls) && is_array($this->controls)){
             $ret_controls = [];
