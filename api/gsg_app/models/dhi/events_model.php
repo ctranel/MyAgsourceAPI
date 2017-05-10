@@ -46,7 +46,7 @@ class Events_model extends CI_Model {
     public function eventDataById($id){
         $id = (int)$id;
 
-        $this->db->where('ID', $id);
+        $this->db->where('animal_event_id', $id);
 
         return $this->eventData();
     }
@@ -168,12 +168,12 @@ class Events_model extends CI_Model {
         }
 
         $res = $this->db
-            ->select("[herd_code],[serial_num],[event_cd_text],[edit_cd],[cost_df],[meat_df],[milk_df],[pen_df],[site_df],[comment_df],[body_df],[ID],[event_cd],[event_cat],[event_dt],[eventtm],[cost],[times_treat],[is_lf_qtr_treated],[is_rf_qtr_treated],[is_lr_qtr_treated],[is_rr_qtr_treated],[comment],[sire_breed_cd],[sire_country_cd],[sire_id],[sire_reg_num],[sire_name],[sire_naab],[preg_stat],[preg_stat_dt],[tech_id],[preg_result_cd],[conception_dt],[days_bred],[breeding_type],[data_source],[open_reason_cd],[times_bred_seq],[logID],[logdttm],[body_wt],[height],[condition_score],[withhold_meat_dt],[withhold_milk_dt],[pen_num],[siteID]")
+            ->select("[herd_code],[serial_num],[event_cd_text],[edit_cd],[cost_df],[meat_df],[milk_df],[pen_df],[site_df],[comment_df],[body_df],[animal_event_id],[event_cd],[event_cat],[event_dt],[eventtm],[cost],[times_treat],[is_lf_qtr_treated],[is_rf_qtr_treated],[is_lr_qtr_treated],[is_rr_qtr_treated],[comment],[sire_breed_cd],[sire_country_cd],[sire_id],[sire_reg_num],[sire_name],[sire_naab],[preg_stat],[preg_stat_dt],[breeding_tech_id],[preg_result_cd],[conception_dt],[days_bred],[breeding_type],[open_reason_cd],[times_bred_seq],[logID],[logdttm],[body_wt],[height],[condition_score],[withhold_meat_dt],[withhold_milk_dt],[pen_num],[siteID]")
             ->where('herd_code', $herd_code)
             ->where('serial_num', $serial_num)
             ->where('event_dt >=', $early_date)
             ->where('event_dt <=', $late_date)
-            ->get('TD.animal.vma_event_data')
+            ->get('TD.animal.vmat_event_data')
             ->result_array();
 
         if(isset($res[0]) && is_array($res[0])){

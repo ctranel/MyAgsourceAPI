@@ -90,9 +90,7 @@ class AnimalEvent
      *  @return: boolean
      *  @throws:
      * -----------------------------------------------------------------*/
-    protected function isValidDateChange($event_id, $event_dt){
-        $data = $this->datasource->eventDataById($event_id);
-
+    protected function isValidDateChange($event_id, $event_dt, $data){
         if(!isset($data) || !is_array($data)){
             throw new \Exception("Could not find an existing event matching submitted event.");
         }
@@ -121,7 +119,7 @@ class AnimalEvent
     }
 
     /* -----------------------------------------------------------------
-     *  isValidDateChange
+     *  inCurrentLactation
 
      *
 
@@ -159,10 +157,14 @@ class AnimalEvent
 
     public function isEligible($event_cd, $event_dt, $event_id = null){
         //if an event is being edited (event id is already set)
+        $orig_event_data = null;
+
         if(isset($event_id) && !empty($event_id)){
+            $orig_event_data = $this->datasource->eventDataById($event_id);
+
             //if a fresh event is being edited (event is fresh or abort)
             if(in_array($event_cd, [1,2,5])){
-                if(!$this->isValidDateChange($event_id, $event_dt)){
+                if(!$this->isValidDateChange($event_id, $event_dt, $orig_event_data)){
                     $this->eligible_messages[] = "Fresh event date change conflicts with existing reproductive events.";
                     return false;
                 }
@@ -190,6 +192,8 @@ class AnimalEvent
         $data = $this->datasource->eventEligibilityData($this->herd_code, $this->serial_num);
         $now = new \DateTime();
         $event_dt = new \DateTime($event_dt);
+        $orig_event_date = isset($orig_event_data) && isset($orig_event_data['event_dt']) ? new \DateTime($orig_event_data['event_dt']) : null;
+
         if($data['isactive'] == false || $data['TopSoldDiedDate'] !== null){
             $this->eligible_messages[] = "Cannot enter events for inactive, sold or dead animals.";
             return false;
@@ -202,23 +206,25 @@ class AnimalEvent
             $this->eligible_messages[] = "Cannot enter events with date or time in the future.";
             return false;
         }
-        if($data['sex_cd'] === 2 && ($event_cd < 21 && $event_cd > 28)){
-            //@todo: custom events need to be allowed
-            $this->eligible_messages[] = "Can only enter sold or died events for males.";
+        if($data['sex_cd'] === 2 && (($event_cd < 21 && $event_cd > 28) || $event_cd < 73)){
+            $this->eligible_messages[] = "Can only enter custom events and sold/died events for males.";
             return false;
         }
 
         //Fresh events
         if($event_cd == 1 || $event_cd == 2){
             $earliest = new \DateTime($data['earliest_fresh_eligible_date']);
-            if($data['earliest_fresh_eligible_date'] === null){
+            $top_fresh_dt = new \DateTime($data['TopFreshDate']);
+            //if there is no fresh eligible date AND the current top fresh date is not the event currently being edited
+            if($data['earliest_fresh_eligible_date'] === null && $orig_event_date != $top_fresh_dt){
                 $this->eligible_messages[] = "This animal is not eligible for a fresh event.  Current status is " . $data['current_status'] . ", and the animal must be dry.";
             }
             elseif($event_cd == 1){
                 if($data['is_youngstock']){
                     $this->eligible_messages[] = "Heifers are not eligible for the cow fresh event.";
                 }
-                if(isset($event_dt) && !empty($event_dt) && $earliest > $event_dt){
+                //if the event_dt is set, is earlier than the earliest valid date AND the current top fresh date is not the event currently being edited
+                if(isset($event_dt) && !empty($event_dt) && $earliest > $event_dt && $orig_event_date != $top_fresh_dt){
                     $this->eligible_messages[] = "This animal is not eligible for a fresh event until " . $data['earliest_fresh_eligible_date'] . ".  Last fresh date was " . $data['TopFreshDate'] . ".";
                 }
             }
@@ -226,7 +232,8 @@ class AnimalEvent
                 if(!$data['is_youngstock']){
                     $this->eligible_messages[] = "Mature cows are not eligible for the heifer fresh event.";
                 }
-                if(isset($event_dt) && !empty($event_dt) && $earliest > $event_dt){
+                //if the event_dt is set, is earlier than the earliest valid date AND the current top fresh date is not the event currently being edited
+                if(isset($event_dt) && !empty($event_dt) && $earliest > $event_dt && $orig_event_date != $top_fresh_dt){
                     $this->eligible_messages[] = "This animal is not eligible for a fresh event until " . $data['earliest_fresh_eligible_date'] . ".  Birth date is " . $data['birth_dt'] . ".";
                 }
             }
@@ -279,15 +286,17 @@ class AnimalEvent
         //Preg events
         if($event_cd == 33){
             $earliest = new \DateTime($data['earliest_preg_eligible_date']);
-            if($data['earliest_preg_eligible_date'] === null){
-                if($data['is_bred'] == false){
-                    $this->eligible_messages[] = "Animal has not been bred, and is not eligible for a pregnancy event.";
-                }
-                else{
+
+            if($data['earliest_preg_eligible_date'] === null && $data['TopStatusDate'] !== null && $data['is_bred'] !== false){
+                //IF THERE ARE NO BREEDINGS, USERS CAN ENTER SIRE AND DAYS BRED
+                //if($data['is_bred'] == false){
+                //    $this->eligible_messages[] = "Animal has not been bred, and is not eligible for a pregnancy event.";
+                //}
+                //else{
                     $this->eligible_messages[] = "This animal is not eligible for a pregnancy event.  Current status is " . $data['current_status'] . ".";
-                }
+                //}
             }
-            elseif(isset($event_dt) && !empty($event_dt) && $earliest > $event_dt){
+            elseif(isset($event_dt) && !empty($event_dt) && $earliest > $event_dt && $data['earliest_preg_eligible_date'] !== null){
                 $this->eligible_messages[] = "This animal is not eligible for a pregnancy event until " . $data['earliest_preg_eligible_date'] . ".  Animal was last bred on " . $data['TopBredDate'] . ".";
             }
         }
