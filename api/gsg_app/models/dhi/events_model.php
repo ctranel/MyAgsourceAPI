@@ -232,6 +232,47 @@ class Events_model extends CI_Model {
     }
 
     /**
+     * @method getConceptionDate()
+     *
+     * @param string herd code
+     * @param int serial_num
+     * @return array of data for determining event eligibility
+     * @access public
+     *
+     **/
+    public function getConceptionDate($herd_code, $serial_num){
+        $herd_code = MssqlUtility::escape($herd_code);
+        $serial_num = (int)$serial_num;
+
+        if (!isset($herd_code) || !isset($serial_num)){
+            throw new Exception('Missing required information');
+        }
+
+        $res = $this->db
+            ->select('TOP 1 conception_dt')
+            ->where('herd_code', $herd_code)
+            ->where('serial_num', $serial_num)
+            ->order_by('event_dt', 'desc')
+            ->get('[TD].[animal].[vmat_event_data]')
+            ->result_array();
+
+        if($res === false){
+            return null;
+        }
+        $err = $this->db->_error_message();
+
+        if(!empty($err)){
+            throw new \Exception($err);
+        }
+
+        if(isset($res[0]) && is_array($res[0])) {
+            return $res[0]['conception_dt'];
+        }
+
+        return null;
+    }
+
+    /**
 	 * @method eventEligibilityData()
      *
 	 * @param string herd code

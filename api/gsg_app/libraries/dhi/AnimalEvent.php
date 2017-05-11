@@ -211,6 +211,17 @@ class AnimalEvent
             return false;
         }
 
+        //Bred event edits in which the date is being changed
+        if($event_cd == 32 && isset($event_id) && !empty($event_id) && $event_dt != $orig_event_date){
+            //if this is the conception breeding, date is not editable
+            $concep_date = $this->datasource->getConceptionDate($this->herd_code, $this->serial_num);
+            if(isset($concep_date) && !empty($concep_date)) {
+                if ($orig_event_date == new \DateTime($concep_date)) {
+                    $this->eligible_messages[] = "The breeding event date you are changing is the animal's conception breeding.  You need to delete the pregnant event before you can edit this breeding date.";
+                }
+            }
+        }
+
         //Fresh events
         if($event_cd == 1 || $event_cd == 2){
             $earliest = new \DateTime($data['earliest_fresh_eligible_date']);
