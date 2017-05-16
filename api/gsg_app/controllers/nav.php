@@ -21,7 +21,7 @@ class Nav extends MY_Api_Controller {
         }
 
         if(!$this->session->userdata('herd_code')){
-            $this->sendResponse(400,  new ResponseMessage('A herd code is required to generate navigation.', 'error'));
+            //$this->sendResponse(400,  new ResponseMessage('A herd code is required to generate navigation.', 'error'));
         }
 
         //$this->page_header_data['num_herds'] = $this->herd_access->getNumAccessibleHerds($this->session->userdata('user_id'), $this->permissions->permissionsList(), $this->session->userdata('arr_regions'));

@@ -173,7 +173,7 @@ class AnimalEvent
                 }
             }
 
-            if(!$this->inCurrentLactation($event_dt) && $event_cd != 1 && $event_cd != 2){
+            if(!$this->inCurrentLactation($event_dt) && !in_array($event_cd, [1,2,5])){
                 $this->eligible_messages[] = "Cannot edit events outside of current lactation.";
                 return false;
             }
