@@ -32,6 +32,18 @@ class FormValidator
     protected $subject_control_label;
 
     /**
+     * subject_operator
+     * @var string
+     **/
+    protected $subject_operator;
+
+    /**
+     * subject_value
+     * @var string
+     **/
+    protected $subject_value;
+
+    /**
      * condition_control_name
      * @var string
      **/
@@ -59,11 +71,13 @@ class FormValidator
     /**
 	 * Constructor
 	 */
-	public function __construct($name, $subject_control_name, $subject_control_label, $condition_control_name, $condition_control_label, $condition_operator, $condition_value = null) {
+	public function __construct($name, $subject_control_name, $subject_control_label, $subject_operator, $subject_value, $condition_control_name, $condition_control_label, $condition_operator, $condition_value = null) {
 		// Validation rules can be stored in a config file.
         $this->name = $name;
         $this->subject_control_name = $subject_control_name;
         $this->subject_control_label = $subject_control_label;
+        $this->subject_operator = $subject_operator;
+        $this->subject_value = $subject_value;
         $this->condition_control_name = $condition_control_name;
         $this->condition_control_label = $condition_control_label;
         $this->condition_operator = $condition_operator;
@@ -75,6 +89,8 @@ class FormValidator
             'name' => $this->name,
             'subject_control_name' => $this->subject_control_name,
             'subject_control_label' => $this->subject_control_label,
+            'subject_operator' => $this->subject_operator,
+            'subject_value' => $this->subject_value,
             'condition_control_name' => $this->condition_control_name,
             'condition_control_label' => $this->condition_control_label,
             'condition_operator' => $this->condition_operator,

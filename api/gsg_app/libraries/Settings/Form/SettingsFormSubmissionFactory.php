@@ -185,7 +185,7 @@ class SettingsFormSubmissionFactory implements iFormSubmissionFactory {
 
         $ret = [];
         foreach($validator_data as $c){
-            $ret[] = new FormValidator($c['validator'], $c['subject_control_name'], $c['subject_control_label'], $c['condition_control_name'], $c['condition_control_label'], $c['condition_operator'], $c['condition_value']);
+            $ret[] = new FormValidator($c['validator'], $c['subject_control_name'], $c['subject_control_label'], $c['subject_operator'], $c['subject_value'], $c['condition_control_name'], $c['condition_control_label'], $c['condition_operator'], $c['condition_value']);
         }
 
         return $ret;

@@ -353,7 +353,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
         $form_id = (int)$form_id;
 
         $res = $this->db
-            ->select('form_validator_id,form_id,validator,subject_control_id,subject_control_name,subject_control_label,condition_control_id,condition_control_name,condition_control_label,condition_operator,condition_value')
+            ->select('form_validator_id,form_id,validator,subject_control_id,subject_control_name,subject_control_label,subject_operator,subject_value,condition_control_id,condition_control_name,condition_control_label,condition_operator,condition_value')
             ->where('form_id', $form_id)
             ->get('users.frm.vma_forms_validators')
             ->result_array();
