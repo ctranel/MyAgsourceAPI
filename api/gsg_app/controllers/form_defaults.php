@@ -302,7 +302,7 @@ class form_defaults extends dpage {
                     $bull_defaults['naab'] = ltrim($input['naab'], '0');
                 }
                 else{
-                    $bull_defaults['sire_naab'] = ltrim($bull_defaults['sire_naab'], '0');
+                    $bull_defaults['naab'] = ltrim($bull_defaults['naab'], '0');
                 };
                 if(isset($bull_defaults['bull_id'])){
                     $bull_defaults['bull_id'] = ltrim($bull_defaults['bull_id'], '0');
@@ -347,4 +347,32 @@ class form_defaults extends dpage {
         $this->sendResponse(204);
     }
 
+    function format_official_id(){
+        $input = $this->input->userInputArray();
+        if(empty($input) || count($input) == 0){
+            $this->sendResponse(400, new ResponseMessage('No data sent with request.', 'error'));
+        }
+
+        if(isset($input['officialid']) && !empty($input['officialid'])){
+            try{
+                $id_pieces = Animal::formatOfficialId($input['officialid']);
+            }
+            catch(\Exception $e){
+                $this->sendResponse(400, new ResponseMessage($e->getMessage(), 'error'));
+            }
+
+            try{
+                $bull_defaults = [
+                    'country_cd' => $id_pieces['country_cd'],
+                    'official_id' => $id_pieces['id'],
+                ];
+                $this->sendResponse(200, null, ['defaults' => $bull_defaults]);
+            }
+            catch(exception $e){
+                $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
+            }
+        }
+
+        $this->sendResponse(204);
+    }
 }
