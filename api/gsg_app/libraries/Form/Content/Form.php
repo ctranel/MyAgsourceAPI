@@ -414,32 +414,6 @@ class Form implements iForm
     }
 
     /* -----------------------------------------------------------------
-    *  extracts generated column data
-
-    *  extracts generated column data from submitted form data, as it is not included in the form data sent to datasource,
-    * but is needed for
-
-    *  @author: ctranel
-    *  @date: 2016-10-13
-    *  @param array of key-value pairs from form submission
-    *  @return key-value pairs
-    *  @throws:
-    * -----------------------------------------------------------------
-    protected function getGeneratedCols($form_data){
-        $ret_val = [];
-        if(!isset($form_data) || !is_array($form_data)){
-            throw new \Exception('No form data found');
-        }
-        foreach($this->controls as $c){
-            if($c->isGenerated()){
-                $ret_val[] = $c->name();
-            }
-        }
-        return $ret_val;
-    }
-*/
-
-    /* -----------------------------------------------------------------
     *  extracts uneditable column data
 
     *  extracts uneditable column data from submitted form data, as it is not included in the form data sent to datasource,
@@ -465,53 +439,4 @@ class Form implements iForm
     }
 */
 
-    /* -----------------------------------------------------------------
-    *  animalOptions
-
-    *  returns an array of animal options contained in form keyed by field name of control.
-
-    *  @author: ctranel
-    *  @date: 2016-11-02
-    *  @return array animal options
-    *  @throws:
-    * -----------------------------------------------------------------
-    */
-    public function animalOptions(){
-        $ret_val = [];
-
-        $controls = $this->controls();
-
-        foreach($controls as $c){
-            if($c->controlType() === "animal_lookup"){
-                $ret_val[$c->name()] = $c->options();
-            }
-        }
-
-        return $ret_val;
-    }
-
-    /* -----------------------------------------------------------------
-    *  extracts keys
-
-    *  extracts keys and corresponding values from submitted form data
-
-    *  @author: ctranel
-    *  @date: 2016-10-13
-    *  @param array of key-value pairs from form submission
-    *  @return key-value pairs
-    *  @throws:
-    * -----------------------------------------------------------------
-    protected function getEntityKeys($form_data){
-        $ret_val = [];
-        if(!isset($form_data) || !is_array($form_data)){
-            throw new \Exception('No form data found');
-        }
-        foreach($this->controls as $c){
-            if($c->isKey()){
-                $ret_val[$c->name()] = $c->parseFormData($form_data[$c->name()]);
-            }
-        }
-        return $ret_val;
-    }
-*/
 }

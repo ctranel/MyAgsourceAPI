@@ -3,10 +3,12 @@ require_once(APPPATH . 'controllers/dpage.php');
 require_once APPPATH . 'libraries/Site/WebContent/WebBlockFactory.php';
 require_once APPPATH . 'libraries/Listings/Content/ListingFactory.php';
 require_once(APPPATH . 'libraries/Supplemental/Content/SupplementalFactory.php');
+require_once(APPPATH . 'libraries/dhi/Animal.php');
 
 use \myagsource\AccessLog;
 use \myagsource\Supplemental\Content\SupplementalFactory;
 use \myagsource\DataHandler;
+use \myagsource\dhi\Animal;
 use \myagsource\Datasource\DbObjects\DbTableFactory;
 use \myagsource\Site\WebContent\WebBlockFactory;
 use \myagsource\Report\Content\ReportFactory;
@@ -95,6 +97,8 @@ class Cow_lookup extends dpage {
 	function id($serial_num){
 		try{
             $params = ['serial_num' => $serial_num];
+            $this->load->model('dhi/animal_model');
+            $editable = Animal::isActive($this->animal_model, $this->session->userdata('herd_code'), $serial_num);
 
             //supplemental factory
             $this->load->model('supplemental_model');
@@ -112,7 +116,7 @@ class Cow_lookup extends dpage {
 
             //create block content
             //$listing = $option_listing_factory->getListing(3, ['herd_code' => $this->session->userdata('herd_code'), 'serial_num' => $serial_num]);
-            $entry_forms = $entry_form_factory->getByPage(126, $this->session->userdata('herd_code'));
+            $entry_forms = $entry_form_factory->getByPage(126, $this->session->userdata('herd_code'), $editable);
 
             //create blocks for content
             $web_block_factory = new WebBlockFactory($this->block_model, $supplemental_factory);

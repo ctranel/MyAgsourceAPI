@@ -68,7 +68,7 @@ class FormDisplayFactory {// implements iFormFactory{
      * @author ctranel
      * @returns \myagsource\Page\Content\FormBlock\FormBlock[]
      */
-    public function getByPage($page_id, $herd_code){
+    public function getByPage($page_id, $herd_code, $editable = true){
         $forms = [];
         $results = $this->datasource->getFormsByPage($page_id);
         if(empty($results)){
@@ -76,7 +76,7 @@ class FormDisplayFactory {// implements iFormFactory{
         }
 
         foreach($results as $r){
-            $forms[$r['list_order']] = $this->createDisplayForm($r, $herd_code);
+            $forms[$r['list_order']] = $this->createDisplayForm($r, $herd_code, null, $editable);
         }
         return $forms;
     }
@@ -89,14 +89,14 @@ class FormDisplayFactory {// implements iFormFactory{
      * @author ctranel
      * @returns \myagsource\Site\iBlock[]
 */
-    public function getByBlock($block_id, $herd_code){
+    public function getByBlock($block_id, $herd_code, $editable = true){
         $results = $this->datasource->getFormByBlock($block_id);
         if(empty($results)){
             return [];
         }
 
         $r = $results[0];
-        $form = $this->createDisplayForm($r, $herd_code);
+        $form = $this->createDisplayForm($r, $herd_code, null, $editable);
 
         return $form;
     }
@@ -108,12 +108,12 @@ class FormDisplayFactory {// implements iFormFactory{
      * @author ctranel
      * @returns \myagsource\Form\Form
      */
-    public function getFormDisplay($form_id, $herd_code){
+    public function getFormDisplay($form_id, $herd_code, $editable = true){
         $results = $this->datasource->getFormById($form_id);
         if(empty($results)){
             throw new \Exception('No data found for requested form.');
         }
-        return $this->createDisplayForm($results[0], $herd_code);
+        return $this->createDisplayForm($results[0], $herd_code, null, $editable);
     }
 
     /*
@@ -123,12 +123,12 @@ class FormDisplayFactory {// implements iFormFactory{
      * @author ctranel
      * @returns \myagsource\Form\Form
      */
-    public function getSubformDisplay($form_id, $herd_code){
+    public function getSubformDisplay($form_id, $herd_code, $editable = true){
         $results = $this->datasource->getSubformById($form_id);
         if(empty($results)){
             throw new \Exception('No data found for requested form.');
         }
-        return $this->createDisplayForm($results[0], $herd_code);
+        return $this->createDisplayForm($results[0], $herd_code, null, $editable);
     }
 
 
@@ -140,9 +140,9 @@ class FormDisplayFactory {// implements iFormFactory{
     * @author ctranel
     * @returns Array of Forms
     */
-    protected function getFormControlData($form_id, $ancestor_form_ids = null)    {
+    protected function getFormControlData($form_id, $ancestor_form_ids = null, $editable = true)    {
         //this function depends on an existing record
-        $control_data = $this->datasource->getFormControlData($form_id, $this->key_params, $ancestor_form_ids);
+        $control_data = $this->datasource->getFormControlData($form_id, $this->key_params, $ancestor_form_ids, $editable);
 
         return $control_data;
     }
@@ -156,12 +156,12 @@ class FormDisplayFactory {// implements iFormFactory{
     * @author ctranel
     * @returns Array of Forms
     */
-    protected function createDisplayForm($form_data, $herd_code, $ancestor_form_ids = null){
+    protected function createDisplayForm($form_data, $herd_code, $ancestor_form_ids = null, $editable = true){
         $subforms = $this->getSubFormShells($form_data['form_id'], $herd_code, $ancestor_form_ids);
         $subblocks = $this->getSubBlockShells($form_data['form_id'], $herd_code, $ancestor_form_ids);
 
         //this function depends on an existing record
-        $control_data = $this->getFormControlData($form_data['form_id'], $ancestor_form_ids);
+        $control_data = $this->getFormControlData($form_data['form_id'], $ancestor_form_ids, $editable);
 
         $existing_values = [];
 

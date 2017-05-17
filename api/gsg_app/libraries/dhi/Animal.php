@@ -56,6 +56,29 @@ class Animal
 	}
 
     /* -----------------------------------------------------------------
+     *  isActive
+
+     *
+
+     *  @author: ctranel
+     *  @date: 2017-05-17
+     * @param: Animal_model
+     * @param: String herd code
+     * @param: int serial num
+     *  @return: boolean
+     *  @throws: Exception
+     * -----------------------------------------------------------------*/
+    public static function isActive(\Animal_model $datasource, $herd_code, $serial_num){
+        if(empty($herd_code) || empty($serial_num)){
+            throw new Exception('Animal information is not specified');
+        }
+
+        $res = $datasource->activeCowIdData($herd_code, $serial_num);
+
+        return is_array($res) && count($res) > 0;
+    }
+
+    /* -----------------------------------------------------------------
      *  formatNAAB
 
      *

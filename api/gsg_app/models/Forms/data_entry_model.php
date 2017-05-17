@@ -223,13 +223,20 @@ class Data_entry_model extends CI_Model implements iForm_Model {
      * @return string category
      * @author ctranel
      **/
-    public function getFormControlMeta($form_id, $ancestor_form_ids = null) {
+    protected function getFormControlMeta($form_id, $ancestor_form_ids = null, $editable = true) {
         $form_id = (int)$form_id;
+        $editable = (bool)$editable;
         if(isset($ancestor_form_ids) && is_array($ancestor_form_ids)){
             //have not yet tested with multiple level nesting
             array_walk_recursive($ancestor_form_ids, function(&$v, $k){return (int)$v;});
         }
-        $results = $this->db->select('cg.label AS control_group, cg.list_order AS cg_list_order, fc.id, ct.name AS control_type, fld.db_field_name AS name, fc.label, fld.is_editable, fld.is_generated, fld.is_fk_field AS is_key, fld.data_type, fc.biz_validation_url, fc.form_defaults_url, fc.add_option_form_id, fc.default_value, fc.batch_variable_type, ld.lookup_url AS dependency_lookup_url, dfld.db_field_name AS dependent_form_control_name')
+
+        $editable_text = 'fld.is_editable';
+        if(!$editable){
+            $editable_text = '0 AS is_editable';
+        }
+
+        $results = $this->db->select('cg.label AS control_group, cg.list_order AS cg_list_order, fc.id, ct.name AS control_type, fld.db_field_name AS name, fc.label, ' . $editable_text . ', fld.is_generated, fld.is_fk_field AS is_key, fld.data_type, fc.biz_validation_url, fc.form_defaults_url, fc.add_option_form_id, fc.default_value, fc.batch_variable_type, fc.program_triggers_change, ld.lookup_url AS dependency_lookup_url, dfld.db_field_name AS dependent_form_control_name')
             ->select("(CAST(
                   (SELECT STUFF((
                       SELECT '|', CONCAT(v.name, ':', v.value) AS [data()] 
@@ -275,7 +282,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
     public function getControlMetaById($control_id) {
         $control_id = (int)$control_id;
 
-        $results = $this->db->select('fc.id, ct.name AS control_type, fld.data_type, fld.db_field_name AS name, fc.label, fld.is_editable, fld.is_generated, fld.is_fk_field AS is_key, fc.biz_validation_url, fc.form_defaults_url, fc.add_option_form_id, fc.default_value, fc.batch_variable_type')
+        $results = $this->db->select('fc.id, ct.name AS control_type, fld.data_type, fld.db_field_name AS name, fc.label, fld.is_editable, fld.is_generated, fld.is_fk_field AS is_key, fc.biz_validation_url, fc.form_defaults_url, fc.add_option_form_id, fc.default_value, fc.batch_variable_type, fc.program_triggers_change')
             ->select("(CAST(
                   (SELECT STUFF((
                       SELECT '|', CONCAT(v.name, ':', v.value) AS [data()] 
@@ -318,7 +325,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
      * @return string category
      * @author ctranel
      **/
-    public function getFormControlData($form_id, $params, $ancestor_form_ids = null) {
+    public function getFormControlData($form_id, $params, $ancestor_form_ids = null, $editable = true) {
         $form_id = (int)$form_id;
         if(isset($params) && is_array($params)){
             array_walk_recursive($params, function(&$v, $k){return MssqlUtility::escape($v);});
@@ -331,7 +338,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
         $common = array_intersect(['herd_code', 'serial_num'], $keys);
 
         if(count($common) === count($keys) || true){ //no key fields besides herd_code and serial num--testing this method with all listings
-            $results = $this->getFormControlMeta($form_id, $ancestor_form_ids);
+            $results = $this->getFormControlMeta($form_id, $ancestor_form_ids, $editable);
             //add passed param values back in to data
             foreach($results as &$r){
                 if(in_array($r['name'], $keys)){

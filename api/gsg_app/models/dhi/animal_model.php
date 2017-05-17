@@ -12,6 +12,24 @@ class Animal_model extends CI_Model {
     }
 
     /**
+     * @method activeCowIdData()
+     * @param string herd code
+     * @param int serial num
+     * @return array of cow id data.
+     * @access public
+     *
+     **/
+
+    public function activeCowIdData($herd_code, $serial_num){
+        $herd_code = MssqlUtility::escape($herd_code);
+        $serial_num = (int)$serial_num;
+
+        $this->db->where('isactive', 1);
+
+        return $this->cowIdData($herd_code, $serial_num);
+    }
+
+    /**
      * @method cowIdData()
      * @param string herd code
      * @param int serial num
