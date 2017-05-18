@@ -88,12 +88,12 @@ class Animal
      *  @return: valid NAAB
      *  @throws: Exception
      * -----------------------------------------------------------------*/
-    public static function formatNAAB(\Animal_model $datasource, $naab, $species_code){
+    public static function formatNAAB(\Animal_model $datasource, $naab, $herd_code){
         $orig_breed = preg_replace("/[^a-zA-Z]+/", "", $naab);
         $breed = $orig_breed;
 
         if(strlen($orig_breed) == 1){
-            $breed = $datasource->getNaabBreedCode($orig_breed, $species_code);
+            $breed = $datasource->getNaabBreedCode($orig_breed, $herd_code);
         }
 
         if(empty($breed) || strlen($breed) != 2){

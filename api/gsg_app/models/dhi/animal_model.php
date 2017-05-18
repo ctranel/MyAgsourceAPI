@@ -95,19 +95,19 @@ class Animal_model extends CI_Model {
      *
      **/
 
-    public function getNaabBreedCode($breed, $species_code){
+    public function getNaabBreedCode($breed, $herd_code){
         $breed = MssqlUtility::escape($breed);
-        $species_code = MssqlUtility::escape($species_code);
 
-        if(empty($breed) || empty($species_code)){
+        if(empty($breed) || empty($herd_code)){
             throw new Exception('Cannot look up NAAB.');
         }
 
         $result = $this->db
-            ->select('naab')
-            ->where('descr', $breed)
-            ->where('species_cd', $species_code)
-            ->get('[TD].[ref].[breeds]')
+            ->select('b.naab')
+            ->where('b.descr', $breed)
+            ->join('[TD].[herd].[herd_id] id', "id.herd_code='$herd_code' AND b.species_cd = id.species_code", 'inner')
+            ->get('[TD].[ref].[breeds] b')
+
             ->result_array();
         //only return a result if there is exactly 1 match, otherwise request is ambiguous
         if(is_array($result) && count($result)==1 && isset($result[0]) && is_array($result[0])){

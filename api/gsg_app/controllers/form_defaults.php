@@ -152,10 +152,10 @@ class form_defaults extends dpage {
             $this->sendResponse(400, new ResponseMessage('No data sent with request.', 'error'));
         }
 
-        if(isset($input['sire_naab']) && !empty($input['sire_naab'])){
+        if(isset($input['sire_naab']) && !empty($input['sire_naab']) && isset($input['herd_code']) && !empty($input['herd_code'])){
             try{
                 $this->load->model('dhi/animal_model');
-                $input['sire_naab'] = Animal::formatNAAB($this->animal_model, $input['sire_naab'], $this->settings->getValue('species'));
+                $input['sire_naab'] = Animal::formatNAAB($this->animal_model, $input['sire_naab'], $input['herd_code']);
             }
             catch(\Exception $e){
                 $this->sendResponse(400, new ResponseMessage($e->getMessage(), 'error'));
@@ -218,10 +218,10 @@ class form_defaults extends dpage {
             $this->sendResponse(400, new ResponseMessage('No data sent with request.', 'error'));
         }
 
-        if(isset($input['sire_naab']) && !empty($input['sire_naab'])){
+        if(isset($input['sire_naab']) && !empty($input['sire_naab']) && isset($input['herd_code']) && !empty($input['herd_code'])){
             try{
                 $this->load->model('dhi/animal_model');
-                $input['sire_naab'] = Animal::formatNAAB($this->animal_model, $input['sire_naab'], $this->settings->getValue('species'));
+                $input['sire_naab'] = Animal::formatNAAB($this->animal_model, $input['sire_naab'], $input['herd_code']);
             }
             catch(\Exception $e){
                 $this->sendResponse(400, new ResponseMessage($e->getMessage(), 'error'));
@@ -285,10 +285,10 @@ class form_defaults extends dpage {
             $this->sendResponse(400, new ResponseMessage('No data sent with request.', 'error'));
         }
 
-        if(isset($input['naab']) && !empty($input['naab'])){
+        if(isset($input['naab']) && !empty($input['naab']) && isset($input['herd_code']) && !empty($input['herd_code'])){
             try{
                 $this->load->model('dhi/animal_model');
-                $input['naab'] = Animal::formatNAAB($this->animal_model, $input['naab'], $this->settings->getValue('species'));
+                $input['naab'] = Animal::formatNAAB($this->animal_model, $input['naab'], $input['herd_code']);
             }
             catch(\Exception $e){
                 $this->sendResponse(400, new ResponseMessage($e->getMessage(), 'error'));
