@@ -475,12 +475,12 @@ class Data_entry_model extends CI_Model implements iForm_Model {
 	public function getLookupOptions($control_id){
         $control_id = (int)$control_id;
 
-	    $sql = "DECLARE @tbl nvarchar(100), @value_col nvarchar(32), @desc_col nvarchar(32), @code_type nvarchar(15), @sql nvarchar(255)
-				SELECT @tbl = table_name, @value_col = value_column, @desc_col = desc_column, @code_type = codetype FROM users.frm.data_lookup WHERE control_id = " . $control_id . "
+	    $sql = "DECLARE @tbl nvarchar(100), @value_col nvarchar(32), @desc_col nvarchar(32), @sort_col nvarchar(32), @sort_order nvarchar(4), @code_type nvarchar(15), @sql nvarchar(255)
+				SELECT @tbl = table_name, @value_col = value_column, @desc_col = desc_column, @sort_col = order_by, @sort_order = sort_order, @code_type = codetype FROM users.frm.data_lookup WHERE control_id = " . $control_id . "
                 IF @code_type IS NOT NULL
-				    SELECT @sql = N' SELECT ' + @value_col + ', ' + @desc_col + ' FROM ' + @tbl + ' WHERE codetype = ''' + @code_type + ''' AND isactive = 1 ORDER BY list_order'
+				    SELECT @sql = N' SELECT ' + @value_col + ', ' + @desc_col + ' FROM ' + @tbl + ' WHERE codetype = ''' + @code_type + ''' AND isactive = 1 ORDER BY ' + @sort_col + ' ' + @sort_order
 				ELSE
-				    SELECT @sql = N' SELECT ' + @value_col + ', ' + @desc_col + ' FROM ' + @tbl + ' WHERE isactive = 1 ORDER BY list_order'
+				    SELECT @sql = N' SELECT ' + @value_col + ', ' + @desc_col + ' FROM ' + @tbl + ' WHERE isactive = 1 ORDER BY ' + @sort_col + ' ' + @sort_order
 				EXEC sp_executesql @sql";
 //die($sql);
         $results = $this->db->query($sql)->result_array();
@@ -541,9 +541,9 @@ class Data_entry_model extends CI_Model implements iForm_Model {
         $herd_code = MssqlUtility::escape($herd_code);
 
         $sql = "USE users;
-				DECLARE @tbl nvarchar(100), @value_col nvarchar(32), @desc_col nvarchar(32), @sql nvarchar(255)
-				SELECT @tbl = table_name, @value_col = value_column, @desc_col = desc_column FROM users.frm.data_lookup WHERE control_id = " . $control_id . "
-				SELECT @sql = N' SELECT ' + @value_col + ', ' + @desc_col + ' FROM ' + @tbl + ' WHERE herd_code = ''" . $herd_code . "'' AND isactive = 1 ORDER BY list_order'
+				DECLARE @tbl nvarchar(100), @value_col nvarchar(32), @desc_col nvarchar(32), @sort_col nvarchar(32), @sort_order nvarchar(4), @sql nvarchar(255)
+				SELECT @tbl = table_name, @value_col = value_column, @desc_col = desc_column, @sort_col = order_by, @sort_order = sort_order FROM users.frm.data_lookup WHERE control_id = " . $control_id . "
+				SELECT @sql = N' SELECT ' + @value_col + ', ' + @desc_col + ' FROM ' + @tbl + ' WHERE herd_code = ''" . $herd_code . "'' AND isactive = 1 ORDER BY ' + @sort_col + ' ' + @sort_order
 				EXEC sp_executesql @sql";
 
         $results = $this->db->query($sql)->result_array();
@@ -573,9 +573,9 @@ class Data_entry_model extends CI_Model implements iForm_Model {
             //throw new Exception('Animal serial number not set in datasource');
         }
         $sql = "USE users;
-				DECLARE @tbl nvarchar(100), @value_col nvarchar(32), @desc_col nvarchar(32), @sql nvarchar(255)
-				SELECT @tbl = table_name, @value_col = value_column, @desc_col = desc_column FROM users.frm.data_lookup WHERE control_id = " . $control_id . "
-				SELECT @sql = N' SELECT ' + @value_col + ', ' + @desc_col + ' FROM ' + @tbl + ' WHERE herd_code = ''" . $herd_code . "'' AND (serial_num = " . $serial_num . " OR serial_num IS NULL) AND isactive = 1 ORDER BY list_order'
+				DECLARE @tbl nvarchar(100), @value_col nvarchar(32), @desc_col nvarchar(32), @sort_col nvarchar(32), @sort_order nvarchar(4), @sql nvarchar(255)
+				SELECT @tbl = table_name, @value_col = value_column, @desc_col = desc_column, @sort_col = order_by, @sort_order = sort_order FROM users.frm.data_lookup WHERE control_id = " . $control_id . "
+				SELECT @sql = N' SELECT ' + @value_col + ', ' + @desc_col + ' FROM ' + @tbl + ' WHERE herd_code = ''" . $herd_code . "'' AND (serial_num = " . $serial_num . " OR serial_num IS NULL) AND isactive = 1 ORDER BY ' + @sort_col + ' ' + @sort_order
 				EXEC sp_executesql @sql";
 
         $results = $this->db->query($sql)->result_array();
@@ -603,9 +603,9 @@ class Data_entry_model extends CI_Model implements iForm_Model {
             throw new Exception('User not specified when getting options.');
         }
         $sql = "USE users;
-				DECLARE @tbl nvarchar(100), @value_col nvarchar(32), @desc_col nvarchar(32), @sql nvarchar(255)
-				SELECT @tbl = table_name, @value_col = value_column, @desc_col = desc_column FROM users.frm.data_lookup WHERE control_id = " . $control_id . "
-				SELECT @sql = N' SELECT ' + @value_col + ', ' + @desc_col + ' FROM ' + @tbl + ' WHERE (user_id = " . $user_id . " OR user_id IS NULL) AND isactive = 1 ORDER BY list_order'
+				DECLARE @tbl nvarchar(100), @value_col nvarchar(32), @desc_col nvarchar(32), @sort_col nvarchar(32), @sort_order nvarchar(4), @sql nvarchar(255)
+				SELECT @tbl = table_name, @value_col = value_column, @desc_col = desc_column, @sort_col = order_by, @sort_order = sort_order FROM users.frm.data_lookup WHERE control_id = " . $control_id . "
+				SELECT @sql = N' SELECT ' + @value_col + ', ' + @desc_col + ' FROM ' + @tbl + ' WHERE (user_id = " . $user_id . " OR user_id IS NULL) AND isactive = 1 ORDER BY ' + @sort_col + ' ' + @sort_order
 				EXEC sp_executesql @sql";
 
         $results = $this->db->query($sql)->result_array();
