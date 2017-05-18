@@ -2,14 +2,15 @@
 //namespace myagsource;
 require_once(APPPATH . 'controllers/dpage.php');
 require_once(APPPATH . 'libraries/dhi/AnimalEvent.php');
-require_once(APPPATH . 'libraries/dhi/Animal.php');
+require_once(APPPATH . 'libraries/dhi/HerdEvents.php');
 require_once(APPPATH . 'libraries/dhi/BatchEvent.php');
+require_once(APPPATH . 'models/dhi/events_model.php');
 
 
 use \myagsource\Api\Response\ResponseMessage;
 use \myagsource\dhi\AnimalEvent;
-use \myagsource\dhi\Animal;
 use \myagsource\dhi\BatchEvent;
+use \myagsource\dhi\HerdEvents;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
@@ -25,8 +26,11 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
  */
 
 class events extends dpage {
+    protected $events_model;
+
 	function __construct(){
 		parent::__construct();
+        $this->events_model = new Events_model();
 
 		/* Load the profile.php config file if it exists*/
 		if (ENVIRONMENT == 'development' || ENVIRONMENT == 'localhost') {
@@ -55,7 +59,6 @@ class events extends dpage {
             $this->sendResponse(204);
         }
 
-        $this->load->model('dhi/events_model');
         try{
             $animal_event = new AnimalEvent($this->events_model, $input['herd_code'], (int)$input['serial_num']);
             $is_eligible = $animal_event->isEligible((int)$input['event_cd'], $input['event_dt'], isset($input['animal_event_id']) ? $input['animal_event_id'] : null);
@@ -92,16 +95,9 @@ class events extends dpage {
             $this->sendResponse(204);
         }
 
-        $this->load->model('dhi/events_model');
         try{
-            $defaults = $this->events_model->getHerdDefaultValues($input['herd_code'], $input['event_cd']);
-            if((int)$input['event_cd'] === 33 && isset($input['serial_num']) && !is_array($input['serial_num']) && !empty($input['serial_num'])){
-                $this->load->model('dhi/animal_model');
-                $conception_dt = Animal::topBredDate($this->animal_model, $input['herd_code'], $input['serial_num']);
-                if(!empty($conception_dt)){
-                    $defaults['conception_dt'] = $conception_dt;
-                }
-            }
+            $herd_events = new HerdEvents($this->events_model, $input['herd_code']);
+            $defaults = $herd_events->getHerdDefaultValues($input['event_cd'], $input['serial_num']);
         }
         catch(exception $e){
             $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
@@ -120,7 +116,6 @@ class events extends dpage {
             $this->sendResponse(204);
         }
 
-        $this->load->model('dhi/events_model');
         try{
             $batch_event = new BatchEvent($this->events_model, $input['herd_code']);
             $eligible_animals = $batch_event->eligibleAnimals((int)$input['event_cd'], $input['event_dt']);
@@ -154,7 +149,6 @@ class events extends dpage {
         }
 
         try {
-            $this->load->model('dhi/events_model');
             $lact_date = $this->events_model->activeEventPeriodStartDate($input['herd_code'], $input['serial_num']);
 
             $dtDate_bred = new \DateTime($input['event_dt']);

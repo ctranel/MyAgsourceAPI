@@ -30,33 +30,6 @@ class Animal_model extends CI_Model {
     }
 
     /**
-     * @method topBredDate()
-     * @param string herd code
-     * @param int serial num
-     * @return array of cow id data.
-     * @access public
-     *
-     **/
-
-    public function topBredDate($herd_code, $serial_num){
-        $herd_code = MssqlUtility::escape($herd_code);
-        $serial_num = (int)$serial_num;
-
-        $result = $this->db
-            ->select('TopBredDate')
-            ->where('herd_code', $herd_code)
-            ->where('serial_num', $serial_num)
-            ->where('isactive', 1)
-            ->get('[TD].[animal].[vma_animal_event_eligibility]')
-            ->result_array();
-        if(is_array($result) && isset($result[0]) && is_array($result[0])){
-            return $result[0]['TopBredDate'];
-        }
-
-        return null;
-    }
-
-    /**
      * @method cowIdData()
      * @param string herd code
      * @param int serial num
