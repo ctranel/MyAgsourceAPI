@@ -97,14 +97,14 @@ class dpage extends MY_Api_Controller {
         }
 
         if(!$this->session->userdata('herd_code')){
-            $this->sendResponse(417,  new ResponseMessage('Please select a herd and try again.', 'error'));
+            $this->sendResponse(205,  new ResponseMessage('Please select a herd and try again.', 'error'));
         }
 
         //is someone logged in?
 		/*if($this->herd->herdCode() != $this->config->item('default_herd')){
 			//is a herd selected?
 			if(!$this->herd->herdCode() || $this->herd->herdCode() == ''){
-                $this->sendResponse(417,  new ResponseMessage('Please select a herd and try again.', 'error'));
+                $this->sendResponse(205,  new ResponseMessage('Please select a herd and try again.', 'error'));
 			}
 			*/
 			//does logged in user have access to selected herd?
