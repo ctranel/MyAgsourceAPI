@@ -138,4 +138,29 @@ class events extends dpage {
         $this->sendResponse(200, $errors);
     }
 
+    function valid_days_bred(){
+        $input = $this->input->userInputArray();
+        if(empty($input) || count($input) == 0){
+            $this->sendResponse(400, new ResponseMessage('No data sent with request.', 'error'));
+        }
+
+        try {
+            $this->load->model('dhi/events_model');
+            $lact_date = $this->events_model->activeEventPeriodStartDate($input['herd_code'], $input['serial_num']);
+
+            $dtDate_bred = new \DateTime($input['event_dt']);
+            $dtDate_bred->modify('-' . $input['days_bred'] . ' days');
+            $dtLact_date = new \DateTime($lact_date);
+        }
+        catch(exception $e){
+            $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
+        }
+
+        if($dtDate_bred > $dtLact_date){
+            $this->sendResponse(202);
+        }
+
+        $msg = new ResponseMessage('Event date minus days bred (' . $dtDate_bred->format('m-d-Y') . ') must be later than the most recent fresh date or birthdate (' . $dtLact_date->format('m-d-Y') . ').', 'error');
+        $this->sendResponse(200, [$msg]);
+    }
 }

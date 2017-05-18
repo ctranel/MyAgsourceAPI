@@ -185,7 +185,7 @@ class Events_model extends CI_Model {
      * @method currentLactationStartDate
      * @param string herd code
      * @param int serial num
-     * @return datetime string
+     * @return string date
      * @access public
      *
      **/
@@ -201,6 +201,30 @@ class Events_model extends CI_Model {
 
         if(isset($res[0]) && is_array($res[0])){
             return $res[0]['TopFreshDate'];
+        }
+    }
+
+    /**
+     * @method activeEventPeriodStartDate
+     * @param string herd code
+     * @param int serial num
+     * @return string date
+     * @access public
+     *
+     **/
+    public function activeEventPeriodStartDate($herd_code, $serial_num){
+        $herd_code = MssqlUtility::escape($herd_code);
+        $serial_num = (int)$serial_num;
+        $res = $this->db
+            ->select("COALESCE([TopFreshDate], birth_dt) AS active_event_period_start_dt")
+            ->where('herd_code', $herd_code)
+            ->where('serial_num', $serial_num)
+            ->where('isactive', 1)
+            ->get('[TD].[animal].[vma_animal_event_eligibility]')
+            ->result_array();
+
+        if(isset($res[0]) && is_array($res[0])){
+            return $res[0]['active_event_period_start_dt'];
         }
     }
 
