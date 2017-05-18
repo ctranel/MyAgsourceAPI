@@ -2,11 +2,13 @@
 //namespace myagsource;
 require_once(APPPATH . 'controllers/dpage.php');
 require_once(APPPATH . 'libraries/dhi/AnimalEvent.php');
+require_once(APPPATH . 'libraries/dhi/Animal.php');
 require_once(APPPATH . 'libraries/dhi/BatchEvent.php');
 
 
 use \myagsource\Api\Response\ResponseMessage;
 use \myagsource\dhi\AnimalEvent;
+use \myagsource\dhi\Animal;
 use \myagsource\dhi\BatchEvent;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
@@ -93,6 +95,13 @@ class events extends dpage {
         $this->load->model('dhi/events_model');
         try{
             $defaults = $this->events_model->getHerdDefaultValues($input['herd_code'], $input['event_cd']);
+            if((int)$input['event_cd'] === 33 && isset($input['serial_num']) && !is_array($input['serial_num']) && !empty($input['serial_num'])){
+                $this->load->model('dhi/animal_model');
+                $conception_dt = Animal::topBredDate($this->animal_model, $input['herd_code'], $input['serial_num']);
+                if(!empty($conception_dt)){
+                    $defaults['conception_dt'] = $conception_dt;
+                }
+            }
         }
         catch(exception $e){
             $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));

@@ -79,6 +79,27 @@ class Animal
     }
 
     /* -----------------------------------------------------------------
+     *  topBredDate
+     *
+     *  @author: ctranel
+     *  @date: 2017-05-18
+     * @param: Animal_model
+     * @param: String herd code
+     * @param: int serial num
+     *  @return: string date
+     *  @throws: Exception
+     * -----------------------------------------------------------------*/
+    public static function topBredDate(\Animal_model $datasource, $herd_code, $serial_num){
+        if(empty($herd_code) || empty($serial_num)){
+            throw new Exception('Animal information is not specified');
+        }
+
+        $res = $datasource->topBredDate($herd_code, $serial_num);
+
+        return $res;
+    }
+
+    /* -----------------------------------------------------------------
      *  formatNAAB
 
      *
