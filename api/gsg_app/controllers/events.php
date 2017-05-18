@@ -96,8 +96,9 @@ class events extends dpage {
         }
 
         try{
+            $ser_num = isset($input['serial_num']) ? $input['serial_num'] : null;
             $herd_events = new HerdEvents($this->events_model, $input['herd_code']);
-            $defaults = $herd_events->getHerdDefaultValues($input['event_cd'], $input['serial_num']);
+            $defaults = $herd_events->getHerdDefaultValues($input['event_cd'], $ser_num);
         }
         catch(exception $e){
             $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));

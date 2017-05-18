@@ -57,10 +57,6 @@ class HerdEvents
      *  @throws: Exception
      * -----------------------------------------------------------------*/
     public function getHerdDefaultValues($event_cd, $serial_num){
-        if(empty($serial_num)){
-            throw new \Exception('Animal information is not specified');
-        }
-
         $defaults = $this->datasource->getHerdDefaultValues($this->herd_code, $event_cd);
 
         if((int)$event_cd === 33 && isset($serial_num) && !is_array($serial_num) && !empty($serial_num)){
