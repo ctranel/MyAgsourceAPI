@@ -305,8 +305,7 @@ class AnimalEvent
         //Preg events
         if($event_cd == 33){
             $earliest = new \DateTime($data['earliest_preg_eligible_date']);
-
-            if($data['earliest_preg_eligible_date'] === null && $data['TopStatusDate'] !== null && $data['is_bred'] !== false){
+            if($data['earliest_preg_eligible_date'] === null && $data['is_bred'] == true && $data['TopStatusDate'] !== null){
                 //IF THERE ARE NO BREEDINGS, USERS CAN ENTER SIRE AND DAYS BRED
                 //if($data['is_bred'] == false){
                 //    $this->eligible_messages[] = "Animal has not been bred, and is not eligible for a pregnancy event.";

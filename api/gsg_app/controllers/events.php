@@ -61,7 +61,9 @@ class events extends dpage {
 
         try{
             $animal_event = new AnimalEvent($this->events_model, $input['herd_code'], (int)$input['serial_num']);
-            $is_eligible = $animal_event->isEligible((int)$input['event_cd'], $input['event_dt'], isset($input['animal_event_id']) ? $input['animal_event_id'] : null);
+            $event_id = isset($input['animal_event_id']) ? $input['animal_event_id'] : null;
+            $days_bred = isset($input['animal_event_id']) ? $input['animal_event_id'] : null;
+            $is_eligible = $animal_event->isEligible((int)$input['event_cd'], $input['event_dt'], $event_id);
         }
         catch(exception $e){
             $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
