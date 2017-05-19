@@ -58,8 +58,14 @@ class ListingFactory implements iListingFactory {
     protected function createListing($listing_data, $criteria){
         $column_data = $this->datasource->getListingColumnMeta($listing_data['listing_id']);
         $display_cols = array_diff(array_column($column_data, 'name'), array_keys($criteria));
+        $preset_cols = array_filter($column_data, function($v, $k) {
+            return $v['is_preset'] == true;
+        }, ARRAY_FILTER_USE_BOTH);
+        $preset_cols = array_column($preset_cols, 'name');
 
         $dataset = $this->datasource->getListingData($listing_data['listing_id'], $criteria, $listing_data['order_by'], $listing_data['sort_order'], $display_cols);//, implode(', ', array_column($column_data, 'name')));
+
+        $add_presets = $this->datasource->getAddPresets($listing_data['listing_id'], $criteria, $preset_cols);
 
         $lc = [];
         if(is_array($column_data) && !empty($column_data) && is_array($column_data[0])){
@@ -68,7 +74,7 @@ class ListingFactory implements iListingFactory {
             }
         }
 
-        return new Listing($listing_data['listing_id'], $listing_data['form_id'], $listing_data['delete_path'], $listing_data['activate_path'], $lc, $dataset, $listing_data['isactive'], $criteria, $listing_data['order_by'], $listing_data['sort_order']);
+        return new Listing($listing_data['listing_id'], $listing_data['form_id'], $listing_data['delete_path'], $listing_data['activate_path'], $lc, $dataset, $listing_data['isactive'], $add_presets, $listing_data['order_by'], $listing_data['sort_order']);
     }
 
     /*

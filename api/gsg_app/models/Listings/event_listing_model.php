@@ -168,7 +168,7 @@ class Event_listing_model extends CI_Model implements iListing_model  {
     public function getListingColumnMeta($listing_id) {
         $listing_id = (int)$listing_id;
 
-        $sql = " select lc.id, ct.name AS control_type, lc.label, lc.is_displayed, fld.is_fk_field AS is_key, lc.db_field_id , fld.db_field_name AS name, '' AS default_value
+        $sql = " select lc.id, ct.name AS control_type, lc.label, lc.is_displayed, lc.is_preset, fld.is_fk_field AS is_key, lc.db_field_id , fld.db_field_name AS name, '' AS default_value
                 from users.options.listings_columns lc
                 inner join users.dbo.db_fields fld ON lc.db_field_id = fld.id AND lc.listing_id = " . $listing_id . "
                 inner join users.frm.control_types ct ON lc.control_type_id = ct.id";
@@ -190,6 +190,10 @@ class Event_listing_model extends CI_Model implements iListing_model  {
      * getListingData
      *
      * @param int listing id
+     * @param array criteria
+     * @param string sort column
+     * @param string sort order
+     * @param array display column names
      * @return array column data
      * @author ctranel
      **/
@@ -198,6 +202,7 @@ class Event_listing_model extends CI_Model implements iListing_model  {
         $order_by = MssqlUtility::escape($order_by);
         $sort_order = MssqlUtility::escape($sort_order);
         $criteria = MssqlUtility::escape(array_filter($criteria));
+        $display_cols = MssqlUtility::escape(array_filter($display_cols));
 
         $keys = array_keys($criteria);
         $key_meta = $this->getListingKeyMeta($listing_id);
@@ -259,6 +264,83 @@ class Event_listing_model extends CI_Model implements iListing_model  {
                 $r = $r + $criteria;
             }
             return $results;
+        }
+
+        return [];
+    }
+
+    /**
+     * getAddPresets
+     *
+     * @param int listing id
+     * @param array criteria
+     * @return array key=>value preset data
+     * @author ctranel
+     **/
+    public function getAddPresets($listing_id, $criteria, $preset_cols) {
+        $listing_id = (int)$listing_id;
+        $criteria = MssqlUtility::escape(array_filter($criteria));
+
+        $keys = array_keys($criteria);
+        $key_meta = $this->getListingKeyMeta($listing_id);
+        $key_condition_text = '';
+
+        //all keys from parent entities are passed, only use the ones that have data in this listing
+        foreach($keys as $k){
+            if(!isset($key_meta[$k])){
+                continue;
+            }
+            $v = $criteria[$k];
+            if(strpos($key_meta[$k]['data_type'], 'char') !== false){
+                if(is_array($v)){
+                    $v = implode("'',''", $v);
+                }
+                $key_condition_text .= $k . " IN(''" . $v . "'') AND ";
+            }
+            else {
+                if(is_array($v)){
+                    $v = implode(",", $v);
+                }
+                $key_condition_text .= $k . " IN(" . $v . ") AND ";
+            }
+        }
+
+        $sql = "
+            DECLARE
+                @dsql NVARCHAR(MAX)
+                ,@db_table_name VARCHAR(100)
+
+            SELECT TOP 1 @db_table_name = CONCAT(db.name, '.',  tbl.db_schema, '.', tbl.name)
+                from users.options.listings_columns lc
+                inner join users.dbo.db_fields fld ON lc.db_field_id = fld.id AND lc.listing_id = " . $listing_id . "
+                inner join users.dbo.db_tables tbl ON fld.db_table_id = tbl.id AND allow_update = 1
+                inner join users.dbo.db_databases db ON tbl.database_id = db.id
+
+            SET @dsql = CONCAT(N'SELECT DISTINCT " . implode(',', $preset_cols) . "
+			    FROM ', @db_table_name, N' WHERE " . substr($key_condition_text, 0, -5);
+
+        if(isset($order_by) && !empty($order_by) && isset($sort_order) && !empty($sort_order)) {
+            $sql .= " ORDER BY " . $order_by . " " . $sort_order;
+        }
+        $sql .= "')
+
+            EXEC (@dsql)
+       ";
+//die($sql);
+
+        $results = $this->db->query($sql)->result_array();
+
+        $err = $this->db->_error_message();
+
+        if(!empty($err)){
+            throw new \Exception($err);
+        }
+
+        if(isset($results[0]) && is_array($results[0])) {
+            foreach($results as &$r){
+                $r = $r + $criteria;
+            }
+            return $results[0];
         }
 
         return [];
