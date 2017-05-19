@@ -329,7 +329,7 @@ class Herd_options_model extends CI_Model implements iListing_model  {
 
             EXEC (@dsql)
        ";
-//die($sql);
+//print($sql);
 
         $results = $this->db->query($sql)->result_array();
 
