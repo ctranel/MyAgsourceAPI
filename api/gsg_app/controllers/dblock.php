@@ -45,40 +45,13 @@ class dblock extends dpage {
      * @return	void
      */
     function get($block_id, $json_data = null){
-        $params = [];
-        if(isset($json_data)) {
-            $params = array_filter((array)json_decode(urldecode($json_data)));
-        }
-/*
-        if(empty(array_filter($params))){
-            $this->sendResponse(400, new ResponseMessage("No identifying information received", 'error'));
-        }
-*/
-
-        $supplemental_factory = $this->_supplementalFactory();
-$page_id = 105; //@todo: this will work until we have content that uses filters (reports)
+        $page_id = 105; //@todo: this will work until we have content that uses filters (reports)
         $this->load->model('Listings/herd_options_model');
-        $listing_factory = new ListingFactory($this->herd_options_model);//, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
-
-        $this->filters = $this->_filters($page_id, $params);
-        $benchmarks = $this->_benchmarks();
-        try {
-            $this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
-            $this->load->model('web_content/block_model');
-            $block_content = $this->_blockContent($block_id, $supplemental_factory, $params, $benchmarks, $listing_factory);
-            $web_block_factory = new WebBlockFactory($this->block_model, $supplemental_factory);
-
-            //create blocks for content
-            $block = $web_block_factory->getBlock($block_id, $block_content);
-        }
-        catch(\Exception $e){
-            $this->sendResponse(404, new ResponseMessage($e->getMessage(), 'error'));
-        }
-        $this->sendResponse(200, $this->message, $block->toArray());
+        $this->_processBlock($page_id, $block_id, $json_data, $this->herd_options_model);
     }
 
     /**
-     * @method get()
+     * @method event_subblock()
      *
      * @param int block id
      * @param string json data (key data for retrieving form)
@@ -87,7 +60,11 @@ $page_id = 105; //@todo: this will work until we have content that uses filters 
      */
     function event_subblock($block_id, $json_data = null){
         $page_id = 79;
+        $this->load->model('Listings/event_listing_model');
+        $this->_processBlock($page_id, $block_id, $json_data, $this->event_listing_model);
+    }
 
+    protected function _processBlock($page_id, $block_id, $json_data, $datasource){
         $params = [];
         if(isset($json_data)) {
             $params = array_filter((array)json_decode(urldecode($json_data)));
@@ -97,15 +74,7 @@ $page_id = 105; //@todo: this will work until we have content that uses filters 
             $params['batchid'] = $params['batchid'][0];
         }
 
-        //$params = ['animal_event_id' => $params['animal_event_id'], 'herd_code' => $params['herd_code']];
-        /*
-                if(empty(array_filter($params))){
-                    $this->sendResponse(400, new ResponseMessage("No identifying information received", 'error'));
-                }
-        */
-
-        $this->load->model('Listings/event_listing_model');
-        $listing_factory = new ListingFactory($this->event_listing_model);
+        $listing_factory = new ListingFactory($datasource);
 
         $supplemental_factory = $this->_supplementalFactory();
 
@@ -125,6 +94,7 @@ $page_id = 105; //@todo: this will work until we have content that uses filters 
             $this->sendResponse(404, new ResponseMessage($e->getMessage(), 'error'));
         }
         $this->sendResponse(200, $this->message, $block->toArray());
+
     }
 
     protected function _blockContent($block_id, $supplemental_factory, $params, $benchmarks, $option_listing_factory){
