@@ -268,7 +268,6 @@ class Event_listing_model extends CI_Model implements iListing_model  {
 
         return [];
     }
-
     /**
      * getAddPresets
      *
@@ -279,6 +278,8 @@ class Event_listing_model extends CI_Model implements iListing_model  {
      **/
     public function getAddPresets($listing_id, $criteria, $preset_cols) {
         $listing_id = (int)$listing_id;
+ //       $order_by = MssqlUtility::escape($order_by);
+  //      $sort_order = MssqlUtility::escape($sort_order);
         $criteria = MssqlUtility::escape(array_filter($criteria));
 
         $keys = array_keys($criteria);
@@ -340,7 +341,7 @@ class Event_listing_model extends CI_Model implements iListing_model  {
             foreach($results as &$r){
                 $r = $r + $criteria;
             }
-            return $results[0];
+            return $results;
         }
 
         return [];

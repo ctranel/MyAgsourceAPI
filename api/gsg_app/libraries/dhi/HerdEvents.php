@@ -48,12 +48,13 @@ class HerdEvents
 	}
 
     /* -----------------------------------------------------------------
-     *  topBredDate
+     *  getHerdDefaultValues
      *
      *  @author: ctranel
      *  @date: 2017-05-18
+     * @param: int event code
      * @param: int serial num
-     *  @return: string date
+     *  @return: array of default values
      *  @throws: Exception
      * -----------------------------------------------------------------*/
     public function getHerdDefaultValues($event_cd, $serial_num){
@@ -65,6 +66,21 @@ class HerdEvents
                 $defaults['conception_dt'] = $conception_dt;
             }
         }
+
+        return $defaults;
+    }
+
+    /* -----------------------------------------------------------------
+     *  getOffspringDefaultValues
+     *
+     *  @author: ctranel
+     *  @date: 2017-05-25
+     * @param: int event id
+     *  @return: array of default values
+     *  @throws: Exception
+     * -----------------------------------------------------------------*/
+    public function getOffspringDefaultValues($event_id){
+        $defaults = $this->datasource->getOffspringDefaultValues($event_id);
 
         return $defaults;
     }

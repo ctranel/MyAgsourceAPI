@@ -31,8 +31,8 @@ class SettingForm extends Form implements iForm {
 	protected $herd_code;
 		
 	
-	function __construct($id, $datasource, $controls_groups, $name, $dom_id, $action, $form_validators, $user_id, $herd_code) {
-		parent::__construct($id, $datasource, $controls_groups, $name, $dom_id, $action, $form_validators);
+	function __construct($id, $datasource, $controls_groups, $name, $dom_id, $action, $initial_defaults_url, $form_validators, $user_id, $herd_code) {
+		parent::__construct($id, $datasource, $controls_groups, $name, $dom_id, $action, $initial_defaults_url, $form_validators);
         $this->user_id = $user_id;
 		$this->herd_code = $herd_code;
 	}

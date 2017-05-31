@@ -145,6 +145,62 @@ class Events_model extends CI_Model {
     }
 
     /**
+     * @method getOffspringDefaultValues()
+     * @param int event id
+     * @return array of key -> value data
+     * @access public
+     *
+     **/
+    public function getOffspringDefaultValues($event_id){
+        $event_id = (int)$event_id;
+
+        $res = $this->db
+            ->select("
+                   ISNULL((SELECT TOP 1 calf_control_num FROM TD.animal.calving WHERE herd_code=e.herd_code AND sex_cd = 1 ORDER BY id DESC), 0) AS last_cntl_num_female
+                  ,ISNULL((SELECT TOP 1 calf_control_num FROM TD.animal.calving WHERE herd_code=e.herd_code AND sex_cd = 2 ORDER BY id DESC), 0) AS last_cntl_num_male
+                  ,((SELECT TOP 1 control_num FROM TD.animal.id WHERE herd_code=e.herd_code ORDER BY serial_num DESC) + 1) AS next_highest_cntl_num
+
+                  ,e.[event_dt] AS calving_dt
+                  ,e.serial_num
+                  ,COALESCE(emb.[sire_breed_cd], be.[sire_breed_cd], bs.breed_cd) AS sire_breed_cd
+                  ,COALESCE(emb.[sire_country_cd], be.[sire_country_cd], bs.country_cd) AS sire_country_cd
+                  ,COALESCE(emb.[sire_bull_id], be.[sire_id], bs.bull_id) AS sire_id
+                  ,be.[sire_reg_num]
+                  ,COALESCE(emb.[sire_name], be.[sire_name], bs.name) AS sire_name
+                  ,COALESCE(emb.[sire_naab], be.[sire_naab], bs.naab) AS sire_naab
+                  ,be.[conception_dt]
+                  ,be.[breeding_type]
+                  ,be.[breeding_sireID]
+                  ,be.[embryoid]
+                  ,emb.[donor_country_cd] AS [donor_dam_country_cd]
+                  ,emb.[donor_officialid] AS [donor_dam_id]
+                  ,emb.[donor_serial_num] AS [donor_dam_serial_num]
+                  ,emb.[donor_name]
+                  ,COALESCE(emb.donor_breed_cd, be.sire_breed_cd) AS calf_breed_code
+            ")
+//            ->join('TD.animal.events be', 'e.herd_code = be.herd_code AND e.serial_num = be.serial_num AND e.conception_dt = be.event_dt AND be.event_cd IN(32,36)', 'left')
+            ->join('TD.animal.vma_offspring_conception_breedings be', 'e.herd_code = be.herd_code AND e.serial_num = be.serial_num', 'left')
+            ->join('TD.herd.embryos emb', 'be.embryoid = emb.id AND be.herd_code = emb.herd_code', 'left')
+            ->join('TD.herd.breeding_sires bs', 'be.breeding_sireID = bs.id AND be.herd_code = bs.herd_code', 'left')
+            ->where('e.id', $event_id)
+            ->order_by('be.conception_dt', 'desc')
+            ->order_by('be.event_dt', 'desc')
+            ->get("[TD].[animal].[events] e")
+            ->result_array();
+
+        if($res === false){
+            throw new \Exception('Event defaults: ' . $this->db->_error_message());
+        }
+
+        if(isset($res[0]) && is_array($res[0])){
+            //Get default treatments for the event
+            return $res[0];
+        }
+
+        return [];
+    }
+
+    /**
      * @method topBredDate()
      * @param string herd code
      * @param int serial num
@@ -289,7 +345,7 @@ class Events_model extends CI_Model {
      *
      * @param string herd code
      * @param int serial_num
-     * @return array of data for determining event eligibility
+     * @return date conception date
      * @access public
      *
      **/
@@ -320,6 +376,88 @@ class Events_model extends CI_Model {
 
         if(isset($res[0]) && is_array($res[0])) {
             return $res[0]['conception_dt'];
+        }
+
+        return null;
+    }
+
+    /**
+     * @method embryoCost()
+     *
+     * @param string herd code
+     * @param int embryo_id
+     * @return decimal cost of given embryo
+     * @access public
+     *
+     **/
+    public function embryoCost($herd_code, $embryo_id){
+        $herd_code = MssqlUtility::escape($herd_code);
+        $embryo_id = (int)$embryo_id;
+
+        if (!isset($herd_code) || !isset($embryo_id)){
+            throw new Exception('Missing required information');
+        }
+
+        $res = $this->db
+            ->select('TOP 1 unit_cost')
+            ->where('herd_code', $herd_code)
+            ->where('embryoid', $embryo_id)
+            ->where('[transaction_type]', 'P')
+            ->order_by('transaction_dttm', 'desc')
+            ->get('[TD].[herd].[vmat_embryo_trans]')
+            ->result_array();
+
+        if($res === false){
+            return null;
+        }
+        $err = $this->db->_error_message();
+
+        if(!empty($err)){
+            throw new \Exception($err);
+        }
+        if(isset($res[0]) && is_array($res[0])) {
+            return $res[0]['unit_cost'];
+        }
+
+        return null;
+    }
+
+    /**
+     * @method sireCost()
+     *
+     * @param string herd code
+     * @param int sire_id
+     * @return decimal cost of given embryo
+     * @access public
+     *
+     **/
+    public function sireCost($herd_code, $sire_id){
+        $herd_code = MssqlUtility::escape($herd_code);
+        $sire_id = (int)$sire_id;
+
+        if (!isset($herd_code) || !isset($sire_id)){
+            throw new Exception('Missing required information');
+        }
+
+        $res = $this->db
+            ->select('TOP 1 unit_cost')
+            ->where('herd_code', $herd_code)
+            ->where('breeding_sireID', $sire_id)
+            ->where('[transaction_type]', 'P')
+            ->order_by('transaction_dttm', 'desc')
+            ->get('[TD].[herd].[vmat_breeding_sire_trans]')
+            ->result_array();
+
+        if($res === false){
+            return null;
+        }
+        $err = $this->db->_error_message();
+
+        if(!empty($err)){
+            throw new \Exception($err);
+        }
+        if(isset($res[0]) && is_array($res[0])) {
+            return $res[0]['unit_cost'];
         }
 
         return null;

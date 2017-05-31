@@ -49,6 +49,12 @@ class Form implements iForm
     protected $action;
 
     /**
+     * form initial_defaults_url
+     * @var string
+     **/
+    protected $initial_defaults_url;
+
+    /**
      * form validators
      * @var array of FormValidator objects
      **/
@@ -60,13 +66,14 @@ class Form implements iForm
      **/
     protected $control_groups;
 
-    public function __construct($id, $datasource, $control_groups, $name, $dom_id, $action, $form_validators){
+    public function __construct($id, $datasource, $control_groups, $name, $dom_id, $action, $initial_defaults_url, $form_validators){
         $this->id = $id;
         $this->datasource = $datasource;
         $this->control_groups = $control_groups;
         $this->name = $name;
         $this->dom_id = $dom_id;
         $this->action = $action;
+        $this->initial_defaults_url = $initial_defaults_url;
         $this->form_validators = $form_validators;
     }
 
@@ -89,6 +96,7 @@ class Form implements iForm
     public function toArray(){
         $ret['dom_id'] = $this->dom_id;
         $ret['action'] = $this->action;
+        $ret['initial_defaults_url'] = $this->initial_defaults_url;
         $ret['name'] = $this->name;
         $ret['form_id'] = $this->id;
 

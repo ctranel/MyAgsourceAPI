@@ -33,7 +33,7 @@ class Setting_form_model extends CI_Model implements iForm_Model {
         $page_id = (int)$page_id;
 
         $results = $this->db
-            ->select('pb.page_id, b.id, b.name, f.id AS form_id, f.name AS form_name, b.name AS block_name, b.description, dt.name AS display_type, s.name AS scope, b.isactive, b.path, f.dom_id, f.action, pb.list_order')
+            ->select('pb.page_id, b.id, b.name, f.id AS form_id, f.name AS form_name, b.name AS block_name, b.description, dt.name AS display_type, s.name AS scope, b.isactive, b.path, f.dom_id, f.action, f.initial_defaults_url, pb.list_order')
             ->join('users.dbo.blocks b', "pb.block_id = b.id AND b.display_type_id = 6 AND pb.page_id = " . $page_id, 'inner')
             ->join('users.frm.forms f', "b.id = f.block_id", 'inner')
             ->join('users.dbo.lookup_display_types dt', 'b.display_type_id = dt.id', 'inner')
@@ -55,7 +55,7 @@ class Setting_form_model extends CI_Model implements iForm_Model {
         $block_id = (int)$block_id;
 
         $results = $this->db
-            ->select('b.id, b.name, f.id AS form_id, f.name AS form_name, b.name AS block_name, b.description, dt.name AS display_type, s.name AS scope, b.isactive, b.path, f.dom_id, f.action, 1 AS list_order') //pb.page_id, pb.list_order
+            ->select('b.id, b.name, f.id AS form_id, f.name AS form_name, b.name AS block_name, b.description, dt.name AS display_type, s.name AS scope, b.isactive, b.path, f.dom_id, f.action, f.initial_defaults_url, 1 AS list_order') //pb.page_id, pb.list_order
             ->join('users.frm.forms f', "b.id = f.block_id AND b.display_type_id = 6 AND b.id = " . $block_id, 'inner')
             ->join('users.dbo.lookup_display_types dt', 'b.display_type_id = dt.id', 'inner')
             ->join('users.dbo.lookup_scopes s', 'b.scope_id = s.id', 'inner')
@@ -75,7 +75,7 @@ class Setting_form_model extends CI_Model implements iForm_Model {
         $parent_form_id = (int)$parent_form_id;
 
         $results = $this->db
-            ->select('sub.parent_control_name, sub.form_id, sub.form_name, sub.action, sub.dom_id, sub.condition_group_id, sub.condition_group_parent_id, sub.condition_group_operator, sub.condition_id, sub.form_control_name, sub.form_control_name, sub.operator, sub.operand, sub.isactive, s.name AS scope, sub.list_order') //, sub.form_control_name
+            ->select('sub.parent_control_name, sub.form_id, sub.form_name, sub.action, sub.initial_defaults_url, sub.dom_id, sub.condition_group_id, sub.condition_group_parent_id, sub.condition_group_operator, sub.condition_id, sub.form_control_name, sub.form_control_name, sub.operator, sub.operand, sub.isactive, s.name AS scope, sub.list_order') //, sub.form_control_name
             ->join('users.dbo.lookup_scopes s', 'sub.scope_id = s.id', 'inner')
             ->where('sub.isactive', 1)
             ->where('sub.parent_form_id', $parent_form_id)
@@ -117,7 +117,7 @@ class Setting_form_model extends CI_Model implements iForm_Model {
         $form_id = (int)$form_id;
 
         $results = $this->db
-            ->select('b.id, b.name, f.id AS form_id, f.name AS form_name, b.name AS block_name, b.description, dt.name AS display_type, s.name AS scope, b.isactive, b.path, f.dom_id, f.action')
+            ->select('b.id, b.name, f.id AS form_id, f.name AS form_name, b.name AS block_name, b.description, dt.name AS display_type, s.name AS scope, b.isactive, b.path, f.dom_id, f.action, f.initial_defaults_url')
             ->join('users.frm.forms f', "b.id = f.block_id AND f.id = " . $form_id, 'inner')
             ->join('users.dbo.lookup_display_types dt', 'b.display_type_id = dt.id', 'inner')
             ->join('users.dbo.lookup_scopes s', 'b.scope_id = s.id', 'inner')
@@ -136,7 +136,7 @@ class Setting_form_model extends CI_Model implements iForm_Model {
         $form_id = (int)$form_id;
 
         $results = $this->db
-            ->select('f.id AS form_id, f.name AS form_name, f.description, s.name AS scope, f.dom_id, f.action')
+            ->select('f.id AS form_id, f.name AS form_name, f.description, s.name AS scope, f.dom_id, f.action, f.initial_defaults_url')
             //->join('users.frm.forms f', "b.id = f.block_id AND f.id = " . $form_id, 'inner')
             ->join('users.dbo.lookup_scopes s', "f.scope_id = s.id AND f.id = " . $form_id, 'inner')
             ->get('users.frm.forms f')

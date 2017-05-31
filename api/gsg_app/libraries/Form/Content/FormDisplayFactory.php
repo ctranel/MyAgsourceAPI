@@ -213,7 +213,7 @@ class FormDisplayFactory {// implements iFormFactory{
             $control_groups[] = new FormControlGroup($control_group_data[$cgk][0]['control_group'], $control_group_data[$cgk][0]['cg_list_order'], $fc);
         }
 
-        return new Form($form_data['form_id'], $this->datasource, $control_groups, $form_data['form_name'], $form_data['dom_id'], $form_data['action'], $this->formValidators($form_data['form_id']));
+        return new Form($form_data['form_id'], $this->datasource, $control_groups, $form_data['form_name'], $form_data['dom_id'], $form_data['action'], $form_data['initial_defaults_url'], $this->formValidators($form_data['form_id']));
     }
 
     /*
