@@ -48,7 +48,8 @@ class WebBlockFactory {
             return false;
         }
         foreach($results as $r){
-            $blocks[] = new Block($this->supplemental_factory, $block_content[$r['list_order']], $r['id'], $r['name'], $r['description'], $r['display_type'], $r['scope'], $r['isactive'], $r['path']);//,
+            $data_map = $this->datasource_blocks->getBlockDataMapping($r['id']);
+            $blocks[] = new Block($this->supplemental_factory, $block_content[$r['list_order']], $r['id'], $r['name'], $r['description'], $r['display_type'], $r['scope'], $r['isactive'], $r['path'], $data_map);//,
         }
         return $blocks;
     }
@@ -63,7 +64,8 @@ class WebBlockFactory {
             throw new \Exception('No data found for specified block.');
         }
 
-        $block = new Block($this->supplemental_factory, $block_content, $r['id'], $r['name'], $r['description'], $r['display_type'], $r['scope'], $r['isactive'], $r['path']);
+        $data_map = $this->datasource_blocks->getBlockDataMapping($r['id']);
+        $block = new Block($this->supplemental_factory, $block_content, $r['id'], $r['name'], $r['description'], $r['display_type'], $r['scope'], $r['isactive'], $r['path'], $data_map);
         return $block;
     }
 }

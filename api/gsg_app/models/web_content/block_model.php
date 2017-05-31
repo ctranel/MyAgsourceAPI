@@ -109,7 +109,38 @@ class Block_model extends CI_Model {
     }
 
     /**
-     * getKeysByContentId
+     * getParentDataMapping
+     * @param int child block id
+     * @return array of block datapoint mappings
+     * @author ctranel
+     **/
+    public function getBlockDataMapping($child_block_id) {
+        $res = $this->db
+            ->select('pf.db_field_name AS parent_element, cf.db_field_name AS child_element, m.aggregate')
+            ->from('users.dbo.[block_datapoint_map] m')
+            ->join('users.dbo.vma_db_fields_by_block pf', 'm.parent_block_id=pf.block_id AND m.parent_datapoint_id=pf.content_datapoint_id', 'inner')
+            ->join('users.dbo.vma_db_fields_by_block cf', 'm.child_block_id=' . $child_block_id . ' AND m.child_block_id=cf.block_id AND m.child_datapoint_id=cf.content_datapoint_id', 'inner')
+            ->get()
+            ->result_array();
+
+        if($res === false){
+            throw new \Exception('Data mapping not found.');
+        }
+        $err = $this->db->_error_message();
+
+        if(!empty($err)){
+            throw new \Exception($err);
+        }
+
+        if(isset($res[0]) && is_array($res[0])) {
+            return $res;
+        }
+
+        return [];
+    }
+
+    /**
+     * getDisplayDataByContent
      * @param string content category
      * @param int content id
      * @return array of db field names

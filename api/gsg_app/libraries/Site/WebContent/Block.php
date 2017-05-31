@@ -92,14 +92,20 @@ class Block implements iBlock {
 	 **/
 	protected $block_content;
 
+    /**
+     * datapoint_map
+     * @var array @todo: create object?
+     **/
+    protected $datapoint_map;
 
-	/**
+
+    /**
 	 * __construct
 	 *
 	 * @return void
 	 * @author ctranel
 	 **/
-	public function __construct(SupplementalFactory $supplemental_factory, $block_content, $id, $name, $description, $display_type, $scope, $active, $path) { //
+	public function __construct(SupplementalFactory $supplemental_factory, $block_content, $id, $name, $description, $display_type, $scope, $active, $path, $datapoint_map) { //
 		$this->id = $id;
 		//$this->page_id = $page_id;
 		$this->name = $name;
@@ -112,7 +118,7 @@ class Block implements iBlock {
 
         $this->supplemental_factory = $supplemental_factory;
         $this->supplemental = $this->supplemental_factory->getBlockSupplemental($this->id);
-
+        $this->datapoint_map = $datapoint_map;
 	}
 	
 	public function id(){
@@ -158,6 +164,9 @@ class Block implements iBlock {
         $ret['display_type'] = $this->display_type;
         $ret['path'] = $this->path;
 //            'has_benchmark' => $this->has_benchmark;
+        if(!empty($this->datapoint_map)){
+            $ret['datapoint_map'] = $this->datapoint_map;
+        }
 
         $tmp = array_filter($this->supplemental->toArray());
         if(is_array($tmp) && !empty($tmp)){
