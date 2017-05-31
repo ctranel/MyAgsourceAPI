@@ -169,4 +169,73 @@ class events extends dpage {
         $msg = new ResponseMessage('Event date minus days bred (' . $dtDate_bred->format('m-d-Y') . ') must be later than the most recent fresh date or birthdate (' . $dtLact_date->format('m-d-Y') . ').', 'error');
         $this->sendResponse(200, [$msg]);
     }
+
+    function embryo_cost(){
+        $input = $this->input->userInputArray();
+        if(empty($input) || count($input) == 0){
+            $this->sendResponse(400, new ResponseMessage('No data sent with request.', 'error'));
+        }
+
+        try {
+            $cost = (float)$this->events_model->embryoCost($input['herd_code'], $input['embryoid']);
+            if($cost == null){
+                $cost = 0.00;
+            }
+        }
+        catch(exception $e){
+            $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
+        }
+
+        if(!empty($cost) || $cost === 0.00){
+            $this->sendResponse(200, null, ['defaults' => ['embryo_cost' => number_format($cost, 2)]]);
+        }
+
+        $msg = new ResponseMessage('No cost data found for selected embryo.', 'notice');
+        $this->sendResponse(202, [$msg]);
+    }
+
+    function sire_cost(){
+        $input = $this->input->userInputArray();
+        if(empty($input) || count($input) == 0){
+            $this->sendResponse(400, new ResponseMessage('No data sent with request.', 'error'));
+        }
+
+        try {
+            $cost = (float)$this->events_model->sireCost($input['herd_code'], $input['breeding_sireid']);
+            if($cost == null){
+                $cost = 0.00;
+            }
+        }
+        catch(exception $e){
+            $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
+        }
+
+        if(!empty($cost) || $cost === 0.00){
+            $this->sendResponse(200, null, ['defaults' => ['sire_cost' => number_format($cost, 2)]]);
+        }
+
+        $msg = new ResponseMessage('No cost data found for selected sire.', 'notice');
+        $this->sendResponse(202, [$msg]);
+    }
+
+    function offspring_defaults(){
+        $input = $this->input->userInputArray();
+        if(empty($input) || count($input) == 0){
+            $this->sendResponse(400, new ResponseMessage('No data sent with request.', 'error'));
+        }
+//var_dump($input); die;
+        if(!isset($input['animal_event_id']) || empty($input['animal_event_id'])){
+            $this->sendResponse(204);
+        }
+
+        try{
+            $herd_events = new HerdEvents($this->events_model, $input['herd_code']);
+            $defaults = $herd_events->getOffspringDefaultValues($input['animal_event_id']);
+        }
+        catch(exception $e){
+            $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
+        }
+
+        $this->sendResponse(200, null, ['defaults' => $defaults]);
+    }
 }
