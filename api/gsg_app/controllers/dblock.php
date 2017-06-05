@@ -91,7 +91,7 @@ class dblock extends dpage {
             $block = $web_block_factory->getBlock($block_id, $block_content);
         }
         catch(\Exception $e){
-            $this->sendResponse(404, new ResponseMessage($e->getMessage(), 'error'));
+            $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
         }
         $this->sendResponse(200, $this->message, $block->toArray());
 
