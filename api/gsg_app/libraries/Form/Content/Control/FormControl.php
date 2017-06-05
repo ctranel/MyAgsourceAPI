@@ -115,12 +115,6 @@ class FormControl implements iFormControl
     protected $add_option_form_id;
 
     /**
-     * program_triggers_change
-     * @var boolean
-     **/
-    protected $program_triggers_change;
-
-    /**
      * validators
      * @var Validator[]
      **/
@@ -169,7 +163,6 @@ class FormControl implements iFormControl
         $this->is_generated = (bool)(isset($control_data['is_generated']) ? $control_data['is_generated'] : false);
         $this->is_key = (bool)(isset($control_data['is_key']) ? $control_data['is_key'] : false);
         $this->batch_variable_type = $control_data['batch_variable_type'];
-        $this->program_triggers_change = (isset($control_data['program_triggers_change']) ? (bool)$control_data['program_triggers_change'] : null);
         $this->biz_validation_url = (isset($control_data['biz_validation_url']) ? $control_data['biz_validation_url'] : null);
         $this->form_defaults_url = (isset($control_data['form_defaults_url']) ? $control_data['form_defaults_url'] : null);
         $this->add_option_form_id = (isset($control_data['add_option_form_id']) ? $control_data['add_option_form_id'] : null);
@@ -348,7 +341,6 @@ class FormControl implements iFormControl
             'biz_validation_url' => $this->biz_validation_url,
             'form_defaults_url' => $this->form_defaults_url,
             'add_option_form_id' => $this->add_option_form_id,
-            'program_triggers_change' => $this->program_triggers_change,
         ];
 
         if(isset($this->options)){

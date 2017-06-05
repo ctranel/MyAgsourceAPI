@@ -236,7 +236,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
             $editable_text = '0 AS is_editable';
         }
 
-        $results = $this->db->select('cg.label AS control_group, cg.list_order AS cg_list_order, fc.id, ct.name AS control_type, fld.db_field_name AS name, fc.label, ' . $editable_text . ', fld.is_generated, fld.is_fk_field AS is_key, fld.data_type, fc.biz_validation_url, fc.form_defaults_url, fc.add_option_form_id, fc.default_value, fc.batch_variable_type, fc.program_triggers_change, ld.lookup_url AS dependency_lookup_url, dfld.db_field_name AS dependent_form_control_name')
+        $results = $this->db->select('cg.label AS control_group, cg.list_order AS cg_list_order, fc.id, ct.name AS control_type, fld.db_field_name AS name, fc.label, ' . $editable_text . ', fld.is_generated, fld.is_fk_field AS is_key, fld.data_type, fc.biz_validation_url, fc.form_defaults_url, fc.add_option_form_id, fc.default_value, fc.batch_variable_type, ld.lookup_url AS dependency_lookup_url, dfld.db_field_name AS dependent_form_control_name')
             ->select("(CAST(
                   (SELECT STUFF((
                       SELECT '|', CONCAT(v.name, ':', v.value) AS [data()] 
@@ -282,7 +282,7 @@ class Data_entry_model extends CI_Model implements iForm_Model {
     public function getControlMetaById($control_id) {
         $control_id = (int)$control_id;
 
-        $results = $this->db->select('fc.id, ct.name AS control_type, fld.data_type, fld.db_field_name AS name, fc.label, fld.is_editable, fld.is_generated, fld.is_fk_field AS is_key, fc.biz_validation_url, fc.form_defaults_url, fc.add_option_form_id, fc.default_value, fc.batch_variable_type, fc.program_triggers_change')
+        $results = $this->db->select('fc.id, ct.name AS control_type, fld.data_type, fld.db_field_name AS name, fc.label, fld.is_editable, fld.is_generated, fld.is_fk_field AS is_key, fc.biz_validation_url, fc.form_defaults_url, fc.add_option_form_id, fc.default_value, fc.batch_variable_type')
             ->select("(CAST(
                   (SELECT STUFF((
                       SELECT '|', CONCAT(v.name, ':', v.value) AS [data()] 
@@ -676,6 +676,12 @@ class Data_entry_model extends CI_Model implements iForm_Model {
             }
         }
 
+        //@todo: find a better way.  See view's trigger for details
+        if($table_name === 'TD.animal.vmat_calving'){
+            $tmp_table_schema[] = 'serial_num INT';
+        }
+
+
         //need the commented select statement to trigger a return value.  temp table is used in updatable views to return key data
         if(!empty($tmp_table_schema)){
             $sql = "--SELECT;
@@ -690,7 +696,8 @@ class Data_entry_model extends CI_Model implements iForm_Model {
                 INSERT " . $table_name . " (" . implode(', ', array_keys($insert_vals)) . ")
                 VALUES (" . implode(", ", $insert_vals) . ");";
         }
-//print($sql);die($sql);
+//print($sql);
+//die($sql);
         $res = $this->db->query($sql);
 
         if($res === false){
