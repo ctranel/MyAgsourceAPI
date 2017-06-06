@@ -20,6 +20,8 @@ interface iDataField {
 	function dbFieldName();
 	function dataType();
     function isKey();
+    function label();
+    function toArray();
 }
 
 ?>

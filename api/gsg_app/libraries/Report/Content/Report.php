@@ -198,25 +198,25 @@ abstract class Report implements iReport {
 	 * @return void
 	 * @author ctranel
 	 **/
-	public function __construct($report_datasource, $id, $path, $max_rows, $cnt_row, $sum_row, $avg_row, $bench_row,
-            $is_summary, $display_type, ReportFilters $filters, SupplementalFactory $supp_factory, DataHandler $data_handler, DbTableFactory $db_table_factory, $field_groups = null) {//$id, $page_id, $name, $description, $scope, $active, $path, 
+	public function __construct($report_datasource, $report_meta, ReportFilters $filters, SupplementalFactory $supp_factory, DataHandler $data_handler, DbTableFactory $db_table_factory, iDataField $pivot_field = null, $field_groups = null) {//$id, $page_id, $name, $description, $scope, $active, $path,
 		$this->datasource = $report_datasource;
 
-		$this->id = $id;
-		$this->max_rows = $max_rows;
-		$this->cnt_row = $cnt_row;
-		$this->sum_row = $sum_row;
-		$this->avg_row = $avg_row;
-		$this->bench_row = $bench_row;
-		$this->is_summary = $is_summary;
+		$this->id = $report_meta['id'];
+		$this->max_rows = $report_meta['max_rows'];
+		$this->cnt_row = $report_meta['cnt_row'];
+		$this->sum_row = $report_meta['sum_row'];
+		$this->avg_row = $report_meta['avg_row'];
+		$this->bench_row = $report_meta['bench_row'];
+		$this->is_summary = $report_meta['is_summary'];
 		$this->field_groups = $field_groups;
 		//$this->group_by_fields = $group_by_fields;
 		//$this->where_fields = $group_by_fields;
-		$this->display_type = $display_type;
+		$this->display_type = $report_meta['display_type'];
         $this->filters = $filters;
         $this->data_handler = $data_handler;
         $this->db_table_factory = $db_table_factory;
         $this->has_aggregate = false;
+        $this->pivot_field = $pivot_field;
         $this->report_fields = [];
 
         /*
@@ -246,16 +246,16 @@ abstract class Report implements iReport {
         $this->verifyFilters();
 
         $this->appended_rows_count = 0;
-		if ($cnt_row) {
+		if ($report_meta['cnt_row']) {
 		    $this->appended_rows_count++;
 		}
-		if ($sum_row) {
+		if ($report_meta['sum_row']) {
 		    $this->appended_rows_count++;
 		}
-		if ($avg_row) {
+		if ($report_meta['avg_row']) {
 		    $this->appended_rows_count++;
 		}
-		if ($bench_row) {
+		if ($report_meta['bench_row']) {
 		    $this->appended_rows_count++;
 		}
 	}
@@ -280,7 +280,9 @@ abstract class Report implements iReport {
 		return $this->max_rows;
 	}
 	public function pivotFieldName(){
-		return $this->pivot_field->dbFieldName();
+		if($this->pivot_field instanceof iDataField){
+            return $this->pivot_field->dbFieldName();
+        }
 	}
 
 	public function primaryTableName(){
@@ -397,7 +399,33 @@ abstract class Report implements iReport {
         return $ret;
     }
 
-	public function getAppendedRowsCount(){
+    public function getFieldLabelByName($field_name){
+        if(!isset($this->report_fields) || count($this->report_fields) === 0){
+            return null;
+        }
+
+        foreach($this->report_fields as $f){
+            if($f->dbFieldName() == $field_name){
+                return $f->displayName();
+            }
+        }
+        return null;
+    }
+
+    public function getFieldFormatByName($field_name){
+        if(!isset($this->report_fields) || count($this->report_fields) === 0){
+            return null;
+        }
+
+        foreach($this->report_fields as $f){
+            if($f->dbFieldName() == $field_name){
+                return $f->displayFormat();
+            }
+        }
+        return null;
+    }
+
+    public function getAppendedRowsCount(){
 	    return $this->appended_rows_count;
 	}
 	
@@ -441,7 +469,7 @@ abstract class Report implements iReport {
      **/
     public function toArray(){
         $ret['report_id'] = $this->id;
-        $ret['pivot_field'] = $this->pivot_field;
+        $ret['pivot_field'] = $this->pivot_field instanceof iDataField ? $this->pivot_field->dbFieldName() : null;
         $ret['is_summary'] = $this->is_summary;
         $ret['display_type'] = $this->display_type;
 //        $ret['appended_rows_count'] = $this->appended_rows_count;
@@ -485,8 +513,35 @@ abstract class Report implements iReport {
 			$data = [];
 			foreach($this->report_fields as $k=>$f){
 				$data[$f->dbFieldName()] = $f->toArray();
+                $key_map[] = $f->dbFieldName();
 			}
-			$ret['metadata'] = $data;
+
+            $ret['metadata'] = $data;
+
+			if($this->hasPivot()) {
+                $pdata = [];
+                $tmp = current($this->dataset);
+                foreach($tmp as $k => $v){
+                    $pdata[$k] = [
+                        'aggregate' => null,
+                        'datatype' => null,
+                        'db_field_name' => null,
+                        'decimal_scale' => null,
+                        'default_sort_order' => null,
+                        'description' => null,
+                        'display_format' => null,
+                        'is_displayed' => 1,
+                        'is_natural_sort' => 0,
+                        'is_sortable' => 0,
+                        'is_timespan' => 0,
+                        'max_length' => null,
+                        'name' => null,
+                        'unit_of_measure' => null,
+                    ];
+                }
+
+                $ret['metadata'] = $pdata;
+            }
 		}
 
         return $ret;
@@ -900,16 +955,6 @@ abstract class Report implements iReport {
 		return $this->bench_row;
 	}
 	
-	/**
-	 * @method setPivot()
-	 * @param iDataField pivot field
-	 * @return void
-	 * @access public
-	* */
-	public function setPivot(iDataField $pivot_field){
-		$this->pivot_field = $pivot_field;
-	}
-
     /**
      * setDataset
      *

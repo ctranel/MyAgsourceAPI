@@ -53,12 +53,10 @@ class TableData extends ReportData {
 	
 	/**
 	 * @method getData()
-	 * @param array - key-value pairs for criteria
 	 * @return array of data for the chart
 	 * @access public
 	 * 
-	 *@todo: criteria param should be removed when filter data is included in object
-     * @todo: when moving away from html being sent from server, split this into "setData" and "getData", so that "prepData" can optionally be called in between
+    * @todo: when moving away from html being sent from server, split this into "setData" and "getData", so that "prepData" can optionally be called in between
 	 **/
     public function getData(){
 		$criteria_key_value = $this->report->filterKeysValues();

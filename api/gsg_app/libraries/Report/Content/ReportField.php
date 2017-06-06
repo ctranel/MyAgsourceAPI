@@ -16,7 +16,7 @@ use myagsource\Supplemental\Content\Supplemental;
  * Description:  Metadata typically associated with data storage for data fields..
  *
  */
-abstract class ReportField {
+class ReportField {
 	/**
 	 * id
 	 * @var int
@@ -139,7 +139,11 @@ abstract class ReportField {
 		return $this->is_displayed;
 	}
 
-	public function isNumeric() {
+    public function displayFormat() {
+        return $this->display_format;
+    }
+
+    public function isNumeric() {
 		return $this->data_field->isNumeric();
 	}
 
@@ -154,8 +158,8 @@ abstract class ReportField {
 	public function unitOfMeasure() {
 		return $this->data_field->unitOfMeasure();
 	}
-	
-	public function dbTableName() {
+
+    public function dbTableName() {
 		return $this->data_field->dbTableName();
 	}
 	

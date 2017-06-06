@@ -9,6 +9,7 @@ require_once(APPPATH . 'libraries/Report/Content/Table/Header/TableHeader.php');
 
 use \myagsource\Datasource\DbObjects\DbTableFactory;
 use \myagsource\DataHandler;
+use \myagsource\Datasource\iDataField;
 use \myagsource\Datasource\DbObjects\DbField;
 use \myagsource\Report\Content\Table\TableField;
 use \myagsource\Report\Content\Report;
@@ -39,12 +40,10 @@ class Table extends Report {
 	 **/
 	protected $top_row;
 	
-	function __construct($table_datasource, $id, $path, $max_rows, $cnt_row, $sum_row, $avg_row, $bench_row,
-			$is_summary, $display_type, ReportFilters $filters, SupplementalFactory $supp_factory = null, DataHandler $data_handler, DbTableFactory $db_table_factory, $field_groups) {
-		parent::__construct($table_datasource, $id, $path, $max_rows, $cnt_row,
-			$sum_row, $avg_row, $bench_row, $is_summary, $display_type, $filters, $supp_factory, $data_handler, $db_table_factory, $field_groups);
+	function __construct($table_datasource, $report_meta, ReportFilters $filters, SupplementalFactory $supp_factory = null, DataHandler $data_handler, DbTableFactory $db_table_factory, iDataField $pivot_field = null, $field_groups) {
+		parent::__construct($table_datasource, $report_meta, $filters, $supp_factory, $data_handler, $db_table_factory, $pivot_field, $field_groups);
 		
-        $this->setDataset($path);
+        $this->setDataset($report_meta['path']);
         $this->setTableHeader();
 	}
 	
@@ -68,11 +67,15 @@ class Table extends Report {
         $this->table_header = new TableHeader($this, $header_groups, $this->supplemental_factory);
 		
 		$top_row = null;
+
+///var_dump($this->getFieldFormatByName($this->pivot_field->dbFieldName()));
+
 		if($this->hasPivot() && is_array($this->dataset) && !empty($this->dataset)){
 			reset($this->dataset);
 			$tmp_key = key($this->dataset);
 			//add placeholder for column generated from header row
-			$this->top_row = array_merge([''],$this->dataset[$tmp_key]);
+			$this->top_row = $this->dataset[$tmp_key];
+            ksort($this->top_row);
 			unset($this->dataset[$tmp_key]);
 		}
 	}
@@ -107,8 +110,10 @@ class Table extends Report {
 	 *
 	 **/
 	public function getTableHeaderData($report_count){
-		return [
-			'structure' => $this->table_header->getTableHeaderStructure($this->top_row),
+        $header_data_format = $this->getFieldFormatByName($this->pivotFieldName());
+
+        return [
+			'structure' => $this->table_header->getTableHeaderStructure($this->top_row, $header_data_format),
 			'block' => $this,
 			'report_count' => $report_count
 		];
@@ -123,7 +128,8 @@ class Table extends Report {
 	 *
 	 **/
 	public function getTableHeaderLeafs(){
-		$header_leafs = $this->table_header->getHeaderLeafs($this->top_row);
+        $header_data_format = $this->getFieldFormatByName($this->pivotFieldName());
+		$header_leafs = $this->table_header->getHeaderLeafs($this->top_row, $header_data_format);
 		return $header_leafs;
 	}
 
@@ -150,8 +156,10 @@ class Table extends Report {
      **/
     public function toArray(){
         $ret = parent::toArray();
+        $header_data_format = $this->getFieldFormatByName($this->pivotFieldName());
+
         if(isset($this->table_header)){
-            $this->table_header->getTableHeaderStructure($this->top_row);
+            $this->table_header->getTableHeaderStructure($this->top_row, $header_data_format);
             $ret['table_header'] = $this->table_header->toArray();
         }
         if(is_array($this->report_fields) && !empty($this->report_fields)){

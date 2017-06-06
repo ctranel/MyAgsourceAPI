@@ -26,21 +26,20 @@ class Cowpopulations extends TableData {
 		$new_dataset = parent::pivot($arr_dataset);
 
 		//Remove columns that were used only to pull summary data
-		unset($new_dataset['l1_avg_calving_cnt']);
-		unset($new_dataset['l4_avg_calving_cnt']);
-		unset($new_dataset['l0_avg_calving_cnt']);
+		unset($new_dataset[3]); //l1_avg_calving_cnt
+		unset($new_dataset[4]); //l4_avg_calving_cnt
+		unset($new_dataset[5]); //l0_avg_calving_cnt
 
 		//Insert summary data into dataset
-		$new_dataset['fresh_month'][] = 'Annual Average';
-		$new_dataset['l1_calving_cnt'][] = $l1_avg_calving_cnt;
-		$new_dataset['l4_calving_cnt'][] = $l4_avg_calving_cnt;
-		$new_dataset['l0_calving_cnt'][] = $l0_avg_calving_cnt;
-		$new_dataset['fresh_month'][] = 'Annual Total';
-		$new_dataset['l1_calving_cnt'][] = $l1_tot_calving_cnt;
-		$new_dataset['l4_calving_cnt'][] = $l4_tot_calving_cnt;
-		$new_dataset['l0_calving_cnt'][] = $l0_tot_calving_cnt;
+		$new_dataset[6][] = 'Annual Average'; //fresh_month
+		$new_dataset[0][] = $l1_avg_calving_cnt; //l1_calving_cnt
+		$new_dataset[1][] = $l4_avg_calving_cnt; //l4_calving_cnt
+		$new_dataset[2][] = $l0_avg_calving_cnt; //l0_calving_cnt
+		$new_dataset[6][] = 'Annual Total';
+		$new_dataset[0][] = $l1_tot_calving_cnt;
+		$new_dataset[1][] = $l4_tot_calving_cnt;
+		$new_dataset[2][] = $l0_tot_calving_cnt;
 
 		return $new_dataset;
-		//
 	}
 }

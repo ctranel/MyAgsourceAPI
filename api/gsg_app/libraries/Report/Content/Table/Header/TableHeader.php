@@ -134,7 +134,7 @@ class TableHeader {
 	 *  @param array representing alternative header row
 	 *  @access public
 	 **/
-	public function getTableHeaderStructure($alt_header = null){
+	public function getTableHeaderStructure($alt_header = null, $header_data_format = null){
 		//pivoted tables will generate their own header
 		if($this->report->hasPivot()){
 			$this->arr_columns = $alt_header;
@@ -145,7 +145,7 @@ class TableHeader {
 		
 		$depth = 0;
 		$rowspan = 1;
-		$this->setTableHeaderGroups();
+		$this->setTableHeaderGroups($header_data_format);
 
 		$tot_levels = array_depth($this->header_group_fields);
 		$this->getHeaderLayer($this->header_group_fields, $depth, $rowspan, $tot_levels, []);
@@ -160,8 +160,8 @@ class TableHeader {
 	 *  @param array representing alternative header row
 	 *  @access public
 	 **/
-	public function getHeaderLeafs($alt_header = null){
-		$this->getTableHeaderStructure($alt_header);
+	public function getHeaderLeafs($alt_header = null, $header_data_format = null){
+		$this->getTableHeaderStructure($alt_header, $header_data_format);
 		$result = [];
 		
 		array_walk_recursive(
@@ -178,12 +178,14 @@ class TableHeader {
 	 * setTableHeaderGroups
 	 * 
 	 * Sets object's header_group_fields property based on the report's field list.
+     *
+     * @param: format of data used in header (in pivoted tables)
 	 * 
 	 * @return void
 	 * @author ctranel
 	 * 
 	 **/
-	protected function setTableHeaderGroups(){
+	protected function setTableHeaderGroups($header_data_format = null){
 		if(is_array($this->header_groups) && !empty($this->header_groups)){
 			foreach($this->header_groups as $h){
 				$header_group_supplemental = null;
@@ -197,7 +199,10 @@ class TableHeader {
 				}
 				//else it is inserted into the parent array
 				else{
-					//$this->nest($this->header_group_fields, new TableHeaderCell($h['id'], $h['parent_id'], $h['text']));//, 'pdf_width' => 0];
+					if(isset($header_data_format)){
+
+                    }
+                    //$this->nest($this->header_group_fields, new TableHeaderCell($h['id'], $h['parent_id'], $h['text']));//, 'pdf_width' => 0];
 					$this->nest($this->header_group_fields, ['id' => $h['id'], 'parent_id' => $h['parent_id'], 'db_field_name' => null, 'text' => $h['text'], 'pdf_width' => 0, 'supplemental' => $header_group_supplemental]);
 				}
 			}
@@ -214,8 +219,9 @@ class TableHeader {
 			}
 		}
 		if(is_array($this->arr_columns)){ //used when table is pivoted
-			foreach($this->arr_columns as $f){
-				$this->addLeaf($this->header_group_fields, null, ['children' => ['id' => null, 'parent_id' => null, 'db_field_name' => null, 'text' => $f, 'pdf_width' => null, 'is_sortable' => false, 'is_displayed' => true, 'default_sort_order' => null, 'supplemental' => null]]);
+			foreach($this->arr_columns as $k=>$f){
+				$f = $this->formatHeaderLabel($f, $header_data_format);
+                $this->addLeaf($this->header_group_fields, null, ['children' => ['id' => null, 'parent_id' => null, 'db_field_name' => $k, 'text' => $f, 'pdf_width' => null, 'is_sortable' => false, 'is_displayed' => true, 'default_sort_order' => null, 'supplemental' => null]]);
 			}
 		}
 	}
@@ -377,8 +383,41 @@ class TableHeader {
 		}
 		return;
 	}
-	
-	/**
+
+    /**
+     * formatHeaderLabel
+     *
+     * inserts leaf at appropriate point in nested array
+     *
+     * @param string value to be formatted
+     * @param string format
+      * @return void
+     * @author ctranel
+     */
+    protected function formatHeaderLabel($value, $format){
+        if (!isset($value) || !isset($format)){
+            return $value;
+        }
+
+        if($format === "MM-dd-yy" || $format === "MMM-yy"){
+            try{
+               $date = new \DateTime($value);
+            }
+            catch(\Exception $e){ //if formatting fails, return original value
+                return $value;
+            }
+
+            if($format === "MM-dd-yy"){
+                return $date->format('m-d-y');
+            }
+            if($format === "MMM-yy"){
+                return $date->format('M y');
+            }
+        }
+        return $value;
+    }
+
+    /**
 	 * mergeDateIntoHeader
 	 *
 	 * merges dynamic date list into headers

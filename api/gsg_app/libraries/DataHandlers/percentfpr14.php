@@ -21,9 +21,9 @@ class Percentfpr14 extends TableData {
 		$new_dataset = parent::pivot($arr_dataset);
 
 		//Insert summary data into dataset
-		$new_dataset['fresh_month'][] = 'Annual Average';
-		$new_dataset['l1_ffp_ratio_gt14_pct'][] = $avg_l1_ffp_ratio_gt14_pct;
-		$new_dataset['l4_ffp_ratio_gt14_pct'][] = $avg_l4_ffp_ratio_gt14_pct;
+		$new_dataset[2][] = 'Annual Average'; //fresh_month
+		$new_dataset[0][] = $avg_l1_ffp_ratio_gt14_pct; //l1_ffp_ratio_gt14_pct
+		$new_dataset[1][] = $avg_l4_ffp_ratio_gt14_pct; //l4_ffp_ratio_gt14_pct
 
 		return $new_dataset;
 	}

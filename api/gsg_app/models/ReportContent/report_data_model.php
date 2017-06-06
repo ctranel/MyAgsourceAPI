@@ -107,7 +107,7 @@ class Report_data_model extends CI_Model {
         //uncomment to dump search query to screen
             //$this->db->select('d');
 
-//echo $this->db->get_compiled_select(); die;
+//echo $this->db->get_compiled_select(); //die;
 	}
 	
 	/** function prepWhereCriteria

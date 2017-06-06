@@ -50,12 +50,12 @@ abstract class ReportData implements iReportData{
 	 * 
 	 * @return array of sql-prepped select fields
 	 * @author ctranel
-	 **/
 	protected function prepSelectFields(){
 die('ReportData->prepSelectFields');
 		//nothing that applies to both graphs and tables yet
 	}
-	
+**/
+
 	/** function whereCriteria
 	 *
 	 * translates filter criteria into sql format
@@ -133,20 +133,31 @@ die('ReportData->prepSelectFields');
 		if(!isset($arr_dataset) || empty($arr_dataset)){
 			return false;
 		}
+
+		//map the keys to a numeric array so they are an array of objects like non-pivoted datasets
+        $tmp = current($arr_dataset);
+        //if(($key = array_search($header_field, $key_map)) !== false) {
+            unset($tmp[$header_field]);
+        //}
+        $key_map = array_keys($tmp);
+        $key_map[] = $header_field;
+        $key_map = array_flip($key_map);
+
 		foreach($arr_dataset as $k => $row){
 			foreach($row as $name => $val){
-				if(strpos($name, 'isnull') === false && isset($row[$header_field]) && !empty($row[$header_field])) { //2nd part eliminates rows where fresh date is null (FCS)
-					$new_dataset[$name][$k] = $val;
-					if(isset($sum[$name]) === false && $val !== null){
-						$sum[$name] = 0;
-						$count[$name] = 0;
+                if(strpos($name, 'isnull') === false && isset($row[$header_field]) && !empty($row[$header_field])) { //2nd part eliminates rows where fresh date is null (FCS)
+					$new_dataset[$key_map[$name]][$k] = $val;
+					if(isset($sum[$key_map[$name]]) === false && $val !== null){
+						$sum[$key_map[$name]] = 0;
+						$count[$key_map[$name]] = 0;
 					} 
 					
 					if($val !== NULL){
-						$sum[$name] += $val;
-						$count[$name]++;
-					} 
-				}				
+						$sum[$key_map[$name]] += $val;
+						$count[$key_map[$name]]++;
+					}
+                    $new_dataset[$key_map[$name]]['0'] = $this->report->getFieldLabelByName($name);
+				}
 			}
 		}
 

@@ -25,24 +25,23 @@ class Numbersoldordied extends TableData {
 		$l4_died_pct = $arr_dataset[0]['l4_died_60_dim_pct'];
 		
 		$new_dataset = parent::pivot($arr_dataset);
-
 		//Remove columns that were used only to pull summary data
-		unset($new_dataset['l1_left_60_dim_pct']);
-		unset($new_dataset['l4_left_60_dim_pct']);
-		unset($new_dataset['l1_died_60_dim_pct']);
-		unset($new_dataset['l4_died_60_dim_pct']);
+		unset($new_dataset[4]); //l1_left_60_dim_pct
+		unset($new_dataset[5]); //l4_left_60_dim_pct
+		unset($new_dataset[6]); //l1_died_60_dim_pct
+		unset($new_dataset[7]); //l4_died_60_dim_pct
 
 		//Insert summary data into dataset
-		$new_dataset['fresh_month'][] = 'Total';
-		$new_dataset['l1_sold_60_dim_cnt'][] = $l1_sold_cnt;
-		$new_dataset['l1_died_60_dim_cnt'][] = $l1_died_cnt;
-		$new_dataset['l4_sold_60_dim_cnt'][] = $l4_sold_cnt;
-		$new_dataset['l4_died_60_dim_cnt'][] = $l4_died_cnt;
-		$new_dataset['fresh_month'][] = 'Percent';
-		$new_dataset['l1_sold_60_dim_cnt'][] = $l1_sold_pct;
-		$new_dataset['l1_died_60_dim_cnt'][] = $l1_died_pct;
-		$new_dataset['l4_sold_60_dim_cnt'][] = $l4_sold_pct;
-		$new_dataset['l4_died_60_dim_cnt'][] = $l4_died_pct;
+		$new_dataset[8][] = 'Total'; //fresh_month
+		$new_dataset[0][] = $l1_sold_cnt; //l1_sold_60_dim_cnt
+		$new_dataset[1][] = $l1_died_cnt; //l1_died_60_dim_cnt
+		$new_dataset[2][] = $l4_sold_cnt; //l4_sold_60_dim_cnt
+		$new_dataset[3][] = $l4_died_cnt; //l4_died_60_dim_cnt
+		$new_dataset[8][] = 'Percent';
+		$new_dataset[0][] = $l1_sold_pct;
+		$new_dataset[1][] = $l1_died_pct;
+		$new_dataset[2][] = $l4_sold_pct;
+		$new_dataset[3][] = $l4_died_pct;
 
 		return $new_dataset;
 	}

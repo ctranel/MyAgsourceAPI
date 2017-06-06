@@ -17,7 +17,6 @@ class Newinfectionsanddrycures extends TableData {
 	 * @return array pivoted resultset
 	 * @author ctranel
 	 * 
-	 * @todo: update code to match refactored code
 	 */
 	public function pivot($arr_dataset){
 		$avg_l1_1st_new_infection_pct = $arr_dataset[0]['l1_1st_new_infection_pct'];
@@ -28,10 +27,10 @@ class Newinfectionsanddrycures extends TableData {
 		$new_dataset = parent::pivot($arr_dataset);
 
 		//update total field in new dataset
-		$new_dataset['fresh_month'][] = 'Average';
-		$new_dataset['l1_1st_new_infection_pct'][] = $avg_l1_1st_new_infection_pct;
-		$new_dataset['l4_1st_new_infection_pct'][] = $avg_l4_1st_new_infection_pct;
-		$new_dataset['l4_dry_cow_cured_pct'][] = $avg_l4_dry_cow_cured_pct;
+		$new_dataset[3][] = 'Average'; //fresh_month
+		$new_dataset[0][] = $avg_l1_1st_new_infection_pct; //l1_1st_new_infection_pct
+		$new_dataset[1][] = $avg_l4_1st_new_infection_pct; //l4_1st_new_infection_pct
+		$new_dataset[2][] = $avg_l4_dry_cow_cured_pct; //l4_dry_cow_cured_pct
 		
 		return $new_dataset;
 	}

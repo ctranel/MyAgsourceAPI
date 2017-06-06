@@ -71,18 +71,16 @@ class Chart extends Report {
 	
 	/**
 	 */
-	function __construct($report_datasource, $id, $path, $max_rows, $cnt_row, $sum_row, $avg_row, $bench_row, 
-		    $is_summary, $display_type, $chart_type, ReportFilters $filters, SupplementalFactory $supp_factory, DataHandler $data_handler, DbTableFactory $db_table_factory, $field_groups, $keep_nulls) {
-		parent::__construct($report_datasource, $id, $path, $max_rows, $cnt_row,
-			$sum_row, $avg_row, $bench_row, $is_summary, $display_type, $filters, $supp_factory, $data_handler, $db_table_factory, $field_groups);
+	function __construct($report_datasource, $report_meta, ReportFilters $filters, SupplementalFactory $supp_factory, DataHandler $data_handler, DbTableFactory $db_table_factory, iDataField $pivot_field = null, $field_groups, $keep_nulls) {
+		parent::__construct($report_datasource, $report_meta, $filters, $supp_factory, $data_handler, $db_table_factory, $pivot_field, $field_groups);
 		
 		$this->keep_nulls = $keep_nulls;
-		$this->chart_type = $chart_type;
+		$this->chart_type = $report_meta['chart_type'];
 		$this->x_axes = [];
 		$this->y_axes = [];
 		$this->setChartAxes();
 		$this->setSeries();
-        $this->setDataset($path);
+        $this->setDataset($report_meta['path']);
 	}
 
 	public function keepNulls(){

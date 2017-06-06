@@ -141,21 +141,22 @@ class ReportFactory {
 	 * @author ctranel
 	 * @returns \myagsource\Report\iReport
 	 */
-	protected function dataToObject($report_data){
-		$field_groups = $this->datasource_reports->getFieldGroupData($report_data['id']);
+	protected function dataToObject($report_meta){
+		$field_groups = $this->datasource_reports->getFieldGroupData($report_meta['id']);
 		$field_groups = $this->keyFieldGroupData($field_groups);
 
+		$pivot_field = null;
 
-		if($report_data['display_type'] === 'table'){
-			$report = new Table($this->datasource_reports, $report_data['id'], $report_data['path'], $report_data['max_rows'], $report_data['cnt_row'], $report_data['sum_row'], $report_data['avg_row'], $report_data['bench_row'], $report_data['is_summary'], $report_data['display_type'], $this->filters, $this->supplemental_factory, $this->data_handler, $this->db_table_factory, $field_groups);
-			if(isset($report_data['pivot_db_field'])){
-				$p = $this->datasource_dbfield->getFieldData($report_data['pivot_db_field']);
-				$pivot_field = new DbField($p['id'], $p['db_table'], $p['db_field_name'], $p['name'], $p['description'], $p['pdf_width'], $p['default_sort_order'], $p['datatype'], $p['max_length'], $p['decimal_scale'], $p['unit_of_measure'], $p['is_timespan'], $p['is_foreign_key'], $p['is_nullable'], $p['is_natural_sort']);
-				$report->setPivot($pivot_field);
-			}
+		if(isset($report_meta['pivot_db_field']) && !empty($report_meta['pivot_db_field'])){
+			$p = $this->datasource_dbfield->getFieldData($report_meta['pivot_db_field']);
+			$pivot_field = new DbField($p['id'], $p['db_table'], $p['db_field_name'], $p['name'], $p['description'], $p['pdf_width'], $p['default_sort_order'], $p['datatype'], $p['max_length'], $p['decimal_scale'], $p['unit_of_measure'], $p['is_timespan'], $p['is_foreign_key'], $p['is_nullable'], $p['is_natural_sort']);
+		}
+
+		if($report_meta['display_type'] === 'table'){
+			$report = new Table($this->datasource_reports, $report_meta, $this->filters, $this->supplemental_factory, $this->data_handler, $this->db_table_factory, $pivot_field, $field_groups);
 		}
 		else{
-			$report = new Chart($this->datasource_reports, $report_data['id'], $report_data['path'], $report_data['max_rows'], $report_data['cnt_row'], $report_data['sum_row'], $report_data['avg_row'], $report_data['bench_row'], $report_data['is_summary'], $report_data['display_type'], $report_data['chart_type'], $this->filters, $this->supplemental_factory, $this->data_handler, $this->db_table_factory, $field_groups, (bool)$report_data['keep_nulls']);
+			$report = new Chart($this->datasource_reports, $report_meta, $this->filters, $this->supplemental_factory, $this->data_handler, $this->db_table_factory, $pivot_field, $field_groups, (bool)$report_meta['keep_nulls']);
 		}
 		return $report;
 	}
