@@ -21,8 +21,10 @@ class Cowpopulations extends TableData {
 		$l1_tot_calving_cnt = $arr_dataset[0]['l1_calving_cnt'];
 		$l4_tot_calving_cnt = $arr_dataset[0]['l4_calving_cnt'];
 		$l0_tot_calving_cnt = $arr_dataset[0]['l0_calving_cnt'];
-		unset($arr_dataset[0]);
-		
+        unset($arr_dataset[0]);
+        //reset array index to 0
+        $arr_dataset = array_values($arr_dataset);
+
 		$new_dataset = parent::pivot($arr_dataset);
 
 		//Remove columns that were used only to pull summary data

@@ -23,7 +23,10 @@ class Numbersoldordied extends TableData {
 		$l1_died_pct = $arr_dataset[0]['l1_died_60_dim_pct'];
 		$l4_sold_pct = $arr_dataset[0]['l4_left_60_dim_pct'];
 		$l4_died_pct = $arr_dataset[0]['l4_died_60_dim_pct'];
-		
+        unset($arr_dataset[0]);
+        //reset array index to 0
+        $arr_dataset = array_values($arr_dataset);
+
 		$new_dataset = parent::pivot($arr_dataset);
 		//Remove columns that were used only to pull summary data
 		unset($new_dataset[4]); //l1_left_60_dim_pct

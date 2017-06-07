@@ -22,7 +22,9 @@ class Newinfectionsanddrycures extends TableData {
 		$avg_l1_1st_new_infection_pct = $arr_dataset[0]['l1_1st_new_infection_pct'];
 		$avg_l4_1st_new_infection_pct = $arr_dataset[0]['l4_1st_new_infection_pct'];
 		$avg_l4_dry_cow_cured_pct = $arr_dataset[0]['l4_dry_cow_cured_pct'];
-		unset($arr_dataset[0]);
+        unset($arr_dataset[0]);
+        //reset array index to 0
+        $arr_dataset = array_values($arr_dataset);
 		
 		$new_dataset = parent::pivot($arr_dataset);
 

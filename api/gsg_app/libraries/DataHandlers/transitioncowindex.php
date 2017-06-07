@@ -17,7 +17,9 @@ class Transitioncowindex extends TableData {
 		//Top row is summary data.  Pull relevant info and remove row
 		$avg_avg_tci = $arr_dataset[0]['avg_tci']; //
 		$avg_tci_pct = $arr_dataset[0]['tci_pct']; //
-		unset($arr_dataset[0]);
+        unset($arr_dataset[0]);
+        //reset array index to 0
+        $arr_dataset = array_values($arr_dataset);
 
 		$new_dataset = parent::pivot($arr_dataset);
 

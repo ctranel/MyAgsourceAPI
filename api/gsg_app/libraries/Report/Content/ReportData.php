@@ -124,7 +124,6 @@ die('ReportData->prepSelectFields');
 	 */
 	public function pivot($arr_dataset){
 		$header_field = $this->report->pivotFieldName();
-		
 		$new_dataset = [];
 		//don't want to insert the sum or count in middle of row, so store in temp vars until end
 		$sum = [];
@@ -136,18 +135,17 @@ die('ReportData->prepSelectFields');
 
 		//map the keys to a numeric array so they are an array of objects like non-pivoted datasets
         $tmp = current($arr_dataset);
-        //if(($key = array_search($header_field, $key_map)) !== false) {
-            unset($tmp[$header_field]);
-        //}
+        unset($tmp[$header_field]);
         $key_map = array_keys($tmp);
         $key_map[] = $header_field;
         $key_map = array_flip($key_map);
 
-		foreach($arr_dataset as $k => $row){
+        $row_cnt = 1;
+		foreach($arr_dataset as $row){
 			foreach($row as $name => $val){
                 if(strpos($name, 'isnull') === false && isset($row[$header_field]) && !empty($row[$header_field])) { //2nd part eliminates rows where fresh date is null (FCS)
-					$new_dataset[$key_map[$name]][$k] = $val;
-					if(isset($sum[$key_map[$name]]) === false && $val !== null){
+					$new_dataset[$key_map[$name]][$row_cnt] = $val;
+					if(!isset($sum[$key_map[$name]]) && $val !== null){
 						$sum[$key_map[$name]] = 0;
 						$count[$key_map[$name]] = 0;
 					} 
@@ -156,9 +154,16 @@ die('ReportData->prepSelectFields');
 						$sum[$key_map[$name]] += $val;
 						$count[$key_map[$name]]++;
 					}
-                    $new_dataset[$key_map[$name]]['0'] = $this->report->getFieldLabelByName($name);
+                    if($row_cnt === 1){
+                        //insert label into first spot in row
+                        array_unshift($new_dataset[$key_map[$name]], $this->report->getFieldLabelByName($name));
+                    }
 				}
 			}
+			//if the conditions within the inner loop were met, the field labels have been added to dataset, so we set first to false
+            if(isset($row[$header_field]) && !empty($row[$header_field])){
+                $row_cnt++;
+            }
 		}
 
 		//Data is pivoted, now handle aggregate rows.
