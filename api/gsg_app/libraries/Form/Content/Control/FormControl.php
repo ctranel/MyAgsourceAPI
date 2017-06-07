@@ -571,6 +571,9 @@ class FormControl implements iFormControl
             if($default_value['FUNC'] === 'CURRDATE') {
                 $ret = date('Y-m-d');
             }
+            if($this->default_value['FUNC'] === 'FIRSTOPTION') {
+                $ret = current($this->options)['value'];
+            }
         }
 
         return $ret;

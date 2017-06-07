@@ -35,7 +35,7 @@ class Criteria{
      * var Settings
      */
     private $settings;
-	private $arr_options; //array of criteria objects
+	//private $arr_options; //array of criteria objects
 	
 	public function __construct($criteria_data, $options, Settings $settings = NULL){
 		$this->type = $criteria_data['type'];
@@ -317,6 +317,9 @@ class Criteria{
                 if(isset($this->default_value['FUNC'])){
                     if($this->default_value['FUNC'] === 'CURRDATE') {
                         $this->selected_values = date('Y-m-d');
+                    }
+                    if($this->default_value['FUNC'] === 'FIRSTOPTION') {
+                        $this->selected_values = current($this->options)['value'];
                     }
                 }
                 elseif(isset($this->default_value['SET'])){
