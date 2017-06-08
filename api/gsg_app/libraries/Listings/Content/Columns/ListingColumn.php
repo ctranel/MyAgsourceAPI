@@ -60,6 +60,12 @@ class ListingColumn implements iListingColumn
     protected $is_displayed;
 
     /**
+     * display_format
+     * @var string
+     **/
+    protected $display_format;
+
+    /**
      * is_key
      * @var boolean
      **/
@@ -86,6 +92,7 @@ class ListingColumn implements iListingColumn
         $this->default_value = $column_data['default_value'];
         $this->control_type = $column_data['control_type'];
         $this->is_displayed = $column_data['is_displayed'];
+        $this->display_format = $column_data['display_format'];
         $this->is_key = $column_data['is_key'];
         //$this->isactive = $column_data['isactive'];
     }
@@ -116,6 +123,7 @@ class ListingColumn implements iListingColumn
             'default_value' => $this->default_value,
             'control_type' => $this->control_type,
             'is_displayed' => $this->is_displayed,
+            'display_format' => $this->display_format,
             'is_key' => $this->is_key,
         ];
 

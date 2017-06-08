@@ -168,7 +168,7 @@ class Event_listing_model extends CI_Model implements iListing_model  {
     public function getListingColumnMeta($listing_id) {
         $listing_id = (int)$listing_id;
 
-        $sql = " select lc.id, ct.name AS control_type, lc.label, lc.is_displayed, lc.is_preset, fld.is_fk_field AS is_key, lc.db_field_id , fld.db_field_name AS name, '' AS default_value
+        $sql = " select lc.id, ct.name AS control_type, lc.label, lc.is_displayed, lc.display_format, lc.is_preset, fld.is_fk_field AS is_key, lc.db_field_id , fld.db_field_name AS name, '' AS default_value
                 from users.options.listings_columns lc
                 inner join users.dbo.db_fields fld ON lc.db_field_id = fld.id AND lc.listing_id = " . $listing_id . "
                 inner join users.frm.control_types ct ON lc.control_type_id = ct.id";
