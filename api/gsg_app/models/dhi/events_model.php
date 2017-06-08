@@ -176,7 +176,7 @@ class Events_model extends CI_Model {
                   ,emb.[donor_officialid] AS [donor_dam_id]
                   ,emb.[donor_serial_num] AS [donor_dam_serial_num]
                   ,emb.[donor_name]
-                  ,COALESCE(emb.donor_breed_cd, be.sire_breed_cd) AS calf_breed_cd
+                  ,COALESCE(emb.donor_breed_cd, be.sire_breed_cd) AS calf_breed_code
             ")
 //            ->join('TD.animal.events be', 'e.herd_code = be.herd_code AND e.serial_num = be.serial_num AND e.conception_dt = be.event_dt AND be.event_cd IN(32,36)', 'left')
             ->join('TD.animal.vma_offspring_conception_breedings be', 'e.herd_code = be.herd_code AND e.serial_num = be.serial_num', 'left')

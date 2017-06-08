@@ -481,7 +481,7 @@ class FormControl implements iFormControl
         elseif($value !== '' && in_array($this->data_type, ['int', 'smallint', 'tinyint', 'bit', 'decimal', 'numeric'])){
             $ret_val = (int)$value;
         }
-        if(strpos($this->control_type, 'lookup') !== false && empty($ret_val)){
+        if(strpos($this->control_type, 'lookup') !== false && empty($ret_val) && $ret_val !== 0 && $ret_val !== '0'){
             $ret_val = null;
         }
 
