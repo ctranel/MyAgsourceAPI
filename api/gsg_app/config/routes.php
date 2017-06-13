@@ -45,6 +45,8 @@ $route['dashboard'] = 'dashboard/index';
 $route['dpage/(:num)'] = 'dpage/index/$1';
 $route['dpage/(:num)/(:any)'] = 'dpage/index/$1/$2';
 $route['listings/(:num)'] = 'listings/index/$1';
+$route['manage_serv_grps'] = 'manage_serv_grps/index';
+$route['serv_grps_manage_herds'] = 'serv_grps_manage_herds/index';
 
 /* End of file routes.php */
 /* Location: ./application/config/routes.php */
