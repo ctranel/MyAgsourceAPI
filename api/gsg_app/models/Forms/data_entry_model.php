@@ -684,12 +684,14 @@ class Data_entry_model extends CI_Model implements iForm_Model {
 
         //need the commented select statement to trigger a return value.  temp table is used in updatable views to return key data
         if(!empty($tmp_table_schema)){
-            $sql = "--SELECT;
+            $sql = "                --SELECT;
+                SET NOCOUNT ON
                 CREATE TABLE #output(" . implode(", ", $tmp_table_schema) . ");
                 INSERT " . $table_name . " (" . implode(', ', array_keys($insert_vals)) . ")
                 VALUES (" . implode(", ", $insert_vals) . ");
                 SELECT * FROM #output;
                 DROP TABLE #output";
+            //$sql = 'EXEC users.dbo.ctranel';
         }
         else {
             $sql = "--SELECT;
