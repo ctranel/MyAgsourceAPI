@@ -6,8 +6,8 @@ require_once(APPPATH . 'libraries/Settings/SettingForm.php');
 require_once(APPPATH . 'libraries/Settings/SettingFormControl.php');
 require_once(APPPATH . 'libraries/Form/Content/Control/FormControlGroup.php');
 require_once(APPPATH . 'libraries/Form/Content/SubForm.php');
-require_once(APPPATH . 'libraries/Form/Content/SubBlock.php');
-require_once(APPPATH . 'libraries/Form/Content/SubFormShell.php');
+//require_once(APPPATH . 'libraries/Form/Content/SubBlock.php');
+//require_once(APPPATH . 'libraries/Form/Content/SubFormShell.php');
 require_once(APPPATH . 'libraries/Form/Content/SubContentCondition.php');
 require_once(APPPATH . 'libraries/Form/Content/SubContentConditionGroup.php');
 require_once(APPPATH . 'libraries/Form/iFormSubmissionFactory.php');
@@ -17,8 +17,6 @@ require_once(APPPATH . 'models/Forms/iForm_Model.php');
 
 use \myagsource\Form\iFormSubmissionFactory;
 use \myagsource\Form\Content\SubForm;
-use \myagsource\Form\Content\SubFormShell;
-use \myagsource\Supplemental\Content\SupplementalFactory;
 use \myagsource\Settings\SettingForm;
 use \myagsource\Settings\SettingFormControl;
 use \myagsource\Form\Content\Control\FormControlGroup;
@@ -49,7 +47,7 @@ class SettingsFormSubmissionFactory implements iFormSubmissionFactory {
      **/
     protected $key_params;
 
-    function __construct(\iForm_Model $datasource, SupplementalFactory $supplemental_factory = null, $key_params = null) {//, \db_field_model $datasource_dbfield
+    function __construct(\iForm_Model $datasource, $key_params = null) {//, \db_field_model $datasource_dbfield
 		$this->datasource = $datasource;
         $this->key_params = $key_params;
 	}
