@@ -122,7 +122,7 @@ class dblock extends dpage {
         //$option_listing_factory = new ListingFactory($this->herd_options_model, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
 
         //create block content
-        $report = $report_factory->getByBlock($block_id);
+        $report = $report_factory->getByBlock($block_id, null, $this->herd->isMetric());
         if(!empty($report)){
             return $report;
         }

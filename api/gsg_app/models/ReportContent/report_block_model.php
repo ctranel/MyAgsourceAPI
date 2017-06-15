@@ -123,16 +123,29 @@ class report_block_model extends CI_Model {
 	 * @return returns multi-dimensional array, one row for each field
 	 * @author ctranel
 	 **/
-	public function getFieldData($report_id){
+	public function getFieldData($report_id, $is_metric){
+        if($is_metric){
+            $this->db
+                ->select("CASE WHEN mc.id IS NOT NULL THEN REPLACE(f.name, mc.imperial_abbrev, mc.metric_abbrev) ELSE f.name END AS [name]
+			        , CASE WHEN mc.id IS NOT NULL THEN REPLACE(f.description, mc.imperial_abbrev, mc.metric_abbrev) ELSE f.description END AS [description]
+					, CASE WHEN mc.id IS NOT NULL THEN REPLACE(f.unit_of_measure, mc.imperial_abbrev, mc.metric_abbrev) ELSE f.unit_of_measure END AS [unit_of_measure]")
+            ->join('users.dbo.metric_conversion mc', 'f.conversion_id = mc.id', 'left');
+        }
+        else{
+            $this->db
+                ->select("f.name, f.description, f.unit_of_measure");
+        }
+
 		return $this->db
-			->select("rsf_id AS id, db_field_id, table_name, db_field_name, name, description, pdf_width, default_sort_order, data_type as datatype, max_length, category_id,
-					decimal_points AS decimal_scale, unit_of_measure, is_timespan_field as is_timespan, is_fk_field AS is_foreign_key, is_nullable, is_sortable, is_natural_sort,
-					is_displayed, supp_id, a_href, a_rel, a_title, a_class, head_a_href, head_a_rel, head_a_title, head_a_class, head_supp_id, head_comment, aggregate,
-					display_format, table_header_group_id, chart_type, axis_index, trend_type, field_group, field_group_ref_key")
+			->select("f.rsf_id AS id, f.db_field_id, f.table_name, f.db_field_name, f.pdf_width, f.default_sort_order, f.data_type as datatype, f.max_length
+			        , f.category_id, f.decimal_points AS decimal_scale, f.is_timespan_field as is_timespan, f.is_fk_field AS is_foreign_key
+					, f.is_nullable, f.is_sortable, f.is_natural_sort, f.is_displayed, f.supp_id, f.a_href, f.a_rel, f.a_title
+					, f.a_class, f.head_a_href, f.head_a_rel, f.head_a_title, f.head_a_class, f.head_supp_id, f.head_comment, f.aggregate
+					, f.display_format, f.table_header_group_id, f.chart_type, f.axis_index, f.trend_type, f.field_group, f.field_group_ref_key")
 			->where('report_id', $report_id)
 //			->order_by('field_group')
 			->order_by('list_order')
-			->get('users.dbo.v_report_field_data')
+			->get('users.dbo.v_report_field_data f')
 			->result_array();
 	}
 	
@@ -227,10 +240,23 @@ class report_block_model extends CI_Model {
 	 * @access public
 	 *
 	 **/
-	public function getChartAxes($report_id){
+	public function getChartAxes($report_id, $is_metric){
+        if($is_metric){
+            $this->db
+                ->select("CASE WHEN mc.id IS NOT NULL THEN REPLACE(f.name, mc.imperial_abbrev, mc.metric_abbrev) ELSE f.name END AS [name]
+			        , CASE WHEN mc.id IS NOT NULL THEN REPLACE(f.description, mc.imperial_abbrev, mc.metric_abbrev) ELSE f.description END AS [description]
+					, CASE WHEN mc.id IS NOT NULL THEN REPLACE(f.unit_of_measure, mc.imperial_abbrev, mc.metric_abbrev) ELSE f.unit_of_measure END AS [unit_of_measure]
+                    , CASE WHEN mc.id IS NOT NULL THEN REPLACE(text, mc.imperial_abbrev, mc.metric_abbrev) ELSE text END AS [text]")
+                ->join('users.dbo.metric_conversion mc', 'a.conversion_id = mc.id', 'left');
+       }
+        else{
+            $this->db
+                ->select("f.name, f.description, f.unit_of_measure, text");
+        }
+
 		$this->db
-		->select("a.id, a.x_or_y, a.min, a.max, a.opposite, a.data_type, a.db_field_id, CONCAT(db.name, '.', t.db_schema, '.', t.name) AS table_name, f.db_field_name, f.name, f.description, f.pdf_width, f.default_sort_order, f.data_type as datatype, f.max_length,
-					f.decimal_points AS decimal_scale, f.unit_of_measure, f.is_timespan_field as is_timespan, f.is_fk_field AS is_foreign_key, f.is_nullable, f.is_natural_sort, text, c.name AS category")
+		->select("a.id, a.x_or_y, a.min, a.max, a.opposite, a.data_type, a.db_field_id, CONCAT(db.name, '.', t.db_schema, '.', t.name) AS table_name, f.db_field_name, f.pdf_width, f.default_sort_order, f.data_type as datatype, f.max_length,
+					f.decimal_points AS decimal_scale, f.is_timespan_field as is_timespan, f.is_fk_field AS is_foreign_key, f.is_nullable, f.is_natural_sort, c.name AS category")
 		->from('users.dbo.chart_axes AS a')
 		->join('users.dbo.chart_categories AS c', 'a.id = c.block_axis_id', 'left')
 		->join('users.dbo.db_fields AS f', 'a.db_field_id = f.id', 'left')

@@ -71,8 +71,8 @@ class Chart extends Report {
 	
 	/**
 	 */
-	function __construct($report_datasource, $report_meta, ReportFilters $filters, SupplementalFactory $supp_factory, DataHandler $data_handler, DbTableFactory $db_table_factory, iDataField $pivot_field = null, $field_groups, $keep_nulls) {
-		parent::__construct($report_datasource, $report_meta, $filters, $supp_factory, $data_handler, $db_table_factory, $pivot_field, $field_groups);
+	function __construct($report_datasource, $report_meta, ReportFilters $filters, SupplementalFactory $supp_factory, DataHandler $data_handler, DbTableFactory $db_table_factory, iDataField $pivot_field = null, $field_groups, $is_metric, $keep_nulls) {
+		parent::__construct($report_datasource, $report_meta, $filters, $supp_factory, $data_handler, $db_table_factory, $pivot_field, $field_groups, $is_metric);
 		
 		$this->keep_nulls = $keep_nulls;
 		$this->chart_type = $report_meta['chart_type'];
@@ -114,7 +114,7 @@ class Chart extends Report {
 	 * @access protected
 	 **/
 	protected function setReportFields(){
-		$arr_res = $this->datasource->getFieldData($this->id);
+		$arr_res = $this->datasource->getFieldData($this->id, $this->is_metric);
 		if(is_array($arr_res)){
 			foreach($arr_res as $s){
 				//aggregate
@@ -191,7 +191,7 @@ class Chart extends Report {
 	 *
 	 **/
 	protected function setChartAxes(){
-		$data = $this->datasource->getChartAxes($this->id);
+		$data = $this->datasource->getChartAxes($this->id, $this->is_metric);
 		if(!is_array($data) || empty($data) || count($data) < 1){
 			return false;
 		}

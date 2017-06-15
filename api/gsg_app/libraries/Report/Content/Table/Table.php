@@ -40,8 +40,8 @@ class Table extends Report {
 	 **/
 	protected $top_row;
 	
-	function __construct($table_datasource, $report_meta, ReportFilters $filters, SupplementalFactory $supp_factory = null, DataHandler $data_handler, DbTableFactory $db_table_factory, iDataField $pivot_field = null, $field_groups) {
-		parent::__construct($table_datasource, $report_meta, $filters, $supp_factory, $data_handler, $db_table_factory, $pivot_field, $field_groups);
+	function __construct($table_datasource, $report_meta, ReportFilters $filters, SupplementalFactory $supp_factory = null, DataHandler $data_handler, DbTableFactory $db_table_factory, iDataField $pivot_field = null, $field_groups, $is_metric) {
+		parent::__construct($table_datasource, $report_meta, $filters, $supp_factory, $data_handler, $db_table_factory, $pivot_field, $field_groups, $is_metric);
 		
         $this->setDataset($report_meta['path']);
         $this->setTableHeader();
@@ -182,7 +182,7 @@ class Table extends Report {
 	 * @access protected
 	 **/
 	protected function setReportFields(){
-		$arr_res = $this->datasource->getFieldData($this->id);
+		$arr_res = $this->datasource->getFieldData($this->id, $this->is_metric);
 		if(is_array($arr_res)){
 			foreach($arr_res as $s){
                 //aggregate

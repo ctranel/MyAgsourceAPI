@@ -160,7 +160,7 @@ class dpage extends MY_Api_Controller {
         $entry_form_factory = new FormDisplayFactory($this->Data_entry_model, $supplemental_factory, $params + ['herd_code'=>$this->session->userdata('herd_code'), 'user_id'=>$this->session->userdata('user_id')]);
 
         //create block content
-        $reports = $report_factory->getByPage($page_id);
+        $reports = $report_factory->getByPage($page_id, $this->herd->isMetric());
         $setting_forms = $setting_form_factory->getByPage($page_id);
         $entry_forms = $entry_form_factory->getByPage($page_id, $this->session->userdata('herd_code'));
         //$serial_num = isset($params['serial_num']) ? $params['serial_num'] : null;

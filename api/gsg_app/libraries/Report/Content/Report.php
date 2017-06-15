@@ -103,8 +103,14 @@ abstract class Report implements iReport {
 	 * @var boolean
 	 **/
 	protected $is_summary;
-	
-	/**
+
+    /**
+     * is_metric
+     * @var boolean
+     **/
+    protected $is_metric;
+
+    /**
 	 * has_aggregate
 	 * @var boolean
 	 **/
@@ -198,7 +204,7 @@ abstract class Report implements iReport {
 	 * @return void
 	 * @author ctranel
 	 **/
-	public function __construct($report_datasource, $report_meta, ReportFilters $filters, SupplementalFactory $supp_factory, DataHandler $data_handler, DbTableFactory $db_table_factory, iDataField $pivot_field = null, $field_groups = null) {//$id, $page_id, $name, $description, $scope, $active, $path,
+	public function __construct($report_datasource, $report_meta, ReportFilters $filters, SupplementalFactory $supp_factory, DataHandler $data_handler, DbTableFactory $db_table_factory, iDataField $pivot_field = null, $field_groups = null, $is_metric) {//$id, $page_id, $name, $description, $scope, $active, $path,
 		$this->datasource = $report_datasource;
 
 		$this->id = $report_meta['id'];
@@ -208,6 +214,7 @@ abstract class Report implements iReport {
 		$this->avg_row = $report_meta['avg_row'];
 		$this->bench_row = $report_meta['bench_row'];
 		$this->is_summary = $report_meta['is_summary'];
+        $this->is_metric = $is_metric;
 		$this->field_groups = $field_groups;
 		//$this->group_by_fields = $group_by_fields;
 		//$this->where_fields = $group_by_fields;

@@ -63,7 +63,14 @@ class Herd
 	 **/
 	protected $recent_test_date;
 
-	/**
+    /**
+     *
+     *
+     * @var boolean
+     **/
+    protected $is_metric;
+
+    /**
 	 * __construct
 	 *
 	 * @return void
@@ -100,23 +107,36 @@ class Herd
 		return $this->recent_test_date;
 	}
 
-	/* -----------------------------------------------------------------
-	 *  Returns number of days since the initial access for herds that
-	*  are not paying for the specified product.
-	
-	*  Returns number of days since the initial access for herds that
-	*  are not paying for the specified product.
-	
-	*  @since: version 1
-	*  @author: ctranel
-	*  @date: Jul 7, 2014
-	*  @param: access log object
-	*  @param: int user id
-	*  @param: string herd code
-	*  @param: string report code
-	*  @return int
-	*  @throws:
-	* -----------------------------------------------------------------*/
+    /**
+     * @method getRecentTest()
+     * @return string recent test date
+     * @access public
+     *
+     **/
+    public function isMetric(){
+        if(!isset($this->is_metric)){
+            $this->is_metric = $this->herd_model->isMetric($this->herd_code);
+        }
+        return $this->is_metric;
+    }
+
+    /* -----------------------------------------------------------------
+     *  Returns number of days since the initial access for herds that
+    *  are not paying for the specified product.
+
+    *  Returns number of days since the initial access for herds that
+    *  are not paying for the specified product.
+
+    *  @since: version 1
+    *  @author: ctranel
+    *  @date: Jul 7, 2014
+    *  @param: access log object
+    *  @param: int user id
+    *  @param: string herd code
+    *  @param: string report code
+    *  @return int
+    *  @throws:
+    * -----------------------------------------------------------------*/
 	public function getTrialData($report_code = null){
 		$trials = $this->herd_model->getTrialData($this->herd_code, $report_code);
 		return $trials;

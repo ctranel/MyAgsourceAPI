@@ -270,7 +270,7 @@ class Cow_lookup extends dpage {
             $db_table_factory = new DbTableFactory($this->db_table_model);
             $report_factory = new ReportFactory($this->report_block_model, $this->db_field_model, $this->filters, $supplemental_factory, $data_handler, $db_table_factory);
 
-            $report = $report_factory->getByBlock(410);
+            $report = $report_factory->getByBlock(410, null, $this->herd->isMetric());
 
             //create blocks for content
             $web_block_factory = new WebBlockFactory($this->block_model, $supplemental_factory);

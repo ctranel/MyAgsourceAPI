@@ -327,7 +327,28 @@ class Herd_model extends CI_Model {
 		return $this->getHerdCodes($limit,null);
 	}
 
-	/**
+    /**
+     * @method isMetric()
+     * @param string herd code
+     * @return array of data for the herd header record
+     * @access public
+     *
+     **/
+    public function isMetric($herd_code){
+        $q = $this->db->select("CAST(CASE WHEN ho.[lbs_kilos_code] = 'K' THEN 1 ELSE 0 END AS BIT) AS is_metric")
+            ->from('herd.dbo.herd_id h')
+            ->join('[TD].[ro_herd].[herd_options] ho', 'h.herd_code = ho.herd_code', 'inner')
+            ->where('h.herd_code',$herd_code);
+        $ret = $q->get()->result_array();
+        if(!empty($ret) && is_array($ret)){
+            return $ret[0]['is_metric'];
+        }
+        else{
+            return false;
+        }
+    } //end function
+
+    /**
 	 * @method header_info()
 	 * @param string herd code
 	 * @return array of data for the herd header record

@@ -85,10 +85,11 @@ class ReportFactory {
      *
      * @param int block_id
      * @param array key=>value new filter data
+	 * @param boolean is metric
      * @author ctranel
      * @returns Report
 */
-    public function getByBlock($block_id, $filter_data = null){
+    public function getByBlock($block_id, $filter_data = null, $is_metric){
         //$criteria = ['b.id' => $block_id];
         if(isset($filter_data) && !empty($filter_data)){
 			$this->filters->resetFilters($filter_data);
@@ -98,7 +99,7 @@ class ReportFactory {
             return [];
         }
         $r = $results[0];
-        $report = $this->dataToObject($r);
+        $report = $this->dataToObject($r, $is_metric);
 
         return $report;
     }
@@ -110,7 +111,7 @@ class ReportFactory {
      * @author ctranel
      * @returns array of Reports
 */
-	public function getByPage($page_id){
+	public function getByPage($page_id, $is_metric){
 		$reports = [];
 		
 		$results = $this->datasource_reports->getByPage($page_id);
@@ -118,7 +119,7 @@ class ReportFactory {
 			return [];
 		}
 		foreach($results as $r){
-			$reports[$r['list_order']] = $this->dataToObject($r);
+			$reports[$r['list_order']] = $this->dataToObject($r, $is_metric);
 		}
 		return $reports;
 	}
@@ -127,21 +128,23 @@ class ReportFactory {
      * blockFromData
      *
      * @param associative array of data needed for block creation
+	 * @param boolean is metric
      * @author ctranel
      * @returns Report
-     */
-	public function blockFromData($data){
-		return $this->dataToObject($data);
+	public function blockFromData($data, $is_metric){
+		return $this->dataToObject($data, $is_metric);
 	}
+*/
 
 	/*
 	 * dataToObject
 	 * 
 	 * @param array result set row
+	 * @param boolean display as metric if data has a conversion set up
 	 * @author ctranel
 	 * @returns \myagsource\Report\iReport
 	 */
-	protected function dataToObject($report_meta){
+	protected function dataToObject($report_meta, $is_metric){
 		$field_groups = $this->datasource_reports->getFieldGroupData($report_meta['id']);
 		$field_groups = $this->keyFieldGroupData($field_groups);
 
@@ -153,10 +156,10 @@ class ReportFactory {
 		}
 
 		if($report_meta['display_type'] === 'table'){
-			$report = new Table($this->datasource_reports, $report_meta, $this->filters, $this->supplemental_factory, $this->data_handler, $this->db_table_factory, $pivot_field, $field_groups);
+			$report = new Table($this->datasource_reports, $report_meta, $this->filters, $this->supplemental_factory, $this->data_handler, $this->db_table_factory, $pivot_field, $field_groups, $is_metric);
 		}
 		else{
-			$report = new Chart($this->datasource_reports, $report_meta, $this->filters, $this->supplemental_factory, $this->data_handler, $this->db_table_factory, $pivot_field, $field_groups, (bool)$report_meta['keep_nulls']);
+			$report = new Chart($this->datasource_reports, $report_meta, $this->filters, $this->supplemental_factory, $this->data_handler, $this->db_table_factory, $pivot_field, $field_groups, $is_metric, (bool)$report_meta['keep_nulls']);
 		}
 		return $report;
 	}
