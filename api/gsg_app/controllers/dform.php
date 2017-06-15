@@ -234,7 +234,9 @@ class dform extends dpage {
                     //use the inserted value
                     $lookup_keys = $form_factory->getLookupKeys($parent_control_id);
                     $value = isset($entity_keys[$lookup_keys['value_column']]) ? $entity_keys[$lookup_keys['value_column']] : $input[$lookup_keys['value_column']];
-                    $this->sendResponse(200, $resp_msg, ['option' => [$value => $input[$lookup_keys['desc_column']]]]);
+                    $label = $input[$lookup_keys['desc_column']];
+                    $label = isset($label) && !empty($label) ? $label : $value;
+                    $this->sendResponse(200, $resp_msg, ['option' => [$value => $label]]);
                 }
 
                 $this->sendResponse(200, $resp_msg, ['identity_keys' => $entity_keys]);
