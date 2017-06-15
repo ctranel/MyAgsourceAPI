@@ -160,7 +160,7 @@ class Serv_grps_manage_herds extends MY_Api_Controller {
             'sg_user_id' => $this->session->userdata('user_id'),
             'service_grp_request' => 1, //bit - did a service group request
             'write_data' => (int)$this->input->userInput('write_data'),
-            'request_status_id' => 7, //7 is the id for open request
+            'request_status_id' => 1, //1 is for granted request, 7 is the id for open request
             'active_date' => date('Y-m-d'),
             'active_user_id' => $this->session->userdata('user_id'),
         ];
