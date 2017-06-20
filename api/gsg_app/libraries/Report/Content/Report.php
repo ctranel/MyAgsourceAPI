@@ -5,6 +5,7 @@ require_once APPPATH . 'libraries/Report/iReport.php';
 require_once APPPATH . 'libraries/Report/Content/Sort.php';
 require_once APPPATH . 'libraries/Report/Content/WhereGroup.php';
 require_once APPPATH . 'libraries/Datasource/DbObjects/DbField.php';
+require_once APPPATH . 'libraries/Datasource/DbObjects/DataConversion.php';
 
 use \myagsource\Report\iReport;
 use \myagsource\Datasource\DbObjects\DbField;
@@ -13,6 +14,7 @@ use \myagsource\DataHandler;
 use \myagsource\Supplemental\Content\SupplementalFactory;
 use \myagsource\Datasource\iDataField;
 use \myagsource\Filters\ReportFilters;
+use \myagsource\Datasource\DbObjects\DataConversion;
 
 /**
 * Name:  Report
@@ -641,9 +643,14 @@ abstract class Report implements iReport {
 					$this->where_groups[] = new WhereGroup($prev_op, $criteria);
 					$criteria = [];
 				}
-				$criteria_datafield = new DbField($s['db_field_id'], $s['db_table_id'], $s['db_field_name'], $s['name'], $s['description'], $s['pdf_width'], $s['default_sort_order'],
-						 $s['datatype'], $s['max_length'], $s['decimal_scale'], $s['unit_of_measure'], $s['is_timespan'], $s['is_foreign_key'], $s['is_nullable'], $s['is_natural_sort']);
-				$criteria[] = new WhereCriteria($criteria_datafield, $s['condition']);
+                $data_conversion = null;
+                if(isset($s['conversion_name'])) {
+                    $data_conversion = new DataConversion($s['conversion_name'], $s['metric_label'], $s['metric_abbrev'],
+                        $s['to_metric_factor'], $s['metric_rounding_precision'], $s['imperial_label'], $s['imperial_abbrev'], $s['to_imperial_factor'], $s['imperial_rounding_precision']);
+                }
+                $criteria_datafield = new DbField($s['db_field_id'], $s['table_name'], $s['db_field_name'], $s['name'], $s['description'], $s['pdf_width'], $s['default_sort_order'],
+                    $s['datatype'], $s['max_length'], $s['decimal_scale'], $s['unit_of_measure'], $s['is_timespan'], $s['is_foreign_key'], $s['is_nullable'], $s['is_natural_sort'], $data_conversion);
+                $criteria[] = new WhereCriteria($criteria_datafield, $s['condition']);
 
 				$prev_group = $s['where_group_id'];
 				$prev_op = $s['operator'];
@@ -762,7 +769,7 @@ abstract class Report implements iReport {
 		if(is_array($arr_res)){
 			foreach($arr_res as $s){
 				$datafield = new DbField($s['db_field_id'], $s['db_table_id'], $s['db_field_name'], $s['name'], $s['description'], $s['pdf_width'], $s['default_sort_order'],
-						 $s['datatype'], $s['max_length'], $s['decimal_scale'], $s['unit_of_measure'], $s['is_timespan'], $s['is_foreign_key'], $s['is_nullable'], $s['is_natural_sort']);
+						 $s['datatype'], $s['max_length'], $s['decimal_scale'], $s['unit_of_measure'], $s['is_timespan'], $s['is_foreign_key'], $s['is_nullable'], $s['is_natural_sort'], null);
 				$this->default_sorts[] = new Sort($datafield, $s['sort_order']);
 			}
 		}
@@ -909,31 +916,6 @@ abstract class Report implements iReport {
 		return false;
 	}
 
-	/**
-	 * @method getSelectFields()
-	 * 
-	 * Retrieves fields designated as select, supplemental params (if set), 
-	 * 
-	 * @return array of text for select statement
-	 * @access public
-	 * */
-	public function getSelectFields(){
-		$ret = [];
-		if(isset($this->report_fields) && count($this->report_fields) > 0){
-			foreach($this->report_fields as $f){
-				$ret[] = $f->selectFieldText();
-			}
-		}
-		//supplemental params
-		if(isset($this->dataset_supplemental) && count($this->dataset_supplemental) > 0){
-			foreach($this->dataset_supplemental as $f){
-                $ret = array_unique(array_merge($ret, $f->getLinkParamFields()));
-			}
-		}
-
-		return $ret;
-	}
-	
 	/**
 	 * @method getGroupBy()
 	 * //@param array of GroupBy objects

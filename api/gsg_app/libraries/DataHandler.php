@@ -40,10 +40,18 @@ class DataHandler {
     protected $benchmarks;
 
     /**
+     * is_metric
+     *
+     * @var boolean
+     **/
+    protected $is_metric;
+
+    /**
 	 */
-	function __construct(\report_data_model $report_data_datasource, Benchmarks $benchmarks = null) {
+	function __construct(\report_data_model $report_data_datasource, Benchmarks $benchmarks, $is_metric) {
         $this->report_data_datasource = $report_data_datasource;
         $this->benchmarks = $benchmarks;
+        $this->is_metric = (bool)$is_metric;
 	}
 	
 	/* -----------------------------------------------------------------
@@ -72,26 +80,24 @@ class DataHandler {
             
             if(is_a($report, '\myagsource\Report\Content\Table\Table')){
                 $data_handler_name = 'myagsource\\Page\\Content\\Table\\' . $data_handler_name;
-                $block_data_handler = new $data_handler_name($report, $this->report_data_datasource, $this->benchmarks, $db_table);
+                return new $data_handler_name($report, $this->report_data_datasource, $this->benchmarks, $db_table, $this->is_metric);
             }
 
             if(is_a($report, '\myagsource\Report\Content\Chart\Chart')){
                 $data_handler_name = 'myagsource\\Page\\Content\\Chart\\' . $data_handler_name;
-                $block_data_handler = new $data_handler_name($report, $this->report_data_datasource);
+                return new $data_handler_name($report, $this->report_data_datasource, $this->is_metric);
             }
 		}
 
-		//if no specific data-handling library found, go with the general data-handling library 
-		if(!isset($data_handler_name)){
-			if(is_a($report, '\myagsource\Report\Content\Table\Table')){
-				$block_data_handler = new TableData($report, $this->report_data_datasource, $this->benchmarks, $db_table);
-			}
-			
-			if(is_a($report, '\myagsource\Report\Content\Chart\Chart')){
-				$block_data_handler = new ChartData($report, $this->report_data_datasource);
-			}
-		}
-		return $block_data_handler;
+        if(is_a($report, '\myagsource\Report\Content\Table\Table')){
+            return new TableData($report, $this->report_data_datasource, $this->benchmarks, $db_table, $this->is_metric);
+        }
+
+        if(is_a($report, '\myagsource\Report\Content\Chart\Chart')){
+            return new ChartData($report, $this->report_data_datasource, $this->is_metric);
+        }
+
+		throw new \Exception('No data handlers found for requested content.');
 	}
 }
 

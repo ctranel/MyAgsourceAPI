@@ -37,7 +37,7 @@ class SortBuilder {
 				foreach($arr_sort_order as $k=>$s){
 					$f = $this->report_meta_datasource->getFieldByName($report->id(), $arr_sort_by[$k]);
 					$datafield = new DbField($f['db_field_id'], $f['table_name'], $f['db_field_name'], $f['name'], $f['description'], $f['pdf_width'], $f['default_sort_order'],
-						 $f['datatype'], $f['max_length'], $f['decimal_scale'], $f['unit_of_measure'], $f['is_timespan'], $f['is_foreign_key'], $f['is_nullable'], $f['is_natural_sort']);
+						 $f['datatype'], $f['max_length'], $f['decimal_scale'], $f['unit_of_measure'], $f['is_timespan'], $f['is_foreign_key'], $f['is_nullable'], $f['is_natural_sort'], null);
 					$report->addSort(new Sort($datafield, $arr_sort_order[$k]));
 				}
 			}

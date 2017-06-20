@@ -102,7 +102,7 @@ class dblock extends dpage {
         $this->load->model('Datasource/db_field_model');
         $this->load->model('ReportContent/report_data_model');
         $this->load->model('Datasource/db_table_model');
-        $data_handler = new DataHandler($this->report_data_model, $benchmarks);
+        $data_handler = new DataHandler($this->report_data_model, $benchmarks, $this->herd->isMetric());
         $db_table_factory = new DbTableFactory($this->db_table_model);
 
         //we want params for the child block, not the parent

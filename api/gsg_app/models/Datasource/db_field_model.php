@@ -29,10 +29,12 @@
 	 **/
 	public function getFieldData($id){
 		$result = $this->db
-			->select('f.id, f.db_field_name, f.name, f.description, f.pdf_width, f.default_sort_order, f.data_type AS datatype, f.max_length, f.is_timespan_field AS is_timespan, f.is_fk_field AS is_foreign_key, f.is_nullable, f.decimal_points AS decimal_scale, f.is_natural_sort, f.unit_of_measure, t.name AS db_table')
+			->select('f.id, f.db_field_name, f.name, f.description, f.pdf_width, f.default_sort_order, f.data_type AS datatype, f.max_length, f.is_timespan_field AS is_timespan, f.is_fk_field AS is_foreign_key, f.is_nullable, f.decimal_points AS decimal_scale, f.is_natural_sort, f.unit_of_measure, t.name AS db_table
+			    ,mc.name AS conversion_name,mc.metric_label,mc.metric_abbrev,mc.to_metric_factor, mc.metric_rounding_precision,mc.imperial_label,mc.imperial_abbrev,mc.to_imperial_factor, mc.imperial_rounding_precision')
 			->from('users.dbo.db_fields f')
 			->join('users.dbo.db_tables t', 'f.db_table_id = t.id','inner')
-			->where('f.id', $id)
+            ->join('users.dbo.metric_conversion mc', 'f.conversion_id = mc.id', 'left')
+            ->where('f.id', $id)
 			->get()
 			->result_array();
 		return $result[0];

@@ -18,6 +18,7 @@ use \myagsource\Report\Content\Report;
 use \myagsource\Supplemental\Content\SupplementalFactory;
 use \myagsource\Report\Content\Chart\XAxis;
 use \myagsource\Report\Content\Chart\YAxis;
+use \myagsource\Datasource\DbObjects\DataConversion;
 
 use \myagsource\Report\iReport;
 
@@ -125,8 +126,13 @@ class Chart extends Report {
                 $this->setSupplemental($s);
 
                 //set report field
-                $datafield = new DbField($s['db_field_id'], $s['table_name'], $s['db_field_name'], $s['name'], $s['description'], $s['pdf_width'], $s['default_sort_order'],
-						 $s['datatype'], $s['max_length'], $s['decimal_scale'], $s['unit_of_measure'], $s['is_timespan'], $s['is_foreign_key'], $s['is_nullable'], $s['is_natural_sort']);
+				$data_conversion = null;
+				if(isset($s['conversion_name'])) {
+					$data_conversion = new DataConversion($s['conversion_name'], $s['metric_label'], $s['metric_abbrev'],
+						$s['to_metric_factor'], $s['metric_rounding_precision'], $s['imperial_label'], $s['imperial_abbrev'], $s['to_imperial_factor'], $s['imperial_rounding_precision']);
+				}
+				$datafield = new DbField($s['db_field_id'], $s['table_name'], $s['db_field_name'], $s['name'], $s['description'], $s['pdf_width'], $s['default_sort_order'],
+					$s['datatype'], $s['max_length'], $s['decimal_scale'], $s['unit_of_measure'], $s['is_timespan'], $s['is_foreign_key'], $s['is_nullable'], $s['is_natural_sort'], $data_conversion);
 				$this->report_fields[] = new ChartField(
 				    $s['id'],
                     $s['name'],
@@ -200,8 +206,13 @@ class Chart extends Report {
 		foreach($data as $a){
 			$datafield = null;
 			if(isset($a['db_field_id']) && !empty($a['db_field_id'])){
+				$data_conversion = null;
+				if(isset($a['conversion_name'])) {
+					$data_conversion = new DataConversion($a['conversion_name'], $a['metric_label'], $a['metric_abbrev'],
+						$a['to_metric_factor'], $a['metric_rounding_precision'], $a['imperial_label'], $a['imperial_abbrev'], $a['to_imperial_factor'], $a['imperial_rounding_precision']);
+				}
 				$datafield = new DbField($a['db_field_id'], $a['table_name'], $a['db_field_name'], $a['name'], $a['description'], $a['pdf_width'], $a['default_sort_order'],
-					$a['datatype'], $a['max_length'], $a['decimal_scale'], $a['unit_of_measure'], $a['is_timespan'], $a['is_foreign_key'], $a['is_nullable'], $a['is_natural_sort']);
+					$a['datatype'], $a['max_length'], $a['decimal_scale'], $a['unit_of_measure'], $a['is_timespan'], $a['is_foreign_key'], $a['is_nullable'], $a['is_natural_sort'], $data_conversion);
 				//add fields as a report field so it is included in the select statement
 				$display_format = $a['data_type'] === 'datetime' ? 'MM-dd-yy' : null;
 				//@todo: this probably shouldn't be in report_fields.  Have prep select function pull fields from x axis objects?
@@ -402,34 +413,6 @@ class Chart extends Report {
 			}
 		}
 		return $return_val;
-	}
-	
-	/************************************* 
-	 * overridden Report functions
-	 *************************************/
-	
-	/**
-	 * @method getSelectFields()
-	 *
-	 * Retrieves fields designated as select, supplemental params (if set),
-	 *
-	 * @return string table name
-	 * @access public
-	 * */
-	public function getSelectFields(){
-		$ret = parent::getSelectFields();
-		if(isset($this->x_axes) && is_array($this->x_axes)){
-			foreach($this->x_axes as $a){
-				$type = $a->dataType();
-				if(strpos($type, 'date') !== false || strpos($type, 'time') !== false){
-					$ret[] = "FORMAT(" . $a->dbFieldName() . ", 'yyyy-MM-dd', 'en-US') AS " . $a->dbFieldName();
-				}
-				else{
-					$ret[] = $a->dbFieldName();
-				}
-			}
-		}
-		return $ret;
 	}
 }
 ?>

@@ -41,12 +41,12 @@ class TableData extends ReportData {
 	 * @var DbTable
 	 **/
 	protected $db_table;
-	
-	/**
+
+    /**
 	 * @todo: add filter data
 	 */
-	function __construct(Table $table, \Report_data_model $report_datasource, Benchmarks $benchmarks, DbTable $db_table) {
-		parent::__construct($table, $report_datasource);
+	function __construct(Table $table, \Report_data_model $report_datasource, Benchmarks $benchmarks, DbTable $db_table, $is_metric) {
+		parent::__construct($table, $report_datasource, $is_metric);
 		$this->benchmarks = $benchmarks;
 		$this->db_table = $db_table;
 	}
@@ -78,7 +78,7 @@ class TableData extends ReportData {
         }
 
         $criteria_key_value = $this->whereCriteria($criteria_key_value);
-		$select_fields = $this->report->getSelectFields();
+		$select_fields = $this->selectFields();
 		$results = $this->report_datasource->search($this->report, $select_fields, $criteria_key_value);
 		if($this->report->hasBenchmark() && isset($this->benchmarks)){
 		//if the data is pivoted, set the pivoted field as the row header, else use the first non-pstring column

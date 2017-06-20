@@ -2,8 +2,10 @@
 namespace myagsource\Datasource\DbObjects;
 
 require_once APPPATH . 'libraries/Datasource/iDataField.php';
+require_once APPPATH . 'libraries/Datasource/iDataConversion.php';
 
 use \myagsource\Datasource\iDataField;
+use \myagsource\Datasource\iDataConversion;
 
 /**
  * Name:  DbField
@@ -105,12 +107,18 @@ class DbField implements iDataField {
 	 * @var boolean
 	 **/
 	protected $is_natural_sort;
-	
-	
-	/**
+
+    /**
+     * data_conversion
+     * @var iDataConversion
+     **/
+    protected $data_conversion;
+
+
+    /**
 	 */
 	function __construct($id, $db_table_name, $db_field_name, $name, $description, $pdf_width, $default_sort_order,
-			$datatype, $max_length, $decimal_scale, $unit_of_measure, $is_timespan, $is_foreign_key, $is_nullable, $is_natural_sort) {
+			$datatype, $max_length, $decimal_scale, $unit_of_measure, $is_timespan, $is_foreign_key, $is_nullable, $is_natural_sort, iDataConversion $data_conversion=null) {
 		$this->id =  $id;
 		$this->db_table_name = $db_table_name;
 		$this->db_field_name = $db_field_name;
@@ -126,6 +134,7 @@ class DbField implements iDataField {
 		$this->is_foreign_key = $is_foreign_key;
 		$this->is_nullable = $is_nullable;
 		$this->is_natural_sort = $is_natural_sort;
+        $this->data_conversion = $data_conversion;
 	}
 
 	public function isKey(){
@@ -159,7 +168,7 @@ class DbField implements iDataField {
         return $this->name;
     }
 
-    public function setDbFieldName($value){
+    protected function setDbFieldName($value){
 		$this->db_field_name = $value;
 	}
 
@@ -191,10 +200,53 @@ class DbField implements iDataField {
 		return (bool)$this->is_natural_sort;
 	}
 
-	public function isNumeric(){
+    public function hasMetricConversion(){
+        return is_a($this->data_conversion, '\myagsource\Datasource\iDataConversion');
+    }
+
+    public function conversionToMetricFactor(){
+        return is_a($this->data_conversion, '\myagsource\Datasource\iDataConversion') ? $this->data_conversion->metricFactor() : 1;
+    }
+
+    public function isNumeric(){
 		//@todo: database neutral
 		return (strpos($this->datatype, 'int') !== false) || (strpos($this->datatype, 'money') !== false) || (strpos($this->datatype, 'decimal') !== false) || $this->datatype === 'float' || $this->datatype === 'numeric' || $this->datatype === 'real';
 	}
+
+    /**
+     * @method selectFieldText()
+     *
+     * Returns SQL text for select statement
+     *
+     * @param boolean is report to be displayed as metric?
+     * @param string report aggregate
+     * @return string of sql select statement text for field
+     * @access public
+     * @todo: should this be in model?
+     * */
+    public function selectFieldText($is_metric, $aggregate) {
+        $field_text = $this->db_table_name . "." . $this->db_field_name;
+
+        if($is_metric && $this->hasMetricConversion()){
+            $alias_field_name = $this->db_field_name;
+
+            $field_text = "(ROUND(" . $this->conversionToMetricFactor() . "*" . $field_text . ", 1))";
+        }
+
+        if($this->datatype === "date" || $this->datatype === "smalldatetime"){//in all cases, time was irrelevent for columsn of this datatype
+            return "FORMAT(" . $field_text . ",  'yyyy-MM-dd', 'en-US') AS " . $this->db_field_name;
+        }
+        if($this->datatype === "datetime"){
+            return "FORMAT(" . $field_text . ",  'yyyy-MM-dd HH:mm:ss', 'en-US') AS " . $this->db_field_name;
+        }
+        if(isset($aggregate) && !empty($aggregate)){
+            $alias_field_name = strtolower($aggregate) . '_' . $this->db_field_name;
+            $ret_val = $aggregate . '(' . $field_text . ') AS ' . $alias_field_name;
+            $this->setDbFieldName($alias_field_name);
+            return $ret_val;
+        }
+        return isset($alias_field_name) ? $field_text . " AS " . $alias_field_name : $field_text;
+    }
 }
 
 ?>

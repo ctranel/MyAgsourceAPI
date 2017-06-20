@@ -266,7 +266,7 @@ class Cow_lookup extends dpage {
             $benchmarks = $this->_benchmarks();
 
             //load factories for block content
-            $data_handler = new DataHandler($this->report_data_model, $benchmarks);
+            $data_handler = new DataHandler($this->report_data_model, $benchmarks, $this->herd->isMetric());
             $db_table_factory = new DbTableFactory($this->db_table_model);
             $report_factory = new ReportFactory($this->report_block_model, $this->db_field_model, $this->filters, $supplemental_factory, $data_handler, $db_table_factory);
 

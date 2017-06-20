@@ -16,6 +16,7 @@ use \myagsource\Report\Content\Report;
 use \myagsource\Filters\ReportFilters;
 use \myagsource\Supplemental\Content\SupplementalFactory;
 use \myagsource\Report\Content\Table\Header\TableHeader;
+use \myagsource\Datasource\DbObjects\DataConversion;
 
 /**
  * Name:  Table
@@ -42,7 +43,7 @@ class Table extends Report {
 	
 	function __construct($table_datasource, $report_meta, ReportFilters $filters, SupplementalFactory $supp_factory = null, DataHandler $data_handler, DbTableFactory $db_table_factory, iDataField $pivot_field = null, $field_groups, $is_metric) {
 		parent::__construct($table_datasource, $report_meta, $filters, $supp_factory, $data_handler, $db_table_factory, $pivot_field, $field_groups, $is_metric);
-		
+
         $this->setDataset($report_meta['path']);
         $this->setTableHeader();
 	}
@@ -193,8 +194,13 @@ class Table extends Report {
 				$this->setSupplemental($s);
 
                 //set report field
-				$datafield = new DbField($s['db_field_id'], $s['table_name'], $s['db_field_name'], $s['name'], $s['description'], $s['pdf_width'], $s['default_sort_order'],
-						 $s['datatype'], $s['max_length'], $s['decimal_scale'], $s['unit_of_measure'], $s['is_timespan'], $s['is_foreign_key'], $s['is_nullable'], $s['is_natural_sort']);
+                $data_conversion = null;
+                if(isset($s['conversion_name'])) {
+                    $data_conversion = new DataConversion($s['conversion_name'], $s['metric_label'], $s['metric_abbrev'],
+                        $s['to_metric_factor'], $s['metric_rounding_precision'], $s['imperial_label'], $s['imperial_abbrev'], $s['to_imperial_factor'], $s['imperial_rounding_precision']);
+                }
+                $datafield = new DbField($s['db_field_id'], $s['table_name'], $s['db_field_name'], $s['name'], $s['description'], $s['pdf_width'], $s['default_sort_order'],
+                    $s['datatype'], $s['max_length'], $s['decimal_scale'], $s['unit_of_measure'], $s['is_timespan'], $s['is_foreign_key'], $s['is_nullable'], $s['is_natural_sort'], $data_conversion);
 				$this->report_fields[] = new TableField(
 				    $s['id'],
                     $s['name'],

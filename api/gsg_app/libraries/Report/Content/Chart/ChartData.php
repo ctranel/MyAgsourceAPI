@@ -43,8 +43,8 @@ class ChartData extends ReportData{
 	/**
 	 * @todo: add filter data
 	 */
-	function __construct(Chart $report, \Report_data_model $report_datasource) {
-		parent::__construct($report, $report_datasource);
+	function __construct(Chart $report, \Report_data_model $report_datasource, $is_metric) {
+		parent::__construct($report, $report_datasource, $is_metric);
 		$this->setXAxesField();
 	}
 
@@ -93,7 +93,7 @@ class ChartData extends ReportData{
 		}
 
 		$criteria_key_value = $this->whereCriteria($criteria_key_value);
-		$select_fields = $this->report->getSelectFields();
+		$select_fields = $this->selectFields($this->is_metric);
 		$this->dataset = $this->report_datasource->search($this->report, $select_fields, $criteria_key_value);
 
 		$tmp_cat = $this->report->categories();

@@ -152,7 +152,12 @@ class ReportFactory {
 
 		if(isset($report_meta['pivot_db_field']) && !empty($report_meta['pivot_db_field'])){
 			$p = $this->datasource_dbfield->getFieldData($report_meta['pivot_db_field']);
-			$pivot_field = new DbField($p['id'], $p['db_table'], $p['db_field_name'], $p['name'], $p['description'], $p['pdf_width'], $p['default_sort_order'], $p['datatype'], $p['max_length'], $p['decimal_scale'], $p['unit_of_measure'], $p['is_timespan'], $p['is_foreign_key'], $p['is_nullable'], $p['is_natural_sort']);
+			$data_conversion = null;
+			if(isset($p['conversion_name'])) {
+				$data_conversion = new DataConversion($p['conversion_name'], $p['metric_label'], $p['metric_abbrev'],
+					$p['to_metric_factor'], $p['metric_rounding_precision'], $p['imperial_label'], $p['imperial_abbrev'], $p['to_imperial_factor'], $p['imperial_rounding_precision']);
+			}
+			$pivot_field = new DbField($p['id'], $p['db_table'], $p['db_field_name'], $p['name'], $p['description'], $p['pdf_width'], $p['default_sort_order'], $p['datatype'], $p['max_length'], $p['decimal_scale'], $p['unit_of_measure'], $p['is_timespan'], $p['is_foreign_key'], $p['is_nullable'], $p['is_natural_sort'], $data_conversion);
 		}
 
 		if($report_meta['display_type'] === 'table'){

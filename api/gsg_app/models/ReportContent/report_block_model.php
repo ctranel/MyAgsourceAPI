@@ -128,8 +128,7 @@ class report_block_model extends CI_Model {
             $this->db
                 ->select("CASE WHEN mc.id IS NOT NULL THEN REPLACE(f.name, mc.imperial_abbrev, mc.metric_abbrev) ELSE f.name END AS [name]
 			        , CASE WHEN mc.id IS NOT NULL THEN REPLACE(f.description, mc.imperial_abbrev, mc.metric_abbrev) ELSE f.description END AS [description]
-					, CASE WHEN mc.id IS NOT NULL THEN REPLACE(f.unit_of_measure, mc.imperial_abbrev, mc.metric_abbrev) ELSE f.unit_of_measure END AS [unit_of_measure]")
-            ->join('users.dbo.metric_conversion mc', 'f.conversion_id = mc.id', 'left');
+					, CASE WHEN mc.id IS NOT NULL THEN REPLACE(f.unit_of_measure, mc.imperial_abbrev, mc.metric_abbrev) ELSE f.unit_of_measure END AS [unit_of_measure]");
         }
         else{
             $this->db
@@ -141,10 +140,12 @@ class report_block_model extends CI_Model {
 			        , f.category_id, f.decimal_points AS decimal_scale, f.is_timespan_field as is_timespan, f.is_fk_field AS is_foreign_key
 					, f.is_nullable, f.is_sortable, f.is_natural_sort, f.is_displayed, f.supp_id, f.a_href, f.a_rel, f.a_title
 					, f.a_class, f.head_a_href, f.head_a_rel, f.head_a_title, f.head_a_class, f.head_supp_id, f.head_comment, f.aggregate
-					, f.display_format, f.table_header_group_id, f.chart_type, f.axis_index, f.trend_type, f.field_group, f.field_group_ref_key")
+					, f.display_format, f.table_header_group_id, f.chart_type, f.axis_index, f.trend_type, f.field_group, f.field_group_ref_key
+					, mc.name AS conversion_name, mc.metric_label, mc.metric_abbrev, mc.to_metric_factor, mc.metric_rounding_precision, mc.imperial_label, mc.imperial_abbrev, mc.to_imperial_factor, mc.imperial_rounding_precision")
 			->where('report_id', $report_id)
 //			->order_by('field_group')
 			->order_by('list_order')
+            ->join('users.dbo.metric_conversion mc', 'f.conversion_id = mc.id', 'left')
 			->get('users.dbo.v_report_field_data f')
 			->result_array();
 	}
@@ -246,8 +247,7 @@ class report_block_model extends CI_Model {
                 ->select("CASE WHEN mc.id IS NOT NULL THEN REPLACE(f.name, mc.imperial_abbrev, mc.metric_abbrev) ELSE f.name END AS [name]
 			        , CASE WHEN mc.id IS NOT NULL THEN REPLACE(f.description, mc.imperial_abbrev, mc.metric_abbrev) ELSE f.description END AS [description]
 					, CASE WHEN mc.id IS NOT NULL THEN REPLACE(f.unit_of_measure, mc.imperial_abbrev, mc.metric_abbrev) ELSE f.unit_of_measure END AS [unit_of_measure]
-                    , CASE WHEN mc.id IS NOT NULL THEN REPLACE(text, mc.imperial_abbrev, mc.metric_abbrev) ELSE text END AS [text]")
-                ->join('users.dbo.metric_conversion mc', 'a.conversion_id = mc.id', 'left');
+                    , CASE WHEN mc.id IS NOT NULL THEN REPLACE(text, mc.imperial_abbrev, mc.metric_abbrev) ELSE text END AS [text]");
        }
         else{
             $this->db
@@ -255,13 +255,15 @@ class report_block_model extends CI_Model {
         }
 
 		$this->db
-		->select("a.id, a.x_or_y, a.min, a.max, a.opposite, a.data_type, a.db_field_id, CONCAT(db.name, '.', t.db_schema, '.', t.name) AS table_name, f.db_field_name, f.pdf_width, f.default_sort_order, f.data_type as datatype, f.max_length,
-					f.decimal_points AS decimal_scale, f.is_timespan_field as is_timespan, f.is_fk_field AS is_foreign_key, f.is_nullable, f.is_natural_sort, c.name AS category")
+		->select("a.id, a.x_or_y, a.min, a.max, a.opposite, a.data_type, a.db_field_id, CONCAT(db.name, '.', t.db_schema, '.', t.name) AS table_name, f.db_field_name, f.pdf_width, f.default_sort_order, f.data_type as datatype, f.max_length
+		            ,f.decimal_points AS decimal_scale, f.is_timespan_field as is_timespan, f.is_fk_field AS is_foreign_key, f.is_nullable, f.is_natural_sort, c.name AS category
+					,mc.name AS conversion_name,mc.metric_label,mc.metric_abbrev,mc.to_metric_factor,mc.metric_rounding_precision,mc.imperial_label,mc.imperial_abbrev,mc.to_imperial_factor,mc.imperial_rounding_precision")
 		->from('users.dbo.chart_axes AS a')
 		->join('users.dbo.chart_categories AS c', 'a.id = c.block_axis_id', 'left')
 		->join('users.dbo.db_fields AS f', 'a.db_field_id = f.id', 'left')
 		->join('users.dbo.db_tables AS t', 'f.db_table_id = t.id', 'left')
         ->join('users.dbo.db_databases AS db', 't.database_id = db.id', 'left')
+        ->join('users.dbo.metric_conversion mc', 'a.conversion_id = mc.id', 'left')
 		->where('a.report_id', $report_id)
 		->order_by('a.list_order', 'asc')
 		->order_by('c.list_order', 'asc');

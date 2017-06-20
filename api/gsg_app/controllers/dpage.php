@@ -144,7 +144,7 @@ class dpage extends MY_Api_Controller {
         $this->load->model('ReportContent/report_block_model');
         $this->load->model('Datasource/db_field_model');
         $this->load->model('Datasource/db_table_model');
-        $data_handler = new DataHandler($data_handler_model, $benchmarks);//$this->report_data_model
+        $data_handler = new DataHandler($data_handler_model, $benchmarks, (bool)$this->herd->isMetric());//true
         $db_table_factory = new DbTableFactory($this->db_table_model);
 
         //load factories for block content
@@ -160,7 +160,7 @@ class dpage extends MY_Api_Controller {
         $entry_form_factory = new FormDisplayFactory($this->Data_entry_model, $supplemental_factory, $params + ['herd_code'=>$this->session->userdata('herd_code'), 'user_id'=>$this->session->userdata('user_id')]);
 
         //create block content
-        $reports = $report_factory->getByPage($page_id, $this->herd->isMetric());
+        $reports = $report_factory->getByPage($page_id, (bool)$this->herd->isMetric());//true
         $setting_forms = $setting_form_factory->getByPage($page_id);
         $entry_forms = $entry_form_factory->getByPage($page_id, $this->session->userdata('herd_code'));
         //$serial_num = isset($params['serial_num']) ? $params['serial_num'] : null;

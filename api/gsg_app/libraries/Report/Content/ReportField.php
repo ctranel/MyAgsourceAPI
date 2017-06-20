@@ -225,23 +225,18 @@ class ReportField {
         return $ret;
     }
 
-	public function selectFieldText() {
-		//if(isset($this->display_format) && !empty($this->display_format) && false){ //test with no formatting on back end
-		//	return "FORMAT(" . $this->data_field->dbTableName() . "." . $this->data_field->dbFieldName() . ", '" . $this->display_format . "', 'en-US') AS " . $this->data_field->dbFieldName();
-		//}
-		if($this->data_field->dataType() === "date"){
-            return "FORMAT(" . $this->data_field->dbTableName() . "." . $this->data_field->dbFieldName() . ",  'yyyy-MM-dd', 'en-US') AS " . $this->data_field->dbFieldName();
-        }
-        if($this->data_field->dataType() === "datetime" || $this->data_field->dataType() === "smalldatetime"){
-            return "FORMAT(" . $this->data_field->dbTableName() . "." . $this->data_field->dbFieldName() . ",  'yyyy-MM-dd HH:mm:ss', 'en-US') AS " . $this->data_field->dbFieldName();
-        }
-		if(isset($this->aggregate) && !empty($this->aggregate)){
-			$alias_field_name = strtolower($this->aggregate) . '_' . $this->data_field->dbFieldName();
-			$ret_val = $this->aggregate . '(' . $this->data_field->dbTableName() . '.' . $this->data_field->dbFieldName() . ') AS ' . $alias_field_name;
-			$this->data_field->setDbFieldName($alias_field_name);
-			return $ret_val;
-		}
-		return $this->data_field->dbFieldName();
+
+    /**
+     * @method selectFieldText()
+     *
+     * Returns SQL text for select statement
+     *
+     * @param boolean is report to be displayed as metric?
+     * @return string of sql select statement text for field
+     * @access public
+     * */
+	public function selectFieldText($is_metric) {
+        return $this->data_field->selectFieldText($is_metric, $this->aggregate);
 	}
 }
 

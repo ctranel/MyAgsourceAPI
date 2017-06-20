@@ -34,29 +34,61 @@ abstract class ReportData implements iReportData{
 	 * @var \Report_data_model 
 	 **/
 	protected $report_datasource;
-	
+
+	/**
+	 * is_metric
+	 *
+	 * @var boolean should data be displayed as metric
+	 **/
+	protected $is_metric;
+
 	/**
 	 * @todo: add filter data
 	 */
-	function __construct(iReport $report, \Report_data_model $report_datasource) {//, Benchmarks $benchmarks, DbTable $db_table
+	function __construct(iReport $report, \Report_data_model $report_datasource, $is_metric) {//, Benchmarks $benchmarks, DbTable $db_table
 		$this->report = $report;
 		$this->report_datasource = $report_datasource;
+		$this->is_metric = (bool)$is_metric;
 	}
-	
-	/**
-	 * prepSelectFields()
-	 * 
-	 * In place to allow child classes to interact with select fields
-	 * 
-	 * @return array of sql-prepped select fields
-	 * @author ctranel
-	protected function prepSelectFields(){
-die('ReportData->prepSelectFields');
-		//nothing that applies to both graphs and tables yet
-	}
-**/
 
-	/** function whereCriteria
+    /**
+     * reportFields()
+     *
+     * @return iBlockField[]
+     * @author ctranel
+     **/
+    protected function reportFields(){
+        return $this->report->reportFields();
+    }
+
+    /**
+     * selectFields()
+     *
+     * In place to allow child classes to interact with select fields
+     *
+     * @return array of sql-prepped select fields
+     * @author ctranel
+     **/
+    protected function selectFields(){
+        $ret = [];
+        $report_fields = $this->reportFields();
+        if(isset($report_fields) && count($report_fields) > 0){
+            foreach($report_fields as $f){
+                $ret[] = $f->selectFieldText($this->is_metric);
+            }
+        }
+        //supplemental params
+        if(isset($this->dataset_supplemental) && count($this->dataset_supplemental) > 0){
+            foreach($this->dataset_supplemental as $f){
+                $ret = array_unique(array_merge($ret, $f->getLinkParamFields()));
+            }
+        }
+
+        return $ret;
+    }
+
+
+    /** function whereCriteria
 	 *
 	 * translates filter criteria into sql format
 	 * @param $arr_filter_criteria
