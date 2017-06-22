@@ -631,7 +631,7 @@ abstract class Report implements iReport {
 		$this->where_groups = [];
 		$criteria = [];
 		$arr_ret = [];
-		$arr_res = $this->datasource->getWhereData($this->id);
+		$arr_res = $this->datasource->getWhereData($this->id, $this->is_metric);
 		if(!is_array($arr_res) || empty($arr_res)){
 			return;
 		}
@@ -768,7 +768,7 @@ abstract class Report implements iReport {
 		$arr_res = $this->datasource->getSortData($this->id);
 		if(is_array($arr_res)){
 			foreach($arr_res as $s){
-				$datafield = new DbField($s['db_field_id'], $s['db_table_id'], $s['db_field_name'], $s['name'], $s['description'], $s['pdf_width'], $s['default_sort_order'],
+				$datafield = new DbField($s['db_field_id'], $s['table_name'], $s['db_field_name'], $s['name'], $s['description'], $s['pdf_width'], $s['default_sort_order'],
 						 $s['datatype'], $s['max_length'], $s['decimal_scale'], $s['unit_of_measure'], $s['is_timespan'], $s['is_foreign_key'], $s['is_nullable'], $s['is_natural_sort'], null);
 				$this->default_sorts[] = new Sort($datafield, $s['sort_order']);
 			}

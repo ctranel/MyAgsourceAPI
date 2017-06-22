@@ -80,19 +80,34 @@ class report_block_model extends CI_Model {
     /**
 	 * @method getWhereData()
 	 * @param int block id
+     * @param bool is_metric
 	 * @return returns multi-dimensional array, arr_sort_by field data and arr_sort_order
 	 * @author ctranel
 	 * @todo: implement nested where group iteration (i.e., parent_id field of where groups)
 	 **/
-	public function getWhereData($report_id){
-		return $this->db
-			->select("f.id AS db_field_id, f.db_table_id, f.db_field_name
-				, f.name, f.description, f.pdf_width, f.default_sort_order, f.data_type, f.is_timespan_field as is_timespan
-				, f.is_natural_sort, is_fk_field AS is_foreign_key, f.is_nullable, f.decimal_points AS decimal_scale, f.unit_of_measure, f.data_type as datatype, f.max_length, wg.operator, wc.where_group_id, wc.condition")
+	public function getWhereData($report_id, $is_metric){
+        if($is_metric){
+            $this->db
+                ->select("CASE WHEN mc.id IS NOT NULL THEN REPLACE(f.name, mc.imperial_abbrev, mc.metric_abbrev) ELSE f.name END AS [name]
+			        , CASE WHEN mc.id IS NOT NULL THEN REPLACE(f.description, mc.imperial_abbrev, mc.metric_abbrev) ELSE f.description END AS [description]
+					, CASE WHEN mc.id IS NOT NULL THEN REPLACE(f.unit_of_measure, mc.imperial_abbrev, mc.metric_abbrev) ELSE f.unit_of_measure END AS [unit_of_measure]");
+        }
+        else{
+            $this->db
+                ->select("f.name, f.description, f.unit_of_measure");
+        }
+
+        return $this->db
+			->select("f.db_field_id, f.table_name, f.db_field_name
+				, f.pdf_width, f.default_sort_order, f.data_type as datatype, f.is_timespan_field as is_timespan
+				, f.is_natural_sort, is_fk_field AS is_foreign_key, f.is_nullable, f.decimal_points AS decimal_scale, f.data_type as datatype, f.max_length
+				, wg.operator, wc.where_group_id, wc.condition
+				, mc.name AS conversion_name, mc.metric_label, mc.metric_abbrev, mc.to_metric_factor, mc.metric_rounding_precision, mc.imperial_label, mc.imperial_abbrev, mc.to_imperial_factor, mc.imperial_rounding_precision")
 			->from('users.dbo.reports_where_groups wg')
 			//->join('users.dbo.reports_where_groups wg2', 'wg.id = wg2.parent_id', 'inner')
 			->join('users.dbo.reports_where_conditions wc', 'wg.report_id = ' . $report_id . ' AND wg.id = wc.where_group_id', 'inner')
-			->join('users.dbo.db_fields f', 'wc.field_id = f.id' , 'inner')
+			->join('users.dbo.v_report_field_data f', 'wc.field_id = f.db_field_id' , 'inner')
+            ->join('users.dbo.metric_conversion mc', 'f.conversion_id = mc.id', 'left')
 			->get()
 			->result_array();
 	}
@@ -105,12 +120,12 @@ class report_block_model extends CI_Model {
 	 **/
 	public function getSortData($report_id){
 		return $this->db
-			->select("f.id AS db_field_id, f.db_table_id, f.db_field_name
+			->select("f.id AS db_field_id, t.name AS table_name, f.db_field_name
 				, f.name, f.description, f.pdf_width, f.default_sort_order, f.data_type, f.is_timespan_field as is_timespan
 				, f.is_natural_sort, is_fk_field AS is_foreign_key, f.is_nullable, f.decimal_points AS decimal_scale, f.unit_of_measure, f.data_type as datatype, f.max_length, s.sort_order")
 			->from('users.dbo.reports_sort_by s')
 			->join('users.dbo.db_fields f', 's.field_id = f.id AND s.report_id = ' . $report_id , 'inner')
-//			->join('users.dbo.db_tables t', 'f.db_table_id = t.id', 'inner')
+			->join('users.dbo.db_tables t', 'f.db_table_id = t.id', 'inner')
 //			->join('users.dbo.db_databases d', 't.database_id = d.id' , 'inner')
 			->order_by('s.list_order', 'asc')
 			->get()
