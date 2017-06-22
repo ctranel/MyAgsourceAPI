@@ -229,15 +229,10 @@ class Custom_report_model extends CI_Model {
 	}
 	
 	function get_tables_select_data($cat_id){
-		$arr_return = array();
 		$tmp = $this->get_tables_by_category($cat_id)->result_array();
-		if(is_array($tmp)){
-//			$arr_return[0] = 'Select one';
-			foreach($tmp as $t){
-				$arr_return[$t['id']] = $t['name'];
-			}
+		if(isset($tmp) && is_array($tmp)){
+            return $tmp;
 		}
-		return $arr_return;
 	}
 	
 	function get_fields(){
@@ -245,21 +240,16 @@ class Custom_report_model extends CI_Model {
 	}
 	
 	function get_fields_select_data($table_id){
-		$arr_return = array();
 		$this->db
 		->select('id, db_field_name, name, is_timespan_field')
 		->where('users.dbo.db_fields.db_table_id', $table_id);
 		$tmp = $this->get_fields()->result_array();
-		if(is_array($tmp)){
-			foreach($tmp as $t){
-				$arr_return[$t['id']] = array($t['id'], $t['db_field_name'], $t['name'], $t['is_timespan_field']);
-			}
+		if(isset($tmp) && is_array($tmp)){
+			return $tmp;
 		}
-		return $arr_return;
 	}
 	
 	function get_insert_after_data($page_id){
-		$arr_return = array();
 		$tmp = $this->db
 		->select('pb.list_order, b.name')
 		->from('users.dbo.pages_blocks pb')
@@ -267,12 +257,9 @@ class Custom_report_model extends CI_Model {
 		->where('pb.page_id', $page_id)
 		->order_by('pb.list_order')
 		->get()->result_array();
-		if(is_array($tmp)){
-			foreach($tmp as $t){
-				$arr_return[$t['list_order']] = $t['name'];
-			}
+		if(isset($tmp) && is_array($tmp)){
+			return $tmp;
 		}
-		return $arr_return;
 	}
 
     /**
@@ -302,12 +289,9 @@ class Custom_report_model extends CI_Model {
             ->where('users.dbo.pages.section_id', $section_id)
             ->where('(users.dbo.pages.user_id IS NULL OR users.dbo.pages.user_id = ' . $user_id . ')');
         $tmp = $this->get_pages()->result_array();
-        if(is_array($tmp)){
-            foreach($tmp as $t){
-                $arr_return[$t['id']] = $t['name'];
-            }
+        if(isset($tmp) && is_array($tmp)){
+            return $tmp;
         }
-        return $arr_return;
     }
 
     /**

@@ -157,13 +157,32 @@ class Custom_content extends MY_Api_Controller {
 	function select_page($section_id){
         try{
             $data = $this->custom_report_model->getPagesSelectDataByUser($this->session->userdata('user_id'), $section_id);
-            $this->sendResponse(200, null, ['options' => json_encode($data)]);
+            $return = [];
+            foreach($data as $c){
+                $return[] = (Object)[$c['id'] => $c['name']];
+            }
+
+            $this->sendResponse(200, null, ['options' => $return]);
         }
         catch(\Exception $e){
             $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
         }
-        $this->sendResponse(400, new ResponseMessage(validation_errors(), 'error'));
 	}
+
+    function select_list_order($page_id){
+        try{
+            $data = $this->custom_report_model->get_insert_after_data($page_id);
+            $return = [];
+            foreach($data as $c){
+                $return[] = (Object)[$c['list_order'] => $c['name']];
+            }
+
+            $this->sendResponse(200, null, ['options' => $return]);
+        }
+        catch(\Exception $e){
+            $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
+        }
+    }
 
 	function select_table($cow_or_summary){
         try{
@@ -183,29 +202,27 @@ class Custom_content extends MY_Api_Controller {
             }
 
             $data = $this->custom_report_model->get_tables_select_data($cat_id);
-            $this->sendResponse(200, null, ['options' => json_encode($data)]);
+            $return = [];
+            foreach($data as $c){
+                $return[] = (Object)[$c['id'] => $c['name']];
+            }
+
+            $this->sendResponse(200, null, ['options' => $return]);
         }
         catch(\Exception $e){
             $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
         }
-        $this->sendResponse(400, new ResponseMessage(validation_errors(), 'error'));
 	}
 
 	function select_field_data($table_id){
         try{
 		    $data = $this->custom_report_model->get_fields_select_data($table_id);
-            $this->sendResponse(200, null, ['options' => json_encode($data)]);
-        }
-        catch(\Exception $e){
-            $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
-        }
-        $this->sendResponse(400, new ResponseMessage(validation_errors(), 'error'));
-	}
+            $return = [];
+            foreach($data as $c){
+                $return[] = (Object)[$c['id'] => $c['name']];
+            }
 
-	function select_list_order($page_id){
-        try{
-		    $data = $this->custom_report_model->get_insert_after_data($page_id);
-            $this->sendResponse(200, null, ['options' => json_encode($data)]);
+            $this->sendResponse(200, null, ['options' => $return]);
         }
         catch(\Exception $e){
             $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
