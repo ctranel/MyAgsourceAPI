@@ -79,7 +79,6 @@ class MY_Api_Controller extends CI_Controller
             die();
         }
 
-        $this->load->library('carabiner');
         $this->load->model('Settings/settings_model', null, false, ['user-id' => $this->session->userdata('user_id'), 'herd_code' => $this->session->userdata('herd_code')]);
         $this->load->model('web_content/section_model');
         $this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));

@@ -1,9 +1,9 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 
 require_once(APPPATH . 'core/MY_Api_Controller.php');
-require_once APPPATH . 'libraries/CustomReport.php';
+require_once APPPATH . 'libraries/CustomContent/Report/CreateCustomReport.php';
 
-use \myagsource\CreateCustomReport;
+use \myagsource\CustomContent\Report\CreateCustomReport;
 
 class Custom_content extends MY_Api_Controller {
 	protected $page_header_data;
@@ -24,41 +24,21 @@ class Custom_content extends MY_Api_Controller {
 	function create(){
         try{
             $input = $this->input->userInputArray();
-//            $is_validated = $this->form_validation->run_input();
-
             $user_id = $this->session->userdata('active_group_id') == 1 ? NULL : $this->session->userdata('user_id');
-//            $form_factory = $this->_formFactory(['herd_code'=>$this->session->userdata('herd_code'), 'user_id'=>$input['user_id']], $input);
-//    $form_id = 35;
-//            $form = $form_factory->getForm($form_id);
 
-//            if ($is_validated === true) {
-                $custom_report = new CreateCustomReport($this->custom_report_model, $input['report_id'], $user_id);
+            $custom_report = new CreateCustomReport($this->custom_report_model, $input['report_id'], $user_id);
 
-                $custom_report->add_report($input);
-                //if($header_groups)
-                die();
-//            }
-//            $entity_keys = $form->write($input);
-
-            //if subcontent = listing,
-            //$form->writeSubContent()
+            $custom_report->add_report($input);
+            die();
 
             $resp_msg = new ResponseMessage('Form submission successful', 'message');
             //$this->_record_access(2); //2 is the page code for herd change
-
-//            if($parent_control_id){
-//                //use the inserted value
-//                $lookup_keys = $form_factory->getLookupKeys($parent_control_id);
-//                $value = isset($entity_keys[$lookup_keys['value_column']]) ? $entity_keys[$lookup_keys['value_column']] : $input[$lookup_keys['value_column']];
-//                $this->sendResponse(200, $resp_msg, ['option' => [$value => $input[$lookup_keys['desc_column']]]]);
-//            }
 
             $this->sendResponse(200, $resp_msg, ['identity_keys' => $entity_keys]);
         }
         catch(\Exception $e){
             $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
         }
-        //$this->sendResponse(400, new ResponseMessage(validation_errors(), 'error'));
     }
 
 	function select_page($section_id){

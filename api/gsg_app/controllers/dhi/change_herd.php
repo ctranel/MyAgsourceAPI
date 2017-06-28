@@ -88,7 +88,6 @@ class Change_herd extends MY_Api_Controller {
 		}
 
 		//validate form input
-        $this->load->library('herds');
 		$this->load->library('form_validation');
 		$this->form_validation->set_rules('herd_code', 'Herd', 'required|max_length[8]');
 		//$this->form_validation->set_rules('herd_code_fill', 'Type Herd Code');

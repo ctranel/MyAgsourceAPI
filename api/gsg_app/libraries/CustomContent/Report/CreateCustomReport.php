@@ -1,5 +1,5 @@
 <?php
-namespace myagsource;
+namespace myagsource\CustomContent\Report;
 
 /**
 * Name:  Custom Report Library
@@ -50,14 +50,6 @@ class CreateCustomReport
 	protected $has_aggregates = FALSE;
 
 
-	/*
-	protected $arr_columns = array(); //key=field_id, value=field_id
-	protected $arr_aggregate_columns = array(); //key=field_id, value=header_text
-	
-	protected $arr_header_groups = array(); //key=field_id, value=header_group_text
-	protected $arr_header_groups_data = array();
-	*/
-
 	public function __construct(\custom_report_model $datasource, $report_id, $user_id=null)
 	{
         $this->datasource = $datasource;
@@ -82,35 +74,7 @@ class CreateCustomReport
 	 */
 	public function add_report($input){
 		$this->datasource->start_transaction();
-/*
-		$arr_block_data = [
-			'user_id' => $this->input['user_id']
-			,'name' => $this->input['report_name']
-			,'description' => $this->input['report_description']
-			,'path' => preg_replace("/\W|/", '', strtolower(str_replace(' ', '_', $this->input['report_name'])))
-			,'display_type_id' => $this->input['report_display_id']
-			,'scope_id' => 2
-        ];
 
-		$this->block_id = $this->datasource->create_block($arr_block_data);
-//		if(!$this->block_id) $this->cancel_add();
-		$bool_block_on_page = $this->datasource->add_block_to_page(['block_id' => $this->block_id, 'page_id' => $this->input['page_id'], 'list_order' => $this->input['insert_after']]);
-//		if(!$bool_block_on_page) $this->cancel_add();
-		//table displays
-        $arr_report_data = [
-            'block_id' => $this->block_id
-            ,'chart_type_id' => isset($this->input['chart_type_id']) && !empty($this->input['chart_type_id']) ? $this->input['chart_type_id'] : null
-            ,'max_rows' => isset($this->input['max_rows']) && !empty($this->input['chart_type_id']) ? $this->input['max_rows'] : null
-            ,'cnt_row' => isset($this->input['cnt_row']) ? $this->input['cnt_row'] : false
-            ,'sum_row' => isset($this->input['sum_row']) ? $this->input['sum_row'] : false
-            ,'avg_row' => isset($this->input['avg_row']) ? $this->input['avg_row'] : false
-            ,'bench_row' => isset($this->input['bench_row']) ? $this->input['bench_row'] : false
-            ,'pivot_db_field' => isset($this->input['pivot_db_field']) && !empty($this->input['pivot_db_field']) ? $this->input['pivot_db_field'] : null
-            ,'is_summary' => $this->input['cow_or_summary'] === 'summary'
-            ,'keep_nulls' => 1
-        ];
-        $this->report_id = $this->datasource->create_report($arr_report_data);
-*/
 		//tables
         if($input['display_type_id'] == 1 || $input['display_type_id'] == 3){
 		    if(isset($this->input['pivot_db_field']) && !empty($this->input['pivot_db_field'])){
@@ -271,10 +235,10 @@ echo "group_by <br>";
         $sort_data = [];
         foreach($sort_cols as $k=>$v){
              $sort_data[] = [
-                'report_id' => $this->report_id
-                ,'field_id' => $v['field_id']
-                ,'sort_order' => isset($v['sort_order']) ? $v['sort_order'] : 'ASC' //if no value, default to ASC
-                ,'list_order' => $cnt
+                'report_id' => $this->report_id,
+                'field_id' => $v['field_id'],
+                'sort_order' => isset($v['sort_order']) ? $v['sort_order'] : 'ASC', //if no value, default to ASC
+                'list_order' => $cnt,
             ];
             $cnt++;
         }
@@ -297,17 +261,17 @@ echo "group_by <br>";
                     $field_id = $arr_tmp[1];
                 }
                 if($field_id > 0){
-                    $arr_column_data[] = array(
-                        'report_id' => $this->report_id
-                    ,'field_id' => $field_id
-                    ,'aggregate' => (!empty($arr_aggregate_vals[$k])) ? $arr_aggregate_vals[$k] : null
-                    ,'chart_type_id' => (!empty($arr_chart_type[$k])) ? $arr_chart_type[$k] : null
-                    ,'list_order' => $cnt
-                    ,'is_displayed' => 1 //bit field, yes or no
-                    ,'user_id' => $this->input['user_id']
-                    ,'axis_index' => $arr_axis_index_vals[$k]
-                    ,'header_text' => $v
-                    );
+                    $arr_column_data[] = [
+                        'report_id' => $this->report_id,
+                        'field_id' => $field_id,
+                        'aggregate' => (!empty($arr_aggregate_vals[$k])) ? $arr_aggregate_vals[$k] : null,
+                        'chart_type_id' => (!empty($arr_chart_type[$k])) ? $arr_chart_type[$k] : null,
+                        'list_order' => $cnt,
+                        'is_displayed' => 1,
+                        'user_id' => $this->input['user_id'],
+                        'axis_index' => $arr_axis_index_vals[$k],
+                        'header_text' => $v,
+                    ];
                     if($arr_aggregate_vals[$k] != NULL) $this->arr_aggregate_columns[$k] = $arr_aggregate_vals[$k];
                     $this->arr_columns[$k] = $v;
                     $cnt++;
@@ -330,16 +294,16 @@ echo "group_by <br>";
             $arr_yaxes_data = array();
             foreach($arr_yaxes_vals as $k=>$v){
                 if($k >= 0){
-                    $arr_yaxes_data[] = array(
-                        'report_id' => $this->report_id
-                    ,'x_or_y' => 'y'
-                        //,'db_field_id' => $k
-                    ,'text' => $v
-                    ,'min' => (!empty($arr_yaxes_min[$k]) || $arr_yaxes_min[$k] === 0) ? $arr_yaxes_min[$k] : null
-                    ,'max' => (!empty($arr_yaxes_max[$k]) || $arr_yaxes_max[$k] === 0) ? $arr_yaxes_max[$k] : null
-                    ,'opposite' => isset($arr_yaxes_opposite[$k]) ? 1 : 0
-                    ,'list_order' => "$k"
-                    );
+                    $arr_yaxes_data[] = [
+                        'report_id' => $this->report_id,
+                        'x_or_y' => 'y',
+                        //'db_field_id' => $k,
+                        'text' => $v,
+                        'min' => (!empty($arr_yaxes_min[$k]) || $arr_yaxes_min[$k] === 0) ? $arr_yaxes_min[$k] : null,
+                        'max' => (!empty($arr_yaxes_max[$k]) || $arr_yaxes_max[$k] === 0) ? $arr_yaxes_max[$k] : null,
+                        'opposite' => isset($arr_yaxes_opposite[$k]) ? 1 : 0,
+                        'list_order' => $k,
+                    ];
                 }
             }
             return $this->datasource->add_yaxes($arr_yaxes_data);
@@ -354,13 +318,13 @@ echo "group_by <br>";
         if(empty($xaxis_field) && empty($xaxis_label)){
             return false;
         }
-        $arr_xaxis_data[] = array(
-            'report_id' => $this->report_id
-        ,'x_or_y' => 'x'
-        ,'db_field_id' => $this->input['xaxis_field']
-        ,'text' => $this->input['xaxis_label']
-        ,'data_type' => $this->input['xaxis_datatype']
-        );
+        $arr_xaxis_data[] = [
+            'report_id' => $this->report_id,
+            'x_or_y' => 'x',
+            'db_field_id' => $this->input['xaxis_field'],
+            'text' => $this->input['xaxis_label'],
+            'data_type' => $this->input['xaxis_datatype'],
+        ];
         return $this->datasource->add_xaxis($arr_xaxis_data);
     }
 

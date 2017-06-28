@@ -36,7 +36,6 @@ class MY_Controller extends CI_Controller
         parent::__construct();
 
         $this->load->library('session');
-        $this->load->library('carabiner');
         $this->load->model('web_content/section_model');
         $this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
         $this->load->model('web_content/block_model');
@@ -45,7 +44,7 @@ class MY_Controller extends CI_Controller
         $this->load->helper('url');
         $this->load->helper('form');
         $this->load->helper('html');
-        $this->load->helper('error');
+        //$this->load->helper('error');
         $this->herd_access = new HerdAccess($this->herd_model);
         $herd = new Herd($this->herd_model, $this->session->userdata('herd_code'));
 

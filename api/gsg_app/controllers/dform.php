@@ -48,7 +48,6 @@ class dform extends dpage {
 	 */
 	function settings($form_id){
 		//validate form input
-        $this->load->library('herds');
 		$this->load->library('form_validation');
         try{
             //$this->form_validation->set_rules('herd_code', 'Herd', 'required|max_length[8]');
@@ -109,7 +108,6 @@ class dform extends dpage {
             //validate form input
             $this->load->model('supplemental_model');
             $supplemental_factory = new SupplementalFactory($this->supplemental_model, site_url());
-            $this->load->library('herds');
             $this->load->library('form_validation');
             $this->load->model('Forms/data_entry_model');
 
@@ -143,7 +141,6 @@ class dform extends dpage {
             //validate form input
             $this->load->model('supplemental_model');
             $supplemental_factory = new SupplementalFactory($this->supplemental_model, site_url());
-            $this->load->library('herds');
             $this->load->library('form_validation');
 
             if($display_data['display_type_id'] !== 6 && $display_data['display_type_id'] !== 7){
@@ -189,7 +186,6 @@ class dform extends dpage {
             //validate form input
         //$this->load->model('supplemental_model');
         //$supplemental_factory = new SupplementalFactory($this->supplemental_model, site_url());
-        $this->load->library('herds');
         $this->load->library('form_validation');
 
         try{
@@ -265,7 +261,6 @@ class dform extends dpage {
         $input = $this->input->userInputArray();
 
         //validate form input
-        $this->load->library('herds');
         $this->load->library('form_validation');
         $form_factory = $this->_formFactory($params + ['herd_code'=>$this->session->userdata('herd_code')], $input);
 

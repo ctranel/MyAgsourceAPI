@@ -54,8 +54,6 @@
 	$config['tables']['groups_tasks']  			= 'users.dbo.groups_tasks';
 	
 	//HERD DB tables
-	$config['tables']['herds']    				= 'herd.dbo.herd_id';
-//	$config['tables']['herds_sections']    		= 'users.dbo.herds_sections';
 	$config['tables']['herds_regions']    		= 'users.dbo.herds_regions';
 
 	//vma DB views
