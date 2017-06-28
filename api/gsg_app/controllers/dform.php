@@ -466,7 +466,7 @@ $page_id = 105;
         $db_table_factory = new DbTableFactory($this->db_table_model);
 
         $this->load->model('ReportContent/report_data_model');
-        $data_handler = new DataHandler($this->report_data_model, $benchmarks. $this->herd->isMetric());
+        $data_handler = new DataHandler($this->report_data_model, $benchmarks, $this->herd->isMetric());
 
         $this->load->model('Datasource/db_field_model');
         $this->load->model('ReportContent/report_block_model');

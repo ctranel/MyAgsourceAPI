@@ -79,6 +79,7 @@ class Custom_report_model extends CI_Model {
 	/**
 	 * @method create_block($data)
 	 * @param array data to insert
+     * @return int
 	 * @access public
 	 *
 	 **/
@@ -87,12 +88,11 @@ class Custom_report_model extends CI_Model {
 		if($this->db->affected_rows() <= 0){
             throw new \Exception("Could not create header group");
 		}
-		else {
-			$arr_ret = $this->db
-			->query("SELECT SCOPE_IDENTITY()")
-			->result_array();
-			return $arr_ret[0]['computed'];
-		}
+
+        $arr_ret = $this->db
+        ->query("SELECT SCOPE_IDENTITY()")
+        ->result_array();
+        return $arr_ret[0]['computed'];
 	}
 
 	/**
@@ -147,6 +147,9 @@ class Custom_report_model extends CI_Model {
 		if($this->db->affected_rows() <= 0){
             throw new \Exception("Could not add columns to report");
 		}
+
+		$sql = "UPDATE users.dbo.reports_select_fields INNER JOIN users.dbo.db_fields db ON field_id = db.id SET display_format = 'MM-dd-yy' WHERE db.data_type LIKE '%date%' AND report_id = $data[0][report_id]";
+		$this->db->query($sql);
 		return TRUE;
 	}
 
@@ -188,21 +191,42 @@ class Custom_report_model extends CI_Model {
 	}
 
 	/**
-	 * @method add_where
-	 * @param array with block and page ids
+	 * @method add_where_group
+	 * @param array with where group data
+     * @return int
 	 * @access public
 	 *
 	 **/
-	function add_where($data){
-//need to account for where groups
-		$this->db->insert('users.dbo.reports_sort_by', $data);
+	function add_where_group($data){
+		$this->db->insert('users.dbo.reports_where_groups', $data);
 		if($this->db->affected_rows() <= 0){
             throw new \Exception("Could not add conditions to report");
 		}
-		return TRUE;
+        $arr_ret = $this->db
+            ->query("SELECT SCOPE_IDENTITY()")
+            ->result_array();
+        return $arr_ret[0]['computed'];
 	}
 
-	function get_tables_by_category($cat_id){
+    /**
+     * @method add_where_conditions
+     * @param array with where condition data
+     * @return int
+     * @access public
+     *
+     **/
+    function add_where_conditions($data){
+        $this->db->insert('users.dbo.reports_where_conditions', $data);
+        if($this->db->affected_rows() <= 0){
+            throw new \Exception("Could not add conditions to report");
+        }
+        $arr_ret = $this->db
+            ->query("SELECT SCOPE_IDENTITY()")
+            ->result_array();
+        return $arr_ret[0]['computed'];
+    }
+
+    function get_tables_by_category($cat_id){
 		return $this->db
 			->query("WITH cteAnchor AS (
 					 SELECT id, parent_id
@@ -241,7 +265,7 @@ class Custom_report_model extends CI_Model {
 	
 	function get_fields_select_data($table_id){
 		$this->db
-		->select('id, db_field_name, name, is_timespan_field')
+		->select('id, db_field_name, name, is_timespan_field, data_type')
 		->where('users.dbo.db_fields.db_table_id', $table_id);
 		$tmp = $this->get_fields()->result_array();
 		if(isset($tmp) && is_array($tmp)){
