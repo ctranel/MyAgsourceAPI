@@ -74,8 +74,12 @@ class Chart extends Report {
 	 */
 	function __construct($report_datasource, $report_meta, ReportFilters $filters, SupplementalFactory $supp_factory, DataHandler $data_handler, DbTableFactory $db_table_factory, iDataField $pivot_field = null, $field_groups, $is_metric, $keep_nulls) {
 		parent::__construct($report_datasource, $report_meta, $filters, $supp_factory, $data_handler, $db_table_factory, $pivot_field, $field_groups, $is_metric);
-		
-		$this->keep_nulls = $keep_nulls;
+
+        if(!isset($this->report_fields) || empty($this->report_fields)){
+            return;
+        }
+
+        $this->keep_nulls = $keep_nulls;
 		$this->chart_type = $report_meta['chart_type'];
 		$this->x_axes = [];
 		$this->y_axes = [];
@@ -162,6 +166,10 @@ class Chart extends Report {
      *
      **/
     public function toArray(){
+        if(!isset($this->report_fields) || empty($this->report_fields)){
+            return;
+        }
+
         $ret = parent::toArray();
         $ret['keep_nulls'] = $this->keep_nulls;
         if(is_array($this->categories) && !empty($this->categories)){
@@ -309,6 +317,10 @@ class Chart extends Report {
 	 *
 	 **/
 	protected function setSeries(){
+		if(!isset($this->report_fields) || empty($this->report_fields)){
+		    return;
+        }
+
 		if(!empty($this->categories) || !empty($this->field_groups)){
 			$this->series = $this->deriveSeries();//count($this->json['data'], COUNT_RECURSIVE));
 			$this->series = array_values($this->series);

@@ -22,6 +22,10 @@ class DbTableFactory
     }
 
     public function getTable($name){
+        if(!isset($name) || empty($name)){
+            return;
+        }
+
         $ret = new DbTable($name, $this->db_table_model);
         return $ret;
     }
