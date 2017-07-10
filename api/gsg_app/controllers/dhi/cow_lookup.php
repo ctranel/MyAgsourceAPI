@@ -99,6 +99,7 @@ class Cow_lookup extends dpage {
 	}
 
 	function dam($serial_num){
+        //parent::index(127, '{"serial_num":' . $serial_num . '}');
 		$this->load->model('dhi/cow_lookup/dam_model');
 
     	try{

@@ -9,6 +9,7 @@ require_once APPPATH . 'libraries/Report/Content/Report.php';
 
 require_once APPPATH . 'libraries/Report/iReport.php';
 
+use \myagsource\Datasource\iDataField;
 use \myagsource\Datasource\DbObjects\DbField;
 use \myagsource\Datasource\DbObjects\DbTableFactory;
 use \myagsource\DataHandler;

@@ -44,6 +44,10 @@ class Table extends Report {
 	function __construct($table_datasource, $report_meta, ReportFilters $filters, SupplementalFactory $supp_factory = null, DataHandler $data_handler, DbTableFactory $db_table_factory, iDataField $pivot_field = null, $field_groups, $is_metric) {
 		parent::__construct($table_datasource, $report_meta, $filters, $supp_factory, $data_handler, $db_table_factory, $pivot_field, $field_groups, $is_metric);
 
+        if(!isset($this->report_fields) || empty($this->report_fields)){
+            return;
+        }
+
         $this->setDataset($report_meta['path']);
         $this->setTableHeader();
 	}

@@ -241,6 +241,7 @@ class Benchmarks extends Settings
 			}
 			$b = array($row_head_field => $bench_head_text) + $b;
 		}
+
 		return $arr_benchmarks;
 	}
 }

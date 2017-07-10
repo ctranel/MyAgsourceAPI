@@ -23,6 +23,31 @@ class Custom_report_model extends CI_Model {
     function trans_status(){
         $this->db->trans_status();
     }
+
+    function reportMeta($report_id){
+        $results = $this->db
+            ->select("r.[block_id],r.[id] AS rpeort_id,b.display_type_id,r.[chart_type_id],r.[max_rows],r.[cnt_row],r.[sum_row],r.[avg_row],r.[pivot_db_field],r.[bench_row],r.[is_summary],r.[keep_nulls]")
+            ->from("[users].[dbo].[reports] r")
+            ->join("users.dbo.blocks b", "r.block_id = b.id", "inner")
+            ->where("r.id", $report_id)
+            ->get()->result_array();
+
+        if(!$results){
+            throw new Exception('No report meta data found.');
+        }
+        $err = $this->db->_error_message();
+        if(!empty($err)){
+            throw new \Exception($err);
+        }
+
+        if(isset($results[0]) && is_array($results[0])) {
+            return $results[0];
+        }
+
+        return [];
+
+    }
+
 	/**
 	 * @method create_block($data)
 	 * @param array data to insert
@@ -148,7 +173,7 @@ class Custom_report_model extends CI_Model {
             throw new \Exception("Could not add columns to report");
 		}
 
-		$sql = "UPDATE users.dbo.reports_select_fields INNER JOIN users.dbo.db_fields db ON field_id = db.id SET display_format = 'MM-dd-yy' WHERE db.data_type LIKE '%date%' AND report_id = $data[0][report_id]";
+		$sql = "UPDATE rsf SET display_format = 'MM-dd-yy' FROM users.dbo.reports_select_fields rsf INNER JOIN users.dbo.db_fields db ON field_id = db.id WHERE db.data_type LIKE '%date%' AND report_id = " . $data[0]['report_id'];
 		$this->db->query($sql);
 		return TRUE;
 	}
@@ -179,6 +204,9 @@ class Custom_report_model extends CI_Model {
 	 *
 	 **/
 	function add_sort_by($data){
+	    if(!isset($data) || empty($data)){
+	        return;
+        }
         $prepped = $this->prepBatchData($data);
         $sql = "INSERT INTO users.dbo.reports_sort_by (" . implode(",", $prepped['keys']) . ")
             VALUES (" . implode("),(", $prepped['values']) . ")";
@@ -216,7 +244,13 @@ class Custom_report_model extends CI_Model {
      *
      **/
     function add_where_conditions($data){
-        $this->db->insert('users.dbo.reports_where_conditions', $data);
+        $prepped = $this->prepBatchData($data);
+        $sql = "INSERT INTO users.dbo.reports_where_conditions (" . implode(",", $prepped['keys']) . ")
+            VALUES (" . implode("),(", $prepped['values']) . ")";
+        $this->db->query($sql);
+
+
+//        $this->db->insert_batch('users.dbo.reports_where_conditions', $data);
         if($this->db->affected_rows() <= 0){
             throw new \Exception("Could not add conditions to report");
         }

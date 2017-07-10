@@ -38,11 +38,7 @@ class CreateCustomReport
      * @var int
      **/
     protected $user_id;
-    /**
-     * header group map
-     * @var array
-     **/
-    protected $header_group_map = [];
+
     /**
      * does the report contain aggregated columns?
      * @var boolean
@@ -55,14 +51,8 @@ class CreateCustomReport
         $this->datasource = $datasource;
         $this->report_id = $report_id;
         $this->user_id = $user_id;
+    }
 
-/*		$this->load->config('ion_auth', TRUE);
-		$this->load->library('email');
-		$this->load->library('session');
-		$this->lang->load('ion_auth');
-		$this->load->helper('cookie'); */
-	}
-	
 	/**
 	 * add_report
 	 *
@@ -73,22 +63,23 @@ class CreateCustomReport
 	 * @return	boolean
 	 */
 	public function add_report($input){
+	    $report_data = $this->datasource->reportMeta($this->report_id);
+
 		$this->datasource->start_transaction();
 
 		//tables
-        if($input['display_type_id'] == 1 || $input['display_type_id'] == 3){
-		    if(isset($this->input['pivot_db_field']) && !empty($this->input['pivot_db_field'])){
+        if($report_data['display_type_id'] == 1 || $report_data['display_type_id'] == 3){
+		    if(isset($input['pivot_db_field']) && !empty($input['pivot_db_field'])){
 		        $this->updateReport(['pivot_db_field' => $input['pivot_db_field']]);
             }
 echo "start <br>";
-            $header_group_map = $this->header_groups($input['table_header']);
+            $this->header_groups($input['table_header']);
 echo "header_groups <br>";
-			$this->table_columns($input['columns'], $header_group_map);
+            $header_row_cnt = count($input['table_header']);
+			$this->table_columns($input['table_header'][$header_row_cnt - 1]);
 echo "table_columns <br>";
-            $this->where($input['where']);
+            $this->whereGroup($input['where']);
 echo "where <br>";
-			$this->group_by($input['columns']);
-echo "group_by <br>";
 			$this->sort_by($input['sort']);
 echo "sort_by <br>";
 		}
@@ -101,8 +92,8 @@ echo "xaxis <br>";
 			$this->xaxis();
 echo "trend_columns <br>";
 			$this->trend_columns();
-echo "group_by <br>";
-			$this->group_by();
+//echo "group_by <br>";
+//			$this->group_by();
 		}
 		else{
 			die('I do not recognize the display type');
@@ -111,73 +102,82 @@ echo "group_by <br>";
 			die($this->datasource->error());
 			return FALSE;
 		}
-		
+
 		$this->datasource->complete_transaction();
 		return $this->datasource->trans_status();
 	}
 
     //where
-    protected function where($where, $parent_id = null){
-        if(!isset($where) || !is_array($where)) {
+    protected function whereGroup($group, $parent_id = null){
+        if(!isset($group) || !is_array($group)) {
             return;
         }
 
-        foreach($where as $v){
+        $where_group_data = [
+            'report_id' => $this->report_id,
+            'operator' => $group['operator'],
+            'parent_id' => $parent_id,
+        ];
+
+        $where_group_id = $this->datasource->add_where_group($where_group_data);
+        if(isset($group['conditions']) && is_array($group['conditions'])){
             $where_condition_data = [];
-            $where_group_data = [
-                'report_id' => $this->report_id,
-                'operator' => $v['operator'],
-                'parent_id' => $parent_id,
-            ];
-            $where_group_id = $this->datasource->add_where_group($where_group_data);
-            if(isset($v['conditions']) && is_array($v['conditions'])){
-                foreach($v['conditions'] as $c){
+            foreach($group['conditions'] as $c){
+                if($c['field_id'] !== null){
                     $where_condition_data[] = [
                         'where_group_id' => $where_group_id,
-                        'field_id' => $c['field_id'],
-                        'condition' => $c['operator'] . ' ' . $c['operand'],
+                        'field_id' => (int)$c['field_id'],
+                        'condition' => $c['operator'] . "''" . $c['operand'] . "''",
                     ];
-                    $this->datasource->add_where_conditions($where_condition_data);
                 }
             }
-            if(isset($v['groups']) && is_array($v['groups'])){
-                foreach($v['groups'] as $g){
-                    $this->where($g, $where_group_id);
-                }
+            $this->datasource->add_where_conditions($where_condition_data);
+        }
+        if(isset($group['conditionGroups']) && is_array($group['conditionGroups'])){
+            foreach($group['conditionGroups'] as $g){
+                $this->whereGroup($g, $where_group_id);
             }
         }
     }
 
     //add header groups
-	protected function header_groups($headers, $parent_id = null) {
-        if(!isset($headers) || !is_array($headers)){
+	protected function header_groups(&$headers) {
+        //if headers is not set, or contains only 1 level, we have no header groups
+        if(!isset($headers) || !is_array($headers) || count($headers) < 2){
             return;
         }
 
-        foreach($headers as $h){
-            $header_data = [
-                'text' => $h['text'],
-                'index' => $h['index'],
-            ];
-            $header_id = $this->datasource->add_header_group($header_data);
+        $last_row_index = (count($headers) - 1);
+        $header_group_map = [];
+        foreach($headers as $ri => &$hr){
+            $idx = 0;
+            $header_group_map[$ri] = [];
+            foreach($hr as $ci => &$hc){
+                $hc['parent_id'] = null;
+                if(isset($hc['header_text']) || !empty($hc['header_text'])){
+                    if($ri > 0){ //first row cannot have a parent
+                        $hc['parent_id'] = $header_group_map[($ri - 1)][$idx];
+                    }
 
-            $this->header_group_map[$h['index']] = $header_id;
+                    if($ri < $last_row_index){ //last row is column headers, don't want them in header groups
+                        $header_data = [
+                            'text' => $hc['header_text'],
+                            'parent_id' => $hc['parent_id'],
+                            'list_order' => ($ci + 1),
+                        ];
 
-            if(isset($h['children']) && is_array($h['children'])){
-                $this->header_groups($h['children'], $header_id);
+                       $header_id = $this->datasource->add_header_group($header_data);
+                    }
+                }
+                $header_group_map[$ri] = array_merge($header_group_map[$ri], array_fill($idx, $hc['colspan'], $header_id));
+                $idx += $hc['colspan'];
             }
         }
-/*
-		$arr_header_groups = $this->input['head_group'];
-		$this->arr_header_groups_data = array();
-		$arr_head_group_parent_index = $this->input['head_group_parent_index'];
-		$arr_header_keys = array();
-		if(isset($arr_header_groups) && is_array($arr_header_groups)) $this->add_header_group($arr_header_groups, $this->arr_header_groups_data, $arr_head_group_parent_index);
-*/
+        return;
     }
-	
+
 	//add columns
-	protected function table_columns($cols, $header_group_map){
+	protected function table_columns($cols){
         if(!isset($cols) || !is_array($cols)){
             return;
         }
@@ -189,12 +189,12 @@ echo "group_by <br>";
                 $column_data[] = [
                     'report_id' => $this->report_id,
                     'field_id' => $v['field_id'],
-                    'aggregate' => $v['aggregate'],
+                    'aggregate' => isset($v['aggregate']) ? $v['aggregate'] : null,
                     'list_order' => $cnt,
                     'is_displayed' => 1,
-                    'table_header_group_id' => $header_group_map[$v['header_group_id']],
+                    'table_header_group_id' => isset($v['parent_id']) ? $v['parent_id'] : null,
                     'user_id' => $this->user_id,
-                    'header_text' => $v['header'],
+                    'header_text' => $v['header_text'],
                 ];
 
                 if(isset($v['aggregate']) && !empty($v['aggregate'])){
@@ -203,29 +203,10 @@ echo "group_by <br>";
                 $cnt++;
             }
         }
+
         return $this->datasource->add_columns($column_data);
 	}
-	
-	//group by
-	protected function group_by($cols){
-        if($this->has_aggregates === false || !isset($cols) || !is_array($cols)){
-            return;
-        }
-	    $group_by_data = [];
-        $cnt = 1;
-        foreach($cols as $k=>$v) {
-            if (empty($v['aggregate'])) {
-                $group_by_data[] = [
-                    'report_id' => $this->report_id,
-                    'field_id' => $v['field_id'],
-                    'list_order' => $cnt,
-                ];
-                $cnt++;
-            }
-        }
-        return $this->datasource->add_group_by($group_by_data);
-	}
-	
+
 	//sort by
 	protected function sort_by($sort_cols){
 		if(!isset($sort_cols) || !is_array($sort_cols)) {
@@ -327,30 +308,5 @@ echo "group_by <br>";
         ];
         return $this->datasource->add_xaxis($arr_xaxis_data);
     }
-
-    /* HELPER FUNCTIONS
-	protected function add_header_group($arr_header_groups, &$new_arr_header_groups, $arr_head_group_parent_index, $parent_key = NULL){
-		foreach($arr_header_groups as $k => $v){
-			if(is_array($v)){
-				$key_param = ($parent_key) ? $parent_key . '-' . $k : $k;
-				$this->add_header_group($v, $new_arr_header_groups, $arr_head_group_parent_index, $key_param);
-			}
-			else {
-				if($v != 'Enter text here to add a header grouping' && $v != '') {
-					$parent_array_index = isset($arr_head_group_parent_index[$parent_key]) ? $arr_head_group_parent_index[$parent_key][$k] : NULL;
-					$parent_id = isset($new_arr_header_groups[($parent_key - 1)]) ? $new_arr_header_groups[($parent_key - 1)][$parent_array_index]['id'] : NULL;
-					$arr_header_group_data = array(
-						'parent_id' => $parent_id,
-						'text' => $v,
-						'list_order' => $k
-					);
-					$arr_header_group_data['id'] = $this->datasource->add_header_group($arr_header_group_data);
-					if($parent_key) $new_arr_header_groups[$parent_key][$k] = $arr_header_group_data;
-					else $new_arr_header_groups[$k] = $arr_header_group_data;
-				}
-			}
-		}
-	}
-*/
 }
 				

@@ -87,7 +87,7 @@ class TableData extends ReportData {
 				$this->db_table,
 				$row_head_field,
 				$arr_field_list,
-				$this->report->getGroupBy()
+				null//$this->report->getGroupBy() unset pstring and herd_code
 			);
 			if(count($arr_bench_data) > 1){
 			/*

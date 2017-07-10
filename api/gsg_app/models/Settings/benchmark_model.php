@@ -118,22 +118,22 @@ class Benchmark_model extends Settings_model {
 			else{
 				$where .= ' WHERE';
 			}
-			$where .= ' pstring = 0';// . $pstring;
+			$where .= ' p.pstring = 0';// . $pstring;
 		}
 		//include additional key fields
 		if(isset($arr_group_by) && is_array($arr_group_by) && count($arr_group_by) > 0){
-			$group_by = " GROUP BY " . $arr_group_by[0];
-			$order_by = " ORDER BY " . $arr_group_by[0];
+			$group_by = " GROUP BY p." . $arr_group_by[0];
+			$order_by = " ORDER BY p." . $arr_group_by[0];
 			$addl_select_fields = $arr_group_by[0] . ',';
 			$high_index = (count($arr_group_by) - 1);
 			for($i=1; $i<=$high_index; $i++){
 				$addl_select_fields .= $arr_group_by[$i] . ',';
-				$group_by .= ", " . $arr_group_by[$i];
-				$order_by .= ", " . $arr_group_by[$i];
+				$group_by .= ", p." . $arr_group_by[$i];
+				$order_by .= ", p." . $arr_group_by[$i];
 			}
 		}
 		$sql = $cte . "SELECT COUNT(1) AS cnt_herds, " . $addl_select_fields. $avg_fields . $from . $where . $group_by . $order_by;
-//die($sql);
+//print($sql);
 		return $sql;
 	}
 	
@@ -160,7 +160,7 @@ class Benchmark_model extends Settings_model {
 		$sql =  'WITH benchmark_herds(' . $cte_fields . ') AS (SELECT ' . $cte_qualifier . 'herd_code, test_date FROM ' . $herd_benchmark_pool_table;
 	
 		$sql .= ' WHERE test_date > DATEADD(MONTH, -4, GETDATE()) AND ' . $arr_criteria_data['field'] . ' IS NOT NULL ';
-//the following line should not be necessary if we eliminate records where pstring != 0 from the table (could also eliminate records older than 4 months)
+//the following line should not be necessary if we eliminate records where pstring != 0 from the table
 		$sql .= ' AND pstring = 0 ';
 		if(isset($arr_breeds) && is_array($arr_breeds) && !empty($arr_breeds)){
 			$sql .= " AND breed_code IN ('" . implode("','", $arr_breeds) . "')";
