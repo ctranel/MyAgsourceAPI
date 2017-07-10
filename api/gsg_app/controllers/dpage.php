@@ -17,6 +17,7 @@ require_once APPPATH . 'libraries/Listings/Content/ListingFactory.php';
 require_once(APPPATH . 'libraries/Report/Content/ReportFactory.php');
 require_once(APPPATH . 'libraries/Form/Content/FormDisplayFactory.php');
 require_once(APPPATH . 'libraries/Settings/Form/SettingsFormDisplayFactory.php');
+require_once(APPPATH . 'libraries/dhi/Animal.php');
 
 
 use \myagsource\Benchmarks\Benchmarks;
@@ -35,6 +36,7 @@ use \myagsource\Settings\Form\SettingsFormDisplayFactory;
 use \myagsource\Listings\Content\ListingFactory;
 use \myagsource\Report\Content\ReportFactory;
 use \myagsource\Form\Content\FormDisplayFactory;
+use \myagsource\dhi\Animal;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
@@ -157,12 +159,19 @@ class dpage extends MY_Api_Controller {
         $setting_form_factory = new SettingsFormDisplayFactory($this->setting_form_model, $supplemental_factory, $params + ['herd_code'=>$this->session->userdata('herd_code'), 'user_id'=>$this->session->userdata('user_id')]);
 
         $this->load->model('Forms/Data_entry_model');//, null, false, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
+        //Can't edit inactive animals
+        $editable = true;
+        if(isset($params['serial_num'])){
+            $this->load->model('dhi/animal_model');
+            $editable = Animal::isActive($this->animal_model, $this->session->userdata('herd_code'), $params['serial_num']);
+        }
+
         $entry_form_factory = new FormDisplayFactory($this->Data_entry_model, $supplemental_factory, $params + ['herd_code'=>$this->session->userdata('herd_code'), 'user_id'=>$this->session->userdata('user_id')]);
 
         //create block content
         $reports = $report_factory->getByPage($page_id, (bool)$this->herd->isMetric());//true
         $setting_forms = $setting_form_factory->getByPage($page_id);
-        $entry_forms = $entry_form_factory->getByPage($page_id, $this->session->userdata('herd_code'));
+        $entry_forms = $entry_form_factory->getByPage($page_id, $this->session->userdata('herd_code'), $editable);
         //$serial_num = isset($params['serial_num']) ? $params['serial_num'] : null;
         $listings = $option_listing_factory->getByPage($page_id, $params + ['herd_code'=>$this->session->userdata('herd_code')]);//, 'serial_num'=>$serial_num
 

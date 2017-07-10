@@ -18,12 +18,12 @@ class Dam_model extends CI_Model {
 
 	public function getCowArray($herd_code, $serial_num){
 		$arr_ret = $this->{$this->db_group_name}
-		->select("c.control_num, c.list_order_num, c.barn_name, c.visible_id, c.dam_control_num, c.dam_breed_code, CASE WHEN c.dam_id IS NOT NULL THEN CONCAT(c.dam_country_code, c.dam_id) END AS dam_id, c.dam_name, c.mgr_dam_control_num, c.mgr_dam_breed_code, CASE WHEN c.mgr_dam_id IS NOT NULL THEN CONCAT(c.mgr_dam_country_code, c.mgr_dam_id) END AS mgr_dam_id, c.mgr_dam_name, c.mgr_sire_breed_code, CASE WHEN c.mgr_sire_id IS NOT NULL THEN CONCAT(c.mgr_sire_country_code, c.mgr_sire_id) END AS mgr_sire_id, c.mgr_sire_name, s.mgr_sire_primary_naab, c.mgrtgr_sire_breed_code, CASE WHEN c.mgrtgr_sire_id IS NOT NULL THEN CONCAT(c.mgrtgr_sire_country_code, c.mgrtgr_sire_id) END AS mgrtgr_sire_id, c.mgrtgr_sire_naab, c.mgrtgr_sire_name, c.dam_serial_num")
+		->select("control_num, list_order AS list_order_num, barn_name, visible_id, dam_control_num, dam_breed_code, dam_id, dam_name, mgr_dam_control_num, mgr_dam_breed_code, mgr_dam_id, mgr_dam_name, mgr_sire_breed_code, mgr_sire_id, mgr_sire_name, mgr_sire_naab, mgrtgr_sire_breed_code, mgrtgr_sire_id, mgrtgr_sire_naab, mgrtgr_sire_name, dam_serial_num")
 		//->join('animal.dbo.view_ped_dam_life_pta d', 'c.herd_code = d.herd_code AND c.serial_num = d.serial_num', 'left')
-		->join('animal.dbo.view_pedigree_mgr_sire_pta s', 'c.herd_code = s.herd_code AND c.serial_num = s.serial_num', 'left')
-		->where('c.herd_code', $herd_code)
-		->where('c.serial_num', $serial_num)
-		->get('animal.dbo.view_pedigree_life_pta c')
+		//->join('animal.dbo.view_pedigree_mgr_sire_pta s', 'c.herd_code = s.herd_code AND c.serial_num = s.serial_num', 'left')
+		->where('herd_code', $herd_code)
+		->where('serial_num', $serial_num)
+		->get('vamTD.dbo.vma_Cow_Lookup_ID')
 		->result_array();
 	
 		if(is_array($arr_ret) && !empty($arr_ret)){

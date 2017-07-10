@@ -95,43 +95,7 @@ class Cow_lookup extends dpage {
 	}
 	
 	function id($serial_num){
-		try{
-            $params = ['serial_num' => $serial_num];
-            $this->load->model('dhi/animal_model');
-            $editable = Animal::isActive($this->animal_model, $this->session->userdata('herd_code'), $serial_num);
-
-            //supplemental factory
-            $this->load->model('supplemental_model');
-            $supplemental_factory = new SupplementalFactory($this->supplemental_model, site_url());
-
-            //Set up site content objects
-            $this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
-            $this->load->model('web_content/block_model');
-
-            //page content
-            $this->load->model('ReportContent/report_block_model');
-
-            $this->load->model('Forms/Data_entry_model');//, null, false, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
-            $entry_form_factory = new FormDisplayFactory($this->Data_entry_model, $supplemental_factory, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
-
-            //create block content
-            //$listing = $option_listing_factory->getListing(3, ['herd_code' => $this->session->userdata('herd_code'), 'serial_num' => $serial_num]);
-            $entry_forms = $entry_form_factory->getByPage(126, $this->session->userdata('herd_code'), $editable);
-
-            //create blocks for content
-            $web_block_factory = new WebBlockFactory($this->block_model, $supplemental_factory);
-            if(is_array($entry_forms)){
-                foreach($entry_forms as $f){
-                    $block = $web_block_factory->getBlock(415, $f);
-                    $data['blocks'][] = $block->toArray();
-                }
-            }
-        }
-        catch(Exception $e){
-            $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
-        }
-
-        $this->sendResponse(200, null, $data);
+        parent::index(126, '{"serial_num":' . $serial_num . '}');
 	}
 
 	function dam($serial_num){
