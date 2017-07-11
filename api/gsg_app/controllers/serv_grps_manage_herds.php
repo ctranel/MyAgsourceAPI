@@ -172,7 +172,7 @@ class Serv_grps_manage_herds extends MY_Api_Controller {
                 array_walk($arr_post_section_id, function (&$value) { $value = (int)$value; });
         */			$arr_post_section_id = array();
 
-        if ($this->as_ion_auth->service_grp_request($arr_relationship_data, $arr_post_section_id, $this->config->item('cust_serv_email'))) {
+        if ($this->as_ion_auth->service_grp_request($arr_relationship_data, $arr_post_section_id)) {
             $this->_record_access(35);
             $this->sendResponse(200, new ResponseMessage($this->as_ion_auth->messages(), 'message')); //  to manage access page
         }

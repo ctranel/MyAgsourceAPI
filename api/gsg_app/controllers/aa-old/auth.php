@@ -246,7 +246,7 @@ class Auth extends Ionauth {
 					case 'Resend Request Email':
 						foreach($arr_modify_id as $k=>$id){
 							$arr_relationship_data = $this->ion_auth_model->get_consult_relationship_by_id($id);
-							if ($this->as_ion_auth->send_consultant_request($arr_relationship_data, $id, $this->config->item('cust_serv_email'))) {
+							if ($this->as_ion_auth->send_consultant_request($arr_relationship_data, $id)) {
 								$this->_record_access(35);
 								$this->page_header_data['message'] = compose_error(validation_errors(), $this->session->flashdata('message'), $this->as_ion_auth->messages(), $this->as_ion_auth->errors());
 							}
