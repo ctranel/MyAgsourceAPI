@@ -206,7 +206,7 @@ class Setting {
     */
     public function getCurrValue($session_value = null){
         //if a string is sent for array type, insert string into array
-        if(isset($session_value)){
+/*        if(isset($session_value)){
             if(strpos($this->control_type, 'array') !== false){
                 if(!is_array($session_value)){
                     $session_value = [$session_value];
@@ -222,7 +222,7 @@ class Setting {
                 }
             }
             return $session_value;
-        }
+        } */
         //if session_value is null
         if(strpos($this->control_type, 'array') !== false){
             if(!is_array($this->value)){

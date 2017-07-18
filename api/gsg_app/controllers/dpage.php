@@ -254,11 +254,7 @@ class dpage extends MY_Api_Controller {
         $this->load->model('Forms/setting_form_model');//, null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
         //end filters
 
-        //benchmarks
-        if($this->permissions->hasPermission("Set Benchmarks")){
-            $this->load->model('Settings/benchmark_model');//, null, false, ['user_id' => $this->session->userdata('user_id'), 'herd_code' => $this->session->userdata('herd_code')]);
-            $benchmarks = new Benchmarks($this->benchmark_model, $this->session->userdata('user_id'), $this->herd->herdCode(), $this->herd_model->header_info($this->herd->herdCode()), $this->session->userdata('benchmarks'));
-        }
+        $benchmarks = $this->_benchmarks();
 
         //create blocks for content
         $this->load->model('dhi/todo_list_model', null, false, $this->settings);
@@ -321,11 +317,8 @@ class dpage extends MY_Api_Controller {
         $this->load->model('Forms/setting_form_model');//, null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
         //end filters
 
-        //benchmarks
-        if($this->permissions->hasPermission("Set Benchmarks")){
-            $this->load->model('Settings/benchmark_model');//, null, false, ['user_id' => $this->session->userdata('user_id'), 'herd_code' => $this->session->userdata('herd_code')]);
-            $benchmarks = new Benchmarks($this->benchmark_model, $this->session->userdata('user_id'), $this->herd->herdCode(), $this->herd_model->header_info($this->herd->herdCode()), $this->session->userdata('benchmarks'));
-        }
+        $benchmarks = $this->_benchmarks();
+
         //create blocks for content
         $this->load->model('dhi/todo_list_model', null, false, $this->settings);
         $block_content = $this->_blockContent($page_id, $supplemental_factory, $params, $benchmarks, $this->todo_list_model);

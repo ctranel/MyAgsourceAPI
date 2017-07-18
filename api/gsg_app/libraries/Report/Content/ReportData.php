@@ -250,16 +250,17 @@ abstract class ReportData implements iReportData{
 		}
 		
 		$first_col_key = key($arr_dataset[0]);
+		$last_rows_index = count($arr_dataset) - 1;
 		foreach($arr_dataset as $k => $row){
 			foreach($row as $name => $val){
-			    $data_type[$name] = $this->report->getFieldDataType($name);
 				if(strpos($name, 'isnull') === false && is_numeric($val)) {
 					if(isset($sum[$name]) === false && $val !== null){
+                        $data_type[$name] = $this->report->getFieldDataType($name);
 						$sum[$name] = 0;
 						$count[$name] = 0;
 					}
 						
-					if($val !== NULL){
+					if($val !== NULL && (!$this->report->hasBenchmark() || $k < $last_rows_index)){
 						$sum[$name] += $val;
 						$count[$name]++;
 					}
@@ -282,16 +283,16 @@ abstract class ReportData implements iReportData{
 		if($this->report->hasAvgRow() && count($sum) > 1){
 			foreach($sum as $k => $v){
 			    //prevent averaging of inappropriate data_types
-			    if ((strpos($data_type[$k],'int') !== false) || (strpos($data_type[$k], 'numeric') !== false)|| (strpos($data_type[$k], 'decimal') !== false) || (strpos($data_type[$k], 'money') !== false)) {
+			    if (isset($data_type[$k])) {
+                //if ((strpos($data_type[$k],'int') !== false) || (strpos($data_type[$k], 'numeric') !== false)|| (strpos($data_type[$k], 'decimal') !== false) || (strpos($data_type[$k], 'money') !== false)) {
 			        //prevent division by zero
-			        if ($count[$k] > 0) $avg[$k] = $sum[$k] / $count[$k];			         
+			        if ($count[$k] > 0){
+			            $avg[$k] = round(($sum[$k] / $count[$k]), $this->report->getFieldDecimalScaleByName($k));
+                    }
 			    }  
 			    else {
 			        $avg[$k] = null;
 			    }
-//				if(isset($this->arr_decimal_points[$k])){
-//					$tmp = round($tmp, $this->arr_decimal_points[$k]);
-//				}
 			}
 			$avg[$first_col_key] = 'AVG';
 			$arr_dataset[] = $avg;

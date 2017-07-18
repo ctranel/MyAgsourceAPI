@@ -151,7 +151,11 @@ class ReportField {
 		return (isset($this->aggregate) && !empty($this->aggregate));
 	}
 
-	public function defaultSortOrder() {
+    public function aggregate() {
+        return $this->aggregate;
+    }
+
+    public function defaultSortOrder() {
 		return $this->data_field->defaultSortOrder();
 	}
 	

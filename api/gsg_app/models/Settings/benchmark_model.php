@@ -24,32 +24,29 @@ class Benchmark_model extends Settings_model {
 	}
 
 	/**
-	 * @method get_benchmark_fields()
+	 * @method get_select_sql()
 	 * @param string table from which benchmarks are pulled
 	 * @param array fields to exclude from the returned value
 	 * @return array of data fields for the current primary table, excluding those fields in the param
 	 * @access protected
 	 *
 	 **/
-	public function get_benchmark_fields($db_table, $arr_excluded_fields = NULL){
-        $db_table = MssqlUtility::escape($db_table);
-        if(isset($arr_excluded_fields) && is_array($arr_excluded_fields)){
-            array_walk_recursive($arr_excluded_fields, function(&$v, $k){return MssqlUtility::escape($v);});
+	public function get_select_sql($report_fields, $arr_excluded_fields = NULL){//$db_table){
+        $text = '';
+
+        foreach($report_fields as $f){
+            if($f->isDisplayed() && $f->isNumeric() && in_array($f->dbFieldName(), $arr_excluded_fields) === false){
+                $base_field_name = $f->dbFieldName();
+                if($f->isAggregate()){
+                    $base_field_name = str_replace(strtolower($f->aggregate()) . '_', '', $base_field_name);
+                }
+
+                $text .= ",CAST(ROUND(AVG(CAST([" . $base_field_name . "] AS DECIMAL(12,4))), " . $f->decimalScale() . ") AS DECIMAL(10, " . $f->decimalScale() . ")) AS [";
+                $text .= $f->dbFieldName() . ']';
+            }
         }
 
-		list($db, $schema, $tbl) = explode('.', $db_table);
-		$sql = "USE " . $db . "
-		 SELECT CAST ((select ',CAST(ROUND(AVG(CAST('+quotename(C.name)+' AS DECIMAL(12,4))),'+CAST(C.scale AS VARCHAR(3))+') AS DECIMAL('+ CAST(C.precision AS VARCHAR(3)) +','+ CAST(C.scale AS VARCHAR(3)) +')) AS '+quotename(C.name)
-         from sys.columns as C
-         where C.object_id = object_id('" . $db_table . "')";
-        if(is_array($arr_excluded_fields) && !empty($arr_excluded_fields)) $sql .= " and C.name IN('" . implode("','", $arr_excluded_fields) . "')";// AND C.name NOT LIKE 'cnt%'";
-        $sql .= " AND TYPE_NAME(C.user_type_id) NOT IN('char','smalldatetime','varchar','date')";
-		$sql .= "for xml path('')) AS text) AS fields";
-
-		$results = $this->db
-		->query($sql)
-		->result_array();
-		return substr($results[0]['fields'], 1);
+		return substr($text, 1);
 	}
 	
 	public function getBenchmarkData($bench_sql){
@@ -175,5 +172,33 @@ class Benchmark_model extends Settings_model {
 		$sql .= ')';
 		return $sql;
 	}
-	
+
+    /**
+     * @method getSettingsData()
+     * @param string herd_code
+     * @return array of data fields for the current primary table, excluding those fields in the param
+     * @access protected
+     *
+     **/
+    public function getSettingsData($user_id, $herd_code){
+        $user_id = (int)$user_id;
+        $herd_code = MssqlUtility::escape($herd_code);
+
+        if(isset($user_id) && $user_id != FALSE){
+            $this->db
+                ->join('users.setng.user_herd_settings uhs', "s.id = uhs.setting_id AND (uhs.user_id = " . $user_id . " OR uhs.user_id IS NULL) AND (uhs.herd_code = '" . $herd_code . "' OR uhs.herd_code IS NULL)", 'left');
+        }
+        else{
+            $this->db
+                ->join('users.setng.user_herd_settings uhs', "s.id = uhs.setting_id AND uhs.user_id IS NULL AND (uhs.herd_code = '" . $herd_code . "' OR uhs.herd_code IS NULL)", 'left');
+        }
+        $ret = $this->db
+            ->select('s.id, s.name, s.label, uhs.value, s.default_value, c.name AS control_type')
+            ->from('users.setng.settings s')
+            ->join('users.frm.control_types c', "s.type_id = c.id AND s.id IN(1,2,3,4)", 'inner')
+            ->get()
+            ->result_array();
+
+        return $ret;
+    }
 }

@@ -82,12 +82,13 @@ class TableData extends ReportData {
 		$results = $this->report_datasource->search($this->report, $select_fields, $criteria_key_value);
 		if($this->report->hasBenchmark() && isset($this->benchmarks)){
 		//if the data is pivoted, set the pivoted field as the row header, else use the first non-pstring column
-			$row_head_field = $this->getRowHeadField($arr_field_list);
+			//$row_head_field = $this->getRowHeadField($arr_field_list);
 			$arr_bench_data = $this->benchmarks->addBenchmarkRow(
 				$this->db_table,
-				$row_head_field,
-				$arr_field_list,
-				null//$this->report->getGroupBy() unset pstring and herd_code
+                $this->report->reportFields()
+				//$row_head_field,
+				//null,
+				//null//$this->report->getGroupBy() unset pstring and herd_code
 			);
 			if(count($arr_bench_data) > 1){
 			/*
@@ -102,9 +103,9 @@ class TableData extends ReportData {
 		if($this->report->hasPivot()){
 			$results = $this->pivot($results);
 		}
-//		elseif($this->report->hasCntRow() || $this->report->hasAvgRow() || $this->report->hasSumRow()){
-//			$results = $this->addAggregateRows($results);
-//		}
+		elseif($this->report->hasCntRow() || $this->report->hasAvgRow() || $this->report->hasSumRow()){
+			$results = $this->addAggregateRows($results);
+		}
 		$this->dataset = $results;
         return $this->dataset;
 	}
@@ -118,7 +119,6 @@ class TableData extends ReportData {
 	 * @param array field list
 	 * @return string field name
 	 * @author ctranel
-	 */
 	protected function getRowHeadField($arr_field_list){
 		if(!empty($this->pivot_db_field)){
 			return $this->pivot_db_field;
@@ -133,6 +133,7 @@ class TableData extends ReportData {
 		}
 		return;
 	}
+*/
 
 	/*
 	 * prepareDisplayData

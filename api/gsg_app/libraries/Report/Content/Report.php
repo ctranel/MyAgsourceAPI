@@ -421,6 +421,19 @@ abstract class Report implements iReport {
         return null;
     }
 
+    public function getFieldDecimalScaleByName($field_name){
+        if(!isset($this->report_fields) || count($this->report_fields) === 0){
+            return null;
+        }
+
+        foreach($this->report_fields as $f){
+            if($f->dbFieldName() == $field_name){
+                return $f->decimalScale();
+            }
+        }
+        return null;
+    }
+
     public function getFieldFormatByName($field_name){
         if(!isset($this->report_fields) || count($this->report_fields) === 0){
             return null;

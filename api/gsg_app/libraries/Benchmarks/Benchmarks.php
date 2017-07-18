@@ -190,21 +190,20 @@ class Benchmarks extends Settings
 	 * @method addBenchmarkRow
 	 * @description retrieves row(s) of benchmark data into an array
 	 * @param object database table
-	 * @param array session benchmarks
-	 * @param string row_head_field - the db field name of the column into which benchmark header text is inserted
+     * @param array of ReportField objects
+	 * @--param array session benchmarks
+	 * @--param string row_head_field - the db field name of the column into which benchmark header text is inserted
 	 * @param array of strings db field names to exclude
 	 * @param array of strings arr_group_by (db field names)
 	 * @return array
 	 * @author ctranel
 	 **/
-	function addBenchmarkRow($db_table, $row_head_field, $arr_fields_to_exclude = ['herd_code', 'pstring', 'lact_group_code', 'ls_type_code', 'sol_group_code'], $arr_group_by){
+	function addBenchmarkRow($db_table, $report_fields, $arr_fields_to_exclude = ['herd_code', 'pstring', 'lact_group_code', 'ls_type_code', 'sol_group_code'], $arr_group_by = null){
 		if(isset($db_table)){
 			$this->db_table = $db_table;
 		}
-		
-		$bench_settings = $this->getSettingKeyValues($this->session_data);
 
-		$avg_fields = $this->benchmark_model->get_benchmark_fields($this->db_table->full_table_name(), $arr_fields_to_exclude);
+		$select_text = $this->benchmark_model->get_select_sql($report_fields, $arr_fields_to_exclude);
 		//make sure we have something to pass for all session vars
 		$sess_herd_size = isset($this->session_data['herd_size']) ? $this->session_data['herd_size'] : null;
 		$sess_herd_size = $this->arr_settings['herd_size']->getCurrValue($sess_herd_size);
@@ -214,7 +213,7 @@ class Benchmarks extends Settings
 		
 		$bench_sql = $this->benchmark_model->build_benchmark_query(
 			$this->db_table,
-			$avg_fields,
+            $select_text,
 			$this->arr_criteria_table[$this->arr_settings['criteria']->getCurrValue($sess_criteria)],
 			$this->herd_benchmark_pool_table,
 			$this->arr_settings['metric']->getCurrValue($sess_metric),
@@ -239,7 +238,8 @@ class Benchmarks extends Settings
 				$keys = array_keys($b);
 				$b = array_fill_keys($keys, 'na');
 			}
-			$b = array($row_head_field => $bench_head_text) + $b;
+			//add benchmark text to first column of benchmark row
+			$b = [$report_fields[0]->dbFieldName() => $bench_head_text] + $b;
 		}
 
 		return $arr_benchmarks;
