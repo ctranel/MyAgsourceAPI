@@ -61,6 +61,7 @@ class WhereGroup implements iWhereGroup {
 		if(!is_array($criteria) && !is_array($child_groups)){
 			throw new \InvalidArgumentException('Either criteria or child group is required to initialize WhereGroup');
 		}
+//var_dump($operator, count($criteria), count($child_groups));
 		$this->operator = $operator;
 		$this->criteria = $criteria;
 		$this->child_groups = $child_groups;
@@ -95,7 +96,7 @@ class WhereGroup implements iWhereGroup {
 		//add child groups to criteria
 		if(is_array($this->child_groups)){
 			foreach($this->child_groups as $cg){
-				$ret['criteria'][] = $this->cg->criteria();
+				$ret['criteria'][] = $cg->criteria();
 			}
 		}
 		return $ret;		

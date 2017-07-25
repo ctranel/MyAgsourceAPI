@@ -47,10 +47,10 @@ abstract class Report implements iReport {
 	protected $addl_select_field_names;
 
 	/**
-	 * array of WhereGroup objects
-	 * @var WhereGroup[]
+	 * WhereGroup
+	 * @var WhereGroup
 	 **/
-	protected $where_groups;
+	protected $where_group;
 	
 	/**
 	 * array of Sort objects
@@ -144,12 +144,6 @@ abstract class Report implements iReport {
 	protected $joins;
 	
 	/**
-	 * supp_param_fieldnames
-	 * @var array
-	 **/
-	//protected $supp_param_fieldnames;
-	
-	/**
 	 * field_groups
 	 * @var numerically keyed array
 	 **/
@@ -166,12 +160,6 @@ abstract class Report implements iReport {
      * @var DataHandler
      **/
    protected $data_handler;
-
-    /**
-     * supplemental
-     * @var Supplemental
-     **/
-    //protected $supplemental;
 
 	/**
 	 * $dataset_supplemental
@@ -218,8 +206,6 @@ abstract class Report implements iReport {
 		$this->is_summary = $report_meta['is_summary'];
         $this->is_metric = $is_metric;
 		$this->field_groups = $field_groups;
-		//$this->group_by_fields = $group_by_fields;
-		//$this->where_fields = $group_by_fields;
 		$this->display_type = $report_meta['display_type'];
         $this->filters = $filters;
         $this->data_handler = $data_handler;
@@ -243,9 +229,7 @@ abstract class Report implements iReport {
         /* end special case */
 
         $this->supplemental_factory = $supp_factory;
-        //$this->supplemental = $supp_factory->getReportSupplemental($this->id);
-		//$this->supp_param_fieldnames = []; //used in child classes
-		
+
 		//load data for remaining properties
         $this->setReportFields();
 		$this->setDBTables();
@@ -276,15 +260,7 @@ abstract class Report implements iReport {
 	public function id(){
 		return $this->id;
 	}
-/*
-	public function path(){
-		return $this->site_block->path();
-	}
 
-	public function title(){
-		return $this->site_block->name();
-	}
-*/
 	public function maxRows(){
 		return $this->max_rows;
 	}
@@ -305,24 +281,6 @@ abstract class Report implements iReport {
 		return $this->sorts;
 	}
 
-/*
-	public function joins(){
-		return $this->joins;
-	}
-*/
-/*
-    public function name(){
-        return $this->site_block->name();
-    }
-
-    public function description(){
-        return $this->site_block->description();
-    }
-
-    public function displayType(){
-		return $this->site_block->displayType();
-	}
-*/
 	public function subtitle(){
 		return $this->filters->get_filter_text();
 	}
@@ -451,38 +409,6 @@ abstract class Report implements iReport {
 	    return $this->appended_rows_count;
 	}
 	
-	/**
-	 * addFieldName
-	 * 
-	 * Add a field name to be included in the data query.  Will not create a new series
-	 * 
-	 * @return void
-	 * @access public
-	 *
-	public function addFieldName($name){
-		$this->addl_select_field_names[] = $name;
-	}
-**/
-
-	/**
-	 * @method getOutputData
-     * 
-     * Returns data needed by original non-API version of site
-     * 
-	 * @return array of output data for block
-	 * @access public
-	 *
-	public function getOutputData(){
-		return [
-			'name' => $this->site_block->name(),
-			'description' => $this->site_block->name(),
-			'filter_text' => $this->filters->get_filter_text(),
-			'block' => $this->site_block->path(), //original program included sort_by, sort_order, graph_order but couldn't find anywhere it was used
-			'block_id' => $this->site_block->id(),
-		];
-	}
-**/
-
     /**
      * toArray
      *
@@ -494,24 +420,14 @@ abstract class Report implements iReport {
         $ret['pivot_field'] = $this->pivot_field instanceof iDataField ? $this->pivot_field->dbFieldName() : null;
         $ret['is_summary'] = $this->is_summary;
         $ret['display_type'] = $this->display_type;
-//        $ret['appended_rows_count'] = $this->appended_rows_count;
-//            'max_rows' => $this->max_rows,
         $ret['cnt_row'] = $this->cnt_row;
         $ret['sum_row'] = $this->sum_row;
         $ret['avg_row'] = $this->avg_row;
         $ret['bench_row'] = $this->bench_row;
-//            'field_groups' => $this->field_groups,
 
         if(is_array($this->dataset) && !empty($this->dataset)){
             $ret['dataset'] = $this->dataset;
         }
-
-        //MOVING SUPPLEMENTAL TO BLOCK LEVEL
-        //$tmp = array_filter($this->supplemental->toArray());
-        //if(is_array($tmp) && !empty($tmp)){
-        //    $ret['supplemental'] = $tmp;
-        //}
-        //unset($tmp);
 
         if(is_array($this->default_sorts) && !empty($this->default_sorts)){
             $dsorts = [];
@@ -618,9 +534,6 @@ abstract class Report implements iReport {
      * @author ctranel
      **/
     protected function setSupplemental($data){
-        //$this->header_supplemental[$data['db_field_name']] = null;
-        //$this->dataset_supplemental[$data['db_field_name']] = null;
-
         if(isset($this->supplemental_factory)){
             if(isset($data['head_supp_id'])){
                 $this->header_supplemental[$data['db_field_name']] = $this->supplemental_factory->getColHeaderSupplemental($data['head_supp_id'], $data['head_a_href'], $data['head_a_rel'], $data['head_a_title'], $data['head_a_class'], $data['head_comment']);
@@ -638,40 +551,65 @@ abstract class Report implements iReport {
 	 * 
 	 * @return void
 	 * @author ctranel
-	 * @todo: implement child/nested groups
 	 **/
 	protected function setWhereGroups(){
-		$this->where_groups = [];
-		$criteria = [];
-		$arr_ret = [];
-		$arr_res = $this->datasource->getWhereData($this->id, $this->is_metric);
-		if(!is_array($arr_res) || empty($arr_res)){
+		$data = $this->datasource->getWhereData($this->id, $this->is_metric);
+
+		if(!is_array($data) || empty($data)){
 			return;
 		}
-		$prev_group = $arr_res[0]['where_group_id'];
-		$prev_op = $arr_res[0]['operator'];
-		if(is_array($arr_res)){
-			foreach($arr_res as $s){
-				if($prev_group != $s['where_group_id']){
-					$this->where_groups[] = new WhereGroup($prev_op, $criteria);
-					$criteria = [];
-				}
-                $data_conversion = null;
-                if(isset($s['conversion_name'])) {
-                    $data_conversion = new DataConversion($s['conversion_name'], $s['metric_label'], $s['metric_abbrev'],
-                        $s['to_metric_factor'], $s['metric_rounding_precision'], $s['imperial_label'], $s['imperial_abbrev'], $s['to_imperial_factor'], $s['imperial_rounding_precision']);
-                }
-                $criteria_datafield = new DbField($s['db_field_id'], $s['table_name'], $s['db_field_name'], $s['name'], $s['description'], $s['pdf_width'], $s['default_sort_order'],
-                    $s['datatype'], $s['max_length'], $s['decimal_scale'], $s['unit_of_measure'], $s['is_timespan'], $s['is_foreign_key'], $s['is_nullable'], $s['is_natural_sort'], $data_conversion);
-                $criteria[] = new WhereCriteria($criteria_datafield, $s['condition']);
-
-				$prev_group = $s['where_group_id'];
-				$prev_op = $s['operator'];
-			}
-			//add the last item
-			$this->where_groups[] = new WhereGroup($s['operator'], $criteria);
-		}
+		$this->where_group = $this->buildWhereTree($data);
 	}
+
+    /**
+     * buildWhereTree()
+     *
+     * Recursive function that returns children (where conditions and group (groups are recursive))
+     *
+     * @param array of data
+     * @param int parent_id
+     * @param string parent_operator
+     * @return array of tree branch
+     * @author ctranel
+     **/
+    public function buildWhereTree(array $data, $parent_id = 0, $parent_operator = null){
+        if(!isset($data) || !is_array($data)){
+            return;
+        }
+
+        $criteria = [];
+        $children = [];
+        foreach ($data as $k=>$s) {
+            if ($s['parent_id'] == $parent_id) {
+                $newdata = $data;
+                unset($newdata[$k]);
+
+                $data_conversion = null;
+
+                if(isset($s['condition_id'])) {
+                    if (isset($s['conversion_name'])) {
+                        $data_conversion = new DataConversion($s['conversion_name'], $s['metric_label'],
+                            $s['metric_abbrev'],
+                            $s['to_metric_factor'], $s['metric_rounding_precision'], $s['imperial_label'],
+                            $s['imperial_abbrev'], $s['to_imperial_factor'], $s['imperial_rounding_precision']);
+                    }
+                    $criteria_datafield = new DbField($s['db_field_id'], $s['table_name'], $s['db_field_name'],
+                        $s['name'], $s['description'], $s['pdf_width'], $s['default_sort_order'],
+                        $s['datatype'], $s['max_length'], $s['decimal_scale'], $s['unit_of_measure'], $s['is_timespan'],
+                        $s['is_foreign_key'], $s['is_nullable'], $s['is_natural_sort'], $data_conversion);
+                    $criteria[] = new WhereCriteria($criteria_datafield, $s['condition']);
+                }
+                else{
+                    $children[] = $this->buildWhereTree($newdata, $s['id'], $s['operator']);
+                }
+            }
+        }
+        if(count($criteria) > 0 || count($children) > 0){
+            return new WhereGroup($parent_operator, $criteria, $children);
+        }
+    }
+
+
 	
 	/**
 	 * getWhereGroupArray()
@@ -680,22 +618,16 @@ abstract class Report implements iReport {
 	 * @author ctranel
 	 **/
 	public function getWhereGroupArray(){
-		$ret = [];
-		if(!is_array($this->where_groups) || empty($this->where_groups)){
-			$this->where_groups = $this->setWhereGroups();
-		}
-		if(count($this->where_groups) === 0){
-			return;
-		}
+        if(!($this->where_group instanceof WhereGroup)){
+            return;
+        }
 
-		foreach($this->where_groups as $wg){
-			$ret[] = $wg->criteria();
-		}
-		return $ret;
+        return $this->where_group->criteria();
 	}
 	
 	/**
 	 * @method sortText()
+     * @param boolean is verbose
 	 * @return string sort text
 	 * @access public
 	* */
@@ -750,34 +682,12 @@ abstract class Report implements iReport {
 	}
 	
 	/**
-	 * @method resetSort()
-	 * @return void
-	 * @access public
-	public function resetSort(){
-		if(isset($this->sorts) && count($this->sorts) > 0){
-			$this->sorts->removeAll($this->sorts);
-		}
-	}
-* */
-
-	/**
-	 * @method addSort()
-	 * @param array of Sort objects
-	 * @return void
-	 * @access public
-	public function addSort(Sort $sort){
-		$this->sorts[] = $sort;
-	}
-* */
-
-	/**
 	 * @method setDefaultSort()
 	 * @return void
 	 * @author ctranel
 	 **/
 	protected function setDefaultSort(){
 		$this->default_sorts = [];
-		$arr_ret = [];
 		$arr_res = $this->datasource->getSortData($this->id);
 		if(is_array($arr_res)){
 			foreach($arr_res as $s){
@@ -831,49 +741,6 @@ abstract class Report implements iReport {
         }
     }
 
-    /**
-	 * @method sortFieldNames()
-	 * @return ordered array of field names
-	 * @access public
-	public function sortFieldNames(){
-		$ret = [];
-		if(isset($this->sorts) && count($this->sorts) > 0){
-			foreach($this->sorts as $s){
-				$ret[] = $s->fieldName();
-			}
-		}
-		
-		return $ret;
-	}
-	* */
-	/**
-	 * sortOrders
-	 *
-	 * @method sortOrders()
-	 * @return ordered array of sort orders
-	 * @access public
-	 public function sortOrders(){
-	 $ret = [];
-	 if(isset($this->sorts) && count($this->sorts) > 0){
-	 foreach($this->sorts as $s){
-	 $ret[] = $s->order();
-	 }
-	 }
-	
-	 return $ret;
-	 }
-	 * */
-	
-	/**
-	 * @method setFilters()
-	 * @param Filter object
-	 * @return void
-	 * @access public
-	public function setFilters(Filters $filters){
-		$this->filters = $filters;
-	}
-* */
-	
 	/**
 	 * @method getFieldTable()
 	 * @param field name
@@ -912,7 +779,7 @@ abstract class Report implements iReport {
 	}
 	
 	/**
-	 * @method isNaturalSort()
+	 * @method isSortable()
 	 * @param field name
 	 * @return boolean
 	 * @access public
@@ -931,7 +798,6 @@ abstract class Report implements iReport {
 
 	/**
 	 * @method getGroupBy()
-	 * //@param array of GroupBy objects
 	 * @return void
 	 * @access public
 	* */
@@ -971,5 +837,3 @@ abstract class Report implements iReport {
         $this->dataset = $report_data_handler->getData();
     }
 }
-
-

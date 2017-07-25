@@ -79,36 +79,43 @@ class report_block_model extends CI_Model {
 
     /**
 	 * @method getWhereData()
-	 * @param int block id
+	 * @param int report id
      * @param bool is_metric
 	 * @return returns multi-dimensional array, arr_sort_by field data and arr_sort_order
 	 * @author ctranel
-	 * @todo: implement nested where group iteration (i.e., parent_id field of where groups)
 	 **/
 	public function getWhereData($report_id, $is_metric){
         if($is_metric){
-            $this->db
-                ->select("CASE WHEN mc.id IS NOT NULL THEN REPLACE(f.name, mc.imperial_abbrev, mc.metric_abbrev) ELSE f.name END AS [name]
+            $cond_select = "CASE WHEN mc.id IS NOT NULL THEN REPLACE(f.name, mc.imperial_abbrev, mc.metric_abbrev) ELSE f.name END AS [name]
 			        , CASE WHEN mc.id IS NOT NULL THEN REPLACE(f.description, mc.imperial_abbrev, mc.metric_abbrev) ELSE f.description END AS [description]
-					, CASE WHEN mc.id IS NOT NULL THEN REPLACE(f.unit_of_measure, mc.imperial_abbrev, mc.metric_abbrev) ELSE f.unit_of_measure END AS [unit_of_measure]");
+					, CASE WHEN mc.id IS NOT NULL THEN REPLACE(f.unit_of_measure, mc.imperial_abbrev, mc.metric_abbrev) ELSE f.unit_of_measure END AS [unit_of_measure]";
+            $cg_select = "NULL AS [name]
+			        , NULL AS [description]
+					, NULL AS [unit_of_measure]";
         }
         else{
-            $this->db
-                ->select("f.name, f.description, f.unit_of_measure");
+            $cond_select = "f.name, f.description, f.unit_of_measure";
+            $cg_select = "NULL AS name, NULL AS description,  NULL AS unit_of_measure";
         }
 
-        return $this->db
-			->select("f.db_field_id, f.table_name, f.db_field_name
-				, f.pdf_width, f.default_sort_order, f.data_type as datatype, f.is_timespan_field as is_timespan
-				, f.is_natural_sort, is_fk_field AS is_foreign_key, f.is_nullable, f.decimal_points AS decimal_scale, f.data_type as datatype, f.max_length
-				, wg.operator, wc.where_group_id, wc.condition
-				, mc.name AS conversion_name, mc.metric_label, mc.metric_abbrev, mc.to_metric_factor, mc.metric_rounding_precision, mc.imperial_label, mc.imperial_abbrev, mc.to_imperial_factor, mc.imperial_rounding_precision")
-			->from('users.dbo.reports_where_groups wg')
-			//->join('users.dbo.reports_where_groups wg2', 'wg.id = wg2.parent_id', 'inner')
-			->join('users.dbo.reports_where_conditions wc', 'wg.report_id = ' . $report_id . ' AND wg.id = wc.where_group_id', 'inner')
-			->join('users.dbo.v_report_field_data f', 'wc.field_id = f.db_field_id' , 'inner')
-            ->join('users.dbo.metric_conversion mc', 'f.conversion_id = mc.id', 'left')
-			->get()
+        return $this->db->query(
+			"SELECT " . $cg_select . ", null AS db_field_id, null AS table_name, null AS db_field_name, null AS pdf_width, null AS default_sort_order, null AS datatype, null AS is_timespan, null AS is_natural_sort, null AS is_foreign_key, null AS is_nullable, null AS decimal_scale, null AS datatype, null AS max_length
+				, wg.operator, wg.id, COALESCE(wg.parent_id, 0) AS parent_id, null AS condition_id, null as condition
+				, null AS conversion_name, null AS metric_label, null AS metric_abbrev, null AS to_metric_factor, null AS metric_rounding_precision, null AS imperial_label, null AS imperial_abbrev, null AS to_imperial_factor, null AS imperial_rounding_precision
+			FROM users.dbo.reports_where_groups wg
+			WHERE wg.report_id = " . $report_id . "
+			
+			UNION
+			
+			SELECT " . $cond_select . ", f.id AS db_field_id, t.name AS table_name, f.db_field_name, f.pdf_width, f.default_sort_order, f.data_type as datatype, f.is_timespan_field as is_timespan, f.is_natural_sort, is_fk_field AS is_foreign_key, f.is_nullable, f.decimal_points AS decimal_scale, f.data_type as datatype, f.max_length
+				, wg.operator, wc.id, wc.where_group_id AS parent_id, wc.id AS condition_id, wc.condition
+				, mc.name AS conversion_name, mc.metric_label, mc.metric_abbrev, mc.to_metric_factor, mc.metric_rounding_precision, mc.imperial_label, mc.imperial_abbrev, mc.to_imperial_factor, mc.imperial_rounding_precision
+			FROM users.dbo.reports_where_groups wg
+                INNER JOIN users.dbo.reports_where_conditions wc ON wg.report_id = " . $report_id . " AND wg.id = wc.where_group_id
+                INNER JOIN users.dbo.db_fields f ON wc.field_id = f.id
+                INNER JOIN users.dbo.db_tables t ON f.db_table_id = t.id
+                LEFT JOIN users.dbo.metric_conversion mc ON f.conversion_id = mc.id
+			WHERE wg.report_id = " . $report_id)
 			->result_array();
 	}
 	

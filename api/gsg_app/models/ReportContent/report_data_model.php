@@ -85,7 +85,11 @@ class Report_data_model extends CI_Model {
 			}
 		}		
 		*/
-		$this->prepWhereCriteria($where_array);
+
+        $where_sql = $this->getWhereSql($where_array);
+		if(isset($where_sql)){
+		    $this->db->where($where_sql);
+        }
 		if(is_array($arr_filter_criteria) && !empty($arr_filter_criteria)){
 			$this->setFilters($arr_filter_criteria);
 		}
@@ -110,49 +114,36 @@ class Report_data_model extends CI_Model {
 //echo $this->db->get_compiled_select(); //die;
 	}
 	
-	/** function prepWhereCriteria
+	/** function getWhereSql
 	 * 
 	 * translates filter criteria into sql format
 	 * @param $arr_filter_criteria
 	 * @return void
 	 * 
-	 * @todo: too much business logic?
-	 * @todo: implement child/nested groups
 	 */
 	
-	protected function prepWhereCriteria($where_groups){
-		if(isset($where_groups) && is_array($where_groups)){
-//			$is_firstg = true;
-			foreach($where_groups as $k => $v){
-				$sql = '(';
-				$is_firstc = true;
-//				if(!$is_firstg){
-//					$sql .= ') AND (';
-//				}
-				foreach($v['criteria'] as $c){
-					if(!$is_firstc){
-						$sql .= ' ' . $v['operator'] . ' ';
-					}
-					$sql .= $c;
-					$is_firstc = false;
-				}
-				//if this criteria has children
-/*				if()){
-					//concatenate all conditions with the operator
-					foreach($v as $vv){
-						//if it is another group
-						if(isset($vv['operator'])){
-							//recursive call, use this as a wrapper that calls a function that returns only SQL snippets (i.e., the code at the top of the foreach above)
-						}
-						//$this->db->where(' ' . $v['operator'] . ' ', $v['criteria']);
-					}
-				}
-*/
-//				$is_firstg = false;
-				$sql .= ')';
-				$this->db->where($sql);
-			}
-		}
+	protected function getWhereSql($where_groups){
+		if(!isset($where_groups) || !is_array($where_groups)) {
+            return;
+        }
+        $sql = '';
+        $is_firstc = true;
+
+        foreach($where_groups['criteria'] as $k => $v){
+            //add operator if this is not the first criteria or group
+            if(!$is_firstc){
+                $sql .= ' ' . $where_groups['operator'] . ' ';
+            }
+            $is_firstc = false;
+
+            if(is_array($v)){
+                $sql .= '('. $this->getWhereSql($v). ')';
+            }
+            else{
+                $sql .= $v;
+            }
+        }
+        return $sql;
 	}
 		
 		

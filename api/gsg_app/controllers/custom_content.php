@@ -28,18 +28,8 @@ class Custom_content extends MY_Api_Controller {
             $user_id = $this->session->userdata('active_group_id') == 1 ? NULL : $this->session->userdata('user_id');
             $custom_report = new CreateCustomReport($this->custom_report_model, $input['report_id'], $user_id);
 
-            //$header_row_cnt = count($input['table_header']);
-            //$input['columns'] = $input['table_header'][$header_row_cnt - 1];
-            $input['where'] = [ //needs the outer parent from client
-                'operator' => 'and',
-                'conditionGroups' => $input['filter']
-            ];
-            unset($input['filter']);
-
             //$input['table_header'] = $custom_report->spansToHeirarchies($input['table_header']);
             $input['sort'] = [];//not getting anything from client yet
-
-//var_dump($input); die;
 
             $custom_report->add_report($input);
             die();
