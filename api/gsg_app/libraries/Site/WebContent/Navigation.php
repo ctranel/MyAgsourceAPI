@@ -164,12 +164,12 @@ class Navigation{
             'list_order' => 15,
             ];
         }*/
-        if(in_array("Update Service Group Access", $this->permissions_list)){//$this->active_group_id == 2){
+        if(in_array("Update SG Access", $this->permissions_list)){//$this->active_group_id == 2){
             $acct_nav[] = [
                 'dom_id' => 'manage_service_grp',
                 'href' => 'api/auth/manage_service_grp',
                 'name' => 'Manage Consultant Access',
-                'route' => 'api/auth/manage_service_grp',
+                'route' => 'dhi/dpage/133',
                 'scope' => 'base'
                 ,
             ];

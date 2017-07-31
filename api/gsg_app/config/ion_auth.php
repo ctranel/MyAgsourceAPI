@@ -28,10 +28,10 @@
 	$config['tables']['lookup_chart_types'] 	= 'users.dbo.lookup_chart_types';
 	$config['tables']['lookup_scopes'] 			= 'users.dbo.lookup_scopes';
 
-	$config['tables']['consultants_herds']    	= 'users.dbo.service_groups_herds';
-	$config['tables']['serv_grps_herds_sections'] = 'users.dbo.service_groups_herds_sections';
+//	$config['tables']['consultants_herds']    	= 'users.dbo.service_groups_herds';
+//	$config['tables']['serv_grps_herds_sections'] = 'users.dbo.service_groups_herds_sections';
 	$config['tables']['users_service_groups']   = 'users.dbo.users_service_groups';
-	$config['tables']['service_groups']    		= 'address.dbo.service_group';
+//	$config['tables']['service_groups']    		= 'address.dbo.service_group';
 
 	$config['tables']['sections']    			= 'users.dbo.sections';
 	$config['tables']['pages']  				= 'users.dbo.pages';

@@ -91,7 +91,7 @@ class Herd_model extends CI_Model {
 		if(!$sg_user_id){
             $sg_user_id = $this->session->userdata('user_id');
         }
-		$this->db->join('users.dbo.service_groups_herds ch', 'h.herd_code = ch.herd_code')
+		$this->db->join('users.sg.service_groups_herds ch', 'h.herd_code = ch.herd_code')
 		->where('ch.sg_user_id', $sg_user_id)
 		->where('(ch.exp_date > GETDATE() OR ch.exp_date IS NULL)')
 		->where('request_status_id', 1);
@@ -266,28 +266,11 @@ class Herd_model extends CI_Model {
 	 **/
 	function getHerdCodesByPermissionGranted($sg_user_id = false){
 		if(!$sg_user_id) $sg_user_id = $this->session->userdata('user_id');
-		$this->db->join('users.dbo.service_groups_herds ch', 'h.herd_code = ch.herd_code')
+		$this->db->join('users.sg.service_groups_herds ch', 'h.herd_code = ch.herd_code')
 		->where('ch.sg_user_id', $sg_user_id)
 		->where('(ch.exp_date > GETDATE() OR ch.exp_date IS NULL)')
 		->where('request_status_id', 1);
 		return $this->getHerdCodes();
-	}
-
-	/**
-	 * @method getHerdDataByPermissions
-	 * @param int consultant's user id
-	 * @return array of arrays representing data table
-	 * @access public
-	 *
-	 **/
-	function getHerdDataByPermissions($sg_user_id = false){
-		if(!$sg_user_id) $sg_user_id = $this->session->userdata('user_id');
-		$this->db
-			->select('rs.name AS status, ch.exp_date AS expires_date, ch.id')
-			->join('users.dbo.service_groups_herds ch', 'h.herd_code = ch.herd_code', 'inner')
-			->join('users.dbo.lookup_sg_request_status rs', 'ch.request_status_id = rs.id', 'inner')
-		->where('ch.sg_user_id', $sg_user_id);
-		return $this->getHerds();
 	}
 
 	/**

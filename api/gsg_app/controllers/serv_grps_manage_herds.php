@@ -53,8 +53,6 @@ class Serv_grps_manage_herds extends MY_Api_Controller {
     }
 
     function remove_access(){
-        $herds_by_status = $this->as_ion_auth->getHerdPermissionsByStatus($this->session->userdata('user_id'));
-
         $this->form_validation->set_rules('modify', 'Herd Selection');
 
         if($this->form_validation->run() == false){

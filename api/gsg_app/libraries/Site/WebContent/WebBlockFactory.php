@@ -47,9 +47,12 @@ class WebBlockFactory {
         if(empty($results)){
             return false;
         }
+
         foreach($results as $r){
-            $data_map = $this->datasource_blocks->getBlockDataMapping($r['id']);
-            $blocks[] = new Block($this->supplemental_factory, $block_content[$r['list_order']], $r['id'], $r['name'], $r['description'], $r['display_type'], $r['scope'], $r['isactive'], $r['path'], $data_map);//,
+            if(isset($block_content[$r['list_order']])){
+                $data_map = $this->datasource_blocks->getBlockDataMapping($r['id']);
+                $blocks[] = new Block($this->supplemental_factory, $block_content[$r['list_order']], $r['id'], $r['name'], $r['description'], $r['display_type'], $r['scope'], $r['isactive'], $r['path'], $data_map);//,
+            }
         }
         return $blocks;
     }

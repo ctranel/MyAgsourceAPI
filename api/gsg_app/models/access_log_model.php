@@ -51,7 +51,7 @@ class Access_log_model extends CI_Model {
 		}
 		return $this->db
 			->select('')
-			->join($this->tables['users_service_groups'] . ' usg', 'al.user_id = usg.user_id', 'left')
+			->join('users.sg.lookup_sg_request_status usg', 'al.user_id = usg.user_id', 'left')
 			->where('usg.sg_acct_num', $sg_acct_num)
 			->where('al.herd_code', $herd_code)
 			->where('al.user_has_accessed_herd', 1)
