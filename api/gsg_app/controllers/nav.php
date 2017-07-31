@@ -41,6 +41,7 @@ class Nav extends MY_Api_Controller {
 
 		$navigation = new Navigation($this->navigation_model,
             $this->herd,
+            $this->session->userdata('user_id'),
             $this->permissions->permissionsList(),
             $this->as_ion_auth->get_users_group_array($this->session->userdata('user_id')),
             $this->session->userdata('active_group_id')

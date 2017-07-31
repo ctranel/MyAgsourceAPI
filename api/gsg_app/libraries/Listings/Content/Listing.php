@@ -50,6 +50,12 @@ class Listing implements iListing
     protected $columns;
 
     /**
+     * ListingActions object
+     * @var iListingActions
+     **/
+    protected $actions;
+
+    /**
      * form_id
      * @var int
      **/
@@ -79,7 +85,7 @@ class Listing implements iListing
      **/
     protected $sort_order;
 
-    public function __construct($id, $form_id, $delete_path, $activate_path, $columns, $dataset, $isactive, $add_presets, $sort_column, $sort_order){
+    public function __construct($id, $form_id, $delete_path, $activate_path, $columns, $actions, $dataset, $isactive, $add_presets, $sort_column, $sort_order){
         $this->id = $id;
         $this->form_id = $form_id;
         $this->delete_path = $delete_path;
@@ -88,6 +94,7 @@ class Listing implements iListing
         $this->add_presets = $add_presets;
         $this->dataset = $dataset;
         $this->columns = $columns;
+        $this->actions = $actions;
         $this->sort_column = $sort_column;
         $this->sort_order = $sort_order;
     }
@@ -110,6 +117,10 @@ class Listing implements iListing
             }
             $ret['columns'] = $columns;
             unset($columns);
+        }
+
+        if(isset($this->actions)){
+            $ret['actions'] = $this->actions->toArray();
         }
 
         if(isset($this->dataset) && is_array($this->dataset) && !empty($this->dataset)) {

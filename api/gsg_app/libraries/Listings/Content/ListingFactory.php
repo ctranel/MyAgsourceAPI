@@ -5,10 +5,14 @@ namespace myagsource\Listings\Content;
 require_once(APPPATH . 'libraries/Listings/Content/Listing.php');
 require_once(APPPATH . 'libraries/Listings/iListingFactory.php');
 require_once(APPPATH . 'libraries/Listings/Content/Columns/ListingColumn.php');
+require_once(APPPATH . 'libraries/Listings/Content/Actions/ListingActions.php');
+require_once(APPPATH . 'libraries/Listings/Content/Actions/ListingAction.php');
 require_once(APPPATH . 'models/Listings/herd_options_model.php');
 
 use \myagsource\Listings\iListingFactory;
 use \myagsource\Listings\Content\Columns\ListingColumn;
+use \myagsource\Listings\Content\Actions\ListingActions;
+use \myagsource\Listings\Content\Actions\ListingAction;
 
 /**
  * A factory for listing objects
@@ -62,6 +66,7 @@ class ListingFactory implements iListingFactory {
             return $v['is_preset'] == true;
         }, ARRAY_FILTER_USE_BOTH);
         $preset_cols = array_column($preset_cols, 'name');
+        $action_data = $this->datasource->getActionData($listing_data['listing_id']);
 
         $dataset = $this->datasource->getListingData($listing_data['listing_id'], $criteria, $listing_data['order_by'], $listing_data['sort_order'], $display_cols);//, implode(', ', array_column($column_data, 'name')));
 
@@ -70,6 +75,7 @@ class ListingFactory implements iListingFactory {
             $add_presets = $this->datasource->getAddPresets($listing_data['listing_id'], $criteria, $preset_cols);
         }
 
+        //listing columns
         $lc = [];
         if(is_array($column_data) && !empty($column_data) && is_array($column_data[0])){
             foreach($column_data as $d){
@@ -77,7 +83,17 @@ class ListingFactory implements iListingFactory {
             }
         }
 
-        return new Listing($listing_data['listing_id'], $listing_data['form_id'], $listing_data['delete_path'], $listing_data['activate_path'], $lc, $dataset, $listing_data['isactive'], array_merge($add_presets, $criteria), $listing_data['order_by'], $listing_data['sort_order']);
+        //listing actions
+        $actions = null;
+        if(is_array($action_data) && !empty($action_data) && is_array($action_data[0])){
+            $la = [];
+            foreach($action_data as $d){
+                $la[] = new ListingAction($d);
+            }
+            $actions = new ListingActions($la);
+        }
+
+        return new Listing($listing_data['listing_id'], $listing_data['form_id'], $listing_data['delete_path'], $listing_data['activate_path'], $lc, $actions, $dataset, $listing_data['isactive'], array_merge($add_presets, $criteria), $listing_data['order_by'], $listing_data['sort_order']);
     }
 
     /*

@@ -126,6 +126,25 @@ class Herd_options_model extends CI_Model implements iListing_model  {
     }
 
     /**
+     * getActionData
+     * @param int listing id
+     * @return action data
+     * @author ctranel
+     **/
+    public function getActionData($listing_id) {
+        $listing_id = (int)$listing_id;
+
+        $results = $this->db
+            ->select('label, url, list_order, isactive')
+            ->where('isactive', true)
+            ->where('listing_id', $listing_id)
+            ->order_by('list_order', 'asc')
+            ->get('users.options.batch_actions')
+            ->result_array();
+        return $results;
+    }
+
+    /**
      * getSourceTable
      *
      * @param int $listing_id

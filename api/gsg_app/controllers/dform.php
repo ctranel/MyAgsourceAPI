@@ -76,7 +76,7 @@ class dform extends dpage {
                 //}
                 //$this->_record_access(2); //2 is the page code for herd change
 /*                $this->load->model('web_content/navigation_model');
-                $navigation = new Navigation($this->navigation_model, $this->herd, $this->permissions->permissionsList());
+                $navigation = new Navigation($this->navigation_model, $this->herd, $this->session->userdata('user_id'), $this->permissions->permissionsList());
                 $payload = ['nav' => $navigation->toArray('DHI')]; */
                 $this->sendResponse(200, $resp_msg);
             }
@@ -285,7 +285,7 @@ class dform extends dpage {
                 //}
                 //$this->_record_access(2); //2 is the page code for herd change
                 /*                $this->load->model('web_content/navigation_model');
-                                $navigation = new Navigation($this->navigation_model, $this->herd, $this->permissions->permissionsList());
+                                $navigation = new Navigation($this->navigation_model, $this->herd, $this->session->userdata('user_id'), $this->permissions->permissionsList());
                                 $payload = ['nav' => $navigation->toArray('DHI')]; */
                 $this->sendResponse(200, $resp_msg, ['identity_keys' => $entity_keys]);
             }

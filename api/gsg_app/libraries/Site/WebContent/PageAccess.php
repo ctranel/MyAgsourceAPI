@@ -61,7 +61,7 @@ class PageAccess implements iPageAccess
 		if($this->can_view_all_content){
 			return true;
 		}
-		if($this->page->scope() === 'base'){
+		if($this->page->scope() === 'base' || $this->page->scope() === 'account'){
 			return true;
 		}
 		if($this->page->scope() === 'subscription' && $is_subscribed){

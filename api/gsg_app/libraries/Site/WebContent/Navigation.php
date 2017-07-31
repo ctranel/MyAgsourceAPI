@@ -27,7 +27,13 @@ class Navigation{
 	 **/
 	protected $herd;
 
-	/**
+    /**
+     * $session_user_id
+     * @var int
+     **/
+    protected $session_user_id;
+
+    /**
 	 * $permissions_list
 	 * @var Array of strings
 	 **/
@@ -51,9 +57,10 @@ class Navigation{
 	 **/
 	protected $tree;
 
-	function __construct(\Navigation_model $datasource_navigation, Herd $herd, $permissions_list, $groups, $active_group_id) {
+	function __construct(\Navigation_model $datasource_navigation, Herd $herd, $session_user_id, $permissions_list, $groups, $active_group_id) {
 		$this->datasource_navigation = $datasource_navigation;
 		$this->herd = $herd;
+        $this->session_user_id = $session_user_id;
 		$this->permissions_list = $permissions_list;
         $this->groups = $groups;
         $this->active_group_id = $active_group_id;
@@ -90,9 +97,10 @@ class Navigation{
 			if(in_array('View Subscriptions', $this->permissions_list)){
 				$tmp_array = array_merge($tmp_array, $this->datasource_navigation->getSubscribedContent($this->herd->herdCode()));
 			}
+			/* account nav is hard-coded through a function call in constructor for now.  Now way to generate nav based on group permissions yet
 			if(in_array('View Account', $this->permissions_list)){
 				$scope[] = 'account';
-			}
+			} */
 			if(in_array('View Admin', $this->permissions_list)){
 				$scope[] = 'admin';
 			}
@@ -167,7 +175,7 @@ class Navigation{
         if(in_array("Update SG Access", $this->permissions_list)){//$this->active_group_id == 2){
             $acct_nav[] = [
                 'dom_id' => 'manage_service_grp',
-                'href' => 'api/auth/manage_service_grp',
+                'href' => 'dhi/dpage/133',
                 'name' => 'Manage Consultant Access',
                 'route' => 'dhi/dpage/133',
                 'scope' => 'base'
@@ -200,29 +208,29 @@ class Navigation{
             ];
         }
         if(true){//$this->as_ion_auth->is_editable_user($this->session->userdata('user_id'), $this->session->userdata('user_id'))){
-            $acct_nav[] = [
+ /*           $acct_nav[] = [
                 'dom_id' => 'edit_user',
                 'href' => 'api/auth/edit_user',
                 'name' => 'Edit User Account',
                 'route' => 'api/auth/edit_user',
                 'scope' => 'base',
-            ];
+            ];*/
             $acct_nav[] = [
                 'dom_id' => 'edit_user',
                 'href' => 'auth/create_user',
                 'name' => 'Edit My User',
-                'route' => 'dhi/dpage/123/{"user_id":' . '1' . '}',
+                'route' => 'dhi/dpage/123/{"user_id":' . $this->session_user_id . '}',
                 'scope' => 'base',
             ];
         }
         if(in_array("Edit All Users", $this->permissions_list) || in_array("Edit Users In Region", $this->permissions_list)){
-            $acct_nav[] = [
+/*            $acct_nav[] = [
                 'dom_id' => 'list_accounts',
                 'href' => 'auth/list_accounts',
                 'name' => 'List User Account',
                 'route' => 'api/auth/list_accounts',
                 'scope' => 'base',
-            ];
+            ]; */
             $acct_nav[] = [
                 'dom_id' => 'list_accounts',
                 'href' => 'auth/list_accounts',
@@ -231,14 +239,14 @@ class Navigation{
                 'scope' => 'account',
             ];
         }
-        if(false && in_array("Add All Users", $this->permissions_list) || in_array("Add Users In Region", $this->permissions_list)){
-            $acct_nav[] = [
+        if(in_array("Add All Users", $this->permissions_list) || in_array("Add Users In Region", $this->permissions_list)){
+/*            $acct_nav[] = [
                 'dom_id' => 'create_user',
                 'href' => 'auth/create_user',
                 'name' => 'Add User Account',
                 'route' => 'api/auth/create_user',
                 'scope' => 'base',
-            ];
+            ]; */
             $acct_nav[] = [
                 'dom_id' => 'create_user',
                 'href' => 'auth/create_user',
