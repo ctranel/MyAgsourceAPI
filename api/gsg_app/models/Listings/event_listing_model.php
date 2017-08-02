@@ -145,6 +145,34 @@ class Event_listing_model extends CI_Model implements iListing_model  {
     }
 
     /**
+     * @method getWhereData()
+     * @param int listing id
+     * @return returns multi-dimensional array
+     * @author ctranel
+     **/
+    public function getWhereData($listing_id){
+        return $this->db->query(
+            "SELECT NULL AS name, NULL AS description,  NULL AS unit_of_measure, null AS db_field_id, null AS table_name, null AS db_field_name, null AS pdf_width, null AS default_sort_order, null AS datatype, null AS is_timespan, null AS is_natural_sort, null AS is_foreign_key, null AS is_nullable, null AS decimal_scale, null AS datatype, null AS max_length
+				, wg.operator AS group_operator, wg.id, COALESCE(wg.parent_id, 0) AS parent_id, null AS condition_id, null as operator, null AS operand
+				--, null AS conversion_name, null AS metric_label, null AS metric_abbrev, null AS to_metric_factor, null AS metric_rounding_precision, null AS imperial_label, null AS imperial_abbrev, null AS to_imperial_factor, null AS imperial_rounding_precision
+			FROM users.options.listing_condition_groups wg
+			WHERE wg.listing_id = " . $listing_id . "
+			
+			UNION
+			
+			SELECT f.name, f.description, f.unit_of_measure, f.id AS db_field_id, t.name AS table_name, f.db_field_name, f.pdf_width, f.default_sort_order, f.data_type as datatype, f.is_timespan_field as is_timespan, f.is_natural_sort, is_fk_field AS is_foreign_key, f.is_nullable, f.decimal_points AS decimal_scale, f.data_type as datatype, f.max_length
+				, wg.operator AS group_operator, wc.id, wc.condition_group_id AS parent_id, wc.id AS condition_id, wc.operator, wc.operand
+				--, mc.name AS conversion_name, mc.metric_label, mc.metric_abbrev, mc.to_metric_factor, mc.metric_rounding_precision, mc.imperial_label, mc.imperial_abbrev, mc.to_imperial_factor, mc.imperial_rounding_precision
+			FROM users.options.listing_condition_groups wg
+                INNER JOIN users.options.listing_condition wc ON wg.listing_id = " . $listing_id . " AND wg.id = wc.condition_group_id
+                INNER JOIN users.dbo.db_fields f ON wc.db_field_id = f.id
+                INNER JOIN users.dbo.db_tables t ON f.db_table_id = t.id
+                --LEFT JOIN users.dbo.metric_conversion mc ON f.conversion_id = mc.id
+			WHERE wg.listing_id = " . $listing_id)
+            ->result_array();
+    }
+
+    /**
      * getSourceTable
      *
      * @param int $listing_id
@@ -223,7 +251,7 @@ class Event_listing_model extends CI_Model implements iListing_model  {
         $criteria = MssqlUtility::escape(array_filter($criteria));
         $display_cols = MssqlUtility::escape(array_filter($display_cols));
 
-        $keys = array_keys($criteria);
+/*        $keys = array_keys($criteria);
         $key_meta = $this->getListingKeyMeta($listing_id);
         $key_condition_text = '';
 
@@ -245,7 +273,8 @@ class Event_listing_model extends CI_Model implements iListing_model  {
                 }
                 $key_condition_text .= $k . " IN(" . $v . ") AND ";
             }
-        }
+        } */
+        $key_condition_text = $this->getWhereSql($criteria);
 
         $sql = "
             DECLARE
@@ -259,7 +288,7 @@ class Event_listing_model extends CI_Model implements iListing_model  {
                 inner join users.dbo.db_databases db ON tbl.database_id = db.id
 
             SET @dsql = CONCAT(N'SELECT DISTINCT " . implode(',', $display_cols) . "
-			    FROM ', @db_table_name, N' WHERE " . substr($key_condition_text, 0, -5);
+			    FROM ', @db_table_name, N' WHERE " . $key_condition_text;//substr($key_condition_text, 0, -5);
 
         if(isset($order_by) && !empty($order_by) && isset($sort_order) && !empty($sort_order)) {
             $sql .= " ORDER BY " . $order_by . " " . $sort_order;
@@ -270,23 +299,58 @@ class Event_listing_model extends CI_Model implements iListing_model  {
        ";
 //die($sql);
 
-        $results = $this->db->query($sql)->result_array();
-
+        $res = $this->db->query($sql)->result_array();
+        if($res === false){
+            throw new \Exception('Listing data not found.');
+        }
         $err = $this->db->_error_message();
 
         if(!empty($err)){
             throw new \Exception($err);
         }
 
-        if(isset($results[0]) && is_array($results[0])) {
-            foreach($results as &$r){
+        if(isset($res[0]) && is_array($res[0])) {
+            foreach($res as &$r){
                 $r = $r + $criteria;
             }
-            return $results;
+            return $res;
         }
 
         return [];
     }
+
+    /** function getWhereSql
+     *
+     * translates filter criteria into sql format
+     * @param $where_array
+     * @return void
+     *
+     */
+
+    protected function getWhereSql($where_array){
+        if(!isset($where_array) || !is_array($where_array)) {
+            return;
+        }
+        $sql = '';
+        $is_firstc = true;
+
+        foreach($where_array['criteria'] as $k => $v){
+            //add operator if this is not the first criteria or group
+            if(!$is_firstc){
+                $sql .= ' ' . $where_array['operator'] . ' ';
+            }
+            $is_firstc = false;
+
+            if(is_array($v)){
+                $sql .= '('. $this->getWhereSql($v). ')';
+            }
+            else{
+                $sql .= $v;
+            }
+        }
+        return $sql;
+    }
+
     /**
      * getAddPresets
      *
