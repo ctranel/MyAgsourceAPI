@@ -153,7 +153,7 @@ class dpage extends MY_Api_Controller {
         $report_factory = new ReportFactory($this->report_block_model, $this->db_field_model, $this->filters, $supplemental_factory, $data_handler, $db_table_factory);
 
         $this->load->model('Listings/herd_options_model');
-        $option_listing_factory = new ListingFactory($this->herd_options_model, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
+        $option_listing_factory = new ListingFactory($this->herd_options_model);//, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
 
         $this->load->model('Forms/setting_form_model');//, null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
         $setting_form_factory = new SettingsFormDisplayFactory($this->setting_form_model, $supplemental_factory, $params + ['herd_code'=>$this->session->userdata('herd_code'), 'user_id'=>$this->session->userdata('user_id')]);

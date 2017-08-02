@@ -67,10 +67,10 @@ class Navigation{
 		$data = $this->setData();
 		$this->tree = $this->buildTree($data);
 
-        //merge hard-coded account nav
+        //merge hard-coded account nav at root level
         $this->tree[0]['children'][(count($this->tree[0]['children']) - 1)] = array_merge($this->tree[0]['children'][(count($this->tree[0]['children']) - 1)], $this->getAccountData());
 
-        //if user has access to multiple groups, add another menu item
+        //if user has access to multiple groups, add another menu item at root level
         if(count($this->groups) > 1){
             $this->tree[0]['children'][] = $this->getGroupData();
         }

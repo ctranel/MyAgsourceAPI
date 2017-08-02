@@ -118,9 +118,6 @@ class dblock extends dpage {
         $this->load->model('Forms/Data_entry_model');//, null, false, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
         $entry_form_factory = new FormDisplayFactory($this->Data_entry_model, $supplemental_factory,$report_factory, $option_listing_factory, $setting_form_factory, $this->block_model, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
 
-        //$this->load->model('Listings/herd_options_model');
-        //$option_listing_factory = new ListingFactory($this->herd_options_model, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
-
         //create block content
         $report = $report_factory->getByBlock($block_id, null, $this->herd->isMetric());
         if(!empty($report)){
