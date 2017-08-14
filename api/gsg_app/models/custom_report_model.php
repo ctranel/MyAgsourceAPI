@@ -188,7 +188,7 @@ class Custom_report_model extends CI_Model {
                 if(!isset($v)){
                     $v = "NULL";
                 }
-                elseif(!is_numeric($v)){
+                elseif(!is_int($v) && !is_float($v) && !is_bool($v)){
                     $v = "'$v'";
                 }
             }

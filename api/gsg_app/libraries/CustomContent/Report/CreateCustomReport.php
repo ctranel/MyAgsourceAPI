@@ -127,8 +127,8 @@ echo "trend_columns <br>";
                     $where_condition_data[] = [
                         'where_group_id' => $where_group_id,
                         'field_id' => (int)$c['field_id'],
-                        'operator' => $c['operator'],
-                        'operand' => $c['operand'],
+                        'operator' => (string)$c['operator'],
+                        'operand' => (string)$c['operand'],
                     ];
                 }
             }
