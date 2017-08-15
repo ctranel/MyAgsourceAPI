@@ -42,7 +42,7 @@ class Auth extends MY_Api_Controller {
         $arr_user = $this->ion_auth_model->user($this->session->userdata('user_id'))->result_array()[0];
 
 		if(isset($arr_inquiry) && is_array($arr_inquiry)){
-			if($this->as_ion_auth->recordProductInquiry($arr_user['first_name'] . ' ' . $arr_user['last_name'], $arr_user['email'],$this->session->userdata('herd_code'), $arr_inquiry, $this->input->userInput('comments'))){
+			if($this->as_ion_auth->recordProductInquiry($arr_user['first_name'] . ' ' . $arr_user['last_name'], $arr_user['email'],$this->herd->herdCode(), $arr_inquiry, $this->input->userInput('comments'))){
                 $this->sendResponse(200, new ResponseMessage('Thank you for your interest.  Your request for more information has been sent.', 'message'));
 			}
 			else{
@@ -88,7 +88,7 @@ class Auth extends MY_Api_Controller {
             //get permissions (also in constuctor, put in function/class somewhere)
             $this->load->model('permissions_model');
             $this->load->model('product_model');
-            //$herd = new Herd($this->herd_model, $this->session->userdata('herd_code'));
+
             $group_permissions = ProgramPermissions::getGroupPermissionsList($this->permissions_model, $this->session->userdata('active_group_id'));
             $products = new Products($this->product_model, $this->herd, $group_permissions);
             $this->permissions = new ProgramPermissions($this->permissions_model, $group_permissions, $products->allHerdProductCodes());
@@ -483,9 +483,6 @@ class Auth extends MY_Api_Controller {
 		if($this->session->userdata('user_id') === FALSE){
 			return FALSE;
 		}
-		$herd_code = $this->session->userdata('herd_code');
-		$recent_test = $this->session->userdata('recent_test_date');
-		$recent_test = empty($recent_test) ? NULL : $recent_test;
 
 		$this->load->model('access_log_model');
 		$access_log = new AccessLog($this->access_log_model);
@@ -493,8 +490,8 @@ class Auth extends MY_Api_Controller {
 		$access_log->writeEntry(
 			$this->as_ion_auth->is_admin(),
 			$event_id,
-			$herd_code,
-			$recent_test,
+            $this->herd->herdCode(),
+            isset($this->herd) ? $this->herd->getRecentTest() : NULL,
 			$this->session->userdata('user_id'),
 			$this->session->userdata('active_group_id')
 		);

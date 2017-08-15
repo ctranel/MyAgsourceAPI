@@ -66,7 +66,7 @@ class Change_herd extends MY_Api_Controller {
     function herd_list(){
         //get herd list
         $tmp_arr = $this->herd_access->getAccessibleHerdOptions($this->session->userdata('user_id'), $this->permissions->permissionsList(), $this->session->userdata('arr_regions'));
-        //@todo: handle if there is only 1 herd (or 0)
+        //@todo: handle if there is only 1 herd
         if(count($tmp_arr) === 0){
             $this->sendResponse(404, new ResponseMessage('No herds found.', 'error'));
         }
@@ -218,13 +218,12 @@ class Change_herd extends MY_Api_Controller {
     }
 
 	protected function _setSessionHerdData(){
-        $herd_info = $this->herd->header_info($this->herd->herdCode());
+        $herd_info = $this->herd->toArray();
 		$this->session->set_userdata('herd_code', $this->herd->herdCode());
-		$this->session->set_userdata('recent_test_date', $herd_info['test_date']);
 		//load new benchmarks
 		//$this->load->model('Forms/setting_form_model', null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->herd->herdCode()]);
-		$this->load->model('Settings/benchmark_model', null, false, ['user_id' => $this->session->userdata('user_id'), 'herd_code' => $this->session->userdata('herd_code')]);
-        $benchmarks = new Benchmarks($this->benchmark_model, $this->session->userdata('user_id'), $this->herd->herdCode(), $herd_info, []);
+		$this->load->model('Settings/benchmark_model', null, false, ['user_id' => $this->session->userdata('user_id'), 'herd_code' => $this->herd->herdCode()]);
+        $benchmarks = new Benchmarks($this->benchmark_model, $this->session->userdata('user_id'), $this->herd, []);
 		$this->session->set_userdata('benchmarks', $benchmarks->getSettingKeyValues());
 
         return $herd_info;
@@ -236,14 +235,13 @@ class Change_herd extends MY_Api_Controller {
 		if($this->session->userdata('user_id') === FALSE){
 			return FALSE;
 		}
-		$herd_code = $this->session->userdata('herd_code');
-		$recent_test = $this->session->userdata('recent_test_date');
+        $recent_test = $this->herd->getRecentTest();
 		$recent_test = empty($recent_test) ? NULL : $recent_test;
 
 		$this->access_log->writeEntry(
 			$this->as_ion_auth->is_admin(),
 			$event_id,
-			$herd_code,
+            $this->herd->herdCode(),
 			$recent_test,
 			$this->session->userdata('user_id'),
 			$this->session->userdata('active_group_id')

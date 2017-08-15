@@ -78,19 +78,6 @@ class ChartData extends ReportData{
         if(isset($this->x_axis)){
             $x_axis_dbfield_name = $this->x_axis->dbFieldName();
         }
-		if(isset($x_axis_dbfield_name) && !empty($x_axis_dbfield_name)){
-			if($this->x_axis->dataType() === 'datetime'){
-                $criteria_key_value[$x_axis_dbfield_name] = [
-                    'column' => $x_axis_dbfield_name,
-                    'operator' => '=',
-                    'value' => [
-                        'dbfrom' => $this->report_datasource->getStartDate($this->report->primaryTableName(), $x_axis_dbfield_name, $this->report->maxRows(), 'MM-dd-yyyy'),
-                        'dbto' => $this->report_datasource->getRecentDates($this->report->primaryTableName(), $x_axis_dbfield_name, 1, 'MM-dd-yyyy')[0]
-                    ]
-                ];
-			}
-			//@todo: do we need to handle "most recent ranges" for linear data types?
-		}
 
 		$criteria_key_value = $this->whereCriteria($criteria_key_value);
 		$select_fields = $this->selectFields($this->is_metric);

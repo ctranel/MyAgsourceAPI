@@ -60,11 +60,11 @@ class listings extends dpage {
         //page content
         $this->load->model('ReportContent/report_block_model');
 
-        $this->load->model('Listings/herd_options_model');//, null, false, ['herd_code'=>$this->session->userdata('herd_code')]);
+        $this->load->model('Listings/herd_options_model');
 		$option_listing_factory = new ListingFactory($this->herd_options_model);
 
         //create block content
-        $listings = $option_listing_factory->getByPage($page_id, ['herd_code'=>$this->session->userdata('herd_code'), 'serial_num'=>$serial_num]);
+        $listings = $option_listing_factory->getByPage($page_id, ['herd_code'=>$this->herd->herdCode(), 'serial_num'=>$serial_num]);
 
 
         //create blocks for content
@@ -94,11 +94,11 @@ class listings extends dpage {
             $params = (array)json_decode(urldecode($json_filter_data));
         }
 
-        $this->load->model('Listings/herd_options_model');//, null, false, ['herd_code'=>$this->session->userdata('herd_code'), 'protocol_id'=>$protocol_id]);
+        $this->load->model('Listings/herd_options_model');
         $option_listing_factory = new ListingFactory($this->herd_options_model);
 
         //create block content
-        $listings = $option_listing_factory->getByPage($page_id, ['herd_code'=>$this->session->userdata('herd_code'), 'protocol_id' => $protocol_id]);
+        $listings = $option_listing_factory->getByPage($page_id, ['herd_code'=>$this->herd->herdCode(), 'protocol_id' => $protocol_id]);
 
         //supplemental factory
         $this->load->model('supplemental_model');

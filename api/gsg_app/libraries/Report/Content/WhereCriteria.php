@@ -23,12 +23,18 @@ class WhereCriteria implements iWhereCriteria {
 	 * @var iDataField
 	 **/
 	protected $datafield;
-	
-	/**
-	 * condition
-	 * @var string
-	 **/
-	protected $condition;
+
+    /**
+     * operator
+     * @var string
+     **/
+    protected $operator;
+
+    /**
+     * operand
+     * @var string
+     **/
+    protected $operand;
 	
 	/**
 	 */
@@ -45,9 +51,10 @@ class WhereCriteria implements iWhereCriteria {
 	*  @throws: 
 	* -----------------------------------------------------------------
 	\*/
-	public function __construct(\myagsource\Datasource\iDataField $datafield, $condition) {
+	public function __construct(\myagsource\Datasource\iDataField $datafield, $operator, $operand) {
 		$this->datafield = $datafield;
-		$this->condition = $condition;
+        $this->operator = $operator;
+        $this->operand = $operand;
 	}
 	
 	/* -----------------------------------------------------------------
@@ -74,7 +81,36 @@ class WhereCriteria implements iWhereCriteria {
 	 * @author ctranel
 	 **/
 	public function criteria(){
-		return $this->datafield->dbFieldName() . ' ' . $this->condition;
+        switch(strtolower($this->operator)){
+            case 'in':
+                $condition = "IN('" . implode("','" , explode('|', $this->operand)) . "')";
+                break;
+            case 'between':
+                $tmp = explode('|', $this->operand);
+                $condition = "BETWEEN '" . $tmp[0] . "' AND '" . $tmp[1] . "'";
+                break;
+            default:
+                if($this->operand === 'CURRDATE'){
+                    $condition = $this->operator . " GETDATE()";
+                    break;
+                }
+                if(!isset($this->operand)){
+                    $condition = $this->operator . " NULL";
+                    break;
+                }
+                $condition = $this->operator . " '" . $this->operand . "'";
+        }
+
+        return $this->datafield->dbFieldName() . ' ' . $condition;
+/*
+	    var_dump($this->condition);
+	    if(is_array($this->condition)){
+	        if(isset($this->condition['dbfrom'])){
+                return $this->datafield->dbFieldName() . ' BETWEEN ' . $this->condition['dbfrom'] . ' AND ' . $this->condition['dbto'];
+            }
+        }
+
+		return $this->datafield->dbFieldName() . ' ' . $this->condition;*/
 	}
 }
 

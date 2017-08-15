@@ -33,7 +33,6 @@ class Cow_lookup extends dpage {
 		parent::__construct();
 
 		$this->cow_id_field = $this->settings->getValue('cow_id_field');
-		//$herd_code = $this->session->userdata('herd_code');
 
 		/* Load the profile.php config file if it exists
 		if (ENVIRONMENT == 'development' || ENVIRONMENT == 'localhost') {
@@ -55,7 +54,7 @@ class Cow_lookup extends dpage {
 		try{
             $this->_loadObjVars($serial_num);
             $this->load->model('dhi/cow_lookup/events_model');
-            $data['animal_data'] = $this->events_model->getCowArray($this->session->userdata('herd_code'), $serial_num);
+            $data['animal_data'] = $this->events_model->getCowArray($this->herd->herdCode(), $serial_num);
             $data['animal_data']['chosen_id'] = $data['animal_data'][$this->cow_id_field];
             $data['animal_data']['serial_num'] = $serial_num;
 
@@ -74,7 +73,7 @@ class Cow_lookup extends dpage {
             $option_listing_factory = new ListingFactory($this->event_listing_model);
 
             //create block content
-            $listing = $option_listing_factory->getListing(3, ['herd_code' => $this->session->userdata('herd_code'), 'serial_num' => $serial_num]);
+            $listing = $option_listing_factory->getListing(3, ['herd_code' => $this->herd->herdCode(), 'serial_num' => $serial_num]);
 
             //create blocks for content
             $web_block_factory = new WebBlockFactory($this->block_model, $supplemental_factory);
@@ -103,14 +102,14 @@ class Cow_lookup extends dpage {
 		$this->load->model('dhi/cow_lookup/dam_model');
 
     	try{
-            $data['dam'] = $this->dam_model->getCowArray($this->session->userdata('herd_code'), $serial_num);
+            $data['dam'] = $this->dam_model->getCowArray($this->herd->herdCode(), $serial_num);
             //build lactation tables
             $this->load->model('dhi/cow_lookup/lactations_model');
             $tab = array();
             if(isset($data['dam']['dam_serial_num']) && !empty($data['dam']['dam_serial_num'])){
-                $subdata['arr_lacts'] = $this->lactations_model->getLactationsArray($this->session->userdata('herd_code'), $data['dam']['dam_serial_num']);
+                $subdata['arr_lacts'] = $this->lactations_model->getLactationsArray($this->herd->herdCode(), $data['dam']['dam_serial_num']);
                 $tab['lact_table'] = $subdata;
-                $subdata['arr_offspring'] = $this->lactations_model->getOffspringArray($this->session->userdata('herd_code'), $data['dam']['dam_serial_num']);
+                $subdata['arr_offspring'] = $this->lactations_model->getOffspringArray($this->herd->herdCode(), $data['dam']['dam_serial_num']);
                 $tab['offspring_table'] = $subdata;
                 unset($subdata);
             }
@@ -129,7 +128,7 @@ class Cow_lookup extends dpage {
 	function sire($serial_num){
 		try{
             $this->load->model('dhi/cow_lookup/sire_model');
-            $data = $this->sire_model->getCowArray($this->session->userdata('herd_code'), $serial_num);
+            $data = $this->sire_model->getCowArray($this->herd->herdCode(), $serial_num);
             $data['chosen_id'] = $data[$this->cow_id_field];
 
             $test_empty = array_filter($data);
@@ -161,11 +160,11 @@ class Cow_lookup extends dpage {
 		}
         try{
             $this->load->model('dhi/animal_model');
-            $cow_data = $this->animal_model->cowIdData($this->session->userdata('herd_code'), $serial_num);
+            $cow_data = $this->animal_model->cowIdData($this->herd->herdCode(), $serial_num);
 
             $this->load->model('dhi/cow_lookup/tests_model');
             $data = [
-                'arr_tests' => $this->tests_model->getTests($this->session->userdata('herd_code'), $serial_num, $lact_num)
+                'arr_tests' => $this->tests_model->getTests($this->herd->herdCode(), $serial_num, $lact_num)
                 ,'cow_id' => $this->cow_id
                 ,'serial_num' => $serial_num
                 ,'lact_num' => $lact_num
@@ -184,11 +183,11 @@ class Cow_lookup extends dpage {
 	function lactations($serial_num){
         try{
             $this->load->model('dhi/animal_model');
-            $cow_data = $this->animal_model->cowIdData($this->session->userdata('herd_code'), $serial_num);
+            $cow_data = $this->animal_model->cowIdData($this->herd->herdCode(), $serial_num);
 
             $this->load->model('dhi/cow_lookup/lactations_model');
-            $data['lactations'] = $this->lactations_model->getLactationsArray($this->session->userdata('herd_code'), $serial_num);
-            $data['offspring'] = $this->lactations_model->getOffspringArray($this->session->userdata('herd_code'), $serial_num);
+            $data['lactations'] = $this->lactations_model->getLactationsArray($this->herd->herdCode(), $serial_num);
+            $data['offspring'] = $this->lactations_model->getOffspringArray($this->herd->herdCode(), $serial_num);
 
             $data['chosen_id'] = $cow_data[$this->cow_id_field];
         }
@@ -213,7 +212,7 @@ class Cow_lookup extends dpage {
 			$lact_num = $this->curr_lact_num;
 		}
 		$params = [
-		    'herd_code' => $this->session->userdata('herd_code'),
+		    'herd_code' => $this->herd->herdCode(),
             'serial_num' => $serial_num,
             'lact_num' => $lact_num,
         ];
@@ -233,7 +232,7 @@ class Cow_lookup extends dpage {
             //load factories for block content
             $data_handler = new DataHandler($this->report_data_model, $benchmarks, $this->herd->isMetric());
             $db_table_factory = new DbTableFactory($this->db_table_model);
-            $report_factory = new ReportFactory($this->report_block_model, $this->db_field_model, $this->filters, $supplemental_factory, $data_handler, $db_table_factory);
+            $report_factory = new ReportFactory($this->report_block_model, $this->db_field_model, $this->filters, $supplemental_factory, $data_handler, $db_table_factory, $this->herd);
 
             $report = $report_factory->getByBlock(410, null, $this->herd->isMetric());
 
@@ -258,7 +257,7 @@ class Cow_lookup extends dpage {
 
     protected function _loadObjVars($serial_num){
 		$this->load->model('dhi/cow_lookup/events_model');
-		$events_data = $this->events_model->getCowArray($this->session->userdata('herd_code'), $serial_num);
+		$events_data = $this->events_model->getCowArray($this->herd->herdCode(), $serial_num);
    		$this->cow_id = $events_data[$this->cow_id_field];
 		$this->curr_lact_num = $events_data['curr_lact_num'];
 		$this->curr_calving_date = $events_data['curr_calving_date'];
@@ -268,18 +267,15 @@ class Cow_lookup extends dpage {
 		if($this->session->userdata('user_id') === FALSE){
 			return FALSE;
 		}
-		$herd_code = $this->session->userdata('herd_code');
-		$recent_test = $this->session->userdata('recent_test_date');
-		$recent_test = empty($recent_test) ? NULL : $recent_test;
-		
+
 		$this->load->model('access_log_model');
 		$access_log = new AccessLog($this->access_log_model);
 				
 		$access_log->writeEntry(
 			$this->as_ion_auth->is_admin(),
 			$event_id,
-			$herd_code,
-			$recent_test,
+            $this->herd->herdCode(),
+            isset($this->herd) ? $this->herd->getRecentTest() : NULL,
 			$this->session->userdata('user_id'),
 			$this->session->userdata('active_group_id'),
 			null //no report code for cow lookup

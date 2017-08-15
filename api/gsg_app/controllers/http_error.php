@@ -14,7 +14,7 @@ class HTTP_Error extends MY_Api_Controller {
             $this->sendResponse(401);
         }
 
-        if(!$this->session->userdata('herd_code')){
+        if(!isset($this->herd)){
             $this->sendResponse(400,  new ResponseMessage('A herd code is required to generate navigation.', 'error'));
         }
 	}

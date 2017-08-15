@@ -98,7 +98,7 @@ class dpage extends MY_Api_Controller {
             $this->sendResponse(401);
         }
 
-        if(!$this->session->userdata('herd_code')){
+        if(!isset($this->herd)){
             $this->sendResponse(400,  new ResponseMessage('Please select a herd and try again.', 'error'));
         }
 
@@ -132,12 +132,12 @@ class dpage extends MY_Api_Controller {
     }
     protected function _filters($page_id, $params){
         $this->load->model('filter_model');
-        return new ReportFilters($this->filter_model, $page_id, ['herd_code' => $this->session->userdata('herd_code')] + $params, $this->settings);
+        return new ReportFilters($this->filter_model, $page_id, ['herd_code' => $this->herd->herdCode()] + $params, $this->settings);
     }
     protected function _benchmarks(){
         if($this->permissions->hasPermission("Set Benchmarks")){
-            $this->load->model('Settings/benchmark_model');//, null, false, ['user_id' => $this->session->userdata('user_id'), 'herd_code' => $this->session->userdata('herd_code')]);
-            return new Benchmarks($this->benchmark_model, $this->session->userdata('user_id'), $this->herd->herdCode(), $this->herd_model->header_info($this->herd->herdCode()), $this->session->userdata('benchmarks'));
+            $this->load->model('Settings/benchmark_model');
+            return new Benchmarks($this->benchmark_model, $this->session->userdata('user_id'), $this->herd, $this->session->userdata('benchmarks'));
         }
 
         return null;
@@ -148,32 +148,31 @@ class dpage extends MY_Api_Controller {
         $this->load->model('Datasource/db_table_model');
         $data_handler = new DataHandler($data_handler_model, $benchmarks, (bool)$this->herd->isMetric());//true
         $db_table_factory = new DbTableFactory($this->db_table_model);
-
         //load factories for block content
-        $report_factory = new ReportFactory($this->report_block_model, $this->db_field_model, $this->filters, $supplemental_factory, $data_handler, $db_table_factory);
+        $report_factory = new ReportFactory($this->report_block_model, $this->db_field_model, $this->filters, $supplemental_factory, $data_handler, $db_table_factory, $this->herd);
 
         $this->load->model('Listings/herd_options_model');
-        $option_listing_factory = new ListingFactory($this->herd_options_model);//, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
+        $option_listing_factory = new ListingFactory($this->herd_options_model);
 
-        $this->load->model('Forms/setting_form_model');//, null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
-        $setting_form_factory = new SettingsFormDisplayFactory($this->setting_form_model, $supplemental_factory, $params + ['herd_code'=>$this->session->userdata('herd_code'), 'user_id'=>$this->session->userdata('user_id')]);
+        $this->load->model('Forms/setting_form_model');
+        $setting_form_factory = new SettingsFormDisplayFactory($this->setting_form_model, $supplemental_factory, $params + ['herd_code'=>$this->herd->herdCode(), 'user_id'=>$this->session->userdata('user_id')]);
 
-        $this->load->model('Forms/Data_entry_model');//, null, false, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
+        $this->load->model('Forms/Data_entry_model');
         //Can't edit inactive animals
         $editable = true;
-        if(isset($params['serial_num'])){
+                if(isset($params['serial_num'])){
             $this->load->model('dhi/animal_model');
-            $editable = Animal::isActive($this->animal_model, $this->session->userdata('herd_code'), $params['serial_num']);
+            $editable = Animal::isActive($this->animal_model, $this->herd->herdCode(), $params['serial_num']);
         }
 
-        $entry_form_factory = new FormDisplayFactory($this->Data_entry_model, $supplemental_factory, $params + ['herd_code'=>$this->session->userdata('herd_code'), 'user_id'=>$this->session->userdata('user_id')]);
+        $entry_form_factory = new FormDisplayFactory($this->Data_entry_model, $supplemental_factory, $params + ['herd_code'=>$this->herd->herdCode(), 'user_id'=>$this->session->userdata('user_id')]);
 
         //create block content
         $reports = $report_factory->getByPage($page_id, (bool)$this->herd->isMetric());//true
         $setting_forms = $setting_form_factory->getByPage($page_id);
-        $entry_forms = $entry_form_factory->getByPage($page_id, $this->session->userdata('herd_code'), $editable);
+        $entry_forms = $entry_form_factory->getByPage($page_id, $this->herd->herdCode(), $editable);
         //$serial_num = isset($params['serial_num']) ? $params['serial_num'] : null;
-        $listings = $option_listing_factory->getByPage($page_id, $params + ['herd_code'=>$this->session->userdata('herd_code')]);//, 'serial_num'=>$serial_num
+        $listings = $option_listing_factory->getByPage($page_id, $params + ['herd_code'=>$this->herd->herdCode()]);//, 'serial_num'=>$serial_num
 
         //combine and sort
         $block_content = $reports + $setting_forms + $entry_forms + $listings;
@@ -192,6 +191,7 @@ class dpage extends MY_Api_Controller {
         $benchmarks = $this->_benchmarks();
         $this->load->model('ReportContent/report_data_model');
         $block_content = $this->_blockContent($page_id, $supplemental_factory, $params, $benchmarks, $this->report_data_model);
+//var_dump($block_content); die;
 
         //Set up site content objects
         $this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
@@ -200,7 +200,7 @@ class dpage extends MY_Api_Controller {
 
         //create blocks for content
         $blocks = $web_block_factory->getBlocksFromContent($page_id, $block_content);
-
+//var_dump($blocks); die;
         $this->load->model('web_content/page_model');
         $page_data = $this->page_model->getPage($page_id);
 		$this->page = new Page($page_data, $blocks, $supplemental_factory, $this->filters, $benchmarks);
@@ -215,6 +215,7 @@ class dpage extends MY_Api_Controller {
         if($this->permissions->hasPermission("View All Content-Billed")){
             $this->message[] = new ResponseMessage('Herd ' . $this->herd->herdCode() . ' is not paying for this product.  You will be billed a monthly fee for any month in which you view content for which the herd is not paying.', 'message');
         }
+//print_r($this->page); die;
         $this->sendResponse(200, $this->message, $this->page->toArray());
 	}
 
@@ -251,7 +252,7 @@ class dpage extends MY_Api_Controller {
         $params['report_options'] = ($page_id == 103) ? 2 : ($page_id == 106 ? 1 : null);
 
         $this->filters = $this->_filters($page_id, $params);
-        $this->load->model('Forms/setting_form_model');//, null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
+        $this->load->model('Forms/setting_form_model');
         //end filters
 
         $benchmarks = $this->_benchmarks();
@@ -314,7 +315,7 @@ class dpage extends MY_Api_Controller {
         unset($params['look_ahead_days']); */
 
         $this->filters = $this->_filters($page_id, $params);
-        $this->load->model('Forms/setting_form_model');//, null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
+        $this->load->model('Forms/setting_form_model');
         //end filters
 
         $benchmarks = $this->_benchmarks();
@@ -346,10 +347,7 @@ class dpage extends MY_Api_Controller {
 		if($this->session->userdata('user_id') === FALSE){
 			return FALSE;
 		}
-		$herd_code = $this->session->userdata('herd_code');
-		$recent_test = $this->session->userdata('recent_test_date');
-		$recent_test = empty($recent_test) ? NULL : $recent_test;
-		
+
 		$filter_text = isset($this->filters) ? $this->filters->get_filter_text() : NULL;
 
 		$this->load->model('access_log_model');
@@ -358,8 +356,8 @@ class dpage extends MY_Api_Controller {
 		$access_log->writeEntry(
 			$this->as_ion_auth->is_admin(),
 			$event_id,
-			$herd_code,
-			$recent_test,
+            $this->herd->herdCode(),
+            isset($this->herd) ? $this->herd->getRecentTest() : NULL,
 			$this->session->userdata('user_id'),
 			$this->session->userdata('active_group_id'),
 			$product_code,

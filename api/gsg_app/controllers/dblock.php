@@ -107,16 +107,15 @@ class dblock extends dpage {
 
         //we want params for the child block, not the parent
         $key_fields = $this->block_model->getKeysByBlock($block_id);
-//var_dump($key_fields, $params); die;
         //$params = array_intersect_key($params, array_flip( $key_fields));
 
         //load factories for block content
-        $report_factory = new ReportFactory($this->report_block_model, $this->db_field_model, $this->filters, $supplemental_factory, $data_handler, $db_table_factory);
-        $this->load->model('Forms/setting_form_model');//, null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
-        $setting_form_factory = new SettingsFormDisplayFactory($this->setting_form_model, $supplemental_factory, $params + ['herd_code'=>$this->session->userdata('herd_code'), 'user_id'=>$this->session->userdata('user_id')]);
+        $report_factory = new ReportFactory($this->report_block_model, $this->db_field_model, $this->filters, $supplemental_factory, $data_handler, $db_table_factory, $this->herd);
+        $this->load->model('Forms/setting_form_model');
+        $setting_form_factory = new SettingsFormDisplayFactory($this->setting_form_model, $supplemental_factory, $params + ['herd_code'=>$this->herd->herdCode(), 'user_id'=>$this->session->userdata('user_id')]);
 
-        $this->load->model('Forms/Data_entry_model');//, null, false, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
-        $entry_form_factory = new FormDisplayFactory($this->Data_entry_model, $supplemental_factory,$report_factory, $option_listing_factory, $setting_form_factory, $this->block_model, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
+        $this->load->model('Forms/Data_entry_model');
+        $entry_form_factory = new FormDisplayFactory($this->Data_entry_model, $supplemental_factory,$report_factory, $option_listing_factory, $setting_form_factory, $this->block_model, $params + ['herd_code'=>$this->herd->herdCode()]);
 
         //create block content
         $report = $report_factory->getByBlock($block_id, null, $this->herd->isMetric());
@@ -127,7 +126,7 @@ class dblock extends dpage {
         if(!empty($setting_forms)){
             return array_values($setting_forms)[0];
         }
-        $entry_forms = $entry_form_factory->getByBlock($block_id, $this->session->userdata('herd_code'));
+        $entry_forms = $entry_form_factory->getByBlock($block_id, $this->herd->herdCode());
         if(!empty($entry_forms)){
             return array_values($entry_forms)[0];
         }

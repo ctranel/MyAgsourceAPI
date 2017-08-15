@@ -3,6 +3,7 @@ namespace myagsource\Benchmarks;
 require_once APPPATH . 'libraries/Settings/Settings.php';
 
 use myagsource\Settings\Settings;
+use \myagsource\dhi\Herd;
 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /**
@@ -62,9 +63,9 @@ class Benchmarks extends Settings
 	 * @return void
 	 * @author ctranel
 	 **/
-	public function __construct(\Benchmark_model $benchmark_model, $user_id, $herd_code, $herd_info, $session_benchmarks)
+	public function __construct(\Benchmark_model $benchmark_model, $user_id, Herd $herd, $session_benchmarks)
 	{
-		parent::__construct($user_id, $herd_code, $benchmark_model, $session_benchmarks); //83 is the id of benchmarks setting form page--need to retrive this based on settings name in controller
+		parent::__construct($user_id, $herd->herdCode(), $benchmark_model, $session_benchmarks); //83 is the id of benchmarks setting form page--need to retrive this based on settings name in controller
 
 		$this->benchmark_model = $benchmark_model;
 		$this->session_data = $session_benchmarks;
@@ -97,8 +98,6 @@ class Benchmarks extends Settings
 				'sort_order' => 'asc',
 			],
 		];
-		
-		//$this->setHerdDefaults($herd_info['breed_code'], $herd_info['herd_size']);
 	}
 
 	/**

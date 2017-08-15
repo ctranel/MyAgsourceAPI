@@ -229,54 +229,6 @@ class Report_data_model extends CI_Model {
 	}
 	
 	/**
-	 * getRecentDates
-	 * @return date string
-	 * @author ctranel
-	 **/
-	public function getRecentDates($primary_table_name, $date_field, $num_dates = 1, $date_format = 'MMM-yy') {
-		if($date_format){
-			$this->db->select("FORMAT(" . $date_field . ", '" . $date_format . "', 'en-US') AS " . $date_field, FALSE);
-		}
-		else{
-			$this->db->select($date_field);
-		}
-		$this->db
-			->where($primary_table_name . '.herd_code', $this->session->userdata('herd_code'))
-			->where($date_field . ' IS NOT NULL')
-			->order_by($primary_table_name . '.' . $date_field, 'desc');
-		if(isset($num_dates) && !empty($num_dates)){
-			$this->db->limit($num_dates);		
-		}
-		$result = $this->db->get($primary_table_name)->result_array();
-		if(is_array($result) && !empty($result)){
-			return array_flatten($result);
-		} 
-		else return FALSE;
-	}
-
-    /**
-    * get_start_test_date
-    * 
-    * @param string date_field - db name of the date field used for this trend
-    * @param int num_dates - number of test dates to include in report
-    * @param string date_format - database string for formatting date
-    * @param int num_dates_to_shift - number of dates to shift the results back
-    * @return string date
-    * @author ctranel
-    **/
-    public function getStartDate($primary_table_name, $date_field, $num_dates = 12, $date_format = 'MMM-yy', $num_dates_to_shift = 0) {
-		$sql = "SELECT TOP 1 FORMAT(a." . $date_field . ", 'MM-dd-yyyy', 'en-US') AS " . $date_field . "
-    		FROM (SELECT DISTINCT TOP " . ($num_dates + $num_dates_to_shift) . " " . $date_field . "
-                FROM " . $primary_table_name . " 
-                WHERE herd_code = '" . $this->session->userdata('herd_code') . "' AND " . $date_field . " IS NOT NULL
-                ORDER BY " . $date_field . " DESC) a
-            ORDER BY a." . $date_field . " ASC";
-		$result = $this->db->query($sql)->result_array();
-        if(is_array($result) && !empty($result)) return $result[(count($result) - 1)][$date_field];
-		else return FALSE;
-	}	
-	
-	/**
 	 * @method getGraphDataset()
 	 * @param string herd code
 	 * @param int number of tests to include on report

@@ -47,7 +47,7 @@ class Manage_serv_grps extends MY_Api_Controller {
      */
     function index()
     {
-        $consultants_by_status = $this->as_ion_auth->getConsultantsByHerd($this->session->userdata('herd_code'));
+        $consultants_by_status = $this->as_ion_auth->getConsultantsByHerd($this->herd->herdCode());
         $this->sendResponse(200, null, $consultants_by_status);
 
 
@@ -163,7 +163,7 @@ class Manage_serv_grps extends MY_Api_Controller {
 
         $arr_relationship_data = array(
             'sg_user_id' => (int)$this->input->userInput('sg_user_id'),
-            'herd_code' => $this->session->userdata('herd_code'),
+            'herd_code' => $this->herd->herdCode(),
             'write_data' => (int)$this->input->userInput('write_data'),
             'active_date' => date('Y-m-d'),
             'active_user_id' => $this->session->userdata('user_id'),
@@ -186,7 +186,7 @@ class Manage_serv_grps extends MY_Api_Controller {
             array_walk($arr_post_section_id, function (&$value) { $value = (int)$value; });
         }
 
-        if ($this->as_ion_auth->allow_service_grp($arr_relationship_data, $arr_post_section_id)) { //if permission is granted successfully
+        if ($this->as_ion_auth->allow_service_grp($arr_relationship_data, $arr_post_section_id, $this->herd)) { //if permission is granted successfully
             $this->_record_access(34);
             $this->sendResponse(200, new ResponseMessage('Permission is granted successfully', 'message'));
         }
@@ -198,9 +198,6 @@ class Manage_serv_grps extends MY_Api_Controller {
         if($this->session->userdata('user_id') === FALSE){
             return FALSE;
         }
-        $herd_code = $this->session->userdata('herd_code');
-        $recent_test = $this->session->userdata('recent_test_date');
-        $recent_test = empty($recent_test) ? NULL : $recent_test;
 
         $this->load->model('access_log_model');
         $access_log = new AccessLog($this->access_log_model);
@@ -208,8 +205,8 @@ class Manage_serv_grps extends MY_Api_Controller {
         $access_log->writeEntry(
             $this->as_ion_auth->is_admin(),
             $event_id,
-            $herd_code,
-            $recent_test,
+            $this->herd->herdCode(),
+            isset($this->herd) ? $this->herd->getRecentTest() : NULL,
             $this->session->userdata('user_id'),
             $this->session->userdata('active_group_id')
         );

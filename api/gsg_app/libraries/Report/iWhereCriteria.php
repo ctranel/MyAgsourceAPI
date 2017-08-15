@@ -14,7 +14,7 @@ namespace myagsource\Report;
 interface iWhereCriteria {
 	/**
 	 */
-	function __construct(\myagsource\Datasource\iDataField $datafield, $order);
+	function __construct(\myagsource\Datasource\iDataField $datafield, $operator, $operand);
 	function fieldName();
 //	function operator();
 	function criteria();

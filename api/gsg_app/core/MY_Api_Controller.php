@@ -91,9 +91,9 @@ class MY_Api_Controller extends CI_Controller
 
         $this->settings = new Settings($this->session->userdata('user_id'), $this->session->userdata('herd_code'), $this->settings_model);
 
-        if($this->session->userdata('herd_code')){
+        //if($this->session->userdata('herd_code')){
             $this->herd = new Herd($this->herd_model, $this->session->userdata('herd_code'));
-        }
+        //}
 
         if($this->session->userdata('active_group_id')) {
             $this->load->model('permissions_model');

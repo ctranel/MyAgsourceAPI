@@ -194,7 +194,7 @@ abstract class Report implements iReport {
 	 * @return void
 	 * @author ctranel
 	 **/
-	public function __construct($report_datasource, $report_meta, ReportFilters $filters, SupplementalFactory $supp_factory, DataHandler $data_handler, DbTableFactory $db_table_factory, iDataField $pivot_field = null, $field_groups = null, $is_metric) {//$id, $page_id, $name, $description, $scope, $active, $path,
+	public function __construct($report_datasource, $report_meta, ReportFilters $filters, $sorts, SupplementalFactory $supp_factory, DataHandler $data_handler, DbTableFactory $db_table_factory, iDataField $pivot_field = null, $field_groups = null) {//$id, $page_id, $name, $description, $scope, $active, $path,
 		$this->datasource = $report_datasource;
 
 		$this->id = $report_meta['id'];
@@ -204,7 +204,8 @@ abstract class Report implements iReport {
 		$this->avg_row = $report_meta['avg_row'];
 		$this->bench_row = $report_meta['bench_row'];
 		$this->is_summary = $report_meta['is_summary'];
-        $this->is_metric = $is_metric;
+        $this->primary_table_name = $report_meta['primary_table_name'];
+        $this->is_metric = $report_meta['is_metric'];
 		$this->field_groups = $field_groups;
 		$this->display_type = $report_meta['display_type'];
         $this->filters = $filters;
@@ -213,6 +214,9 @@ abstract class Report implements iReport {
         $this->has_aggregate = false;
         $this->pivot_field = $pivot_field;
         $this->report_fields = [];
+        $this->sorts = $sorts;
+
+        $this->where_group = $report_meta['where_groups'];
 
         /*
          * myagsource special case: if PAGE filters or params contain only a pstring of 0, and the report is not a summary
@@ -231,10 +235,8 @@ abstract class Report implements iReport {
         $this->supplemental_factory = $supp_factory;
 
 		//load data for remaining properties
-        $this->setReportFields();
-		$this->setDBTables();
-        $this->setWhereGroups();
-		$this->setDefaultSort();
+        $this->setReportFields($report_meta['field_data']);
+        $this->setDBTables();
 		$this->setJoins();
         $this->verifyFilters();
 
@@ -271,9 +273,6 @@ abstract class Report implements iReport {
 	}
 
 	public function primaryTableName(){
-        if(!isset($this->primary_table_name)){
-            $this->setDBTables();
-        }
 		return $this->primary_table_name;
 	}
 
@@ -486,7 +485,7 @@ abstract class Report implements iReport {
     }
 
 
-    abstract protected function setReportFields();
+    abstract protected function setReportFields($field_data);
 
 
     /**
@@ -495,31 +494,17 @@ abstract class Report implements iReport {
      * @author ctranel
      **/
     protected function setDBTables(){
-        $max_cnt = 0;
-        $max_table = null;
-
         if(is_array($this->report_fields) && count($this->report_fields) >  1){
             foreach($this->report_fields as $f){
                 $tbl = $f->dbTableName();
 
-                if(isset($this->db_tables[$tbl])){
-                    $this->db_tables[$tbl]['cnt']++;
-                    $max_cnt = $this->db_tables[$tbl]['cnt'];
-                    $max_table = $this->db_tables[$tbl]['DBTable'];
-                    continue;
-                }
-
-                $this->db_tables[$tbl] = [
-                    'DBTable' => $this->db_table_factory->getTable($tbl),
-                    'cnt' => 1,
-                ];
-                if($this->db_tables[$tbl]['cnt'] > $max_cnt){
-                    $max_cnt = 1;
-                    $max_table = $this->db_tables[$tbl]['DBTable'];
+                if(!isset($this->db_tables[$tbl])){
+                    $this->db_tables[$tbl] = [
+                        'DBTable' => $this->db_table_factory->getTable($tbl),
+                        'cnt' => 1,
+                    ];
                 }
             }
-
-            $this->primary_table_name = $max_table->full_table_name();
         }
     }
 
@@ -551,15 +536,15 @@ abstract class Report implements iReport {
 	 * 
 	 * @return void
 	 * @author ctranel
-	 **/
-	protected function setWhereGroups(){
-		$data = $this->datasource->getWhereData($this->id, $this->is_metric);
-
-		if(!is_array($data) || empty($data)){
+	protected function setWhereGroups($where_data){
+		//$data = $this->datasource->getWhereData($this->id, $this->is_metric);
+var_dump('->',$where_data);
+		if(!is_array($where_data) || empty($where_data)){
 			return;
 		}
-		$this->where_group = $this->buildWhereTree($data);
+		$this->where_group = $this->buildWhereTree($where_data);
 	}
+**/
 
     /**
      * buildWhereTree()
@@ -571,7 +556,6 @@ abstract class Report implements iReport {
      * @param string parent_operator
      * @return array of tree branch
      * @author ctranel
-     **/
     public function buildWhereTree(array $data, $parent_id = 0, $parent_operator = null){
         if(!isset($data) || !is_array($data)){
             return;
@@ -608,6 +592,7 @@ abstract class Report implements iReport {
             return new WhereGroup($parent_operator, $criteria, $children);
         }
     }
+**/
 
 
 	
@@ -645,25 +630,6 @@ abstract class Report implements iReport {
 	}
 
 	/**
-	 * getSortDateFieldName()
-	 *
-	 * returns field-name-keyed array of sort orders
-	 *
-	 * @return string field name
-	 * @access public
-	 * */
-	public function getSortDateFieldName(){
-		if(isset($this->sorts) && count($this->sorts) > 0){
-			foreach($this->sorts as $s){
-				if($s->isDate()){
-					return $s->fieldName();
-				}
-			}
-		}
-		return null;
-	}
-
-	/**
 	 * getSortArray()
 	 * 
 	 * returns field-name-keyed array of sort orders
@@ -681,24 +647,6 @@ abstract class Report implements iReport {
 		return $ret;
 	}
 	
-	/**
-	 * @method setDefaultSort()
-	 * @return void
-	 * @author ctranel
-	 **/
-	protected function setDefaultSort(){
-		$this->default_sorts = [];
-		$arr_res = $this->datasource->getSortData($this->id);
-		if(is_array($arr_res)){
-			foreach($arr_res as $s){
-				$datafield = new DbField($s['db_field_id'], $s['table_name'], $s['db_field_name'], $s['name'], $s['description'], $s['pdf_width'], $s['default_sort_order'],
-						 $s['datatype'], $s['max_length'], $s['decimal_scale'], $s['unit_of_measure'], $s['is_timespan'], $s['is_foreign_key'], $s['is_nullable'], $s['is_natural_sort'], null);
-				$this->default_sorts[] = new Sort($datafield, $s['sort_order']);
-			}
-		}
-		$this->sorts = $this->default_sorts;
-	}
-
     /**
      * @method setJoins()
      * @return void

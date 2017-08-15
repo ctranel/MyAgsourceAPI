@@ -41,8 +41,8 @@ class Table extends Report {
 	 **/
 	protected $top_row;
 	
-	function __construct($table_datasource, $report_meta, ReportFilters $filters, SupplementalFactory $supp_factory = null, DataHandler $data_handler, DbTableFactory $db_table_factory, iDataField $pivot_field = null, $field_groups, $is_metric) {
-		parent::__construct($table_datasource, $report_meta, $filters, $supp_factory, $data_handler, $db_table_factory, $pivot_field, $field_groups, $is_metric);
+	function __construct($table_datasource, $report_meta, ReportFilters $filters, $sorts, SupplementalFactory $supp_factory = null, DataHandler $data_handler, DbTableFactory $db_table_factory, iDataField $pivot_field = null, $field_groups) {
+		parent::__construct($table_datasource, $report_meta, $filters, $sorts, $supp_factory, $data_handler, $db_table_factory, $pivot_field, $field_groups);
 
         if(!isset($this->report_fields) || empty($this->report_fields)){
             return;
@@ -65,15 +65,13 @@ class Table extends Report {
         $header_groups = $this->datasource->getHeaderGroups($this->id());
 
         //@todo: pull this only when needed? move adjustHeaderGroups to Table or TableHeader class
-        $arr_dates = null;//$this->herd_model->get_test_dates_7_short($this->session->userdata('herd_code'));
+        $arr_dates = null;//$this->herd_model->get_test_dates_7_short($herd_code);
         $header_groups = TableHeader::mergeDateIntoHeader($header_groups, $arr_dates);
         //end new for API refactoring
 
         $this->table_header = new TableHeader($this, $header_groups, $this->supplemental_factory);
 		
 		$top_row = null;
-
-///var_dump($this->getFieldFormatByName($this->pivot_field->dbFieldName()));
 
 		if($this->hasPivot() && is_array($this->dataset) && !empty($this->dataset)){
 			reset($this->dataset);
@@ -186,10 +184,9 @@ class Table extends Report {
 	 * @return void
 	 * @access protected
 	 **/
-	protected function setReportFields(){
-		$arr_res = $this->datasource->getFieldData($this->id, $this->is_metric);
-		if(is_array($arr_res)){
-			foreach($arr_res as $s){
+	protected function setReportFields($field_data){
+		if(is_array($field_data)){
+			foreach($field_data as $s){
                 //aggregate
 				if(isset($s['aggregate']) && !empty($s['aggregate'])){
 					$this->has_aggregate = true;

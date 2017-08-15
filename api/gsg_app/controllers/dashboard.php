@@ -32,7 +32,7 @@ class Dashboard extends dpage {
 
             $this->load->model('dhi/pdf_archive_model');
             try{
-                $PdfArchives = new PdfArchives($this->pdf_archive_model, $this->session->userdata('herd_code'));
+                $PdfArchives = new PdfArchives($this->pdf_archive_model, $this->herd->herdCode());
                 if($this->permissions->hasPermission('View All Content')){
                     $PdfArchives->setAllHerdArchives();
                 }
@@ -106,7 +106,7 @@ class Dashboard extends dpage {
         }
 
 		if($this->permissions->hasPermission('Update SG Access')){
-			$consultants_by_status = $this->as_ion_auth->getConsultantsByHerd($this->session->userdata('herd_code'));
+			$consultants_by_status = $this->as_ion_auth->getConsultantsByHerd($this->herd->herdCode());
 			if(isset($consultants_by_status['open']) && is_array($consultants_by_status['open'])){
 				$this->data['widget']['herd'][] = [
 					'content' => $this->_set_consult_section($consultants_by_status['open'], 'open', array('Grant Access', 'Deny Access')),

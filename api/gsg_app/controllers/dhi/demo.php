@@ -42,7 +42,7 @@ class Demo extends MY_Api_Controller {
             //get permissions (also in constuctor, put in function/class somewhere)
             $this->load->model('permissions_model');
             $this->load->model('product_model');
-            $herd = new Herd($this->herd_model, $this->session->userdata('herd_code'));
+            $herd = new Herd($this->herd_model, $this->herd->herdCode());
             $group_permissions = ProgramPermissions::getGroupPermissionsList($this->permissions_model, $this->session->userdata('active_group_id'));
             $products = new Products($this->product_model, $this->herd, $group_permissions);
             $this->permissions = new ProgramPermissions($this->permissions_model, $group_permissions, $products->allHerdProductCodes());
@@ -62,10 +62,9 @@ class Demo extends MY_Api_Controller {
 //		$this->session->set_userdata('arr_pstring', $this->herd_model->get_pstring_array($this->herd->getHerdCode()));
 //		$this->session->set_userdata('breed_code', 'HO');
 //		$this->session->set_userdata('arr_breeds', $this->herd_model->breedArray($this->herd->getHerdCode()));
-		$this->session->set_userdata('recent_test_date', $this->herd->getRecentTest());
 		//load new benchmarks
 		$this->load->model('setting_form_model');
-		$benchmarks_lib = new Benchmarks($this->session->userdata('user_id'), $this->input->post('herd_code'), $this->herd->header_info($this->input->post('herd_code')), $this->setting_form_model);
+		$benchmarks_lib = new Benchmarks($this->session->userdata('user_id'), $this->input->post('herd_code'), $this->herd, $this->setting_form_model);
 		$this->session->set_userdata('benchmarks', $benchmarks_lib->getSettingKeyValues());
 	} */
 }

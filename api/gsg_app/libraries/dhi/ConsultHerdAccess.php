@@ -135,7 +135,7 @@ class ConsultHerdAccess
      * @access public
      *
      **/
-    public function allow_service_grp($arr_relationship_data, $arr_section_id) {
+    public function allow_service_grp($arr_relationship_data, $arr_section_id, Herd $active_herd) {
         $old_relationship_id = $this->datasource->get_consult_relationship_id($arr_relationship_data['sg_user_id'], $arr_relationship_data['herd_code']);
         //insert into consulants_herds
         $relationship_id = $this->datasource->set_consult_relationship($arr_relationship_data, $old_relationship_id);
@@ -145,12 +145,15 @@ class ConsultHerdAccess
             if($success){
                 $this->set_message('consultant_status_update_successful');
                 //send e-mail
-                $arr_herd_info = $this->herd_model->header_info($this->session->userdata('herd_code'));
                 $consultant_info = $this->datasource->user($arr_relationship_data['sg_user_id'])->result_array();
                 $consultant_info = $consultant_info[0];
 
-                if($arr_relationship_data['request_status_id'] == 1) $message = $this->load->view($this->config->item('email_templates', 'ion_auth').$this->config->item('consult_granted', 'ion_auth'), $arr_herd_info, true);
-                elseif($arr_relationship_data['request_status_id'] == 2) $message = $this->load->view($this->config->item('email_templates', 'ion_auth').$this->config->item('consult_denied', 'ion_auth'), $arr_herd_info, true);
+                if($arr_relationship_data['request_status_id'] == 1){
+                    $message = $this->load->view($this->config->item('email_templates', 'ion_auth').$this->config->item('consult_granted', 'ion_auth'), $active_herd->toArray(), true);
+                }
+                elseif($arr_relationship_data['request_status_id'] == 2){
+                    $message = $this->load->view($this->config->item('email_templates', 'ion_auth').$this->config->item('consult_denied', 'ion_auth'), $active_herd->toArray(), true);
+                }
 
                 if(isset($message)){
                     $this->email->clear();

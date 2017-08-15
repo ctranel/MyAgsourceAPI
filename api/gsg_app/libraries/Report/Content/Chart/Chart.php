@@ -73,8 +73,8 @@ class Chart extends Report {
 	
 	/**
 	 */
-	function __construct($report_datasource, $report_meta, ReportFilters $filters, SupplementalFactory $supp_factory, DataHandler $data_handler, DbTableFactory $db_table_factory, iDataField $pivot_field = null, $field_groups, $is_metric, $keep_nulls) {
-		parent::__construct($report_datasource, $report_meta, $filters, $supp_factory, $data_handler, $db_table_factory, $pivot_field, $field_groups, $is_metric);
+	function __construct($report_datasource, $report_meta, ReportFilters $filters, $sorts, SupplementalFactory $supp_factory, DataHandler $data_handler, DbTableFactory $db_table_factory, iDataField $pivot_field = null, $field_groups, $keep_nulls) {
+		parent::__construct($report_datasource, $report_meta, $filters, $sorts, $supp_factory, $data_handler, $db_table_factory, $pivot_field, $field_groups);
 
         if(!isset($this->report_fields) || empty($this->report_fields)){
             return;
@@ -119,10 +119,9 @@ class Chart extends Report {
 	 * @return void
 	 * @access protected
 	 **/
-	protected function setReportFields(){
-		$arr_res = $this->datasource->getFieldData($this->id, $this->is_metric);
-		if(is_array($arr_res)){
-			foreach($arr_res as $s){
+	protected function setReportFields($field_data){
+		if(is_array($field_data)){
+			foreach($field_data as $s){
 				//aggregate
                 if(isset($s['aggregate']) && !empty($s['aggregate'])){
 					$this->has_aggregate = true;

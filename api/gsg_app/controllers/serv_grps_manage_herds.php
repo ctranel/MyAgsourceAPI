@@ -183,9 +183,6 @@ class Serv_grps_manage_herds extends MY_Api_Controller {
         if($this->session->userdata('user_id') === FALSE){
             return FALSE;
         }
-        $herd_code = $this->session->userdata('herd_code');
-        $recent_test = $this->session->userdata('recent_test_date');
-        $recent_test = empty($recent_test) ? NULL : $recent_test;
 
         $this->load->model('access_log_model');
         $access_log = new AccessLog($this->access_log_model);
@@ -193,8 +190,8 @@ class Serv_grps_manage_herds extends MY_Api_Controller {
         $access_log->writeEntry(
             $this->as_ion_auth->is_admin(),
             $event_id,
-            $herd_code,
-            $recent_test,
+            $this->herd->herdCode(),
+            isset($this->herd) ? $this->herd->getRecentTest() : NULL,
             $this->session->userdata('user_id'),
             $this->session->userdata('active_group_id')
         );

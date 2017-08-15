@@ -100,7 +100,7 @@ class report_block_model extends CI_Model {
 
         return $this->db->query(
 			"SELECT " . $cg_select . ", null AS db_field_id, null AS table_name, null AS db_field_name, null AS pdf_width, null AS default_sort_order, null AS datatype, null AS is_timespan, null AS is_natural_sort, null AS is_foreign_key, null AS is_nullable, null AS decimal_scale, null AS datatype, null AS max_length
-				, wg.operator, wg.id, COALESCE(wg.parent_id, 0) AS parent_id, null AS condition_id, null as condition
+				, wg.operator AS group_operator, wg.id, COALESCE(wg.parent_id, 0) AS parent_id, null AS condition_id, null as operator, null AS operand
 				, null AS conversion_name, null AS metric_label, null AS metric_abbrev, null AS to_metric_factor, null AS metric_rounding_precision, null AS imperial_label, null AS imperial_abbrev, null AS to_imperial_factor, null AS imperial_rounding_precision
 			FROM users.dbo.reports_where_groups wg
 			WHERE wg.report_id = " . $report_id . "
@@ -108,7 +108,7 @@ class report_block_model extends CI_Model {
 			UNION
 			
 			SELECT " . $cond_select . ", f.id AS db_field_id, t.name AS table_name, f.db_field_name, f.pdf_width, f.default_sort_order, f.data_type as datatype, f.is_timespan_field as is_timespan, f.is_natural_sort, is_fk_field AS is_foreign_key, f.is_nullable, f.decimal_points AS decimal_scale, f.data_type as datatype, f.max_length
-				, wg.operator, wc.id, wc.where_group_id AS parent_id, wc.id AS condition_id, wc.condition
+				, wg.operator AS group_operator, wc.id, wc.where_group_id AS parent_id, wc.id AS condition_id, wc.operator, wc.operand
 				, mc.name AS conversion_name, mc.metric_label, mc.metric_abbrev, mc.to_metric_factor, mc.metric_rounding_precision, mc.imperial_label, mc.imperial_abbrev, mc.to_imperial_factor, mc.imperial_rounding_precision
 			FROM users.dbo.reports_where_groups wg
                 INNER JOIN users.dbo.reports_where_conditions wc ON wg.report_id = " . $report_id . " AND wg.id = wc.where_group_id

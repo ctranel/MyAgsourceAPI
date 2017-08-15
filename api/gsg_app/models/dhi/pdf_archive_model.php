@@ -16,7 +16,7 @@ class Pdf_archive_model extends CI_Model {
      *
      **/
     function getSubscribedHerdArchiveData($herd_code){
-        $this->db->where('p.is_viewable_by_herd', 1);
+        $this->db->where('p.is_viewable_by_herdz', 1);
         return $this->getHerdArchiveData($herd_code);
     }
 

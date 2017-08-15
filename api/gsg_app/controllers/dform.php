@@ -55,10 +55,10 @@ class dform extends dpage {
 
             //get form object
             //@todo: split form core from form display (core would be included in display), no need for web content or supplemental here
-            $this->load->model('Forms/setting_form_model');//, null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
-            $setting_form_factory = new SettingsFormSubmissionFactory($this->setting_form_model, ['herd_code'=>$this->session->userdata('herd_code'), 'user_id'=>$this->session->userdata('user_id')]);
+            $this->load->model('Forms/setting_form_model');
+            $setting_form_factory = new SettingsFormSubmissionFactory($this->setting_form_model, ['herd_code'=>$this->herd->herdCode(), 'user_id'=>$this->session->userdata('user_id')]);
 
-            $form = $setting_form_factory->getForm($form_id, $this->session->userdata('herd_code'), $this->session->userdata('user_id'));
+            $form = $setting_form_factory->getForm($form_id, $this->herd->herdCode(), $this->session->userdata('user_id'));
             $input = $this->input->userInputArray();
         }
         catch(Exception $e){
@@ -111,9 +111,9 @@ class dform extends dpage {
             $this->load->library('form_validation');
             $this->load->model('Forms/data_entry_model');
 
-            $form_factory = new FormDisplayFactory($this->data_entry_model, $supplemental_factory, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
+            $form_factory = new FormDisplayFactory($this->data_entry_model, $supplemental_factory, $params + ['herd_code'=>$this->herd->herdCode()]);
 
-            $form = $form_factory->getFormDisplay($form_id, $this->session->userdata('herd_code'));
+            $form = $form_factory->getFormDisplay($form_id, $this->herd->herdCode());
         }
         catch(Exception $e){
             $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));
@@ -148,14 +148,14 @@ class dform extends dpage {
             }
 
             if($display_data['display_type_id'] === 6) { //setting form
-                $this->load->model('Forms/setting_form_model');//, null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
-                $form_factory = new SettingsFormDisplayFactory($this->setting_form_model, $supplemental_factory, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
-                $form = $form_factory->getSubformDisplay($form_id, $this->session->userdata('herd_code'));
+                $this->load->model('Forms/setting_form_model');
+                $form_factory = new SettingsFormDisplayFactory($this->setting_form_model, $supplemental_factory, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->herd->herdCode()]);
+                $form = $form_factory->getSubformDisplay($form_id, $this->herd->herdCode());
             }
             elseif($display_data['display_type_id'] === 7){ //display_form
                 $this->load->model('Forms/data_entry_model');
-                $form_factory = new FormDisplayFactory($this->data_entry_model, $supplemental_factory, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
-                $form = $form_factory->getSubformDisplay($form_id, $this->session->userdata('herd_code'));
+                $form_factory = new FormDisplayFactory($this->data_entry_model, $supplemental_factory, $params + ['herd_code'=>$this->herd->herdCode()]);
+                $form = $form_factory->getSubformDisplay($form_id, $this->herd->herdCode());
             }
 
 
@@ -189,7 +189,7 @@ class dform extends dpage {
         $this->load->library('form_validation');
 
         try{
-            $form_factory = $this->_formFactory($params + ['herd_code'=>$this->session->userdata('herd_code')], $input);
+            $form_factory = $this->_formFactory($params + ['herd_code'=>$this->herd->herdCode()], $input);
             $form = $form_factory->getForm($form_id);
         }
         catch(Exception $e){
@@ -262,7 +262,7 @@ class dform extends dpage {
 
         //validate form input
         $this->load->library('form_validation');
-        $form_factory = $this->_formFactory($params + ['herd_code'=>$this->session->userdata('herd_code')], $input);
+        $form_factory = $this->_formFactory($params + ['herd_code'=>$this->herd->herdCode()], $input);
 
         $form = $form_factory->getForm($form_id);
 
@@ -310,7 +310,7 @@ class dform extends dpage {
         }
         $input = (array)json_decode(urldecode($json_data));
 
-        $form_factory = $this->_formFactory($input + ['herd_code'=>$this->session->userdata('herd_code')], $input);
+        $form_factory = $this->_formFactory($input + ['herd_code'=>$this->herd->herdCode()], $input);
 
         $form = $form_factory->getForm($form_id);
             try{
@@ -339,7 +339,7 @@ class dform extends dpage {
         }
         $input = (array)json_decode(urldecode($json_data));
 
-        $form_factory = $this->_formFactory($input + ['herd_code'=>$this->session->userdata('herd_code')]);
+        $form_factory = $this->_formFactory($input + ['herd_code'=>$this->herd->herdCode()]);
 
         $form = $form_factory->getForm($form_id);
         try{
@@ -368,7 +368,7 @@ class dform extends dpage {
         }
         $input = (array)json_decode(urldecode($json_data));
 
-        $form_factory = $this->_formFactory($input + ['herd_code'=>$this->session->userdata('herd_code')], $input);
+        $form_factory = $this->_formFactory($input + ['herd_code'=>$this->herd->herdCode()], $input);
 
         $form = $form_factory->getForm($form_id);
 
@@ -465,17 +465,17 @@ $page_id = 105;
 
         $this->load->model('Datasource/db_field_model');
         $this->load->model('ReportContent/report_block_model');
-        $report_factory = new ReportFactory($this->report_block_model, $this->db_field_model, $this->filters, $supplemental_factory, $data_handler, $db_table_factory);
+        $report_factory = new ReportFactory($this->report_block_model, $this->db_field_model, $this->filters, $supplemental_factory, $data_handler, $db_table_factory, $this->herd);
 
         $this->load->model('Listings/herd_options_model');
-        $option_listing_factory = new ListingFactory($this->herd_options_model);//, $key_data + ['herd_code'=>$this->session->userdata('herd_code')]);
+        $option_listing_factory = new ListingFactory($this->herd_options_model);
 
-        $this->load->model('Forms/setting_form_model');//, null, false, ['user_id'=>$this->session->userdata('user_id'), 'herd_code'=>$this->session->userdata('herd_code')]);
-        $setting_form_factory = new SettingsFormSubmissionFactory($this->setting_form_model, $key_data + ['herd_code'=>$this->session->userdata('herd_code'), 'user_id'=>$this->session->userdata('user_id')]);
+        $this->load->model('Forms/setting_form_model');
+        $setting_form_factory = new SettingsFormSubmissionFactory($this->setting_form_model, $key_data + ['herd_code'=>$this->herd->herdCode(), 'user_id'=>$this->session->userdata('user_id')]);
 
         $this->load->model('web_content/block_model');
-        $this->load->model('Forms/Data_entry_model');//, null, false, $params + ['herd_code'=>$this->session->userdata('herd_code')]);
-        $entry_form_factory = new FormSubmissionFactory($this->Data_entry_model, $key_data + ['herd_code'=>$this->session->userdata('herd_code')], $form_data, $supplemental_factory, $report_factory, $option_listing_factory, $setting_form_factory, $this->block_model);
+        $this->load->model('Forms/Data_entry_model');
+        $entry_form_factory = new FormSubmissionFactory($this->Data_entry_model, $key_data + ['herd_code'=>$this->herd->herdCode()], $form_data, $supplemental_factory, $report_factory, $option_listing_factory, $setting_form_factory, $this->block_model);
 
         return $entry_form_factory;
     }

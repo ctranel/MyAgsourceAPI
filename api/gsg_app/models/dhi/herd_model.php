@@ -195,11 +195,16 @@ class Herd_model extends CI_Model {
 	{
 		$this->db
 		->join('address.dbo.email e', 'h.herd_code = e.account_num', 'left')
-		->select('h.[herd_code],h.[farm_name],h.[herd_owner],h.[contact_fn],h.[contact_ln],h.[address_1],h.[address_2]
+        ->join('[herd].[dbo].[view_herd_id_curr_test] ct', 'h.herd_code = ' . 'ct.herd_code', 'left')
+        ->join('address.dbo.association r', 'ct.association_num = r.association_num', 'left')
+        ->join('address.dbo.dhi_supervisor s', "CONCAT('SP', h.supervisor_num) = s.account_num", 'left')
+		->select("h.[herd_code],h.[farm_name],h.[herd_owner],h.breed_code,h.[contact_fn],h.[contact_ln],h.[address_1],h.[address_2]
 				,h.[city],h.[state],h.[zip_5],h.[zip_4],h.[primary_area_code],h.[primary_phone_num],h.[association_num]
-				,h.[dhi_affiliate_num],h.[supervisor_num],h.[owner_privacy],h.[records_release_code], e.[email_address] AS email')
+				,h.[dhi_affiliate_num],h.[supervisor_num],h.[owner_privacy],h.[records_release_code], e.[email_address] AS email
+				,r.assoc_name, CONCAT(s.first_name, ' ', s.last_name) AS supervisor_name, FORMAT(ct.test_date,'MM-dd-yyyy') AS recent_test_date, ct.cow_cnt AS herd_size, ct.milk_cow_cnt")
 		->where("h.dhi_quit_date IS NULL");
-		
+
+
 		if(isset($order_by)){
             $this->db->order_by($order_by);
         }
@@ -209,7 +214,7 @@ class Herd_model extends CI_Model {
 		elseif(isset($limit)){
             $this->db->limit($limit);
         }
-		$results = $this->db->get('herd.dbo.herd_id h')->result_array();
+		$results = $this->db->get('TD.herd.herd_id h')->result_array();
 		return $results;
 	}
 
@@ -331,29 +336,6 @@ class Herd_model extends CI_Model {
         }
     } //end function
 
-    /**
-	 * @method header_info()
-	 * @param string herd code
-	 * @return array of data for the herd header record
-	 * @access public
-	 *
-	 **/
-	public function header_info($herd_code){
-		$q = $this->db->select("h.herd_code, h.farm_name, h.herd_owner, h.breed_code, h.state, r.assoc_name, CONCAT(s.first_name, ' ', s.last_name) AS supervisor_name, FORMAT(ct.test_date,'MM-dd-yyyy') AS test_date, ct.cow_cnt AS herd_size, ct.milk_cow_cnt", FALSE)
-		->from('herd.dbo.herd_id h')
-		->join('[herd].[dbo].[view_herd_id_curr_test] ct', 'h.herd_code = ' . 'ct.herd_code', 'left')
-		->join('address.dbo.association r', 'ct.association_num = r.association_num', 'left')
-		->join('address.dbo.dhi_supervisor s', "CONCAT('SP', h.supervisor_num) = s.account_num", 'left')
-		->where('h.herd_code',$herd_code);
-		$ret = $q->get()->result_array();
-		if(!empty($ret) && is_array($ret)){
-            return $ret[0];
-        }
-		else{
-            return false;
-        }
-	} //end function
-
 	/**
 	 * @method get_field()
 	 * @abstract gets the given field name for the field that is currently loaded
@@ -363,9 +345,8 @@ class Herd_model extends CI_Model {
 	 * @access public
 	 *
 	 **/
-	public function get_field($field_name, $herd_code = false){
+	public function get_field($field_name, $herd_code){
 		// results query
-		if(!$herd_code) $herd_code = $this->session->userdata('herd_code');
 		if(strlen($herd_code) != 8) return null;
 		$q = $this->db
 		->select($field_name)
@@ -469,25 +450,32 @@ class Herd_model extends CI_Model {
 		else return false;
 	}
 	
-	/**
-	 * get_recent_test
-	 * @param string herd code
-	 * @return date string most recent test date
-	 * @author ctranel
-	 **/
-	public function get_recent_test($herd_code){
-		$result = $this->db
-			->select('MAX(test_date) AS test_date')
-			->where('herd_code', $herd_code)
-			->get('[herd].[dbo].[herd_test_turnaround]')
-			->result_array();
-		if(is_array($result)){
-			return $result[0]['test_date'];
-		}
-		return false;
-	}
-	
-	/**
+    /**
+     * get_start_test_date
+     *
+     * @param string herd code
+     * @param string db_table_name - database string for formatting date
+     * @param string date_field - db name of the date field used for this trend
+     * @param int num_dates - number of test dates to include in report
+     * @return string date
+     * @todo: convert all dates to date object
+     * @author ctranel
+     **/
+    public function getStartDate($herd_code, $db_table_name, $date_field, $num_dates = 12) {
+        $sql = "SELECT TOP 1 FORMAT(a." . $date_field . ", 'MM-dd-yyyy', 'en-US') AS " . $date_field . "
+    		FROM (SELECT DISTINCT TOP " . ($num_dates) . " " . $date_field . "
+                FROM " . $db_table_name . " 
+                WHERE herd_code = '" . $herd_code . "' AND " . $date_field . " IS NOT NULL
+                ORDER BY " . $date_field . " DESC) a
+            ORDER BY a." . $date_field . " ASC";
+
+        $result = $this->db->query($sql)->result_array();
+        if(is_array($result) && !empty($result)) return $result[(count($result) - 1)][$date_field];
+        else return FALSE;
+    }
+
+
+    /**
 	 * getHerdEnrollmentData
 	 * @param string herd code
 	 * @param string or array of report codes
