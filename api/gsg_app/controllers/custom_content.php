@@ -62,7 +62,8 @@ class Custom_content extends MY_Api_Controller {
     function select_list_order($page_id){
         try{
             $data = $this->custom_report_model->get_insert_after_data($page_id);
-            $return = [0 => [null => 'Top of page']];
+            $return = [];
+            $return[] = (object)[0 => 'Top of page']; //must convert to object to maintain 0-index
             foreach($data as $c){
                 $return[] = [$c['list_order'] => $c['name']];
             }

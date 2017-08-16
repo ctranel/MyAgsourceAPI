@@ -649,8 +649,16 @@ class Data_entry_model extends CI_Model implements iForm_Model {
 
         $table_name = $this->getSourceTable($form_id);
 
-        //string vs numeric, or can we use quotes for both?
+        //string vs numeric, and casting info
         $no_quotes = ['decimal', 'numeric', 'tinyint', 'int', 'smallint', 'bit'];
+        $cast = [
+            'decimal' => 'float',
+            'numeric' => 'float',
+            'tinyint' => 'int',
+            'int' => 'int',
+            'smallint' => 'int',
+            'bit' => 'int',
+        ];
 
         $tmp_table_schema = [];
 
@@ -664,6 +672,9 @@ class Data_entry_model extends CI_Model implements iForm_Model {
                     $insert_vals[$k] = 'null';
                 }
                 elseif(in_array($control_meta[$k]['data_type'], $no_quotes) === true){
+                    if($v !== 'null'){
+                        settype($v, $cast[$control_meta[$k]['data_type']]);
+                    }
                     $insert_vals[$k] = $v;
                 }
                 else {
@@ -751,6 +762,14 @@ class Data_entry_model extends CI_Model implements iForm_Model {
 
         //string vs numeric, or can we use quotes for both?
         $no_quotes = ['decimal', 'numeric', 'tinyint', 'int', 'smallint', 'bit'];
+        $cast = [
+            'decimal' => 'float',
+            'numeric' => 'float',
+            'tinyint' => 'int',
+            'int' => 'int',
+            'smallint' => 'int',
+            'bit' => 'int',
+        ];
 
         $tmp_table_schema = [];
 
@@ -763,6 +782,9 @@ class Data_entry_model extends CI_Model implements iForm_Model {
             if($control_meta[$k]['is_generated'] === false && $k != $variable_field){
                 if(in_array($control_meta[$k]['data_type'], $no_quotes) === true){
                     $v = (isset($v) && (!empty($v) || $v === 0)) ? $v : 'null';
+                    if($v !== 'null'){
+                        settype($v, $cast[$control_meta[$k]['data_type']]);
+                    }
                     $insert_vals[$k] = $v;
                 }
                 else {
@@ -863,6 +885,14 @@ class Data_entry_model extends CI_Model implements iForm_Model {
         $update_set = [];
         //string vs numeric, or can we use quotes for both?
         $no_quotes = ['decimal', 'numeric', 'tinyint', 'int', 'smallint', 'bit'];
+        $cast = [
+            'decimal' => 'float',
+            'numeric' => 'float',
+            'tinyint' => 'int',
+            'int' => 'int',
+            'smallint' => 'int',
+            'bit' => 'int',
+        ];
         foreach($form_data as $k=>$v){
             if(is_array($v)){
                 $v = implode('|', $v);
@@ -871,6 +901,9 @@ class Data_entry_model extends CI_Model implements iForm_Model {
             if($control_meta[$k]['is_editable'] == true){
                 if(in_array($control_meta[$k]['data_type'], $no_quotes) === true){
                     $v = (isset($v) && (!empty($v) || $v === 0)) ? $v : 'null';
+                    if($v !== 'null'){
+                        settype($v, $cast[$control_meta[$k]['data_type']]);
+                    }
                     $update_set[] = $k . "=" . $v;
                 }
                 else {
@@ -949,6 +982,14 @@ class Data_entry_model extends CI_Model implements iForm_Model {
         $update_set = [];
         $update_dataset = [];
         $no_quotes = ['decimal', 'numeric', 'tinyint', 'int', 'smallint', 'bit'];
+        $cast = [
+            'decimal' => 'float',
+            'numeric' => 'float',
+            'tinyint' => 'int',
+            'int' => 'int',
+            'smallint' => 'int',
+            'bit' => 'int',
+        ];
 
         foreach($form_data as $k=>$v){
             if(is_array($v)){
@@ -961,6 +1002,9 @@ class Data_entry_model extends CI_Model implements iForm_Model {
                 }
                 if(in_array($control_meta[$k]['data_type'], $no_quotes) === true){
                     $v = (isset($v) && (!empty($v) || $v === 0)) ? $v : 'null';
+                    if($v !== 'null'){
+                        settype($v, $cast[$control_meta[$k]['data_type']]);
+                    }
                     $update_dataset[] = $v . " AS " . $k;
                 }
                 else {
