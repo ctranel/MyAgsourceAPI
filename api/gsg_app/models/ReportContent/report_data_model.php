@@ -14,7 +14,7 @@ class Report_data_model extends CI_Model {
 	public function __construct(){
 		parent::__construct();
 	}
-
+/*
 	protected function get_join_text($primary_table, $join_table){
 		$join_text = '';
 		list($a, $b, $tmp_tbl_only) = explode('.', $primary_table);
@@ -43,7 +43,7 @@ class Report_data_model extends CI_Model {
 		}
 		else return FALSE;
 	}
-	
+*/
 	/**
 	 * @method search()
 	 * @param iReport
@@ -76,22 +76,20 @@ class Report_data_model extends CI_Model {
 		
 		//Start building query
 		$this->db->from($report->primaryTableName());
-		/*
-		 * @todo: add joins
+
 		$joins = $report->joins();
 		if(is_array($joins) && !empty($joins)) {
 			foreach($joins as $j){
 				$this->db->join($j['table'], $j['join_text']);
 			}
 		}		
-		*/
 
         $where_sql = $this->getWhereSql($where_array);
 		if(isset($where_sql)){
 		    $this->db->where($where_sql);
         }
 		if(is_array($arr_filter_criteria) && !empty($arr_filter_criteria)){
-			$this->setFilters($arr_filter_criteria);
+			$this->setFilters($arr_filter_criteria, $report->primaryTableName());
 		}
 
 		$this->db->group_by($group_by_array);
@@ -155,10 +153,13 @@ class Report_data_model extends CI_Model {
 	 * @return void
 	 */
 	
-	protected function setFilters($where_criteria){
+	protected function setFilters($where_criteria, $primary_table_name){
         if(isset($where_criteria) && is_array($where_criteria)){
 			foreach($where_criteria as $k => $v){
-                $val = $v['value'];
+                if(strpos($k,'.') === false){
+                    $k = $primary_table_name . '.' . $k;
+                }
+			    $val = $v['value'];
 				if(empty($val) === FALSE || $val === '0'){
 					if(is_array($val)){
 						//if filter is a range

@@ -138,8 +138,38 @@ class report_block_model extends CI_Model {
 			->get()
 			->result_array();
 	}
-	
-	/**
+
+    public function get_join_text($primary_table, $join_table){
+        $join_text = '';
+        list($a, $b, $tmp_tbl_only) = explode('.', $primary_table);
+        $arr_primary_table_fields = $this->db
+            ->select('db_field_name')
+            ->from('users.dbo.db_fields')
+            ->join('users.dbo.db_tables', 'users.dbo.db_fields.db_table_id = users.dbo.db_tables.id')
+            ->where(array('users.dbo.db_fields.is_fk_field'=>1, 'users.dbo.db_tables.name'=>$tmp_tbl_only))
+            ->get()
+            ->result_array();
+        list($a, $b, $tmp_tbl_only) = explode('.', $join_table);
+        $arr_join_table_fields = $this->db
+            ->select('db_field_name')
+            ->from('users.dbo.db_fields')
+            ->join('users.dbo.db_tables', 'users.dbo.db_fields.db_table_id = users.dbo.db_tables.id')
+            ->where(array('users.dbo.db_fields.is_fk_field'=>1, 'users.dbo.db_tables.name'=>$tmp_tbl_only))
+            ->get()
+            ->result_array();
+        if(is_array($arr_primary_table_fields) && is_array($arr_join_table_fields)){
+            $arr_intersect = array_intersect(array_flatten($arr_primary_table_fields), array_flatten($arr_join_table_fields));
+            foreach($arr_intersect as $j){
+                if(!empty($join_text)) $join_text .= ' AND ';
+                $join_text .= $primary_table . '.' . $j . '=' . $join_table . '.' . $j;
+            }
+
+            return $join_text;
+        }
+        else return FALSE;
+    }
+
+    /**
 	 * @method getFieldData()
 	 * @param int block id
 	 * @return returns multi-dimensional array, one row for each field

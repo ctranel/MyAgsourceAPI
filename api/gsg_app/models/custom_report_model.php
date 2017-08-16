@@ -26,7 +26,7 @@ class Custom_report_model extends CI_Model {
 
     function reportMeta($report_id){
         $results = $this->db
-            ->select("r.[block_id],r.[id] AS rpeort_id,b.display_type_id,r.[chart_type_id],r.[max_rows],r.[cnt_row],r.[sum_row],r.[avg_row],r.[pivot_db_field],r.[bench_row],r.[is_summary],r.[keep_nulls]")
+            ->select("r.[block_id],r.[id] AS report_id,b.display_type_id,r.[chart_type_id],r.[max_rows],r.[cnt_row],r.[sum_row],r.[avg_row],r.[pivot_db_field],r.[bench_row],r.[is_summary],r.[keep_nulls]")
             ->from("[users].[dbo].[reports] r")
             ->join("users.dbo.blocks b", "r.block_id = b.id", "inner")
             ->where("r.id", $report_id)
@@ -127,6 +127,9 @@ class Custom_report_model extends CI_Model {
 	 *
 	 **/
 	function add_yaxes($data){
+        if(!isset($data) || empty($data)){
+            return;
+        }
         $prepped = $this->prepBatchData($data);
         $sql = "INSERT INTO users.dbo.chart_axes (" . implode(",", $prepped['keys']) . ")
             VALUES (" . implode("),(", $prepped['values']) . ")";
@@ -145,7 +148,13 @@ class Custom_report_model extends CI_Model {
 	 *
 	 **/
 	function add_xaxis($data){
-        $prepped = $this->prepBatchData($data);
+        try{
+            $prepped = $this->prepBatchData($data);
+        }
+        catch(\Exception $e){
+            throw new \Exception("No data found for X axis, the chart cannot be created.");
+        }
+
         $sql = "INSERT INTO users.dbo.chart_axes (" . implode(",", $prepped['keys']) . ")
             VALUES (" . implode("),(", $prepped['values']) . ")";
         $this->db->query($sql);
@@ -163,7 +172,12 @@ class Custom_report_model extends CI_Model {
 	 *
 	 **/
 	function add_columns($data){
-        $prepped = $this->prepBatchData($data);
+        try{
+            $prepped = $this->prepBatchData($data);
+        }
+        catch(\Exception $e){
+            throw new \Exception("No table columns found, report cannot be created.");
+        }
 
         $sql = "INSERT INTO users.dbo.reports_select_fields (" . implode(",", $prepped['keys']) . ")
             VALUES (" . implode("),(", $prepped['values']) . ")";
@@ -179,7 +193,10 @@ class Custom_report_model extends CI_Model {
 	}
 
 	function prepBatchData($data){
-        $values = [];
+        if(!isset($data) || empty($data)){
+            throw new \Exception('No data passed to batch function.');
+        }
+
         foreach($data as $r){
             if(!isset($keys)){
                 $keys = array_keys($r);
@@ -194,6 +211,7 @@ class Custom_report_model extends CI_Model {
             }
             $values[] = implode(",", $r);
         }
+
         return ['keys'=>$keys, 'values'=>$values];
     }
 
@@ -244,6 +262,9 @@ class Custom_report_model extends CI_Model {
      *
      **/
     function add_where_conditions($data){
+        if(!isset($data) || empty($data)){
+            return;
+        }
         $prepped = $this->prepBatchData($data);
         $sql = "INSERT INTO users.dbo.reports_where_conditions (" . implode(",", $prepped['keys']) . ")
             VALUES (" . implode("),(", $prepped['values']) . ")";

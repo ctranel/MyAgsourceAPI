@@ -280,7 +280,11 @@ abstract class Report implements iReport {
 		return $this->sorts;
 	}
 
-	public function subtitle(){
+    public function joins(){
+        return $this->joins;
+    }
+
+    public function subtitle(){
 		return $this->filters->get_filter_text();
 	}
 
@@ -531,71 +535,6 @@ abstract class Report implements iReport {
        }
     }
 
-    /**
-	 * setWhereGroups()
-	 * 
-	 * @return void
-	 * @author ctranel
-	protected function setWhereGroups($where_data){
-		//$data = $this->datasource->getWhereData($this->id, $this->is_metric);
-var_dump('->',$where_data);
-		if(!is_array($where_data) || empty($where_data)){
-			return;
-		}
-		$this->where_group = $this->buildWhereTree($where_data);
-	}
-**/
-
-    /**
-     * buildWhereTree()
-     *
-     * Recursive function that returns children (where conditions and group (groups are recursive))
-     *
-     * @param array of data
-     * @param int parent_id
-     * @param string parent_operator
-     * @return array of tree branch
-     * @author ctranel
-    public function buildWhereTree(array $data, $parent_id = 0, $parent_operator = null){
-        if(!isset($data) || !is_array($data)){
-            return;
-        }
-
-        $criteria = [];
-        $children = [];
-        foreach ($data as $k=>$s) {
-            if ($s['parent_id'] == $parent_id) {
-                $newdata = $data;
-                unset($newdata[$k]);
-
-                $data_conversion = null;
-
-                if(isset($s['condition_id'])) {
-                    if (isset($s['conversion_name'])) {
-                        $data_conversion = new DataConversion($s['conversion_name'], $s['metric_label'],
-                            $s['metric_abbrev'],
-                            $s['to_metric_factor'], $s['metric_rounding_precision'], $s['imperial_label'],
-                            $s['imperial_abbrev'], $s['to_imperial_factor'], $s['imperial_rounding_precision']);
-                    }
-                    $criteria_datafield = new DbField($s['db_field_id'], $s['table_name'], $s['db_field_name'],
-                        $s['name'], $s['description'], $s['pdf_width'], $s['default_sort_order'],
-                        $s['datatype'], $s['max_length'], $s['decimal_scale'], $s['unit_of_measure'], $s['is_timespan'],
-                        $s['is_foreign_key'], $s['is_nullable'], $s['is_natural_sort'], $data_conversion);
-                    $criteria[] = new WhereCriteria($criteria_datafield, $s['condition']);
-                }
-                else{
-                    $children[] = $this->buildWhereTree($newdata, $s['id'], $s['operator']);
-                }
-            }
-        }
-        if(count($criteria) > 0 || count($children) > 0){
-            return new WhereGroup($parent_operator, $criteria, $children);
-        }
-    }
-**/
-
-
-	
 	/**
 	 * getWhereGroupArray()
 	 * 
@@ -656,11 +595,12 @@ var_dump('->',$where_data);
         if(is_array($this->db_tables) && count($this->db_tables) >  1){
             foreach($this->db_tables as $t => $cnt){
                 if($t != $this->primaryTableName()){
-                    $this->joins[] = array('table'=>$t, 'join_text'=>$this->get_join_text($this->primaryTableName(), $t));
+                    $this->joins[] = array('table'=>$t, 'join_text'=>$this->datasource->get_join_text($this->primaryTableName(), $t));
                 }
             }
         }
     }
+
 
     /**
      * @verifyFilters

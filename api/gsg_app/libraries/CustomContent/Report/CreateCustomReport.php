@@ -64,18 +64,12 @@ class CreateCustomReport
 
 		//tables
         if($report_data['display_type_id'] == 1 || $report_data['display_type_id'] == 3){
-
-            $update_data = ['is_summary' => $input['pivot_db_field']];
-            if(isset($input['pivot_db_field']) && !empty($input['pivot_db_field'])){
-                $update_data['pivot_db_field'] = $input['pivot_db_field'];
+		    if(isset($input['pivot_db_field']) && !empty($input['pivot_db_field'])){
+		        $this->updateReport(['pivot_db_field' => $input['pivot_db_field']]);
             }
-            $this->updateReport($update_data);
-
             $this->header_groups($input['table_header']);
             $header_row_cnt = count($input['table_header']);
 			$this->table_columns($input['table_header'][$header_row_cnt - 1]);
-            $this->whereGroup($input['where']);
-			$this->sort_by($input['sort']);
 		}
 		//chart displays
 		//@todo: add a section for type 5 that will add categories to x axis
@@ -87,6 +81,14 @@ class CreateCustomReport
 		else{
 			die('I do not recognize the display type');
 		}
+        if(isset($input['where']) && !empty($input['where'])){
+		    $this->whereGroup($input['where']);
+        }
+
+        if(isset($input['sort']) && !empty($input['sort'])){
+            $this->sort_by($input['sort']);
+        }
+
 		if ($this->datasource->trans_status() === FALSE){
 			die($this->datasource->error());
 			return FALSE;
@@ -102,6 +104,17 @@ class CreateCustomReport
             return;
         }
 
+        //remove invalid conditions
+        $group['conditions'] = array_filter($group['conditions'], function($v){
+            return (isset($v['field_id']) && isset($v['operator']));
+        });
+
+        //is there valid content here?  if not, return
+        if((!isset($group['conditions']) || !is_array($group['conditions']) || empty($group['conditions']))
+            && (!isset($group['conditionGroups']) || !is_array($group['conditionGroups'] || empty($group['conditionGroups'])))){
+            return;
+        }
+
         $where_group_data = [
             'report_id' => $this->report_id,
             'operator' => $group['operator'],
@@ -109,6 +122,7 @@ class CreateCustomReport
         ];
 
         $where_group_id = $this->datasource->add_where_group($where_group_data);
+
         if(isset($group['conditions']) && is_array($group['conditions'])){
             $where_condition_data = [];
             foreach($group['conditions'] as $c){
