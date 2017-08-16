@@ -265,7 +265,7 @@ class Custom_report_model extends CI_Model {
 			->query("WITH cteAnchor AS (
 					 SELECT id, parent_id
 					 FROM users.dbo.db_table_categories 
-					 WHERE id = " . $cat_id . "
+					 WHERE id = " . (int)$cat_id . "
 				), cteRecursive AS (
 					SELECT id, parent_id
 					  FROM cteAnchor
