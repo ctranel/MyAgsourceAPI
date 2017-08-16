@@ -24,11 +24,6 @@ class CreateCustomReport
     protected $datasource;
 
     /**
-     * id of block in which report resides
-     * @var int
-     **/
-    protected $block_id;
-    /**
      * id of report
      * @var int
      **/
@@ -69,31 +64,25 @@ class CreateCustomReport
 
 		//tables
         if($report_data['display_type_id'] == 1 || $report_data['display_type_id'] == 3){
-		    if(isset($input['pivot_db_field']) && !empty($input['pivot_db_field'])){
-		        $this->updateReport(['pivot_db_field' => $input['pivot_db_field']]);
+
+            $update_data = ['is_summary' => $input['pivot_db_field']];
+            if(isset($input['pivot_db_field']) && !empty($input['pivot_db_field'])){
+                $update_data['pivot_db_field'] = $input['pivot_db_field'];
             }
-echo "start <br>";
+            $this->updateReport($update_data);
+
             $this->header_groups($input['table_header']);
-echo "header_groups <br>";
             $header_row_cnt = count($input['table_header']);
 			$this->table_columns($input['table_header'][$header_row_cnt - 1]);
-echo "table_columns <br>";
             $this->whereGroup($input['where']);
-echo "where <br>";
 			$this->sort_by($input['sort']);
-echo "sort_by <br>";
 		}
 		//chart displays
 		//@todo: add a section for type 5 that will add categories to x axis
 		elseif($input['display_type_id'] == 2 || $input['display_type_id'] == 5){
-echo "yaxis <br>";
 			$this->yaxes();
-echo "xaxis <br>";
 			$this->xaxis();
-echo "trend_columns <br>";
 			$this->trend_columns();
-//echo "group_by <br>";
-//			$this->group_by();
 		}
 		else{
 			die('I do not recognize the display type');
