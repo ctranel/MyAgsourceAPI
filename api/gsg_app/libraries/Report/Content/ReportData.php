@@ -112,43 +112,6 @@ abstract class ReportData implements iReportData{
 	}
 	
 	/*
-	* @method prep_group_by()
-	* @author ctranel
-	protected function prep_group_by(){
-		$arr_len = is_array($this->arr_group_by_field)?count($this->arr_group_by_field):0;
-		for($c=0; $c<$arr_len; $c++) {
-			$table = isset($this->arr_field_table[$this->arr_group_by_field[$c]]) && !empty($this->arr_field_table[$this->arr_group_by_field[$c]])?$this->arr_field_table[$this->arr_group_by_field[$c]] . '.':$this->primary_table_name . '.';
-			if(!empty($this->arr_group_by_field[$c])){
-				$this->{$this->db_group_name}->group_by($table . $this->arr_group_by_field[$c]);
-			}
-		}
-	}
-	*/
-	
-	/*
-	 * @method prep_sort()
-	* @param array fields to sort by
-	* @param array sort order--corresponds to first parameter
-	* @author ctranel
-	protected function prep_sort($arr_sort_by, $arr_sort_order){
-		$arr_len = is_array($arr_sort_by)?count($arr_sort_by):0;
-		for($c=0; $c<$arr_len; $c++) {
-			$sort_order = (strtoupper($arr_sort_order[$c]) == 'DESC') ? 'DESC' : 'ASC';
-			$table = isset($this->arr_field_table[$arr_sort_by[$c]]) && !empty($this->arr_field_table[$arr_sort_by[$c]])?$this->arr_field_table[$arr_sort_by[$c]] . '.':$this->primary_table_name . '.';
-			if((!is_array($this->arr_unsortable_columns) || in_array($arr_sort_by[$c], $this->arr_unsortable_columns) === FALSE) && !empty($arr_sort_by[$c])){
-				//put the select in an array in case the field includes a function with commas between parameters
-				if(is_array($this->arr_natural_sort_fields) && in_array($arr_sort_by[$c], $this->arr_natural_sort_fields) !== FALSE){
-					$this->{$this->db_group_name}->order_by('users.dbo.naturalize(' . $table . $arr_sort_by[$c] . ')', $sort_order);
-				}
-				else {
-					$this->{$this->db_group_name}->order_by($table . $arr_sort_by[$c], $sort_order);
-				}
-			}
-		}
-	}
-	*/
-	
-	/*  
 	 * @method pivot()
 	 * @param array dataset
 	 * @return array pivoted resultset

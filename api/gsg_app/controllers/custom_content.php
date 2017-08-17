@@ -9,35 +9,23 @@ use \myagsource\Api\Response\ResponseMessage;
 class Custom_content extends MY_Api_Controller {
 	protected $page_header_data;
 
-	function __construct()
-	{
+	function __construct(){
         parent::__construct();
-
         $this->load->model('custom_report_model');
-
-		/* Load the profile.php config file if it exists
-		$this->config->load('profiler', false, true);
-		if ($this->config->config['enable_profiler']) {
-			$this->output->enable_profiler(TRUE);
-		} */
 	}
 
 	function create(){
         try{
             $input = $this->input->userInputArray();
             $user_id = $this->session->userdata('active_group_id') == 1 ? NULL : $this->session->userdata('user_id');
+
             $custom_report = new CreateCustomReport($this->custom_report_model, $input['report_id'], $user_id);
-
-            //$input['table_header'] = $custom_report->spansToHeirarchies($input['table_header']);
-            $input['sort'] = [];//not getting anything from client yet
-
             $custom_report->add_report($input);
-            die();
 
             $resp_msg = new ResponseMessage('Form submission successful', 'message');
             //$this->_record_access(2); //2 is the page code for herd change
 
-            $this->sendResponse(200, $resp_msg, ['identity_keys' => $entity_keys]);
+            $this->sendResponse(200, $resp_msg, ['identity_keys' => $input['report_id']]);
         }
         catch(\Exception $e){
             $this->sendResponse(500, new ResponseMessage($e->getMessage(), 'error'));

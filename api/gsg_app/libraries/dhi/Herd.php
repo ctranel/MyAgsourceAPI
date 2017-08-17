@@ -22,11 +22,11 @@ use \DateTime;
 class Herd
 {
 	/**
-	 * herd model
+	 * herd datasource
 	 *
-	 * @var herd_model
+	 * @var datasource
 	 **/
-	protected $herd_model;
+	protected $datasource;
 
 	/**
 	 * herd identifier
@@ -181,14 +181,13 @@ class Herd
 	 * @return void
 	 * @author ctranel
 	 **/
-	public function __construct(\herd_model $herd_model, $herd_code) {
-		$this->herd_model = $herd_model;
-        if(empty($herd_code) || strlen($herd_code) != 8){
-            return;
-            //throw new \Exception('Herd could not be loaded.  No herd code passed to constructor.');
-        }
+	public function __construct(\Herd_model $datasource, $herd_code) {
+		if(empty($herd_code) || strlen($herd_code) != 8){
+			throw new \Exception('Herd could not be loaded.  No herd code passed to constructor.');
+		}
+		$this->datasource = $datasource;
 
-		$data = $this->herd_model->get_herd($herd_code);
+		$data = $this->datasource->get_herd($herd_code);
         $this->herd_code = $herd_code;
         $this->farm_name = $data['farm_name'];
         $this->breed_code = $data['breed_code'];
@@ -230,12 +229,8 @@ class Herd
      *
      **/
     public function herdOwner(){
-        if(!isset($this->datasource) || !isset($this->herd_code)) {
-            return null;
-        }
-
         if(!isset($this->herd_owner)){
-            $this->herd_owner = $this->herd_model->isMetric($this->herd_code);
+            $this->herd_owner = $this->datasource->isMetric($this->herd_code);
         }
         return $this->herd_owner;
     }
@@ -251,6 +246,19 @@ class Herd
 	}
 
     /**
+     * @method isMetric()
+     * @return boolean
+     * @access public
+     *
+     **/
+    public function isMetric(){
+        if(!isset($this->is_metric)){
+            $this->is_metric = $this->datasource->isMetric($this->herd_code);
+        }
+        return (boolean)$this->is_metric;
+    }
+
+    /**
      * getDateRangeStart
      *
      * @param string db_table_name - database string for formatting date
@@ -261,26 +269,10 @@ class Herd
      *
      **/
     public function getDateRangeStart($db_table_name, $date_field, $num_dates = 12){
-        if(isset($this->herd_model) && isset($this->herd_code)){
-            return $this->herd_model->getStartDate($this->herd_code, $db_table_name, $date_field, $num_dates);
-        }
-    }
-
-    /**
-     * @method isMetric()
-     * @return boolean
-     * @access public
-     *
-     **/
-    public function isMetric(){
-        if(!isset($this->datasource) || !isset($this->herd_code)) {
+        if(isset($this->datasource)){
             return null;
         }
-
-        if(!isset($this->is_metric)){
-            $this->is_metric = $this->herd_model->isMetric($this->herd_code);
-        }
-        return (boolean)$this->is_metric;
+        return $this->datasource->getStartDate($this->herd_code, $db_table_name, $date_field, $num_dates);
     }
 
     /* -----------------------------------------------------------------
@@ -301,11 +293,7 @@ class Herd
     *  @throws:
     * -----------------------------------------------------------------*/
 	public function getTrialData($report_code = null){
-        if(!isset($this->datasource) || !isset($this->herd_code)) {
-            return null;
-        }
-
-        $trials = $this->herd_model->getTrialData($this->herd_code, $report_code);
+		$trials = $this->datasource->getTrialData($this->herd_code, $report_code);
 		return $trials;
 	}
 	
@@ -349,11 +337,7 @@ class Herd
 	 *  @throws: 
 	 * -----------------------------------------------------------------*/
 	public function getCowOptions($value_field, $show_heifers, $show_bulls, $show_sold) {
-        if(!isset($this->datasource) || !isset($this->herd_code)) {
-            return null;
-        }
-
-        $cows = $this->herd_model->getCowList($this->herd_code, $value_field, $show_heifers, $show_bulls, $show_sold);
+		$cows = $this->datasource->getCowList($this->herd_code, $value_field, $show_heifers, $show_bulls, $show_sold);
 		if(!$cows || empty($cows)){
 			return false;
 		}
@@ -375,11 +359,7 @@ class Herd
      *  @throws:
      * -----------------------------------------------------------------*/
     public function getEventMap() {
-        if(!isset($this->datasource) || !isset($this->herd_code)) {
-            return null;
-        }
-
-        $events = $this->herd_model->getEventMap($this->herd_code);
+        $events = $this->datasource->getEventMap($this->herd_code);
         $return = [];
         foreach($events as $e){
             $return[] = [(int)$e['event_cd'] => $e['event_cat']];

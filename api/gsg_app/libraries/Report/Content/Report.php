@@ -199,13 +199,13 @@ abstract class Report implements iReport {
 
 		$this->id = $report_meta['id'];
 		$this->max_rows = $report_meta['max_rows'];
-		$this->cnt_row = $report_meta['cnt_row'];
-		$this->sum_row = $report_meta['sum_row'];
-		$this->avg_row = $report_meta['avg_row'];
-		$this->bench_row = $report_meta['bench_row'];
-		$this->is_summary = $report_meta['is_summary'];
+		$this->cnt_row = (bool)$report_meta['cnt_row'];
+		$this->sum_row = (bool)$report_meta['sum_row'];
+		$this->avg_row = (bool)$report_meta['avg_row'];
+		$this->bench_row = (bool)$report_meta['bench_row'];
+		$this->is_summary = (bool)$report_meta['is_summary'];
         $this->primary_table_name = $report_meta['primary_table_name'];
-        $this->is_metric = $report_meta['is_metric'];
+        $this->is_metric = (bool)$report_meta['is_metric'];
 		$this->field_groups = $field_groups;
 		$this->display_type = $report_meta['display_type'];
         $this->filters = $filters;
@@ -424,10 +424,6 @@ abstract class Report implements iReport {
         $ret['is_summary'] = $this->is_summary;
         $ret['display_type'] = $this->display_type;
         $ret['num_summary_rows'] = $this->hasPivot() ? 0 : $this->cnt_row + $this->sum_row + $this->avg_row + $this->bench_row;
-        $ret['cnt_row'] = $this->cnt_row;
-        $ret['sum_row'] = $this->sum_row;
-        $ret['avg_row'] = $this->avg_row;
-        $ret['bench_row'] = $this->bench_row;
 
         if(is_array($this->dataset) && !empty($this->dataset)){
             $ret['dataset'] = $this->dataset;

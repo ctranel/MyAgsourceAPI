@@ -453,7 +453,6 @@ class Herd_model extends CI_Model {
     /**
      * get_start_test_date
      *
-     * @param string herd code
      * @param string db_table_name - database string for formatting date
      * @param string date_field - db name of the date field used for this trend
      * @param int num_dates - number of test dates to include in report
@@ -461,14 +460,13 @@ class Herd_model extends CI_Model {
      * @todo: convert all dates to date object
      * @author ctranel
      **/
-    public function getStartDate($herd_code, $db_table_name, $date_field, $num_dates = 12) {
+    public function getStartDate($db_table_name, $date_field, $num_dates = 12) {
         $sql = "SELECT TOP 1 FORMAT(a." . $date_field . ", 'MM-dd-yyyy', 'en-US') AS " . $date_field . "
     		FROM (SELECT DISTINCT TOP " . ($num_dates) . " " . $date_field . "
                 FROM " . $db_table_name . " 
-                WHERE herd_code = '" . $herd_code . "' AND " . $date_field . " IS NOT NULL
+                WHERE herd_code = '" . $this->herd_code . "' AND " . $date_field . " IS NOT NULL
                 ORDER BY " . $date_field . " DESC) a
             ORDER BY a." . $date_field . " ASC";
-
         $result = $this->db->query($sql)->result_array();
         if(is_array($result) && !empty($result)) return $result[(count($result) - 1)][$date_field];
         else return FALSE;

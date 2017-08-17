@@ -14,36 +14,7 @@ class Report_data_model extends CI_Model {
 	public function __construct(){
 		parent::__construct();
 	}
-/*
-	protected function get_join_text($primary_table, $join_table){
-		$join_text = '';
-		list($a, $b, $tmp_tbl_only) = explode('.', $primary_table);
-		$arr_primary_table_fields = $this->db
-			->select('db_field_name')
-			->from('users.dbo.db_fields')
-			->join('users.dbo.db_tables', 'users.dbo.db_fields.db_table_id = users.dbo.db_tables.id')
-			->where(array('users.dbo.db_fields.is_fk_field'=>1, 'users.dbo.db_tables.name'=>$tmp_tbl_only))
-			->get()
-			->result_array();
-		list($a, $b, $tmp_tbl_only) = explode('.', $join_table);
-		$arr_join_table_fields = $this->db
-			->select('db_field_name')
-			->from('users.dbo.db_fields')
-			->join('users.dbo.db_tables', 'users.dbo.db_fields.db_table_id = users.dbo.db_tables.id')
-			->where(array('users.dbo.db_fields.is_fk_field'=>1, 'users.dbo.db_tables.name'=>$tmp_tbl_only))
-			->get()
-			->result_array();
-		if(is_array($arr_primary_table_fields) && is_array($arr_join_table_fields)){
-			$arr_intersect = array_intersect(array_flatten($arr_primary_table_fields), array_flatten($arr_join_table_fields));
-			foreach($arr_intersect as $j){
-				if(!empty($join_text)) $join_text .= ' AND ';
-				$join_text .= $primary_table . '.' . $j . '=' . $join_table . '.' . $j;
-			}
-			return $join_text;
-		}
-		else return FALSE;
-	}
-*/
+
 	/**
 	 * @method search()
 	 * @param iReport
@@ -192,21 +163,7 @@ class Report_data_model extends CI_Model {
 		}
 	}
 	
-	/*  
-	 * @method prep_group_by()
-	 * @author ctranel
-	 */
-/*	protected function prep_group_by(){
-		$arr_len = is_array($this->arr_group_by_field)?count($this->arr_group_by_field):0;
-		for($c=0; $c<$arr_len; $c++) {
-			$table = isset($this->arr_field_table[$this->arr_group_by_field[$c]]) && !empty($this->arr_field_table[$this->arr_group_by_field[$c]])?$this->arr_field_table[$this->arr_group_by_field[$c]] . '.':$this->primary_table_name . '.';
-			if(!empty($this->arr_group_by_field[$c])){
-				$this->db->group_by($table . $this->arr_group_by_field[$c]);
-			}
-		}
-	}
-	*/
-	/*  
+	/*
 	 * @method prep_sort()
 	 * @param array fields to sort by
 	 * @param array sort order--corresponds to first parameter
@@ -228,7 +185,52 @@ class Report_data_model extends CI_Model {
 			}
 		}
 	}
-	
+
+    /*
+     * @method prep_group_by()
+     * @author ctranel
+     */
+    /*	protected function prep_group_by(){
+            $arr_len = is_array($this->arr_group_by_field)?count($this->arr_group_by_field):0;
+            for($c=0; $c<$arr_len; $c++) {
+                $table = isset($this->arr_field_table[$this->arr_group_by_field[$c]]) && !empty($this->arr_field_table[$this->arr_group_by_field[$c]])?$this->arr_field_table[$this->arr_group_by_field[$c]] . '.':$this->primary_table_name . '.';
+                if(!empty($this->arr_group_by_field[$c])){
+                    $this->db->group_by($table . $this->arr_group_by_field[$c]);
+                }
+            }
+        }
+        */
+    /*
+        protected function get_join_text($primary_table, $join_table){
+            $join_text = '';
+            list($a, $b, $tmp_tbl_only) = explode('.', $primary_table);
+            $arr_primary_table_fields = $this->db
+                ->select('db_field_name')
+                ->from('users.dbo.db_fields')
+                ->join('users.dbo.db_tables', 'users.dbo.db_fields.db_table_id = users.dbo.db_tables.id')
+                ->where(array('users.dbo.db_fields.is_fk_field'=>1, 'users.dbo.db_tables.name'=>$tmp_tbl_only))
+                ->get()
+                ->result_array();
+            list($a, $b, $tmp_tbl_only) = explode('.', $join_table);
+            $arr_join_table_fields = $this->db
+                ->select('db_field_name')
+                ->from('users.dbo.db_fields')
+                ->join('users.dbo.db_tables', 'users.dbo.db_fields.db_table_id = users.dbo.db_tables.id')
+                ->where(array('users.dbo.db_fields.is_fk_field'=>1, 'users.dbo.db_tables.name'=>$tmp_tbl_only))
+                ->get()
+                ->result_array();
+            if(is_array($arr_primary_table_fields) && is_array($arr_join_table_fields)){
+                $arr_intersect = array_intersect(array_flatten($arr_primary_table_fields), array_flatten($arr_join_table_fields));
+                foreach($arr_intersect as $j){
+                    if(!empty($join_text)) $join_text .= ' AND ';
+                    $join_text .= $primary_table . '.' . $j . '=' . $join_table . '.' . $j;
+                }
+                return $join_text;
+            }
+            else return FALSE;
+        }
+    */
+
 	/**
 	 * @method getGraphDataset()
 	 * @param string herd code
