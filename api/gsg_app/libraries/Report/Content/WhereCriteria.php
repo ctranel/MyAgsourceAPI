@@ -101,16 +101,7 @@ class WhereCriteria implements iWhereCriteria {
                 $condition = $this->operator . " '" . $this->operand . "'";
         }
 
-        return $this->datafield->dbFieldName() . ' ' . $condition;
-/*
-	    var_dump($this->condition);
-	    if(is_array($this->condition)){
-	        if(isset($this->condition['dbfrom'])){
-                return $this->datafield->dbFieldName() . ' BETWEEN ' . $this->condition['dbfrom'] . ' AND ' . $this->condition['dbto'];
-            }
-        }
-
-		return $this->datafield->dbFieldName() . ' ' . $this->condition;*/
+        return $this->datafield->fullDbFieldName() . ' ' . $condition;
 	}
 }
 

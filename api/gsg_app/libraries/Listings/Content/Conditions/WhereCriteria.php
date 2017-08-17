@@ -69,7 +69,7 @@ class WhereCriteria implements iWhereCriteria {
 	* -----------------------------------------------------------------
 	\*/
 	public function fieldName(){
-		return $this->datafield->dbFieldName();
+		return $this->datafield->fullDbFieldName();
 	}
 
 	/**
@@ -101,7 +101,7 @@ class WhereCriteria implements iWhereCriteria {
                 $condition = $this->operator . " '" . $this->operand . "'";
         }
 
-	    return $this->datafield->dbFieldName() . ' ' . $condition;
+	    return $this->datafield->fullDbFieldName() . ' ' . $condition;
 	}
 }
 

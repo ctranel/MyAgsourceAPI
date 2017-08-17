@@ -164,6 +164,13 @@ class DbField implements iDataField {
 		return $this->db_field_name;
 	}
 
+    public function fullDbFieldName(){
+        if(isset($this->db_table_name) && !empty($this->db_table_name)){
+            return $this->db_table_name . '.' . $this->db_field_name;
+        }
+        return $this->db_field_name;
+    }
+
     public function label(){
         return $this->name;
     }
