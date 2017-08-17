@@ -65,7 +65,9 @@ class CreateCustomReport
 		//tables
         if($report_data['display_type_id'] == 1 || $report_data['display_type_id'] == 3){
 		    if(isset($input['pivot_db_field']) && !empty($input['pivot_db_field'])){
-		        $this->updateReport(['pivot_db_field' => $input['pivot_db_field']]);
+		        $this->updateReport([
+		            'pivot_db_field' => $input['pivot_db_field'],
+                ]);
             }
             $this->header_groups($input['table_header']);
             $header_row_cnt = count($input['table_header']);
@@ -85,8 +87,8 @@ class CreateCustomReport
 		    $this->whereGroup($input['where']);
         }
 
-        if(isset($input['sort']) && !empty($input['sort'])){
-            $this->sort_by($input['sort']);
+        if(isset($input['order_by']) && !empty($input['order_by'])){
+            $this->sort_by($input['order_by']);
         }
 
 		if ($this->datasource->trans_status() === FALSE){
@@ -219,13 +221,15 @@ class CreateCustomReport
         $cnt = 1;
         $sort_data = [];
         foreach($sort_cols as $k=>$v){
-             $sort_data[] = [
-                'report_id' => $this->report_id,
-                'field_id' => $v['field_id'],
-                'sort_order' => isset($v['sort_order']) ? $v['sort_order'] : 'ASC', //if no value, default to ASC
-                'list_order' => $cnt,
-            ];
-            $cnt++;
+            if(isset($v['field_id']) && !empty($v['field_id'])){
+                 $sort_data[] = [
+                    'report_id' => $this->report_id,
+                    'field_id' => $v['field_id'],
+                    'sort_order' => isset($v['sort_order']) ? $v['sort_order'] : 'ASC', //if no value, default to ASC
+                    'list_order' => $cnt,
+                ];
+                $cnt++;
+            }
         }
         return $this->datasource->add_sort_by($sort_data);
 	}
