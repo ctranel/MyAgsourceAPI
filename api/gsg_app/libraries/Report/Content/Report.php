@@ -317,7 +317,7 @@ abstract class Report implements iReport {
 	}
 	
 	public function hasPivot(){
-		return isset($this->pivot_field);
+		return $this->pivot_field instanceof iDataField;
 	}
 	
 	public function reportFields(){
@@ -420,9 +420,10 @@ abstract class Report implements iReport {
      **/
     public function toArray(){
         $ret['report_id'] = $this->id;
-        $ret['pivot_field'] = $this->pivot_field instanceof iDataField ? $this->pivot_field->dbFieldName() : null;
+        $ret['pivot_field'] = $this->hasPivot() ? $this->pivot_field->dbFieldName() : null;
         $ret['is_summary'] = $this->is_summary;
         $ret['display_type'] = $this->display_type;
+        $ret['num_summary_rows'] = $this->hasPivot() ? 0 : $this->cnt_row + $this->sum_row + $this->avg_row + $this->bench_row;
         $ret['cnt_row'] = $this->cnt_row;
         $ret['sum_row'] = $this->sum_row;
         $ret['avg_row'] = $this->avg_row;
