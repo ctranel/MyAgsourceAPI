@@ -161,30 +161,6 @@ class Benchmarks extends Settings
 		return $bench_text;
 	}
 
-	/* -----------------------------------------------------------------
-	 *  parses form data according to data type conventions.
-	
-	*  Parses form data according to data type conventions.
-	
-	*  @since: version 1
-	*  @author: ctranel
-	*  @date: July 7, 2014
-	*  @param array of key-value pairs from form submission
-	*  @return void
-	*  @throws:
-	* -----------------------------------------------------------------
-	public function parseFormData($form_data){
-		if($form_data['breed'] !== 'HO'){
-			$form_data['herd_size']['dbfrom'] = '1';
-			$form_data['herd_size']['dbto'] = '100000';
-		}
-		if($form_data['breed'] !== 'HO' && $form_data['breed'] !== 'JE'){
-			$form_data['metric'] = 'AVG';
-		}
-		return parent::parseFormData($form_data);
-	}
-*/
-
 	/**
 	 * @method addBenchmarkRow
 	 * @description retrieves row(s) of benchmark data into an array
@@ -198,7 +174,9 @@ class Benchmarks extends Settings
 	 * @author ctranel
 	 **/
 	function addBenchmarkRow($db_table, $report_fields, $arr_fields_to_exclude = ['herd_code', 'pstring', 'lact_group_code', 'ls_type_code', 'sol_group_code'], $arr_group_by = null){
-		if(isset($db_table)){
+        $return_val = [];
+
+	    if(isset($db_table)){
 			$this->db_table = $db_table;
 		}
 
@@ -223,24 +201,24 @@ class Benchmarks extends Settings
 		);
 		$arr_benchmarks = $this->benchmark_model->getBenchmarkData($bench_sql);
 		$bench_head_text = $this->arr_settings['metric']->getCurrValue($sess_metric);
-		if($arr_benchmarks[0]['cnt_herds'] < 3){
-			$bench_head_text .= '<br>(benchmarks not available)';
-		}
-		else{
-			$bench_head_text .= ' (n=' . $arr_benchmarks[0]['cnt_herds'] . ')';
-		}
-		
-		foreach($arr_benchmarks as &$b){
-			$cnt = $b['cnt_herds'];
-			unset($b['cnt_herds']);
-			if($cnt < 3){
-				$keys = array_keys($b);
-				$b = array_fill_keys($keys, 'na');
-			}
-			//add benchmark text to first column of benchmark row
-			$b = [$report_fields[0]->dbFieldName() => $bench_head_text] + $b;
-		}
+    	$bench_head_text .= $arr_benchmarks[0]['cnt_herds'] < 3 ? '<br>(benchmarks not available)' : ' (n=' . $arr_benchmarks[0]['cnt_herds'] . ')';
 
-		return $arr_benchmarks;
+        foreach ($arr_benchmarks as $k => $b) {
+            $cnt = $b['cnt_herds'];
+            unset($b['cnt_herds']);
+            foreach ($report_fields as $f) {
+                if ($cnt < 3) {
+                    //$b = array_fill_keys($bench_row_keys, 'na');
+                    $return_val[$k] = 'na';
+                }
+                else {
+                    $return_val[$k][$f->dbFieldName()] = isset($b[$f->dbFieldName()]) ? $b[$f->dbFieldName()] : null;
+                }
+            }
+            //add benchmark text to first column of benchmark row
+            $return_val[$k] = [$report_fields[0]->dbFieldName() => $bench_head_text] + $return_val[$k];
+        }
+
+		return $return_val;
 	}
 }
