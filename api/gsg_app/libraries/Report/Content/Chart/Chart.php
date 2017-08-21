@@ -152,7 +152,6 @@ class Chart extends Report {
                     $s['field_group'],
                     isset($this->header_supplemental[$s['db_field_name']]) ? $this->header_supplemental[$s['db_field_name']] : null,
                     isset($this->dataset_supplemental[$s['db_field_name']]) ? $this->dataset_supplemental[$s['db_field_name']] : null,
-                    $s['field_group'],
                     $s['field_group_ref_key']
                 );
 			}

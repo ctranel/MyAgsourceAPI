@@ -49,9 +49,7 @@ class Dashboard extends dpage {
     }
 
 	//dashboard
-	function index(){
-        $page_id = 74; //page_id for dashboard page
-
+	function index($page_id = 74, $json_filter_data = null){//page_id for dashboard page
         $params = [];
         if(isset($json_filter_data)) {
             $params = (array)json_decode(urldecode($json_filter_data));

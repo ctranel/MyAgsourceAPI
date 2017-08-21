@@ -490,8 +490,8 @@ class Auth extends MY_Api_Controller {
 		$access_log->writeEntry(
 			$this->as_ion_auth->is_admin(),
 			$event_id,
-            $this->herd->herdCode(),
-            isset($this->herd) ? $this->herd->getRecentTest() : NULL,
+            isset($this->herd) ? $this->herd->herdCode() : null,
+            isset($this->herd) ? $this->herd->getRecentTest() : null,
 			$this->session->userdata('user_id'),
 			$this->session->userdata('active_group_id')
 		);

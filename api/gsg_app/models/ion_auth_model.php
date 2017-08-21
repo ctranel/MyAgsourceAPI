@@ -414,7 +414,7 @@ SELECT DISTINCT id, name, list_order FROM cteAnchor ORDER BY list_order;";
 	 * @return bool
 	 * @author ctranel
 	 **/
-	public function update($id, $data, $session_group_id, $session_arr_groups)
+	public function update($id, array $data, $session_group_id=null, $session_arr_groups=null)
 	{
 		$this->db->trans_begin();
 		$tran_status = parent::update($id, $data);

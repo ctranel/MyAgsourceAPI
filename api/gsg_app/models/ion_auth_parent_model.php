@@ -1563,7 +1563,7 @@ class Ion_auth_parent_model extends CI_Model
 		{
 			$hook = $this->_ion_hooks->{$event}[$name];
 
-			return call_user_func_array(array($hook->class, $hook->method), $hook->arguments);
+			return call_user_func_array(array($this, $hook->method), $hook->arguments);
 		}
 
 		return FALSE;

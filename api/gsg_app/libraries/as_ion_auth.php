@@ -47,8 +47,8 @@ class As_ion_auth extends \Ion_auth {
 	 * @return boolean/void
 	 * @author ctranel
 	 **/
-	public function register($username, $password, $email, $additional_data = array(), $group_name = array(), $report_code) {
-		$id = parent::register($username, $password, $email, $additional_data, $group_name);
+	public function register($username, $password, $email, $additional_data = array(), $group_name = array(), $report_code = null) {
+		$id = parent::register($username, $password, $email, $additional_data, $group_name, $report_code);
 
         if(!$id){
             throw new \Exception('Recording of registration failed: ' . implode(', ', $this->errors()));
