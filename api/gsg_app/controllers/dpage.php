@@ -191,7 +191,6 @@ class dpage extends MY_Api_Controller {
         $benchmarks = $this->_benchmarks();
         $this->load->model('ReportContent/report_data_model');
         $block_content = $this->_blockContent($page_id, $supplemental_factory, $params, $benchmarks, $this->report_data_model);
-//var_dump($block_content); die;
 
         //Set up site content objects
         $this->load->model('web_content/page_model', null, false, $this->session->userdata('user_id'));
@@ -200,7 +199,6 @@ class dpage extends MY_Api_Controller {
 
         //create blocks for content
         $blocks = $web_block_factory->getBlocksFromContent($page_id, $block_content);
-//var_dump($blocks); die;
         $this->load->model('web_content/page_model');
         $page_data = $this->page_model->getPage($page_id);
 		$this->page = new Page($page_data, $blocks, $supplemental_factory, $this->filters, $benchmarks);
@@ -215,7 +213,6 @@ class dpage extends MY_Api_Controller {
         if($this->permissions->hasPermission("View All Content-Billed")){
             $this->message[] = new ResponseMessage('Herd ' . $this->herd->herdCode() . ' is not paying for this product.  You will be billed a monthly fee for any month in which you view content for which the herd is not paying.', 'message');
         }
-//print_r($this->page); die;
         $this->sendResponse(200, $this->message, $this->page->toArray());
 	}
 
