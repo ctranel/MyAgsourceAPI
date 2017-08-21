@@ -1,17 +1,7 @@
-/dummy.php
-/gsg_app/config/database.php
-/.buildpath
-/.project
-/.settings
-/deployment.properties
-/ci_system_tmp
-/uploads
-/deployment.xml
-/asset_cache
-/phpinfo.php
-/php.ini
-/vendor
-/demo1.html
-/demo2.html
-/demo3.html
-/npm-debug.log
+dummy.php
+.idea/
+api/asset_cache/
+api/ci_system_tmp
+api/gsg_app/controllers/aa-old
+Project and Git Repository Setup.txt
+How to Setup PC VM.txt
