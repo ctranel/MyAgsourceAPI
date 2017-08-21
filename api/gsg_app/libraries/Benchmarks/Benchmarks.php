@@ -209,7 +209,7 @@ class Benchmarks extends Settings
             foreach ($report_fields as $f) {
                 if ($cnt < 3) {
                     //$b = array_fill_keys($bench_row_keys, 'na');
-                    $return_val[$k] = 'na';
+                    $return_val[$k][$f->dbFieldName()] = 'na';
                 }
                 else {
                     $return_val[$k][$f->dbFieldName()] = isset($b[$f->dbFieldName()]) ? $b[$f->dbFieldName()] : null;
