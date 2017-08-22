@@ -36,7 +36,7 @@ class dform extends dpage {
 		}
 	}
 
-	function index(){
+	function index($page_id = null, $json_filter_data = null){
 		$this->sendResponse(404);
 	}
 

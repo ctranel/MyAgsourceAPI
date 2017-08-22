@@ -46,7 +46,7 @@ use \myagsource\Datasource\iDataTable;
 	
  	/**
 	 * arr_fields
-	 * @var array of field objects
+	 * @var array of field names
 	 **/
 	protected $arr_fields;
 	
@@ -67,15 +67,15 @@ use \myagsource\Datasource\iDataTable;
 	*  @throws:
 	 **/
 	public function field_exists($col_name){
-		//require_once APPPATH . 'helpers/multid_array_helper.php';
 		if(!isset($this->arr_fields)){
-			$this->arr_fields = $this->db_table_model->get_columns($this->database_name, $this->table_name);
+			$this->arr_fields = $this->db_table_model->getColumns($this->database_name, $this->table_name);
 		}
-		return (bool)array_search_recursive($col_name, $this->arr_fields);
+
+		return (bool)in_array($col_name, $this->arr_fields);
 	}
 
      /**
-      * returns all columns from given table
+      * columnNames
       *
       * returns all columns from given table
 
@@ -84,10 +84,9 @@ use \myagsource\Datasource\iDataTable;
       * @return array of column names
       *  @throws:
       **/
-     public function columns(){
-         //require_once APPPATH . 'helpers/multid_array_helper.php';
+     public function columnNames(){
          if(!isset($this->arr_fields)){
-             $this->arr_fields = $this->db_table_model->get_columns($this->database_name, $this->table_name);
+             $this->arr_fields = $this->db_table_model->getColumns($this->database_name, $this->table_name);
          }
          return $this->arr_fields;
      }

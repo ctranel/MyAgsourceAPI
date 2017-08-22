@@ -18,7 +18,7 @@
 	}
 
 	/**
-	 * Retrieves column metadata for give db and table
+	 * getColumns
 	 * 
 	 * Retrieves column metadata for give db and table
 
@@ -30,9 +30,17 @@
 	 * @return boolean
 	*  @throws:
 	 **/
-	public function get_columns($db_name, $table_name){
-		$sql = "USE $db_name; SELECT COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH, NUMERIC_PRECISION FROM INFORMATION_SCHEMA.Columns WHERE TABLE_NAME = '$table_name'";
-		$result = $this->db->query($sql)->result_array();
-		return $result;
+	public function getColumns($db_name, $table_name){
+        //$sql = "USE $db_name;";
+        //$this->db->query($sql);
+		//$sql = "SELECT * FROM INFORMATION_SCHEMA.Columns WHERE TABLE_NAME = '$table_name';";
+		//$result = $this->db->query($sql)->result_array();
+        $sql = "USE $db_name;";
+        $this->db->query($sql);
+        $result = $this->db->list_fields($table_name);//query($sql)->result_array();
+
+
+
+        return $result;
 	}
 }

@@ -614,10 +614,11 @@ abstract class Report implements iReport {
             $cols = [];
 
             foreach($this->db_tables as $tname => $tobj){
-                $cols = array_merge($cols, $tobj['DBTable']->columns());
+                $cols = array_merge($cols, $tobj['DBTable']->columnNames());
             }
-            $cols = array_column($cols, 'COLUMN_NAME');
+
             $remove = array_diff($criteria, $cols);
+
             if(isset($remove) && !empty($remove)){
                 foreach($remove as $r){
                     $this->filters->removeCriteria($r);

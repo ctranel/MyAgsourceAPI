@@ -263,7 +263,7 @@ class Cow_lookup extends dpage {
 		$this->curr_calving_date = $events_data['curr_calving_date'];
 	} 
 	
-	protected function _record_access($event_id){
+	protected function _record_access($event_id, $format=null, $product_code = NULL){
 		if($this->session->userdata('user_id') === FALSE){
 			return FALSE;
 		}
